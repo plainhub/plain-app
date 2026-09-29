@@ -18,9 +18,13 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.ismartcoding.plain.i18n.Res
-import com.ismartcoding.plain.i18n.file_text
-import com.ismartcoding.plain.i18n.folder
+import com.ismartcoding.plain.ui.resources.file_text as ui_drawable_file_text
+import com.ismartcoding.plain.ui.resources.folder as ui_drawable_folder
 import org.jetbrains.compose.resources.painterResource
+import com.ismartcoding.plain.ui.resources.Res as UiRes
+import com.ismartcoding.plain.ui.resources.file_text as ui_drawable_file_text
+import com.ismartcoding.plain.ui.resources.folder as ui_drawable_folder
+import com.ismartcoding.plain.i18n.folder
 
 /**
  * One row of a device-storage directory browser (folder pickers, share-item
@@ -47,7 +51,7 @@ fun DirBrowserRow(
         horizontalArrangement = Arrangement.spacedBy(12.dp),
     ) {
         Icon(
-            painter = painterResource(if (isDir) Res.drawable.folder else Res.drawable.file_text),
+            painter = painterResource(if (isDir) UiRes.drawable.ui_drawable_folder else UiRes.drawable.ui_drawable_file_text),
             contentDescription = name,
             tint = MaterialTheme.colorScheme.primary,
             modifier = Modifier.size(24.dp),

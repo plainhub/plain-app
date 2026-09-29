@@ -21,6 +21,10 @@ import org.jetbrains.compose.resources.painterResource
 import androidx.compose.ui.unit.dp
 import com.ismartcoding.plain.lib.extensions.formatMinSec
 import com.ismartcoding.plain.ui.base.PlayerSlider
+import com.ismartcoding.plain.ui.resources.Res as UiRes
+import com.ismartcoding.plain.ui.resources.pause as ui_drawable_pause
+import com.ismartcoding.plain.ui.resources.play_arrow as ui_drawable_play_arrow
+import com.ismartcoding.plain.i18n.pause
 
 @Composable
 fun AudioPlayerControls(
@@ -56,7 +60,7 @@ fun AudioPlayerControls(
         ) {
             IconButton(modifier = Modifier.size(72.dp), onClick = onPlayPause) {
                 Icon(
-                    painter = painterResource(if (isPlaying) Res.drawable.pause else Res.drawable.play_arrow),
+                    painter = painterResource(if (isPlaying) UiRes.drawable.ui_drawable_pause else UiRes.drawable.ui_drawable_play_arrow),
                     contentDescription = null,
                     tint = Color.White,
                     modifier = Modifier.size(40.dp),

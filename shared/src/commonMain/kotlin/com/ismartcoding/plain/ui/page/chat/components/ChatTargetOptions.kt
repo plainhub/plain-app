@@ -9,14 +9,17 @@ import com.ismartcoding.plain.chat.data.ChatTargetType
 import com.ismartcoding.plain.chat.peer.PeerCacher
 import com.ismartcoding.plain.enums.getIcon
 import com.ismartcoding.plain.i18n.Res
-import com.ismartcoding.plain.i18n.bot
+import com.ismartcoding.plain.ui.resources.bot as ui_drawable_bot
 import com.ismartcoding.plain.i18n.channel_members
-import com.ismartcoding.plain.i18n.hash
+import com.ismartcoding.plain.ui.resources.hash as ui_drawable_hash
 import com.ismartcoding.plain.i18n.local_chat
 import com.ismartcoding.plain.i18n.local_chat_desc
 import com.ismartcoding.plain.ui.extensions.collectAsStateValue
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.stringResource
+import com.ismartcoding.plain.ui.resources.Res as UiRes
+import com.ismartcoding.plain.ui.resources.bot as ui_drawable_bot
+import com.ismartcoding.plain.ui.resources.hash as ui_drawable_hash
 
 /**
  * A pickable chat destination for forwarding/selection UIs: local chat,
@@ -37,14 +40,14 @@ fun chatTargetOptions(): List<ChatTargetOption> {
     val localDesc = stringResource(Res.string.local_chat_desc)
     val membersLabel = stringResource(Res.string.channel_members)
     return buildList {
-        add(ChatTargetOption(ChatTarget("local", ChatTargetType.PEER), localTitle, localDesc, Res.drawable.bot))
+        add(ChatTargetOption(ChatTarget("local", ChatTargetType.PEER), localTitle, localDesc, UiRes.drawable.ui_drawable_bot))
         channels.filter { it.isJoined() }.forEach { channel ->
             add(
                 ChatTargetOption(
                     ChatTarget(channel.id, ChatTargetType.CHANNEL),
                     channel.name,
                     "${channel.joinedMembers().size} $membersLabel",
-                    Res.drawable.hash,
+                    UiRes.drawable.ui_drawable_hash,
                 ),
             )
         }

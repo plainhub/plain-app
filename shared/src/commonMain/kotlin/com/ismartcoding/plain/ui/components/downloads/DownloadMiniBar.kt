@@ -23,12 +23,16 @@ import com.ismartcoding.plain.features.download.DownloadStatus
 import com.ismartcoding.plain.features.download.isTerminalDownloadStatus
 import com.ismartcoding.plain.features.share.SharedFolderBatchTask
 import com.ismartcoding.plain.i18n.Res
-import com.ismartcoding.plain.i18n.check
-import com.ismartcoding.plain.i18n.download
+import com.ismartcoding.plain.ui.resources.check as ui_drawable_check
+import com.ismartcoding.plain.ui.resources.download as ui_drawable_download
 import com.ismartcoding.plain.lib.extensions.formatBytes
 import com.ismartcoding.plain.ui.theme.green
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.painterResource
+import com.ismartcoding.plain.ui.resources.Res as UiRes
+import com.ismartcoding.plain.ui.resources.check as ui_drawable_check
+import com.ismartcoding.plain.ui.resources.download as ui_drawable_download
+import com.ismartcoding.plain.i18n.download
 
 /**
  * In-page floating summary of the batch tasks: the most relevant batch's
@@ -41,7 +45,7 @@ fun DownloadMiniBar(
     tasks: List<SharedFolderBatchTask>,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
-    leadingIcon: DrawableResource = Res.drawable.download,
+    leadingIcon: DrawableResource = UiRes.drawable.ui_drawable_download,
 ) {
     val task = mostRelevant(tasks) ?: return
     val running = tasks.count { !it.status.isTerminalDownloadStatus() }
@@ -63,7 +67,7 @@ fun DownloadMiniBar(
         Column(modifier = Modifier.padding(start = 14.dp, end = 14.dp, top = 10.dp, bottom = 12.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Icon(
-                    painterResource(if (completed) Res.drawable.check else leadingIcon),
+                    painterResource(if (completed) UiRes.drawable.ui_drawable_check else leadingIcon),
                     contentDescription = null,
                     tint = accent,
                     modifier = Modifier.size(18.dp),

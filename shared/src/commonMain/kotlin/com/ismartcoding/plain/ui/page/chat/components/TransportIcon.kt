@@ -19,16 +19,21 @@ import com.ismartcoding.plain.i18n.*
 import com.ismartcoding.plain.ui.theme.greenText
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.painterResource
+import com.ismartcoding.plain.ui.resources.Res as UiRes
+import com.ismartcoding.plain.ui.resources.bluetooth as ui_drawable_bluetooth
+import com.ismartcoding.plain.ui.resources.wifi as ui_drawable_wifi
+import com.ismartcoding.plain.ui.resources.wifi_tethering as ui_drawable_wifi_tethering
+import com.ismartcoding.plain.i18n.bluetooth
 
 enum class TransportStyle {
     LAN {
-        override val icon = Res.drawable.wifi
+        override val icon = UiRes.drawable.ui_drawable_wifi
     },
     AWARE {
-        override val icon = Res.drawable.wifi_tethering
+        override val icon = UiRes.drawable.ui_drawable_wifi_tethering
     },
     BLE {
-        override val icon = Res.drawable.bluetooth
+        override val icon = UiRes.drawable.ui_drawable_bluetooth
     };
 
     abstract val icon: DrawableResource

@@ -21,6 +21,8 @@ import org.jetbrains.compose.resources.painterResource
 import androidx.compose.ui.unit.dp
 import com.ismartcoding.plain.lib.withIO
 import com.ismartcoding.plain.platform.loadAudioCoverBitmap
+import com.ismartcoding.plain.ui.resources.Res as UiRes
+import com.ismartcoding.plain.ui.resources.music2 as ui_drawable_music2
 
 /**
  * In-memory cache of audio cover art keyed by file path.
@@ -38,7 +40,7 @@ fun AudioCoverOrIcon(
 ) {
     if (path.isNullOrBlank()) {
         Icon(
-            painter = painterResource(Res.drawable.music2),
+            painter = painterResource(UiRes.drawable.ui_drawable_music2),
             contentDescription = null,
             tint = MaterialTheme.colorScheme.primary,
         )
@@ -78,7 +80,7 @@ fun AudioCoverOrIcon(
         )
     } else {
         Icon(
-            painter = painterResource(Res.drawable.music2),
+            painter = painterResource(UiRes.drawable.ui_drawable_music2),
             contentDescription = null,
             tint = MaterialTheme.colorScheme.primary,
         )

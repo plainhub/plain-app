@@ -41,6 +41,19 @@ import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
+import com.ismartcoding.plain.ui.resources.Res as UiRes
+import com.ismartcoding.plain.ui.resources.cast as ui_drawable_cast
+import com.ismartcoding.plain.ui.resources.chevron_right as ui_drawable_chevron_right
+import com.ismartcoding.plain.ui.resources.devices as ui_drawable_devices
+import com.ismartcoding.plain.ui.resources.grid_3x3 as ui_drawable_grid_3x3
+import com.ismartcoding.plain.ui.resources.house as ui_drawable_house
+import com.ismartcoding.plain.ui.resources.message_circle as ui_drawable_message_circle
+import com.ismartcoding.plain.ui.resources.pen as ui_drawable_pen
+import com.ismartcoding.plain.ui.resources.scan_qr_code as ui_drawable_scan_qr_code
+import com.ismartcoding.plain.ui.resources.settings as ui_drawable_settings
+import com.ismartcoding.plain.i18n.cast
+import com.ismartcoding.plain.i18n.devices
+import com.ismartcoding.plain.i18n.settings
 
 /** App home in the service-ON state: device-name top bar (TopBarHome) +
  *  service card (PlainAppServiceSection) + Desktop Access + Cast Receiver +
@@ -66,7 +79,7 @@ internal fun AppHomeScreen() {
                 )
                 HorizontalSpace(dp = 2.dp)
                 Icon(
-                    painter = painterResource(Res.drawable.pen),
+                    painter = painterResource(UiRes.drawable.ui_drawable_pen),
                     contentDescription = null,
                     tint = mockupMutedColor(),
                     modifier = Modifier.size(6.dp),
@@ -74,14 +87,14 @@ internal fun AppHomeScreen() {
             }
             HorizontalSpace(dp = 5.dp)
             Icon(
-                painter = painterResource(Res.drawable.settings),
+                painter = painterResource(UiRes.drawable.ui_drawable_settings),
                 contentDescription = null,
                 tint = mockupMutedColor(),
                 modifier = Modifier.size(9.dp),
             )
             HorizontalSpace(dp = 5.dp)
             Icon(
-                painter = painterResource(Res.drawable.scan_qr_code),
+                painter = painterResource(UiRes.drawable.ui_drawable_scan_qr_code),
                 contentDescription = null,
                 tint = mockupMutedColor(),
                 modifier = Modifier.size(9.dp),
@@ -121,7 +134,7 @@ internal fun AppHomeScreen() {
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     Icon(
-                        painter = painterResource(Res.drawable.devices),
+                        painter = painterResource(UiRes.drawable.ui_drawable_devices),
                         contentDescription = null,
                         tint = MaterialTheme.colorScheme.primary,
                         modifier = Modifier.size(8.dp),
@@ -200,7 +213,7 @@ internal fun AppHomeScreen() {
                         modifier = Modifier.weight(1f),
                     )
                     Icon(
-                        painter = painterResource(Res.drawable.chevron_right),
+                        painter = painterResource(UiRes.drawable.ui_drawable_chevron_right),
                         contentDescription = null,
                         tint = mockupMutedColor(),
                         modifier = Modifier.size(8.dp),
@@ -217,7 +230,7 @@ internal fun AppHomeScreen() {
             Column(modifier = Modifier.padding(start = 7.dp, end = 7.dp, top = 5.dp, bottom = 5.dp)) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Icon(
-                        painter = painterResource(Res.drawable.cast),
+                        painter = painterResource(UiRes.drawable.ui_drawable_cast),
                         contentDescription = null,
                         tint = MaterialTheme.colorScheme.primary,
                         modifier = Modifier.size(8.dp),
@@ -250,9 +263,9 @@ internal fun AppHomeScreen() {
             modifier = Modifier.fillMaxWidth().background(MaterialTheme.colorScheme.surfaceContainer).padding(vertical = 3.dp),
             horizontalArrangement = Arrangement.SpaceEvenly,
         ) {
-            BottomNavItem(Res.drawable.house, Res.string.home, selected = true)
-            BottomNavItem(Res.drawable.message_circle, Res.string.chat, selected = false)
-            BottomNavItem(Res.drawable.grid_3x3, Res.string.tools, selected = false)
+            BottomNavItem(UiRes.drawable.ui_drawable_house, Res.string.home, selected = true)
+            BottomNavItem(UiRes.drawable.ui_drawable_message_circle, Res.string.chat, selected = false)
+            BottomNavItem(UiRes.drawable.ui_drawable_grid_3x3, Res.string.tools, selected = false)
         }
     }
 }

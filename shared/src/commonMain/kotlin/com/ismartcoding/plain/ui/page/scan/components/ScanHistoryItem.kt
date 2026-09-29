@@ -33,6 +33,10 @@ import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.base.linkify
 import com.ismartcoding.plain.ui.base.urlAt
 import com.ismartcoding.plain.ui.helpers.DialogHelper
+import com.ismartcoding.plain.ui.resources.Res as UiRes
+import com.ismartcoding.plain.ui.resources.copy as ui_drawable_copy
+import com.ismartcoding.plain.ui.resources.delete_forever as ui_drawable_delete_forever
+import com.ismartcoding.plain.i18n.copy
 
 @Composable
 private fun ActionButton(
@@ -96,7 +100,7 @@ fun ScanHistoryItem(
                 modifier = Modifier.fillMaxWidth()
             ) {
                 ActionButton(
-                    icon = Res.drawable.copy,
+                    icon = UiRes.drawable.ui_drawable_copy,
                     text = stringResource(Res.string.copy),
                     tint = MaterialTheme.colorScheme.onSurface,
                     onClick = {
@@ -106,7 +110,7 @@ fun ScanHistoryItem(
                     modifier = Modifier.weight(1f)
                 )
                 ActionButton(
-                    icon = Res.drawable.delete_forever,
+                    icon = UiRes.drawable.ui_drawable_delete_forever,
                     text = stringResource(Res.string.delete),
                     tint = MaterialTheme.colorScheme.error,
                     onClick = onDelete,

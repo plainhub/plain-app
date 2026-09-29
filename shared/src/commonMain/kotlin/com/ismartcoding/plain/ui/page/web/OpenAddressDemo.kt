@@ -28,6 +28,9 @@ import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.helpers.UrlHelper
 import com.ismartcoding.plain.i18n.*
 import org.jetbrains.compose.resources.painterResource
+import com.ismartcoding.plain.ui.resources.Res as UiRes
+import com.ismartcoding.plain.ui.resources.search as ui_drawable_search
+import com.ismartcoding.plain.i18n.search
 
 /**
  * Compose-drawn "video" for Quick start step 2: a browser address bar where
@@ -79,7 +82,7 @@ fun OpenAddressDemo() {
                         contentAlignment = Alignment.Center,
                     ) {
                         Icon(
-                            painter = painterResource(Res.drawable.search),
+                            painter = painterResource(UiRes.drawable.ui_drawable_search),
                             contentDescription = null,
                             modifier = Modifier.size(24.dp),
                             tint = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -95,7 +98,7 @@ fun OpenAddressDemo() {
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
                         Icon(
-                            painter = painterResource(Res.drawable.search),
+                            painter = painterResource(UiRes.drawable.ui_drawable_search),
                             contentDescription = null,
                             modifier = Modifier.size(14.dp),
                             tint = MaterialTheme.colorScheme.onSurfaceVariant,

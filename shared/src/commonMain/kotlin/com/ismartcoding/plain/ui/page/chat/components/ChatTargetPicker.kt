@@ -32,10 +32,12 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.ismartcoding.plain.chat.data.ChatTargetType
 import com.ismartcoding.plain.i18n.Res
-import com.ismartcoding.plain.i18n.send
+import com.ismartcoding.plain.ui.resources.send as ui_drawable_send
 import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.components.CheckCircle
 import org.jetbrains.compose.resources.painterResource
+import com.ismartcoding.plain.ui.resources.Res as UiRes
+import com.ismartcoding.plain.ui.resources.send as ui_drawable_send
 
 /**
  * Multi-select chat target list used by the share sheet and the forward
@@ -149,7 +151,7 @@ private fun SendButton(count: Int, enabled: Boolean, sending: Boolean, onClick: 
                 )
             } else {
                 Icon(
-                    painter = painterResource(Res.drawable.send),
+                    painter = painterResource(UiRes.drawable.ui_drawable_send),
                     contentDescription = null,
                     tint = if (enabled) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.size(22.dp),

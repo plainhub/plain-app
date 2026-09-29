@@ -38,6 +38,15 @@ import com.ismartcoding.plain.ui.theme.cardBackgroundNormal
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
+import com.ismartcoding.plain.ui.resources.Res as UiRes
+import com.ismartcoding.plain.ui.resources.image as ui_drawable_image
+import com.ismartcoding.plain.ui.resources.music2 as ui_drawable_music2
+import com.ismartcoding.plain.ui.resources.notebook_pen as ui_drawable_notebook_pen
+import com.ismartcoding.plain.ui.resources.scan_qr_code as ui_drawable_scan_qr_code
+import com.ismartcoding.plain.ui.resources.search as ui_drawable_search
+import com.ismartcoding.plain.ui.resources.send as ui_drawable_send
+import com.ismartcoding.plain.i18n.image
+import com.ismartcoding.plain.i18n.search
 
 @Composable
 fun WelcomeIllustration() {
@@ -104,7 +113,7 @@ fun ChatIllustration() {
         ) {
             Text(text = stringResource(Res.string.chat), fontSize = 10.sp, fontWeight = FontWeight.Bold)
             Icon(
-                painter = painterResource(Res.drawable.search),
+                painter = painterResource(UiRes.drawable.ui_drawable_search),
                 contentDescription = null,
                 tint = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.size(12.dp),
@@ -166,7 +175,7 @@ fun ChatIllustration() {
                 modifier = Modifier.align(Alignment.CenterStart),
             )
             Icon(
-                painter = painterResource(Res.drawable.send),
+                painter = painterResource(UiRes.drawable.ui_drawable_send),
                 contentDescription = null,
                 tint = MaterialTheme.colorScheme.primary,
                 modifier = Modifier.align(Alignment.CenterEnd).size(11.dp),
@@ -237,14 +246,14 @@ fun MediaToolsIllustration() {
         Row(modifier = Modifier.height(IntrinsicSize.Min), horizontalArrangement = Arrangement.spacedBy(14.dp)) {
             ToolCard(
                 modifier = Modifier.weight(1f).fillMaxHeight(),
-                icon = Res.drawable.image,
+                icon = UiRes.drawable.ui_drawable_image,
                 title = stringResource(Res.string.onboarding_4_photo_title),
                 subtitle = stringResource(Res.string.onboarding_4_photo_desc),
                 hero = false,
             )
             ToolCard(
                 modifier = Modifier.weight(1f).fillMaxHeight(),
-                icon = Res.drawable.music2,
+                icon = UiRes.drawable.ui_drawable_music2,
                 title = stringResource(Res.string.onboarding_4_music_title),
                 subtitle = stringResource(Res.string.onboarding_4_music_desc),
                 hero = true,
@@ -253,14 +262,14 @@ fun MediaToolsIllustration() {
         Row(modifier = Modifier.height(IntrinsicSize.Min), horizontalArrangement = Arrangement.spacedBy(14.dp)) {
             ToolCard(
                 modifier = Modifier.weight(1f).fillMaxHeight(),
-                icon = Res.drawable.notebook_pen,
+                icon = UiRes.drawable.ui_drawable_notebook_pen,
                 title = stringResource(Res.string.notes),
                 subtitle = stringResource(Res.string.onboarding_4_notes_desc),
                 hero = false,
             )
             ToolCard(
                 modifier = Modifier.weight(1f).fillMaxHeight(),
-                icon = Res.drawable.scan_qr_code,
+                icon = UiRes.drawable.ui_drawable_scan_qr_code,
                 title = stringResource(Res.string.tools),
                 subtitle = stringResource(Res.string.onboarding_4_tools_desc),
                 hero = false,

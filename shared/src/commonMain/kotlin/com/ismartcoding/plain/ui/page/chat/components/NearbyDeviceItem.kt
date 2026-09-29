@@ -25,6 +25,10 @@ import com.ismartcoding.plain.ui.base.PStatusBadge
 import com.ismartcoding.plain.ui.models.NearbyItemStatus
 import com.ismartcoding.plain.ui.models.NearbyViewModel
 import com.ismartcoding.plain.ui.theme.PlainTheme
+import com.ismartcoding.plain.ui.resources.Res as UiRes
+import com.ismartcoding.plain.ui.resources.bluetooth as ui_drawable_bluetooth
+import com.ismartcoding.plain.ui.resources.wifi as ui_drawable_wifi
+import com.ismartcoding.plain.i18n.bluetooth
 
 @Composable
 fun NearbyDeviceItem(
@@ -41,7 +45,7 @@ fun NearbyDeviceItem(
             titleSuffix = {
                 if (DiscoveryMethod.BLE in item.discoveryMethods) {
                     Icon(
-                        painter = painterResource(Res.drawable.bluetooth),
+                        painter = painterResource(UiRes.drawable.ui_drawable_bluetooth),
                         contentDescription = "Bluetooth",
                         modifier = Modifier.size(16.dp),
                         tint = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -50,7 +54,7 @@ fun NearbyDeviceItem(
                 if (DiscoveryMethod.LAN in item.discoveryMethods) {
                     if (DiscoveryMethod.BLE in item.discoveryMethods) HorizontalSpace(2.dp)
                     Icon(
-                        painter = painterResource(Res.drawable.wifi),
+                        painter = painterResource(UiRes.drawable.ui_drawable_wifi),
                         contentDescription = "Wi-Fi",
                         modifier = Modifier.size(16.dp),
                         tint = MaterialTheme.colorScheme.onSurfaceVariant,

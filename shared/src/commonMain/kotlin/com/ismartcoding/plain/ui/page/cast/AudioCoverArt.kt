@@ -21,6 +21,8 @@ import com.ismartcoding.plain.lib.withIO
 import com.ismartcoding.plain.i18n.*
 import com.ismartcoding.plain.platform.loadAudioCoverBitmap
 import org.jetbrains.compose.resources.painterResource
+import com.ismartcoding.plain.ui.resources.Res as UiRes
+import com.ismartcoding.plain.ui.resources.music2 as ui_drawable_music2
 
 @Composable
 fun AudioCoverArt(path: String, modifier: Modifier = Modifier) {
@@ -42,7 +44,7 @@ fun AudioCoverArt(path: String, modifier: Modifier = Modifier) {
     } else if (loaded) {
         Box(modifier = modifier.background(MaterialTheme.colorScheme.primaryContainer), contentAlignment = Alignment.Center) {
             Icon(
-                painter = painterResource(Res.drawable.music2),
+                painter = painterResource(UiRes.drawable.ui_drawable_music2),
                 contentDescription = null,
                 tint = MaterialTheme.colorScheme.primary,
                 modifier = Modifier.size(64.dp),

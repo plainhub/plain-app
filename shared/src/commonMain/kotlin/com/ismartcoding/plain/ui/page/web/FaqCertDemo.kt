@@ -39,6 +39,10 @@ import com.ismartcoding.plain.i18n.*
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import com.ismartcoding.plain.ui.theme.green
+import com.ismartcoding.plain.ui.resources.Res as UiRes
+import com.ismartcoding.plain.ui.resources.chevron_right as ui_drawable_chevron_right
+import com.ismartcoding.plain.ui.resources.lock as ui_drawable_lock
+import com.ismartcoding.plain.ui.resources.triangle_alert as ui_drawable_triangle_alert
 
 /**
  * Compose-drawn "video" demo for the HTTPS certificate FAQ: the browser
@@ -61,7 +65,7 @@ fun FaqCertDemo() {
     ) { step, elapsedMs ->
         DemoBrowserFrame(
             url = "https://" + host,
-            icon = if (step >= 2) Res.drawable.lock else Res.drawable.triangle_alert,
+            icon = if (step >= 2) UiRes.drawable.ui_drawable_lock else UiRes.drawable.ui_drawable_triangle_alert,
             iconTint = if (step >= 2) MaterialTheme.colorScheme.green else MaterialTheme.colorScheme.error,
         ) {
             if (step >= 2) {
@@ -82,7 +86,7 @@ fun FaqCertDemo() {
 private fun DemoErrorPage(host: String, expanded: Boolean, ringOnAdvanced: Boolean, ringOnProceed: Boolean) {
     Column(Modifier.fillMaxWidth().padding(16.dp)) {
         Icon(
-            painter = painterResource(Res.drawable.triangle_alert),
+            painter = painterResource(UiRes.drawable.ui_drawable_triangle_alert),
             contentDescription = null,
             modifier = Modifier.size(24.dp),
             tint = MaterialTheme.colorScheme.error,
@@ -128,7 +132,7 @@ private fun DemoErrorPage(host: String, expanded: Boolean, ringOnAdvanced: Boole
                 )
                 Spacer(Modifier.width(4.dp))
                 Icon(
-                    painter = painterResource(Res.drawable.chevron_right),
+                    painter = painterResource(UiRes.drawable.ui_drawable_chevron_right),
                     contentDescription = null,
                     modifier = Modifier
                         .size(16.dp)

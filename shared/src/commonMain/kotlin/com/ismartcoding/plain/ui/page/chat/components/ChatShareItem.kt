@@ -32,6 +32,9 @@ import com.ismartcoding.plain.ui.models.VChat
 import com.ismartcoding.plain.ui.theme.cardBackgroundNormal
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
+import com.ismartcoding.plain.ui.resources.Res as UiRes
+import com.ismartcoding.plain.ui.resources.folders as ui_drawable_folders
+import com.ismartcoding.plain.i18n.folders
 
 /**
  * Chat card for a shared folder/link message (MessageType.SHARE). Tapping the
@@ -83,7 +86,7 @@ fun ChatShareItem(
                 color = MaterialTheme.colorScheme.surfaceContainerHigh,
             ) {
                 Icon(
-                    painter = painterResource(Res.drawable.folders),
+                    painter = painterResource(UiRes.drawable.ui_drawable_folders),
                     contentDescription = share.name,
                     tint = MaterialTheme.colorScheme.primary,
                     modifier = Modifier.padding(10.dp),

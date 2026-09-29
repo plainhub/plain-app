@@ -24,7 +24,7 @@ import com.ismartcoding.plain.features.share.ShareExpiry
 import com.ismartcoding.plain.features.share.ShareManager
 import com.ismartcoding.plain.i18n.Res
 import com.ismartcoding.plain.i18n.cancel
-import com.ismartcoding.plain.i18n.close
+import com.ismartcoding.plain.ui.resources.close as ui_drawable_close
 import com.ismartcoding.plain.i18n.create
 import com.ismartcoding.plain.i18n.create_share_link
 import com.ismartcoding.plain.i18n.name
@@ -63,6 +63,7 @@ import com.ismartcoding.plain.ui.theme.dialogSheetBackground
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.stringResource
+import com.ismartcoding.plain.i18n.close
 
 /**
  * Dialog to create a share link for the selected [paths]. First collects the

@@ -19,6 +19,9 @@ import androidx.compose.ui.unit.dp
 import com.ismartcoding.plain.ui.base.HorizontalSpace
 import com.ismartcoding.plain.ui.base.PIconButton
 import org.jetbrains.compose.resources.painterResource
+import com.ismartcoding.plain.ui.resources.Res as UiRes
+import com.ismartcoding.plain.ui.resources.chevron_right as ui_drawable_chevron_right
+import com.ismartcoding.plain.ui.resources.expand_more as ui_drawable_expand_more
 
 /**
  * Collapsible section header used inside sidebar drawers (media / notes pages).
@@ -54,7 +57,7 @@ fun SidebarSectionHeader(
             )
             HorizontalSpace(dp = 4.dp)
             Icon(
-                painter = painterResource(if (isExpanded) Res.drawable.expand_more else Res.drawable.chevron_right),
+                painter = painterResource(if (isExpanded) UiRes.drawable.ui_drawable_expand_more else UiRes.drawable.ui_drawable_chevron_right),
                 contentDescription = null,
                 modifier = Modifier.size(16.dp),
                 tint = MaterialTheme.colorScheme.onSurfaceVariant

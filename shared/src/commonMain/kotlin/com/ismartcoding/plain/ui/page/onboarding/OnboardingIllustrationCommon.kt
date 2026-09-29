@@ -22,6 +22,13 @@ import com.ismartcoding.plain.i18n.*
 import com.ismartcoding.plain.preferences.LocalDarkTheme
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.painterResource
+import com.ismartcoding.plain.ui.resources.Res as UiRes
+import com.ismartcoding.plain.ui.resources.demo_photo_1 as ui_drawable_demo_photo_1
+import com.ismartcoding.plain.ui.resources.demo_photo_2 as ui_drawable_demo_photo_2
+import com.ismartcoding.plain.ui.resources.demo_photo_3 as ui_drawable_demo_photo_3
+import com.ismartcoding.plain.ui.resources.demo_photo_4 as ui_drawable_demo_photo_4
+import com.ismartcoding.plain.ui.resources.demo_photo_5 as ui_drawable_demo_photo_5
+import com.ismartcoding.plain.ui.resources.demo_photo_6 as ui_drawable_demo_photo_6
 
 // The dark surface ramp is compressed, so containers tuned for light need a
 // visibly lifted dark equivalent to keep the illustrations readable.
@@ -54,12 +61,12 @@ internal fun mockupMutedColor(): Color =
 // Generated scenic thumbnails (composeResources/drawable/demo_photo_*.png) —
 // real-looking demo photos, never dot placeholders.
 internal fun demoPhotoRes(index: Int): DrawableResource = when (((index % 6) + 6) % 6) {
-    0 -> Res.drawable.demo_photo_1
-    1 -> Res.drawable.demo_photo_2
-    2 -> Res.drawable.demo_photo_3
-    3 -> Res.drawable.demo_photo_4
-    4 -> Res.drawable.demo_photo_5
-    else -> Res.drawable.demo_photo_6
+    0 -> UiRes.drawable.ui_drawable_demo_photo_1
+    1 -> UiRes.drawable.ui_drawable_demo_photo_2
+    2 -> UiRes.drawable.ui_drawable_demo_photo_3
+    3 -> UiRes.drawable.ui_drawable_demo_photo_4
+    4 -> UiRes.drawable.ui_drawable_demo_photo_5
+    else -> UiRes.drawable.ui_drawable_demo_photo_6
 }
 
 @Composable

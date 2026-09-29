@@ -26,7 +26,7 @@ import com.ismartcoding.plain.i18n.cancel
 import com.ismartcoding.plain.i18n.clear_all
 import com.ismartcoding.plain.i18n.clear_all_confirm
 import com.ismartcoding.plain.i18n.confirm
-import com.ismartcoding.plain.i18n.delete_forever
+import com.ismartcoding.plain.ui.resources.delete_forever as ui_drawable_delete_forever
 import com.ismartcoding.plain.i18n.drag_number_to_reorder_list
 import com.ismartcoding.plain.i18n.empty_queue
 import com.ismartcoding.plain.i18n.ok
@@ -46,6 +46,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
+import com.ismartcoding.plain.ui.resources.Res as UiRes
+import com.ismartcoding.plain.ui.resources.delete_forever as ui_drawable_delete_forever
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -80,7 +82,7 @@ fun AudioQueuePage(audioQueueVM: AudioQueueViewModel, onDismissRequest: () -> Un
                             }
                         }) {
                             Icon(
-                                painter = painterResource(Res.drawable.delete_forever),
+                                painter = painterResource(UiRes.drawable.ui_drawable_delete_forever),
                                 contentDescription = stringResource(Res.string.clear_all),
                                 tint = MaterialTheme.colorScheme.error
                             )

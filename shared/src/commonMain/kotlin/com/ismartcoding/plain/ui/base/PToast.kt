@@ -34,6 +34,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.ismartcoding.plain.preferences.LocalDarkTheme
 import com.ismartcoding.plain.enums.DarkTheme
+import com.ismartcoding.plain.ui.resources.Res as UiRes
+import com.ismartcoding.plain.ui.resources.circle_alert as ui_drawable_circle_alert
+import com.ismartcoding.plain.ui.resources.circle_check as ui_drawable_circle_check
+import com.ismartcoding.plain.ui.resources.circle_x as ui_drawable_circle_x
+import com.ismartcoding.plain.ui.resources.info as ui_drawable_info
 
 enum class ToastType {
     INFO,
@@ -89,10 +94,10 @@ fun PToast(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     val iconRes = when (type) {
-                        ToastType.INFO -> Res.drawable.info
-                        ToastType.SUCCESS -> Res.drawable.circle_check
-                        ToastType.WARNING -> Res.drawable.circle_alert
-                        ToastType.ERROR -> Res.drawable.circle_x
+                        ToastType.INFO -> UiRes.drawable.ui_drawable_info
+                        ToastType.SUCCESS -> UiRes.drawable.ui_drawable_circle_check
+                        ToastType.WARNING -> UiRes.drawable.ui_drawable_circle_alert
+                        ToastType.ERROR -> UiRes.drawable.ui_drawable_circle_x
                     }
                     Icon(
                         painter = painterResource(iconRes),

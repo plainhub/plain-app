@@ -42,6 +42,14 @@ import com.ismartcoding.plain.ui.models.ShareViewModel
 import com.ismartcoding.plain.ui.page.chat.components.ChatTargetPicker
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
+import com.ismartcoding.plain.ui.resources.Res as UiRes
+import com.ismartcoding.plain.ui.resources.arrow_left as ui_drawable_arrow_left
+import com.ismartcoding.plain.ui.resources.download as ui_drawable_download
+import com.ismartcoding.plain.ui.resources.eye as ui_drawable_eye
+import com.ismartcoding.plain.ui.resources.file_text as ui_drawable_file_text
+import com.ismartcoding.plain.ui.resources.notebook_pen as ui_drawable_notebook_pen
+import com.ismartcoding.plain.ui.resources.send as ui_drawable_send
+import com.ismartcoding.plain.i18n.download
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -65,7 +73,7 @@ fun ShareSheet(
             navigationIcon = if (vm.stage == ShareStage.TARGETS) {
                 {
                     PIconButton(
-                        icon = Res.drawable.arrow_left,
+                        icon = UiRes.drawable.ui_drawable_arrow_left,
                         contentDescription = stringResource(Res.string.back),
                         tint = MaterialTheme.colorScheme.onSurface,
                         enabled = !vm.sending,
@@ -127,7 +135,7 @@ private fun ActionsStage(
             text = stringResource(Res.string.send_to_chat),
             onClick = { vm.stage = ShareStage.TARGETS },
             modifier = Modifier.fillMaxWidth(),
-            icon = painterResource(Res.drawable.send),
+            icon = painterResource(UiRes.drawable.ui_drawable_send),
             enabled = contentReady && !vm.sending,
         )
         if (openable) {
@@ -135,7 +143,7 @@ private fun ActionsStage(
                 text = stringResource(Res.string.open),
                 onClick = onOpen,
                 modifier = Modifier.fillMaxWidth(),
-                icon = painterResource(Res.drawable.eye),
+                icon = painterResource(UiRes.drawable.ui_drawable_eye),
                 enabled = !vm.sending,
             )
         }
@@ -144,7 +152,7 @@ private fun ActionsStage(
                 text = stringResource(Res.string.save_to_files),
                 onClick = onSaveToFiles,
                 modifier = Modifier.fillMaxWidth(),
-                icon = painterResource(Res.drawable.download),
+                icon = painterResource(UiRes.drawable.ui_drawable_download),
                 enabled = contentReady && !vm.sending,
             )
         } else if (!vm.text.isSingleUrl()) {
@@ -152,13 +160,13 @@ private fun ActionsStage(
                 text = stringResource(Res.string.save_as_note),
                 onClick = onSaveAsNote,
                 modifier = Modifier.fillMaxWidth(),
-                icon = painterResource(Res.drawable.notebook_pen),
+                icon = painterResource(UiRes.drawable.ui_drawable_notebook_pen),
             )
             PTextButton(
                 text = stringResource(Res.string.open_as_text),
                 onClick = onOpenAsText,
                 modifier = Modifier.fillMaxWidth(),
-                icon = painterResource(Res.drawable.file_text),
+                icon = painterResource(UiRes.drawable.ui_drawable_file_text),
             )
         }
     }

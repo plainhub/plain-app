@@ -32,6 +32,10 @@ import com.ismartcoding.plain.ui.models.NotesViewModel
 import com.ismartcoding.plain.ui.models.TagsViewModel
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
+import com.ismartcoding.plain.ui.resources.Res as UiRes
+import com.ismartcoding.plain.ui.resources.layout_grid as ui_drawable_layout_grid
+import com.ismartcoding.plain.ui.resources.plus as ui_drawable_plus
+import com.ismartcoding.plain.ui.resources.trash_2 as ui_drawable_trash_2
 
 /**
  * Sidebar drawer content for the notes page. Shows All, Trash, and Tags.
@@ -65,7 +69,7 @@ fun NotesSidebarDrawer(
         // All
         SidebarItem(
             label = stringResource(Res.string.all),
-            icon = Res.drawable.layout_grid,
+            icon = UiRes.drawable.ui_drawable_layout_grid,
             isSelected = !NotesViewModel.trash.value && NotesViewModel.tag.value == null,
             onClick = {
                 NotesViewModel.trash.value = false
@@ -78,7 +82,7 @@ fun NotesSidebarDrawer(
         // Trash
         SidebarItem(
             label = stringResource(Res.string.trash),
-            icon = Res.drawable.trash_2,
+            icon = UiRes.drawable.ui_drawable_trash_2,
             isSelected = NotesViewModel.trash.value,
             onClick = {
                 NotesViewModel.trash.value = true
@@ -96,7 +100,7 @@ fun NotesSidebarDrawer(
             isExpanded = tagsExpanded,
             onToggle = { tagsExpanded = !tagsExpanded },
             onAction = { tagsVM.showAddDialog() },
-            actionIcon = Res.drawable.plus
+            actionIcon = UiRes.drawable.ui_drawable_plus
         )
 
         if (tagsExpanded) {

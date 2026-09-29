@@ -57,6 +57,11 @@ import com.ismartcoding.plain.ui.models.ImageEditorViewModel
 import com.ismartcoding.plain.ui.nav.Routing
 import com.ismartcoding.plain.lib.withIO
 import kotlinx.coroutines.launch
+import com.ismartcoding.plain.ui.resources.Res as UiRes
+import com.ismartcoding.plain.ui.resources.chevron_right as ui_drawable_chevron_right
+import com.ismartcoding.plain.ui.resources.image as ui_drawable_image
+import com.ismartcoding.plain.ui.resources.plus as ui_drawable_plus
+import com.ismartcoding.plain.i18n.image
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -87,7 +92,7 @@ fun ImageEditorListPage(
         },
         floatingActionButton = {
             FloatingActionButton(onClick = { navController.navigate(Routing.ImageEditorDetail("")) }) {
-                Icon(painter = painterResource(Res.drawable.plus), contentDescription = stringResource(Res.string.add))
+                Icon(painter = painterResource(UiRes.drawable.ui_drawable_plus), contentDescription = stringResource(Res.string.add))
             }
         },
     ) { paddingValues ->
@@ -149,7 +154,7 @@ private fun ImageEditorProjectListItem(
                 )
             } else {
                 Icon(
-                    painter = painterResource(Res.drawable.image),
+                    painter = painterResource(UiRes.drawable.ui_drawable_image),
                     contentDescription = null,
                     tint = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
@@ -174,7 +179,7 @@ private fun ImageEditorProjectListItem(
             )
         }
         Icon(
-            painter = painterResource(Res.drawable.chevron_right),
+            painter = painterResource(UiRes.drawable.ui_drawable_chevron_right),
             contentDescription = null,
             tint = MaterialTheme.colorScheme.onSurfaceVariant,
         )

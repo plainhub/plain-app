@@ -21,6 +21,9 @@ import com.ismartcoding.plain.lib.extensions.formatBytes
 import com.ismartcoding.plain.platform.combineBitmapGrid
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import com.ismartcoding.plain.ui.resources.Res as UiRes
+import com.ismartcoding.plain.ui.resources.folder as ui_drawable_folder
+import com.ismartcoding.plain.i18n.folder
 
 /**
  * Sidebar drawer item for a media bucket (folder). Shows a combined thumbnail
@@ -46,7 +49,7 @@ fun MediaSidebarBucketItem(
         subtitle = m.size.formatBytes(),
         isSelected = isSelected,
         badge = m.itemCount.toString(),
-        icon = if (showThumbnail) null else Res.drawable.folder,
+        icon = if (showThumbnail) null else UiRes.drawable.ui_drawable_folder,
         leading = if (showThumbnail) {
             {
                 Image(

@@ -21,7 +21,7 @@ import com.ismartcoding.plain.i18n.Res
 import com.ismartcoding.plain.i18n.access_settings
 import com.ismartcoding.plain.i18n.desktop_access
 import com.ismartcoding.plain.i18n.desktop_access_desc
-import com.ismartcoding.plain.i18n.devices
+import com.ismartcoding.plain.ui.resources.devices as ui_drawable_devices
 import com.ismartcoding.plain.i18n.open_web_address
 import com.ismartcoding.plain.preferences.DesktopAccessPreference
 import com.ismartcoding.plain.ui.base.HorizontalSpace
@@ -40,6 +40,9 @@ import com.ismartcoding.plain.httpserver.setOnlineClientIds
 import com.ismartcoding.plain.httpserver.onlineClientIds
 import kotlinx.coroutines.flow.map
 import org.jetbrains.compose.resources.stringResource
+import com.ismartcoding.plain.ui.resources.Res as UiRes
+import com.ismartcoding.plain.ui.resources.devices as ui_drawable_devices
+import com.ismartcoding.plain.i18n.devices
 
 @Composable
 fun DesktopAccessSection(navController: NavHostController) {
@@ -48,7 +51,7 @@ fun DesktopAccessSection(navController: NavHostController) {
     val onlineCount by onlineClientIds.map { it.size }.collectAsState(0)
 
     PCard(modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN)) {
-        PListItem(icon = Res.drawable.devices, title = stringResource(Res.string.desktop_access)) {
+        PListItem(icon = UiRes.drawable.ui_drawable_devices, title = stringResource(Res.string.desktop_access)) {
             PSwitch(activated = desktopAccessEnabled) { enable ->
                 scope.launchSafe {
                     DesktopAccessPreference.putAsync(enable)

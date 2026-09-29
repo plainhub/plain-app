@@ -30,11 +30,19 @@ kotlin {
             api(libs.ui)
             api(libs.foundation)
             api(libs.material3)
+            api(libs.compose.components.resources)
+            api(libs.coil.compose)
         }
         commonTest.dependencies {
             implementation(kotlin("test"))
         }
     }
+}
+
+compose.resources {
+    packageOfResClass = "com.ismartcoding.plain.ui.resources"
+    generateResClass = always
+    publicResClass = true
 }
 
 dependencies {

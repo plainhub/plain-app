@@ -22,6 +22,10 @@ import com.ismartcoding.plain.ui.base.PModalBottomSheet
 import com.ismartcoding.plain.ui.base.PSwitch
 import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.models.TextFileViewModel
+import com.ismartcoding.plain.ui.resources.Res as UiRes
+import com.ismartcoding.plain.ui.resources.arrow_down_to_line as ui_drawable_arrow_down_to_line
+import com.ismartcoding.plain.ui.resources.arrow_up_to_line as ui_drawable_arrow_up_to_line
+import com.ismartcoding.plain.ui.resources.share_2 as ui_drawable_share_2
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
@@ -44,15 +48,15 @@ fun ViewTextContentBottomSheet(
             }
             item {
                 PSheetPrimaryActionsCard {
-                    PSheetPrimaryAction(Res.drawable.share_2, stringResource(Res.string.share)) {
+                    PSheetPrimaryAction(UiRes.drawable.ui_drawable_share_2, stringResource(Res.string.share)) {
                         shareText(content)
                         onDismiss()
                     }
-                    PSheetPrimaryAction(Res.drawable.arrow_up_to_line, stringResource(Res.string.jump_to_top)) {
+                    PSheetPrimaryAction(UiRes.drawable.ui_drawable_arrow_up_to_line, stringResource(Res.string.jump_to_top)) {
                         textFileVM.gotoTop()
                         onDismiss()
                     }
-                    PSheetPrimaryAction(Res.drawable.arrow_down_to_line, stringResource(Res.string.jump_to_bottom)) {
+                    PSheetPrimaryAction(UiRes.drawable.ui_drawable_arrow_down_to_line, stringResource(Res.string.jump_to_bottom)) {
                         textFileVM.gotoEnd()
                         onDismiss()
                     }

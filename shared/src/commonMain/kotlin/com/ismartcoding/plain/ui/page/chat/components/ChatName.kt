@@ -26,6 +26,8 @@ import com.ismartcoding.plain.platform.formatTime
 import com.ismartcoding.plain.ui.base.HorizontalSpace
 import com.ismartcoding.plain.ui.base.PIconButton
 import com.ismartcoding.plain.ui.models.VChat
+import com.ismartcoding.plain.ui.resources.Res as UiRes
+import com.ismartcoding.plain.ui.resources.rotate_ccw as ui_drawable_rotate_ccw
 
 @Composable
 fun ChatName(
@@ -90,7 +92,7 @@ fun ChatName(
                         ) {
                             if (isAllFailed) {
                                 Icon(
-                                    painter = painterResource(Res.drawable.rotate_ccw),
+                                    painter = painterResource(UiRes.drawable.ui_drawable_rotate_ccw),
                                     contentDescription = null,
                                     tint = badgeColor,
                                     modifier = Modifier.size(10.dp),
@@ -113,7 +115,7 @@ fun ChatName(
                     if (onRetry != null) {
                         HorizontalSpace(4.dp)
                         PIconButton(
-                            icon = Res.drawable.rotate_ccw,
+                            icon = UiRes.drawable.ui_drawable_rotate_ccw,
                             contentDescription = stringResource(Res.string.try_again),
                             tint = MaterialTheme.colorScheme.error,
                             modifier = Modifier.size(16.dp)

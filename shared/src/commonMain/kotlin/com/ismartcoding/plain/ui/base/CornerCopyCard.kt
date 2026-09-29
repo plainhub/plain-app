@@ -29,8 +29,8 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.unit.dp
 import com.ismartcoding.plain.i18n.Res
-import com.ismartcoding.plain.i18n.check
-import com.ismartcoding.plain.i18n.copy
+import com.ismartcoding.plain.ui.resources.check as ui_drawable_check
+import com.ismartcoding.plain.ui.resources.copy as ui_drawable_copy
 import com.ismartcoding.plain.i18n.copy_text
 import com.ismartcoding.plain.lib.extensions.toBreakableUrl
 import com.ismartcoding.plain.platform.setClipboardText
@@ -38,6 +38,10 @@ import com.ismartcoding.plain.ui.theme.listItemTitle
 import kotlinx.coroutines.delay
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
+import com.ismartcoding.plain.ui.resources.Res as UiRes
+import com.ismartcoding.plain.ui.resources.check as ui_drawable_check
+import com.ismartcoding.plain.ui.resources.copy as ui_drawable_copy
+import com.ismartcoding.plain.i18n.copy
 
 // The corner copy button is a small circle whose center sits exactly on the
 // card's bottom-right corner, so ~50% overlaps the card and ~50% floats outside.
@@ -96,7 +100,7 @@ fun CornerCopyCard(
             ) { copied ->
                 PIcon(
                     modifier = Modifier.size(16.dp),
-                    icon = painterResource(if (copied) Res.drawable.check else Res.drawable.copy),
+                    icon = painterResource(if (copied) UiRes.drawable.ui_drawable_check else UiRes.drawable.ui_drawable_copy),
                     contentDescription = stringResource(Res.string.copy_text),
                     tint = MaterialTheme.colorScheme.onSurfaceVariant,
                 )

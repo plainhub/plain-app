@@ -38,6 +38,9 @@ import com.ismartcoding.plain.i18n.Res
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import kotlin.math.min
+import com.ismartcoding.plain.ui.resources.Res as UiRes
+import com.ismartcoding.plain.ui.resources.download as ui_drawable_download
+import com.ismartcoding.plain.i18n.download
 
 /**
  * Edge-docked overlay shown on non-share pages while batches run in the
@@ -78,7 +81,7 @@ fun BoxScope.DownloadFloatingWidget(
             modifier = Modifier.padding(start = 6.dp, end = 8.dp, top = 10.dp, bottom = 10.dp),
         ) {
             Icon(
-                painterResource(Res.drawable.download),
+                painterResource(UiRes.drawable.ui_drawable_download),
                 contentDescription = stringResource(Res.string.downloads),
                 tint = if (attention) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.primary,
                 modifier = Modifier.size(16.dp),

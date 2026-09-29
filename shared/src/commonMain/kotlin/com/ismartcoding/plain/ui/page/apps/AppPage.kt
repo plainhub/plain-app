@@ -24,6 +24,8 @@ import com.ismartcoding.plain.ui.base.*
 import com.ismartcoding.plain.ui.base.rememberLifecycleEvent
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import com.ismartcoding.plain.ui.resources.Res as UiRes
+import com.ismartcoding.plain.ui.resources.share_2 as ui_drawable_share_2
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -47,7 +49,7 @@ fun AppPage(navController: NavHostController, id: String) {
         topBar = {
             PTopAppBar(navController = navController, title = item?.name ?: "", actions = {
                 if (isShareable) {
-                    PIconButton(icon = Res.drawable.share_2, contentDescription = stringResource(Res.string.share),
+                    PIconButton(icon = UiRes.drawable.ui_drawable_share_2, contentDescription = stringResource(Res.string.share),
                         tint = MaterialTheme.colorScheme.onSurface) {
                         item?.let { pkg ->
                             shareFileAs(pkg.path, "${pkg.name.replace(" ", "")}-${pkg.id}.apk")

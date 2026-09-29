@@ -27,8 +27,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.ismartcoding.plain.i18n.Res
-import com.ismartcoding.plain.i18n.arrow_left
-import com.ismartcoding.plain.i18n.ellipsis
+import com.ismartcoding.plain.ui.resources.arrow_left as ui_drawable_arrow_left
+import com.ismartcoding.plain.ui.resources.ellipsis as ui_drawable_ellipsis
 import com.ismartcoding.plain.i18n.more_info
 import com.ismartcoding.plain.i18n.unknown
 import com.ismartcoding.plain.lib.extensions.formatMinSec
@@ -36,6 +36,9 @@ import com.ismartcoding.plain.ui.base.PlayerSlider
 import com.ismartcoding.plain.ui.components.mediaviewer.PreviewerSoftWhite
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
+import com.ismartcoding.plain.ui.resources.Res as UiRes
+import com.ismartcoding.plain.ui.resources.arrow_left as ui_drawable_arrow_left
+import com.ismartcoding.plain.ui.resources.ellipsis as ui_drawable_ellipsis
 
 /**
  * Shared full-screen video overlay scaffold: top title bar (with exit + more
@@ -88,7 +91,7 @@ fun VideoOverlayScaffold(
                 ) {
                     IconButton(onClick = onExit, modifier = Modifier.fillMaxSize()) {
                         Icon(
-                            painter = painterResource(Res.drawable.arrow_left),
+                            painter = painterResource(UiRes.drawable.ui_drawable_arrow_left),
                             contentDescription = null,
                             tint = PreviewerSoftWhite,
                             modifier = Modifier.size(22.dp),
@@ -127,7 +130,7 @@ fun VideoOverlayScaffold(
                     ) {
                         IconButton(onClick = onMore, modifier = Modifier.fillMaxSize()) {
                             Icon(
-                                painter = painterResource(Res.drawable.ellipsis),
+                                painter = painterResource(UiRes.drawable.ui_drawable_ellipsis),
                                 contentDescription = stringResource(Res.string.more_info),
                                 tint = PreviewerSoftWhite,
                                 modifier = Modifier.size(22.dp),

@@ -46,6 +46,9 @@ import com.ismartcoding.plain.ui.theme.listItemTitle
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.pluralStringResource
 import org.jetbrains.compose.resources.stringResource
+import com.ismartcoding.plain.ui.resources.Res as UiRes
+import com.ismartcoding.plain.ui.resources.search as ui_drawable_search
+import com.ismartcoding.plain.i18n.search
 
 /**
  * Multi-select library picker for a playlist. Tracks already in it start
@@ -82,7 +85,7 @@ fun PlaylistAddItemsPage(
                     navController = navController,
                     actions = {
                         PIconButton(
-                            icon = Res.drawable.search,
+                            icon = UiRes.drawable.ui_drawable_search,
                             contentDescription = stringResource(Res.string.search),
                             click = { vm.enterSearchMode() },
                         )

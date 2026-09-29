@@ -21,6 +21,10 @@ import com.ismartcoding.plain.ui.nav.Routing
 import androidx.navigation.NavHostController
 import com.ismartcoding.plain.ui.base.HorizontalSpace
 import kotlinx.coroutines.launch
+import com.ismartcoding.plain.ui.resources.Res as UiRes
+import com.ismartcoding.plain.ui.resources.database_backup as ui_drawable_database_backup
+import com.ismartcoding.plain.ui.resources.languages as ui_drawable_languages
+import com.ismartcoding.plain.ui.resources.sun_moon as ui_drawable_sun_moon
 
 @Composable
 internal fun SettingsCardItems(navController: NavHostController) {
@@ -32,7 +36,7 @@ internal fun SettingsCardItems(navController: NavHostController) {
             modifier = Modifier.clickable {
                 navController.navigate(Routing.DarkTheme)
             },
-            icon = Res.drawable.sun_moon,
+            icon = UiRes.drawable.ui_drawable_sun_moon,
             title = stringResource(Res.string.dark_theme),
             subtitle = DarkTheme.entries.find { it.value == darkTheme }?.getText() ?: "",
             separatedActions = true,
@@ -55,7 +59,7 @@ internal fun SettingsCardItems(navController: NavHostController) {
             },
             title = stringResource(Res.string.language),
             subtitle = LocalLocale.current?.getElegantDisplayName() ?: stringResource(Res.string.use_device_language),
-            icon = Res.drawable.languages,
+            icon = UiRes.drawable.ui_drawable_languages,
             showMore = true,
         )
     }
@@ -67,7 +71,7 @@ internal fun SettingsCardItems(navController: NavHostController) {
             },
             title = stringResource(Res.string.backup_restore),
             subtitle = stringResource(Res.string.backup_desc),
-            icon = Res.drawable.database_backup,
+            icon = UiRes.drawable.ui_drawable_database_backup,
             showMore = true,
         )
     }

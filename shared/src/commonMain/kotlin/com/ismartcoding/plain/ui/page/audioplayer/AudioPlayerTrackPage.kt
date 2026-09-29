@@ -41,13 +41,17 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.ismartcoding.plain.audio.DPlaylistAudio
 import com.ismartcoding.plain.i18n.Res
-import com.ismartcoding.plain.i18n.pause
-import com.ismartcoding.plain.i18n.play_arrow
+import com.ismartcoding.plain.ui.resources.pause as ui_drawable_pause
+import com.ismartcoding.plain.ui.resources.play_arrow as ui_drawable_play_arrow
 import com.ismartcoding.plain.lib.LrcParser
 import com.ismartcoding.plain.platform.audioPause
 import com.ismartcoding.plain.platform.audioPlay
 import com.ismartcoding.plain.ui.page.audioplayer.components.AudioPlayerCover
 import org.jetbrains.compose.resources.painterResource
+import com.ismartcoding.plain.ui.resources.Res as UiRes
+import com.ismartcoding.plain.ui.resources.pause as ui_drawable_pause
+import com.ismartcoding.plain.ui.resources.play_arrow as ui_drawable_play_arrow
+import com.ismartcoding.plain.i18n.pause
 
 internal enum class PlayerView { COVER, LYRICS }
 private fun dpLerp(start: Dp, stop: Dp, fraction: Float): Dp = start + (stop - start) * fraction
@@ -200,7 +204,7 @@ internal fun AudioPlayerTrackPage(
                     .background(MaterialTheme.colorScheme.surfaceContainer),
             ) {
                 Icon(
-                    painter = painterResource(if (isPlaying) Res.drawable.pause else Res.drawable.play_arrow),
+                    painter = painterResource(if (isPlaying) UiRes.drawable.ui_drawable_pause else UiRes.drawable.ui_drawable_play_arrow),
                     contentDescription = null,
                     tint = MaterialTheme.colorScheme.primary,
                     modifier = Modifier.size(24.dp),

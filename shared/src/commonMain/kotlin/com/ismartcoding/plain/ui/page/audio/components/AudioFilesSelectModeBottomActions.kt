@@ -37,6 +37,8 @@ import com.ismartcoding.plain.ui.page.tags.BatchSelectTagsDialog
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
 import androidx.compose.runtime.collectAsState
+import com.ismartcoding.plain.ui.resources.Res as UiRes
+import com.ismartcoding.plain.ui.resources.playlist_remove as ui_drawable_playlist_remove
 
 @OptIn(ExperimentalLayoutApi::class, ExperimentalMaterial3Api::class)
 @Composable
@@ -66,7 +68,7 @@ fun AudioFilesSelectModeBottomActions(
     PBottomAppBar {
         BottomActionButtons {
             if (removeFromPlaylist != null) {
-                PIconTextSmallButton(Res.drawable.playlist_remove, stringResource(Res.string.remove_from_playlist), click = removeFromPlaylist)
+                PIconTextSmallButton(UiRes.drawable.ui_drawable_playlist_remove, stringResource(Res.string.remove_from_playlist), click = removeFromPlaylist)
             }
             if (!audioVM.trash.value) {
                 IconTextSmallButtonLabel {

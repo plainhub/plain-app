@@ -53,7 +53,10 @@ class ShareActivity : ComponentActivity() {
         parseIntent(intent)
         setContent {
             SettingsProvider {
-                AppTheme(useDarkTheme = DarkTheme.isDarkTheme(LocalDarkTheme.current)) {
+                AppTheme(
+                    useDarkTheme = DarkTheme.isDarkTheme(LocalDarkTheme.current),
+                    amoledDarkTheme = com.ismartcoding.plain.preferences.LocalAmoledDarkTheme.current,
+                ) {
                     ShareSheet(
                         vm,
                         onDismiss = { finish() },

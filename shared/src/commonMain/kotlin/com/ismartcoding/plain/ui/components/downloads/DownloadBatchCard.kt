@@ -38,6 +38,13 @@ import com.ismartcoding.plain.ui.theme.green
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.pluralStringResource
 import org.jetbrains.compose.resources.stringResource
+import com.ismartcoding.plain.ui.resources.Res as UiRes
+import com.ismartcoding.plain.ui.resources.circle_alert as ui_drawable_circle_alert
+import com.ismartcoding.plain.ui.resources.download as ui_drawable_download
+import com.ismartcoding.plain.ui.resources.folder as ui_drawable_folder
+import com.ismartcoding.plain.ui.resources.x as ui_drawable_x
+import com.ismartcoding.plain.i18n.download
+import com.ismartcoding.plain.i18n.folder
 
 /**
  * One aggregated batch card: title, destination, status chip, byte progress
@@ -80,13 +87,13 @@ fun DownloadBatchCard(
                 }
                 if (active) {
                     PIconButton(
-                        icon = Res.drawable.x,
+                        icon = UiRes.drawable.ui_drawable_x,
                         contentDescription = stringResource(Res.string.cancel),
                     ) { DownloadCenter.cancel(task.id) }
                 } else {
                     if (task.status == DownloadStatus.PARTIAL || task.status == DownloadStatus.FAILED) {
                         PIconButton(
-                            icon = Res.drawable.circle_alert,
+                            icon = UiRes.drawable.ui_drawable_circle_alert,
                             contentDescription = stringResource(Res.string.try_again),
                         ) {
                             failuresExpanded = false
@@ -94,7 +101,7 @@ fun DownloadBatchCard(
                         }
                     }
                     PIconButton(
-                        icon = Res.drawable.x,
+                        icon = UiRes.drawable.ui_drawable_x,
                         contentDescription = stringResource(Res.string.cancel),
                     ) { DownloadCenter.remove(task.id) }
                 }
@@ -274,7 +281,7 @@ private fun FailureSummary(
                                 )
                             }
                             PIconButton(
-                                icon = Res.drawable.circle_alert,
+                                icon = UiRes.drawable.ui_drawable_circle_alert,
                                 contentDescription = stringResource(Res.string.try_again),
                             ) { onRetryItem() }
                         }
@@ -287,8 +294,8 @@ private fun FailureSummary(
 
 @Composable
 private fun batchIcon(task: SharedFolderBatchTask) = when {
-    task.zipName.isNotEmpty() || task.type == com.ismartcoding.plain.features.share.ShareBatchType.ZIP -> Res.drawable.folder
-    else -> Res.drawable.download
+    task.zipName.isNotEmpty() || task.type == com.ismartcoding.plain.features.share.ShareBatchType.ZIP -> UiRes.drawable.ui_drawable_folder
+    else -> UiRes.drawable.ui_drawable_download
 }
 
 @Composable

@@ -46,6 +46,9 @@ import com.ismartcoding.plain.ui.models.select
 import com.ismartcoding.plain.ui.theme.green
 import com.ismartcoding.plain.ui.theme.listItemValue
 import kotlinx.coroutines.launch
+import com.ismartcoding.plain.ui.resources.Res as UiRes
+import com.ismartcoding.plain.ui.resources.list_checks as ui_drawable_list_checks
+import com.ismartcoding.plain.ui.resources.square_pen as ui_drawable_square_pen
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
@@ -70,12 +73,12 @@ fun ViewFeedBottomSheet(
     ) {
         VerticalSpace(16.dp)
         PSheetPrimaryActionsCard {
-            PSheetPrimaryAction(Res.drawable.list_checks, stringResource(Res.string.select)) {
+            PSheetPrimaryAction(UiRes.drawable.ui_drawable_list_checks, stringResource(Res.string.select)) {
                 feedsVM.enterSelectMode()
                 feedsVM.select(m.id)
                 onDismiss()
             }
-            PSheetPrimaryAction(Res.drawable.square_pen, stringResource(Res.string.edit)) {
+            PSheetPrimaryAction(UiRes.drawable.ui_drawable_square_pen, stringResource(Res.string.edit)) {
                 feedsVM.showEditDialog(m)
                 onDismiss()
             }

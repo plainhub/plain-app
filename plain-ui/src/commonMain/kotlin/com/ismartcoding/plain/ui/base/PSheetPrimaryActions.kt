@@ -21,10 +21,12 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import com.ismartcoding.plain.i18n.*
 import com.ismartcoding.plain.ui.theme.PlainTheme
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.painterResource
+import com.ismartcoding.plain.ui.resources.Res as UiRes
+import com.ismartcoding.plain.ui.resources.delete_forever as ui_drawable_delete_forever
+import com.ismartcoding.plain.ui.resources.trash_2 as ui_drawable_trash_2
 
 // Primary bottom-sheet actions: a row of colored disc buttons, replacing
 // FlowRow button walls. One or two actions keep four-column slots anchored
@@ -119,7 +121,7 @@ fun PSheetPrimaryAction(
 @Composable
 fun PSheetPrimaryTrashAction(text: String, click: () -> Unit) {
     PSheetPrimaryAction(
-        Res.drawable.trash_2,
+        UiRes.drawable.ui_drawable_trash_2,
         text,
         container = MaterialTheme.colorScheme.errorContainer,
         tint = MaterialTheme.colorScheme.error,
@@ -130,7 +132,7 @@ fun PSheetPrimaryTrashAction(text: String, click: () -> Unit) {
 @Composable
 fun PSheetPrimaryDeleteAction(text: String, click: () -> Unit) {
     PSheetPrimaryAction(
-        Res.drawable.delete_forever,
+        UiRes.drawable.ui_drawable_delete_forever,
         text,
         container = MaterialTheme.colorScheme.errorContainer,
         tint = MaterialTheme.colorScheme.error,

@@ -30,6 +30,8 @@ import androidx.compose.ui.unit.dp
 import com.ismartcoding.plain.lib.withIO
 import com.ismartcoding.plain.ui.page.audio.components.audioCoverCache
 import com.ismartcoding.plain.platform.loadAudioCoverBitmap
+import com.ismartcoding.plain.ui.resources.Res as UiRes
+import com.ismartcoding.plain.ui.resources.music2 as ui_drawable_music2
 
 /**
  * Placeholder artwork for tracks without an embedded cover: a music note on a
@@ -49,7 +51,7 @@ private fun DefaultCoverArt(modifier: Modifier = Modifier) {
             val discRadius = size.minDimension * 0.32f
             drawCircle(color = primary.copy(alpha = 0.12f), radius = discRadius)
 
-            // Stroked music note from Res.drawable.music2 (24x24 viewport), centered.
+            // Stroked music note from UiRes.drawable.ui_drawable_music2 (24x24 viewport), centered.
             val s = discRadius * 0.038f
             fun nx(x: Float) = center.x + (x - 11.5f) * s
             fun ny(y: Float) = center.y + (y - 12f) * s

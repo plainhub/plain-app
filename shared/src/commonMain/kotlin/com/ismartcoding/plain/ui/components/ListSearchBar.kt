@@ -23,6 +23,8 @@ import com.ismartcoding.plain.ui.base.PIconButton
 import com.ismartcoding.plain.ui.models.ISearchableViewModel
 import com.ismartcoding.plain.ui.models.exitSearchMode
 import com.ismartcoding.plain.ui.theme.cardBackgroundNormal
+import com.ismartcoding.plain.ui.resources.Res as UiRes
+import com.ismartcoding.plain.ui.resources.arrow_left as ui_drawable_arrow_left
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -68,7 +70,7 @@ fun <T : IData> ListSearchBar(
                     placeholder = { Text(stringResource(Res.string.search)) },
                     leadingIcon = {
                         PIconButton(
-                            icon = Res.drawable.arrow_left,
+                            icon = UiRes.drawable.ui_drawable_arrow_left,
                             contentDescription = stringResource(Res.string.back),
                             tint = MaterialTheme.colorScheme.onSurface,
                         ) {

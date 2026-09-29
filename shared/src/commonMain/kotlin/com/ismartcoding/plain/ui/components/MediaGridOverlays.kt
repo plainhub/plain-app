@@ -28,6 +28,11 @@ import androidx.compose.ui.unit.dp
 import com.ismartcoding.plain.ui.base.HorizontalSpace
 import com.ismartcoding.plain.ui.theme.darkMask
 import com.ismartcoding.plain.ui.theme.lightMask
+import com.ismartcoding.plain.ui.resources.Res as UiRes
+import com.ismartcoding.plain.ui.resources.cast as ui_drawable_cast
+import com.ismartcoding.plain.ui.resources.check as ui_drawable_check
+import com.ismartcoding.plain.ui.resources.horizontal_rule as ui_drawable_horizontal_rule
+import com.ismartcoding.plain.i18n.cast
 
 @Composable
 fun SelectedOverlay() {
@@ -51,7 +56,7 @@ fun CastModeOverlay() {
             modifier = Modifier
                 .align(Alignment.Center)
                 .size(48.dp),
-            painter = painterResource(Res.drawable.cast),
+            painter = painterResource(UiRes.drawable.ui_drawable_cast),
             contentDescription = null,
             tint = Color.LightGray
         )
@@ -89,7 +94,7 @@ fun SelectionCheckbox(
         if (checked) {
             Icon(
                 modifier = Modifier.size(16.dp),
-                painter = painterResource(if (partial) Res.drawable.horizontal_rule else Res.drawable.check),
+                painter = painterResource(if (partial) UiRes.drawable.ui_drawable_horizontal_rule else UiRes.drawable.ui_drawable_check),
                 contentDescription = null,
                 tint = MaterialTheme.colorScheme.onPrimary,
             )

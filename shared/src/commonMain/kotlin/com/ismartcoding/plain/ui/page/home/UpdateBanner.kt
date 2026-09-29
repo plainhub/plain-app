@@ -40,6 +40,8 @@ import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.helpers.WebHelper
 import com.ismartcoding.plain.ui.models.UpdateViewModel
 import kotlinx.coroutines.launch
+import com.ismartcoding.plain.ui.resources.Res as UiRes
+import com.ismartcoding.plain.ui.resources.lightbulb as ui_drawable_lightbulb
 
 private const val GITHUB_RELEASES_URL = "https://github.com/plainhub/plain-app/releases/latest"
 
@@ -118,7 +120,7 @@ fun UpdateBanner(updateVM: UpdateViewModel) {
             PBanner(
                 title = stringResource(Res.string.get_new_updates, newVersion.toString()),
                 desc = stringResource(Res.string.get_new_updates_desc),
-                icon = Res.drawable.lightbulb,
+                icon = UiRes.drawable.ui_drawable_lightbulb,
             ) { updateVM.showDialog() }
             VerticalSpace(dp = 12.dp)
         }
@@ -177,7 +179,7 @@ private fun DownloadCompleteBanner(
 ) {
     PBanner(
         title = stringResource(Res.string.update_downloaded),
-        icon = Res.drawable.lightbulb,
+        icon = UiRes.drawable.ui_drawable_lightbulb,
         action = {
             PFilledButton(
                 text = stringResource(Res.string.install_update),
@@ -199,7 +201,7 @@ private fun DownloadFailedBanner(
         title = stringResource(Res.string.download_update_failed),
         backgroundColor = MaterialTheme.colorScheme.errorContainer,
         contentColor = MaterialTheme.colorScheme.onErrorContainer,
-        icon = Res.drawable.lightbulb,
+        icon = UiRes.drawable.ui_drawable_lightbulb,
         action = {
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 PFilledButton(

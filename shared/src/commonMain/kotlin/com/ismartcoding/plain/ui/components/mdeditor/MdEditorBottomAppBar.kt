@@ -48,6 +48,8 @@ import com.ismartcoding.plain.ui.models.MdToolbarItem
 import com.ismartcoding.plain.ui.models.mdToolbarCategories
 import com.ismartcoding.plain.ui.theme.cardBackgroundNormal
 import com.ismartcoding.plain.ui.theme.checkColorHex
+import com.ismartcoding.plain.ui.resources.Res as UiRes
+import com.ismartcoding.plain.ui.resources.circle_help as ui_drawable_circle_help
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -114,7 +116,7 @@ fun MdEditorBottomAppBar(
                 }
             }
                 CategoryButton(
-                    category = MdToolbarCategory("help", Res.string.help, icon = Res.drawable.circle_help, items = emptyList()),
+                    category = MdToolbarCategory("help", Res.string.help, icon = UiRes.drawable.ui_drawable_circle_help, items = emptyList()),
                 active = false,
                 modifier = Modifier
                     .weight(1f)
@@ -161,7 +163,7 @@ private fun CategoryButton(
             contentAlignment = Alignment.Center,
         ) {
             Icon(
-                painter = painterResource(category.icon ?: Res.drawable.circle_help),
+                painter = painterResource(category.icon ?: UiRes.drawable.ui_drawable_circle_help),
                 contentDescription = stringResource(category.tip),
                 tint = contentColor,
             )
@@ -192,7 +194,7 @@ private fun SubToolbarButton(
         verticalArrangement = Arrangement.Center,
     ) {
         Icon(
-            painter = painterResource(item.icon ?: Res.drawable.circle_help),
+            painter = painterResource(item.icon ?: UiRes.drawable.ui_drawable_circle_help),
             contentDescription = stringResource(item.tip),
             tint = contentColor,
             modifier = Modifier.size(20.dp),

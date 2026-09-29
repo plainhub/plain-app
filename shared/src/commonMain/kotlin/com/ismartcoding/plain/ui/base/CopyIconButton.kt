@@ -23,6 +23,10 @@ import kotlinx.coroutines.delay
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
+import com.ismartcoding.plain.ui.resources.Res as UiRes
+import com.ismartcoding.plain.ui.resources.check as ui_drawable_check
+import com.ismartcoding.plain.ui.resources.copy as ui_drawable_copy
+import com.ismartcoding.plain.i18n.copy
 
 // How long the button shows the check icon before switching back.
 private const val COPIED_ICON_DURATION_MS = 1500L
@@ -32,7 +36,7 @@ fun CopyIconButton(
     text: String,
     clipLabel: String,
     modifier: Modifier = Modifier,
-    icon: DrawableResource = Res.drawable.copy,
+    icon: DrawableResource = UiRes.drawable.ui_drawable_copy,
     contentDescription: String = stringResource(Res.string.copy_text),
     copiedMessage: String = text,
     onCopied: (() -> Unit)? = null,
@@ -63,7 +67,7 @@ fun CopyIconButton(
         ) { copied ->
             PIcon(
                 modifier = Modifier.size(24.dp),
-                icon = painterResource(if (copied) Res.drawable.check else icon),
+                icon = painterResource(if (copied) UiRes.drawable.ui_drawable_check else icon),
                 contentDescription = contentDescription,
             )
         }

@@ -32,6 +32,9 @@ import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.theme.green
 import com.ismartcoding.plain.ui.theme.orange
 import org.jetbrains.compose.resources.painterResource
+import com.ismartcoding.plain.ui.resources.Res as UiRes
+import com.ismartcoding.plain.ui.resources.lock as ui_drawable_lock
+import com.ismartcoding.plain.ui.resources.wifi as ui_drawable_wifi
 
 @Composable
 private fun DashedLine(modifier: Modifier = Modifier) {
@@ -63,7 +66,7 @@ internal fun DeviceLink(modifier: Modifier = Modifier) {
             horizontalArrangement = Arrangement.spacedBy(4.dp),
         ) {
             Icon(
-                painter = painterResource(Res.drawable.wifi),
+                painter = painterResource(UiRes.drawable.ui_drawable_wifi),
                 contentDescription = null,
                 tint = MaterialTheme.colorScheme.onPrimaryContainer,
                 modifier = Modifier.size(12.dp),
@@ -149,7 +152,7 @@ internal fun BrowserFrame(
                 horizontalArrangement = Arrangement.spacedBy(3.dp),
             ) {
                 Icon(
-                    painter = painterResource(Res.drawable.lock),
+                    painter = painterResource(UiRes.drawable.ui_drawable_lock),
                     contentDescription = null,
                     tint = mockupMutedColor(),
                     modifier = Modifier.size(8.dp),

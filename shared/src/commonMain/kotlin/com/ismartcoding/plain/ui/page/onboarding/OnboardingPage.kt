@@ -50,6 +50,9 @@ import com.ismartcoding.plain.ui.theme.listItemTitle
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
+import com.ismartcoding.plain.ui.resources.Res as UiRes
+import com.ismartcoding.plain.ui.resources.check as ui_drawable_check
+import com.ismartcoding.plain.ui.resources.lock as ui_drawable_lock
 
 private const val PAGE_COUNT = 5
 
@@ -257,7 +260,7 @@ private fun BadgeChip(text: String) {
         horizontalArrangement = Arrangement.spacedBy(5.dp),
     ) {
         Icon(
-            painter = painterResource(Res.drawable.check),
+            painter = painterResource(UiRes.drawable.ui_drawable_check),
             contentDescription = null,
             tint = MaterialTheme.colorScheme.primary,
             modifier = Modifier.size(12.dp),
@@ -302,7 +305,7 @@ private fun SlideGetStarted() {
             horizontalArrangement = Arrangement.spacedBy(6.dp),
         ) {
             Icon(
-                painter = painterResource(Res.drawable.lock),
+                painter = painterResource(UiRes.drawable.ui_drawable_lock),
                 contentDescription = null,
                 tint = MaterialTheme.colorScheme.primary,
                 modifier = Modifier.size(12.dp),

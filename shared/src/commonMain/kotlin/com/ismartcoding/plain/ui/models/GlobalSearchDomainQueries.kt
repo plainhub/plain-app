@@ -31,6 +31,11 @@ import com.ismartcoding.plain.platform.searchMedia
 import com.ismartcoding.plain.platform.searchPackages
 import com.ismartcoding.plain.ui.nav.Routing
 import org.jetbrains.compose.resources.DrawableResource
+import com.ismartcoding.plain.ui.resources.Res as UiRes
+import com.ismartcoding.plain.ui.resources.bot as ui_drawable_bot
+import com.ismartcoding.plain.ui.resources.devices as ui_drawable_devices
+import com.ismartcoding.plain.ui.resources.hash as ui_drawable_hash
+import com.ismartcoding.plain.i18n.devices
 
 /**
  * Data-source layer of the global search: how each domain is counted,
@@ -202,11 +207,11 @@ private fun DChat.toHit(q: String): GlobalSearchHit {
         senderName = if (fromId == "me") LocaleHelper.getString(Res.string.me) else conversation
     }
     val thumbRes: DrawableResource = if (isChannel) {
-        Res.drawable.hash
+        UiRes.drawable.ui_drawable_hash
     } else {
         val other = if (fromId == "me" || fromId == "local") toId else fromId
-        if (other == "local") Res.drawable.bot
-        else PeerCacher.getPeer(other)?.deviceType?.getIcon() ?: Res.drawable.devices
+        if (other == "local") UiRes.drawable.ui_drawable_bot
+        else PeerCacher.getPeer(other)?.deviceType?.getIcon() ?: UiRes.drawable.ui_drawable_devices
     }
     return GlobalSearchHit(
         key = "chat_$id",

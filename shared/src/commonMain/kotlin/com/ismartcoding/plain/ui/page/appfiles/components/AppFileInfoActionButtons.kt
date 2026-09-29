@@ -23,6 +23,13 @@ import com.ismartcoding.plain.ui.models.VAppFile
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
+import com.ismartcoding.plain.ui.resources.Res as UiRes
+import com.ismartcoding.plain.ui.resources.forward as ui_drawable_forward
+import com.ismartcoding.plain.ui.resources.save as ui_drawable_save
+import com.ismartcoding.plain.ui.resources.share_2 as ui_drawable_share_2
+import com.ismartcoding.plain.ui.resources.square_arrow_out_up_right as ui_drawable_square_arrow_out_up_right
+import com.ismartcoding.plain.i18n.save
+import com.ismartcoding.plain.i18n.forward
 
 @Composable
 fun AppFileInfoActionButtons(
@@ -35,19 +42,19 @@ fun AppFileInfoActionButtons(
     val realPath = file.appFile.realPath.resolveAppFileRealPath()
 
     PSheetPrimaryActionsCard {
-        PSheetPrimaryAction(Res.drawable.forward, stringResource(Res.string.forward)) {
+        PSheetPrimaryAction(UiRes.drawable.ui_drawable_forward, stringResource(Res.string.forward)) {
             onShowForwardDialog()
         }
-        PSheetPrimaryAction(Res.drawable.share_2, stringResource(Res.string.share)) {
+        PSheetPrimaryAction(UiRes.drawable.ui_drawable_share_2, stringResource(Res.string.share)) {
             scope.launch(Dispatchers.Default) {
                 shareFiles(listOf(realPath))
             }
             onDismiss()
         }
-        PSheetPrimaryAction(Res.drawable.save, stringResource(Res.string.save_as)) {
+        PSheetPrimaryAction(UiRes.drawable.ui_drawable_save, stringResource(Res.string.save_as)) {
             showSaveSheet = true
         }
-        PSheetPrimaryAction(Res.drawable.square_arrow_out_up_right, stringResource(Res.string.open_with)) {
+        PSheetPrimaryAction(UiRes.drawable.ui_drawable_square_arrow_out_up_right, stringResource(Res.string.open_with)) {
             openFileExternal(realPath)
         }
     }

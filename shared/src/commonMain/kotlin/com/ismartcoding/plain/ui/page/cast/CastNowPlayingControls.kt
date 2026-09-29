@@ -30,6 +30,10 @@ import com.ismartcoding.plain.ui.base.HorizontalSpace
 import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.theme.listItemSubtitle
 import com.ismartcoding.plain.ui.theme.listItemTitle
+import com.ismartcoding.plain.ui.resources.Res as UiRes
+import com.ismartcoding.plain.ui.resources.pause as ui_drawable_pause
+import com.ismartcoding.plain.ui.resources.play_arrow as ui_drawable_play_arrow
+import com.ismartcoding.plain.i18n.pause
 
 /** Now-playing controls shown at the top of the cast playlist sheet. */
 @Composable
@@ -86,7 +90,7 @@ internal fun CastNowPlayingControls(
                     .background(if (isPlaying) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.primary),
             ) {
                 Icon(
-                    painter = painterResource(if (isPlaying) Res.drawable.pause else Res.drawable.play_arrow),
+                    painter = painterResource(if (isPlaying) UiRes.drawable.ui_drawable_pause else UiRes.drawable.ui_drawable_play_arrow),
                     contentDescription = if (isPlaying) stringResource(Res.string.pause) else stringResource(Res.string.play),
                     tint = if (isPlaying) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.onPrimary,
                     modifier = Modifier.size(24.dp),

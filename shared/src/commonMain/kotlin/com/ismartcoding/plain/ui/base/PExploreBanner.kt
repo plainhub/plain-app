@@ -4,6 +4,10 @@ import com.ismartcoding.plain.i18n.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import org.jetbrains.compose.resources.stringResource
+import com.ismartcoding.plain.ui.resources.Res as UiRes
+import com.ismartcoding.plain.ui.resources.link as ui_drawable_link
+import com.ismartcoding.plain.ui.resources.square_arrow_out_up_right as ui_drawable_square_arrow_out_up_right
+import com.ismartcoding.plain.i18n.link
 
 @Composable
 fun PExploreBanner(
@@ -17,7 +21,7 @@ fun PExploreBanner(
         description = stringResource(Res.string.official_website_desc),
         buttonText = "plainapp.app",
         onClick = onClick,
-        tagIcon = Res.drawable.link,
-        buttonIcon = Res.drawable.square_arrow_out_up_right,
+        tagIcon = UiRes.drawable.ui_drawable_link,
+        buttonIcon = UiRes.drawable.ui_drawable_square_arrow_out_up_right,
     )
 }

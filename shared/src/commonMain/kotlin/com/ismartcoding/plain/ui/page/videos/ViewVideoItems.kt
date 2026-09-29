@@ -48,6 +48,14 @@ import androidx.compose.ui.layout.ContentScale
 import com.ismartcoding.plain.lib.extensions.formatBytes
 import com.ismartcoding.plain.lib.extensions.getFilenameFromPath
 import com.ismartcoding.plain.lib.extensions.getMimeType
+import com.ismartcoding.plain.ui.resources.Res as UiRes
+import com.ismartcoding.plain.ui.resources.archive_restore as ui_drawable_archive_restore
+import com.ismartcoding.plain.ui.resources.file_video as ui_drawable_file_video
+import com.ismartcoding.plain.ui.resources.list_checks as ui_drawable_list_checks
+import com.ismartcoding.plain.ui.resources.pen as ui_drawable_pen
+import com.ismartcoding.plain.ui.resources.share_2 as ui_drawable_share_2
+import com.ismartcoding.plain.ui.resources.smartphone as ui_drawable_smartphone
+import com.ismartcoding.plain.ui.resources.square_arrow_out_up_right as ui_drawable_square_arrow_out_up_right
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
@@ -65,7 +73,7 @@ internal fun VideoActionButtons(
             thumbnail = {
                 PSheetHeaderThumb(
                     model = getMediaItemUriString(videosVM.dataType, m.id).ifEmpty { m.path },
-                    fallbackIcon = Res.drawable.file_video,
+                    fallbackIcon = UiRes.drawable.ui_drawable_file_video,
                     contentScale = ContentScale.Crop,
                 )
             },
@@ -74,18 +82,18 @@ internal fun VideoActionButtons(
         )
         PSheetPrimaryActionsRow {
             if (!videosVM.showSearchBar.value) {
-                PSheetPrimaryAction(Res.drawable.list_checks, stringResource(Res.string.select)) {
+                PSheetPrimaryAction(UiRes.drawable.ui_drawable_list_checks, stringResource(Res.string.select)) {
                     dragSelectState.enterSelectMode()
                     dragSelectState.select(m.id)
                     onDismiss()
                 }
             }
-            PSheetPrimaryAction(Res.drawable.share_2, stringResource(Res.string.share)) {
+            PSheetPrimaryAction(UiRes.drawable.ui_drawable_share_2, stringResource(Res.string.share)) {
                 shareFiles(listOf(getMediaItemUriString(videosVM.dataType, m.id)))
                 onDismiss()
             }
             if (!videosVM.trash.value) {
-                PSheetPrimaryAction(Res.drawable.pen, stringResource(Res.string.rename)) {
+                PSheetPrimaryAction(UiRes.drawable.ui_drawable_pen, stringResource(Res.string.rename)) {
                     videosVM.showRenameDialog.value = true
                 }
             }
@@ -96,7 +104,7 @@ internal fun VideoActionButtons(
                 }
             }
             if (AppFeatureType.MEDIA_TRASH.has() && videosVM.trash.value) {
-                PSheetPrimaryAction(Res.drawable.archive_restore, stringResource(Res.string.restore)) {
+                PSheetPrimaryAction(UiRes.drawable.ui_drawable_archive_restore, stringResource(Res.string.restore)) {
                     videosVM.restore(tagsVM, setOf(m.id))
                     onDismiss()
                 }
@@ -125,15 +133,15 @@ internal fun VideoActionButtons(
         PCard(modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN)) {
             Column {
                 if (!m.path.isUrl() && !videosVM.trash.value) {
-                    PSheetActionRow(Res.drawable.smartphone, stringResource(Res.string.add_to_home), trailing = { AddToHomeHelpAction() }) {
+                    PSheetActionRow(UiRes.drawable.ui_drawable_smartphone, stringResource(Res.string.add_to_home), trailing = { AddToHomeHelpAction() }) {
                         showAddToHomeDialog = true
                     }
-                    PSheetActionRow(Res.drawable.square_arrow_out_up_right, stringResource(Res.string.open_with)) {
+                    PSheetActionRow(UiRes.drawable.ui_drawable_square_arrow_out_up_right, stringResource(Res.string.open_with)) {
                         openFileExternal(m.path)
                     }
                 }
                 if (videosVM.trash.value) {
-                    PSheetActionRow(Res.drawable.pen, stringResource(Res.string.rename)) {
+                    PSheetActionRow(UiRes.drawable.ui_drawable_pen, stringResource(Res.string.rename)) {
                         videosVM.showRenameDialog.value = true
                     }
                 }

@@ -16,6 +16,10 @@ import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.components.SidebarItem
 import com.ismartcoding.plain.ui.models.AppsViewModel
 import com.ismartcoding.plain.ui.models.VTabData
+import com.ismartcoding.plain.ui.resources.Res as UiRes
+import com.ismartcoding.plain.ui.resources.layout_grid as ui_drawable_layout_grid
+import com.ismartcoding.plain.ui.resources.package2 as ui_drawable_package2
+import com.ismartcoding.plain.ui.resources.rocket as ui_drawable_rocket
 
 /**
  * Drawer content for the apps page: All / System / User app filters with counts.
@@ -23,7 +27,7 @@ import com.ismartcoding.plain.ui.models.VTabData
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AppsDrawerContent(appsVM: AppsViewModel, onSelect: (VTabData) -> Unit) {
-    val tabIcons = listOf(Res.drawable.layout_grid, Res.drawable.package2, Res.drawable.rocket)
+    val tabIcons = listOf(UiRes.drawable.ui_drawable_layout_grid, UiRes.drawable.ui_drawable_package2, UiRes.drawable.ui_drawable_rocket)
     Column(
         modifier = Modifier
             .verticalScroll(rememberScrollState())
@@ -33,7 +37,7 @@ fun AppsDrawerContent(appsVM: AppsViewModel, onSelect: (VTabData) -> Unit) {
         appsVM.tabs.value.forEachIndexed { index, tab ->
             SidebarItem(
                 label = tab.title,
-                icon = tabIcons.getOrElse(index) { Res.drawable.layout_grid },
+                icon = tabIcons.getOrElse(index) { UiRes.drawable.ui_drawable_layout_grid },
                 isSelected = appsVM.appType.value == tab.value,
                 onClick = { onSelect(tab) },
                 badge = tab.count.toString()

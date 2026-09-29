@@ -38,6 +38,10 @@ import com.ismartcoding.plain.ui.base.Tips
 import com.ismartcoding.plain.ui.base.ToastManager
 import com.ismartcoding.plain.ui.base.TopSpace
 import com.ismartcoding.plain.ui.base.VerticalSpace
+import com.ismartcoding.plain.ui.resources.Res as UiRes
+import com.ismartcoding.plain.ui.resources.lightbulb as ui_drawable_lightbulb
+import com.ismartcoding.plain.ui.resources.settings as ui_drawable_settings
+import com.ismartcoding.plain.i18n.settings
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -82,7 +86,7 @@ private fun ShowcaseAlerts() {
 @Composable
 private fun ShowcaseBanners() {
     Subtitle("PBanner")
-    PBanner(title = "Banner Title", desc = "Banner description.", icon = Res.drawable.lightbulb, onClick = {})
+    PBanner(title = "Banner Title", desc = "Banner description.", icon = UiRes.drawable.ui_drawable_lightbulb, onClick = {})
     VerticalSpace(16.dp)
 }
 
@@ -90,7 +94,7 @@ private fun ShowcaseBanners() {
 private fun ShowcaseCards() {
     Subtitle("PCard + PListItem")
     PCard(modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN)) {
-        PListItem(title = "List item with icon", subtitle = "Subtitle", icon = Res.drawable.settings, showMore = true)
+        PListItem(title = "List item with icon", subtitle = "Subtitle", icon = UiRes.drawable.ui_drawable_settings, showMore = true)
         PListItem(title = "List item with value", value = "Value")
         PListItem(title = "List item with switch", separatedActions = true) {
             val checked = remember { mutableStateOf(true) }

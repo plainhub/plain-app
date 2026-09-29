@@ -17,6 +17,8 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.ismartcoding.plain.db.DMessageDeliveryResult
 import com.ismartcoding.plain.ui.components.CheckCircle
+import com.ismartcoding.plain.ui.resources.Res as UiRes
+import com.ismartcoding.plain.ui.resources.check as ui_drawable_check
 
 @Composable
 internal fun ChannelDeliveryResultRow(
@@ -33,7 +35,7 @@ internal fun ChannelDeliveryResultRow(
     ) {
         if (isSuccess) {
             Icon(
-                painter = painterResource(Res.drawable.check),
+                painter = painterResource(UiRes.drawable.ui_drawable_check),
                 contentDescription = null,
                 tint = MaterialTheme.colorScheme.primary,
                 modifier = Modifier

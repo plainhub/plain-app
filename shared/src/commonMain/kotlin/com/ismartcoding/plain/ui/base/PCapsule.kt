@@ -29,6 +29,9 @@ import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
+import com.ismartcoding.plain.ui.resources.Res as UiRes
+import com.ismartcoding.plain.ui.resources.circle_dot as ui_drawable_circle_dot
+import com.ismartcoding.plain.ui.resources.more_three_dots as ui_drawable_more_three_dots
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -55,7 +58,7 @@ fun PCapsuleMoreClose(
             contentAlignment = Alignment.Center,
         ) {
             Image(
-                painter = painterResource(Res.drawable.more_three_dots),
+                painter = painterResource(UiRes.drawable.ui_drawable_more_three_dots),
                 contentDescription = stringResource(Res.string.more),
                 modifier = Modifier.padding(horizontal = 9.dp).size(24.dp),
                 colorFilter = ColorFilter.tint(tint),
@@ -71,7 +74,7 @@ fun PCapsuleMoreClose(
             contentAlignment = Alignment.Center,
         ) {
             Image(
-                painter = painterResource(Res.drawable.circle_dot),
+                painter = painterResource(UiRes.drawable.ui_drawable_circle_dot),
                 contentDescription = stringResource(Res.string.close),
                 modifier = Modifier.padding(horizontal = 9.dp).size(24.dp),
                 colorFilter = ColorFilter.tint(tint),

@@ -38,6 +38,8 @@ import com.ismartcoding.plain.ui.theme.dialogSheetBackground
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import kotlin.math.min
+import com.ismartcoding.plain.ui.resources.Res as UiRes
+import com.ismartcoding.plain.ui.resources.circle_help as ui_drawable_circle_help
 
 // Help entry for "Add to Home Screen": a trailing help icon that opens a
 // dialog with a looping animation showing a shortcut landing on the phone's
@@ -48,7 +50,7 @@ fun AddToHomeHelpAction() {
     var showHelp by remember { mutableStateOf(false) }
     IconButton(onClick = { showHelp = true }, modifier = Modifier.size(32.dp)) {
         Icon(
-            painter = painterResource(Res.drawable.circle_help),
+            painter = painterResource(UiRes.drawable.ui_drawable_circle_help),
             contentDescription = stringResource(Res.string.help),
             tint = MaterialTheme.colorScheme.onSurfaceVariant,
             modifier = Modifier.size(22.dp),

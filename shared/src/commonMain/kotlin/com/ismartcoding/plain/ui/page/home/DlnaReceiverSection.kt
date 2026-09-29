@@ -16,7 +16,7 @@ import com.ismartcoding.plain.i18n.dlna_receiver
 import com.ismartcoding.plain.i18n.dlna_receiver_desc
 import com.ismartcoding.plain.features.dlna.startDlnaRenderer
 import com.ismartcoding.plain.features.dlna.stopDlnaRenderer
-import com.ismartcoding.plain.i18n.cast
+import com.ismartcoding.plain.ui.resources.cast as ui_drawable_cast
 import com.ismartcoding.plain.preferences.DlnaPreference
 import com.ismartcoding.plain.ui.base.HorizontalSpace
 import com.ismartcoding.plain.ui.base.PCard
@@ -28,6 +28,9 @@ import com.ismartcoding.plain.ui.models.launchSafe
 import com.ismartcoding.plain.ui.nav.Routing
 import com.ismartcoding.plain.ui.theme.tipsText
 import org.jetbrains.compose.resources.stringResource
+import com.ismartcoding.plain.ui.resources.Res as UiRes
+import com.ismartcoding.plain.ui.resources.cast as ui_drawable_cast
+import com.ismartcoding.plain.i18n.cast
 
 @Composable
 fun DlnaReceiverSection(navController: NavHostController) {
@@ -37,7 +40,7 @@ fun DlnaReceiverSection(navController: NavHostController) {
     PCard(modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN)) {
         PListItem(
             modifier = Modifier.clickable { navController.navigate(Routing.DlnaReceiver) },
-            icon = Res.drawable.cast,
+            icon = UiRes.drawable.ui_drawable_cast,
             separatedActions = true,
             title = stringResource(Res.string.dlna_receiver),
         ) {

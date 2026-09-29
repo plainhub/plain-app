@@ -21,6 +21,8 @@ import androidx.compose.ui.unit.dp
 import com.ismartcoding.plain.ui.models.FilesViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import com.ismartcoding.plain.ui.resources.Res as UiRes
+import com.ismartcoding.plain.ui.resources.x as ui_drawable_x
 
 @Composable
 fun FilePasteBar(
@@ -39,7 +41,7 @@ fun FilePasteBar(
                 filesVM.copyFiles.clear()
                 filesVM.showPasteBar.value = false
             }) {
-                Icon(painter = painterResource(Res.drawable.x), contentDescription = "Cancel")
+                Icon(painter = painterResource(UiRes.drawable.ui_drawable_x), contentDescription = "Cancel")
             }
 
             Text(

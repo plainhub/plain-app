@@ -46,6 +46,10 @@ import com.ismartcoding.plain.ui.theme.dialogSheetBackground
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.getString
+import com.ismartcoding.plain.ui.resources.Res as UiRes
+import com.ismartcoding.plain.ui.resources.check as ui_drawable_check
+import com.ismartcoding.plain.ui.resources.download as ui_drawable_download
+import com.ismartcoding.plain.i18n.download
 
 /**
  * Global overlay that renders the DLNA cast-request dialog and media player on
@@ -176,13 +180,13 @@ fun DlnaDownloadIconButton(
                 modifier = Modifier.size(24.dp),
             )
             DlnaDownloadState.SUCCESS -> Icon(
-                painter = painterResource(Res.drawable.check),
+                painter = painterResource(UiRes.drawable.ui_drawable_check),
                 contentDescription = stringResource(Res.string.download),
                 tint = iconTint,
                 modifier = Modifier.size(24.dp),
             )
             else -> Icon(
-                painter = painterResource(Res.drawable.download),
+                painter = painterResource(UiRes.drawable.ui_drawable_download),
                 contentDescription = stringResource(Res.string.download),
                 tint = iconTint,
                 modifier = Modifier.size(24.dp),

@@ -32,6 +32,9 @@ import com.ismartcoding.plain.ui.models.TagsViewModel
 import com.ismartcoding.plain.ui.models.enterSelectMode
 import com.ismartcoding.plain.ui.models.select
 import kotlinx.coroutines.launch
+import com.ismartcoding.plain.ui.resources.Res as UiRes
+import com.ismartcoding.plain.ui.resources.archive_restore as ui_drawable_archive_restore
+import com.ismartcoding.plain.ui.resources.list_checks as ui_drawable_list_checks
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
@@ -58,14 +61,14 @@ fun ViewNoteBottomSheet(
             item {
                 PSheetPrimaryActionsCard {
                     if (!NotesViewModel.showSearchBar.value) {
-                        PSheetPrimaryAction(Res.drawable.list_checks, stringResource(Res.string.select)) {
+                        PSheetPrimaryAction(UiRes.drawable.ui_drawable_list_checks, stringResource(Res.string.select)) {
                             NotesViewModel.enterSelectMode()
                             NotesViewModel.select(m.id)
                             onDismiss()
                         }
                     }
                     if (NotesViewModel.trash.value) {
-                        PSheetPrimaryAction(Res.drawable.archive_restore, stringResource(Res.string.restore)) {
+                        PSheetPrimaryAction(UiRes.drawable.ui_drawable_archive_restore, stringResource(Res.string.restore)) {
                             NotesViewModel.restore(tagsVM, setOf(m.id))
                             onDismiss()
                         }

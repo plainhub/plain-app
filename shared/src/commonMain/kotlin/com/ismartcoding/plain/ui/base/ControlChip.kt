@@ -11,8 +11,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.ismartcoding.plain.i18n.Res
-import com.ismartcoding.plain.i18n.volume_2
-import com.ismartcoding.plain.i18n.volume_x
+import com.ismartcoding.plain.ui.resources.volume_2 as ui_drawable_volume_2
+import com.ismartcoding.plain.ui.resources.volume_x as ui_drawable_volume_x
 import com.ismartcoding.plain.ui.components.mediaviewer.PreviewerSoftWhite
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.painterResource

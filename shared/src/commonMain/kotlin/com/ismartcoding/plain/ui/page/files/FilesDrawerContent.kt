@@ -48,6 +48,14 @@ import com.ismartcoding.plain.ui.models.FolderOption
 import com.ismartcoding.plain.ui.nav.Routing
 import com.ismartcoding.plain.ui.page.shares.expiryLabel
 import kotlinx.coroutines.launch
+import com.ismartcoding.plain.ui.resources.Res as UiRes
+import com.ismartcoding.plain.ui.resources.folder as ui_drawable_folder
+import com.ismartcoding.plain.ui.resources.history as ui_drawable_history
+import com.ismartcoding.plain.ui.resources.link as ui_drawable_link
+import com.ismartcoding.plain.ui.resources.pen as ui_drawable_pen
+import com.ismartcoding.plain.ui.resources.square_pen as ui_drawable_square_pen
+import com.ismartcoding.plain.i18n.folder
+import com.ismartcoding.plain.i18n.link
 
 /**
  * Drawer content for the Files page: storage locations as SidebarItems, a
@@ -110,7 +118,7 @@ fun FilesDrawerContent(
         options.filterNot { it.isFavoriteFolder }.forEach { item ->
             SidebarItem(
                 label = item.title,
-                icon = if (item.type == FilesType.RECENTS) Res.drawable.history else Res.drawable.folder,
+                icon = if (item.type == FilesType.RECENTS) UiRes.drawable.ui_drawable_history else UiRes.drawable.ui_drawable_folder,
                 isSelected = item.isChecked,
                 onClick = { sendEvent(FolderKanbanSelectEvent(item)); onSelect(item) }
             )
@@ -128,7 +136,7 @@ fun FilesDrawerContent(
                     Box {
                         SidebarItem(
                             label = item.title,
-                            icon = Res.drawable.folder,
+                            icon = UiRes.drawable.ui_drawable_folder,
                             isSelected = item.isChecked,
                             onLongClick = { contextMenuPath = item.fullPath },
                             onClick = { sendEvent(FolderKanbanSelectEvent(item)); onSelect(item) }
@@ -139,7 +147,7 @@ fun FilesDrawerContent(
                         ) {
                             PDropdownMenuItem(
                                 text = { Text(stringResource(Res.string.rename)) },
-                                leadingIcon = { Icon(painterResource(Res.drawable.pen), null, modifier = Modifier.size(20.dp)) },
+                                leadingIcon = { Icon(painterResource(UiRes.drawable.ui_drawable_pen), null, modifier = Modifier.size(20.dp)) },
                                 onClick = {
                                     contextMenuPath = null
                                     renameValue = item.title
@@ -168,7 +176,7 @@ fun FilesDrawerContent(
                     SidebarItem(
                         label = share.name.ifBlank { share.id },
                         subtitle = share.expiryLabel(),
-                        icon = Res.drawable.link,
+                        icon = UiRes.drawable.ui_drawable_link,
                         onClick = { navController.navigate(Routing.EditShare(share.id)) },
                         onLongClick = { contextMenuShareId = share.id },
                     )
@@ -178,7 +186,7 @@ fun FilesDrawerContent(
                     ) {
                         PDropdownMenuItem(
                             text = { Text(stringResource(Res.string.edit)) },
-                            leadingIcon = { Icon(painterResource(Res.drawable.square_pen), null, modifier = Modifier.size(20.dp)) },
+                            leadingIcon = { Icon(painterResource(UiRes.drawable.ui_drawable_square_pen), null, modifier = Modifier.size(20.dp)) },
                             onClick = {
                                 contextMenuShareId = null
                                 navController.navigate(Routing.EditShare(share.id))

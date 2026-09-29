@@ -45,6 +45,14 @@ import org.jetbrains.compose.resources.stringResource
 import androidx.compose.foundation.layout.size
 import com.ismartcoding.plain.lib.extensions.formatDurationMs
 import com.ismartcoding.plain.lib.extensions.getFilenameFromPath
+import com.ismartcoding.plain.ui.resources.Res as UiRes
+import com.ismartcoding.plain.ui.resources.archive_restore as ui_drawable_archive_restore
+import com.ismartcoding.plain.ui.resources.list_checks as ui_drawable_list_checks
+import com.ismartcoding.plain.ui.resources.pen as ui_drawable_pen
+import com.ismartcoding.plain.ui.resources.playlist_remove as ui_drawable_playlist_remove
+import com.ismartcoding.plain.ui.resources.share_2 as ui_drawable_share_2
+import com.ismartcoding.plain.ui.resources.smartphone as ui_drawable_smartphone
+import com.ismartcoding.plain.ui.resources.square_arrow_out_up_right as ui_drawable_square_arrow_out_up_right
 
 @Composable
 internal fun AudioActionButtons(
@@ -68,18 +76,18 @@ internal fun AudioActionButtons(
         )
         PSheetPrimaryActionsRow {
             if (!audioVM.showSearchBar.value) {
-                PSheetPrimaryAction(Res.drawable.list_checks, stringResource(Res.string.select)) {
+                PSheetPrimaryAction(UiRes.drawable.ui_drawable_list_checks, stringResource(Res.string.select)) {
                     dragSelectState.enterSelectMode()
                     dragSelectState.select(m.id)
                     onDismiss()
                 }
             }
             if (!audioVM.trash.value) {
-                PSheetPrimaryAction(Res.drawable.share_2, stringResource(Res.string.share)) {
+                PSheetPrimaryAction(UiRes.drawable.ui_drawable_share_2, stringResource(Res.string.share)) {
                     shareFiles(listOf(getMediaItemUriString(DataType.AUDIO, m.id)))
                     onDismiss()
                 }
-                PSheetPrimaryAction(Res.drawable.pen, stringResource(Res.string.rename)) {
+                PSheetPrimaryAction(UiRes.drawable.ui_drawable_pen, stringResource(Res.string.rename)) {
                     audioVM.showRenameDialog.value = true
                 }
                 if (AppFeatureType.MEDIA_TRASH.has()) {
@@ -90,7 +98,7 @@ internal fun AudioActionButtons(
                 }
             }
             if (AppFeatureType.MEDIA_TRASH.has() && audioVM.trash.value) {
-                PSheetPrimaryAction(Res.drawable.archive_restore, stringResource(Res.string.restore)) {
+                PSheetPrimaryAction(UiRes.drawable.ui_drawable_archive_restore, stringResource(Res.string.restore)) {
                     audioVM.restore(tagsVM, setOf(m.id))
                     onDismiss()
                 }
@@ -118,7 +126,7 @@ internal fun AudioActionButtons(
         PCard(modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN)) {
             Column {
                 if (playlistId != null) {
-                    PSheetActionRow(Res.drawable.playlist_remove, stringResource(Res.string.remove_from_playlist)) {
+                    PSheetActionRow(UiRes.drawable.ui_drawable_playlist_remove, stringResource(Res.string.remove_from_playlist)) {
                         scope.launch {
                             withIO { AudioPlaylistManager.removePlaylistItem(playlistId, m.path) }
                             DialogHelper.showMessage(Res.string.removed_from_playlist)
@@ -128,10 +136,10 @@ internal fun AudioActionButtons(
                     }
                 }
                 if (!audioVM.trash.value && !m.path.isUrl()) {
-                    PSheetActionRow(Res.drawable.smartphone, stringResource(Res.string.add_to_home), trailing = { AddToHomeHelpAction() }) {
+                    PSheetActionRow(UiRes.drawable.ui_drawable_smartphone, stringResource(Res.string.add_to_home), trailing = { AddToHomeHelpAction() }) {
                         showAddToHomeDialog = true
                     }
-                    PSheetActionRow(Res.drawable.square_arrow_out_up_right, stringResource(Res.string.open_with)) {
+                    PSheetActionRow(UiRes.drawable.ui_drawable_square_arrow_out_up_right, stringResource(Res.string.open_with)) {
                         openFileExternal(m.path)
                     }
                 }

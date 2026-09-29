@@ -42,8 +42,8 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.ismartcoding.plain.db.DTag
 import com.ismartcoding.plain.db.DTagRelation
 import com.ismartcoding.plain.i18n.Res
-import com.ismartcoding.plain.i18n.close
-import com.ismartcoding.plain.i18n.double_arrow_right
+import com.ismartcoding.plain.ui.resources.close as ui_drawable_close
+import com.ismartcoding.plain.ui.resources.double_arrow_right as ui_drawable_double_arrow_right
 import com.ismartcoding.plain.ui.base.ControlChipIconButton
 import com.ismartcoding.plain.ui.components.mediaviewer.GestureScope
 import com.ismartcoding.plain.ui.components.mediaviewer.ImagePreviewActions
@@ -63,6 +63,10 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
+import com.ismartcoding.plain.ui.resources.Res as UiRes
+import com.ismartcoding.plain.ui.resources.close as ui_drawable_close
+import com.ismartcoding.plain.ui.resources.double_arrow_right as ui_drawable_double_arrow_right
+import com.ismartcoding.plain.i18n.close
 
 // Grace period before showing a loading icon: media that becomes ready within
 // this window switches without any visible loading state (Douyin-like).
@@ -272,7 +276,7 @@ private fun PreviewerCloseButton(state: MediaPreviewerState) {
     ) {
         if (state.showActions) {
             ControlChipIconButton(
-                icon = Res.drawable.close,
+                icon = UiRes.drawable.ui_drawable_close,
                 contentDescription = stringResource(Res.string.close),
             ) {
                 scope.launch { state.closeTransform() }
@@ -300,7 +304,7 @@ private fun SpeedBoostIndicator(state: MediaPreviewerState) {
                     .padding(horizontal = 16.dp, vertical = 6.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Icon(painter = painterResource(Res.drawable.double_arrow_right), contentDescription = null, tint = PreviewerSoftWhite, modifier = Modifier.size(20.dp))
+                Icon(painter = painterResource(UiRes.drawable.ui_drawable_double_arrow_right), contentDescription = null, tint = PreviewerSoftWhite, modifier = Modifier.size(20.dp))
                 Text(text = " 2x", color = PreviewerSoftWhite, fontSize = 16.sp, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center)
             }
         }

@@ -44,6 +44,8 @@ import com.ismartcoding.plain.ui.theme.listItemTag
 import com.ismartcoding.plain.ui.theme.listItemTitle
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
+import com.ismartcoding.plain.ui.resources.Res as UiRes
+import com.ismartcoding.plain.ui.resources.chevron_right as ui_drawable_chevron_right
 
 /** Title style shared by entry rows and digest previews: big bold when unread, muted regular when read. */
 @Composable
@@ -105,7 +107,7 @@ internal fun FeedDayHeaderRow(
         if (onToggle != null) {
             HorizontalSpace(dp = 8.dp)
             Icon(
-                painter = painterResource(Res.drawable.chevron_right),
+                painter = painterResource(UiRes.drawable.ui_drawable_chevron_right),
                 contentDescription = null,
                 modifier = Modifier
                     .size(20.dp)
@@ -194,7 +196,7 @@ internal fun FeedClusterHeaderRow(
         if (onToggle != null) {
             HorizontalSpace(dp = 8.dp)
             Icon(
-                painter = painterResource(Res.drawable.chevron_right),
+                painter = painterResource(UiRes.drawable.ui_drawable_chevron_right),
                 contentDescription = null,
                 modifier = Modifier
                     .size(20.dp)

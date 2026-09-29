@@ -46,6 +46,14 @@ import com.ismartcoding.plain.ui.theme.grey
 import com.ismartcoding.plain.ui.theme.orange
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
+import com.ismartcoding.plain.ui.resources.Res as UiRes
+import com.ismartcoding.plain.ui.resources.circle_alert as ui_drawable_circle_alert
+import com.ismartcoding.plain.ui.resources.circle_help as ui_drawable_circle_help
+import com.ismartcoding.plain.ui.resources.lock as ui_drawable_lock
+import com.ismartcoding.plain.ui.resources.refresh_ccw as ui_drawable_refresh_ccw
+import com.ismartcoding.plain.ui.resources.smartphone as ui_drawable_smartphone
+import com.ismartcoding.plain.ui.resources.troubleshoot as ui_drawable_troubleshoot
+import com.ismartcoding.plain.i18n.troubleshoot
 
 private const val TROUBLESHOOTING_GUIDE_URL = "https://plainapp.app/docs/troubleshooting"
 
@@ -92,7 +100,7 @@ fun HowToUsePage(
                         PCard(modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN)) {
                             PListItem(
                                 modifier = Modifier.clickable { navController.navigate(Routing.Onboarding) },
-                                icon = Res.drawable.refresh_ccw,
+                                icon = UiRes.drawable.ui_drawable_refresh_ccw,
                                 title = stringResource(Res.string.onboarding_replay),
                                 showMore = true,
                             )
@@ -103,7 +111,7 @@ fun HowToUsePage(
                         Subtitle(text = stringResource(Res.string.troubleshooting))
                         PCard(modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN)) {
                             FaqItem(
-                                icon = Res.drawable.circle_alert,
+                                icon = UiRes.drawable.ui_drawable_circle_alert,
                                 tint = MaterialTheme.colorScheme.error,
                                 question = stringResource(Res.string.faq_cannot_open_q),
                                 answer = stringResource(Res.string.faq_cannot_open_a),
@@ -111,7 +119,7 @@ fun HowToUsePage(
                                 RunDiagnosticsChip(onClick = onRunDiagnostics)
                             }
                             FaqItem(
-                                icon = Res.drawable.lock,
+                                icon = UiRes.drawable.ui_drawable_lock,
                                 tint = MaterialTheme.colorScheme.orange,
                                 question = stringResource(Res.string.faq_https_warning_q),
                                 answer = stringResource(Res.string.browser_https_error_tips),
@@ -119,7 +127,7 @@ fun HowToUsePage(
                                 answerFooterFullWidth = true,
                             )
                             FaqItem(
-                                icon = Res.drawable.smartphone,
+                                icon = UiRes.drawable.ui_drawable_smartphone,
                                 tint = MaterialTheme.colorScheme.orange,
                                 question = stringResource(Res.string.faq_stay_online_q),
                                 answer = stringResource(Res.string.faq_stay_online_a),
@@ -131,7 +139,7 @@ fun HowToUsePage(
                         PCard(modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN)) {
                             PListItem(
                                 modifier = Modifier.clickable { WebHelper.open(TROUBLESHOOTING_GUIDE_URL) },
-                                icon = Res.drawable.circle_help,
+                                icon = UiRes.drawable.ui_drawable_circle_help,
                                 title = stringResource(Res.string.more_help),
                                 subtitle = TROUBLESHOOTING_GUIDE_URL.removePrefix("https://"),
                                 showMore = true,
@@ -157,7 +165,7 @@ private fun RunDiagnosticsChip(onClick: () -> Unit) {
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Icon(
-                painter = painterResource(Res.drawable.troubleshoot),
+                painter = painterResource(UiRes.drawable.ui_drawable_troubleshoot),
                 contentDescription = null,
                 tint = MaterialTheme.colorScheme.primary,
                 modifier = Modifier.size(16.dp),

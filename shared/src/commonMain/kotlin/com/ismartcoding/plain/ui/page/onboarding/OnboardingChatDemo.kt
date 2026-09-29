@@ -32,6 +32,9 @@ import com.ismartcoding.plain.ui.base.HorizontalSpace
 import com.ismartcoding.plain.ui.theme.cardBackgroundNormal
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
+import com.ismartcoding.plain.ui.resources.Res as UiRes
+import com.ismartcoding.plain.ui.resources.folders as ui_drawable_folders
+import com.ismartcoding.plain.i18n.folders
 
 /** Share-folder message card, mirroring ChatShareItem. */
 @Composable
@@ -52,7 +55,7 @@ internal fun ShareCard() {
                 color = MaterialTheme.colorScheme.surfaceContainerHigh,
             ) {
                 Icon(
-                    painter = painterResource(Res.drawable.folders),
+                    painter = painterResource(UiRes.drawable.ui_drawable_folders),
                     contentDescription = null,
                     tint = MaterialTheme.colorScheme.primary,
                     modifier = Modifier.padding(7.dp),

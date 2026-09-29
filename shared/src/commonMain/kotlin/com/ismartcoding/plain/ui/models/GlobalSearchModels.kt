@@ -15,21 +15,34 @@ import com.ismartcoding.plain.features.file.DFile
 import com.ismartcoding.plain.platform.DPackageInfo
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.StringResource
+import com.ismartcoding.plain.ui.resources.Res as UiRes
+import com.ismartcoding.plain.ui.resources.file_text as ui_drawable_file_text
+import com.ismartcoding.plain.ui.resources.folder as ui_drawable_folder
+import com.ismartcoding.plain.ui.resources.image as ui_drawable_image
+import com.ismartcoding.plain.ui.resources.layout_grid as ui_drawable_layout_grid
+import com.ismartcoding.plain.ui.resources.message_circle as ui_drawable_message_circle
+import com.ismartcoding.plain.ui.resources.music as ui_drawable_music
+import com.ismartcoding.plain.ui.resources.notebook_pen as ui_drawable_notebook_pen
+import com.ismartcoding.plain.ui.resources.rss as ui_drawable_rss
+import com.ismartcoding.plain.ui.resources.video as ui_drawable_video
+import com.ismartcoding.plain.i18n.folder
+import com.ismartcoding.plain.i18n.video
+import com.ismartcoding.plain.i18n.image
 
 /** Content domains of the global search, in the fixed section order of the results page. */
 enum class GlobalSearchDomain(
     val labelRes: StringResource,
     val iconRes: DrawableResource,
 ) {
-    NOTES(Res.string.notes, Res.drawable.notebook_pen),
-    AUDIO(Res.string.audios, Res.drawable.music),
-    IMAGES(Res.string.images, Res.drawable.image),
-    VIDEOS(Res.string.videos, Res.drawable.video),
-    DOCS(Res.string.docs, Res.drawable.file_text),
-    FILES(Res.string.files, Res.drawable.folder),
-    FEEDS(Res.string.feeds, Res.drawable.rss),
-    CHAT(Res.string.chat, Res.drawable.message_circle),
-    APPS(Res.string.apps, Res.drawable.layout_grid);
+    NOTES(Res.string.notes, UiRes.drawable.ui_drawable_notebook_pen),
+    AUDIO(Res.string.audios, UiRes.drawable.ui_drawable_music),
+    IMAGES(Res.string.images, UiRes.drawable.ui_drawable_image),
+    VIDEOS(Res.string.videos, UiRes.drawable.ui_drawable_video),
+    DOCS(Res.string.docs, UiRes.drawable.ui_drawable_file_text),
+    FILES(Res.string.files, UiRes.drawable.ui_drawable_folder),
+    FEEDS(Res.string.feeds, UiRes.drawable.ui_drawable_rss),
+    CHAT(Res.string.chat, UiRes.drawable.ui_drawable_message_circle),
+    APPS(Res.string.apps, UiRes.drawable.ui_drawable_layout_grid);
 }
 
 fun globalSearchDomains(): List<GlobalSearchDomain> =

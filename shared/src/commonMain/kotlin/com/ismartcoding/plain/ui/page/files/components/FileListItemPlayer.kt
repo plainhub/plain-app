@@ -27,6 +27,11 @@ import com.ismartcoding.plain.lib.extensions.formatDurationMs
 import com.ismartcoding.plain.ui.base.HorizontalSpace
 import com.ismartcoding.plain.ui.base.PlayerSlider
 import com.ismartcoding.plain.ui.base.PlayerSliderDefaults
+import com.ismartcoding.plain.ui.resources.Res as UiRes
+import com.ismartcoding.plain.ui.resources.music2 as ui_drawable_music2
+import com.ismartcoding.plain.ui.resources.pause as ui_drawable_pause
+import com.ismartcoding.plain.ui.resources.play_arrow as ui_drawable_play_arrow
+import com.ismartcoding.plain.i18n.pause
 
 @Composable
 internal fun FileListItemPlayer(
@@ -63,7 +68,7 @@ internal fun FileListItemPlayer(
                             .background(if (isPlaying) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.primary)
                     ) {
                         Icon(
-                            painter = painterResource(if (isPlaying) Res.drawable.pause else Res.drawable.play_arrow),
+                            painter = painterResource(if (isPlaying) UiRes.drawable.ui_drawable_pause else UiRes.drawable.ui_drawable_play_arrow),
                             contentDescription = if (isPlaying) "Pause" else "Play",
                             tint = if (isPlaying) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.onPrimary,
                             modifier = Modifier.size(24.dp)
@@ -75,7 +80,7 @@ internal fun FileListItemPlayer(
                         modifier = Modifier.size(36.dp).shadow(2.dp, CircleShape).clip(CircleShape).background(MaterialTheme.colorScheme.surfaceVariant)
                     ) {
                         Icon(
-                            painter = painterResource(Res.drawable.music2), contentDescription = "Full player",
+                            painter = painterResource(UiRes.drawable.ui_drawable_music2), contentDescription = "Full player",
                             tint = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.size(20.dp)
                         )
                     }

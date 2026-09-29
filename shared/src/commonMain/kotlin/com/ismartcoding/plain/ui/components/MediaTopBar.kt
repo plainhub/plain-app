@@ -35,6 +35,12 @@ import com.ismartcoding.plain.ui.models.TagsViewModel
 import com.ismartcoding.plain.ui.models.enterSearchMode
 import com.ismartcoding.plain.ui.page.home.MediaSidebarDrawer
 import kotlinx.coroutines.launch
+import com.ismartcoding.plain.ui.resources.Res as UiRes
+import com.ismartcoding.plain.ui.resources.cast as ui_drawable_cast
+import com.ismartcoding.plain.ui.resources.left_panel_open as ui_drawable_left_panel_open
+import com.ismartcoding.plain.ui.resources.sort as ui_drawable_sort
+import com.ismartcoding.plain.i18n.sort
+import com.ismartcoding.plain.i18n.cast
 
 /**
  * Shared layout for the media pages (Images / Audio / Videos / Docs). Wraps the
@@ -89,12 +95,12 @@ fun <T : IData> MediaTopBar(
         PCapsuleMoreClose(
             onClose = { navController.navigateUp() },
         ) { dismiss ->
-            PSheetActionRow(Res.drawable.sort, stringResource(Res.string.sort)) {
+            PSheetActionRow(UiRes.drawable.ui_drawable_sort, stringResource(Res.string.sort)) {
                 dismiss()
                 mediaVM.showSortAndBrowseDialog.value = true
             }
             if (!isDocs && showCastModeMenu) {
-                PSheetActionRow(Res.drawable.cast, stringResource(Res.string.cast_mode)) {
+                PSheetActionRow(UiRes.drawable.ui_drawable_cast, stringResource(Res.string.cast_mode)) {
                     dismiss()
                     castVM.showCastDialog.value = true
                 }
@@ -125,7 +131,7 @@ fun <T : IData> MediaTopBar(
                                 }
                             } else {
                                 PIconButton(
-                                    icon = Res.drawable.left_panel_open,
+                                    icon = UiRes.drawable.ui_drawable_left_panel_open,
                                     contentDescription = stringResource(Res.string.folders),
                                     click = {
                                         scope.launch {

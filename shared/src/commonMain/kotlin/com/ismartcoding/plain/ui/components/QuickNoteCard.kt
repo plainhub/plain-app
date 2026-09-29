@@ -32,13 +32,13 @@ import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.unit.dp
 import com.ismartcoding.plain.features.NoteHelper
 import com.ismartcoding.plain.i18n.Res
-import com.ismartcoding.plain.i18n.check
+import com.ismartcoding.plain.ui.resources.check as ui_drawable_check
 import com.ismartcoding.plain.i18n.edit
-import com.ismartcoding.plain.i18n.maximize_2
+import com.ismartcoding.plain.ui.resources.maximize_2 as ui_drawable_maximize_2
 import com.ismartcoding.plain.i18n.note_saved
 import com.ismartcoding.plain.i18n.quick_note_hint
-import com.ismartcoding.plain.i18n.save
-import com.ismartcoding.plain.i18n.undo
+import com.ismartcoding.plain.ui.resources.save as ui_drawable_save
+import com.ismartcoding.plain.ui.resources.undo as ui_drawable_undo
 import com.ismartcoding.plain.lib.coIO
 import com.ismartcoding.plain.lib.extensions.getMarkdownTitle
 import com.ismartcoding.plain.lib.withIO
@@ -53,6 +53,11 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
+import com.ismartcoding.plain.ui.resources.Res as UiRes
+import com.ismartcoding.plain.ui.resources.check as ui_drawable_check
+import com.ismartcoding.plain.ui.resources.maximize_2 as ui_drawable_maximize_2
+import com.ismartcoding.plain.i18n.undo
+import com.ismartcoding.plain.i18n.save
 
 /** In-process cache so re-entering the page renders the draft immediately, without an async swap. */
 object QuickNoteDraftCache {
@@ -163,7 +168,7 @@ fun QuickNoteCard(
             if (showActions) {
                 Row(modifier = Modifier.align(Alignment.End)) {
                     PIconButton(
-                        icon = Res.drawable.maximize_2,
+                        icon = UiRes.drawable.ui_drawable_maximize_2,
                         iconSize = 20.dp,
                         contentDescription = stringResource(Res.string.edit),
                         click = {
@@ -176,7 +181,7 @@ fun QuickNoteCard(
                     )
                     if (canSave) {
                         PIconButton(
-                            icon = Res.drawable.check,
+                            icon = UiRes.drawable.ui_drawable_check,
                             contentDescription = stringResource(Res.string.save),
                             tint = MaterialTheme.colorScheme.primary,
                             click = {

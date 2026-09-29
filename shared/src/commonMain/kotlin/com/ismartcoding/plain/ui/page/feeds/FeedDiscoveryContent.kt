@@ -37,6 +37,9 @@ import com.ismartcoding.plain.ui.models.FeedsViewModel
 import com.ismartcoding.plain.ui.theme.green
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
+import com.ismartcoding.plain.ui.resources.Res as UiRes
+import com.ismartcoding.plain.ui.resources.check as ui_drawable_check
+import com.ismartcoding.plain.ui.resources.rss as ui_drawable_rss
 
 /**
  * First-run discovery mode for FeedEntriesPage: a short hero + the curated
@@ -106,7 +109,7 @@ private fun DiscoveryHero(modifier: Modifier = Modifier) {
             contentAlignment = Alignment.Center,
         ) {
             Icon(
-                painter = painterResource(Res.drawable.rss),
+                painter = painterResource(UiRes.drawable.ui_drawable_rss),
                 contentDescription = null,
                 tint = MaterialTheme.colorScheme.onPrimary,
                 modifier = Modifier.size(28.dp),
@@ -136,7 +139,7 @@ private fun DiscoveryBanner(count: Int, modifier: Modifier = Modifier) {
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Icon(
-            painter = painterResource(Res.drawable.check),
+            painter = painterResource(UiRes.drawable.ui_drawable_check),
             contentDescription = null,
             tint = MaterialTheme.colorScheme.green,
             modifier = Modifier.size(16.dp),
@@ -188,7 +191,7 @@ fun EmptyArticlesState(modifier: Modifier = Modifier) {
             contentAlignment = Alignment.Center,
         ) {
             Icon(
-                painter = painterResource(Res.drawable.rss),
+                painter = painterResource(UiRes.drawable.ui_drawable_rss),
                 contentDescription = null,
                 tint = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.size(28.dp),

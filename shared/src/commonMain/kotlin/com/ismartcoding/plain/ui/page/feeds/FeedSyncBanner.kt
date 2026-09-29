@@ -48,6 +48,9 @@ import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.base.AlertType
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
+import com.ismartcoding.plain.ui.resources.Res as UiRes
+import com.ismartcoding.plain.ui.resources.chevron_up as ui_drawable_chevron_up
+import com.ismartcoding.plain.ui.resources.x as ui_drawable_x
 
 /** Maps the persisted DFeed.lastError.code to a localized user-facing reason. */
 @Composable
@@ -101,7 +104,7 @@ internal fun FeedSyncBanner(
         onClick = { expanded = !expanded },
         trailing = {
             Icon(
-                painter = painterResource(Res.drawable.chevron_up),
+                painter = painterResource(UiRes.drawable.ui_drawable_chevron_up),
                 contentDescription = null,
                 tint = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier
@@ -110,7 +113,7 @@ internal fun FeedSyncBanner(
             )
             Spacer(modifier = Modifier.width(8.dp))
             Icon(
-                painter = painterResource(Res.drawable.x),
+                painter = painterResource(UiRes.drawable.ui_drawable_x),
                 contentDescription = stringResource(Res.string.close),
                 tint = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier

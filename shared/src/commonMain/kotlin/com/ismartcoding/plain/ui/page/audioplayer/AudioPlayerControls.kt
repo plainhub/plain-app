@@ -27,6 +27,17 @@ import com.ismartcoding.plain.ui.components.mediaviewer.PlaybackSpeedButton
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.painterResource
+import com.ismartcoding.plain.ui.resources.Res as UiRes
+import com.ismartcoding.plain.ui.resources.list_music as ui_drawable_list_music
+import com.ismartcoding.plain.ui.resources.pause as ui_drawable_pause
+import com.ismartcoding.plain.ui.resources.play_arrow as ui_drawable_play_arrow
+import com.ismartcoding.plain.ui.resources.repeat as ui_drawable_repeat
+import com.ismartcoding.plain.ui.resources.repeat1 as ui_drawable_repeat1
+import com.ismartcoding.plain.ui.resources.shuffle as ui_drawable_shuffle
+import com.ismartcoding.plain.ui.resources.skip_next as ui_drawable_skip_next
+import com.ismartcoding.plain.ui.resources.skip_previous as ui_drawable_skip_previous
+import com.ismartcoding.plain.ui.resources.timer as ui_drawable_timer
+import com.ismartcoding.plain.i18n.pause
 
 @Composable
 fun AudioPlayerControls(
@@ -64,9 +75,9 @@ fun AudioPlayerControls(
         ) {
             Icon(
                 painter = painterResource(when (playMode) {
-                    MediaPlayMode.REPEAT -> Res.drawable.repeat
-                    MediaPlayMode.REPEAT_ONE -> Res.drawable.repeat1
-                    MediaPlayMode.SHUFFLE -> Res.drawable.shuffle
+                    MediaPlayMode.REPEAT -> UiRes.drawable.ui_drawable_repeat
+                    MediaPlayMode.REPEAT_ONE -> UiRes.drawable.ui_drawable_repeat1
+                    MediaPlayMode.SHUFFLE -> UiRes.drawable.ui_drawable_shuffle
                 }),
                 contentDescription = "Play mode",
                 tint = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.size(24.dp),
@@ -79,7 +90,7 @@ fun AudioPlayerControls(
             ),
         ) {
             Icon(
-                painter = painterResource(Res.drawable.timer), contentDescription = "Sleep timer",
+                painter = painterResource(UiRes.drawable.ui_drawable_timer), contentDescription = "Sleep timer",
                 tint = if (isTimerActive) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.size(24.dp),
             )
@@ -88,7 +99,7 @@ fun AudioPlayerControls(
             onClick = onOpenQueue,
             modifier = Modifier.size(44.dp).clip(CircleShape).background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)),
         ) {
-            Icon(painter = painterResource(Res.drawable.list_music), contentDescription = "Queue", tint = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.size(24.dp))
+            Icon(painter = painterResource(UiRes.drawable.ui_drawable_list_music), contentDescription = "Queue", tint = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.size(24.dp))
         }
     }
 
@@ -102,7 +113,7 @@ fun AudioPlayerControls(
             onClick = onPlayPrevious,
             modifier = Modifier.size(56.dp).clip(CircleShape).background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)),
         ) {
-            Icon(painter = painterResource(Res.drawable.skip_previous), contentDescription = "Previous", tint = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.size(32.dp))
+            Icon(painter = painterResource(UiRes.drawable.ui_drawable_skip_previous), contentDescription = "Previous", tint = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.size(32.dp))
         }
         IconButton(
             onClick = onPlayPause,
@@ -110,7 +121,7 @@ fun AudioPlayerControls(
                 .background(if (isPlaying) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.primary),
         ) {
             Icon(
-                painter = painterResource(if (isPlaying) Res.drawable.pause else Res.drawable.play_arrow),
+                painter = painterResource(if (isPlaying) UiRes.drawable.ui_drawable_pause else UiRes.drawable.ui_drawable_play_arrow),
                 contentDescription = if (isPlaying) "Pause" else "Play",
                 tint = if (isPlaying) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.onPrimary,
                 modifier = Modifier.size(40.dp),
@@ -120,7 +131,7 @@ fun AudioPlayerControls(
             onClick = onPlayNext,
             modifier = Modifier.size(56.dp).clip(CircleShape).background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)),
         ) {
-            Icon(painter = painterResource(Res.drawable.skip_next), contentDescription = "Next", tint = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.size(32.dp))
+            Icon(painter = painterResource(UiRes.drawable.ui_drawable_skip_next), contentDescription = "Next", tint = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.size(32.dp))
         }
     }
 }

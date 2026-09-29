@@ -37,6 +37,9 @@ import com.ismartcoding.plain.ui.base.PTopAppBar
 import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.models.PomodoroViewModel
 import kotlinx.coroutines.launch
+import com.ismartcoding.plain.ui.resources.Res as UiRes
+import com.ismartcoding.plain.ui.resources.settings as ui_drawable_settings
+import com.ismartcoding.plain.i18n.settings
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -62,7 +65,7 @@ fun PomodoroPage(
     PScaffold(topBar = {
         PTopAppBar(title = "", actions = {
             PCapsuleMoreClose(onClose = { navController.navigateUp() }) { dismiss ->
-                PSheetActionRow(Res.drawable.settings, stringResource(Res.string.settings)) {
+                PSheetActionRow(UiRes.drawable.ui_drawable_settings, stringResource(Res.string.settings)) {
                     dismiss()
                     pomodoroVM.showSettings.value = true
                 }

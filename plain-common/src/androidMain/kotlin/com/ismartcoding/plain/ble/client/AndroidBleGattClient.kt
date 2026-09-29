@@ -2,6 +2,7 @@ package com.ismartcoding.plain.ble.client
 
 import android.annotation.SuppressLint
 import android.bluetooth.BluetoothDevice
+import android.content.Context
 import android.bluetooth.BluetoothGatt
 import android.bluetooth.BluetoothGattCallback
 import android.bluetooth.BluetoothGattCharacteristic
@@ -10,9 +11,7 @@ import android.bluetooth.BluetoothProfile
 import android.bluetooth.BluetoothGatt.GATT_SUCCESS
 import android.os.Handler
 import android.os.Looper
-import com.ismartcoding.plain.appContext
 import com.ismartcoding.plain.ble.BleService
-import com.ismartcoding.plain.lib.logcat.LogCat
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.withTimeoutOrNull
 import java.util.UUID
@@ -21,6 +20,9 @@ import kotlin.time.Duration.Companion.milliseconds
 @SuppressLint("MissingPermission")
 class AndroidBleGattClient(
     val device: BluetoothDevice,
+    private val context: Context,
+    private val logger: (String, String) -> Unit = { _, _ -> },
+    private val onDisconnected: (AndroidBleGattClient) -> Unit = {},
     override var rssi: Int = 0,
     shortId: String = "",
     override val awareSupported: Boolean = false,
@@ -42,6 +44,10 @@ class AndroidBleGattClient(
      * so never persist this or use it as a peer id.
      */
     val mac: String = device.address
+
+    private fun debug(message: String) = logger("D", message)
+    private fun warning(message: String) = logger("W", message)
+    private fun error(message: String) = logger("E", message)
 
     private val nameCache = mutableMapOf<String, String>()
 
@@ -85,7 +91,7 @@ class AndroidBleGattClient(
                     publish(ActionType.READ, ActionResult(uuid, strValue, true))
                 }
                 else -> {
-                    LogCat.e("Characteristic read failed for $uuid, error: $status")
+                    error("Characteristic read failed for $uuid, error: $status")
                     publish(ActionType.READ, ActionResult(uuid, null, false))
                 }
             }
@@ -102,7 +108,7 @@ class AndroidBleGattClient(
             if (status == GATT_SUCCESS) {
                 publish(ActionType.WRITE, ActionResult(uuid, null, true))
             } else {
-                LogCat.e("Characteristic write failed for $uuid, error: $status")
+                error("Characteristic write failed for $uuid, error: $status")
                 publish(ActionType.WRITE, ActionResult(uuid, null, false))
             }
             signalEndOfOperation()
@@ -118,7 +124,7 @@ class AndroidBleGattClient(
             if (status == GATT_SUCCESS) {
                 publish(ActionType.NOTIFY, ActionResult(uuid, null, true))
             } else {
-                LogCat.e("Descriptor write failed for ${descriptor.characteristic.uuid}, error: $status")
+                error("Descriptor write failed for ${descriptor.characteristic.uuid}, error: $status")
                 publish(ActionType.NOTIFY, ActionResult(uuid, null, false))
             }
             signalEndOfOperation()
@@ -140,16 +146,16 @@ class AndroidBleGattClient(
             status: Int,
             newState: Int,
         ) {
-            LogCat.d("[BLE] onConnectionStateChange ${mac} status=$status newState=$newState")
+            debug("[BLE] onConnectionStateChange ${mac} status=$status newState=$newState")
             if (status == GATT_SUCCESS) {
                 when (newState) {
                     BluetoothProfile.STATE_DISCONNECTED -> {
-                        LogCat.d("[BLE] Disconnected from ${mac}")
+                        debug("[BLE] Disconnected from ${mac}")
                         disconnect()
-                        AndroidBleScanner.teardown(this@AndroidBleGattClient)
+                        onDisconnected(this@AndroidBleGattClient)
                     }
                     BluetoothProfile.STATE_CONNECTED -> {
-                        LogCat.d("[BLE] Connected to ${mac}")
+                        debug("[BLE] Connected to ${mac}")
                         // Bind bluetoothGatt BEFORE publishing the CONNECTION
                         // result so ensureConnected() only observes success once
                         // isConnected() is true (avoids a race where the channel
@@ -162,7 +168,7 @@ class AndroidBleGattClient(
                 }
                 publish(ActionType.CONNECTION, ActionResult(null, newState.toString(), true))
             } else {
-                LogCat.e("[BLE] ${mac} gatt failed $status, $newState")
+                error("[BLE] ${mac} gatt failed $status, $newState")
                 publish(ActionType.CONNECTION, ActionResult(null, newState.toString(), false))
                 gatt.close()
                 bluetoothGatt = null
@@ -179,11 +185,11 @@ class AndroidBleGattClient(
                 val charUuids = gatt.services?.flatMap { s ->
                     (s.characteristics ?: emptyList()).map { it.uuid.toString().takeLast(4) }
                 } ?: emptyList()
-                LogCat.d("[BLE] onServicesDiscovered ${mac}: $serviceCount services, chars=$charUuids")
+                debug("[BLE] onServicesDiscovered ${mac}: $serviceCount services, chars=$charUuids")
                 gatt.requestMtu(517)
             } else {
-                LogCat.e("[BLE] onServicesDiscovered ${mac}: FAILED status=$status")
-                AndroidBleScanner.teardown(this@AndroidBleGattClient)
+                error("[BLE] onServicesDiscovered ${mac}: FAILED status=$status")
+                onDisconnected(this@AndroidBleGattClient)
                 signalEndOfOperation()
             }
         }
@@ -193,9 +199,9 @@ class AndroidBleGattClient(
             mtu: Int,
             status: Int,
         ) {
-            LogCat.d("[BLE] onMtuChanged ${mac} mtu=$mtu status=$status")
+            debug("[BLE] onMtuChanged ${mac} mtu=$mtu status=$status")
             if (status != GATT_SUCCESS) {
-                LogCat.w("[BLE] onMtuChanged ${mac}: MTU negotiation failed status=$status, using default MTU")
+                warning("[BLE] onMtuChanged ${mac}: MTU negotiation failed status=$status, using default MTU")
             }
             publish(ActionType.MTU, ActionResult(null, null, true))
             signalEndOfOperation()
@@ -203,7 +209,7 @@ class AndroidBleGattClient(
     }
 
     override fun disconnect() {
-        LogCat.d("Disconnect ${mac} gatt=${bluetoothGatt != null}")
+        debug("Disconnect ${mac} gatt=${bluetoothGatt != null}")
         bluetoothGatt?.close()
         bluetoothGatt = null
         signalEndOfOperation()
@@ -216,88 +222,88 @@ class AndroidBleGattClient(
 
     override suspend fun ensureConnected(retries: Int): Boolean {
         if (isConnected()) {
-            LogCat.d("ensureConnected ${mac}: already connected")
+            debug("ensureConnected ${mac}: already connected")
             return true
         }
         for (attempt in 0..retries) {
-            LogCat.d("ensureConnected ${mac}: attempt $attempt/$retries, gatt=${bluetoothGatt != null}")
+            debug("ensureConnected ${mac}: attempt $attempt/$retries, gatt=${bluetoothGatt != null}")
             val operation = Operation.Connect(this)
             enqueueOperation(operation)
             val result = waitForResult(ActionType.CONNECTION, timeoutMs = 10_000L)
-            LogCat.d("ensureConnected ${mac}: attempt $attempt connection result=$result gatt=${bluetoothGatt != null}")
+            debug("ensureConnected ${mac}: attempt $attempt connection result=$result gatt=${bluetoothGatt != null}")
             if (result?.success == true && result.value == BluetoothProfile.STATE_CONNECTED.toString()) {
                 val mtuResult = waitForResult(ActionType.MTU, timeoutMs = 5_000L)
-                LogCat.d("ensureConnected ${mac}: attempt $attempt mtu result=$mtuResult")
+                debug("ensureConnected ${mac}: attempt $attempt mtu result=$mtuResult")
                 // Only report connected once the GATT is actually bound.
                 // A stale MTU result left in the channel from a previous
                 // connection must not make us skip the real connection.
                 if (mtuResult?.success == true && bluetoothGatt != null) return true
             }
         }
-        LogCat.e("ensureConnected ${mac}: all $retries retries exhausted, gatt=${bluetoothGatt != null}")
+        error("ensureConnected ${mac}: all $retries retries exhausted, gatt=${bluetoothGatt != null}")
         return false
     }
 
     override suspend fun writeCharacteristic(service: BleService, value: String): Boolean {
         val gatt = bluetoothGatt ?: run {
-            LogCat.e("[BLE] writeCharacteristic ${service.name} ${mac}: FAIL bluetoothGatt is null")
+            error("[BLE] writeCharacteristic ${service.name} ${mac}: FAIL bluetoothGatt is null")
             return false
         }
         val charUuid = UUID.fromString(service.charUuid)
         val char = gatt.getService(UUID.fromString(service.serviceUuid))?.getCharacteristic(charUuid) ?: run {
-            LogCat.e("[BLE] writeCharacteristic ${service.name} ${mac}: FAIL characteristic not found, services=${gatt.services?.size ?: 0}")
+            error("[BLE] writeCharacteristic ${service.name} ${mac}: FAIL characteristic not found, services=${gatt.services?.size ?: 0}")
             return false
         }
         enqueueOperation(Operation.Write(this, char, value))
         val result = waitForResult(ActionType.WRITE, charUuid, 5_000L)
         val ok = result?.success == true
         if (!ok) {
-            LogCat.e("[BLE] writeCharacteristic ${service.name} ${mac}: FAIL result=$result")
+            error("[BLE] writeCharacteristic ${service.name} ${mac}: FAIL result=$result")
         }
         return ok
     }
 
     override suspend fun readCharacteristic(service: BleService): String? {
         val gatt = bluetoothGatt ?: run {
-            LogCat.e("[BLE] readCharacteristic ${service.name} ${mac}: FAIL bluetoothGatt is null")
+            error("[BLE] readCharacteristic ${service.name} ${mac}: FAIL bluetoothGatt is null")
             return null
         }
         val charUuid = UUID.fromString(service.charUuid)
         val char = gatt.getService(UUID.fromString(service.serviceUuid))?.getCharacteristic(charUuid) ?: run {
-            LogCat.e("[BLE] readCharacteristic ${service.name} ${mac}: FAIL characteristic not found, services=${gatt.services?.size ?: 0}")
+            error("[BLE] readCharacteristic ${service.name} ${mac}: FAIL characteristic not found, services=${gatt.services?.size ?: 0}")
             return null
         }
         enqueueOperation(Operation.Read(this, char))
         val result = waitForResult(ActionType.READ, charUuid, 10_000L)
         if (result?.success != true) {
-            LogCat.e("[BLE] readCharacteristic ${service.name} ${mac}: FAIL result=$result")
+            error("[BLE] readCharacteristic ${service.name} ${mac}: FAIL result=$result")
         }
         return if (result?.success == true) result.value else null
     }
 
     override suspend fun setNotification(service: BleService, enable: Boolean): Boolean {
         val gatt = bluetoothGatt ?: run {
-            LogCat.e("[BLE] setNotification ${service.name} ${mac}: FAIL bluetoothGatt is null")
+            error("[BLE] setNotification ${service.name} ${mac}: FAIL bluetoothGatt is null")
             return false
         }
         val charUuid = UUID.fromString(service.charUuid)
         val char = gatt.getService(UUID.fromString(service.serviceUuid))?.getCharacteristic(charUuid) ?: run {
-            LogCat.e("[BLE] setNotification ${service.name} ${mac}: FAIL characteristic not found, services=${gatt.services?.size ?: 0}")
+            error("[BLE] setNotification ${service.name} ${mac}: FAIL characteristic not found, services=${gatt.services?.size ?: 0}")
             return false
         }
         if (!gatt.setCharacteristicNotification(char, enable)) {
-            LogCat.e("[BLE] setNotification ${service.name} ${mac}: FAIL setCharacteristicNotification returned false")
+            error("[BLE] setNotification ${service.name} ${mac}: FAIL setCharacteristicNotification returned false")
             return false
         }
         val descriptor = char.descriptors.firstOrNull() ?: run {
-            LogCat.e("[BLE] setNotification ${service.name} ${mac}: FAIL no CCCD descriptor")
+            error("[BLE] setNotification ${service.name} ${mac}: FAIL no CCCD descriptor")
             return false
         }
         enqueueOperation(Operation.Notify(this, descriptor, enable))
         val result = waitForResult(ActionType.NOTIFY, charUuid, 5_000L)
         val ok = result?.success == true
         if (!ok) {
-            LogCat.e("[BLE] setNotification ${service.name} ${mac}: FAIL result=$result")
+            error("[BLE] setNotification ${service.name} ${mac}: FAIL result=$result")
         }
         return ok
     }
@@ -326,13 +332,13 @@ class AndroidBleGattClient(
             val channel = getChannel(type)
             var result = channel.receive()
             while (uuid != null && result.uuid != uuid) {
-                LogCat.e("$tag STALE: got uuid=${result.uuid} success=${result.success}, expecting $uuid (draining)")
+                error("$tag STALE: got uuid=${result.uuid} success=${result.success}, expecting $uuid (draining)")
                 result = channel.receive()
             }
             result
         }
         if (result == null) {
-            LogCat.e("$tag TIMEOUT after ${timeoutMs}ms, expecting uuid=$uuid")
+            error("$tag TIMEOUT after ${timeoutMs}ms, expecting uuid=$uuid")
         }
         return result
     }
@@ -382,7 +388,7 @@ class AndroidBleGattClient(
 
         class Connect(override val client: AndroidBleGattClient) : Operation() {
             override fun run() {
-                client.device.connectGatt(appContext, false, client.gattCallback, BluetoothDevice.TRANSPORT_LE)
+                client.device.connectGatt(client.context, false, client.gattCallback, BluetoothDevice.TRANSPORT_LE)
             }
         }
 
@@ -396,9 +402,9 @@ class AndroidBleGattClient(
                 char.setValue(value)
                 char.writeType = BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT
                 val ok = client.bluetoothGatt?.writeCharacteristic(char) ?: false
-                LogCat.d("[BLE] Write op ${client.mac} charUuid=${char.uuid} valueLen=${value.length} writeCharacteristic=$ok")
+                client.debug("[BLE] Write op ${client.mac} charUuid=${char.uuid} valueLen=${value.length} writeCharacteristic=$ok")
                 if (!ok) {
-                    LogCat.e("[BLE] Write op ${client.mac}: writeCharacteristic returned false, failing operation")
+                    client.error("[BLE] Write op ${client.mac}: writeCharacteristic returned false, failing operation")
                     client.failOperation(ActionType.WRITE, char.uuid)
                 }
             }
@@ -410,9 +416,9 @@ class AndroidBleGattClient(
         ) : Operation() {
             override fun run() {
                 val ok = client.bluetoothGatt?.readCharacteristic(char) ?: false
-                LogCat.d("[BLE] Read op ${client.mac} charUuid=${char.uuid} readCharacteristic=$ok")
+                client.debug("[BLE] Read op ${client.mac} charUuid=${char.uuid} readCharacteristic=$ok")
                 if (!ok) {
-                    LogCat.e("[BLE] Read op ${client.mac}: readCharacteristic returned false, failing operation")
+                    client.error("[BLE] Read op ${client.mac}: readCharacteristic returned false, failing operation")
                     client.failOperation(ActionType.READ, char.uuid)
                 }
             }
@@ -427,9 +433,9 @@ class AndroidBleGattClient(
             override fun run() {
                 descriptor.value = if (enable) BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE else BluetoothGattDescriptor.DISABLE_NOTIFICATION_VALUE
                 val ok = client.bluetoothGatt?.writeDescriptor(descriptor) ?: false
-                LogCat.d("[BLE] Notify op ${client.mac} charUuid=${descriptor.characteristic.uuid} enable=$enable writeDescriptor=$ok")
+                client.debug("[BLE] Notify op ${client.mac} charUuid=${descriptor.characteristic.uuid} enable=$enable writeDescriptor=$ok")
                 if (!ok) {
-                    LogCat.e("[BLE] Notify op ${client.mac}: writeDescriptor returned false, failing operation")
+                    client.error("[BLE] Notify op ${client.mac}: writeDescriptor returned false, failing operation")
                     client.failOperation(ActionType.NOTIFY, descriptor.characteristic.uuid)
                 }
             }

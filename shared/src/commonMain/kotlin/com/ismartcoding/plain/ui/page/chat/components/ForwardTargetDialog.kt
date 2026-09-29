@@ -8,11 +8,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import com.ismartcoding.plain.chat.data.ChatTarget
 import com.ismartcoding.plain.i18n.Res
-import com.ismartcoding.plain.i18n.forward
+import com.ismartcoding.plain.ui.resources.forward as ui_drawable_forward
 import com.ismartcoding.plain.ui.base.BottomSpace
 import com.ismartcoding.plain.ui.base.PBottomSheetTopAppBar
 import com.ismartcoding.plain.ui.base.PModalBottomSheet
 import org.jetbrains.compose.resources.stringResource
+import com.ismartcoding.plain.i18n.forward
 
 /**
  * Multi-select forward target picker: local chat, joined channels, paired

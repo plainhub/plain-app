@@ -40,6 +40,9 @@ import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.helpers.confirmActionAsync
 import com.ismartcoding.plain.ui.models.VSession
 import com.ismartcoding.plain.httpserver.onlineClientIds
+import com.ismartcoding.plain.ui.resources.Res as UiRes
+import com.ismartcoding.plain.ui.resources.laptop as ui_drawable_laptop
+import com.ismartcoding.plain.ui.resources.lock as ui_drawable_lock
 
 @Composable
 internal fun SessionListItem(
@@ -78,7 +81,7 @@ internal fun SessionListItem(
             SessionMainListItem(
                 title = m.name.ifEmpty { osDisplay },
                 subtitle = if (m.name.isEmpty()) "" else osDisplay,
-                icon = if (m.isCustom) Res.drawable.lock else Res.drawable.laptop,
+                icon = if (m.isCustom) UiRes.drawable.ui_drawable_lock else UiRes.drawable.ui_drawable_laptop,
                 onEditTitle = {
                     showRenameDialog = true
                 },

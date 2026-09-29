@@ -22,6 +22,9 @@ import com.ismartcoding.plain.ui.models.TagsViewModel
 import com.ismartcoding.plain.ui.models.exitSelectMode
 import com.ismartcoding.plain.ui.models.getSelectedItems
 import com.ismartcoding.plain.ui.page.tags.BatchSelectTagsDialog
+import com.ismartcoding.plain.ui.resources.Res as UiRes
+import com.ismartcoding.plain.ui.resources.circle_check as ui_drawable_circle_check
+import com.ismartcoding.plain.ui.resources.circle_dot as ui_drawable_circle_dot
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
@@ -59,7 +62,7 @@ fun FeedEntriesSelectModeBottomActions(
             // Short Gmail-style labels: the action bar scrolls horizontally and
             // 4-5 char labels overflow it.
             PIconTextSmallButton(
-                icon = if (anyUnread) Res.drawable.circle_check else Res.drawable.circle_dot,
+                icon = if (anyUnread) UiRes.drawable.ui_drawable_circle_check else UiRes.drawable.ui_drawable_circle_dot,
                 text = stringResource(if (anyUnread) Res.string.read else Res.string.unread),
                 click = {
                     feedEntriesVM.markRead(selectedIds, anyUnread)

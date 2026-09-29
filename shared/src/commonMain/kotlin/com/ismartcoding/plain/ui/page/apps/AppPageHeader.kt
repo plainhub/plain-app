@@ -34,6 +34,12 @@ import com.ismartcoding.plain.ui.base.PIconTextActionButton
 import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.helpers.DialogHelper
 import com.ismartcoding.plain.ui.nav.navigateText
+import com.ismartcoding.plain.ui.resources.Res as UiRes
+import com.ismartcoding.plain.ui.resources.code as ui_drawable_code
+import com.ismartcoding.plain.ui.resources.delete_forever as ui_drawable_delete_forever
+import com.ismartcoding.plain.ui.resources.settings as ui_drawable_settings
+import com.ismartcoding.plain.ui.resources.square_arrow_out_up_right as ui_drawable_square_arrow_out_up_right
+import com.ismartcoding.plain.i18n.settings
 
 @Composable
 fun AppPageHeader(
@@ -79,16 +85,16 @@ fun AppPageHeader(
                 modifier = Modifier.align(Alignment.CenterHorizontally),
                 horizontalArrangement = Arrangement.spacedBy(32.dp),
             ) {
-                PIconTextActionButton(icon = Res.drawable.square_arrow_out_up_right, text = stringResource(Res.string.launch), click = {
+                PIconTextActionButton(icon = UiRes.drawable.ui_drawable_square_arrow_out_up_right, text = stringResource(Res.string.launch), click = {
                     try { launchPackage(item.id) } catch (ex: Exception) { DialogHelper.showMessage(ex) }
                 })
-                PIconTextActionButton(icon = Res.drawable.delete_forever, text = stringResource(Res.string.uninstall), click = {
+                PIconTextActionButton(icon = UiRes.drawable.ui_drawable_delete_forever, text = stringResource(Res.string.uninstall), click = {
                     try { uninstallPackage(item.id) } catch (ex: Exception) { DialogHelper.showMessage(ex) }
                 })
-                PIconTextActionButton(icon = Res.drawable.settings, text = stringResource(Res.string.settings), click = {
+                PIconTextActionButton(icon = UiRes.drawable.ui_drawable_settings, text = stringResource(Res.string.settings), click = {
                     try { viewPackageInSettings(item.id) } catch (ex: Exception) { DialogHelper.showMessage(ex) }
                 })
-                PIconTextActionButton(icon = Res.drawable.code, text = "Manifest", click = {
+                PIconTextActionButton(icon = UiRes.drawable.ui_drawable_code, text = "Manifest", click = {
                     coMain {
                         try {
                             DialogHelper.showLoading()

@@ -13,6 +13,9 @@ import com.ismartcoding.plain.ui.base.PFilledButton
 import com.ismartcoding.plain.ui.base.POutlinedButton
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
+import com.ismartcoding.plain.ui.resources.Res as UiRes
+import com.ismartcoding.plain.ui.resources.music2 as ui_drawable_music2
+import com.ismartcoding.plain.ui.resources.shuffle as ui_drawable_shuffle
 
 /** Quick actions: shuffle the whole library / browse all items. */
 @Composable
@@ -23,14 +26,14 @@ fun HomeQuickActions(
     Row(modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp)) {
         PFilledButton(
             text = stringResource(Res.string.shuffle_play),
-            icon = painterResource(Res.drawable.shuffle),
+            icon = painterResource(UiRes.drawable.ui_drawable_shuffle),
             modifier = Modifier.weight(1f),
             onClick = onShuffleAll,
         )
         Spacer(Modifier.width(12.dp))
         POutlinedButton(
             text = stringResource(Res.string.view_all),
-            icon = painterResource(Res.drawable.music2),
+            icon = painterResource(UiRes.drawable.ui_drawable_music2),
             modifier = Modifier.weight(1f),
             onClick = onViewAllItems,
         )

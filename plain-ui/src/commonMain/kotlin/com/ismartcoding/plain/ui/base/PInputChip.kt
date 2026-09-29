@@ -15,9 +15,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.unit.dp
-import com.ismartcoding.plain.i18n.*
 import com.ismartcoding.plain.ui.theme.cardBackgroundNormal
 import org.jetbrains.compose.resources.painterResource
+import com.ismartcoding.plain.ui.resources.Res as UiRes
+import com.ismartcoding.plain.ui.resources.close as ui_drawable_close
 
 /**
  * Material input chip with an optional leading icon and an optional close
@@ -60,7 +61,7 @@ fun PInputChip(
                     contentAlignment = Alignment.Center,
                 ) {
                     PIcon(
-                        icon = painterResource(Res.drawable.close),
+                        icon = painterResource(UiRes.drawable.ui_drawable_close),
                         contentDescription = closeContentDescription,
                         modifier = Modifier.size(16.dp),
                     )

@@ -2,14 +2,18 @@ package com.ismartcoding.plain.db
 
 import com.ismartcoding.plain.platform.LocaleHelper
 import com.ismartcoding.plain.i18n.Res
-import com.ismartcoding.plain.i18n.file
-import com.ismartcoding.plain.i18n.files
-import com.ismartcoding.plain.i18n.image
+import com.ismartcoding.plain.ui.resources.file as ui_drawable_file
+import com.ismartcoding.plain.ui.resources.files as ui_drawable_files
+import com.ismartcoding.plain.ui.resources.image as ui_drawable_image
 import com.ismartcoding.plain.i18n.images
 import com.ismartcoding.plain.i18n.message
 import com.ismartcoding.plain.i18n.shared_folder
-import com.ismartcoding.plain.i18n.video
+import com.ismartcoding.plain.ui.resources.video as ui_drawable_video
 import com.ismartcoding.plain.i18n.videos
+import com.ismartcoding.plain.i18n.video
+import com.ismartcoding.plain.i18n.files
+import com.ismartcoding.plain.i18n.image
+import com.ismartcoding.plain.i18n.file
 
 fun DChat.getMessagePreview(): String {
     return when (content.type) {

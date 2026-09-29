@@ -23,9 +23,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.ismartcoding.plain.i18n.*
 import com.ismartcoding.plain.ui.theme.orange
 import org.jetbrains.compose.resources.painterResource
+import com.ismartcoding.plain.ui.resources.Res as UiRes
+import com.ismartcoding.plain.ui.resources.circle_alert as ui_drawable_circle_alert
+import com.ismartcoding.plain.ui.resources.info as ui_drawable_info
+import com.ismartcoding.plain.ui.resources.octagon_alert as ui_drawable_octagon_alert
 
 enum class AlertType {
     WARNING,
@@ -61,9 +64,9 @@ fun PAlert(
         AlertType.INFO -> accentColor.copy(alpha = 0.12f)
     }
     val iconRes = when (type) {
-        AlertType.WARNING -> Res.drawable.octagon_alert
-        AlertType.ERROR -> Res.drawable.circle_alert
-        AlertType.INFO -> Res.drawable.info
+        AlertType.WARNING -> UiRes.drawable.ui_drawable_octagon_alert
+        AlertType.ERROR -> UiRes.drawable.ui_drawable_circle_alert
+        AlertType.INFO -> UiRes.drawable.ui_drawable_info
     }
     val shape = RoundedCornerShape(16.dp)
 

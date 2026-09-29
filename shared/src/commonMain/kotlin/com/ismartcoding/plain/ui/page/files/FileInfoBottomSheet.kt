@@ -38,6 +38,9 @@ import com.ismartcoding.plain.ui.components.FileRenameDialog
 import com.ismartcoding.plain.ui.models.FilesViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import com.ismartcoding.plain.ui.resources.Res as UiRes
+import com.ismartcoding.plain.ui.resources.file as ui_drawable_file
+import com.ismartcoding.plain.i18n.file
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -76,7 +79,7 @@ fun FileInfoBottomSheet(filesVM: FilesViewModel) {
                         thumbnail = {
                             PSheetHeaderThumb(
                                 model = if (file.isDir) getFileIconPath("folder") else getFileIconPath(file.path.getFilenameExtension()),
-                                fallbackIcon = Res.drawable.file,
+                                fallbackIcon = UiRes.drawable.ui_drawable_file,
                             )
                         },
                         title = file.name,

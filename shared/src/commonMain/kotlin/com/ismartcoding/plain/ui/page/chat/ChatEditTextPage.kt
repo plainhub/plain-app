@@ -23,6 +23,9 @@ import androidx.navigation.NavHostController
 import com.ismartcoding.plain.ui.base.PIconButton
 import com.ismartcoding.plain.ui.base.PScaffold
 import com.ismartcoding.plain.ui.base.PTopAppBar
+import com.ismartcoding.plain.ui.resources.Res as UiRes
+import com.ismartcoding.plain.ui.resources.save as ui_drawable_save
+import com.ismartcoding.plain.i18n.save
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -41,7 +44,7 @@ fun ChatEditTextPage(
                 title = stringResource(Res.string.edit_text),
                 actions = {
                     PIconButton(
-                        icon = Res.drawable.save,
+                        icon = UiRes.drawable.ui_drawable_save,
                         contentDescription = stringResource(Res.string.save),
                         tint = MaterialTheme.colorScheme.onSurface,
                     ) {

@@ -37,6 +37,9 @@ import com.ismartcoding.plain.ui.models.GlobalSearchViewModel
 import com.ismartcoding.plain.ui.components.mediaviewer.previewer.TransformItemState
 import com.ismartcoding.plain.ui.theme.cardBackgroundNormal
 import org.jetbrains.compose.resources.stringResource
+import com.ismartcoding.plain.ui.resources.Res as UiRes
+import com.ismartcoding.plain.ui.resources.search as ui_drawable_search
+import com.ismartcoding.plain.i18n.search
 
 /** Result list while a query is active: one section per domain, rows rendered by [GlobalSearchRow]. */
 @Composable
@@ -183,7 +186,7 @@ private fun EmptyResults(
             contentAlignment = Alignment.Center,
         ) {
             PIcon(
-                icon = Res.drawable.search,
+                icon = UiRes.drawable.ui_drawable_search,
                 contentDescription = null,
                 tint = MaterialTheme.colorScheme.onSurfaceVariant,
             )

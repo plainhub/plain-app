@@ -38,6 +38,9 @@ import com.ismartcoding.plain.ui.components.FileEntryThumb
 import com.ismartcoding.plain.ui.theme.cardBackgroundNormal
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
+import com.ismartcoding.plain.ui.resources.Res as UiRes
+import com.ismartcoding.plain.ui.resources.download as ui_drawable_download
+import com.ismartcoding.plain.i18n.download
 
 /** Load-failure strip with a retry action. */
 @Composable
@@ -136,7 +139,7 @@ internal fun EntryRow(
             }
             if (!selectMode && !busy && !previewLoading) {
                 PIconButton(
-                    icon = Res.drawable.download,
+                    icon = UiRes.drawable.ui_drawable_download,
                     contentDescription = stringResource(Res.string.download),
                     tint = MaterialTheme.colorScheme.primary,
                 ) { onDownload() }

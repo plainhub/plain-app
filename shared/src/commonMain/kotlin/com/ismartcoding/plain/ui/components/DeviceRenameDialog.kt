@@ -11,12 +11,13 @@ import com.ismartcoding.plain.events.EventType
 import com.ismartcoding.plain.events.WebSocketEvent
 import com.ismartcoding.plain.i18n.Res
 import com.ismartcoding.plain.i18n.device_name
-import com.ismartcoding.plain.i18n.save
+import com.ismartcoding.plain.ui.resources.save as ui_drawable_save
 import com.ismartcoding.plain.lib.sendEvent
 import com.ismartcoding.plain.preferences.DeviceNamePreference
 import com.ismartcoding.plain.ui.base.TextFieldDialog
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
+import com.ismartcoding.plain.i18n.save
 
 @Composable
 fun DeviceRenameDialog(name: String, onDismiss: () -> Unit, onDone: (String) -> Unit) {

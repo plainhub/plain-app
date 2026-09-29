@@ -84,6 +84,9 @@ import com.ismartcoding.plain.ui.page.tags.TagsBottomSheet
 import com.ismartcoding.plain.platform.getMediaItemUriString
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import com.ismartcoding.plain.ui.resources.Res as UiRes
+import com.ismartcoding.plain.ui.resources.image as ui_drawable_image
+import com.ismartcoding.plain.i18n.image
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -238,7 +241,7 @@ fun ImagesPage(
                 .padding(top = paddingValues.calculateTopPadding())
         ) {
             if (!imagesVM.hasPermission.value) {
-                NeedPermissionColumn(Res.drawable.image, AppFeatureType.FILES.getPermission()!!); return@Column
+                NeedPermissionColumn(UiRes.drawable.ui_drawable_image, AppFeatureType.FILES.getPermission()!!); return@Column
             }
 
             PullToRefresh(refreshLayoutState = topRefreshLayoutState) {

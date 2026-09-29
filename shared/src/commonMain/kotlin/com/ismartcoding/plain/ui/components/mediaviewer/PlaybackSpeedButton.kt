@@ -22,6 +22,8 @@ import androidx.compose.ui.window.PopupProperties
 import com.ismartcoding.plain.i18n.*
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
+import com.ismartcoding.plain.ui.resources.Res as UiRes
+import com.ismartcoding.plain.ui.resources.gauge as ui_drawable_gauge
 
 /**
  * Speed picker button shared by the video and audio players.
@@ -66,7 +68,7 @@ fun PlaybackSpeedButton(
         IconButton(onClick = { showMenu = !showMenu }, modifier = modifier) {
             if (isDefault) {
                 Icon(
-                    painter = painterResource(Res.drawable.gauge),
+                    painter = painterResource(UiRes.drawable.ui_drawable_gauge),
                     contentDescription = stringResource(Res.string.change_playback_speed),
                     tint = tint,
                 )

@@ -72,6 +72,13 @@ import org.jetbrains.compose.resources.stringResource
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import kotlin.math.abs
+import com.ismartcoding.plain.ui.resources.Res as UiRes
+import com.ismartcoding.plain.ui.resources.download as ui_drawable_download
+import com.ismartcoding.plain.ui.resources.left_panel_open as ui_drawable_left_panel_open
+import com.ismartcoding.plain.ui.resources.settings as ui_drawable_settings
+import com.ismartcoding.plain.ui.resources.upload as ui_drawable_upload
+import com.ismartcoding.plain.i18n.settings
+import com.ismartcoding.plain.i18n.download
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
@@ -169,7 +176,7 @@ fun FeedEntriesPage(
                 scrollToTop = { scope.launch { scrollState.scrollToItem(0) } },
                 navigationIcon = {
                     if (feedEntriesVM.selectMode.value) NavigationCloseIcon { feedEntriesVM.exitSelectMode() }
-                    else PIconButton(icon = Res.drawable.left_panel_open, contentDescription = stringResource(Res.string.feeds), click = {
+                    else PIconButton(icon = UiRes.drawable.ui_drawable_left_panel_open, contentDescription = stringResource(Res.string.feeds), click = {
                         scope.launch { if (drawerState.isOpen) drawerState.close() else drawerState.open() }
                     })
                 }, actions = {
@@ -180,15 +187,15 @@ fun FeedEntriesPage(
                     } else {
                         ActionButtonSearch { feedEntriesVM.enterSearchMode() }
                         PCapsuleMoreClose(onClose = { navController.navigateUp() }) { dismiss ->
-                            PSheetActionRow(Res.drawable.settings, stringResource(Res.string.settings)) {
+                            PSheetActionRow(UiRes.drawable.ui_drawable_settings, stringResource(Res.string.settings)) {
                                 dismiss()
                                 navController.navigate(Routing.FeedSettings)
                             }
-                            PSheetActionRow(Res.drawable.upload, stringResource(Res.string.import_opml_file)) {
+                            PSheetActionRow(UiRes.drawable.ui_drawable_upload, stringResource(Res.string.import_opml_file)) {
                                 dismiss()
                                 sendEvent(PickFileEvent(PickFileTag.FEED, PickFileType.FILE, false))
                             }
-                            PSheetActionRow(Res.drawable.download, stringResource(Res.string.export_opml_file)) {
+                            PSheetActionRow(UiRes.drawable.ui_drawable_download, stringResource(Res.string.export_opml_file)) {
                                 dismiss()
                                 sendEvent(ExportFileEvent(ExportFileType.OPML, "feeds_" + TimeHelper.now().formatName() + ".opml"))
                             }

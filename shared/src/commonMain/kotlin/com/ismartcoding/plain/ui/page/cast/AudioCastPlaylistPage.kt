@@ -46,6 +46,8 @@ import com.ismartcoding.plain.ui.theme.cardBackgroundActive
 import com.ismartcoding.plain.ui.theme.cardBackgroundNormal
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import com.ismartcoding.plain.ui.resources.Res as UiRes
+import com.ismartcoding.plain.ui.resources.delete_forever as ui_drawable_delete_forever
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -93,7 +95,7 @@ fun AudioCastPlaylistPage(castVM: CastViewModel, onDismissRequest: () -> Unit) {
                                 danger = true,
                             )
                         }) {
-                            Icon(painter = painterResource(Res.drawable.delete_forever), contentDescription = "Clear playlist", tint = MaterialTheme.colorScheme.error)
+                            Icon(painter = painterResource(UiRes.drawable.ui_drawable_delete_forever), contentDescription = "Clear playlist", tint = MaterialTheme.colorScheme.error)
                         }
                     }
                 })

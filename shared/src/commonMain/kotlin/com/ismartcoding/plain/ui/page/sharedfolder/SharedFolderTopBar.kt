@@ -16,6 +16,10 @@ import com.ismartcoding.plain.platform.launchUrl
 import com.ismartcoding.plain.platform.setClipboardText
 import org.jetbrains.compose.resources.pluralStringResource
 import org.jetbrains.compose.resources.stringResource
+import com.ismartcoding.plain.ui.resources.Res as UiRes
+import com.ismartcoding.plain.ui.resources.chrome as ui_drawable_chrome
+import com.ismartcoding.plain.ui.resources.copy as ui_drawable_copy
+import com.ismartcoding.plain.i18n.copy
 
 /**
  * Top bar, styled after FilesPage: browse mode shows the current directory
@@ -51,11 +55,11 @@ internal fun SharedFolderTopBar(
                 PCapsuleMoreClose(
                     onClose = onClose,
                 ) { dismiss ->
-                    PSheetActionRow(Res.drawable.chrome, stringResource(Res.string.open_in_browser)) {
+                    PSheetActionRow(UiRes.drawable.ui_drawable_chrome, stringResource(Res.string.open_in_browser)) {
                         dismiss()
                         state.browserUrl()?.let { launchUrl(it) }
                     }
-                    PSheetActionRow(Res.drawable.copy, stringResource(Res.string.copy_link)) {
+                    PSheetActionRow(UiRes.drawable.ui_drawable_copy, stringResource(Res.string.copy_link)) {
                         dismiss()
                         state.browserUrl()?.let {
                             setClipboardText("", it)

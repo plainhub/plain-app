@@ -19,9 +19,9 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.ui.unit.dp
 import com.ismartcoding.plain.i18n.Res
-import com.ismartcoding.plain.i18n.download
-import com.ismartcoding.plain.i18n.folder
-import com.ismartcoding.plain.i18n.folders
+import com.ismartcoding.plain.ui.resources.download as ui_drawable_download
+import com.ismartcoding.plain.ui.resources.folder as ui_drawable_folder
+import com.ismartcoding.plain.ui.resources.folders as ui_drawable_folders
 import org.jetbrains.compose.resources.DrawableResource
 import com.ismartcoding.plain.i18n.download_to_downloads
 import com.ismartcoding.plain.i18n.download_zip
@@ -37,6 +37,13 @@ import com.ismartcoding.plain.ui.base.PSheetActionRow
 import com.ismartcoding.plain.ui.base.VerticalSpace
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
+import com.ismartcoding.plain.ui.resources.Res as UiRes
+import com.ismartcoding.plain.ui.resources.download as ui_drawable_download
+import com.ismartcoding.plain.ui.resources.folder as ui_drawable_folder
+import com.ismartcoding.plain.ui.resources.folders as ui_drawable_folders
+import com.ismartcoding.plain.i18n.download
+import com.ismartcoding.plain.i18n.folders
+import com.ismartcoding.plain.i18n.folder
 
 /**
  * Reusable "save to this device" bottom sheet for any feature that writes
@@ -80,7 +87,7 @@ fun SaveToSheet(
             )
             PSheetActionCard {
                 if (downloadsAvailable) {
-                    PSheetActionRow(Res.drawable.download, stringResource(Res.string.download_to_downloads)) {
+                    PSheetActionRow(UiRes.drawable.ui_drawable_download, stringResource(Res.string.download_to_downloads)) {
                         onDismiss()
                         onDownloads()
                     }
@@ -90,17 +97,17 @@ fun SaveToSheet(
                         modifier = Modifier.clip(RoundedCornerShape(12.dp)).clickable { useDirectory(dir) },
                         title = dir.substringAfterLast('/'),
                         subtitle = dir,
-                        icon = Res.drawable.folder,
+                        icon = UiRes.drawable.ui_drawable_folder,
                     )
                 }
             }
             VerticalSpace(16.dp)
             PSheetActionCard {
-                PSheetActionRow(Res.drawable.folders, stringResource(Res.string.pick_directory)) {
+                PSheetActionRow(UiRes.drawable.ui_drawable_folders, stringResource(Res.string.pick_directory)) {
                     showFolderPick = true
                 }
                 if (onZip != null) {
-                    PSheetActionRow(Res.drawable.download, stringResource(Res.string.download_zip)) {
+                    PSheetActionRow(UiRes.drawable.ui_drawable_download, stringResource(Res.string.download_zip)) {
                         onDismiss()
                         onZip()
                     }

@@ -41,6 +41,11 @@ import com.ismartcoding.plain.ui.models.FeedsViewModel
 import com.ismartcoding.plain.ui.models.TagsViewModel
 import com.ismartcoding.plain.ui.models.enterSelectMode
 import com.ismartcoding.plain.ui.models.select
+import com.ismartcoding.plain.ui.resources.Res as UiRes
+import com.ismartcoding.plain.ui.resources.circle_check as ui_drawable_circle_check
+import com.ismartcoding.plain.ui.resources.circle_dot as ui_drawable_circle_dot
+import com.ismartcoding.plain.ui.resources.list_checks as ui_drawable_list_checks
+import com.ismartcoding.plain.ui.resources.rss as ui_drawable_rss
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
@@ -73,7 +78,7 @@ fun ViewFeedEntryBottomSheet(
                         thumbnail = {
                             PSheetHeaderThumb(
                                 model = m.image.getFinalPath().ifEmpty { feedLogo },
-                                fallbackIcon = Res.drawable.rss,
+                                fallbackIcon = UiRes.drawable.ui_drawable_rss,
                                 contentScale = ContentScale.Crop,
                             )
                         },
@@ -82,7 +87,7 @@ fun ViewFeedEntryBottomSheet(
                     )
                     PSheetPrimaryActionsRow {
                         if (!feedEntriesVM.showSearchBar.value) {
-                            PSheetPrimaryAction(Res.drawable.list_checks, stringResource(Res.string.select)) {
+                            PSheetPrimaryAction(UiRes.drawable.ui_drawable_list_checks, stringResource(Res.string.select)) {
                                 feedEntriesVM.enterSelectMode()
                                 feedEntriesVM.select(m.id)
                                 onDismiss()
@@ -91,7 +96,7 @@ fun ViewFeedEntryBottomSheet(
                         // Toggle in place: the sheet stays open and the action flips
                         // to the opposite state via the updated selected copy.
                         PSheetPrimaryAction(
-                            if (m.read) Res.drawable.circle_dot else Res.drawable.circle_check,
+                            if (m.read) UiRes.drawable.ui_drawable_circle_dot else UiRes.drawable.ui_drawable_circle_check,
                             stringResource(if (m.read) Res.string.mark_as_unread else Res.string.mark_as_read),
                         ) {
                             feedEntriesVM.selectedItem.value = m.copy(read = !m.read)

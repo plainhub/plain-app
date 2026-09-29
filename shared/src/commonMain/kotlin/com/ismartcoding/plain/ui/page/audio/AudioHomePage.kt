@@ -70,6 +70,9 @@ import com.ismartcoding.plain.ui.page.tags.TagsBottomSheet
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
+import com.ismartcoding.plain.ui.resources.Res as UiRes
+import com.ismartcoding.plain.ui.resources.music as ui_drawable_music
+import com.ismartcoding.plain.ui.resources.plus as ui_drawable_plus
 
 /**
  * Audio home: quick actions + artists / playlists / recent sections on top of
@@ -176,7 +179,7 @@ fun AudioHomePage(
             }
         },
         moreMenu = { dismiss ->
-            PSheetActionRow(Res.drawable.plus, stringResource(Res.string.new_playlist)) {
+            PSheetActionRow(UiRes.drawable.ui_drawable_plus, stringResource(Res.string.new_playlist)) {
                 dismiss()
                 showCreatePlaylist = true
             }
@@ -194,7 +197,7 @@ fun AudioHomePage(
         ) {
             Column(modifier = Modifier.fillMaxSize()) {
                 if (!audioVM.hasPermission.value) {
-                    NeedPermissionColumn(Res.drawable.music, AppFeatureType.FILES.getPermission()!!); return@Column
+                    NeedPermissionColumn(UiRes.drawable.ui_drawable_music, AppFeatureType.FILES.getPermission()!!); return@Column
                 }
 
                 if (audioVM.showSearchBar.value || sidebarFilterActive) {

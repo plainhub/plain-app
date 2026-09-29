@@ -39,6 +39,12 @@ import androidx.compose.runtime.setValue
 import com.ismartcoding.plain.ui.models.launchSafe
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import com.ismartcoding.plain.ui.resources.Res as UiRes
+import com.ismartcoding.plain.ui.resources.arrow_down_to_line as ui_drawable_arrow_down_to_line
+import com.ismartcoding.plain.ui.resources.arrow_up_to_line as ui_drawable_arrow_up_to_line
+import com.ismartcoding.plain.ui.resources.share_2 as ui_drawable_share_2
+import com.ismartcoding.plain.ui.resources.type as ui_drawable_type
+import com.ismartcoding.plain.i18n.type
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
@@ -60,15 +66,15 @@ fun ViewTextFileBottomSheet(
     ) {
         VerticalSpace(16.dp)
         PSheetPrimaryActionsCard {
-            PSheetPrimaryAction(Res.drawable.share_2, stringResource(Res.string.share)) {
+            PSheetPrimaryAction(UiRes.drawable.ui_drawable_share_2, stringResource(Res.string.share)) {
                 shareFiles(listOf(path))
                 onDismiss()
             }
-            PSheetPrimaryAction(Res.drawable.arrow_up_to_line, stringResource(Res.string.jump_to_top)) {
+            PSheetPrimaryAction(UiRes.drawable.ui_drawable_arrow_up_to_line, stringResource(Res.string.jump_to_top)) {
                 textFileVM.gotoTop()
                 onDismiss()
             }
-            PSheetPrimaryAction(Res.drawable.arrow_down_to_line, stringResource(Res.string.jump_to_bottom)) {
+            PSheetPrimaryAction(UiRes.drawable.ui_drawable_arrow_down_to_line, stringResource(Res.string.jump_to_bottom)) {
                 textFileVM.gotoEnd()
                 onDismiss()
             }
@@ -134,11 +140,11 @@ private fun EditorDisplayActionsCard(textFileVM: TextFileViewModel, scope: kotli
 
     PCard(modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN)) {
         com.ismartcoding.plain.ui.base.PSheetActionRow(
-            icon = com.ismartcoding.plain.i18n.Res.drawable.arrow_down_to_line,
+            icon = com.ismartcoding.plain.ui.resources.Res.drawable.ui_drawable_arrow_down_to_line,
             title = stringResource(Res.string.go_to_line),
         ) { showGoToLine = true }
         com.ismartcoding.plain.ui.base.PSheetActionRow(
-            icon = com.ismartcoding.plain.i18n.Res.drawable.type,
+            icon = com.ismartcoding.plain.ui.resources.Res.drawable.ui_drawable_type,
             title = stringResource(Res.string.editor_font_size),
             trailing = {
                 androidx.compose.material3.Text(

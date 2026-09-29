@@ -22,6 +22,9 @@ import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import com.ismartcoding.plain.ui.base.dragselect.DragSelectState
 import com.ismartcoding.plain.ui.models.CastViewModel
+import com.ismartcoding.plain.ui.resources.Res as UiRes
+import com.ismartcoding.plain.ui.resources.cast as ui_drawable_cast
+import com.ismartcoding.plain.i18n.cast
 
 /**
  * Cast-mode entry to the cast playlist: replaces the old bottom cast player
@@ -49,7 +52,7 @@ fun CastQueueFab(
             modifier = Modifier.navigationBarsPadding().padding(16.dp),
         ) {
             Icon(
-                painter = painterResource(Res.drawable.cast),
+                painter = painterResource(UiRes.drawable.ui_drawable_cast),
                 contentDescription = stringResource(Res.string.cast_playlist),
             )
         }

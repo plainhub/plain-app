@@ -38,6 +38,8 @@ import com.ismartcoding.plain.i18n.*
 import com.ismartcoding.plain.platform.isLanAddress
 import org.jetbrains.compose.resources.painterResource
 import kotlinx.coroutines.launch
+import com.ismartcoding.plain.ui.resources.Res as UiRes
+import com.ismartcoding.plain.ui.resources.play_arrow as ui_drawable_play_arrow
 
 /** First LAN IPv4 known to the app, or a stable fallback for the demos. */
 internal fun demoServerIp(): String =
@@ -146,7 +148,7 @@ internal fun DemoPlayer(
                         contentAlignment = Alignment.Center,
                     ) {
                         Icon(
-                            painter = painterResource(Res.drawable.play_arrow),
+                            painter = painterResource(UiRes.drawable.ui_drawable_play_arrow),
                             contentDescription = null,
                             tint = Color.White,
                             modifier = Modifier.size(24.dp),

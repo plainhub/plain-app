@@ -40,6 +40,9 @@ import com.ismartcoding.plain.ui.base.POutlinedButton
 import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.httpserver.HttpServerManager
 import kotlinx.coroutines.launch
+import com.ismartcoding.plain.ui.resources.Res as UiRes
+import com.ismartcoding.plain.ui.resources.chrome as ui_drawable_chrome
+import com.ismartcoding.plain.ui.resources.laptop as ui_drawable_laptop
 
 @Composable
 fun LoginRequestPage(
@@ -55,7 +58,7 @@ fun LoginRequestPage(
         isWeb -> Res.string.allow_web_access_desc
         else -> Res.string.allow_desktop_access_desc
     }
-    val iconRes = if (isWeb) Res.drawable.chrome else Res.drawable.laptop
+    val iconRes = if (isWeb) UiRes.drawable.ui_drawable_chrome else UiRes.drawable.ui_drawable_laptop
 
     var allowing by remember { mutableStateOf(false) }
     var denying by remember { mutableStateOf(false) }

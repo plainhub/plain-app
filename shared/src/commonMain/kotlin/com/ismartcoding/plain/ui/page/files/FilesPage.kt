@@ -62,6 +62,10 @@ import com.ismartcoding.plain.ui.page.files.components.FilePasteBar
 import com.ismartcoding.plain.features.file.ZipBrowserHelper
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import com.ismartcoding.plain.ui.resources.Res as UiRes
+import com.ismartcoding.plain.ui.resources.folder as ui_drawable_folder
+import com.ismartcoding.plain.ui.resources.left_panel_open as ui_drawable_left_panel_open
+import com.ismartcoding.plain.i18n.folder
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
@@ -124,7 +128,7 @@ fun FilesPage(
             scrollBehavior = scrollBehavior,
             title = title,
             subtitle = subtitle,
-            navigationIcon = { if (filesVM.selectMode.value) NavigationCloseIcon { filesVM.exitSelectMode() } else PIconButton(icon = Res.drawable.left_panel_open, contentDescription = stringResource(Res.string.folders), click = { scope.launch { if (drawerState.isOpen) drawerState.close() else drawerState.open() } }) },
+            navigationIcon = { if (filesVM.selectMode.value) NavigationCloseIcon { filesVM.exitSelectMode() } else PIconButton(icon = UiRes.drawable.ui_drawable_left_panel_open, contentDescription = stringResource(Res.string.folders), click = { scope.launch { if (drawerState.isOpen) drawerState.close() else drawerState.open() } }) },
             actions = {
                 if (!filesVM.selectMode.value) {
                     ActionButtonSearch { filesVM.enterSearchMode() }
@@ -168,7 +172,7 @@ fun FilesPage(
                 .padding(paddingValues)
         ) {
             if (!filesVM.hasPermission.value && filesVM.type != FilesType.APP) {
-                NeedPermissionColumn(Res.drawable.folder, AppFeatureType.FILES.getPermission()!!)
+                NeedPermissionColumn(UiRes.drawable.ui_drawable_folder, AppFeatureType.FILES.getPermission()!!)
                 return@Column
             }
             if (filesVM.type != FilesType.RECENTS) {

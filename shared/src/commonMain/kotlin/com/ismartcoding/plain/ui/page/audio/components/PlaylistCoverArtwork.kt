@@ -11,6 +11,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.ismartcoding.plain.i18n.*
 import org.jetbrains.compose.resources.painterResource
+import com.ismartcoding.plain.ui.resources.Res as UiRes
+import com.ismartcoding.plain.ui.resources.music2 as ui_drawable_music2
 
 @Composable
 fun PlaylistCoverArtwork(gradientIndex: Int, modifier: Modifier = Modifier, iconSize: Int = 28) {
@@ -19,7 +21,7 @@ fun PlaylistCoverArtwork(gradientIndex: Int, modifier: Modifier = Modifier, icon
         contentAlignment = Alignment.Center,
     ) {
         Icon(
-            painter = painterResource(Res.drawable.music2),
+            painter = painterResource(UiRes.drawable.ui_drawable_music2),
             contentDescription = null,
             tint = MaterialTheme.colorScheme.onPrimaryContainer,
             modifier = Modifier.size(iconSize.dp),

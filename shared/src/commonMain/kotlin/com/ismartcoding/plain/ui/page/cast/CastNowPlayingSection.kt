@@ -49,6 +49,12 @@ import com.ismartcoding.plain.ui.theme.cardBackgroundNormal
 import com.ismartcoding.plain.ui.theme.listItemSubtitle
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
+import com.ismartcoding.plain.ui.resources.Res as UiRes
+import com.ismartcoding.plain.ui.resources.cast as ui_drawable_cast
+import com.ismartcoding.plain.ui.resources.pause as ui_drawable_pause
+import com.ismartcoding.plain.ui.resources.play_arrow as ui_drawable_play_arrow
+import com.ismartcoding.plain.i18n.pause
+import com.ismartcoding.plain.i18n.cast
 
 @Composable
 fun CastNowPlayingSection(
@@ -112,7 +118,7 @@ fun CastNowPlayingSection(
                     contentAlignment = Alignment.Center,
                 ) {
                     Icon(
-                        painter = painterResource(Res.drawable.cast),
+                        painter = painterResource(UiRes.drawable.ui_drawable_cast),
                         contentDescription = null,
                         tint = MaterialTheme.colorScheme.onSurfaceVariant,
                         modifier = Modifier.size(48.dp),
@@ -193,7 +199,7 @@ fun CastNowPlayingSection(
                 contentAlignment = Alignment.Center,
             ) {
                 Icon(
-                    painter = painterResource(if (isPlaying) Res.drawable.pause else Res.drawable.play_arrow),
+                    painter = painterResource(if (isPlaying) UiRes.drawable.ui_drawable_pause else UiRes.drawable.ui_drawable_play_arrow),
                     contentDescription = if (isPlaying) stringResource(Res.string.pause) else stringResource(Res.string.play),
                     tint = if (isPlaying) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.onPrimary,
                     modifier = Modifier.size(28.dp),

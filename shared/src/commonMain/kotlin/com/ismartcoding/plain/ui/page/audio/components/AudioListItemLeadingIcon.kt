@@ -17,6 +17,9 @@ import com.ismartcoding.plain.audio.DAudio
 import com.ismartcoding.plain.ui.base.dragselect.DragSelectState
 import com.ismartcoding.plain.ui.components.CheckCircle
 import com.ismartcoding.plain.ui.components.PulsatingWave
+import com.ismartcoding.plain.ui.resources.Res as UiRes
+import com.ismartcoding.plain.ui.resources.cast as ui_drawable_cast
+import com.ismartcoding.plain.i18n.cast
 
 @Composable
 fun AudioListItemLeadingIcon(
@@ -50,7 +53,7 @@ fun AudioListItemLeadingIcon(
                 } else {
                     Icon(
                         modifier = Modifier.size(24.dp),
-                        painter = painterResource(Res.drawable.cast),
+                        painter = painterResource(UiRes.drawable.ui_drawable_cast),
                         contentDescription = stringResource(Res.string.cast),
                         tint = MaterialTheme.colorScheme.primary
                     )

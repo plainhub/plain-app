@@ -28,6 +28,11 @@ import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import com.ismartcoding.plain.platform.getClipboardText
+import com.ismartcoding.plain.ui.resources.Res as UiRes
+import com.ismartcoding.plain.ui.resources.content_paste as ui_drawable_content_paste
+import com.ismartcoding.plain.ui.resources.eye as ui_drawable_eye
+import com.ismartcoding.plain.ui.resources.eye_off as ui_drawable_eye_off
+import com.ismartcoding.plain.ui.resources.x as ui_drawable_x
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -104,12 +109,12 @@ fun PTextField(
                             painterResource(
                                 if (isPassword) {
                                     if (showPassword) {
-                                        Res.drawable.eye
+                                        UiRes.drawable.ui_drawable_eye
                                     } else {
-                                        Res.drawable.eye_off
+                                        UiRes.drawable.ui_drawable_eye_off
                                     }
                                 } else {
-                                    Res.drawable.x
+                                    UiRes.drawable.ui_drawable_x
                                 }
                             ),
                         contentDescription = if (isPassword) stringResource(Res.string.password) else stringResource(Res.string.clear),
@@ -121,7 +126,7 @@ fun PTextField(
                     onValueChange(getClipboardText() ?: "")
                 }) {
                     Icon(
-                        painter = painterResource(Res.drawable.content_paste),
+                        painter = painterResource(UiRes.drawable.ui_drawable_content_paste),
                         contentDescription = stringResource(Res.string.paste),
                         tint = MaterialTheme.colorScheme.primary,
                     )

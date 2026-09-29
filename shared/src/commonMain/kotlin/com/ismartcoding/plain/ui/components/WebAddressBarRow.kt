@@ -20,6 +20,9 @@ import com.ismartcoding.plain.ui.base.HorizontalSpace
 import com.ismartcoding.plain.ui.base.PIconButton
 import com.ismartcoding.plain.ui.helpers.DialogHelper
 import com.ismartcoding.plain.platform.setClipboardText
+import com.ismartcoding.plain.ui.resources.Res as UiRes
+import com.ismartcoding.plain.ui.resources.pen as ui_drawable_pen
+import com.ismartcoding.plain.ui.resources.qr_code as ui_drawable_qr_code
 
 @Composable
 fun WebAddressBarRow(
@@ -49,7 +52,7 @@ fun WebAddressBarRow(
         }
         Spacer(modifier = Modifier.weight(1f))
         PIconButton(
-            icon = Res.drawable.pen,
+            icon = UiRes.drawable.ui_drawable_pen,
             modifier = Modifier.size(32.dp),
             iconSize = 16.dp,
             contentDescription = if (isHostnameRow) "Edit hostname" else "Edit port",
@@ -57,7 +60,7 @@ fun WebAddressBarRow(
             click = onEditClick,
         )
         PIconButton(
-            icon = Res.drawable.qr_code,
+            icon = UiRes.drawable.ui_drawable_qr_code,
             modifier = Modifier.size(32.dp),
             iconSize = 16.dp,
             contentDescription = "Show QR code",

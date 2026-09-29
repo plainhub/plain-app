@@ -32,6 +32,8 @@ import com.ismartcoding.plain.ui.helpers.confirmActionAsync
 import com.ismartcoding.plain.ui.models.TagsViewModel
 import com.ismartcoding.plain.ui.theme.PlainTheme
 import kotlinx.coroutines.launch
+import com.ismartcoding.plain.ui.resources.Res as UiRes
+import com.ismartcoding.plain.ui.resources.delete_forever as ui_drawable_delete_forever
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
@@ -83,7 +85,7 @@ fun TagsBottomSheet(
                             title = tag.name,
                             action = {
                                 PIconButton(
-                                    icon = Res.drawable.delete_forever,
+                                    icon = UiRes.drawable.ui_drawable_delete_forever,
                                     tint = MaterialTheme.colorScheme.error,
                                     contentDescription = stringResource(Res.string.delete),
                                     click = {

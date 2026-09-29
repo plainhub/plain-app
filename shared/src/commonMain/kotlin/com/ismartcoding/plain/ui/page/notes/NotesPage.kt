@@ -70,6 +70,11 @@ import com.ismartcoding.plain.ui.models.toggleSelectAll
 import com.ismartcoding.plain.ui.nav.Routing
 import com.ismartcoding.plain.ui.page.tags.TagsBottomSheet
 import kotlinx.coroutines.launch
+import com.ismartcoding.plain.ui.resources.Res as UiRes
+import com.ismartcoding.plain.ui.resources.left_panel_open as ui_drawable_left_panel_open
+import com.ismartcoding.plain.ui.resources.plus as ui_drawable_plus
+import com.ismartcoding.plain.ui.resources.tags as ui_drawable_tags
+import com.ismartcoding.plain.i18n.tags
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
@@ -117,7 +122,7 @@ fun NotesPage(navController: NavHostController, tagsVM: TagsViewModel) {
                     navController = navController, navigationIcon = {
                         if (NotesViewModel.selectMode.value) NavigationCloseIcon { NotesViewModel.exitSelectMode() }
                         else PIconButton(
-                            icon = Res.drawable.left_panel_open,
+                            icon = UiRes.drawable.ui_drawable_left_panel_open,
                             contentDescription = null,
                             click = { scope.launch { if (drawerState.isOpen) drawerState.close() else drawerState.open() } }
                         )
@@ -127,7 +132,7 @@ fun NotesPage(navController: NavHostController, tagsVM: TagsViewModel) {
                         else {
                             ActionButtonSearch { NotesViewModel.enterSearchMode() }
                             PCapsuleMoreClose(onClose = { navController.navigateUp() }) { dismiss ->
-                                PSheetActionRow(Res.drawable.tags, stringResource(Res.string.tags)) {
+                                PSheetActionRow(UiRes.drawable.ui_drawable_tags, stringResource(Res.string.tags)) {
                                     dismiss()
                                     NotesViewModel.showTagsDialog.value = true
                                 }
@@ -136,7 +141,7 @@ fun NotesPage(navController: NavHostController, tagsVM: TagsViewModel) {
                     })
             },
             bottomBar = { AnimatedVisibility(visible = NotesViewModel.showBottomActions(), enter = slideInVertically { it }, exit = slideOutVertically { it }) { NotesSelectModeBottomActions(tagsVM, tagsState) } },
-            floatingActionButton = if (NotesViewModel.selectMode.value) null else { { PDraggableElement { FloatingActionButton(onClick = { navController.navigate(Routing.NotesCreate(NotesViewModel.tag.value?.id ?: "")) }) { Icon(painter = painterResource(Res.drawable.plus), stringResource(Res.string.add)) } } } },
+            floatingActionButton = if (NotesViewModel.selectMode.value) null else { { PDraggableElement { FloatingActionButton(onClick = { navController.navigate(Routing.NotesCreate(NotesViewModel.tag.value?.id ?: "")) }) { Icon(painter = painterResource(UiRes.drawable.ui_drawable_plus), stringResource(Res.string.add)) } } } },
         ) { paddingValues ->
             Column(Modifier.padding(top = paddingValues.calculateTopPadding())) {
                 PullToRefresh(refreshLayoutState = topRefreshLayoutState) {

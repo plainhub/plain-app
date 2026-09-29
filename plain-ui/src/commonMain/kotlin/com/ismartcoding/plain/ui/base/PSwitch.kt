@@ -1,14 +1,12 @@
 package com.ismartcoding.plain.ui.base
-import com.ismartcoding.plain.preferences.*
 
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
-import com.ismartcoding.plain.enums.DarkTheme
-import com.ismartcoding.plain.preferences.LocalDarkTheme
 import com.ismartcoding.plain.ui.theme.filledButtonContent
+import com.ismartcoding.plain.ui.theme.LocalDarkTheme
 
 @Composable
 fun PSwitch(
@@ -16,7 +14,7 @@ fun PSwitch(
     enabled: Boolean = true,
     onClick: ((Boolean) -> Unit)? = null,
 ) {
-    val isDark = DarkTheme.isDarkTheme(LocalDarkTheme.current)
+    val isDark = LocalDarkTheme.current
 
     val switchBlue = MaterialTheme.colorScheme.primary
     val iosLightTrackGray = Color(0xFFE9E9EA)

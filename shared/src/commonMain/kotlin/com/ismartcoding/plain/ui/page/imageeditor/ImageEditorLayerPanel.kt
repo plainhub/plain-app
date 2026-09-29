@@ -42,6 +42,26 @@ import com.ismartcoding.plain.lib.yjs.MosaicLayer
 import com.ismartcoding.plain.lib.yjs.RectLayer
 import com.ismartcoding.plain.lib.yjs.StickerLayer
 import com.ismartcoding.plain.lib.yjs.TextLayer
+import com.ismartcoding.plain.ui.resources.Res as UiRes
+import com.ismartcoding.plain.ui.resources.arrow_up_right as ui_drawable_arrow_up_right
+import com.ismartcoding.plain.ui.resources.chevron_up as ui_drawable_chevron_up
+import com.ismartcoding.plain.ui.resources.circle as ui_drawable_circle
+import com.ismartcoding.plain.ui.resources.copy as ui_drawable_copy
+import com.ismartcoding.plain.ui.resources.expand_more as ui_drawable_expand_more
+import com.ismartcoding.plain.ui.resources.eye as ui_drawable_eye
+import com.ismartcoding.plain.ui.resources.eye_off as ui_drawable_eye_off
+import com.ismartcoding.plain.ui.resources.grid_3x3 as ui_drawable_grid_3x3
+import com.ismartcoding.plain.ui.resources.highlighter as ui_drawable_highlighter
+import com.ismartcoding.plain.ui.resources.image as ui_drawable_image
+import com.ismartcoding.plain.ui.resources.pen as ui_drawable_pen
+import com.ismartcoding.plain.ui.resources.square as ui_drawable_square
+import com.ismartcoding.plain.ui.resources.sticky_note as ui_drawable_sticky_note
+import com.ismartcoding.plain.ui.resources.trash_2 as ui_drawable_trash_2
+import com.ismartcoding.plain.ui.resources.type as ui_drawable_type
+import com.ismartcoding.plain.ui.resources.x as ui_drawable_x
+import com.ismartcoding.plain.i18n.copy
+import com.ismartcoding.plain.i18n.image
+import com.ismartcoding.plain.i18n.type
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -56,7 +76,7 @@ fun ImageEditorLayerPanel(
                 title = stringResource(Res.string.image_editor_layers),
                 actions = {
                     PIconButton(
-                        icon = Res.drawable.x,
+                        icon = UiRes.drawable.ui_drawable_x,
                         contentDescription = stringResource(Res.string.close),
                         click = onDismiss,
                     )
@@ -120,7 +140,7 @@ private fun LayerRow(
         horizontalArrangement = Arrangement.spacedBy(8.dp),
     ) {
         PIconButton(
-            icon = if (layer.visible) Res.drawable.eye else Res.drawable.eye_off,
+            icon = if (layer.visible) UiRes.drawable.ui_drawable_eye else UiRes.drawable.ui_drawable_eye_off,
             contentDescription = stringResource(Res.string.image_editor_layer_visibility),
             iconSize = 20.dp,
             tint = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -149,28 +169,28 @@ private fun LayerRow(
             modifier = Modifier.weight(1f),
         )
         PIconButton(
-            icon = Res.drawable.chevron_up,
+            icon = UiRes.drawable.ui_drawable_chevron_up,
             contentDescription = stringResource(Res.string.image_editor_bring_forward),
             iconSize = 18.dp,
             tint = MaterialTheme.colorScheme.onSurfaceVariant,
             click = onBringForward,
         )
         PIconButton(
-            icon = Res.drawable.expand_more,
+            icon = UiRes.drawable.ui_drawable_expand_more,
             contentDescription = stringResource(Res.string.image_editor_send_backward),
             iconSize = 18.dp,
             tint = MaterialTheme.colorScheme.onSurfaceVariant,
             click = onSendBackward,
         )
         PIconButton(
-            icon = Res.drawable.copy,
+            icon = UiRes.drawable.ui_drawable_copy,
             contentDescription = stringResource(Res.string.image_editor_duplicate_layer),
             iconSize = 18.dp,
             tint = MaterialTheme.colorScheme.onSurfaceVariant,
             click = onDuplicate,
         )
         PIconButton(
-            icon = Res.drawable.trash_2,
+            icon = UiRes.drawable.ui_drawable_trash_2,
             contentDescription = stringResource(Res.string.image_editor_delete_layer),
             iconSize = 18.dp,
             tint = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -180,15 +200,15 @@ private fun LayerRow(
 }
 
 private fun iconForLayer(layer: EditorLayer) = when (layer) {
-    is ArrowLayer -> Res.drawable.arrow_up_right
-    is RectLayer -> Res.drawable.square
-    is EllipseLayer -> Res.drawable.circle
-    is HighlightLayer -> Res.drawable.highlighter
-    is MosaicLayer -> Res.drawable.grid_3x3
-    is TextLayer -> Res.drawable.type
-    is FreehandLayer -> Res.drawable.pen
-    is StickerLayer -> Res.drawable.sticky_note
-    is ImageLayer -> Res.drawable.image
+    is ArrowLayer -> UiRes.drawable.ui_drawable_arrow_up_right
+    is RectLayer -> UiRes.drawable.ui_drawable_square
+    is EllipseLayer -> UiRes.drawable.ui_drawable_circle
+    is HighlightLayer -> UiRes.drawable.ui_drawable_highlighter
+    is MosaicLayer -> UiRes.drawable.ui_drawable_grid_3x3
+    is TextLayer -> UiRes.drawable.ui_drawable_type
+    is FreehandLayer -> UiRes.drawable.ui_drawable_pen
+    is StickerLayer -> UiRes.drawable.ui_drawable_sticky_note
+    is ImageLayer -> UiRes.drawable.ui_drawable_image
 }
 
 private fun labelForLayer(layer: EditorLayer) = when (layer) {

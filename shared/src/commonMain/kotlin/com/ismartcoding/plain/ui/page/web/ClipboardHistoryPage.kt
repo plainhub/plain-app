@@ -44,6 +44,8 @@ import com.ismartcoding.plain.ui.base.pullrefresh.setRefreshState
 import com.ismartcoding.plain.ui.models.ClipboardHistoryViewModel
 import com.ismartcoding.plain.ui.theme.PlainTheme
 import kotlinx.coroutines.launch
+import com.ismartcoding.plain.ui.resources.Res as UiRes
+import com.ismartcoding.plain.ui.resources.delete_forever as ui_drawable_delete_forever
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
@@ -76,7 +78,7 @@ fun ClipboardHistoryPage(
                             PDropdownMenuItem(
                                 leadingIcon = {
                                     Icon(
-                                        painter = painterResource(Res.drawable.delete_forever),
+                                        painter = painterResource(UiRes.drawable.ui_drawable_delete_forever),
                                         tint = MaterialTheme.colorScheme.error,
                                         contentDescription = stringResource(Res.string.clear_all)
                                     )
@@ -143,7 +145,7 @@ fun ClipboardHistoryListItem(entry: DClipboard, sourceName: String, onCopy: () -
         },
         action = {
             Icon(
-                painter = painterResource(Res.drawable.delete_forever),
+                painter = painterResource(UiRes.drawable.ui_drawable_delete_forever),
                 contentDescription = stringResource(Res.string.delete),
                 tint = MaterialTheme.colorScheme.error,
                 modifier = Modifier.clickable { onDelete() }.padding(8.dp),

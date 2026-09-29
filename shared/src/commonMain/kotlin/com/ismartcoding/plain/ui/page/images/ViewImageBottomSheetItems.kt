@@ -48,6 +48,16 @@ import androidx.compose.ui.layout.ContentScale
 import com.ismartcoding.plain.lib.extensions.formatBytes
 import com.ismartcoding.plain.lib.extensions.getFilenameFromPath
 import com.ismartcoding.plain.lib.extensions.getMimeType
+import com.ismartcoding.plain.ui.resources.Res as UiRes
+import com.ismartcoding.plain.ui.resources.archive_restore as ui_drawable_archive_restore
+import com.ismartcoding.plain.ui.resources.image as ui_drawable_image
+import com.ismartcoding.plain.ui.resources.list_checks as ui_drawable_list_checks
+import com.ismartcoding.plain.ui.resources.pen as ui_drawable_pen
+import com.ismartcoding.plain.ui.resources.scan_qr_code as ui_drawable_scan_qr_code
+import com.ismartcoding.plain.ui.resources.share_2 as ui_drawable_share_2
+import com.ismartcoding.plain.ui.resources.smartphone as ui_drawable_smartphone
+import com.ismartcoding.plain.ui.resources.square_arrow_out_up_right as ui_drawable_square_arrow_out_up_right
+import com.ismartcoding.plain.i18n.image
 
 @Composable
 internal fun ViewImageActionButtons(
@@ -64,25 +74,25 @@ internal fun ViewImageActionButtons(
     PCard(modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN)) {
         PSheetHeader(
             thumbnail = {
-                PSheetHeaderThumb(model = m.path, fallbackIcon = Res.drawable.image, contentScale = ContentScale.Crop)
+                PSheetHeaderThumb(model = m.path, fallbackIcon = UiRes.drawable.ui_drawable_image, contentScale = ContentScale.Crop)
             },
             title = m.title.ifEmpty { m.path.getFilenameFromPath() },
             subtitle = m.path.getMimeType() + " · " + m.size.formatBytes(),
         )
         PSheetPrimaryActionsRow {
             if (!imagesVM.showSearchBar.value) {
-                PSheetPrimaryAction(Res.drawable.list_checks, stringResource(Res.string.select)) {
+                PSheetPrimaryAction(UiRes.drawable.ui_drawable_list_checks, stringResource(Res.string.select)) {
                     dragSelectState.enterSelectMode()
                     dragSelectState.select(m.id)
                     onDismiss()
                 }
             }
-            PSheetPrimaryAction(Res.drawable.share_2, stringResource(Res.string.share)) {
+            PSheetPrimaryAction(UiRes.drawable.ui_drawable_share_2, stringResource(Res.string.share)) {
                 shareFiles(listOf(getMediaItemUriString(DataType.IMAGE, m.id)))
                 onDismiss()
             }
             if (!imagesVM.trash.value) {
-                PSheetPrimaryAction(Res.drawable.pen, stringResource(Res.string.rename)) {
+                PSheetPrimaryAction(UiRes.drawable.ui_drawable_pen, stringResource(Res.string.rename)) {
                     imagesVM.showRenameDialog.value = true
                 }
             }
@@ -93,7 +103,7 @@ internal fun ViewImageActionButtons(
                 }
             }
             if (AppFeatureType.MEDIA_TRASH.has() && imagesVM.trash.value) {
-                PSheetPrimaryAction(Res.drawable.archive_restore, stringResource(Res.string.restore)) {
+                PSheetPrimaryAction(UiRes.drawable.ui_drawable_archive_restore, stringResource(Res.string.restore)) {
                     imagesVM.restore(tagsVM, setOf(m.id))
                     onDismiss()
                 }
@@ -123,20 +133,20 @@ internal fun ViewImageActionButtons(
         PCard(modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN)) {
             Column {
                 if (qrScanResult.isNotEmpty()) {
-                    PSheetActionRow(Res.drawable.scan_qr_code, stringResource(Res.string.scan_qrcode)) {
+                    PSheetActionRow(UiRes.drawable.ui_drawable_scan_qr_code, stringResource(Res.string.scan_qrcode)) {
                         onShowQrScanResult()
                     }
                 }
                 if (!m.path.isUrl() && !imagesVM.trash.value) {
-                    PSheetActionRow(Res.drawable.smartphone, stringResource(Res.string.add_to_home), trailing = { AddToHomeHelpAction() }) {
+                    PSheetActionRow(UiRes.drawable.ui_drawable_smartphone, stringResource(Res.string.add_to_home), trailing = { AddToHomeHelpAction() }) {
                         showAddToHomeDialog = true
                     }
-                    PSheetActionRow(Res.drawable.square_arrow_out_up_right, stringResource(Res.string.open_with)) {
+                    PSheetActionRow(UiRes.drawable.ui_drawable_square_arrow_out_up_right, stringResource(Res.string.open_with)) {
                         openFileExternal(m.path)
                     }
                 }
                 if (imagesVM.trash.value) {
-                    PSheetActionRow(Res.drawable.pen, stringResource(Res.string.rename)) {
+                    PSheetActionRow(UiRes.drawable.ui_drawable_pen, stringResource(Res.string.rename)) {
                         imagesVM.showRenameDialog.value = true
                     }
                 }

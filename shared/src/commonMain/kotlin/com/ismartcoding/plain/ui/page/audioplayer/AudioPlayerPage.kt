@@ -33,8 +33,8 @@ import androidx.compose.ui.unit.dp
 import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.audio.DPlaylistAudio
 import com.ismartcoding.plain.i18n.Res
-import com.ismartcoding.plain.i18n.chevron_left
-import com.ismartcoding.plain.i18n.expand_more
+import com.ismartcoding.plain.ui.resources.chevron_left as ui_drawable_chevron_left
+import com.ismartcoding.plain.ui.resources.expand_more as ui_drawable_expand_more
 import com.ismartcoding.plain.lib.TimeHelper
 import com.ismartcoding.plain.lib.withIO
 import com.ismartcoding.plain.platform.audioIsPlayingFlow
@@ -53,6 +53,9 @@ import com.ismartcoding.plain.ui.models.AudioQueueViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.painterResource
+import com.ismartcoding.plain.ui.resources.Res as UiRes
+import com.ismartcoding.plain.ui.resources.chevron_left as ui_drawable_chevron_left
+import com.ismartcoding.plain.ui.resources.expand_more as ui_drawable_expand_more
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -159,7 +162,7 @@ fun AudioPlayerPage(audioQueueVM: AudioQueueViewModel, onDismissRequest: () -> U
                     modifier = Modifier.size(48.dp),
                 ) {
                     Icon(
-                        painter = painterResource(if (inLyrics) Res.drawable.chevron_left else Res.drawable.expand_more),
+                        painter = painterResource(if (inLyrics) UiRes.drawable.ui_drawable_chevron_left else UiRes.drawable.ui_drawable_expand_more),
                         contentDescription = if (inLyrics) "Back" else "Collapse",
                         tint = MaterialTheme.colorScheme.onSurface,
                         modifier = Modifier.size(28.dp),

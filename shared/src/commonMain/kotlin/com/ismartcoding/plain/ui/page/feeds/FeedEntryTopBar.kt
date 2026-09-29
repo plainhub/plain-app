@@ -36,6 +36,16 @@ import com.ismartcoding.plain.ui.models.FeedEntryViewModel
 import com.ismartcoding.plain.platform.setClipboardText
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import com.ismartcoding.plain.ui.resources.Res as UiRes
+import com.ismartcoding.plain.ui.resources.chrome as ui_drawable_chrome
+import com.ismartcoding.plain.ui.resources.label as ui_drawable_label
+import com.ismartcoding.plain.ui.resources.link as ui_drawable_link
+import com.ismartcoding.plain.ui.resources.save as ui_drawable_save
+import com.ismartcoding.plain.ui.resources.share_2 as ui_drawable_share_2
+import com.ismartcoding.plain.ui.resources.type as ui_drawable_type
+import com.ismartcoding.plain.i18n.link
+import com.ismartcoding.plain.i18n.save
+import com.ismartcoding.plain.i18n.type
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
@@ -49,20 +59,20 @@ internal fun FeedEntryTopBar(
         modifier = Modifier.combinedClickable(onClick = {}, onDoubleClick = { onScrollToTop() }),
         navController = navController, title = "", scrollBehavior = scrollBehavior,
         actions = {
-            PIconButton(icon = Res.drawable.label, contentDescription = stringResource(Res.string.select_tags), tint = MaterialTheme.colorScheme.onSurface) {
+            PIconButton(icon = UiRes.drawable.ui_drawable_label, contentDescription = stringResource(Res.string.select_tags), tint = MaterialTheme.colorScheme.onSurface) {
                 feedEntryVM.showSelectTagsDialog.value = true
             }
-            PIconButton(icon = Res.drawable.chrome, contentDescription = stringResource(Res.string.open_in_web), tint = MaterialTheme.colorScheme.onSurface) {
+            PIconButton(icon = UiRes.drawable.ui_drawable_chrome, contentDescription = stringResource(Res.string.open_in_web), tint = MaterialTheme.colorScheme.onSurface) {
                 val m = feedEntryVM.item.value ?: return@PIconButton
                 try { launchUrl(m.url) } catch (_: Exception) { DialogHelper.showMessage(Res.string.no_browser_error) }
             }
-            PIconButton(icon = Res.drawable.share_2, contentDescription = stringResource(Res.string.share), tint = MaterialTheme.colorScheme.onSurface) {
+            PIconButton(icon = UiRes.drawable.ui_drawable_share_2, contentDescription = stringResource(Res.string.share), tint = MaterialTheme.colorScheme.onSurface) {
                 val m = feedEntryVM.item.value ?: return@PIconButton
                 shareText(m.title.let { it + "\n" } + m.url)
             }
             ActionButtonMoreWithMenu { dismiss ->
                 PDropdownMenuItem(text = { Text(stringResource(Res.string.save_to_notes)) },
-                    leadingIcon = { Icon(painter = painterResource(Res.drawable.save), contentDescription = stringResource(Res.string.save_to_notes)) },
+                    leadingIcon = { Icon(painter = painterResource(UiRes.drawable.ui_drawable_save), contentDescription = stringResource(Res.string.save_to_notes)) },
                     onClick = {
                         dismiss(); val m = feedEntryVM.item.value ?: return@PDropdownMenuItem
                         scope.launch(IODispatcher) {
@@ -72,14 +82,14 @@ internal fun FeedEntryTopBar(
                         }
                     })
                 PDropdownMenuItem(text = { Text(stringResource(Res.string.copy_link)) },
-                    leadingIcon = { Icon(painter = painterResource(Res.drawable.link), contentDescription = stringResource(Res.string.copy_link)) },
+                    leadingIcon = { Icon(painter = painterResource(UiRes.drawable.ui_drawable_link), contentDescription = stringResource(Res.string.copy_link)) },
                     onClick = {
                         dismiss(); val m = feedEntryVM.item.value ?: return@PDropdownMenuItem
                         setClipboardText("link", m.url)
                         DialogHelper.showTextCopiedMessage(m.url)
                     })
                 PDropdownMenuItem(text = { Text(stringResource(Res.string.font_size)) },
-                    leadingIcon = { Icon(painter = painterResource(Res.drawable.type), contentDescription = stringResource(Res.string.font_size)) },
+                    leadingIcon = { Icon(painter = painterResource(UiRes.drawable.ui_drawable_type), contentDescription = stringResource(Res.string.font_size)) },
                     onClick = { dismiss(); showFontSizeDialog = true })
             }
         },

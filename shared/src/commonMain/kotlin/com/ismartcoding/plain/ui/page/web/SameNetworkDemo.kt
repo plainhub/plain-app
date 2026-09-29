@@ -29,6 +29,9 @@ import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import com.ismartcoding.plain.ui.theme.cardBackgroundNormal
 import com.ismartcoding.plain.ui.theme.green
+import com.ismartcoding.plain.ui.resources.Res as UiRes
+import com.ismartcoding.plain.ui.resources.lock as ui_drawable_lock
+import com.ismartcoding.plain.ui.resources.wifi as ui_drawable_wifi
 
 /**
  * Compose-drawn "video" for Quick start step 1, replaying the real flow:
@@ -122,7 +125,7 @@ private fun MacMenuBar(highlight: Boolean) {
                         .padding(horizontal = 8.dp, vertical = 4.dp),
                 ) {
                     Icon(
-                        painter = painterResource(Res.drawable.wifi),
+                        painter = painterResource(UiRes.drawable.ui_drawable_wifi),
                         contentDescription = null,
                         modifier = Modifier.size(14.dp),
                         tint = Color.White,
@@ -243,7 +246,7 @@ private fun WifiMenuRow(name: String, selected: Boolean, highlighted: Boolean = 
             contentAlignment = Alignment.Center,
         ) {
             Icon(
-                painter = painterResource(Res.drawable.wifi),
+                painter = painterResource(UiRes.drawable.ui_drawable_wifi),
                 contentDescription = null,
                 modifier = Modifier.size(16.dp),
                 tint = if (selected) Color.White else MaterialTheme.colorScheme.onSurface,
@@ -257,7 +260,7 @@ private fun WifiMenuRow(name: String, selected: Boolean, highlighted: Boolean = 
             modifier = Modifier.weight(1f),
         )
         Icon(
-            painter = painterResource(Res.drawable.lock),
+            painter = painterResource(UiRes.drawable.ui_drawable_lock),
             contentDescription = null,
             modifier = Modifier.size(14.dp),
             tint = MaterialTheme.colorScheme.onSurfaceVariant,

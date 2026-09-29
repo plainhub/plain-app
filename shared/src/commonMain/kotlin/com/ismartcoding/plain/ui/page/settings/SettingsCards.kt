@@ -19,10 +19,10 @@ import com.ismartcoding.plain.i18n.Res
 import com.ismartcoding.plain.i18n.allow_any_host
 import com.ismartcoding.plain.i18n.allow_any_host_desc
 import com.ismartcoding.plain.i18n.ble_debug
-import com.ismartcoding.plain.i18n.circle_alert
+import com.ismartcoding.plain.ui.resources.circle_alert as ui_drawable_circle_alert
 import com.ismartcoding.plain.i18n.client_id
 import com.ismartcoding.plain.i18n.developer_mode
-import com.ismartcoding.plain.i18n.layout_grid
+import com.ismartcoding.plain.ui.resources.layout_grid as ui_drawable_layout_grid
 import com.ismartcoding.plain.i18n.mdns_debug
 import com.ismartcoding.plain.i18n.not_supported
 import com.ismartcoding.plain.i18n.service_debug

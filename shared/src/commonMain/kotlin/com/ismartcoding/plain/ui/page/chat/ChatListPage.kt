@@ -36,12 +36,12 @@ import com.ismartcoding.plain.platform.isGranted
 import com.ismartcoding.plain.platform.isIOS
 import com.ismartcoding.plain.platform.openAppSettings
 import com.ismartcoding.plain.i18n.Res
-import com.ismartcoding.plain.i18n.bot
+import com.ismartcoding.plain.ui.resources.bot as ui_drawable_bot
 import com.ismartcoding.plain.i18n.channels
-import com.ismartcoding.plain.i18n.devices
+import com.ismartcoding.plain.ui.resources.devices as ui_drawable_devices
 import com.ismartcoding.plain.i18n.desktop_access
 import com.ismartcoding.plain.i18n.grant_permission
-import com.ismartcoding.plain.i18n.hash
+import com.ismartcoding.plain.ui.resources.hash as ui_drawable_hash
 import com.ismartcoding.plain.i18n.local_chat
 import com.ismartcoding.plain.i18n.local_chat_desc
 import com.ismartcoding.plain.i18n.nearby_wifi_devices_required_for_chat
@@ -73,6 +73,10 @@ import com.ismartcoding.plain.ui.page.chat.components.PeerListItem
 import com.ismartcoding.plain.ui.theme.PlainTheme
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
+import com.ismartcoding.plain.ui.resources.Res as UiRes
+import com.ismartcoding.plain.ui.resources.bot as ui_drawable_bot
+import com.ismartcoding.plain.ui.resources.hash as ui_drawable_hash
+import com.ismartcoding.plain.i18n.devices
 
 @Composable
 fun ChatListPage(
@@ -190,7 +194,7 @@ fun ChatListPage(
                     PeerListItem(
                         title = stringResource(Res.string.local_chat),
                         desc = stringResource(Res.string.local_chat_desc),
-                        icon = Res.drawable.bot,
+                        icon = UiRes.drawable.ui_drawable_bot,
                         latestChat = ChatCacher.getLatestChat("local"),
                         modifier = PlainTheme.getCardModifier(),
                         onClick = { navController.navigate(Routing.Chat("peer:local")) })
@@ -203,7 +207,7 @@ fun ChatListPage(
                         PeerListItem(
                             title = channel.name,
                             desc = "",
-                            icon = Res.drawable.hash,
+                            icon = UiRes.drawable.ui_drawable_hash,
                             latestChat = ChatCacher.getLatestChat(channel.id),
                             onClick = {
                                 navController.navigate(Routing.Chat("channel:${channel.id}"))

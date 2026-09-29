@@ -35,6 +35,8 @@ import com.ismartcoding.plain.ui.base.PFilledButton
 import com.ismartcoding.plain.ui.base.PListItem
 import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.models.ChannelViewModel
+import com.ismartcoding.plain.ui.resources.Res as UiRes
+import com.ismartcoding.plain.ui.resources.hash as ui_drawable_hash
 
 @Composable
 fun ChannelInvitePage(
@@ -64,7 +66,7 @@ fun ChannelInvitePage(
                 contentAlignment = Alignment.Center,
             ) {
                 Icon(
-                    painter = painterResource(Res.drawable.hash),
+                    painter = painterResource(UiRes.drawable.ui_drawable_hash),
                     contentDescription = null,
                     modifier = Modifier.size(44.dp),
                     tint = MaterialTheme.colorScheme.primary,

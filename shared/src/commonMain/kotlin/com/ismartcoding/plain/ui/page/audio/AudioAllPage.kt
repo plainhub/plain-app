@@ -62,6 +62,12 @@ import com.ismartcoding.plain.ui.page.tags.TagsBottomSheet
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
+import com.ismartcoding.plain.ui.resources.Res as UiRes
+import com.ismartcoding.plain.ui.resources.cast as ui_drawable_cast
+import com.ismartcoding.plain.ui.resources.music as ui_drawable_music
+import com.ismartcoding.plain.ui.resources.sort as ui_drawable_sort
+import com.ismartcoding.plain.i18n.sort
+import com.ismartcoding.plain.i18n.cast
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
@@ -151,12 +157,12 @@ fun AudioAllPage(
                 topBarActions = {
                     ActionButtonSearch { audioVM.enterSearchMode() }
                     PIconButton(
-                        icon = Res.drawable.sort,
+                        icon = UiRes.drawable.ui_drawable_sort,
                         contentDescription = stringResource(Res.string.sort),
                         click = { audioVM.showSortAndBrowseDialog.value = true },
                     )
                     PIconButton(
-                        icon = Res.drawable.cast,
+                        icon = UiRes.drawable.ui_drawable_cast,
                         contentDescription = stringResource(Res.string.cast_mode),
                         click = { castVM.showCastDialog.value = true },
                     )
@@ -174,7 +180,7 @@ fun AudioAllPage(
         ) {
             Column(modifier = Modifier.fillMaxSize()) {
                 if (!audioVM.hasPermission.value) {
-                    NeedPermissionColumn(Res.drawable.music, AppFeatureType.FILES.getPermission()!!); return@Column
+                    NeedPermissionColumn(UiRes.drawable.ui_drawable_music, AppFeatureType.FILES.getPermission()!!); return@Column
                 }
 
                 AudioPageList(

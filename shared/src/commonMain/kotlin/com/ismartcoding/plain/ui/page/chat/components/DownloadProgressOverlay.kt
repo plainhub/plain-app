@@ -17,6 +17,13 @@ import androidx.compose.ui.unit.dp
 import com.ismartcoding.plain.chat.download.DownloadQueue
 import com.ismartcoding.plain.features.download.DownloadStatus
 import com.ismartcoding.plain.ui.base.PIconButton
+import com.ismartcoding.plain.ui.resources.Res as UiRes
+import com.ismartcoding.plain.ui.resources.circle_alert as ui_drawable_circle_alert
+import com.ismartcoding.plain.ui.resources.download as ui_drawable_download
+import com.ismartcoding.plain.ui.resources.pause as ui_drawable_pause
+import com.ismartcoding.plain.ui.resources.x as ui_drawable_x
+import com.ismartcoding.plain.i18n.download
+import com.ismartcoding.plain.i18n.pause
 
 @Composable
 private fun DualProgressIndicator(
@@ -47,7 +54,7 @@ private fun DownloadActionButton(
 ) {
     when (status) {
         DownloadStatus.DOWNLOADING -> PIconButton(
-            icon = Res.drawable.pause,
+            icon = UiRes.drawable.ui_drawable_pause,
             click = { DownloadQueue.pauseDownload(taskId) },
             tint = Color.White,
             contentDescription = stringResource(Res.string.pause),
@@ -55,7 +62,7 @@ private fun DownloadActionButton(
         )
 
         DownloadStatus.PAUSED -> PIconButton(
-            icon = Res.drawable.download,
+            icon = UiRes.drawable.ui_drawable_download,
             click = { DownloadQueue.resumeDownload(taskId) },
             tint = Color.White,
             contentDescription = stringResource(Res.string.resume),
@@ -63,7 +70,7 @@ private fun DownloadActionButton(
         )
 
         DownloadStatus.PENDING -> PIconButton(
-            icon = Res.drawable.x,
+            icon = UiRes.drawable.ui_drawable_x,
             click = { DownloadQueue.removeDownload(taskId) },
             tint = Color.White,
             contentDescription = stringResource(Res.string.cancel),
@@ -71,7 +78,7 @@ private fun DownloadActionButton(
         )
 
         DownloadStatus.FAILED -> PIconButton(
-            icon = Res.drawable.circle_alert,
+            icon = UiRes.drawable.ui_drawable_circle_alert,
             click = { DownloadQueue.retryDownload(taskId) },
             tint = Color.White,
             contentDescription = stringResource(Res.string.try_again),

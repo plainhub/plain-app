@@ -30,6 +30,14 @@ import com.ismartcoding.plain.ui.models.enterSelectMode
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
+import com.ismartcoding.plain.ui.resources.Res as UiRes
+import com.ismartcoding.plain.ui.resources.eye as ui_drawable_eye
+import com.ismartcoding.plain.ui.resources.eye_off as ui_drawable_eye_off
+import com.ismartcoding.plain.ui.resources.file_plus as ui_drawable_file_plus
+import com.ismartcoding.plain.ui.resources.folder_plus as ui_drawable_folder_plus
+import com.ismartcoding.plain.ui.resources.list_checks as ui_drawable_list_checks
+import com.ismartcoding.plain.ui.resources.sort as ui_drawable_sort
+import com.ismartcoding.plain.i18n.sort
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -46,12 +54,12 @@ fun FilesMoreActionsSheet(filesVM: FilesViewModel, onDismiss: () -> Unit) {
             VerticalSpace(16.dp)
             PSheetActionCard {
                 if (!isZip) {
-                    PSheetActionRow(Res.drawable.list_checks, stringResource(Res.string.select)) {
+                    PSheetActionRow(UiRes.drawable.ui_drawable_list_checks, stringResource(Res.string.select)) {
                         onDismiss()
                         filesVM.enterSelectMode()
                     }
                 }
-                PSheetActionRow(Res.drawable.sort, stringResource(Res.string.sort)) {
+                PSheetActionRow(UiRes.drawable.ui_drawable_sort, stringResource(Res.string.sort)) {
                     onDismiss()
                     filesVM.showSortDialog.value = true
                 }
@@ -65,7 +73,7 @@ fun FilesMoreActionsSheet(filesVM: FilesViewModel, onDismiss: () -> Unit) {
                                 filesVM.loadAsync()
                             }
                         },
-                    icon = if (showHiddenFiles) Res.drawable.eye else Res.drawable.eye_off,
+                    icon = if (showHiddenFiles) UiRes.drawable.ui_drawable_eye else UiRes.drawable.ui_drawable_eye_off,
                     title = stringResource(Res.string.show_hidden_files),
                     action = {
                         PSwitch(activated = showHiddenFiles, onClick = {
@@ -81,11 +89,11 @@ fun FilesMoreActionsSheet(filesVM: FilesViewModel, onDismiss: () -> Unit) {
             if (!isZip) {
                 VerticalSpace(16.dp)
                 PSheetActionCard {
-                    PSheetActionRow(Res.drawable.folder_plus, stringResource(Res.string.create_folder)) {
+                    PSheetActionRow(UiRes.drawable.ui_drawable_folder_plus, stringResource(Res.string.create_folder)) {
                         onDismiss()
                         filesVM.showCreateFolderDialog.value = true
                     }
-                    PSheetActionRow(Res.drawable.file_plus, stringResource(Res.string.create_file)) {
+                    PSheetActionRow(UiRes.drawable.ui_drawable_file_plus, stringResource(Res.string.create_file)) {
                         onDismiss()
                         filesVM.showCreateFileDialog.value = true
                     }

@@ -29,6 +29,14 @@ import com.ismartcoding.plain.enums.PickFileType
 import com.ismartcoding.plain.events.PickFileEvent
 import com.ismartcoding.plain.lib.sendEvent
 import com.ismartcoding.plain.ui.base.PIconButton
+import com.ismartcoding.plain.ui.resources.Res as UiRes
+import com.ismartcoding.plain.ui.resources.folder as ui_drawable_folder
+import com.ismartcoding.plain.ui.resources.folders as ui_drawable_folders
+import com.ismartcoding.plain.ui.resources.image as ui_drawable_image
+import com.ismartcoding.plain.ui.resources.send as ui_drawable_send
+import com.ismartcoding.plain.i18n.folders
+import com.ismartcoding.plain.i18n.image
+import com.ismartcoding.plain.i18n.folder
 
 @Composable
 fun ChatInput(
@@ -74,21 +82,21 @@ fun ChatInput(
                 horizontalArrangement = Arrangement.SpaceBetween,
             ) {
                 PIconButton(
-                    icon = Res.drawable.image,
+                    icon = UiRes.drawable.ui_drawable_image,
                     contentDescription = stringResource(Res.string.images),
                     tint = MaterialTheme.colorScheme.primary,
                 ) {
                     sendEvent(PickFileEvent(PickFileTag.SEND_MESSAGE, PickFileType.IMAGE_VIDEO, multiple = true))
                 }
                 PIconButton(
-                    icon = Res.drawable.folder,
+                    icon = UiRes.drawable.ui_drawable_folder,
                     contentDescription = stringResource(Res.string.files),
                     tint = MaterialTheme.colorScheme.primary,
                 ) {
                     sendEvent(PickFileEvent(PickFileTag.SEND_MESSAGE, PickFileType.FILE, multiple = true))
                 }
                 PIconButton(
-                    icon = Res.drawable.folders,
+                    icon = UiRes.drawable.ui_drawable_folders,
                     contentDescription = stringResource(Res.string.share_folder),
                     tint = MaterialTheme.colorScheme.primary,
                 ) {
@@ -96,7 +104,7 @@ fun ChatInput(
                 }
                 Spacer(modifier = Modifier.weight(1f))
                 PIconButton(
-                    icon = Res.drawable.send,
+                    icon = UiRes.drawable.ui_drawable_send,
                     contentDescription = stringResource(Res.string.send_message),
                     tint = MaterialTheme.colorScheme.primary,
                 ) {

@@ -28,6 +28,10 @@ import coil3.request.ImageRequest
 import com.ismartcoding.plain.lib.extensions.isImageFast
 import com.ismartcoding.plain.platform.applyForceVideoDecoder
 import kotlinx.coroutines.launch
+import com.ismartcoding.plain.ui.resources.Res as UiRes
+import com.ismartcoding.plain.ui.resources.file_video as ui_drawable_file_video
+import com.ismartcoding.plain.ui.resources.image as ui_drawable_image
+import com.ismartcoding.plain.i18n.image
 
 /**
  * CommonMain variant that accepts a String uri (e.g. a MediaStore content-uri string).
@@ -52,7 +56,7 @@ fun TransformImageViewWithUri(
             if (painter.state.value is AsyncImagePainter.State.Error) {
                 Image(
                     modifier = imageModifier,
-                    painter = painterResource(if (fileName.isImageFast()) Res.drawable.image else Res.drawable.file_video),
+                    painter = painterResource(if (fileName.isImageFast()) UiRes.drawable.ui_drawable_image else UiRes.drawable.ui_drawable_file_video),
                     contentDescription = path,
                     contentScale = ContentScale.Crop
                 )

@@ -61,6 +61,14 @@ import com.ismartcoding.plain.ui.nav.Routing
 import com.ismartcoding.plain.ui.theme.PlainTheme
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import com.ismartcoding.plain.ui.resources.Res as UiRes
+import com.ismartcoding.plain.ui.resources.bell as ui_drawable_bell
+import com.ismartcoding.plain.ui.resources.code as ui_drawable_code
+import com.ismartcoding.plain.ui.resources.content_paste as ui_drawable_content_paste
+import com.ismartcoding.plain.ui.resources.devices as ui_drawable_devices
+import com.ismartcoding.plain.ui.resources.info as ui_drawable_info
+import com.ismartcoding.plain.ui.resources.lock as ui_drawable_lock
+import com.ismartcoding.plain.i18n.devices
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
@@ -132,15 +140,15 @@ fun DesktopAccessSettingsPage(navController: NavHostController, webVM: DesktopAc
                         PCard(modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN)) {
                             PListItem(
                                 modifier = Modifier.clickable { navController.navigate(Routing.Connections) },
-                                icon = Res.drawable.devices, title = stringResource(Res.string.connections), showMore = true
+                                icon = UiRes.drawable.ui_drawable_devices, title = stringResource(Res.string.connections), showMore = true
                             )
                             PListItem(
                                 modifier = Modifier.clickable { navController.navigate(Routing.WebSecurity) },
-                                icon = Res.drawable.lock, title = stringResource(Res.string.security), showMore = true
+                                icon = UiRes.drawable.ui_drawable_lock, title = stringResource(Res.string.security), showMore = true
                             )
                             PListItem(
                                 modifier = Modifier.clickable { navController.navigate(Routing.HowToUse) },
-                                icon = Res.drawable.info, title = stringResource(Res.string.how_to_use), showMore = true
+                                icon = UiRes.drawable.ui_drawable_info, title = stringResource(Res.string.how_to_use), showMore = true
                             )
                         }
                         VerticalSpace(dp = 16.dp)
@@ -179,7 +187,7 @@ fun DesktopAccessSettingsPage(navController: NavHostController, webVM: DesktopAc
                         item {
                             VerticalSpace(dp = 16.dp)
                             PCard(modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN)) {
-                                val m = PermissionItem.create(Res.drawable.bell, Permission.NOTIFICATION_LISTENER)
+                                val m = PermissionItem.create(UiRes.drawable.ui_drawable_bell, Permission.NOTIFICATION_LISTENER)
                                 val permission = m.permission
                                 val enabled = notificationListenerGranted.value && enabledPermissions.contains(permission.name)
                                 PListItem(
@@ -200,7 +208,7 @@ fun DesktopAccessSettingsPage(navController: NavHostController, webVM: DesktopAc
                     }
                     item {
                         VerticalSpace(dp = 16.dp)
-                        val m = remember { PermissionItem.create(Res.drawable.content_paste, Permission.CLIPBOARD) }
+                        val m = remember { PermissionItem.create(UiRes.drawable.ui_drawable_content_paste, Permission.CLIPBOARD) }
                         val clipboardEnabled = enabledPermissions.contains(m.permission.name)
                         PCard(modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN)) {
                             PListItem(
@@ -249,7 +257,7 @@ fun DesktopAccessSettingsPage(navController: NavHostController, webVM: DesktopAc
                         PCard(modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN)) {
                             PListItem(
                                 modifier = Modifier.clickable { navController.navigate(Routing.WebDev) },
-                                icon = Res.drawable.code, title = stringResource(Res.string.adb_automation), showMore = true
+                                icon = UiRes.drawable.ui_drawable_code, title = stringResource(Res.string.adb_automation), showMore = true
                             )
                         }
                     }

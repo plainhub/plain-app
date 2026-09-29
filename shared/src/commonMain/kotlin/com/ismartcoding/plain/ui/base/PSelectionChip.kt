@@ -14,6 +14,8 @@ import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.unit.dp
 import com.ismartcoding.plain.ui.theme.cardBackgroundNormal
+import com.ismartcoding.plain.ui.resources.Res as UiRes
+import com.ismartcoding.plain.ui.resources.check as ui_drawable_check
 
 @Composable
 fun PSelectionChip(
@@ -35,7 +37,7 @@ fun PSelectionChip(
                     modifier = Modifier
                         .padding(start = 8.dp)
                         .size(20.dp),
-                    painter = painterResource(Res.drawable.check),
+                    painter = painterResource(UiRes.drawable.ui_drawable_check),
                     contentDescription = stringResource(Res.string.select),
                     tint = MaterialTheme.colorScheme.onPrimary
                 )

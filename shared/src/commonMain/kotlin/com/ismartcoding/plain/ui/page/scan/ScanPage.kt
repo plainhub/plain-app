@@ -66,6 +66,10 @@ import com.ismartcoding.plain.ui.page.scan.components.ScanImageCodePicker
 import com.ismartcoding.plain.ui.theme.darkMask
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import com.ismartcoding.plain.ui.resources.Res as UiRes
+import com.ismartcoding.plain.ui.resources.history as ui_drawable_history
+import com.ismartcoding.plain.ui.resources.image as ui_drawable_image
+import com.ismartcoding.plain.i18n.image
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -242,7 +246,7 @@ fun ScanPage(navController: NavHostController) {
             title = stringResource(Res.string.scan_qrcode),
             actions = {
                 PIconButton(
-                    icon = Res.drawable.history,
+                    icon = UiRes.drawable.ui_drawable_history,
                     contentDescription = stringResource(Res.string.scan_history),
                     tint = MaterialTheme.colorScheme.onSurface
                 ) { navController.navigate(Routing.ScanHistory) }
@@ -302,7 +306,7 @@ fun ScanPage(navController: NavHostController) {
                         .clickable { sendEvent(PickFileEvent(PickFileTag.SCAN, PickFileType.IMAGE, multiple = false)) },
                     contentAlignment = Alignment.Center,
                 ) {
-                    Icon(painter = painterResource(Res.drawable.image), contentDescription = stringResource(Res.string.images), tint = Color.White)
+                    Icon(painter = painterResource(UiRes.drawable.ui_drawable_image), contentDescription = stringResource(Res.string.images), tint = Color.White)
                 }
             }
             pickedImage?.let { image ->

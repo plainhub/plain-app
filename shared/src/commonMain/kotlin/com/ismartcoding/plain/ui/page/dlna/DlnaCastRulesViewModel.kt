@@ -36,6 +36,8 @@ import com.ismartcoding.plain.ui.base.TopSpace
 import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.models.launchSafe
 import kotlinx.coroutines.flow.MutableStateFlow
+import com.ismartcoding.plain.ui.resources.Res as UiRes
+import com.ismartcoding.plain.ui.resources.trash_2 as ui_drawable_trash_2
 
 class DlnaCastRulesViewModel : ViewModel() {
     val allowedFlow = MutableStateFlow<List<Pair<String, String>>>(emptyList())
@@ -95,7 +97,7 @@ fun DlnaCastHistoryPage(
                                 action = {
                                     IconButton(onClick = { vm.removeAllowed(ip) }) {
                                         Icon(
-                                            painter = painterResource(Res.drawable.trash_2),
+                                            painter = painterResource(UiRes.drawable.ui_drawable_trash_2),
                                             contentDescription = stringResource(Res.string.delete),
                                             tint = MaterialTheme.colorScheme.error,
                                         )
@@ -116,7 +118,7 @@ fun DlnaCastHistoryPage(
                                 action = {
                                     IconButton(onClick = { vm.removeDenied(ip) }) {
                                         Icon(
-                                            painter = painterResource(Res.drawable.trash_2),
+                                            painter = painterResource(UiRes.drawable.ui_drawable_trash_2),
                                             contentDescription = stringResource(Res.string.delete),
                                             tint = MaterialTheme.colorScheme.error,
                                         )

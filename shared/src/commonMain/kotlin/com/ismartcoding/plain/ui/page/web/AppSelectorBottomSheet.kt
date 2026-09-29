@@ -31,6 +31,9 @@ import com.ismartcoding.plain.ui.base.PTopRightButton
 import com.ismartcoding.plain.ui.models.NotificationSettingsViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import com.ismartcoding.plain.ui.resources.Res as UiRes
+import com.ismartcoding.plain.ui.resources.search as ui_drawable_search
+import com.ismartcoding.plain.i18n.search
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -96,7 +99,7 @@ fun AppSelectorBottomSheet(
                     .padding(bottom = 8.dp),
                 leadingIcon = {
                     Icon(
-                        painter = painterResource(Res.drawable.search),
+                        painter = painterResource(UiRes.drawable.ui_drawable_search),
                         contentDescription = null,
                         tint = MaterialTheme.colorScheme.onSurfaceVariant
                     )

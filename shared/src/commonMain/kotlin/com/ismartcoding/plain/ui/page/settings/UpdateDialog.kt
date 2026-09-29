@@ -36,6 +36,8 @@ import com.ismartcoding.plain.ui.models.UpdateViewModel
 import com.ismartcoding.plain.ui.theme.dialogSheetBackground
 import kotlinx.coroutines.launch
 import kotlin.time.Instant
+import com.ismartcoding.plain.ui.resources.Res as UiRes
+import com.ismartcoding.plain.ui.resources.rocket as ui_drawable_rocket
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -53,7 +55,7 @@ fun UpdateDialog(updateVM: UpdateViewModel) {
             onDismissRequest = { updateVM.updateDialogVisible.value = false },
             icon = {
                 Icon(
-                    painter = painterResource(Res.drawable.rocket),
+                    painter = painterResource(UiRes.drawable.ui_drawable_rocket),
                     contentDescription = stringResource(Res.string.change_log),
                 )
             },

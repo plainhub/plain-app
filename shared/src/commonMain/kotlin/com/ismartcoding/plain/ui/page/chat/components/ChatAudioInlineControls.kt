@@ -26,6 +26,11 @@ import com.ismartcoding.plain.lib.extensions.formatDurationMs
 import com.ismartcoding.plain.ui.base.HorizontalSpace
 import com.ismartcoding.plain.ui.base.PlayerSlider
 import com.ismartcoding.plain.ui.base.PlayerSliderDefaults
+import com.ismartcoding.plain.ui.resources.Res as UiRes
+import com.ismartcoding.plain.ui.resources.music2 as ui_drawable_music2
+import com.ismartcoding.plain.ui.resources.pause as ui_drawable_pause
+import com.ismartcoding.plain.ui.resources.play_arrow as ui_drawable_play_arrow
+import com.ismartcoding.plain.i18n.pause
 
 @Composable
 fun ChatAudioInlineControls(
@@ -86,7 +91,7 @@ fun ChatAudioInlineControls(
                         .background(MaterialTheme.colorScheme.primaryContainer),
                 ) {
                     Icon(
-                        painter = painterResource(Res.drawable.pause),
+                        painter = painterResource(UiRes.drawable.ui_drawable_pause),
                         contentDescription = stringResource(Res.string.pause),
                         tint = MaterialTheme.colorScheme.onPrimaryContainer,
                         modifier = Modifier.size(24.dp),
@@ -102,7 +107,7 @@ fun ChatAudioInlineControls(
                         .background(MaterialTheme.colorScheme.primary),
                 ) {
                     Icon(
-                        painter = painterResource(Res.drawable.play_arrow),
+                        painter = painterResource(UiRes.drawable.ui_drawable_play_arrow),
                         contentDescription = stringResource(Res.string.play),
                         tint = MaterialTheme.colorScheme.onPrimary,
                         modifier = Modifier.size(24.dp),
@@ -119,7 +124,7 @@ fun ChatAudioInlineControls(
                     .clip(CircleShape),
             ) {
                 Icon(
-                    painter = painterResource(Res.drawable.music2),
+                    painter = painterResource(UiRes.drawable.ui_drawable_music2),
                     contentDescription = "Full player",
                     tint = MaterialTheme.colorScheme.primary,
                 )

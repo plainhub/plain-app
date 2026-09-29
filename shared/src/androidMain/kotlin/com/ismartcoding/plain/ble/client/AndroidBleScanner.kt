@@ -192,6 +192,15 @@ object AndroidBleScanner : BleScanner {
             LogCat.v("Found device: ${device.name}, shortId=${parts?.shortId}, mac=${device.address}, $rssi")
             d = AndroidBleGattClient(
                 device = device,
+                context = appContext,
+                logger = { level, message ->
+                    when (level) {
+                        "D" -> LogCat.d(message)
+                        "W" -> LogCat.w(message)
+                        else -> LogCat.e(message)
+                    }
+                },
+                onDisconnected = ::teardown,
                 rssi = rssi,
                 shortId = parts?.shortId ?: "",
                 awareSupported = parts?.awareSupported ?: false,

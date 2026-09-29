@@ -39,6 +39,8 @@ import com.ismartcoding.plain.ui.base.PTopAppBar
 import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.models.launchSafe
 import com.ismartcoding.plain.ui.nav.Routing
+import com.ismartcoding.plain.ui.resources.Res as UiRes
+import com.ismartcoding.plain.ui.resources.history as ui_drawable_history
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -54,7 +56,7 @@ fun DlnaReceiverPage(navController: NavHostController) {
                 title = stringResource(Res.string.dlna_receiver),
                 actions = {
                     PIconButton(
-                        icon = Res.drawable.history,
+                        icon = UiRes.drawable.ui_drawable_history,
                         contentDescription = stringResource(Res.string.dlna_cast_history),
                         tint = MaterialTheme.colorScheme.onSurface
                     ) { navController.navigate(Routing.DlnaCastHistory) }

@@ -23,6 +23,8 @@ import com.ismartcoding.plain.enums.ButtonSize
 import com.ismartcoding.plain.platform.LocaleHelper
 import com.ismartcoding.plain.platform.isAndroidOnly
 import com.ismartcoding.plain.ui.theme.dialogSheetBackground
+import com.ismartcoding.plain.ui.resources.Res as UiRes
+import com.ismartcoding.plain.ui.resources.rocket as ui_drawable_rocket
 
 @Composable
 fun PDonationBanner(
@@ -50,8 +52,8 @@ fun PDonationBanner(
         description = stringResource(Res.string.donation_desc),
         buttonText = stringResource(Res.string.buy_me_a_coffee),
         onClick = effectiveOnClick,
-        tagIcon = Res.drawable.rocket,
-        buttonIcon = Res.drawable.rocket,
+        tagIcon = UiRes.drawable.ui_drawable_rocket,
+        buttonIcon = UiRes.drawable.ui_drawable_rocket,
     )
 }
 

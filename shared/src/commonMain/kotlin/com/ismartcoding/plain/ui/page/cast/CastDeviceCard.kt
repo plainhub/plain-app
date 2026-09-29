@@ -20,6 +20,10 @@ import org.jetbrains.compose.resources.painterResource
 import androidx.compose.ui.unit.dp
 import com.ismartcoding.plain.ui.base.HorizontalSpace
 import com.ismartcoding.plain.ui.base.PCard
+import com.ismartcoding.plain.ui.resources.Res as UiRes
+import com.ismartcoding.plain.ui.resources.chevron_right as ui_drawable_chevron_right
+import com.ismartcoding.plain.ui.resources.tv as ui_drawable_tv
+import com.ismartcoding.plain.i18n.tv
 
 @Composable
 fun CastDeviceCard(
@@ -38,7 +42,7 @@ fun CastDeviceCard(
                 modifier = Modifier.size(48.dp),
             ) {
                 Icon(
-                    painter = painterResource(Res.drawable.tv),
+                    painter = painterResource(UiRes.drawable.ui_drawable_tv),
                     contentDescription = null,
                     tint = MaterialTheme.colorScheme.onPrimaryContainer,
                     modifier = Modifier.padding(12.dp),
@@ -55,7 +59,7 @@ fun CastDeviceCard(
             }
             HorizontalSpace(12.dp)
             Icon(
-                painter = painterResource(Res.drawable.chevron_right),
+                painter = painterResource(UiRes.drawable.ui_drawable_chevron_right),
                 contentDescription = null,
                 tint = MaterialTheme.colorScheme.onSurfaceVariant,
             )

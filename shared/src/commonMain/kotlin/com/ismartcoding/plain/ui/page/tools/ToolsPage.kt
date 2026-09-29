@@ -29,11 +29,11 @@ import com.ismartcoding.plain.enums.AppFeatureType
 import com.ismartcoding.plain.features.media.CastPlayer
 import com.ismartcoding.plain.i18n.Res
 import com.ismartcoding.plain.i18n.customize_home_features
-import com.ismartcoding.plain.i18n.grid_3x3
+import com.ismartcoding.plain.ui.resources.grid_3x3 as ui_drawable_grid_3x3
 import com.ismartcoding.plain.i18n.launcher_shortcuts
 import com.ismartcoding.plain.i18n.casting
 import com.ismartcoding.plain.i18n.casting_to
-import com.ismartcoding.plain.i18n.layout_grid
+import com.ismartcoding.plain.ui.resources.layout_grid as ui_drawable_layout_grid
 import com.ismartcoding.plain.i18n.tools
 import com.ismartcoding.plain.ui.base.ActionButtonAddWithMenu
 import com.ismartcoding.plain.ui.base.BottomSpace
@@ -55,6 +55,9 @@ import com.ismartcoding.plain.ui.theme.greenText
 import kotlinx.coroutines.flow.map
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
+import com.ismartcoding.plain.ui.resources.Res as UiRes
+import com.ismartcoding.plain.ui.resources.grid_3x3 as ui_drawable_grid_3x3
+import com.ismartcoding.plain.ui.resources.layout_grid as ui_drawable_layout_grid
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -83,7 +86,7 @@ fun ToolsPage(
                             text = { Text(stringResource(Res.string.customize_home_features)) },
                             leadingIcon = {
                                 Icon(
-                                    painter = painterResource(Res.drawable.layout_grid),
+                                    painter = painterResource(UiRes.drawable.ui_drawable_layout_grid),
                                     contentDescription = null,
                                 )
                             },
@@ -96,7 +99,7 @@ fun ToolsPage(
                             text = { Text(stringResource(Res.string.launcher_shortcuts)) },
                             leadingIcon = {
                                 Icon(
-                                    painter = painterResource(Res.drawable.grid_3x3),
+                                    painter = painterResource(UiRes.drawable.ui_drawable_grid_3x3),
                                     contentDescription = null,
                                 )
                             },

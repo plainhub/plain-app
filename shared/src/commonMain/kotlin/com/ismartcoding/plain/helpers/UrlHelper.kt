@@ -77,10 +77,10 @@ object UrlHelper {
     }
 
     fun getPolicyUrl(): String {
-        return "https://plainhub.github.io/plain-app/policy.html"
+        return "https://plainapp.app/privacy"
     }
 
     fun getTermsUrl(): String {
-        return "https://plainhub.github.io/plain-app/terms.html"
+        return "https://plainapp.app/terms"
     }
 }

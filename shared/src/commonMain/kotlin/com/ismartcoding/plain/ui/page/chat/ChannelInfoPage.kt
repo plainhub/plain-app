@@ -43,7 +43,7 @@ import com.ismartcoding.plain.i18n.channel_info
 import com.ismartcoding.plain.i18n.channel_name
 import com.ismartcoding.plain.i18n.clear_messages
 import com.ismartcoding.plain.i18n.clear_messages_confirm
-import com.ismartcoding.plain.i18n.close
+import com.ismartcoding.plain.ui.resources.close as ui_drawable_close
 import com.ismartcoding.plain.i18n.delete_channel
 import com.ismartcoding.plain.i18n.delete_channel_warning
 import com.ismartcoding.plain.i18n.device_type
@@ -79,6 +79,7 @@ import com.ismartcoding.plain.ui.page.chat.components.RenameChannelDialog
 import com.ismartcoding.plain.ui.theme.dialogSheetBackground
 import com.ismartcoding.plain.ui.base.PTextButton
 import org.jetbrains.compose.resources.stringResource
+import com.ismartcoding.plain.i18n.close
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

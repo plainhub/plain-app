@@ -39,6 +39,18 @@ import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
+import com.ismartcoding.plain.ui.resources.Res as UiRes
+import com.ismartcoding.plain.ui.resources.folder as ui_drawable_folder
+import com.ismartcoding.plain.ui.resources.image as ui_drawable_image
+import com.ismartcoding.plain.ui.resources.message_circle as ui_drawable_message_circle
+import com.ismartcoding.plain.ui.resources.music as ui_drawable_music
+import com.ismartcoding.plain.ui.resources.music2 as ui_drawable_music2
+import com.ismartcoding.plain.ui.resources.play_arrow as ui_drawable_play_arrow
+import com.ismartcoding.plain.ui.resources.send as ui_drawable_send
+import com.ismartcoding.plain.ui.resources.video as ui_drawable_video
+import com.ismartcoding.plain.i18n.folder
+import com.ismartcoding.plain.i18n.video
+import com.ismartcoding.plain.i18n.image
 
 /** Mini default track cover, mirroring the app's DefaultCoverArt pairing. */
 @Composable
@@ -55,7 +67,7 @@ private fun MiniMusicCover(size: Dp, modifier: Modifier = Modifier) {
         contentAlignment = Alignment.Center,
     ) {
         Icon(
-            painter = painterResource(Res.drawable.music2),
+            painter = painterResource(UiRes.drawable.ui_drawable_music2),
             contentDescription = null,
             tint = MaterialTheme.colorScheme.primary,
             modifier = Modifier.size(size * 0.5f),
@@ -67,11 +79,11 @@ private data class WebSection(val icon: DrawableResource, val label: StringResou
 
 private val webSections: List<WebSection>
     get() = listOf(
-        WebSection(Res.drawable.folder, Res.string.files),
-        WebSection(Res.drawable.music, Res.string.audios),
-        WebSection(Res.drawable.image, Res.string.images),
-        WebSection(Res.drawable.video, Res.string.videos),
-        WebSection(Res.drawable.message_circle, Res.string.chat),
+        WebSection(UiRes.drawable.ui_drawable_folder, Res.string.files),
+        WebSection(UiRes.drawable.ui_drawable_music, Res.string.audios),
+        WebSection(UiRes.drawable.ui_drawable_image, Res.string.images),
+        WebSection(UiRes.drawable.ui_drawable_video, Res.string.videos),
+        WebSection(UiRes.drawable.ui_drawable_message_circle, Res.string.chat),
     )
 
 /** Icon rail mirroring plain-desktop app-rail: icon over label, primary pill on active. */
@@ -185,7 +197,7 @@ private fun WebVideoGrid() {
                             contentAlignment = Alignment.Center,
                         ) {
                             Icon(
-                                painter = painterResource(Res.drawable.play_arrow),
+                                painter = painterResource(UiRes.drawable.ui_drawable_play_arrow),
                                 contentDescription = null,
                                 tint = MaterialTheme.colorScheme.primary,
                                 modifier = Modifier.size(9.dp),
@@ -311,7 +323,7 @@ private fun WebChatPreview() {
                 modifier = Modifier.weight(1f),
             )
             Icon(
-                painter = painterResource(Res.drawable.send),
+                painter = painterResource(UiRes.drawable.ui_drawable_send),
                 contentDescription = null,
                 tint = MaterialTheme.colorScheme.primary,
                 modifier = Modifier.size(10.dp),

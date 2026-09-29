@@ -22,6 +22,8 @@ import com.ismartcoding.plain.ui.base.PFilledButton
 import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.models.FeedsViewModel
 import com.ismartcoding.plain.ui.theme.dialogSheetBackground
+import com.ismartcoding.plain.ui.resources.Res as UiRes
+import com.ismartcoding.plain.ui.resources.square_pen as ui_drawable_square_pen
 
 @Composable
 fun EditFeedDialog(feedsVM: FeedsViewModel) {
@@ -34,7 +36,7 @@ fun EditFeedDialog(feedsVM: FeedsViewModel) {
             },
             icon = {
                 Icon(
-                    painter = painterResource(Res.drawable.square_pen),
+                    painter = painterResource(UiRes.drawable.ui_drawable_square_pen),
                     contentDescription = stringResource(Res.string.edit),
                 )
             },

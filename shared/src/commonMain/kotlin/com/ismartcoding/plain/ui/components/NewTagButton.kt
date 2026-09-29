@@ -17,6 +17,8 @@ import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.unit.dp
 import com.ismartcoding.plain.ui.theme.cardBackgroundNormal
+import com.ismartcoding.plain.ui.resources.Res as UiRes
+import com.ismartcoding.plain.ui.resources.plus as ui_drawable_plus
 
 @Composable
 fun NewTagButton(click: () -> Unit) {
@@ -31,7 +33,7 @@ fun NewTagButton(click: () -> Unit) {
     ) {
         Icon(
             modifier = Modifier.size(20.dp),
-            painter = painterResource(Res.drawable.plus),
+            painter = painterResource(UiRes.drawable.ui_drawable_plus),
             contentDescription = stringResource(Res.string.add_tag),
             tint = MaterialTheme.colorScheme.onSurface,
         )

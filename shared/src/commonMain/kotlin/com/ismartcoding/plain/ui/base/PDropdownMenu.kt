@@ -17,6 +17,8 @@ import androidx.compose.ui.Modifier
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.unit.dp
+import com.ismartcoding.plain.ui.resources.Res as UiRes
+import com.ismartcoding.plain.ui.resources.trash_2 as ui_drawable_trash_2
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -63,7 +65,7 @@ fun PDropdownMenuItemDelete(onClick: () -> Unit) {
         text = { Text(stringResource(Res.string.delete), color = MaterialTheme.colorScheme.error) },
         leadingIcon = {
             Icon(
-                painter = painterResource(Res.drawable.trash_2),
+                painter = painterResource(UiRes.drawable.ui_drawable_trash_2),
                 contentDescription = null,
                 modifier = Modifier.size(20.dp),
                 tint = MaterialTheme.colorScheme.error,

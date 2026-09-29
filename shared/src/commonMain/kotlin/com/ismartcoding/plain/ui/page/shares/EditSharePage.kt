@@ -36,12 +36,12 @@ import com.ismartcoding.plain.i18n.name
 import com.ismartcoding.plain.i18n.add_items
 import com.ismartcoding.plain.i18n.confirm_to_delete
 import com.ismartcoding.plain.i18n.delete
-import com.ismartcoding.plain.i18n.file_text
-import com.ismartcoding.plain.i18n.folder
-import com.ismartcoding.plain.i18n.folder_plus
-import com.ismartcoding.plain.i18n.save
+import com.ismartcoding.plain.ui.resources.file_text as ui_drawable_file_text
+import com.ismartcoding.plain.ui.resources.folder as ui_drawable_folder
+import com.ismartcoding.plain.ui.resources.folder_plus as ui_drawable_folder_plus
+import com.ismartcoding.plain.ui.resources.save as ui_drawable_save
 import com.ismartcoding.plain.i18n.shared_items
-import com.ismartcoding.plain.i18n.x
+import com.ismartcoding.plain.ui.resources.x as ui_drawable_x
 import com.ismartcoding.plain.i18n.share_expired
 import com.ismartcoding.plain.i18n.share_expires_on
 import com.ismartcoding.plain.i18n.share_expiry
@@ -83,6 +83,13 @@ import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import kotlin.math.abs
+import com.ismartcoding.plain.ui.resources.Res as UiRes
+import com.ismartcoding.plain.ui.resources.file_text as ui_drawable_file_text
+import com.ismartcoding.plain.ui.resources.folder as ui_drawable_folder
+import com.ismartcoding.plain.ui.resources.folder_plus as ui_drawable_folder_plus
+import com.ismartcoding.plain.ui.resources.x as ui_drawable_x
+import com.ismartcoding.plain.i18n.folder
+import com.ismartcoding.plain.i18n.save
 
 /**
  * Page to edit an existing share link: rename it, change the expiry, and
@@ -183,7 +190,7 @@ fun EditSharePage(
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     Icon(
-                        painter = painterResource(if (dirFlags[path] == true) Res.drawable.folder else Res.drawable.file_text),
+                        painter = painterResource(if (dirFlags[path] == true) UiRes.drawable.ui_drawable_folder else UiRes.drawable.ui_drawable_file_text),
                         contentDescription = null,
                         tint = MaterialTheme.colorScheme.primary,
                         modifier = Modifier.padding(end = 12.dp),
@@ -202,7 +209,7 @@ fun EditSharePage(
                         )
                     }
                     PIconButton(
-                        icon = Res.drawable.x,
+                        icon = UiRes.drawable.ui_drawable_x,
                         contentDescription = stringResource(Res.string.delete),
                         tint = MaterialTheme.colorScheme.onSurfaceVariant,
                         enabled = paths.size > 1,
@@ -214,7 +221,7 @@ fun EditSharePage(
             VerticalSpace(8.dp)
             POutlinedButton(
                 text = stringResource(Res.string.add_items),
-                icon = painterResource(Res.drawable.folder_plus),
+                icon = painterResource(UiRes.drawable.ui_drawable_folder_plus),
                 onClick = { showItemsPicker = true },
             )
             VerticalSpace(16.dp)

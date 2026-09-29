@@ -65,6 +65,11 @@ import kotlinx.coroutines.withTimeoutOrNull
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
+import com.ismartcoding.plain.ui.resources.Res as UiRes
+import com.ismartcoding.plain.ui.resources.bell as ui_drawable_bell
+import com.ismartcoding.plain.ui.resources.check as ui_drawable_check
+import com.ismartcoding.plain.ui.resources.folder as ui_drawable_folder
+import com.ismartcoding.plain.i18n.folder
 
 private enum class WizardStep { CHECKLIST, NOTIFICATION, STORAGE, DONE }
 
@@ -210,7 +215,7 @@ fun ServiceOnboardingWizard(
                     PCard {
                         Column(Modifier.padding(vertical = 8.dp)) {
                             PListItem(
-                                icon = Res.drawable.bell,
+                                icon = UiRes.drawable.ui_drawable_bell,
                                 title = stringResource(Res.string.perm_wizard_notif_name),
                                 subtitle = stringResource(Res.string.perm_wizard_notif_desc),
                                 titleTrailing = {
@@ -221,7 +226,7 @@ fun ServiceOnboardingWizard(
                                 },
                             )
                             PListItem(
-                                icon = Res.drawable.folder,
+                                icon = UiRes.drawable.ui_drawable_folder,
                                 title = stringResource(Res.string.perm_wizard_storage_name),
                                 subtitle = stringResource(Res.string.perm_wizard_storage_desc),
                                 titleTrailing = {
@@ -255,7 +260,7 @@ fun ServiceOnboardingWizard(
                     StepHeader(current = 1, total = totalSteps)
                     if (notifCard == NotifCard.ASK) {
                         ExplanationStep(
-                            icon = Res.drawable.bell,
+                            icon = UiRes.drawable.ui_drawable_bell,
                             title = stringResource(Res.string.perm_wizard_notif_title),
                             body = stringResource(Res.string.perm_wizard_notif_body),
                         ) {
@@ -280,7 +285,7 @@ fun ServiceOnboardingWizard(
                         }
                     } else {
                         ExplanationStep(
-                            icon = Res.drawable.bell,
+                            icon = UiRes.drawable.ui_drawable_bell,
                             title = stringResource(Res.string.perm_wizard_notif_denied_title),
                             body = stringResource(Res.string.perm_wizard_notif_denied_body),
                             warning = true,
@@ -327,7 +332,7 @@ fun ServiceOnboardingWizard(
                     VerticalSpace(24.dp)
                     StepHeader(current = 2, total = 2)
                     ExplanationStep(
-                        icon = Res.drawable.folder,
+                        icon = UiRes.drawable.ui_drawable_folder,
                         title = stringResource(Res.string.perm_wizard_storage_title),
                         body = stringResource(Res.string.perm_wizard_storage_body),
                     ) {
@@ -363,7 +368,7 @@ fun ServiceOnboardingWizard(
                     VerticalSpace(32.dp)
                     Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
                         WizardIcon(
-                            resource = Res.drawable.check,
+                            resource = UiRes.drawable.ui_drawable_check,
                             tint = MaterialTheme.colorScheme.green,
                             container = MaterialTheme.colorScheme.green.copy(alpha = 0.15f),
                         )
@@ -506,7 +511,7 @@ private fun StatusRow(label: String, status: PermStatus) {
         ) {
             if (status == PermStatus.ALLOWED) {
                 Icon(
-                    painter = painterResource(Res.drawable.check),
+                    painter = painterResource(UiRes.drawable.ui_drawable_check),
                     contentDescription = null,
                     tint = MaterialTheme.colorScheme.green,
                     modifier = Modifier.size(20.dp),

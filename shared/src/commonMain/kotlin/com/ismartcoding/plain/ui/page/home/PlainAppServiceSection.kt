@@ -30,8 +30,8 @@ import com.ismartcoding.plain.i18n.relaunch_app
 import com.ismartcoding.plain.i18n.start_service
 import com.ismartcoding.plain.i18n.stay_online
 import com.ismartcoding.plain.i18n.stop_service
-import com.ismartcoding.plain.i18n.troubleshoot
-import com.ismartcoding.plain.i18n.tune
+import com.ismartcoding.plain.ui.resources.troubleshoot as ui_drawable_troubleshoot
+import com.ismartcoding.plain.ui.resources.tune as ui_drawable_tune
 import com.ismartcoding.plain.ui.base.PFilledButton
 import com.ismartcoding.plain.ui.base.PIconButton
 import com.ismartcoding.plain.ui.base.POutlinedButton
@@ -40,6 +40,9 @@ import com.ismartcoding.plain.ui.helpers.WebHelper
 import com.ismartcoding.plain.ui.nav.Routing
 import com.ismartcoding.plain.ui.theme.PlainTheme
 import org.jetbrains.compose.resources.stringResource
+import com.ismartcoding.plain.ui.resources.Res as UiRes
+import com.ismartcoding.plain.ui.resources.tune as ui_drawable_tune
+import com.ismartcoding.plain.i18n.troubleshoot
 
 @Composable
 fun PlainAppServiceSection(
@@ -81,7 +84,7 @@ fun PlainAppServiceSection(
                 )
                 if (httpServiceState != HttpServiceState.ON) {
                     PIconButton(
-                        icon = Res.drawable.tune,
+                        icon = UiRes.drawable.ui_drawable_tune,
                         contentDescription = stringResource(Res.string.access_settings),
                         tint = MaterialTheme.colorScheme.primary,
                         click = { navController.navigate(Routing.DesktopAccessSettings) })

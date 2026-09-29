@@ -25,6 +25,8 @@ import com.ismartcoding.plain.ui.theme.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import com.ismartcoding.plain.ui.resources.Res as UiRes
+import com.ismartcoding.plain.ui.resources.playlist_remove as ui_drawable_playlist_remove
 
 @Composable
 fun ReorderableCollectionItemScope.AudioQueueItemRow(
@@ -62,7 +64,7 @@ fun ReorderableCollectionItemScope.AudioQueueItemRow(
                 Text(text = audio.artist, style = MaterialTheme.typography.listItemSubtitle())
             }
             if (canRemove) {
-                PIconButton(icon = Res.drawable.playlist_remove, tint = MaterialTheme.colorScheme.error,
+                PIconButton(icon = UiRes.drawable.ui_drawable_playlist_remove, tint = MaterialTheme.colorScheme.error,
                     contentDescription = stringResource(Res.string.remove_from_queue),
                     click = { scope.launch(Dispatchers.Default) { audioQueueVM.removeAsync(audio.path) } })
             }

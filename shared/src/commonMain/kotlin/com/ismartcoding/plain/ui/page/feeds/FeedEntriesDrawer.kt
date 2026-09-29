@@ -40,6 +40,11 @@ import com.ismartcoding.plain.ui.models.FeedEntriesViewModel
 import com.ismartcoding.plain.ui.models.FeedsViewModel
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
+import com.ismartcoding.plain.ui.resources.Res as UiRes
+import com.ismartcoding.plain.ui.resources.history as ui_drawable_history
+import com.ismartcoding.plain.ui.resources.layout_grid as ui_drawable_layout_grid
+import com.ismartcoding.plain.ui.resources.plus as ui_drawable_plus
+import com.ismartcoding.plain.ui.resources.tag as ui_drawable_tag
 
 /**
  * Drawer content for the feed entries page: All, Today, Feeds (with a "+"
@@ -70,7 +75,7 @@ internal fun FeedEntriesDrawerContent(
 
         SidebarItem(
             label = stringResource(Res.string.all),
-            icon = Res.drawable.layout_grid,
+            icon = UiRes.drawable.ui_drawable_layout_grid,
             isSelected = feedEntriesVM.feedId.value.isEmpty() && feedEntriesVM.tag.value == null && feedEntriesVM.filterType.value == FeedEntryFilterType.DEFAULT,
             onClick = { onSelect("", FeedEntryFilterType.DEFAULT, null) },
             badge = feedEntriesVM.total.intValue.toString()
@@ -78,7 +83,7 @@ internal fun FeedEntriesDrawerContent(
 
         SidebarItem(
             label = stringResource(Res.string.today),
-            icon = Res.drawable.history,
+            icon = UiRes.drawable.ui_drawable_history,
             isSelected = feedEntriesVM.feedId.value.isEmpty() && feedEntriesVM.tag.value == null && feedEntriesVM.filterType.value == FeedEntryFilterType.TODAY,
             onClick = { onSelect("", FeedEntryFilterType.TODAY, null) },
             badge = feedEntriesVM.totalToday.value.toString()
@@ -91,7 +96,7 @@ internal fun FeedEntriesDrawerContent(
             isExpanded = feedsExpanded,
             onToggle = { feedsExpanded = !feedsExpanded },
             onAction = onOpenCatalog,
-            actionIcon = Res.drawable.plus
+            actionIcon = UiRes.drawable.ui_drawable_plus
         )
         if (feedsExpanded) {
             feedsState.forEach { feed ->
@@ -144,13 +149,13 @@ internal fun FeedEntriesDrawerContent(
             isExpanded = tagsExpanded,
             onToggle = { tagsExpanded = !tagsExpanded },
             onAction = { feedEntriesVM.showTagsDialog.value = true; closeDrawer() },
-            actionIcon = Res.drawable.plus
+            actionIcon = UiRes.drawable.ui_drawable_plus
         )
         if (tagsExpanded) {
             tagsState.forEach { tag ->
                 SidebarItem(
                     label = tag.name,
-                    icon = Res.drawable.tag,
+                    icon = UiRes.drawable.ui_drawable_tag,
                     isSelected = feedEntriesVM.feedId.value.isEmpty() && feedEntriesVM.tag.value?.id == tag.id,
                     onClick = { onSelect("", FeedEntryFilterType.DEFAULT, tag) },
                     badge = tag.count.toString()

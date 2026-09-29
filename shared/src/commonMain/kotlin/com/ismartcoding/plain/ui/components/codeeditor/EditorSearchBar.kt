@@ -25,6 +25,11 @@ import androidx.compose.ui.unit.sp
 import com.ismartcoding.plain.i18n.*
 import com.ismartcoding.plain.ui.base.PIconButton
 import org.jetbrains.compose.resources.stringResource
+import com.ismartcoding.plain.ui.resources.Res as UiRes
+import com.ismartcoding.plain.ui.resources.chevron_down as ui_drawable_chevron_down
+import com.ismartcoding.plain.ui.resources.chevron_up as ui_drawable_chevron_up
+import com.ismartcoding.plain.ui.resources.match_case as ui_drawable_match_case
+import com.ismartcoding.plain.ui.resources.x as ui_drawable_x
 
 /** Compact find bar: query, case toggle, prev/next and match counter. */
 @Composable
@@ -100,13 +105,13 @@ fun EditorSearchBar(controller: EditorController) {
             )
         }
         PIconButton(
-            icon = Res.drawable.match_case,
+            icon = UiRes.drawable.ui_drawable_match_case,
             tint = if (controller.searchCaseSensitive.value) accent else tint,
         ) {
             controller.requestSearch(controller.searchQuery.value, !controller.searchCaseSensitive.value, controller.searchRegex.value)
         }
-        PIconButton(icon = Res.drawable.chevron_up, tint = tint, enabled = count > 0) { controller.prevMatch() }
-        PIconButton(icon = Res.drawable.chevron_down, tint = tint, enabled = count > 0) { controller.nextMatch() }
-        PIconButton(icon = Res.drawable.x, tint = tint) { controller.setSearchVisible(false) }
+        PIconButton(icon = UiRes.drawable.ui_drawable_chevron_up, tint = tint, enabled = count > 0) { controller.prevMatch() }
+        PIconButton(icon = UiRes.drawable.ui_drawable_chevron_down, tint = tint, enabled = count > 0) { controller.nextMatch() }
+        PIconButton(icon = UiRes.drawable.ui_drawable_x, tint = tint) { controller.setSearchVisible(false) }
     }
 }

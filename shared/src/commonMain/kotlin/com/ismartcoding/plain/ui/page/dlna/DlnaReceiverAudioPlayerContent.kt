@@ -51,6 +51,9 @@ import kotlinx.coroutines.delay
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import kotlin.time.Duration.Companion.seconds
+import com.ismartcoding.plain.ui.resources.Res as UiRes
+import com.ismartcoding.plain.ui.resources.arrow_left as ui_drawable_arrow_left
+import com.ismartcoding.plain.ui.resources.music2 as ui_drawable_music2
 
 @Composable
 fun DlnaReceiverAudioPlayerContent(onExit: () -> Unit) {
@@ -142,7 +145,7 @@ fun DlnaReceiverAudioPlayerContent(onExit: () -> Unit) {
             ) {
                 IconButton(onClick = onExit) {
                     Icon(
-                        painter = painterResource(Res.drawable.arrow_left),
+                        painter = painterResource(UiRes.drawable.ui_drawable_arrow_left),
                         contentDescription = stringResource(Res.string.dlna_receiver_exit_player),
                         tint = Color.White,
                         modifier = Modifier.size(24.dp),
@@ -168,7 +171,7 @@ fun DlnaReceiverAudioPlayerContent(onExit: () -> Unit) {
                         )
                     } else {
                         Icon(
-                            painter = painterResource(Res.drawable.music2),
+                            painter = painterResource(UiRes.drawable.ui_drawable_music2),
                             contentDescription = null,
                             tint = Color.White.copy(alpha = 0.6f),
                             modifier = Modifier.size(96.dp),

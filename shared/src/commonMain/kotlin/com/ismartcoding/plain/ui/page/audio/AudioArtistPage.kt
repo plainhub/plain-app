@@ -68,6 +68,15 @@ import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.pluralStringResource
 import org.jetbrains.compose.resources.stringResource
+import com.ismartcoding.plain.ui.resources.Res as UiRes
+import com.ismartcoding.plain.ui.resources.cast as ui_drawable_cast
+import com.ismartcoding.plain.ui.resources.pause as ui_drawable_pause
+import com.ismartcoding.plain.ui.resources.play_arrow as ui_drawable_play_arrow
+import com.ismartcoding.plain.ui.resources.shuffle as ui_drawable_shuffle
+import com.ismartcoding.plain.ui.resources.sort as ui_drawable_sort
+import com.ismartcoding.plain.i18n.sort
+import com.ismartcoding.plain.i18n.pause
+import com.ismartcoding.plain.i18n.cast
 
 /** Artist detail: hero header plus the artist's tracks, play-all / shuffle. */
 @OptIn(ExperimentalMaterial3Api::class)
@@ -167,12 +176,12 @@ fun AudioArtistPage(
         },
         topBarActions = {
             PIconButton(
-                icon = Res.drawable.sort,
+                icon = UiRes.drawable.ui_drawable_sort,
                 contentDescription = stringResource(Res.string.sort),
                 click = { audioVM.showSortAndBrowseDialog.value = true },
             )
             PIconButton(
-                icon = Res.drawable.cast,
+                icon = UiRes.drawable.ui_drawable_cast,
                 contentDescription = stringResource(Res.string.cast_mode),
                 click = { castVM.showCastDialog.value = true },
             )
@@ -220,7 +229,7 @@ fun AudioArtistPage(
                     Row(modifier = Modifier.fillMaxWidth().padding(horizontal = 20.dp, vertical = 12.dp)) {
                         PFilledButton(
                             text = stringResource(Res.string.play_all),
-                            icon = painterResource(if (contextActive && isPlaying) Res.drawable.pause else Res.drawable.play_arrow),
+                            icon = painterResource(if (contextActive && isPlaying) UiRes.drawable.ui_drawable_pause else UiRes.drawable.ui_drawable_play_arrow),
                             modifier = Modifier.weight(1f),
                             onClick = {
                                 if (contextActive) {
@@ -233,7 +242,7 @@ fun AudioArtistPage(
                         Spacer(Modifier.width(12.dp))
                         POutlinedButton(
                             text = stringResource(Res.string.shuffle_play),
-                            icon = painterResource(Res.drawable.shuffle),
+                            icon = painterResource(UiRes.drawable.ui_drawable_shuffle),
                             modifier = Modifier.weight(1f),
                             onClick = { playAll(true) },
                         )

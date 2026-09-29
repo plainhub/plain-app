@@ -65,6 +65,14 @@ import com.ismartcoding.plain.ui.models.TagsViewModel
 import com.ismartcoding.plain.ui.page.tags.SelectTagsDialog
 import com.ismartcoding.plain.ui.theme.PlainTheme
 import com.ismartcoding.plain.ui.theme.cardBackgroundNormal
+import com.ismartcoding.plain.ui.resources.Res as UiRes
+import com.ismartcoding.plain.ui.resources.markdown as ui_drawable_markdown
+import com.ismartcoding.plain.ui.resources.redo as ui_drawable_redo
+import com.ismartcoding.plain.ui.resources.share_2 as ui_drawable_share_2
+import com.ismartcoding.plain.ui.resources.square_pen as ui_drawable_square_pen
+import com.ismartcoding.plain.ui.resources.undo as ui_drawable_undo
+import com.ismartcoding.plain.i18n.undo
+import com.ismartcoding.plain.i18n.redo
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class, ExperimentalLayoutApi::class)
 @Composable
@@ -103,21 +111,21 @@ fun NotePage(
         } else {
             PTopAppBar(navController = navController, title = "", scrollBehavior = scrollBehavior, actions = {
                 if (noteVM.editMode.value) {
-                    PIconButton(icon = Res.drawable.undo, contentDescription = stringResource(Res.string.undo), enabled = mdEditorVM.canUndo.value,
+                    PIconButton(icon = UiRes.drawable.ui_drawable_undo, contentDescription = stringResource(Res.string.undo), enabled = mdEditorVM.canUndo.value,
                         tint = MaterialTheme.colorScheme.onSurface) { mdEditorVM.undo() }
-                    PIconButton(icon = Res.drawable.redo, contentDescription = stringResource(Res.string.redo), enabled = mdEditorVM.canRedo.value,
+                    PIconButton(icon = UiRes.drawable.ui_drawable_redo, contentDescription = stringResource(Res.string.redo), enabled = mdEditorVM.canRedo.value,
                         tint = MaterialTheme.colorScheme.onSurface) { mdEditorVM.redo() }
                 } else if (id.value.isNotEmpty()) {
                     ActionButtonTags { noteVM.showSelectTagsDialog.value = true }
                     PIconButton(
-                        icon = Res.drawable.share_2,
+                        icon = UiRes.drawable.ui_drawable_share_2,
                         contentDescription = stringResource(Res.string.share),
                         tint = MaterialTheme.colorScheme.onSurface,
                     ) {
                         shareText(noteVM.content.value)
                     }
                 }
-                PIconButton(icon = if (noteVM.editMode.value) Res.drawable.markdown else Res.drawable.square_pen,
+                PIconButton(icon = if (noteVM.editMode.value) UiRes.drawable.ui_drawable_markdown else UiRes.drawable.ui_drawable_square_pen,
                     contentDescription = stringResource(if (noteVM.editMode.value) Res.string.view else Res.string.edit),
                     tint = MaterialTheme.colorScheme.onSurface) { noteVM.editMode.value = !noteVM.editMode.value }
             })

@@ -19,6 +19,9 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
+import com.ismartcoding.plain.ui.resources.Res as UiRes
+import com.ismartcoding.plain.ui.resources.playlist_add as ui_drawable_playlist_add
+import com.ismartcoding.plain.ui.resources.playlist_remove as ui_drawable_playlist_remove
 
 /**
  * Trailing action of [AudioListItem]: toggles manual-queue membership, or
@@ -54,7 +57,7 @@ fun AudioListItemActions(
     }
 
     PIconButton(
-        icon = if (active) Res.drawable.playlist_remove else Res.drawable.playlist_add,
+        icon = if (active) UiRes.drawable.ui_drawable_playlist_remove else UiRes.drawable.ui_drawable_playlist_add,
         tint = if (active) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.primary,
         contentDescription = description,
         modifier = Modifier.rotate(rotation),

@@ -18,7 +18,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.ismartcoding.plain.i18n.Res
 import com.ismartcoding.plain.i18n.share
-import com.ismartcoding.plain.i18n.share_2
+import com.ismartcoding.plain.ui.resources.share_2 as ui_drawable_share_2
 import com.ismartcoding.plain.ui.base.PClickableText
 import com.ismartcoding.plain.ui.base.PIconButton
 import com.ismartcoding.plain.ui.base.NavigationCloseIcon
@@ -27,6 +27,9 @@ import com.ismartcoding.plain.ui.base.PTopAppBar
 import com.ismartcoding.plain.ui.base.linkify
 import com.ismartcoding.plain.ui.base.urlAt
 import org.jetbrains.compose.resources.stringResource
+import com.ismartcoding.plain.ui.resources.Res as UiRes
+import com.ismartcoding.plain.ui.resources.print as ui_drawable_print
+import com.ismartcoding.plain.i18n.print
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -47,7 +50,7 @@ fun ChatTextPage(
                 title = "",
                 actions = {
                     PIconButton(
-                        icon = Res.drawable.print,
+                        icon = UiRes.drawable.ui_drawable_print,
                         contentDescription = stringResource(Res.string.print),
                         tint = MaterialTheme.colorScheme.onSurface,
                     ) {

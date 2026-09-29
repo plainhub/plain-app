@@ -1,7 +1,6 @@
 package com.ismartcoding.plain.ui.base
 
 import org.jetbrains.compose.resources.DrawableResource
-import com.ismartcoding.plain.i18n.*
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
@@ -31,6 +30,8 @@ import androidx.compose.ui.unit.sp
 import com.ismartcoding.plain.ui.theme.listItemSubtitle
 import com.ismartcoding.plain.ui.theme.listItemTitle
 import com.ismartcoding.plain.ui.theme.listItemValue
+import com.ismartcoding.plain.ui.resources.Res as UiRes
+import com.ismartcoding.plain.ui.resources.chevron_right as ui_drawable_chevron_right
 
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -154,7 +155,7 @@ fun PListItem(
 
             if (showMore) {
                 Icon(
-                    painter = painterResource(Res.drawable.chevron_right),
+                    painter = painterResource(UiRes.drawable.ui_drawable_chevron_right),
                     modifier =
                         Modifier
                             .size(24.dp),

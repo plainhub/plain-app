@@ -16,7 +16,9 @@ import androidx.compose.ui.graphics.Color
 import org.jetbrains.compose.resources.painterResource
 import androidx.compose.ui.unit.dp
 import com.ismartcoding.plain.i18n.Res
-import com.ismartcoding.plain.i18n.check
+import com.ismartcoding.plain.ui.resources.check as ui_drawable_check
+import com.ismartcoding.plain.ui.resources.Res as UiRes
+import com.ismartcoding.plain.ui.resources.check as ui_drawable_check
 
 @Composable
 fun CheckCircle(
@@ -35,7 +37,7 @@ fun CheckCircle(
     ) {
         if (selected) {
             Icon(
-                painter = painterResource(Res.drawable.check),
+                painter = painterResource(UiRes.drawable.ui_drawable_check),
                 contentDescription = null,
                 tint = MaterialTheme.colorScheme.onPrimary,
                 modifier = Modifier.size(14.dp),

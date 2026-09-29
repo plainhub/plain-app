@@ -19,6 +19,9 @@ import com.ismartcoding.plain.ui.base.PDropdownMenuItem
 import com.ismartcoding.plain.ui.base.PDropdownMenuItemDelete
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
+import com.ismartcoding.plain.ui.resources.Res as UiRes
+import com.ismartcoding.plain.ui.resources.square_pen as ui_drawable_square_pen
+import com.ismartcoding.plain.ui.resources.tag as ui_drawable_tag
 
 /**
  * Sidebar drawer item for a tag. Long-press opens a menu to edit or delete the tag.
@@ -36,7 +39,7 @@ fun MediaSidebarTagItem(
     Box {
         SidebarItem(
             label = tag.name,
-            icon = Res.drawable.tag,
+            icon = UiRes.drawable.ui_drawable_tag,
             isSelected = isSelected,
             badge = tag.count.toString(),
             onClick = onClick,
@@ -50,7 +53,7 @@ fun MediaSidebarTagItem(
             ) {
                 PDropdownMenuItem(
                     text = { Text(stringResource(Res.string.edit)) },
-                    leadingIcon = { Icon(painterResource(Res.drawable.square_pen), null, modifier = Modifier.size(20.dp)) },
+                    leadingIcon = { Icon(painterResource(UiRes.drawable.ui_drawable_square_pen), null, modifier = Modifier.size(20.dp)) },
                     onClick = {
                         menuExpanded = false
                         onEdit()

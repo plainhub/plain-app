@@ -42,6 +42,11 @@ import com.ismartcoding.plain.ui.models.TagsViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
+import com.ismartcoding.plain.ui.resources.Res as UiRes
+import com.ismartcoding.plain.ui.resources.file_digit as ui_drawable_file_digit
+import com.ismartcoding.plain.ui.resources.layout_grid as ui_drawable_layout_grid
+import com.ismartcoding.plain.ui.resources.plus as ui_drawable_plus
+import com.ismartcoding.plain.ui.resources.trash_2 as ui_drawable_trash_2
 
 /**
  * Sidebar drawer content for media pages. Shows All, Trash, Folders, and Tags.
@@ -105,7 +110,7 @@ fun <T : IData> MediaSidebarDrawer(
         // All
         SidebarItem(
             label = stringResource(Res.string.all),
-            icon = Res.drawable.layout_grid,
+            icon = UiRes.drawable.ui_drawable_layout_grid,
             isSelected = !mediaVM.trash.value && mediaVM.bucketId.value.isEmpty() && mediaVM.tag.value == null && (mediaVM !is DocsViewModel || (mediaVM as DocsViewModel).fileType.value.isEmpty()),
             onClick = {
                 mediaVM.trash.value = false
@@ -122,7 +127,7 @@ fun <T : IData> MediaSidebarDrawer(
         if (AppFeatureType.MEDIA_TRASH.has()) {
             SidebarItem(
                 label = stringResource(Res.string.trash),
-                icon = Res.drawable.trash_2,
+                icon = UiRes.drawable.ui_drawable_trash_2,
                 isSelected = mediaVM.trash.value,
                 onClick = {
                     mediaVM.trash.value = true
@@ -154,7 +159,7 @@ fun <T : IData> MediaSidebarDrawer(
                     extensionTabs.forEach { tab ->
                         SidebarItem(
                             label = tab.title,
-                            icon = Res.drawable.file_digit,
+                            icon = UiRes.drawable.ui_drawable_file_digit,
                             isSelected = !mediaVM.trash.value && docsVM.fileType.value == tab.value,
                             onClick = {
                                 mediaVM.trash.value = false
@@ -211,7 +216,7 @@ fun <T : IData> MediaSidebarDrawer(
             onAction = {
                 tagsVM.showAddDialog()
             },
-            actionIcon = Res.drawable.plus
+            actionIcon = UiRes.drawable.ui_drawable_plus
         )
 
         if (tagsExpanded) {

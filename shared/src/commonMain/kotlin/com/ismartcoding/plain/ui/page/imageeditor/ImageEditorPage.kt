@@ -79,6 +79,12 @@ import kotlin.math.max
 import kotlin.math.min
 import kotlin.math.roundToInt
 import kotlin.math.sqrt
+import com.ismartcoding.plain.ui.resources.Res as UiRes
+import com.ismartcoding.plain.ui.resources.redo as ui_drawable_redo
+import com.ismartcoding.plain.ui.resources.trash_2 as ui_drawable_trash_2
+import com.ismartcoding.plain.ui.resources.undo as ui_drawable_undo
+import com.ismartcoding.plain.i18n.undo
+import com.ismartcoding.plain.i18n.redo
 
 private enum class DragMode { NONE, MOVE, PAN, RESIZE }
 
@@ -154,13 +160,13 @@ fun ImageEditorPage(
                 title = stringResource(Res.string.image_editor),
                 actions = {
                     PIconButton(
-                        icon = Res.drawable.undo,
+                        icon = UiRes.drawable.ui_drawable_undo,
                         contentDescription = stringResource(Res.string.undo),
                         tint = MaterialTheme.colorScheme.onSurface,
                         enabled = vm.canUndo.value,
                     ) { vm.undo() }
                     PIconButton(
-                        icon = Res.drawable.redo,
+                        icon = UiRes.drawable.ui_drawable_redo,
                         contentDescription = stringResource(Res.string.redo),
                         tint = MaterialTheme.colorScheme.onSurface,
                         enabled = vm.canRedo.value,
@@ -168,7 +174,7 @@ fun ImageEditorPage(
                     val sel = vm.selectedLayerId.value
                     if (sel != null) {
                         PIconButton(
-                            icon = Res.drawable.trash_2,
+                            icon = UiRes.drawable.ui_drawable_trash_2,
                             contentDescription = stringResource(Res.string.image_editor_delete_layer),
                             tint = MaterialTheme.colorScheme.onSurface,
                         ) { vm.deleteLayer(sel) }

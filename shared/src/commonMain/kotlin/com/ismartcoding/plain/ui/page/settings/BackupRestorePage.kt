@@ -38,6 +38,9 @@ import com.ismartcoding.plain.ui.base.PCircularButton
 import com.ismartcoding.plain.ui.base.PScaffold
 import com.ismartcoding.plain.ui.base.PTopAppBar
 import kotlin.time.Clock
+import com.ismartcoding.plain.ui.resources.Res as UiRes
+import com.ismartcoding.plain.ui.resources.archive_restore as ui_drawable_archive_restore
+import com.ismartcoding.plain.ui.resources.database_backup as ui_drawable_database_backup
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -87,7 +90,7 @@ fun BackupRestorePage(
 
                     PCircularButton(
                         text = stringResource(Res.string.backup),
-                        icon = Res.drawable.database_backup,
+                        icon = UiRes.drawable.ui_drawable_database_backup,
                         description = stringResource(Res.string.backup),
                         onClick = {
                             val fileName = "backup_" + Clock.System.now().formatName() + ".zip"
@@ -107,7 +110,7 @@ fun BackupRestorePage(
 
                     PCircularButton(
                         text = stringResource(Res.string.restore),
-                        icon = Res.drawable.archive_restore,
+                        icon = UiRes.drawable.ui_drawable_archive_restore,
                         description = stringResource(Res.string.restore),
                         onClick = {
                             sendEvent(PickFileEvent(PickFileTag.RESTORE, PickFileType.FILE, false))

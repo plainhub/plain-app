@@ -33,6 +33,21 @@ import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import com.ismartcoding.plain.ui.models.ImageEditorTool
+import com.ismartcoding.plain.ui.resources.Res as UiRes
+import com.ismartcoding.plain.ui.resources.arrow_up_right as ui_drawable_arrow_up_right
+import com.ismartcoding.plain.ui.resources.circle as ui_drawable_circle
+import com.ismartcoding.plain.ui.resources.grid_3x3 as ui_drawable_grid_3x3
+import com.ismartcoding.plain.ui.resources.highlighter as ui_drawable_highlighter
+import com.ismartcoding.plain.ui.resources.layers as ui_drawable_layers
+import com.ismartcoding.plain.ui.resources.looks_one as ui_drawable_looks_one
+import com.ismartcoding.plain.ui.resources.looks_two as ui_drawable_looks_two
+import com.ismartcoding.plain.ui.resources.mouse_pointer as ui_drawable_mouse_pointer
+import com.ismartcoding.plain.ui.resources.pen as ui_drawable_pen
+import com.ismartcoding.plain.ui.resources.square as ui_drawable_square
+import com.ismartcoding.plain.ui.resources.sticky_note as ui_drawable_sticky_note
+import com.ismartcoding.plain.ui.resources.trash_2 as ui_drawable_trash_2
+import com.ismartcoding.plain.ui.resources.type as ui_drawable_type
+import com.ismartcoding.plain.i18n.type
 
 private data class ToolItem(
     val tool: ImageEditorTool,
@@ -41,18 +56,18 @@ private data class ToolItem(
 )
 
 private val TOOL_LIST_1 = listOf(
-    ToolItem(ImageEditorTool.SELECT, Res.drawable.mouse_pointer, Res.string.image_editor_tool_select),
-    ToolItem(ImageEditorTool.FREEHAND, Res.drawable.pen, Res.string.image_editor_tool_freehand),
-    ToolItem(ImageEditorTool.ARROW, Res.drawable.arrow_up_right, Res.string.image_editor_tool_arrow),
-    ToolItem(ImageEditorTool.RECT, Res.drawable.square, Res.string.image_editor_tool_rect),
-    ToolItem(ImageEditorTool.ELLIPSE, Res.drawable.circle, Res.string.image_editor_tool_ellipse),
+    ToolItem(ImageEditorTool.SELECT, UiRes.drawable.ui_drawable_mouse_pointer, Res.string.image_editor_tool_select),
+    ToolItem(ImageEditorTool.FREEHAND, UiRes.drawable.ui_drawable_pen, Res.string.image_editor_tool_freehand),
+    ToolItem(ImageEditorTool.ARROW, UiRes.drawable.ui_drawable_arrow_up_right, Res.string.image_editor_tool_arrow),
+    ToolItem(ImageEditorTool.RECT, UiRes.drawable.ui_drawable_square, Res.string.image_editor_tool_rect),
+    ToolItem(ImageEditorTool.ELLIPSE, UiRes.drawable.ui_drawable_circle, Res.string.image_editor_tool_ellipse),
 )
 
 private val TOOL_LIST_2 = listOf(
-    ToolItem(ImageEditorTool.HIGHLIGHT, Res.drawable.highlighter, Res.string.image_editor_tool_highlight),
-    ToolItem(ImageEditorTool.MOSAIC, Res.drawable.grid_3x3, Res.string.image_editor_tool_mosaic),
-    ToolItem(ImageEditorTool.TEXT, Res.drawable.type, Res.string.image_editor_tool_text),
-    ToolItem(ImageEditorTool.STICKER, Res.drawable.sticky_note, Res.string.image_editor_tool_sticker),
+    ToolItem(ImageEditorTool.HIGHLIGHT, UiRes.drawable.ui_drawable_highlighter, Res.string.image_editor_tool_highlight),
+    ToolItem(ImageEditorTool.MOSAIC, UiRes.drawable.ui_drawable_grid_3x3, Res.string.image_editor_tool_mosaic),
+    ToolItem(ImageEditorTool.TEXT, UiRes.drawable.ui_drawable_type, Res.string.image_editor_tool_text),
+    ToolItem(ImageEditorTool.STICKER, UiRes.drawable.ui_drawable_sticky_note, Res.string.image_editor_tool_sticker),
 )
 
 @Composable
@@ -101,13 +116,13 @@ fun ImageEditorBottomAppBar(
                             .background(MaterialTheme.colorScheme.outlineVariant),
                     )
                     ActionButton(
-                        icon = Res.drawable.trash_2,
+                        icon = UiRes.drawable.ui_drawable_trash_2,
                         label = stringResource(Res.string.image_editor_delete_layer),
                         enabled = true,
                         onClick = onClear,
                     )
                     ActionButton(
-                        icon = Res.drawable.layers,
+                        icon = UiRes.drawable.ui_drawable_layers,
                         label = stringResource(Res.string.image_editor_layers),
                         enabled = true,
                         onClick = onLayerPanel,
@@ -123,7 +138,7 @@ fun ImageEditorBottomAppBar(
                 androidx.compose.material3.IconButton(onClick = onToggleLevel) {
                     Icon(
                         painter = painterResource(
-                            if (level == 0) Res.drawable.looks_one else Res.drawable.looks_two
+                            if (level == 0) UiRes.drawable.ui_drawable_looks_one else UiRes.drawable.ui_drawable_looks_two
                         ),
                         contentDescription = null,
                         tint = MaterialTheme.colorScheme.onPrimary,

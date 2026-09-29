@@ -25,6 +25,8 @@ import com.ismartcoding.plain.ui.components.mediaviewer.previewer.MediaPreviewer
 import com.ismartcoding.plain.ui.components.mediaviewer.previewer.rememberTransformItemState
 import com.ismartcoding.plain.ui.models.AudioQueueViewModel
 import com.ismartcoding.plain.ui.models.VAppFile
+import com.ismartcoding.plain.ui.resources.Res as UiRes
+import com.ismartcoding.plain.ui.resources.package_open as ui_drawable_package_open
 
 @Composable
 fun AppFileListContent(
@@ -55,7 +57,7 @@ fun AppFileListContent(
 
     if (files.isEmpty()) {
         NoDataView(
-            icon = Res.drawable.package_open,
+            icon = UiRes.drawable.ui_drawable_package_open,
             message = stringResource(Res.string.no_app_files),
             showRefreshButton = true,
             onRefresh = onRefresh,

@@ -24,6 +24,8 @@ import androidx.compose.ui.unit.dp
 import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.theme.listItemSubtitle
 import com.ismartcoding.plain.ui.theme.listItemTitle
+import com.ismartcoding.plain.ui.resources.Res as UiRes
+import com.ismartcoding.plain.ui.resources.pen as ui_drawable_pen
 
 @Composable
 internal fun SessionMainListItem(
@@ -62,7 +64,7 @@ internal fun SessionMainListItem(
                     modifier = Modifier.size(24.dp),
                 ) {
                     Icon(
-                        painter = painterResource(Res.drawable.pen),
+                        painter = painterResource(UiRes.drawable.ui_drawable_pen),
                         contentDescription = stringResource(Res.string.rename),
                         modifier = Modifier.size(12.dp),
                         tint = MaterialTheme.colorScheme.onSurfaceVariant,

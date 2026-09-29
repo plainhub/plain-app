@@ -35,6 +35,9 @@ import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.models.NotificationSettingsViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import com.ismartcoding.plain.ui.resources.Res as UiRes
+import com.ismartcoding.plain.ui.resources.delete_forever as ui_drawable_delete_forever
+import com.ismartcoding.plain.ui.resources.plus as ui_drawable_plus
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
@@ -59,7 +62,7 @@ fun NotificationSettingsPage(
                         ActionButtonMoreWithMenu { dismiss ->
                             PDropdownMenuItem(
                                 leadingIcon = {
-                                    Icon(painter = painterResource(Res.drawable.delete_forever),
+                                    Icon(painter = painterResource(UiRes.drawable.ui_drawable_delete_forever),
                                         tint = MaterialTheme.colorScheme.error,
                                         contentDescription = stringResource(Res.string.clear_all))
                                 },
@@ -100,7 +103,7 @@ fun NotificationSettingsPage(
                         onClick = { vm.showAppSelectorDialog() },
                         modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp)
                     ) {
-                        Icon(painter = painterResource(Res.drawable.plus), contentDescription = null, modifier = Modifier.size(18.dp))
+                        Icon(painter = painterResource(UiRes.drawable.ui_drawable_plus), contentDescription = null, modifier = Modifier.size(18.dp))
                         HorizontalSpace(dp = 8.dp)
                         Text(stringResource(Res.string.add_app))
                     }

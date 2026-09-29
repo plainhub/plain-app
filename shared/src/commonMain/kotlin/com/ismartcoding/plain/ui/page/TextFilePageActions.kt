@@ -22,6 +22,14 @@ import com.ismartcoding.plain.lib.withIO
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import androidx.compose.runtime.rememberCoroutineScope
+import com.ismartcoding.plain.ui.resources.Res as UiRes
+import com.ismartcoding.plain.ui.resources.save as ui_drawable_save
+import com.ismartcoding.plain.ui.resources.search as ui_drawable_search
+import com.ismartcoding.plain.ui.resources.share_2 as ui_drawable_share_2
+import com.ismartcoding.plain.ui.resources.square_pen as ui_drawable_square_pen
+import com.ismartcoding.plain.ui.resources.wrap_text as ui_drawable_wrap_text
+import com.ismartcoding.plain.i18n.search
+import com.ismartcoding.plain.i18n.save
 
 @Composable
 internal fun RowScope.TextFilePageActions(
@@ -54,14 +62,14 @@ internal fun RowScope.TextFilePageActions(
 
     if (controller.readOnly.value) {
         PIconButton(
-            icon = Res.drawable.search,
+            icon = UiRes.drawable.ui_drawable_search,
             contentDescription = stringResource(Res.string.search),
             tint = MaterialTheme.colorScheme.onSurface,
         ) {
             controller.setSearchVisible(!controller.searchVisible.value)
         }
         PIconButton(
-            icon = Res.drawable.wrap_text,
+            icon = UiRes.drawable.ui_drawable_wrap_text,
             contentDescription = stringResource(Res.string.wrap_content),
             tint = if (controller.wrapContent.value) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface,
         ) {
@@ -69,7 +77,7 @@ internal fun RowScope.TextFilePageActions(
         }
         if (type != TextFileType.APP_LOG.name && type != TextFileType.CRASH_REPORT.name && !textFileVM.isExternalFile.value) {
             PIconButton(
-                icon = Res.drawable.square_pen,
+                icon = UiRes.drawable.ui_drawable_square_pen,
                 contentDescription = stringResource(Res.string.edit),
                 tint = MaterialTheme.colorScheme.onSurface,
             ) {
@@ -78,7 +86,7 @@ internal fun RowScope.TextFilePageActions(
         }
     } else {
         PIconButton(
-            icon = Res.drawable.save,
+            icon = UiRes.drawable.ui_drawable_save,
             contentDescription = stringResource(Res.string.save),
             tint = if (isSaving) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface,
             modifier = Modifier.rotate(rotation),
@@ -104,7 +112,7 @@ internal fun RowScope.TextFilePageActions(
     }
     if (setOf(TextFileType.APP_LOG.name, TextFileType.CHAT.name, TextFileType.CRASH_REPORT.name).contains(type)) {
         PIconButton(
-            icon = Res.drawable.share_2,
+            icon = UiRes.drawable.ui_drawable_share_2,
             contentDescription = stringResource(Res.string.share),
             tint = MaterialTheme.colorScheme.onSurface,
         ) {

@@ -29,7 +29,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.ismartcoding.plain.i18n.Res
-import com.ismartcoding.plain.i18n.music2
+import com.ismartcoding.plain.ui.resources.music2 as ui_drawable_music2
 import com.ismartcoding.plain.i18n.no_lyrics
 import com.ismartcoding.plain.lib.LrcParser
 import com.ismartcoding.plain.lib.withIO
@@ -40,6 +40,8 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
+import com.ismartcoding.plain.ui.resources.Res as UiRes
+import com.ismartcoding.plain.ui.resources.music2 as ui_drawable_music2
 
 /**
  * Sibling .lrc file path for an audio file path. content:// URIs have no
@@ -81,7 +83,7 @@ fun AudioPlayerLyrics(
         Box(modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 Icon(
-                    painter = painterResource(Res.drawable.music2),
+                    painter = painterResource(UiRes.drawable.ui_drawable_music2),
                     contentDescription = null,
                     tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
                     modifier = Modifier.size(56.dp),

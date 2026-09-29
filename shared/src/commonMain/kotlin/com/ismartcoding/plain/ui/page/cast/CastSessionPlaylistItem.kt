@@ -30,8 +30,8 @@ import com.ismartcoding.plain.audio.DAudio
 import com.ismartcoding.plain.db.IMedia
 import com.ismartcoding.plain.lib.withIO
 import com.ismartcoding.plain.i18n.Res
-import com.ismartcoding.plain.i18n.file
-import com.ismartcoding.plain.i18n.playlist_remove
+import com.ismartcoding.plain.ui.resources.file as ui_drawable_file
+import com.ismartcoding.plain.ui.resources.playlist_remove as ui_drawable_playlist_remove
 import com.ismartcoding.plain.i18n.remove_from_cast_queue
 import com.ismartcoding.plain.lib.extensions.getFilenameWithoutExtensionFromPath
 import com.ismartcoding.plain.lib.extensions.isAudioFast
@@ -45,6 +45,10 @@ import com.ismartcoding.plain.ui.theme.listItemTitle
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import kotlin.text.ifEmpty
+import com.ismartcoding.plain.ui.resources.Res as UiRes
+import com.ismartcoding.plain.ui.resources.file as ui_drawable_file
+import com.ismartcoding.plain.ui.resources.playlist_remove as ui_drawable_playlist_remove
+import com.ismartcoding.plain.i18n.file
 
 @Composable
 fun CastSessionPlaylistItem(
@@ -96,7 +100,7 @@ fun CastSessionPlaylistItem(
 
                 item.path.isAudioFast() -> AudioCoverArt(path = item.path, modifier = Modifier.size(40.dp))
                 else -> Icon(
-                    painter = painterResource(Res.drawable.file),
+                    painter = painterResource(UiRes.drawable.ui_drawable_file),
                     contentDescription = null,
                     tint = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
@@ -122,7 +126,7 @@ fun CastSessionPlaylistItem(
             }
         }
         PIconButton(
-            icon = Res.drawable.playlist_remove,
+            icon = UiRes.drawable.ui_drawable_playlist_remove,
             tint = MaterialTheme.colorScheme.error,
             contentDescription = stringResource(Res.string.remove_from_cast_queue),
             click = onRemove,

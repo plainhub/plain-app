@@ -169,7 +169,10 @@ class MainActivity : AppCompatActivity() {
         }
         setContent {
             SettingsProvider {
-                AppTheme(useDarkTheme = DarkTheme.isDarkTheme(LocalDarkTheme.current)) {
+                AppTheme(
+                    useDarkTheme = DarkTheme.isDarkTheme(LocalDarkTheme.current),
+                    amoledDarkTheme = com.ismartcoding.plain.preferences.LocalAmoledDarkTheme.current,
+                ) {
                     Main(
                         navControllerState, onLaunched = { handleIntent(intent) },
                         mainVM, audioQueueVM, pomodoroVM,

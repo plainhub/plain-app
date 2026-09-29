@@ -34,6 +34,9 @@ import com.ismartcoding.plain.ui.base.StepNumber
 import com.ismartcoding.plain.ui.base.Tips
 import com.ismartcoding.plain.ui.base.VerticalSpace
 import androidx.compose.runtime.collectAsState
+import com.ismartcoding.plain.ui.resources.Res as UiRes
+import com.ismartcoding.plain.ui.resources.cast as ui_drawable_cast
+import com.ismartcoding.plain.i18n.cast
 
 @Composable
 fun DlnaReceiverWaitingScreen() {
@@ -107,7 +110,7 @@ private fun DlnaRippleAnimation() {
             ring(s1, a1); ring(s2, a2); ring(s3, a3)
             drawCircle(color, radius = 28.dp.toPx())
         }
-        Icon(painter = painterResource(Res.drawable.cast), contentDescription = null, modifier = Modifier.size(28.dp), tint = MaterialTheme.colorScheme.onPrimary)
+        Icon(painter = painterResource(UiRes.drawable.ui_drawable_cast), contentDescription = null, modifier = Modifier.size(28.dp), tint = MaterialTheme.colorScheme.onPrimary)
     }
 }
 

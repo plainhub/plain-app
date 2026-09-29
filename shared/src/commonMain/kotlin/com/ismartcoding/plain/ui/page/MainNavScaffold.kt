@@ -32,11 +32,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.ismartcoding.plain.i18n.Res
 import com.ismartcoding.plain.i18n.chat
-import com.ismartcoding.plain.i18n.grid_3x3
+import com.ismartcoding.plain.ui.resources.grid_3x3 as ui_drawable_grid_3x3
 import com.ismartcoding.plain.i18n.home
-import com.ismartcoding.plain.i18n.house
-import com.ismartcoding.plain.i18n.message_circle
-import com.ismartcoding.plain.i18n.search
+import com.ismartcoding.plain.ui.resources.house as ui_drawable_house
+import com.ismartcoding.plain.ui.resources.message_circle as ui_drawable_message_circle
+import com.ismartcoding.plain.ui.resources.search as ui_drawable_search
 import com.ismartcoding.plain.i18n.tools
 import com.ismartcoding.plain.platform.isAndroidOnly
 import com.ismartcoding.plain.ui.base.PScaffold
@@ -45,6 +45,12 @@ import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
+import com.ismartcoding.plain.ui.resources.Res as UiRes
+import com.ismartcoding.plain.ui.resources.grid_3x3 as ui_drawable_grid_3x3
+import com.ismartcoding.plain.ui.resources.house as ui_drawable_house
+import com.ismartcoding.plain.ui.resources.message_circle as ui_drawable_message_circle
+import com.ismartcoding.plain.ui.resources.search as ui_drawable_search
+import com.ismartcoding.plain.i18n.search
 
 internal data class MainNavItem(
     val index: Int,
@@ -54,12 +60,12 @@ internal data class MainNavItem(
 
 internal val mainNavItems: List<MainNavItem>
     get() = buildList {
-        add(MainNavItem(0, Res.drawable.house, Res.string.home))
-        add(MainNavItem(1, Res.drawable.message_circle, Res.string.chat))
+        add(MainNavItem(0, UiRes.drawable.ui_drawable_house, Res.string.home))
+        add(MainNavItem(1, UiRes.drawable.ui_drawable_message_circle, Res.string.chat))
         if (isAndroidOnly()) {
-            add(MainNavItem(2, Res.drawable.grid_3x3, Res.string.tools))
+            add(MainNavItem(2, UiRes.drawable.ui_drawable_grid_3x3, Res.string.tools))
         }
-        add(MainNavItem(3, Res.drawable.search, Res.string.search))
+        add(MainNavItem(3, UiRes.drawable.ui_drawable_search, Res.string.search))
     }
 
 // Material 3 window width classes: compact < 600dp <= medium < 840dp <= expanded.

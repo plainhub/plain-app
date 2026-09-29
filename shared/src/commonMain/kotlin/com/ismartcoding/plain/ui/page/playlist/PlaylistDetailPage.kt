@@ -70,6 +70,12 @@ import com.ismartcoding.plain.ui.page.playlist.components.PlaylistMoreSheet
 import com.ismartcoding.plain.ui.page.playlist.components.sortedByAudio
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
+import com.ismartcoding.plain.ui.resources.Res as UiRes
+import com.ismartcoding.plain.ui.resources.cast as ui_drawable_cast
+import com.ismartcoding.plain.ui.resources.more_horiz as ui_drawable_more_horiz
+import com.ismartcoding.plain.ui.resources.sort as ui_drawable_sort
+import com.ismartcoding.plain.i18n.sort
+import com.ismartcoding.plain.i18n.cast
 
 /** Playlist detail page: state, load/reload, and wiring; pieces live in components/. */
 @OptIn(ExperimentalMaterial3Api::class)
@@ -228,17 +234,17 @@ fun PlaylistDetailPage(
         },
         topBarActions = {
             PIconButton(
-                icon = Res.drawable.sort,
+                icon = UiRes.drawable.ui_drawable_sort,
                 contentDescription = stringResource(Res.string.sort),
                 click = { audioVM.showSortAndBrowseDialog.value = true },
             )
             PIconButton(
-                icon = Res.drawable.cast,
+                icon = UiRes.drawable.ui_drawable_cast,
                 contentDescription = stringResource(Res.string.cast_mode),
                 click = { castVM.showCastDialog.value = true },
             )
             PIconButton(
-                icon = Res.drawable.more_horiz,
+                icon = UiRes.drawable.ui_drawable_more_horiz,
                 contentDescription = stringResource(Res.string.more),
                 click = { showMore = true },
             )

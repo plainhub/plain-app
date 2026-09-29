@@ -85,6 +85,9 @@ import com.ismartcoding.plain.ui.page.tags.TagsBottomSheet
 import com.ismartcoding.plain.platform.getMediaItemUriString
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import com.ismartcoding.plain.ui.resources.Res as UiRes
+import com.ismartcoding.plain.ui.resources.video as ui_drawable_video
+import com.ismartcoding.plain.i18n.video
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -224,7 +227,7 @@ fun VideosPage(
                 .padding(top = paddingValues.calculateTopPadding())
         ) {
             if (!videosVM.hasPermission.value) {
-                NeedPermissionColumn(Res.drawable.video, AppFeatureType.FILES.getPermission()!!); return@Column
+                NeedPermissionColumn(UiRes.drawable.ui_drawable_video, AppFeatureType.FILES.getPermission()!!); return@Column
             }
 
             PullToRefresh(refreshLayoutState = topRefreshLayoutState) {

@@ -37,6 +37,9 @@ import com.ismartcoding.plain.ui.base.PScaffold
 import com.ismartcoding.plain.ui.base.PTopAppBar
 import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.page.appfiles.AppFileDisplayNameHelper
+import com.ismartcoding.plain.ui.resources.Res as UiRes
+import com.ismartcoding.plain.ui.resources.file_question as ui_drawable_file_question
+import com.ismartcoding.plain.ui.resources.share_2 as ui_drawable_share_2
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -61,7 +64,7 @@ fun OtherFilePage(
                 title = displayTitle,
                 actions = {
                     PIconButton(
-                        icon = Res.drawable.share_2,
+                        icon = UiRes.drawable.ui_drawable_share_2,
                         contentDescription = stringResource(Res.string.share),
                         tint = MaterialTheme.colorScheme.onSurface,
                     ) {
@@ -84,7 +87,7 @@ fun OtherFilePage(
                                 Modifier
                                     .padding(bottom = 32.dp)
                                     .size(56.dp),
-                            painter = painterResource(Res.drawable.file_question),
+                            painter = painterResource(UiRes.drawable.ui_drawable_file_question),
                             contentDescription = "",
                         )
                         SelectionContainer {

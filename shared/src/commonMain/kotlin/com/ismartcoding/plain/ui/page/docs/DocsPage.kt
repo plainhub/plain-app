@@ -40,6 +40,8 @@ import com.ismartcoding.plain.ui.nav.NavLoadGate
 import com.ismartcoding.plain.ui.page.tags.TagsBottomSheet
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import com.ismartcoding.plain.ui.resources.Res as UiRes
+import com.ismartcoding.plain.ui.resources.file_text as ui_drawable_file_text
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
@@ -123,7 +125,7 @@ fun DocsPage(
     ) { paddingValues ->
         Column(modifier = Modifier.padding(top = paddingValues.calculateTopPadding())) {
             if (!docsVM.hasPermission.value) {
-                NeedPermissionColumn(Res.drawable.file_text, AppFeatureType.FILES.getPermission()!!)
+                NeedPermissionColumn(UiRes.drawable.ui_drawable_file_text, AppFeatureType.FILES.getPermission()!!)
                 return@Column
             }
 

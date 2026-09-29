@@ -16,23 +16,33 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.ismartcoding.plain.i18n.Res
 import com.ismartcoding.plain.i18n.exit_fullscreen
-import com.ismartcoding.plain.i18n.fullscreen
-import com.ismartcoding.plain.i18n.fullscreen_exit
+import com.ismartcoding.plain.ui.resources.fullscreen as ui_drawable_fullscreen
+import com.ismartcoding.plain.ui.resources.fullscreen_exit as ui_drawable_fullscreen_exit
 import com.ismartcoding.plain.i18n.mute
-import com.ismartcoding.plain.i18n.pause
+import com.ismartcoding.plain.ui.resources.pause as ui_drawable_pause
 import com.ismartcoding.plain.i18n.picture_in_picture
-import com.ismartcoding.plain.i18n.pip
+import com.ismartcoding.plain.ui.resources.pip as ui_drawable_pip
 import com.ismartcoding.plain.i18n.play
-import com.ismartcoding.plain.i18n.play_arrow
+import com.ismartcoding.plain.ui.resources.play_arrow as ui_drawable_play_arrow
 import com.ismartcoding.plain.i18n.unmute
-import com.ismartcoding.plain.i18n.volume_2
-import com.ismartcoding.plain.i18n.volume_x
+import com.ismartcoding.plain.ui.resources.volume_2 as ui_drawable_volume_2
+import com.ismartcoding.plain.ui.resources.volume_x as ui_drawable_volume_x
 import com.ismartcoding.plain.ui.base.ControlChip
 import com.ismartcoding.plain.ui.base.ControlChipIconButton
 import com.ismartcoding.plain.ui.components.mediaviewer.PlaybackSpeedButton
 import com.ismartcoding.plain.ui.components.mediaviewer.PreviewerSoftWhite
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
+import com.ismartcoding.plain.ui.resources.Res as UiRes
+import com.ismartcoding.plain.ui.resources.fullscreen as ui_drawable_fullscreen
+import com.ismartcoding.plain.ui.resources.fullscreen_exit as ui_drawable_fullscreen_exit
+import com.ismartcoding.plain.ui.resources.pause as ui_drawable_pause
+import com.ismartcoding.plain.ui.resources.pip as ui_drawable_pip
+import com.ismartcoding.plain.ui.resources.play_arrow as ui_drawable_play_arrow
+import com.ismartcoding.plain.ui.resources.volume_2 as ui_drawable_volume_2
+import com.ismartcoding.plain.ui.resources.volume_x as ui_drawable_volume_x
+import com.ismartcoding.plain.i18n.pause
+import com.ismartcoding.plain.i18n.fullscreen
 
 @Composable
 fun VideoControlsBar(
@@ -65,7 +75,7 @@ fun VideoControlsBar(
 
         // [Sound]
         ControlChipIconButton(
-            if (isMuted) Res.drawable.volume_x else Res.drawable.volume_2,
+            if (isMuted) UiRes.drawable.ui_drawable_volume_x else UiRes.drawable.ui_drawable_volume_2,
             contentDescription = stringResource(if (isMuted) Res.string.unmute else Res.string.mute),
             click = onMuteToggle
         )
@@ -78,7 +88,7 @@ fun VideoControlsBar(
         ) {
             IconButton(onClick = onPlayPause, modifier = Modifier.fillMaxWidth()) {
                 Icon(
-                    painter = painterResource(if (isPlaying) Res.drawable.pause else Res.drawable.play_arrow),
+                    painter = painterResource(if (isPlaying) UiRes.drawable.ui_drawable_pause else UiRes.drawable.ui_drawable_play_arrow),
                     contentDescription = stringResource(if (isPlaying) Res.string.pause else Res.string.play),
                     tint = Color.Black,
                     modifier = Modifier.size(32.dp),
@@ -89,7 +99,7 @@ fun VideoControlsBar(
         // [Pip] — hidden on iOS (showPip = false)
         if (showPip) {
             ControlChipIconButton(
-                Res.drawable.pip,
+                UiRes.drawable.ui_drawable_pip,
                 contentDescription = stringResource(Res.string.picture_in_picture),
                 click = onPip
             )
@@ -97,7 +107,7 @@ fun VideoControlsBar(
 
         // [Fullscreen]
         ControlChipIconButton(
-            if (isFullscreen) Res.drawable.fullscreen_exit else Res.drawable.fullscreen,
+            if (isFullscreen) UiRes.drawable.ui_drawable_fullscreen_exit else UiRes.drawable.ui_drawable_fullscreen,
             contentDescription = stringResource(if (isFullscreen) Res.string.exit_fullscreen else Res.string.fullscreen),
             click = onFullscreenToggle
         )

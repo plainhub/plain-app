@@ -14,6 +14,9 @@ import com.ismartcoding.plain.ui.base.PDropdownMenuItem
 import com.ismartcoding.plain.ui.base.PTopAppBar
 import com.ismartcoding.plain.ui.nav.Routing
 import com.ismartcoding.plain.ui.nav.navigateAppFiles
+import com.ismartcoding.plain.ui.resources.Res as UiRes
+import com.ismartcoding.plain.ui.resources.hash as ui_drawable_hash
+import com.ismartcoding.plain.ui.resources.plus as ui_drawable_plus
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -32,7 +35,7 @@ fun TopBarChat(
                     text = { Text(stringResource(Res.string.create_channel)) },
                     leadingIcon = {
                         Icon(
-                            painter = painterResource(Res.drawable.hash),
+                            painter = painterResource(UiRes.drawable.ui_drawable_hash),
                             contentDescription = null,
                         )
                     },
@@ -45,7 +48,7 @@ fun TopBarChat(
                     text = { Text(stringResource(Res.string.pair_device)) },
                     leadingIcon = {
                         Icon(
-                            painter = painterResource(Res.drawable.plus),
+                            painter = painterResource(UiRes.drawable.ui_drawable_plus),
                             contentDescription = null,
                         )
                     },

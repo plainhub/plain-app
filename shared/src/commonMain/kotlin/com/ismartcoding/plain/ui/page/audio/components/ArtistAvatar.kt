@@ -23,6 +23,8 @@ import com.ismartcoding.plain.i18n.*
 import com.ismartcoding.plain.lib.withIO
 import com.ismartcoding.plain.platform.loadAudioCoverBitmap
 import org.jetbrains.compose.resources.painterResource
+import com.ismartcoding.plain.ui.resources.Res as UiRes
+import com.ismartcoding.plain.ui.resources.person as ui_drawable_person
 
 /**
  * Artist avatar: the artist's album artwork cropped to a circle — the standard
@@ -56,7 +58,7 @@ fun ArtistAvatar(name: String, artworkPath: String?, size: Dp, modifier: Modifie
             contentAlignment = Alignment.Center,
         ) {
             Icon(
-                painter = painterResource(Res.drawable.person),
+                painter = painterResource(UiRes.drawable.ui_drawable_person),
                 contentDescription = null,
                 tint = MaterialTheme.colorScheme.onSecondaryContainer,
                 modifier = Modifier.size(size * 0.55f),

@@ -24,6 +24,8 @@ import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.models.FeedsViewModel
 import com.ismartcoding.plain.ui.theme.dialogSheetBackground
 import com.ismartcoding.plain.ui.base.PListItem
+import com.ismartcoding.plain.ui.resources.Res as UiRes
+import com.ismartcoding.plain.ui.resources.rss as ui_drawable_rss
 
 @Composable
 fun AddFeedDialog(feedsVM: FeedsViewModel) {
@@ -36,7 +38,7 @@ fun AddFeedDialog(feedsVM: FeedsViewModel) {
             },
             icon = {
                 Icon(
-                    painter = painterResource(Res.drawable.rss),
+                    painter = painterResource(UiRes.drawable.ui_drawable_rss),
                     contentDescription = stringResource(Res.string.subscriptions),
                 )
             },

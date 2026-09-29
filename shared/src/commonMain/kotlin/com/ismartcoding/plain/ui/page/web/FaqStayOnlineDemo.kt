@@ -33,6 +33,12 @@ import com.ismartcoding.plain.i18n.*
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import com.ismartcoding.plain.ui.theme.cardBackgroundNormal
+import com.ismartcoding.plain.ui.resources.Res as UiRes
+import com.ismartcoding.plain.ui.resources.devices as ui_drawable_devices
+import com.ismartcoding.plain.ui.resources.expand_more as ui_drawable_expand_more
+import com.ismartcoding.plain.ui.resources.pen as ui_drawable_pen
+import com.ismartcoding.plain.ui.resources.qr_code as ui_drawable_qr_code
+import com.ismartcoding.plain.i18n.devices
 
 /**
  * Compose-drawn "video" demo for the Stay Online FAQ, mirroring the real
@@ -164,7 +170,7 @@ private fun DemoHomeScreen(ring: Boolean, url: String) {
         ) {
             Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
                 Icon(
-                    painter = painterResource(Res.drawable.devices),
+                    painter = painterResource(UiRes.drawable.ui_drawable_devices),
                     contentDescription = null,
                     modifier = Modifier.size(16.dp),
                     tint = MaterialTheme.colorScheme.primary,
@@ -196,14 +202,14 @@ private fun DemoHomeScreen(ring: Boolean, url: String) {
                     modifier = Modifier.weight(1f),
                 )
                 Icon(
-                    painter = painterResource(Res.drawable.pen),
+                    painter = painterResource(UiRes.drawable.ui_drawable_pen),
                     contentDescription = null,
                     modifier = Modifier.size(14.dp),
                     tint = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
                 Spacer(Modifier.width(8.dp))
                 Icon(
-                    painter = painterResource(Res.drawable.qr_code),
+                    painter = painterResource(UiRes.drawable.ui_drawable_qr_code),
                     contentDescription = null,
                     modifier = Modifier.size(14.dp),
                     tint = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -222,7 +228,7 @@ private fun DemoHomeScreen(ring: Boolean, url: String) {
                 )
                 Spacer(Modifier.width(4.dp))
                 Icon(
-                    painter = painterResource(Res.drawable.expand_more),
+                    painter = painterResource(UiRes.drawable.ui_drawable_expand_more),
                     contentDescription = null,
                     modifier = Modifier.size(12.dp),
                     tint = MaterialTheme.colorScheme.onSurfaceVariant,

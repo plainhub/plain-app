@@ -53,6 +53,8 @@ import com.ismartcoding.plain.ui.page.files.components.BreadcrumbView
 import com.ismartcoding.plain.ui.page.files.components.FileListContent
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import com.ismartcoding.plain.ui.resources.Res as UiRes
+import com.ismartcoding.plain.ui.resources.share_2 as ui_drawable_share_2
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
@@ -120,7 +122,7 @@ fun ZipFilePage(
                 navigationIcon = { NavigationBackIcon { navController.navigateUp() } },
                 actions = {
                     PIconButton(
-                        icon = Res.drawable.share_2,
+                        icon = UiRes.drawable.ui_drawable_share_2,
                         contentDescription = stringResource(Res.string.share),
                         tint = MaterialTheme.colorScheme.onSurface,
                     ) {

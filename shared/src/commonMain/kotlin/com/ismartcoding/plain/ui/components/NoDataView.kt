@@ -20,12 +20,15 @@ import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.ismartcoding.plain.ui.base.VerticalSpace
+import com.ismartcoding.plain.ui.resources.Res as UiRes
+import com.ismartcoding.plain.ui.resources.files as ui_drawable_files
+import com.ismartcoding.plain.i18n.files
 
 @Composable
 fun NoDataView(
     modifier: Modifier = Modifier,
     message: String = stringResource(Res.string.no_data),
-    icon: DrawableResource? = Res.drawable.files,
+    icon: DrawableResource? = UiRes.drawable.ui_drawable_files,
     showRefreshButton: Boolean = false,
     onRefresh: () -> Unit = {}
 ) {

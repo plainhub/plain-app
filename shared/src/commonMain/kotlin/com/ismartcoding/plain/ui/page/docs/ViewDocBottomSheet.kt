@@ -58,6 +58,14 @@ import com.ismartcoding.plain.ui.components.TagSelector
 import com.ismartcoding.plain.ui.helpers.confirmActionAsync
 import com.ismartcoding.plain.ui.models.DocsViewModel
 import com.ismartcoding.plain.ui.models.TagsViewModel
+import com.ismartcoding.plain.ui.resources.Res as UiRes
+import com.ismartcoding.plain.ui.resources.archive_restore as ui_drawable_archive_restore
+import com.ismartcoding.plain.ui.resources.file as ui_drawable_file
+import com.ismartcoding.plain.ui.resources.list_checks as ui_drawable_list_checks
+import com.ismartcoding.plain.ui.resources.pen as ui_drawable_pen
+import com.ismartcoding.plain.ui.resources.share_2 as ui_drawable_share_2
+import com.ismartcoding.plain.ui.resources.square_arrow_out_up_right as ui_drawable_square_arrow_out_up_right
+import com.ismartcoding.plain.i18n.file
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
@@ -109,7 +117,7 @@ fun ViewDocBottomSheet(
                         thumbnail = {
                             PSheetHeaderThumb(
                                 model = getFileIconPath(m.extension),
-                                fallbackIcon = Res.drawable.file,
+                                fallbackIcon = UiRes.drawable.ui_drawable_file,
                             )
                         },
                         title = m.title.ifEmpty { m.path.getFilenameFromPath() },
@@ -117,18 +125,18 @@ fun ViewDocBottomSheet(
                     )
                     PSheetPrimaryActionsRow {
                         if (!docsVM.showSearchBar.value) {
-                            PSheetPrimaryAction(Res.drawable.list_checks, stringResource(Res.string.select)) {
+                            PSheetPrimaryAction(UiRes.drawable.ui_drawable_list_checks, stringResource(Res.string.select)) {
                                 dragSelectState.enterSelectMode()
                                 dragSelectState.select(m.id)
                                 onDismiss()
                             }
                         }
                         if (!docsVM.trash.value) {
-                            PSheetPrimaryAction(Res.drawable.share_2, stringResource(Res.string.share)) {
+                            PSheetPrimaryAction(UiRes.drawable.ui_drawable_share_2, stringResource(Res.string.share)) {
                                 shareFile(m.path)
                                 onDismiss()
                             }
-                            PSheetPrimaryAction(Res.drawable.pen, stringResource(Res.string.rename)) {
+                            PSheetPrimaryAction(UiRes.drawable.ui_drawable_pen, stringResource(Res.string.rename)) {
                                 docsVM.showRenameDialog.value = true
                             }
                             if (AppFeatureType.MEDIA_TRASH.has()) {
@@ -139,7 +147,7 @@ fun ViewDocBottomSheet(
                             }
                         }
                         if (AppFeatureType.MEDIA_TRASH.has() && docsVM.trash.value) {
-                            PSheetPrimaryAction(Res.drawable.archive_restore, stringResource(Res.string.restore)) {
+                            PSheetPrimaryAction(UiRes.drawable.ui_drawable_archive_restore, stringResource(Res.string.restore)) {
                                 docsVM.restore(tagsVM, setOf(m.id))
                                 onDismiss()
                             }
@@ -179,7 +187,7 @@ fun ViewDocBottomSheet(
                             ) {
                                 showAddToHomeDialog = true
                             }
-                            PSheetActionRow(Res.drawable.square_arrow_out_up_right, stringResource(Res.string.open_with)) {
+                            PSheetActionRow(UiRes.drawable.ui_drawable_square_arrow_out_up_right, stringResource(Res.string.open_with)) {
                                 openFileExternal(m.path)
                             }
                         }

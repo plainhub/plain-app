@@ -7,6 +7,10 @@ import com.ismartcoding.plain.platform.LocaleHelper
 import com.ismartcoding.plain.ui.base.*
 import com.ismartcoding.plain.ui.helpers.DialogHelper
 import org.jetbrains.compose.resources.stringResource
+import com.ismartcoding.plain.ui.resources.Res as UiRes
+import com.ismartcoding.plain.ui.resources.delete_forever as ui_drawable_delete_forever
+import com.ismartcoding.plain.ui.resources.pen as ui_drawable_pen
+import com.ismartcoding.plain.ui.resources.plus as ui_drawable_plus
 
 /** Manage menu: rename, add items, delete (with confirm). */
 @OptIn(ExperimentalMaterial3Api::class)
@@ -20,15 +24,15 @@ fun PlaylistMoreSheet(
     onDelete: () -> Unit,
 ) {
     PModalBottomSheet(onDismissRequest = onDismiss) {
-        PSheetActionRow(Res.drawable.pen, stringResource(Res.string.rename_playlist)) {
+        PSheetActionRow(UiRes.drawable.ui_drawable_pen, stringResource(Res.string.rename_playlist)) {
             onDismiss()
             onRename()
         }
-        PSheetActionRow(Res.drawable.plus, stringResource(Res.string.add_items)) {
+        PSheetActionRow(UiRes.drawable.ui_drawable_plus, stringResource(Res.string.add_items)) {
             onDismiss()
             onAddItems()
         }
-        PSheetActionRow(Res.drawable.delete_forever, stringResource(Res.string.delete_playlist)) {
+        PSheetActionRow(UiRes.drawable.ui_drawable_delete_forever, stringResource(Res.string.delete_playlist)) {
             onDismiss()
             DialogHelper.showConfirmDialog(
                 title = LocaleHelper.getString(Res.string.delete_playlist),

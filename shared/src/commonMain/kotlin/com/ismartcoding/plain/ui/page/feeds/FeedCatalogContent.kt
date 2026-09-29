@@ -28,7 +28,7 @@ import com.ismartcoding.plain.i18n.category_reads
 import com.ismartcoding.plain.i18n.category_tech_cn
 import com.ismartcoding.plain.i18n.category_tech_en
 import com.ismartcoding.plain.i18n.feed_catalog
-import com.ismartcoding.plain.i18n.plus
+import com.ismartcoding.plain.ui.resources.plus as ui_drawable_plus
 import com.ismartcoding.plain.i18n.retry
 import com.ismartcoding.plain.i18n.subscribe
 import com.ismartcoding.plain.i18n.unsubscribe
@@ -46,6 +46,8 @@ import com.ismartcoding.plain.ui.theme.PlainTheme
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.stringResource
+import com.ismartcoding.plain.ui.resources.Res as UiRes
+import com.ismartcoding.plain.ui.resources.plus as ui_drawable_plus
 
 @Composable
 fun FeedCatalogContent(
@@ -87,7 +89,7 @@ fun FeedCatalogContent(
                         PListItem(
                             modifier = Modifier.clickable { feedsVM.showAddDialog() },
                             title = stringResource(Res.string.add_rss_manually),
-                            icon = Res.drawable.plus,
+                            icon = UiRes.drawable.ui_drawable_plus,
                         )
                     }
                 }

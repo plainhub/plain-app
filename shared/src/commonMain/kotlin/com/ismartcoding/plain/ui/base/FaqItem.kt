@@ -33,6 +33,9 @@ import com.ismartcoding.plain.ui.theme.listItemTitle
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
+import com.ismartcoding.plain.ui.resources.Res as UiRes
+import com.ismartcoding.plain.ui.resources.chevron_right as ui_drawable_chevron_right
+import com.ismartcoding.plain.ui.resources.expand_more as ui_drawable_expand_more
 
 @Composable
 fun FaqItem(
@@ -74,7 +77,7 @@ fun FaqItem(
             )
             HorizontalSpace(dp = 8.dp)
             Icon(
-                painter = painterResource(if (expanded) Res.drawable.expand_more else Res.drawable.chevron_right),
+                painter = painterResource(if (expanded) UiRes.drawable.ui_drawable_expand_more else UiRes.drawable.ui_drawable_chevron_right),
                 contentDescription = null,
                 tint = MaterialTheme.colorScheme.onSurfaceVariant,
             )

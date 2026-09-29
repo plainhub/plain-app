@@ -26,7 +26,7 @@ import androidx.navigation.NavHostController
 import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.i18n.Res
 import com.ismartcoding.plain.i18n.device_name
-import com.ismartcoding.plain.i18n.pen
+import com.ismartcoding.plain.ui.resources.pen as ui_drawable_pen
 import com.ismartcoding.plain.platform.getDeviceName
 import com.ismartcoding.plain.ui.base.ActionButtonScan
 import com.ismartcoding.plain.ui.base.ActionButtonSettings
@@ -34,6 +34,8 @@ import com.ismartcoding.plain.ui.components.DeviceRenameDialog
 import com.ismartcoding.plain.ui.nav.Routing
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
+import com.ismartcoding.plain.ui.resources.Res as UiRes
+import com.ismartcoding.plain.ui.resources.pen as ui_drawable_pen
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -66,7 +68,7 @@ fun TopBarHome(navController: NavHostController) {
                     modifier = Modifier.size(32.dp),
                 ) {
                     Icon(
-                        painter = painterResource(Res.drawable.pen),
+                        painter = painterResource(UiRes.drawable.ui_drawable_pen),
                         contentDescription = stringResource(Res.string.device_name),
                         modifier = Modifier.size(16.dp),
                         tint = MaterialTheme.colorScheme.onSurfaceVariant,

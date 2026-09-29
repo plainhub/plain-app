@@ -24,6 +24,8 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import com.ismartcoding.plain.platform.getClipboardText
+import com.ismartcoding.plain.ui.resources.Res as UiRes
+import com.ismartcoding.plain.ui.resources.content_paste as ui_drawable_content_paste
 
 @Composable
 fun PasswordTextField(
@@ -43,7 +45,7 @@ fun PasswordTextField(
                     if (isChanged()) { Button(onClick = { onConfirm(value) }) { Text(stringResource(Res.string.save)) } }
                 } else {
                     IconButton(onClick = { onValueChange(getClipboardText() ?: "") }) {
-                        Icon(painter = painterResource(Res.drawable.content_paste), contentDescription = stringResource(Res.string.paste), tint = MaterialTheme.colorScheme.primary)
+                        Icon(painter = painterResource(UiRes.drawable.ui_drawable_content_paste), contentDescription = stringResource(Res.string.paste), tint = MaterialTheme.colorScheme.primary)
                     }
                 }
             },

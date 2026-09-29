@@ -38,6 +38,9 @@ import com.ismartcoding.plain.ui.theme.tipsText
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
+import com.ismartcoding.plain.ui.resources.Res as UiRes
+import com.ismartcoding.plain.ui.resources.chevron_up as ui_drawable_chevron_up
+import com.ismartcoding.plain.ui.resources.expand_more as ui_drawable_expand_more
 
 @Composable
 fun WebAddressBar(
@@ -197,7 +200,7 @@ private fun ExpandCollapseBar(expanded: Boolean, onClick: () -> Unit) {
         )
         HorizontalSpace(dp = 4.dp)
         Icon(
-            painter = painterResource(if (expanded) Res.drawable.chevron_up else Res.drawable.expand_more),
+            painter = painterResource(if (expanded) UiRes.drawable.ui_drawable_chevron_up else UiRes.drawable.ui_drawable_expand_more),
             contentDescription = null,
             modifier = Modifier.size(16.dp),
             tint = MaterialTheme.colorScheme.onSurfaceVariant,

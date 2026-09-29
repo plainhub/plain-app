@@ -9,25 +9,27 @@ import androidx.compose.runtime.ProvidableCompositionLocal
 import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.graphics.Color
-import com.ismartcoding.plain.enums.DarkTheme
-import com.ismartcoding.plain.preferences.LocalAmoledDarkTheme
-import com.ismartcoding.plain.preferences.LocalDarkTheme
 
 @Composable
-fun AppTheme(useDarkTheme: Boolean, content: @Composable () -> Unit) {
-    MaterialTheme(
-        colorScheme = if (useDarkTheme) plainDarkColorScheme() else plainLightColorScheme(),
-        typography = SystemTypography.applyTextDirection(),
-        shapes = Shapes,
-        content = content,
-    )
+fun AppTheme(useDarkTheme: Boolean, amoledDarkTheme: Boolean = false, content: @Composable () -> Unit) {
+    androidx.compose.runtime.CompositionLocalProvider(
+        LocalDarkTheme provides useDarkTheme,
+        LocalAmoledDarkTheme provides amoledDarkTheme,
+    ) {
+        MaterialTheme(
+            colorScheme = if (useDarkTheme) plainDarkColorScheme() else plainLightColorScheme(),
+            typography = SystemTypography.applyTextDirection(),
+            shapes = Shapes,
+            content = content,
+        )
+    }
 }
 
 /** Soft near-white for dark-theme text: #E5E5EA glared at large sizes (user, 2026-09-13). */
 private val DarkSoftOnSurface = Color(0xFFD1D1D6)
 
 /** Brand indigo (light primary): single source for the scheme and non-Compose surfaces (notification accent). */
-internal val BrandPrimary = Color(0xFF4F5F9E)
+val BrandPrimary = Color(0xFF4F5F9E)
 
 @Composable
 private fun plainDarkColorScheme(): ColorScheme {
@@ -103,19 +105,19 @@ val ColorScheme.green: Color
     @Composable @ReadOnlyComposable
     // Softened from the iOS greens (#30D158/#34C759) per user 2026-09-16 —
     // same Material ramp family as greenText (#A5D6A7/#2E7D32).
-    get() = if (DarkTheme.isDarkTheme(LocalDarkTheme.current)) Color(0xFF81C784) else Color(0xFF43A047)
+    get() = if (LocalDarkTheme.current) Color(0xFF81C784) else Color(0xFF43A047)
 
 val ColorScheme.grey: Color
     @Composable @ReadOnlyComposable
-    get() = if (DarkTheme.isDarkTheme(LocalDarkTheme.current)) Color(0xFF636366) else Color(0xFF8E8E93)
+    get() = if (LocalDarkTheme.current) Color(0xFF636366) else Color(0xFF8E8E93)
 
 val ColorScheme.yellow: Color
     @Composable @ReadOnlyComposable
-    get() = if (DarkTheme.isDarkTheme(LocalDarkTheme.current)) Color(0xFFFFD60A) else Color(0xFFFFCC00)
+    get() = if (LocalDarkTheme.current) Color(0xFFFFD60A) else Color(0xFFFFCC00)
 
 val ColorScheme.orange: Color
     @Composable @ReadOnlyComposable
-    get() = if (DarkTheme.isDarkTheme(LocalDarkTheme.current)) Color(0xFFFF9F0A) else Color(0xFFFF9500)
+    get() = if (LocalDarkTheme.current) Color(0xFFFF9F0A) else Color(0xFFFF9500)
 
 // -------- App semantic colors --------
 
@@ -129,11 +131,11 @@ val LocalFloatingHostColor: ProvidableCompositionLocal<Color?> = staticCompositi
 // pastel primary fill uses onPrimary (dark navy) instead.
 val ColorScheme.filledButtonContent: Color
     @Composable @ReadOnlyComposable
-    get() = if (DarkTheme.isDarkTheme(LocalDarkTheme.current)) DarkSoftOnSurface else Color(0xFFFFFFFF)
+    get() = if (LocalDarkTheme.current) DarkSoftOnSurface else Color(0xFFFFFFFF)
 
 val ColorScheme.backgroundNormal: Color
     @Composable @ReadOnlyComposable
-    get() = if (DarkTheme.isDarkTheme(LocalDarkTheme.current)) Color(0xFF1C1B1F) else Color(0xFFFFFBFE)
+    get() = if (LocalDarkTheme.current) Color(0xFF1C1B1F) else Color(0xFFFFFBFE)
 
 val ColorScheme.cardBackgroundNormal: Color
     @Composable @ReadOnlyComposable
@@ -151,7 +153,7 @@ val ColorScheme.cardBackgroundNormal: Color
  *  background there (amoled) or lifts inconsistently. Light keeps white. */
 val ColorScheme.dialogSheetBackground: Color
     @Composable @ReadOnlyComposable
-    get() = if (DarkTheme.isDarkTheme(LocalDarkTheme.current)) this.surfaceContainerLow else this.surface
+    get() = if (LocalDarkTheme.current) this.surfaceContainerLow else this.surface
 
 // Selected/playing cards, same treatment as plain-desktop .selectable-card.selected.
 val ColorScheme.cardBackgroundActive: Color
@@ -167,7 +169,7 @@ val ColorScheme.cardBackgroundActive: Color
 val ColorScheme.circleBackground: Color
     @Composable @ReadOnlyComposable
     get() {
-        val base = if (DarkTheme.isDarkTheme(LocalDarkTheme.current)) Color(0xFF2C2C2E) else Color(0xFFFFFFFF)
+        val base = if (LocalDarkTheme.current) Color(0xFF2C2C2E) else Color(0xFFFFFFFF)
         // Same collision as cards: the base color equals the floating host
         // surface in dark mode — lift to stay visible.
         val host = LocalFloatingHostColor.current
@@ -176,19 +178,19 @@ val ColorScheme.circleBackground: Color
 
 val ColorScheme.greenDot: Color
     @Composable @ReadOnlyComposable
-    get() = if (DarkTheme.isDarkTheme(LocalDarkTheme.current)) Color(0xFF66BB6A) else Color(0xFF4CAF50)
+    get() = if (LocalDarkTheme.current) Color(0xFF66BB6A) else Color(0xFF4CAF50)
 
 val ColorScheme.greenText: Color
     @Composable @ReadOnlyComposable
-    get() = if (DarkTheme.isDarkTheme(LocalDarkTheme.current)) Color(0xFFA5D6A7) else Color(0xFF2E7D32)
+    get() = if (LocalDarkTheme.current) Color(0xFFA5D6A7) else Color(0xFF2E7D32)
 
 val ColorScheme.greenPill: Color
     @Composable @ReadOnlyComposable
-    get() = if (DarkTheme.isDarkTheme(LocalDarkTheme.current)) Color(0x4D1B5E20) else Color(0xFFE8F5E9)
+    get() = if (LocalDarkTheme.current) Color(0x4D1B5E20) else Color(0xFFE8F5E9)
 
 val ColorScheme.primaryPill: Color
     @Composable @ReadOnlyComposable
-    get() = if (DarkTheme.isDarkTheme(LocalDarkTheme.current)) {
+    get() = if (LocalDarkTheme.current) {
         Color(0x33B8C4FF)
     } else {
         Color(0xFFDDE2F9)
@@ -196,17 +198,17 @@ val ColorScheme.primaryPill: Color
 
 val ColorScheme.waveInactiveColor: Color
     @Composable @ReadOnlyComposable
-    get() = if (DarkTheme.isDarkTheme(LocalDarkTheme.current)) Color(0xFF48484A) else Color(0xFFE5E5EA)
+    get() = if (LocalDarkTheme.current) Color(0xFF48484A) else Color(0xFFE5E5EA)
 
 val ColorScheme.badgeBorderColor: Color
     @Composable @ReadOnlyComposable
-    get() = if (DarkTheme.isDarkTheme(LocalDarkTheme.current)) Color(0xFF1C1C1E) else Color(0xFFFFFFFF)
+    get() = if (LocalDarkTheme.current) Color(0xFF1C1C1E) else Color(0xFFFFFFFF)
 
 /** Background of matched query spans in search results — pale marker yellow on
  *  light, muted amber on dark so the bold span stays readable on e-ink. */
 val ColorScheme.searchHighlight: Color
     @Composable @ReadOnlyComposable
-    get() = if (DarkTheme.isDarkTheme(LocalDarkTheme.current)) Color(0xFF5A512E) else Color(0xFFFFF1B8)
+    get() = if (LocalDarkTheme.current) Color(0xFF5A512E) else Color(0xFFFFF1B8)
 
 
 @Composable

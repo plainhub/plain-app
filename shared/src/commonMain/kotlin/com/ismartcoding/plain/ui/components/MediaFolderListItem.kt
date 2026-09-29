@@ -28,6 +28,9 @@ import com.ismartcoding.plain.ui.theme.cardBackgroundActive
 import com.ismartcoding.plain.ui.theme.cardBackgroundNormal
 import com.ismartcoding.plain.ui.theme.listItemSubtitle
 import com.ismartcoding.plain.ui.theme.listItemTitle
+import com.ismartcoding.plain.ui.resources.Res as UiRes
+import com.ismartcoding.plain.ui.resources.folder as ui_drawable_folder
+import com.ismartcoding.plain.i18n.folder
 
 @Composable
 fun MediaFolderListItem(
@@ -54,7 +57,7 @@ fun MediaFolderListItem(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Icon(
-                painter = painterResource(Res.drawable.folder),
+                painter = painterResource(UiRes.drawable.ui_drawable_folder),
                 contentDescription = null,
                 modifier = Modifier.size(24.dp),
                 tint = MaterialTheme.colorScheme.primary

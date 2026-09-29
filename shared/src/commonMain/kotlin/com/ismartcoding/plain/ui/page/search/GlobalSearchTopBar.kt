@@ -26,6 +26,11 @@ import com.ismartcoding.plain.ui.models.GlobalSearchDomain
 import com.ismartcoding.plain.ui.models.GlobalSearchViewModel
 import com.ismartcoding.plain.ui.theme.cardBackgroundNormal
 import org.jetbrains.compose.resources.stringResource
+import com.ismartcoding.plain.ui.resources.Res as UiRes
+import com.ismartcoding.plain.ui.resources.close as ui_drawable_close
+import com.ismartcoding.plain.ui.resources.search as ui_drawable_search
+import com.ismartcoding.plain.i18n.search
+import com.ismartcoding.plain.i18n.close
 
 /** Search input bar of the global search tab, with once-per-session auto focus. */
 @OptIn(ExperimentalMaterial3Api::class)
@@ -64,7 +69,7 @@ internal fun GlobalSearchTopBar(
                     placeholder = { Text(hint) },
                     leadingIcon = {
                         PIcon(
-                            icon = Res.drawable.search,
+                            icon = UiRes.drawable.ui_drawable_search,
                             contentDescription = null,
                             tint = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
@@ -72,7 +77,7 @@ internal fun GlobalSearchTopBar(
                     trailingIcon = {
                         if (viewModel.queryText.value.isNotEmpty()) {
                             PIconButton(
-                                icon = Res.drawable.close,
+                                icon = UiRes.drawable.ui_drawable_close,
                                 contentDescription = stringResource(Res.string.clear_search_term),
                                 tint = MaterialTheme.colorScheme.onSurfaceVariant,
                             ) {

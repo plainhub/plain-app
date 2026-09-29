@@ -42,6 +42,8 @@ import com.ismartcoding.plain.platform.exitImmersiveFullscreen
 import com.ismartcoding.plain.platform.setSystemBarsVisible
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
+import com.ismartcoding.plain.ui.resources.Res as UiRes
+import com.ismartcoding.plain.ui.resources.arrow_left as ui_drawable_arrow_left
 
 @Composable
 fun DlnaReceiverImageViewerContent(onExit: () -> Unit) {
@@ -106,7 +108,7 @@ fun DlnaReceiverImageViewerContent(onExit: () -> Unit) {
             ) {
                 IconButton(onClick = onExit) {
                     Icon(
-                        painter = painterResource(Res.drawable.arrow_left),
+                        painter = painterResource(UiRes.drawable.ui_drawable_arrow_left),
                         contentDescription = stringResource(Res.string.dlna_receiver_exit_player),
                         tint = Color.White,
                         modifier = Modifier.size(24.dp),
