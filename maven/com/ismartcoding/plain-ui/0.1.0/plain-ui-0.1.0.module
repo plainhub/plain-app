@@ -1,0 +1,283 @@
+{
+  "formatVersion": "1.1",
+  "component": {
+    "group": "com.ismartcoding",
+    "module": "plain-ui",
+    "version": "0.1.0",
+    "attributes": {
+      "org.gradle.status": "release"
+    }
+  },
+  "createdBy": {
+    "gradle": {
+      "version": "9.7.1"
+    }
+  },
+  "variants": [
+    {
+      "name": "metadataApiElements",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.jvm.environment": "non-jvm",
+        "org.gradle.usage": "kotlin-metadata",
+        "org.jetbrains.kotlin.platform.type": "common"
+      },
+      "dependencies": [
+        {
+          "group": "org.jetbrains.compose.runtime",
+          "module": "runtime",
+          "version": {
+            "requires": "1.12.0"
+          }
+        },
+        {
+          "group": "org.jetbrains.compose.ui",
+          "module": "ui",
+          "version": {
+            "requires": "1.12.0"
+          }
+        },
+        {
+          "group": "org.jetbrains.compose.foundation",
+          "module": "foundation",
+          "version": {
+            "requires": "1.12.0"
+          }
+        },
+        {
+          "group": "org.jetbrains.compose.material3",
+          "module": "material3",
+          "version": {
+            "requires": "1.9.0"
+          }
+        },
+        {
+          "group": "org.jetbrains.kotlin",
+          "module": "kotlin-stdlib",
+          "version": {
+            "requires": "2.4.10"
+          }
+        }
+      ],
+      "files": [
+        {
+          "name": "plain-ui-metadata-0.1.0.jar",
+          "url": "plain-ui-0.1.0.jar",
+          "size": 3603,
+          "sha512": "c8f59abf08c91eb839714a8a5cabbcca8367b6da19006d71d04ba002cf6d31ef5a047086c5bb82e05fd869bf8a0697544c9d77e48aade7d3dbedee9d8c477992",
+          "sha256": "d14ac2785d1b3835d60caef68a9338de374d0dadd76b0ddacb60d11c18738475",
+          "sha1": "aeb5d5b3b7cde960ff54557ef79c5b0208902aa5",
+          "md5": "f7c7636b3038256cfe9478c1a0d82d1d"
+        }
+      ]
+    },
+    {
+      "name": "metadataSourcesElements",
+      "attributes": {
+        "org.gradle.category": "documentation",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.docstype": "sources",
+        "org.gradle.jvm.environment": "non-jvm",
+        "org.gradle.usage": "kotlin-runtime",
+        "org.jetbrains.kotlin.platform.type": "common"
+      },
+      "files": [
+        {
+          "name": "plain-ui-kotlin-0.1.0-sources.jar",
+          "url": "plain-ui-0.1.0-sources.jar",
+          "size": 2797,
+          "sha512": "a855ea8aa98ff2deb91983bbef5147eb312fe58a9e4a3027d5224177419980150740b1859631c96a27d8cd398a818b2ba76a29b859b5edef76d14f8b77294582",
+          "sha256": "be14aabd073803fe30148c10694c4b43d063f79744e62c1debf038845f5119ed",
+          "sha1": "abd951c2789e2a3d95d19ac585e61f93e0d8326d",
+          "md5": "a9924d7ba1f3221d8391bdfc11ca08c1"
+        }
+      ]
+    },
+    {
+      "name": "androidApiElements-published",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.jvm.environment": "android",
+        "org.gradle.libraryelements": "aar",
+        "org.gradle.usage": "java-api",
+        "org.jetbrains.kotlin.platform.type": "androidJvm"
+      },
+      "available-at": {
+        "url": "../../plain-ui-android/0.1.0/plain-ui-android-0.1.0.module",
+        "group": "com.ismartcoding",
+        "module": "plain-ui-android",
+        "version": "0.1.0"
+      }
+    },
+    {
+      "name": "androidRuntimeElements-published",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.jvm.environment": "android",
+        "org.gradle.libraryelements": "aar",
+        "org.gradle.usage": "java-runtime",
+        "org.jetbrains.kotlin.platform.type": "androidJvm"
+      },
+      "available-at": {
+        "url": "../../plain-ui-android/0.1.0/plain-ui-android-0.1.0.module",
+        "group": "com.ismartcoding",
+        "module": "plain-ui-android",
+        "version": "0.1.0"
+      }
+    },
+    {
+      "name": "androidSourcesElements-published",
+      "attributes": {
+        "org.gradle.category": "documentation",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.docstype": "sources",
+        "org.gradle.jvm.environment": "android",
+        "org.gradle.libraryelements": "jar",
+        "org.gradle.usage": "java-runtime",
+        "org.jetbrains.kotlin.platform.type": "androidJvm"
+      },
+      "available-at": {
+        "url": "../../plain-ui-android/0.1.0/plain-ui-android-0.1.0.module",
+        "group": "com.ismartcoding",
+        "module": "plain-ui-android",
+        "version": "0.1.0"
+      }
+    },
+    {
+      "name": "iosArm64ApiElements-published",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.jvm.environment": "non-jvm",
+        "org.gradle.usage": "kotlin-api",
+        "org.jetbrains.kotlin.native.target": "ios_arm64",
+        "org.jetbrains.kotlin.platform.type": "native"
+      },
+      "available-at": {
+        "url": "../../plain-ui-iosarm64/0.1.0/plain-ui-iosarm64-0.1.0.module",
+        "group": "com.ismartcoding",
+        "module": "plain-ui-iosarm64",
+        "version": "0.1.0"
+      }
+    },
+    {
+      "name": "iosArm64SourcesElements-published",
+      "attributes": {
+        "org.gradle.category": "documentation",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.docstype": "sources",
+        "org.gradle.jvm.environment": "non-jvm",
+        "org.gradle.usage": "kotlin-runtime",
+        "org.jetbrains.kotlin.native.target": "ios_arm64",
+        "org.jetbrains.kotlin.platform.type": "native"
+      },
+      "available-at": {
+        "url": "../../plain-ui-iosarm64/0.1.0/plain-ui-iosarm64-0.1.0.module",
+        "group": "com.ismartcoding",
+        "module": "plain-ui-iosarm64",
+        "version": "0.1.0"
+      }
+    },
+    {
+      "name": "iosArm64ResourcesElements-published",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.jvm.environment": "non-jvm",
+        "org.gradle.libraryelements": "kotlin-multiplatformresources",
+        "org.gradle.usage": "kotlin-multiplatformresources",
+        "org.jetbrains.kotlin.native.target": "ios_arm64",
+        "org.jetbrains.kotlin.platform.type": "native"
+      },
+      "available-at": {
+        "url": "../../plain-ui-iosarm64/0.1.0/plain-ui-iosarm64-0.1.0.module",
+        "group": "com.ismartcoding",
+        "module": "plain-ui-iosarm64",
+        "version": "0.1.0"
+      }
+    },
+    {
+      "name": "iosArm64MetadataElements-published",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.jvm.environment": "non-jvm",
+        "org.gradle.usage": "kotlin-metadata",
+        "org.jetbrains.kotlin.native.target": "ios_arm64",
+        "org.jetbrains.kotlin.platform.type": "native"
+      },
+      "available-at": {
+        "url": "../../plain-ui-iosarm64/0.1.0/plain-ui-iosarm64-0.1.0.module",
+        "group": "com.ismartcoding",
+        "module": "plain-ui-iosarm64",
+        "version": "0.1.0"
+      }
+    },
+    {
+      "name": "iosSimulatorArm64ApiElements-published",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.jvm.environment": "non-jvm",
+        "org.gradle.usage": "kotlin-api",
+        "org.jetbrains.kotlin.native.target": "ios_simulator_arm64",
+        "org.jetbrains.kotlin.platform.type": "native"
+      },
+      "available-at": {
+        "url": "../../plain-ui-iossimulatorarm64/0.1.0/plain-ui-iossimulatorarm64-0.1.0.module",
+        "group": "com.ismartcoding",
+        "module": "plain-ui-iossimulatorarm64",
+        "version": "0.1.0"
+      }
+    },
+    {
+      "name": "iosSimulatorArm64SourcesElements-published",
+      "attributes": {
+        "org.gradle.category": "documentation",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.docstype": "sources",
+        "org.gradle.jvm.environment": "non-jvm",
+        "org.gradle.usage": "kotlin-runtime",
+        "org.jetbrains.kotlin.native.target": "ios_simulator_arm64",
+        "org.jetbrains.kotlin.platform.type": "native"
+      },
+      "available-at": {
+        "url": "../../plain-ui-iossimulatorarm64/0.1.0/plain-ui-iossimulatorarm64-0.1.0.module",
+        "group": "com.ismartcoding",
+        "module": "plain-ui-iossimulatorarm64",
+        "version": "0.1.0"
+      }
+    },
+    {
+      "name": "iosSimulatorArm64ResourcesElements-published",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.jvm.environment": "non-jvm",
+        "org.gradle.libraryelements": "kotlin-multiplatformresources",
+        "org.gradle.usage": "kotlin-multiplatformresources",
+        "org.jetbrains.kotlin.native.target": "ios_simulator_arm64",
+        "org.jetbrains.kotlin.platform.type": "native"
+      },
+      "available-at": {
+        "url": "../../plain-ui-iossimulatorarm64/0.1.0/plain-ui-iossimulatorarm64-0.1.0.module",
+        "group": "com.ismartcoding",
+        "module": "plain-ui-iossimulatorarm64",
+        "version": "0.1.0"
+      }
+    },
+    {
+      "name": "iosSimulatorArm64MetadataElements-published",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.jvm.environment": "non-jvm",
+        "org.gradle.usage": "kotlin-metadata",
+        "org.jetbrains.kotlin.native.target": "ios_simulator_arm64",
+        "org.jetbrains.kotlin.platform.type": "native"
+      },
+      "available-at": {
+        "url": "../../plain-ui-iossimulatorarm64/0.1.0/plain-ui-iossimulatorarm64-0.1.0.module",
+        "group": "com.ismartcoding",
+        "module": "plain-ui-iossimulatorarm64",
+        "version": "0.1.0"
+      }
+    }
+  ]
+}
