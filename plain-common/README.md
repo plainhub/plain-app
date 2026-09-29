@@ -30,8 +30,8 @@ Then add the dependency shown above. Releases use tags named
 ## Publishing
 
 The `Publish plain-common` GitHub Actions workflow builds the KMP publications
-and adds the Maven files to the existing GitHub Pages source at `maven/` when a
-`plain-common-v<version>` tag is pushed. It can also be run manually with a
+and adds the Maven files to the dedicated `maven` branch under `maven/` when a
+`plain-common-v<version>` tag is pushed. The workflow also syncs `policy.html` and `terms.html` from main so their existing public URLs stay available. It can also be run manually with a
 version number. The workflow uses its temporary `GITHUB_TOKEN`; no publishing
 credentials are stored in the repository.
 

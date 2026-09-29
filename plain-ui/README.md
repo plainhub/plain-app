@@ -7,7 +7,7 @@ The library currently provides `PScaffold`, `PIcon`, `HorizontalSpace`, and
 platform behavior, and ViewModel-backed components stay in their owning app.
 
 Maven coordinate: `com.ismartcoding:plain-ui`. Releases are published to
-`https://plainhub.github.io/plain-app/maven` with the `plain-ui-v<version>` tag
+`https://plainhub.github.io/plain-app/maven` from the dedicated `maven` branch (which also carries the policy and terms pages), with the `plain-ui-v<version>` tag
 or the `Publish plain-ui` workflow.
 
 ```kotlin

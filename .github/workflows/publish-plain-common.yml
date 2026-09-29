@@ -68,9 +68,10 @@ jobs:
           PLAIN_COMMON_VERSION: ${{ steps.version.outputs.value }}
         run: |
           set -euo pipefail
-          git fetch origin main
-          git worktree add site origin/main
+          git fetch origin maven
+          git worktree add site origin/maven
           mkdir -p site/maven
+          cp policy.html terms.html site/
           python3 - plain-common/build/maven-repository site/maven "$PLAIN_COMMON_VERSION" <<'PY'
           import shutil
           import hashlib
@@ -130,20 +131,20 @@ jobs:
                       checksum.write_text(hashlib.new(algorithm, content).hexdigest())
           PY
 
-      - name: Publish Maven files to Pages source
+      - name: Publish Maven files to maven branch
         env:
           PLAIN_COMMON_VERSION: ${{ steps.version.outputs.value }}
         run: |
           set -euo pipefail
           git -C site config user.name "github-actions[bot]"
           git -C site config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git -C site add -A maven
+          git -C site add -A maven policy.html terms.html
           if git -C site diff --cached --quiet; then
             echo "No Maven repository changes to publish"
             exit 0
           fi
           git -C site commit -m "Publish plain-common $PLAIN_COMMON_VERSION"
-          git -C site push origin HEAD:main
+          git -C site push origin HEAD:maven
 
       - name: Rebuild GitHub Pages site
         env:
