@@ -116,7 +116,6 @@ kotlin {
 
             // Vendored libraries (lib/) dependencies
             implementation(libs.pdfium.android)
-            implementation(libs.zxing.core)
 
 
             // Media3 (AudioPlayerService, audio playback, PlayerView UI)

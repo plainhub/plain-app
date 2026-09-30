@@ -3,6 +3,7 @@ package com.ismartcoding.plain.helpers
 import android.graphics.Bitmap
 import com.ismartcoding.plain.platform.ScannedCode
 import com.ismartcoding.plain.platform.ScannedImage
+import com.ismartcoding.plain.ui.scanner.QrScanPipeline
 import com.ismartcoding.plain.lib.extensions.scaleDown
 
 object QrCodeScanHelper {

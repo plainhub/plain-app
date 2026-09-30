@@ -1,5 +1,8 @@
 package com.ismartcoding.plain.helpers
 
+import com.ismartcoding.plain.ui.scanner.QrScanPipeline
+import com.ismartcoding.plain.ui.scanner.ScanCoordMapper
+
 import com.google.zxing.BarcodeFormat
 import com.google.zxing.MultiFormatWriter
 import com.google.zxing.common.BitMatrix

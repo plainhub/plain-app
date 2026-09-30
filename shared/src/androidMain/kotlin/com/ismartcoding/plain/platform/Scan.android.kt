@@ -34,9 +34,9 @@ import com.google.zxing.MultiFormatReader
 import com.ismartcoding.plain.appContext
 import com.ismartcoding.plain.helpers.QrCodeBitmapHelper
 import com.ismartcoding.plain.helpers.QrCodeScanHelper
-import com.ismartcoding.plain.helpers.QrScanPipeline
-import com.ismartcoding.plain.helpers.ScanCoordMapper
-import com.ismartcoding.plain.helpers.YPlane
+import com.ismartcoding.plain.ui.scanner.QrScanPipeline
+import com.ismartcoding.plain.ui.scanner.ScanCoordMapper
+import com.ismartcoding.plain.ui.scanner.YPlane
 import com.ismartcoding.plain.lib.logcat.LogCat
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext

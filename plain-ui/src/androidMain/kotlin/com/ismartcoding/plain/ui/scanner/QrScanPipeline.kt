@@ -1,4 +1,4 @@
-package com.ismartcoding.plain.helpers
+package com.ismartcoding.plain.ui.scanner
 
 import com.google.zxing.BarcodeFormat
 import com.google.zxing.BinaryBitmap
