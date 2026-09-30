@@ -3,21 +3,18 @@ package com.ismartcoding.plain.ui.components.codeeditor
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.text.TextRange
-import com.ismartcoding.plain.lib.codeeditor.EditHistory
-import com.ismartcoding.plain.lib.codeeditor.EditRange
-import com.ismartcoding.plain.lib.codeeditor.HighlightEngine
-import com.ismartcoding.plain.lib.codeeditor.HorizontalPan
-import com.ismartcoding.plain.lib.codeeditor.Languages
-import com.ismartcoding.plain.lib.codeeditor.LineIndexBuilder
-import com.ismartcoding.plain.lib.codeeditor.LineVectorDocument
-import com.ismartcoding.plain.lib.codeeditor.SearchEngine
-import com.ismartcoding.plain.lib.codeeditor.SearchMatch
-import com.ismartcoding.plain.lib.codeeditor.Span
-import com.ismartcoding.plain.lib.codeeditor.DetectedEncoding
-import com.ismartcoding.plain.lib.codeeditor.EncodingProbe
-import com.ismartcoding.plain.lib.withIO
-import com.ismartcoding.plain.platform.openByteSource
-import com.ismartcoding.plain.platform.writeByteChunksStreaming
+import com.ismartcoding.plain.ui.components.codeeditor.engine.EditHistory
+import com.ismartcoding.plain.ui.components.codeeditor.engine.EditRange
+import com.ismartcoding.plain.ui.components.codeeditor.engine.HighlightEngine
+import com.ismartcoding.plain.ui.components.codeeditor.engine.HorizontalPan
+import com.ismartcoding.plain.ui.components.codeeditor.engine.Languages
+import com.ismartcoding.plain.ui.components.codeeditor.engine.LineIndexBuilder
+import com.ismartcoding.plain.ui.components.codeeditor.engine.LineVectorDocument
+import com.ismartcoding.plain.ui.components.codeeditor.engine.SearchEngine
+import com.ismartcoding.plain.ui.components.codeeditor.engine.SearchMatch
+import com.ismartcoding.plain.ui.components.codeeditor.engine.Span
+import com.ismartcoding.plain.ui.components.codeeditor.engine.DetectedEncoding
+import com.ismartcoding.plain.ui.components.codeeditor.engine.EncodingProbe
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -37,7 +34,7 @@ sealed class EditorLoadState {
  * scroll/caret/selection state the composables render. Heavy work (index build, search,
  * highlighting) runs on Dispatchers.Default; edits apply on the main thread.
  */
-class EditorController(private val scope: kotlinx.coroutines.CoroutineScope) {
+class EditorController(private val scope: kotlinx.coroutines.CoroutineScope, private val fileIO: EditorFileIO) {
     val loadState = mutableStateOf<EditorLoadState>(EditorLoadState.Idle)
     val docVersion = mutableStateOf(0)
     val mapperVersion = mutableStateOf(0)
@@ -94,8 +91,8 @@ class EditorController(private val scope: kotlinx.coroutines.CoroutineScope) {
     internal var doc: LineVectorDocument? = null
         private set
     private var highlighter: HighlightEngine? = null
-    private var history = EditHistory()
-    private var snapshot: com.ismartcoding.plain.lib.codeeditor.DocSnapshot? = null
+    private var history = EditHistory().apply { injectClock(fileIO::nowMillis) }
+    private var snapshot: com.ismartcoding.plain.ui.components.codeeditor.engine.DocSnapshot? = null
     private var searchJob: Job? = null
     private var mapperJob: Job? = null
     private var suppressFieldSync = false
@@ -113,7 +110,7 @@ class EditorController(private val scope: kotlinx.coroutines.CoroutineScope) {
         scope.launch {
             try {
                 val languageId = Languages.pathToLanguageId(filePath)
-                val loaded = withIO { loadDocument(filePath) }
+                val loaded = withContext(Dispatchers.Default) { loadDocument(filePath) }
                 finishOpen(loaded, languageId, gotoEnd)
             } catch (e: Exception) {
                 loadState.value = EditorLoadState.Error(e.message ?: "failed to open file")
@@ -147,7 +144,7 @@ class EditorController(private val scope: kotlinx.coroutines.CoroutineScope) {
     }
 
     private suspend fun loadDocument(filePath: String): LineVectorDocument {
-        val source = openByteSource(filePath)
+        val source = fileIO.openByteSource(filePath)
         openFileSize = source.size
         val encoding = EncodingProbe.probe(source)
         encodingLabel.value = when (encoding) {
@@ -319,8 +316,8 @@ class EditorController(private val scope: kotlinx.coroutines.CoroutineScope) {
 
     suspend fun saveAsync(): Result<Unit> {
         val d = doc ?: return Result.failure(IllegalStateException("no document"))
-        return withIO {
-            val ok = writeByteChunksStreaming(path, d.byteChunks())
+        return withContext(Dispatchers.Default) {
+            val ok = fileIO.writeByteChunksStreaming(path, d.byteChunks())
             if (ok) {
                 snapshot = d.snapshot()
                 isDirty.value = false

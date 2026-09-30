@@ -1,4 +1,4 @@
-package com.ismartcoding.plain.lib.codeeditor
+package com.ismartcoding.plain.ui.components.codeeditor.engine
 
 import kotlinx.atomicfu.locks.SynchronizedObject
 import kotlinx.atomicfu.locks.synchronized

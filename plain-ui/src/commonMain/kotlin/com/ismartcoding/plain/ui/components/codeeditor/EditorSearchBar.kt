@@ -22,9 +22,6 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.ismartcoding.plain.i18n.*
-import com.ismartcoding.plain.ui.base.PIconButton
-import org.jetbrains.compose.resources.stringResource
 import com.ismartcoding.plain.ui.resources.Res as UiRes
 import com.ismartcoding.plain.ui.resources.chevron_down as ui_drawable_chevron_down
 import com.ismartcoding.plain.ui.resources.chevron_up as ui_drawable_chevron_up
@@ -70,7 +67,7 @@ fun EditorSearchBar(controller: EditorController) {
             decorationBox = { inner ->
                 if (controller.searchQuery.value.isEmpty()) {
                     Text(
-                        text = stringResource(Res.string.search),
+                        text = "Search",
                         fontSize = 14.sp,
                         fontFamily = FontFamily.Monospace,
                         color = tint.copy(alpha = 0.7f),
@@ -104,14 +101,14 @@ fun EditorSearchBar(controller: EditorController) {
                 modifier = Modifier.padding(horizontal = 6.dp),
             )
         }
-        PIconButton(
+        EditorIconButton(
             icon = UiRes.drawable.ui_drawable_match_case,
             tint = if (controller.searchCaseSensitive.value) accent else tint,
         ) {
             controller.requestSearch(controller.searchQuery.value, !controller.searchCaseSensitive.value, controller.searchRegex.value)
         }
-        PIconButton(icon = UiRes.drawable.ui_drawable_chevron_up, tint = tint, enabled = count > 0) { controller.prevMatch() }
-        PIconButton(icon = UiRes.drawable.ui_drawable_chevron_down, tint = tint, enabled = count > 0) { controller.nextMatch() }
-        PIconButton(icon = UiRes.drawable.ui_drawable_x, tint = tint) { controller.setSearchVisible(false) }
+        EditorIconButton(icon = UiRes.drawable.ui_drawable_chevron_up, tint = tint, enabled = count > 0) { controller.prevMatch() }
+        EditorIconButton(icon = UiRes.drawable.ui_drawable_chevron_down, tint = tint, enabled = count > 0) { controller.nextMatch() }
+        EditorIconButton(icon = UiRes.drawable.ui_drawable_x, tint = tint) { controller.setSearchVisible(false) }
     }
 }

@@ -1,4 +1,4 @@
-package com.ismartcoding.plain.lib.codeeditor
+package com.ismartcoding.plain.ui.components.codeeditor.engine
 
 /**
  * Sequential line index builder. Produces the line vector for a [LineVectorDocument] in one

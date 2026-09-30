@@ -2,8 +2,8 @@ package com.ismartcoding.plain.platform
 
 import android.net.Uri
 import com.ismartcoding.plain.appContext
-import com.ismartcoding.plain.lib.codeeditor.ByteSource
-import com.ismartcoding.plain.lib.codeeditor.ChunkedByteSource
+import com.ismartcoding.plain.ui.components.codeeditor.engine.ByteSource
+import com.ismartcoding.plain.ui.components.codeeditor.engine.ChunkedByteSource
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream

@@ -1,4 +1,4 @@
-package com.ismartcoding.plain.lib.codeeditor
+package com.ismartcoding.plain.ui.components.codeeditor.engine
 
 import kotlin.test.Test
 import kotlin.test.assertEquals

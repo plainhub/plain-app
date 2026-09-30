@@ -48,7 +48,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.ismartcoding.plain.lib.codeeditor.EditRange
+import com.ismartcoding.plain.ui.components.codeeditor.engine.EditRange
 import kotlin.math.roundToInt
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -57,7 +57,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 /** Public entry: renders [controller]'s document with gutter, highlighting and search marks. */
 @Composable
 fun CodeEditor(controller: EditorController, modifier: Modifier = Modifier) {
-    val dark = com.ismartcoding.plain.enums.DarkTheme.isDarkTheme(com.ismartcoding.plain.preferences.LocalDarkTheme.current)
+    val dark = com.ismartcoding.plain.ui.theme.LocalDarkTheme.current
     val colors = if (dark) DarkSyntaxColors else LightSyntaxColors
     androidx.compose.runtime.CompositionLocalProvider(LocalEditorSyntaxColors provides colors) {
         Column(modifier = modifier) {

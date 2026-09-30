@@ -1,6 +1,6 @@
-package com.ismartcoding.plain.lib.codeeditor
+package com.ismartcoding.plain.ui.components.codeeditor.engine
 
-import com.ismartcoding.plain.lib.codeeditor.TokenKind.*
+import com.ismartcoding.plain.ui.components.codeeditor.engine.TokenKind.*
 import kotlinx.atomicfu.locks.SynchronizedObject
 import kotlinx.atomicfu.locks.synchronized
 

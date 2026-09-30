@@ -1,6 +1,6 @@
 package com.ismartcoding.plain.ui.components.codeeditor
 
-import com.ismartcoding.plain.lib.codeeditor.LineVectorDocument
+import com.ismartcoding.plain.ui.components.codeeditor.engine.LineVectorDocument
 
 /**
  * Maps between logical lines and visual rows. Plain lines map 1:1; extremely long lines

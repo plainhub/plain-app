@@ -1,4 +1,4 @@
-package com.ismartcoding.plain.lib.codeeditor
+package com.ismartcoding.plain.ui.components.codeeditor.engine
 
 /** Primitive growable int array; avoids boxing of ArrayList&lt;Int&gt; for million-entry line indexes. */
 class IntList(initialCapacity: Int = 1024) {

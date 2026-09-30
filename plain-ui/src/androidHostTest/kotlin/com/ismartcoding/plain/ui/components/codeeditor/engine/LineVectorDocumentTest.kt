@@ -1,4 +1,4 @@
-package com.ismartcoding.plain.lib.codeeditor
+package com.ismartcoding.plain.ui.components.codeeditor.engine
 
 import kotlin.random.Random
 import kotlin.test.Test

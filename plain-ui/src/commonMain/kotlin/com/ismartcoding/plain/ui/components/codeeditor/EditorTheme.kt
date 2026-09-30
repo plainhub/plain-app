@@ -4,7 +4,7 @@ import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.font.FontStyle
-import com.ismartcoding.plain.lib.codeeditor.TokenKind
+import com.ismartcoding.plain.ui.components.codeeditor.engine.TokenKind
 
 /**
  * Syntax palette. Light theme is the first-class citizen (e-ink friendly: high contrast on

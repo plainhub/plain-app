@@ -1,6 +1,4 @@
-package com.ismartcoding.plain.lib.codeeditor
-
-import com.ismartcoding.plain.lib.TimeHelper
+package com.ismartcoding.plain.ui.components.codeeditor.engine
 
 /**
  * Undo/redo over document replaces. Adjacent single-character typing is coalesced into one
@@ -15,7 +13,7 @@ class EditHistory(
 
     private val undoStack = ArrayDeque<Step>()
     private val redoStack = ArrayDeque<Step>()
-    private var nowMillis: () -> Long = { TimeHelper.nowMillis() }
+    private var nowMillis: () -> Long = { 0L }
 
     fun injectClock(clock: () -> Long) {
         nowMillis = clock

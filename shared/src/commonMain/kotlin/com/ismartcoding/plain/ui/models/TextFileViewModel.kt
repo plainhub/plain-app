@@ -11,12 +11,20 @@ import com.ismartcoding.plain.platform.isContentUri
 import com.ismartcoding.plain.preferences.EditorFontSizePreference
 import com.ismartcoding.plain.preferences.EditorStatusBarPreference
 import com.ismartcoding.plain.preferences.EditorWrapContentPreference
+import com.ismartcoding.plain.platform.openByteSource
+import com.ismartcoding.plain.platform.writeByteChunksStreaming
+import com.ismartcoding.plain.ui.components.codeeditor.EditorFileIO
 import com.ismartcoding.plain.ui.components.codeeditor.EditorController
 import com.ismartcoding.plain.ui.components.codeeditor.EditorLoadState
 import com.ismartcoding.plain.ui.helpers.DialogHelper
 
 class TextFileViewModel : ViewModel() {
-    val controller = EditorController(viewModelScope)
+    val controller = EditorController(viewModelScope, object : EditorFileIO {
+        override fun nowMillis() = com.ismartcoding.plain.lib.TimeHelper.nowMillis()
+        override fun openByteSource(path: String) = com.ismartcoding.plain.platform.openByteSource(path)
+        override fun writeByteChunksStreaming(path: String, chunks: Iterator<ByteArray>) =
+            com.ismartcoding.plain.platform.writeByteChunksStreaming(path, chunks)
+    })
     val showMoreActions = mutableStateOf(false)
     val file = mutableStateOf<DFile?>(null)
     val isExternalFile = mutableStateOf(false)

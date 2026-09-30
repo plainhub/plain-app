@@ -34,22 +34,18 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.ismartcoding.plain.i18n.*
-import com.ismartcoding.plain.ui.base.PIconButton
 import com.ismartcoding.plain.ui.resources.Res as UiRes
 import com.ismartcoding.plain.ui.resources.chevron_down as ui_drawable_chevron_down
 import com.ismartcoding.plain.ui.resources.chevron_left as ui_drawable_chevron_left
 import com.ismartcoding.plain.ui.resources.chevron_right as ui_drawable_chevron_right
 import com.ismartcoding.plain.ui.resources.chevron_up as ui_drawable_chevron_up
 import com.ismartcoding.plain.ui.resources.copy as ui_drawable_copy
+import com.ismartcoding.plain.ui.resources.select_all as ui_drawable_select_all
 import com.ismartcoding.plain.ui.resources.delete_forever as ui_drawable_delete_forever
 import com.ismartcoding.plain.ui.resources.redo_2 as ui_drawable_redo_2
 import com.ismartcoding.plain.ui.resources.scissors as ui_drawable_scissors
-import com.ismartcoding.plain.ui.resources.select_all as ui_drawable_select_all
 import com.ismartcoding.plain.ui.resources.undo_2 as ui_drawable_undo_2
 import com.ismartcoding.plain.ui.resources.x as ui_drawable_x
-import com.ismartcoding.plain.i18n.copy
-import com.ismartcoding.plain.i18n.select_all
 
 /**
  * The single persistent input field (mdeditor-proven pattern: the IME session never moves
@@ -146,23 +142,23 @@ fun EditAssistToolbar(controller: EditorController, modifier: Modifier = Modifie
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(0.dp),
     ) {
-        PIconButton(icon = UiRes.drawable.ui_drawable_chevron_up, tint = tint) { controller.moveCaretRelative(-1, 0) }
-        PIconButton(icon = UiRes.drawable.ui_drawable_chevron_down, tint = tint) { controller.moveCaretRelative(1, 0) }
-        PIconButton(icon = UiRes.drawable.ui_drawable_chevron_left, tint = tint) { controller.moveCaretRelative(0, -1) }
-        PIconButton(icon = UiRes.drawable.ui_drawable_chevron_right, tint = tint) { controller.moveCaretRelative(0, 1) }
-        PIconButton(icon = UiRes.drawable.ui_drawable_delete_forever, tint = tint) {
+        EditorIconButton(icon = UiRes.drawable.ui_drawable_chevron_up, tint = tint) { controller.moveCaretRelative(-1, 0) }
+        EditorIconButton(icon = UiRes.drawable.ui_drawable_chevron_down, tint = tint) { controller.moveCaretRelative(1, 0) }
+        EditorIconButton(icon = UiRes.drawable.ui_drawable_chevron_left, tint = tint) { controller.moveCaretRelative(0, -1) }
+        EditorIconButton(icon = UiRes.drawable.ui_drawable_chevron_right, tint = tint) { controller.moveCaretRelative(0, 1) }
+        EditorIconButton(icon = UiRes.drawable.ui_drawable_delete_forever, tint = tint) {
             if (controller.selection.value != null) {
                 controller.deleteSelection()
             } else if (controller.activeCol.value == 0) {
                 controller.joinWithPreviousLine()
             }
         }
-        PIconButton(
+        EditorIconButton(
             icon = UiRes.drawable.ui_drawable_undo_2,
             enabled = controller.canUndo.value,
             tint = if (controller.canUndo.value) MaterialTheme.colorScheme.onSurface else tint.copy(alpha = 0.4f),
         ) { controller.undo() }
-        PIconButton(
+        EditorIconButton(
             icon = UiRes.drawable.ui_drawable_redo_2,
             enabled = controller.canRedo.value,
             tint = if (controller.canRedo.value) MaterialTheme.colorScheme.onSurface else tint.copy(alpha = 0.4f),
@@ -190,19 +186,19 @@ fun SelectionToolbarOverlay(controller: EditorController) {
                 .padding(horizontal = 4.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            PIconButton(icon = UiRes.drawable.ui_drawable_copy, tint = tint) {
+            EditorIconButton(icon = UiRes.drawable.ui_drawable_copy, tint = tint) {
                 controller.selectedText()?.let { clipboard.setText(AnnotatedString(it)) }
             }
             if (!controller.readOnly.value) {
-                PIconButton(icon = UiRes.drawable.ui_drawable_scissors, tint = tint) {
+                EditorIconButton(icon = UiRes.drawable.ui_drawable_scissors, tint = tint) {
                     controller.selectedText()?.let { clipboard.setText(AnnotatedString(it)) }
                     controller.deleteSelection()
                 }
             }
-            PIconButton(icon = UiRes.drawable.ui_drawable_select_all, tint = tint) {
+            EditorIconButton(icon = UiRes.drawable.ui_drawable_select_all, tint = tint) {
                 controller.selectAll()
             }
-            PIconButton(icon = UiRes.drawable.ui_drawable_x, tint = tint) {
+            EditorIconButton(icon = UiRes.drawable.ui_drawable_x, tint = tint) {
                 controller.selection.value = null
             }
         }

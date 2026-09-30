@@ -1,4 +1,4 @@
-package com.ismartcoding.plain.lib.codeeditor
+package com.ismartcoding.plain.ui.components.codeeditor.engine
 
 /**
  * Horizontal panning state for no-wrap rows. Pure logic, unit-testable.

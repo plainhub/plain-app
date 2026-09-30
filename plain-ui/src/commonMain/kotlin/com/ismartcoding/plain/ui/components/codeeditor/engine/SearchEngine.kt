@@ -1,4 +1,4 @@
-package com.ismartcoding.plain.lib.codeeditor
+package com.ismartcoding.plain.ui.components.codeeditor.engine
 
 data class SearchMatch(val line: Int, val startCol: Int, val length: Int)
 

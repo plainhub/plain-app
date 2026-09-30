@@ -11,9 +11,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.ismartcoding.plain.i18n.*
-import com.ismartcoding.plain.lib.extensions.formatBytes
-import org.jetbrains.compose.resources.stringResource
 
 /** Single-line status strip: caret position (edit mode), encoding, file size, dirty flag. */
 @Composable
@@ -30,9 +27,9 @@ fun EditorStatusBar(controller: EditorController) {
                 add("Ln ${controller.activeLine.value + 1}, Col ${controller.activeCol.value + 1}")
             }
             add(controller.encodingLabel.value)
-            add(controller.openFileSize.formatBytes())
+            add(formatEditorBytes(controller.openFileSize))
             if (controller.isDirty.value) {
-                add(stringResource(Res.string.modified))
+                add("Modified")
             }
         }
         Text(
@@ -43,4 +40,11 @@ fun EditorStatusBar(controller: EditorController) {
             maxLines = 1,
         )
     }
+}
+
+private fun formatEditorBytes(bytes: Long): String = when {
+    bytes < 1024 -> "$bytes B"
+    bytes < 1024L * 1024 -> "${bytes / 1024} KB"
+    bytes < 1024L * 1024 * 1024 -> "${bytes / (1024 * 1024)} MB"
+    else -> "${bytes / (1024L * 1024 * 1024)} GB"
 }

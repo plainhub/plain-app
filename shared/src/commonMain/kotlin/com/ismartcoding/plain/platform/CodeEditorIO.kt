@@ -1,6 +1,6 @@
 package com.ismartcoding.plain.platform
 
-import com.ismartcoding.plain.lib.codeeditor.ByteSource
+import com.ismartcoding.plain.ui.components.codeeditor.engine.ByteSource
 
 /** Opens a positioned-read byte source for editor loading (plain path, file:// or content://). */
 expect fun openByteSource(path: String): ByteSource

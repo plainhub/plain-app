@@ -1,7 +1,7 @@
 package com.ismartcoding.plain.platform
 
-import com.ismartcoding.plain.lib.codeeditor.ByteSource
-import com.ismartcoding.plain.lib.codeeditor.ChunkedByteSource
+import com.ismartcoding.plain.ui.components.codeeditor.engine.ByteSource
+import com.ismartcoding.plain.ui.components.codeeditor.engine.ChunkedByteSource
 import kotlinx.atomicfu.locks.SynchronizedObject
 import kotlinx.atomicfu.locks.synchronized
 import kotlinx.cinterop.ExperimentalForeignApi

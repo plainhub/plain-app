@@ -1,4 +1,4 @@
-package com.ismartcoding.plain.lib.codeeditor
+package com.ismartcoding.plain.ui.components.codeeditor.engine
 
 enum class TokenKind { PLAIN, KEYWORD, TYPE, STRING, NUMBER, COMMENT, ANNOTATION, FUNCTION, OPERATOR, TAG, ATTRIBUTE, CONSTANT, VARIABLE }
 
