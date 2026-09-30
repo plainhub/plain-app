@@ -2,7 +2,7 @@
 
 Reusable Compose Multiplatform UI primitives shared by Plain applications.
 
-The library provides shared Compose components in `com.ismartcoding.plain.ui.base`, including `PScaffold`, `PTopAppBar`, fast scrollbars, pull to refresh, and drag selection. App-specific resources, platform behavior, and ViewModel-backed components stay in their owning app.
+The library provides shared Compose components in `com.ismartcoding.plain.ui.base`, including `PScaffold`, `PTopAppBar`, fast scrollbars, pull to refresh, and drag selection. It also includes the reusable large-file `CodeEditor` and its document, syntax highlighting, search, and edit-history engine. Platform file access is supplied through `EditorFileIO` by the host app.
 
 `PTopAppBar` accepts `onNavigateBack` and `navigationIcon` callbacks. Pull refresh strings ship with the library resources. Drag selection uses the small `Identifiable` contract from `plain-common`.
 
@@ -12,9 +12,9 @@ or the `Publish plain-ui` workflow.
 
 ```kotlin
 dependencies {
-    implementation("com.ismartcoding:plain-ui:0.1.0")
+    implementation("com.ismartcoding:plain-ui:0.2.0")
 }
 ```
 
-Use the shared components from `com.ismartcoding.plain.ui.base` and its `fastscroll`, `pullrefresh`, and `dragselect` packages. Downstream Android clients already use
+Use the shared components from `com.ismartcoding.plain.ui.base`, the `fastscroll`, `pullrefresh`, and `dragselect` packages, and `CodeEditor` from `com.ismartcoding.plain.ui.components.codeeditor`. Downstream Android clients already use
 the same Maven repository URL as `plain-common`.
