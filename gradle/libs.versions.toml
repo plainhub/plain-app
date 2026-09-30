@@ -114,7 +114,6 @@ androidx-work-multiprocess = { module = "androidx.work:work-multiprocess", versi
 
 # compose
 compose-ui = { module = "androidx.compose.ui:ui", version.ref = "compose" }
-compose-runtime = { module = "androidx.compose.runtime:runtime", version.ref = "compose" }
 compose-navigation = { module = "androidx.navigation:navigation-compose", version.ref = "navigationComposeVersion" }
 compose-lifecycle-runtime = { group = "androidx.lifecycle", name = "lifecycle-runtime-compose", version.ref = "lifecycleViewmodelKtxVersion" }
 compose-activity = { module = "androidx.activity:activity-compose", version.ref = "activityComposeVersion" }

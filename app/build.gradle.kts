@@ -213,8 +213,6 @@ dependencies {
     implementation(libs.coil.compose)
     implementation(libs.coil.network.okhttp)
 
-    implementation(libs.zxing.core)
-
     debugImplementation(libs.leakcanary.android)
     debugImplementation(libs.androidx.work.multiprocess)
     // Diagnostic: expose ktor/netty SLF4J logs to logcat (System.err)

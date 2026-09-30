@@ -43,6 +43,6 @@ data class AudioPlayHistory(
     val title: String,
     val artist: String,
     val durationMs: Long,
-    val playCount: Long,
+    val playCount: Int,
     val playedAt: Instant,
 )

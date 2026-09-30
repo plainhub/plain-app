@@ -4,7 +4,7 @@ import com.ismartcoding.plain.enums.DriveType
 import com.ismartcoding.plain.lib.kgraphql.annotations.GraphQLType
 
 @GraphQLType
-data class StorageMount(
+data class Mount(
     val id: ID = ID(""),
     val name: String = "",
     val path: String = "",

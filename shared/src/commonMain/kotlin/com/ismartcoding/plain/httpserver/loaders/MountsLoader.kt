@@ -10,18 +10,18 @@ import com.ismartcoding.plain.platform.getSDCardStorageStats
 import com.ismartcoding.plain.platform.getUSBStorageStats
 import com.ismartcoding.plain.platform.getUsbDiskPaths
 import com.ismartcoding.plain.httpserver.models.ID
-import com.ismartcoding.plain.httpserver.models.StorageMount
+import com.ismartcoding.plain.httpserver.models.Mount
 
 object MountsLoader {
-    fun load(): List<StorageMount> {
+    fun load(): List<Mount> {
         fun buildMount(
             path: String,
             name: String,
             totalBytes: Long,
             freeBytes: Long,
             driveType: DriveType,
-        ): StorageMount {
-            return StorageMount(
+        ): Mount {
+            return Mount(
                 id = ID("path:$path"),
                 name = name,
                 path = path,
@@ -36,7 +36,7 @@ object MountsLoader {
             )
         }
 
-        val mounts = mutableListOf<StorageMount>()
+        val mounts = mutableListOf<Mount>()
 
         val internalPath = getInternalStoragePath()
         val internalStats = getInternalStorageStats()

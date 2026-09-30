@@ -21,7 +21,7 @@ import com.ismartcoding.plain.httpserver.models.File
 import com.ismartcoding.plain.httpserver.models.FileInfo
 import com.ismartcoding.plain.httpserver.models.ID
 import com.ismartcoding.plain.httpserver.models.MediaFileInfo
-import com.ismartcoding.plain.httpserver.models.StorageMount
+import com.ismartcoding.plain.httpserver.models.Mount
 import com.ismartcoding.plain.httpserver.models.toModel
 import com.ismartcoding.plain.platform.loadAudioInfo
 import com.ismartcoding.plain.platform.loadImageInfo
@@ -29,7 +29,7 @@ import com.ismartcoding.plain.platform.loadVideoInfo
 import kotlin.reflect.typeOf
 
 @GraphQLQuery
-suspend fun mounts(): List<StorageMount> {
+suspend fun mounts(): List<Mount> {
     return MountsLoader.load()
 }
 
