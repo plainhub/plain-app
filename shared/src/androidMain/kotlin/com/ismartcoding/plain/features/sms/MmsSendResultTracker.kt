@@ -2,24 +2,22 @@ package com.ismartcoding.plain.features.sms
 
 import com.ismartcoding.plain.events.MmsSendResultData
 import com.ismartcoding.plain.lib.JsonHelper
-import com.ismartcoding.plain.preferences.appPreferences
-import com.ismartcoding.plain.preferences.stringPreferenceKey
-import kotlinx.coroutines.runBlocking
+import com.ismartcoding.plain.preferences.Prefs
 import kotlinx.serialization.json.JsonPrimitive
 
 private class RustMmsSendResultStateStore : MmsSendResultStateStore {
     override fun readAll(): List<MmsTerminalResultState> {
-        return appPreferences.snapshot.entries.mapNotNull { (key, value) ->
+        return Prefs.snapshot.mapNotNull { (key, value) ->
             if (!key.startsWith(KEY_PREFIX) || value !is JsonPrimitive || !value.isString) null else runCatching { JsonHelper.jsonDecode<MmsTerminalResultState>(value.content) }.getOrNull()
         }
     }
 
     override fun write(state: MmsTerminalResultState) {
-        runBlocking { appPreferences.put(stringPreferenceKey(KEY_PREFIX + state.pendingId), JsonHelper.jsonEncode(state)) }
+        Prefs.setString(KEY_PREFIX + state.pendingId, JsonHelper.jsonEncode(state))
     }
 
     override fun remove(pendingId: String) {
-        runBlocking { appPreferences.remove(KEY_PREFIX + pendingId) }
+        Prefs.remove(KEY_PREFIX + pendingId)
     }
 
     private companion object {

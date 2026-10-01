@@ -18,6 +18,18 @@ kotlin {
         namespace = "com.ismartcoding.plain.ui"
         compileSdk = 37
         minSdk = 28
+
+        // Required so that Compose Multiplatform resources (strings_components/
+        // drawable) are packaged into the published AAR's assets. Without this the
+        // new `com.android.kotlin.multiplatform.library` plugin disables Android
+        // resource processing and `copyAndroidMainComposeResourcesToAndroidAssets`
+        // is never wired up — consumers crash with MissingResourceException at
+        // runtime when plain-ui components call stringResource() on their own
+        // resources (seen when consuming plain-ui 0.3.0).
+        androidResources {
+            enable = true
+        }
+
         withHostTest {}
     }
 

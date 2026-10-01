@@ -2,29 +2,27 @@ package com.ismartcoding.plain.features.sms
 
 import com.ismartcoding.plain.events.SmsSendResultData
 import com.ismartcoding.plain.lib.JsonHelper
-import com.ismartcoding.plain.preferences.appPreferences
-import com.ismartcoding.plain.preferences.stringPreferenceKey
-import kotlinx.coroutines.runBlocking
+import com.ismartcoding.plain.preferences.Prefs
 import kotlinx.serialization.json.JsonPrimitive
 
 private class RustSmsSendStateStore : SmsSendStateStore {
     override fun read(requestId: String): SmsPendingSendState? {
-        val encoded = appPreferences.snapshot[stringPreferenceKey(KEY_PREFIX + requestId)]
+        val encoded = Prefs.string(KEY_PREFIX + requestId)
         return encoded?.let { runCatching { JsonHelper.jsonDecode<SmsPendingSendState>(it) }.getOrNull() }
     }
 
     override fun readAll(): List<SmsPendingSendState> {
-        return appPreferences.snapshot.entries.mapNotNull { (key, value) ->
+        return Prefs.snapshot.mapNotNull { (key, value) ->
             if (!key.startsWith(KEY_PREFIX) || value !is JsonPrimitive || !value.isString) null else runCatching { JsonHelper.jsonDecode<SmsPendingSendState>(value.content) }.getOrNull()
         }
     }
 
     override fun write(state: SmsPendingSendState) {
-        runBlocking { appPreferences.put(stringPreferenceKey(KEY_PREFIX + state.requestId), JsonHelper.jsonEncode(state)) }
+        Prefs.setString(KEY_PREFIX + state.requestId, JsonHelper.jsonEncode(state))
     }
 
     override fun remove(requestId: String) {
-        runBlocking { appPreferences.remove(KEY_PREFIX + requestId) }
+        Prefs.remove(KEY_PREFIX + requestId)
     }
 
     private companion object {
