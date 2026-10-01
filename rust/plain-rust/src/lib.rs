@@ -188,7 +188,7 @@ mod tests {
     #[test]
     fn rust_prefs_bridge_persists_typed_values() {
         let path =
-            std::env::temp_dir().join(format!("plain-prefs-mobile-{}.json", std::process::id()));
+            std::env::temp_dir().join(format!("plain-rust-{}.json", std::process::id()));
         let path_c = CString::new(path.to_str().unwrap()).unwrap();
         assert!(plain_prefs_open(path_c.as_ptr()).is_null());
         for (key, json) in [

@@ -1,10 +1,10 @@
 [package]
-name = "plain-prefs-mobile"
+name = "plain-rust"
 version = "0.1.0"
 edition = "2024"
 
 [lib]
-name = "plain_prefs_mobile"
+name = "plain_rust"
 crate-type = ["cdylib", "staticlib"]
 
 [dependencies]

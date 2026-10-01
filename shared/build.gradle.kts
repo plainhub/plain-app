@@ -52,30 +52,30 @@ kotlin {
     iosTargets.forEach { iosTarget ->
         val rustTarget = if (iosTarget.name == "iosArm64") "aarch64-apple-ios" else "aarch64-apple-ios-sim"
         val rustTargetDir = layout.buildDirectory.dir("rust-target")
-        val installRustTarget = tasks.register<Exec>("installRustPrefsTarget${iosTarget.name.replaceFirstChar { it.uppercase() }}") {
+        val installRustTarget = tasks.register<Exec>("installPlainRustTarget${iosTarget.name.replaceFirstChar { it.uppercase() }}") {
             commandLine("rustup", "target", "add", rustTarget)
         }
-        val buildRustPrefs = tasks.register<Exec>("buildRustPrefs${iosTarget.name.replaceFirstChar { it.uppercase() }}") {
+        val buildPlainRust = tasks.register<Exec>("buildPlainRust${iosTarget.name.replaceFirstChar { it.uppercase() }}") {
             dependsOn(installRustTarget)
-            inputs.file(rootProject.file("rust/plain-prefs-mobile/Cargo.toml"))
-            inputs.file(rootProject.file("rust/plain-prefs-mobile/Cargo.lock"))
-            inputs.dir(rootProject.file("rust/plain-prefs-mobile/src"))
-            outputs.file(rustTargetDir.map { it.file("$rustTarget/release/libplain_prefs_mobile.a") })
+            inputs.file(rootProject.file("rust/plain-rust/Cargo.toml"))
+            inputs.file(rootProject.file("rust/plain-rust/Cargo.lock"))
+            inputs.dir(rootProject.file("rust/plain-rust/src"))
+            outputs.file(rustTargetDir.map { it.file("$rustTarget/release/libplain_rust.a") })
             environment("CARGO_TARGET_DIR", rustTargetDir.get().asFile.absolutePath)
-            commandLine("cargo", "build", "--locked", "--manifest-path", rootProject.file("rust/plain-prefs-mobile/Cargo.toml"), "--release", "--target", rustTarget)
+            commandLine("cargo", "build", "--locked", "--manifest-path", rootProject.file("rust/plain-rust/Cargo.toml"), "--release", "--target", rustTarget)
         }
         iosTarget.compilations.getByName("main").cinterops.create("plainPrefs") {
             defFile(rootProject.file("shared/src/nativeInterop/cinterop/plainPrefs.def"))
-            compilerOpts("-I${rootProject.file("rust/plain-prefs-mobile/include").absolutePath}")
+            compilerOpts("-I${rootProject.file("rust/plain-rust/include").absolutePath}")
         }
         iosTarget.binaries.framework {
             baseName = "PlainShared"
             isStatic = true
             debuggable = kotlinDebuggable
-            linkerOpts("-L${rustTargetDir.get().asFile.absolutePath}/$rustTarget/release", "-lplain_prefs_mobile")
+            linkerOpts("-L${rustTargetDir.get().asFile.absolutePath}/$rustTarget/release", "-lplain_rust")
         }
         tasks.matching { it.name.startsWith("link") && it.name.contains(iosTarget.name.replaceFirstChar { c -> c.uppercase() }) }.configureEach {
-            dependsOn(buildRustPrefs)
+            dependsOn(buildPlainRust)
         }
     }
 

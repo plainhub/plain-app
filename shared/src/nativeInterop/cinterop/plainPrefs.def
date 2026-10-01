@@ -1,2 +1,2 @@
-headers = plain_prefs_mobile.h
+headers = plain_rust.h
 package = com.ismartcoding.plain.rustprefs

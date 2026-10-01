@@ -2,7 +2,7 @@ package com.ismartcoding.plain.preferences
 
 internal actual object RustPrefsBridge {
     init {
-        System.loadLibrary("plain_prefs_mobile")
+        System.loadLibrary("plain_rust")
     }
 
     private external fun openNative(path: String)

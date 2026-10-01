@@ -1,5 +1,5 @@
-#ifndef PLAIN_PREFS_MOBILE_H
-#define PLAIN_PREFS_MOBILE_H
+#ifndef PLAIN_RUST_H
+#define PLAIN_RUST_H
 
 char *plain_prefs_open(const char *path);
 char *plain_prefs_snapshot(void);

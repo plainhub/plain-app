@@ -144,7 +144,7 @@ android {
     sourceSets.getByName("main").jniLibs.srcDir(layout.buildDirectory.dir("generated/rustJniLibs").get().asFile)
 }
 
-val rustPrefsDir = rootProject.file("rust/plain-prefs-mobile")
+val rustCoreDir = rootProject.file("rust/plain-rust")
 val rustTargetDir = layout.buildDirectory.dir("rust-target")
 val rustAbi = providers.gradleProperty("abiFilters").orNull?.split(';')?.singleOrNull() ?: "arm64-v8a"
 val rustAndroidTarget = when (rustAbi) {
@@ -174,30 +174,30 @@ val installRustAndroidTarget by tasks.registering(Exec::class) {
     commandLine("rustup", "target", "add", rustAndroidTarget)
 }
 
-val buildRustPrefsAndroid by tasks.registering(Exec::class) {
+val buildPlainRustAndroid by tasks.registering(Exec::class) {
     dependsOn(installRustAndroidTarget)
-    inputs.file(File(rustPrefsDir, "Cargo.toml"))
-    inputs.file(File(rustPrefsDir, "Cargo.lock"))
-    inputs.dir(File(rustPrefsDir, "src"))
-    outputs.file(rustTargetDir.map { it.file("$rustAndroidTarget/release/libplain_prefs_mobile.so") })
+    inputs.file(File(rustCoreDir, "Cargo.toml"))
+    inputs.file(File(rustCoreDir, "Cargo.lock"))
+    inputs.dir(File(rustCoreDir, "src"))
+    outputs.file(rustTargetDir.map { it.file("$rustAndroidTarget/release/libplain_rust.so") })
     environment("CARGO_TARGET_DIR", rustTargetDir.get().asFile.absolutePath)
     environment("CARGO_TARGET_${rustAndroidTarget.uppercase().replace('-', '_')}_LINKER", androidClang.absolutePath)
     environment("CC_${rustAndroidTarget.replace('-', '_')}", androidClang.absolutePath)
     environment("AR_${rustAndroidTarget.replace('-', '_')}", File(ndkHost, "bin/llvm-ar").absolutePath)
     environment("CARGO_TARGET_${rustAndroidTarget.uppercase().replace('-', '_')}_AR", File(ndkHost, "bin/llvm-ar").absolutePath)
-    commandLine("cargo", "build", "--locked", "--manifest-path", File(rustPrefsDir, "Cargo.toml"), "--release", "--target", rustAndroidTarget)
+    commandLine("cargo", "build", "--locked", "--manifest-path", File(rustCoreDir, "Cargo.toml"), "--release", "--target", rustAndroidTarget)
 }
 
-val packageRustPrefsAndroid by tasks.registering(Sync::class) {
-    dependsOn(buildRustPrefsAndroid)
-    from(rustTargetDir.map { it.file("$rustAndroidTarget/release/libplain_prefs_mobile.so") })
+val packagePlainRustAndroid by tasks.registering(Sync::class) {
+    dependsOn(buildPlainRustAndroid)
+    from(rustTargetDir.map { it.file("$rustAndroidTarget/release/libplain_rust.so") })
     into(layout.buildDirectory.dir("generated/rustJniLibs"))
     eachFile { path = "$rustAbi/$name" }
     includeEmptyDirs = false
 }
 
 tasks.matching { it.name.startsWith("merge") && it.name.endsWith("JniLibFolders") }.configureEach {
-    dependsOn(packageRustPrefsAndroid)
+    dependsOn(packagePlainRustAndroid)
 }
 
 tasks.withType<KotlinCompile>().configureEach {
