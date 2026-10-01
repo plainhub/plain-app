@@ -159,13 +159,6 @@ kotlin {
             // Activity Compose (LocalActivity)
             implementation(libs.compose.activity)
 
-            // CameraX (ScanPage, ScanCameraView)
-            implementation(libs.camera.core)
-            implementation(libs.camera.camera2)
-            implementation(libs.camera.lifecycle)
-            implementation(libs.camera.view)
-            implementation(libs.camera.compose)
-
             // Transitions (UI animations)
             implementation(libs.androidx.transition)
 

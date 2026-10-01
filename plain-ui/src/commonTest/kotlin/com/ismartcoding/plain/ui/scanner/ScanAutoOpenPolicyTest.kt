@@ -1,6 +1,6 @@
-package com.ismartcoding.plain.tests
+package com.ismartcoding.plain.ui.scanner
 
-import com.ismartcoding.plain.ui.page.scan.ScanAutoOpenPolicy
+import com.ismartcoding.plain.ui.scanner.ScanAutoOpenPolicy
 import kotlin.test.Test
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue

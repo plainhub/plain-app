@@ -121,6 +121,10 @@ fun ViewImageBottomSheet(
     }
 
     if (showQrScanResult) {
-        QrScanResultBottomSheet(qrScanResult) { showQrScanResult = false }
+        QrScanResultBottomSheet(
+            qrScanResult,
+            title = stringResource(Res.string.scan_result),
+            copyLabel = stringResource(Res.string.scan_result),
+        ) { showQrScanResult = false }
     }
 }

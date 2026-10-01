@@ -1,7 +1,6 @@
-package com.ismartcoding.plain.tests
+package com.ismartcoding.plain.ui.scanner
 
-import com.ismartcoding.plain.platform.ScannedCode
-import com.ismartcoding.plain.ui.page.scan.ScanCodeTracker
+import com.ismartcoding.plain.ui.scanner.ScannedCode
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue

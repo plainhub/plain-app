@@ -1,4 +1,4 @@
-package com.ismartcoding.plain.ui.page.scan.components
+package com.ismartcoding.plain.ui.scanner.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -13,8 +13,8 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.IntOffset
 import coil3.compose.AsyncImage
-import com.ismartcoding.plain.platform.ScannedCode
-import com.ismartcoding.plain.platform.ScannedImage
+import com.ismartcoding.plain.ui.scanner.ScannedCode
+import com.ismartcoding.plain.ui.scanner.ScannedImage
 import kotlin.math.roundToInt
 
 /** Aspect-fit rect of an image displayed inside a view, in px. */

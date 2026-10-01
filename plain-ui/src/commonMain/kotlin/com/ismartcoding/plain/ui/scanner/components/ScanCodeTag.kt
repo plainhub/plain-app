@@ -1,6 +1,5 @@
-package com.ismartcoding.plain.ui.page.scan.components
+package com.ismartcoding.plain.ui.scanner.components
 
-import com.ismartcoding.plain.i18n.*
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
