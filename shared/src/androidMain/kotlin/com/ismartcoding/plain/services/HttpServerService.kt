@@ -1,5 +1,7 @@
 package com.ismartcoding.plain.services
 
+import com.ismartcoding.plain.preferences.*
+
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.content.pm.ServiceInfo
@@ -47,8 +49,8 @@ class HttpServerService : LifecycleService() {
             context = this,
             isActive = { HttpServerManager.serverState.value == HttpServerState.ON },
             hostnameProvider = { TempData.mdnsHostname },
-            httpPortProvider = { TempData.httpPort.value },
-            httpsPortProvider = { TempData.httpsPort.value },
+            httpPortProvider = { UserPrefs.httpPort.value },
+            httpsPortProvider = { UserPrefs.httpsPort.value },
         ).also { it.start() }
     }
 

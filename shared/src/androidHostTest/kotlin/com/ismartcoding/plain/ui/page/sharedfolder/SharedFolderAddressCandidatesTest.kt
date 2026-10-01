@@ -1,5 +1,7 @@
 package com.ismartcoding.plain.ui.page.sharedfolder
 
+import com.ismartcoding.plain.preferences.*
+
 import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.db.DMessageShare
 import com.ismartcoding.plain.db.DSharePeerInfo
@@ -36,7 +38,7 @@ class SharedFolderAddressCandidatesTest {
     @Test
     fun ownCardLeadsWithCurrentLocalEndpoints() {
         TempData.clientId = "self"
-        TempData.httpsPort.value = 9999
+        UserPrefs.httpsPort.value = 9999
         try {
             val candidates = addressCandidates(msg("self", ip = "10.0.0.9", port = 8443))
             assertEquals(
@@ -54,14 +56,14 @@ class SharedFolderAddressCandidatesTest {
             )
         } finally {
             TempData.clientId = ""
-            TempData.httpsPort.value = 8443
+            UserPrefs.httpsPort.value = 8443
         }
     }
 
     @Test
     fun ownCardWithoutServerPortFallsBackToRecordedEndpoint() {
         TempData.clientId = "self"
-        TempData.httpsPort.value = 0
+        UserPrefs.httpsPort.value = 0
         try {
             assertEquals(
                 listOf("10.0.0.9:8443"),
@@ -70,14 +72,14 @@ class SharedFolderAddressCandidatesTest {
             )
         } finally {
             TempData.clientId = ""
-            TempData.httpsPort.value = 8443
+            UserPrefs.httpsPort.value = 8443
         }
     }
 
     @Test
     fun sameHostPortCandidatesCollapseToOne() {
         TempData.clientId = "self"
-        TempData.httpsPort.value = 8443
+        UserPrefs.httpsPort.value = 8443
         try {
             val ip = com.ismartcoding.plain.platform.getDeviceIP4()
             if (ip.isEmpty()) return
@@ -89,7 +91,7 @@ class SharedFolderAddressCandidatesTest {
             )
         } finally {
             TempData.clientId = ""
-            TempData.httpsPort.value = 8443
+            UserPrefs.httpsPort.value = 8443
         }
     }
 }

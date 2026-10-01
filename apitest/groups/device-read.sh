@@ -148,36 +148,27 @@ else
 fi
 
 # ----------------------------------------------------------------------------
-# device-read-C07  prefsPath file exists on device
+# device-read-C07  userPrefs returns native JSON
 # ----------------------------------------------------------------------------
-DSP=$(call_gql '{ prefsPath }')
-api_dsp=$(printf '%s' "$DSP" | jq -r '.data.prefsPath')
-# Strip the leading slash segments the API returns and check existence via run-as
-adb_dsp_exists=$(adb_sh "run-as com.ismartcoding.plain.debug test -f $api_dsp && echo yes || echo no" 2>/dev/null | tr -d '\r')
-if [[ "$adb_dsp_exists" == "yes" ]]; then
-  pass "device-read-C07 prefsPath ($api_dsp) exists on device"
+PREFS=$(call_gql '{ userPrefs }')
+api_user_prefs_type=$(printf '%s' "$PREFS" | jq -r '.data.userPrefs | type')
+if [[ "$api_user_prefs_type" == "object" ]]; then
+  pass "device-read-C07 userPrefs returns native JSON object"
 else
-  fail "device-read-C07 prefsPath ($api_dsp) does not exist on device"
+  fail "device-read-C07 userPrefs type: $api_user_prefs_type"
 fi
 
 # ----------------------------------------------------------------------------
-# device-read-C08  prefEntries returns a list (possibly empty)
+# device-read-C08  systemPrefs returns native JSON
 # ----------------------------------------------------------------------------
-DSE=$(call_gql '{ prefEntries { key value } }')
+DSE=$(call_gql '{ systemPrefs }')
 echo "$DSE" > "$RESULTS_DIR/device-read-prefs.json"
-api_dse_count=$(printf '%s' "$DSE" | jq '.data.prefEntries | length')
-[[ "$api_dse_count" -ge 0 ]] && pass "device-read-C08 prefEntries returns a list (length=$api_dse_count)" \
-                             || fail "device-read-C08 prefEntries not a list"
-
-# device-read-C08b  every entry has a non-empty key
-api_dse_nokey=$(printf '%s' "$DSE" | jq '[.data.prefEntries[] | select(.key == "" or .key == null)] | length')
-[[ "$api_dse_nokey" == "0" ]] && pass "device-read-C08b prefEntries every entry has a key ($api_dse_count entries)" \
-                                || fail "device-read-C08b prefEntries has $api_dse_nokey entries with no key"
-
-PREFS=$(call_gql '{ prefs { key value } }')
-api_prefs_invalid=$(printf '%s' "$PREFS" | jq '[.data.prefs[] | select(.key == "" or (.key | startswith("admin.")))] | length')
-[[ "$api_prefs_invalid" == "0" ]] && pass "device-read-C08c prefs exposes only unprefixed keys" \
-                                  || fail "device-read-C08c prefs contains invalid keys"
+api_system_prefs_type=$(printf '%s' "$DSE" | jq -r '.data.systemPrefs | type')
+if [[ "$api_system_prefs_type" == "object" ]]; then
+  pass "device-read-C08 systemPrefs returns native JSON object"
+else
+  fail "device-read-C08 systemPrefs type: $api_system_prefs_type"
+fi
 
 # ----------------------------------------------------------------------------
 # device-read-C09  dbPath matches the device's databases/plain.db

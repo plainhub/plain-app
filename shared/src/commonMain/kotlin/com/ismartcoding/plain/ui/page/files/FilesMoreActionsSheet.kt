@@ -1,5 +1,7 @@
 package com.ismartcoding.plain.ui.page.files
 
+import com.ismartcoding.plain.preferences.*
+
 import com.ismartcoding.plain.i18n.*
 
 import androidx.compose.foundation.clickable
@@ -17,7 +19,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import com.ismartcoding.plain.features.file.ZipBrowserHelper
-import com.ismartcoding.plain.preferences.ShowHiddenFilesPreference
 import com.ismartcoding.plain.ui.base.BottomSpace
 import com.ismartcoding.plain.ui.base.PListItem
 import com.ismartcoding.plain.ui.base.PModalBottomSheet
@@ -45,7 +46,7 @@ fun FilesMoreActionsSheet(filesVM: FilesViewModel, onDismiss: () -> Unit) {
     val scope = rememberCoroutineScope()
     var showHiddenFiles by remember { mutableStateOf(false) }
     LaunchedEffect(Unit) {
-        showHiddenFiles = ShowHiddenFilesPreference.getAsync()
+        showHiddenFiles = UserPrefs.showHiddenFiles.value
     }
     val isZip = ZipBrowserHelper.isZipPath(filesVM.selectedPath)
 
@@ -69,7 +70,7 @@ fun FilesMoreActionsSheet(filesVM: FilesViewModel, onDismiss: () -> Unit) {
                         .clickable {
                             onDismiss()
                             scope.launch(Dispatchers.Default) {
-                                ShowHiddenFilesPreference.putAsync(!showHiddenFiles)
+                                UserPrefs.showHiddenFiles.value = !showHiddenFiles
                                 filesVM.loadAsync()
                             }
                         },
@@ -79,7 +80,7 @@ fun FilesMoreActionsSheet(filesVM: FilesViewModel, onDismiss: () -> Unit) {
                         PSwitch(activated = showHiddenFiles, onClick = {
                             onDismiss()
                             scope.launch(Dispatchers.Default) {
-                                ShowHiddenFilesPreference.putAsync(!showHiddenFiles)
+                                UserPrefs.showHiddenFiles.value = !showHiddenFiles
                                 filesVM.loadAsync()
                             }
                         })

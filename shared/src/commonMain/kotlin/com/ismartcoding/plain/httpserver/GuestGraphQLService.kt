@@ -1,5 +1,7 @@
 package com.ismartcoding.plain.httpserver
 
+import com.ismartcoding.plain.preferences.*
+
 import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.features.share.ShareManager
 import com.ismartcoding.plain.lib.kgraphql.GraphqlRequest
@@ -48,7 +50,7 @@ class GuestGraphQLService private constructor(
      * are delegated to [TokenGraphQLHandler].
      */
     suspend fun handle(call: HttpCall) {
-        if (!TempData.serviceEnabled.value) {
+        if (!UserPrefs.service.value) {
             call.respondNoBody(HttpStatus.FORBIDDEN)
             return
         }

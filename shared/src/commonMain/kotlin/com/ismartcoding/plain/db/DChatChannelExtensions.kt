@@ -1,4 +1,6 @@
 package com.ismartcoding.plain.db
+
+import com.ismartcoding.plain.preferences.*
 import com.ismartcoding.plain.platform.AppDatabase
 
 import kotlin.io.encoding.ExperimentalEncodingApi
@@ -39,7 +41,7 @@ suspend fun DChatChannel.getPeersAsync(): List<DPeer> = withIO {
                 id = peerId,
                 name = TempData.deviceName.value,
                 ip = getDeviceIP4s().joinToString(","),
-                port = TempData.httpsPort.value,
+                port = UserPrefs.httpsPort.value,
                 publicKey = SignatureHelper.getRawPublicKeyBase64Async(),
                 deviceType = DeviceType.PHONE,
             )
@@ -53,7 +55,7 @@ fun mePeer(): DPeer = DPeer(
     id = TempData.clientId,
     name = TempData.deviceName.value,
     ip = getDeviceIP4s().joinToString(","),
-    port = TempData.httpsPort.value,
+    port = UserPrefs.httpsPort.value,
     deviceType = DeviceType.PHONE,
 )
 

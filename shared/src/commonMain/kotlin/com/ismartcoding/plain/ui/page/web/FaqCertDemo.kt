@@ -1,5 +1,7 @@
 package com.ismartcoding.plain.ui.page.web
 
+import com.ismartcoding.plain.preferences.*
+
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateFloat
@@ -54,7 +56,7 @@ import com.ismartcoding.plain.ui.resources.triangle_alert as ui_drawable_triangl
 
 @Composable
 fun FaqCertDemo() {
-    val port = TempData.httpsPort.collectAsState()
+    val port = UserPrefs.httpsPort.collectAsState()
     val host = UrlHelper.buildUrl("https", demoServerIp(), port.value).removePrefix("https://")
 
     DemoPlayer(

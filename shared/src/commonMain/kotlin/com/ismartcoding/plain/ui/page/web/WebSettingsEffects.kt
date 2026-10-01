@@ -1,5 +1,7 @@
 package com.ismartcoding.plain.ui.page.web
 
+import com.ismartcoding.plain.preferences.*
+
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
@@ -21,8 +23,6 @@ import com.ismartcoding.plain.lib.sendEvent
 import com.ismartcoding.plain.platform.isGranted
 import com.ismartcoding.plain.platform.isIgnoringBatteryOptimizations
 import com.ismartcoding.plain.platform.toggleNotificationListener
-import com.ismartcoding.plain.preferences.ApiPermissionsPreference
-import com.ismartcoding.plain.preferences.DesktopAccessPreference
 import com.ismartcoding.plain.ui.helpers.DialogHelper
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
@@ -45,7 +45,7 @@ internal fun WebSettingsEffects(
                     systemAlertWindow.value = Permission.SYSTEM_ALERT_WINDOW.isGranted()
                     notificationListenerGranted.value = Permission.NOTIFICATION_LISTENER.isGranted()
                     if (event.map[Permission.NOTIFICATION_LISTENER.toSysPermission()] == true) {
-                        toggleNotificationListener(DesktopAccessPreference.getAsync())
+                        toggleNotificationListener(UserPrefs.desktopAccess.value)
                     }
                 }
                 is WindowFocusChangedEvent -> {
@@ -67,13 +67,13 @@ internal fun WebSettingsEffects(
 
 internal fun togglePermission(scope: CoroutineScope, m: PermissionItem, enable: Boolean) {
     scope.launch {
-        ApiPermissionsPreference.putAsync(m.permission, enable)
+        SystemPrefs.setApiPermission(m.permission, enable)
         // The web `permissions` list is backed by this preference and toggling
         // a switch never produces a PermissionsResultEvent — push the fresh
         // snapshot so web clients refetch.
         sendEvent(WebSocketEvent(EventType.PERMISSIONS_UPDATED, jsonEncode(getGrantedWebPermissionsAsync())))
         if (m.permission == Permission.NOTIFICATION_LISTENER) {
-            val webEnabled = DesktopAccessPreference.getAsync()
+            val webEnabled = UserPrefs.desktopAccess.value
             toggleNotificationListener(enable && webEnabled)
         }
         // ClipboardWatcher listens for this to start/stop its logcat thread.

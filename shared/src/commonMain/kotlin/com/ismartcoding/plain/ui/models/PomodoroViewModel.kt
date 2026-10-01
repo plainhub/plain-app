@@ -1,5 +1,6 @@
 package com.ismartcoding.plain.ui.models
 
+import com.ismartcoding.plain.preferences.*
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
@@ -10,7 +11,6 @@ import com.ismartcoding.plain.data.DPomodoroSettings
 import com.ismartcoding.plain.platform.AppDatabase
 import com.ismartcoding.plain.db.DPomodoroItem
 import com.ismartcoding.plain.lib.TimeHelper
-import com.ismartcoding.plain.preferences.PomodoroSettingsPreference
 import com.ismartcoding.plain.ui.page.pomodoro.PomodoroState
 import com.ismartcoding.plain.platform.showPomodoroNotification
 import com.ismartcoding.plain.platform.playPomodoroCompletionSound
@@ -45,7 +45,7 @@ class PomodoroViewModel : ViewModel() {
 
     suspend fun loadAsync() {
         val today = getCurrentDateString()
-        settings.value = PomodoroSettingsPreference.getValueAsync()
+        settings.value = UserPrefs.pomodoroSettingsValue()
         withIO {
             todayRecord.value = pomodoroDao.getByDate(today)
             completedCount.intValue = todayRecord.value?.completedCount ?: 0

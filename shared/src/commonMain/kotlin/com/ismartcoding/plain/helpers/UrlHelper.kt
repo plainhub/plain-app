@@ -1,5 +1,7 @@
 package com.ismartcoding.plain.helpers
 
+import com.ismartcoding.plain.preferences.*
+
 import androidx.compose.runtime.mutableStateMapOf
 import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.lib.TimeHelper
@@ -29,25 +31,25 @@ object UrlHelper {
         val id = TimeHelper.nowMillis().toString()
         mediaPathMap[id] = path
         val extension = path.getFilenameExtension()
-        return buildUrl("http", getDeviceIP4(), TempData.httpPort.value, "/media/$id.$extension")
+        return buildUrl("http", getDeviceIP4(), UserPrefs.httpPort.value, "/media/$id.$extension")
     }
 
     fun getAlbumArtHttpUrl(albumUri: String): String {
         val id = "art_${TimeHelper.nowMillis()}"
         mediaPathMap[id] = albumUri
-        return buildUrl("http", getDeviceIP4(), TempData.httpPort.value, "/media/$id.jpg")
+        return buildUrl("http", getDeviceIP4(), UserPrefs.httpPort.value, "/media/$id.jpg")
     }
 
     fun getCastCallbackUrl(): String {
-        return buildUrl("http", getDeviceIP4(), TempData.httpPort.value, "/callback/cast")
+        return buildUrl("http", getDeviceIP4(), UserPrefs.httpPort.value, "/callback/cast")
     }
 
     fun getHealthCheckUrl(): String {
-        return buildUrl("http", "127.0.0.1", TempData.httpPort.value, "/health")
+        return buildUrl("http", "127.0.0.1", UserPrefs.httpPort.value, "/health")
     }
 
     fun getShutdownUrl(): String {
-        return buildUrl("http", "127.0.0.1", TempData.httpPort.value, "/shutdown")
+        return buildUrl("http", "127.0.0.1", UserPrefs.httpPort.value, "/shutdown")
     }
 
     fun getMediaPath(id: String): String {

@@ -1,4 +1,6 @@
 package com.ismartcoding.plain.ui.page.settings
+
+import com.ismartcoding.plain.preferences.*
 import androidx.compose.foundation.layout.padding
 import com.ismartcoding.plain.ui.theme.PlainTheme
 
@@ -6,11 +8,8 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
+import com.ismartcoding.plain.ui.extensions.collectAsStateValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
@@ -35,8 +34,6 @@ import com.ismartcoding.plain.platform.isBluetoothSupported
 import com.ismartcoding.plain.platform.isDebugBuild
 import com.ismartcoding.plain.platform.isWifiAwareSupported
 import com.ismartcoding.plain.platform.restartServer
-import com.ismartcoding.plain.preferences.AllowAnyHostPreference
-import com.ismartcoding.plain.preferences.DeveloperModePreference
 import com.ismartcoding.plain.ui.base.HorizontalSpace
 import com.ismartcoding.plain.ui.base.PCard
 import com.ismartcoding.plain.ui.base.PListItem
@@ -52,17 +49,15 @@ internal fun DeveloperSettingsCard(
     navController: NavHostController,
 ) {
     val scope = rememberCoroutineScope()
-    var developerMode by remember { mutableStateOf(TempData.developerMode) }
-    var allowAnyHost by remember { mutableStateOf(TempData.allowAnyHost.value) }
+    val developerMode = UserPrefs.developerMode.collectAsStateValue()
+    val allowAnyHost = UserPrefs.allowAnyHost.collectAsStateValue()
 
     PCard(modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN)) {
         PListItem(title = stringResource(Res.string.client_id), value = TempData.clientId)
         PListItem(title = stringResource(Res.string.developer_mode)) {
             PSwitch(activated = developerMode) {
                 scope.launch(Dispatchers.Default) {
-                    developerMode = it
-                    DeveloperModePreference.putAsync(it)
-                    TempData.developerMode = it
+                    UserPrefs.developerMode.value = it
                 }
             }
             HorizontalSpace(8.dp)
@@ -103,8 +98,7 @@ internal fun DeveloperSettingsCard(
                 ) {
                     PSwitch(activated = allowAnyHost) {
                         scope.launch(Dispatchers.Default) {
-                            allowAnyHost = it
-                            AllowAnyHostPreference.putAsync(it)
+                            UserPrefs.allowAnyHost.value = it
                             restartServer()
                         }
                     }

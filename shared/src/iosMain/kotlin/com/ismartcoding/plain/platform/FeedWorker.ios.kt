@@ -1,8 +1,9 @@
 package com.ismartcoding.plain.platform
 
+import com.ismartcoding.plain.preferences.*
+
 import com.ismartcoding.plain.features.feed.FeedFetcher
 import com.ismartcoding.plain.features.feed.FeedWorkerState
-import com.ismartcoding.plain.preferences.FeedAutoRefreshIntervalPreference
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -21,7 +22,7 @@ actual fun feedWorkerStartRepeat() {
     feedRepeatJob = feedWorkerScope.launch {
         while (isActive) {
             FeedFetcher.fetchAll(autoRefresh = true)
-            val intervalSec = FeedAutoRefreshIntervalPreference.getAsync().toLong()
+            val intervalSec = UserPrefs.feedAutoRefreshInterval.value.toLong()
             delay(intervalSec * 1000L)
         }
     }

@@ -1,5 +1,7 @@
 package com.ismartcoding.plain.httpserver
 
+import com.ismartcoding.plain.preferences.*
+
 import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.chat.channel.ChannelCacher
 import com.ismartcoding.plain.chat.peer.PeerCacher
@@ -42,7 +44,7 @@ class PeerGraphQLService private constructor(
      * operation and re-encrypt the response with the same key.
      */
     suspend fun handle(call: HttpCall) {
-        if (!TempData.serviceEnabled.value) {
+        if (!UserPrefs.service.value) {
             LogCat.w("[PeerGraphQL] reject webDisabled")
             call.respondNoBody(HttpStatus.FORBIDDEN)
             return

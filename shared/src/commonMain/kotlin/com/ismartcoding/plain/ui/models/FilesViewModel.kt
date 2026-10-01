@@ -1,5 +1,7 @@
 package com.ismartcoding.plain.ui.models
 
+import com.ismartcoding.plain.preferences.*
+
 import com.ismartcoding.plain.i18n.*
 
 import androidx.compose.runtime.mutableIntStateOf
@@ -29,8 +31,6 @@ import com.ismartcoding.plain.platform.listFilesInDir
 import com.ismartcoding.plain.platform.listZipEntries
 import com.ismartcoding.plain.platform.scanFiles
 import com.ismartcoding.plain.platform.searchFilesByName
-import com.ismartcoding.plain.preferences.LastFilePathPreference
-import com.ismartcoding.plain.preferences.ShowHiddenFilesPreference
 import com.ismartcoding.plain.ui.helpers.DialogHelper
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -51,7 +51,7 @@ class FilesViewModel : ISearchableViewModel<DFile>, ISelectableViewModel<DFile>,
                 viewModelScope.launchSafe {
                     val breadcrumbsCopy = breadcrumbs.toList()
                     val fullPath = if (breadcrumbsCopy.isNotEmpty()) breadcrumbsCopy.last().path else value
-                    LastFilePathPreference.putAsync(FilePathData(rootPath = rootPath, fullPath = fullPath, selectedPath = value))
+                    UserPrefs.setLastFilePath(FilePathData(rootPath = rootPath, fullPath = fullPath, selectedPath = value))
                 }
             }
         }
@@ -128,7 +128,7 @@ class FilesViewModel : ISearchableViewModel<DFile>, ISelectableViewModel<DFile>,
     }
 
     suspend fun loadLastPathAsync() = withIO {
-        val data = LastFilePathPreference.getValueAsync()
+        val data = UserPrefs.lastFilePathValue()
         if (data.selectedPath.isNotEmpty() && fileExists(data.selectedPath)) {
             type = inferFileTypeFromRoot(data.rootPath)
             initSelectedPath(data.rootPath, type, data.selectedPath, data.selectedPath)
@@ -220,7 +220,7 @@ class FilesViewModel : ISearchableViewModel<DFile>, ISelectableViewModel<DFile>,
     fun getQuery(): String = queryText.value.trim()
 
     suspend fun loadAsync() {
-        val showHiddenFiles = ShowHiddenFilesPreference.getAsync()
+        val showHiddenFiles = UserPrefs.showHiddenFiles.value
         withIO {
             isLoading.value = true
             val query = getQuery()

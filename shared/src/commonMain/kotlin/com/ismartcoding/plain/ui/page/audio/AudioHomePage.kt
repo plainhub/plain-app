@@ -1,5 +1,6 @@
 package com.ismartcoding.plain.ui.page.audio
 
+import com.ismartcoding.plain.preferences.*
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -33,7 +34,6 @@ import com.ismartcoding.plain.lib.withIO
 import com.ismartcoding.plain.platform.PBackHandler
 import com.ismartcoding.plain.platform.audioIsPlayingFlow
 import com.ismartcoding.plain.platform.audioJustPlayWithNotificationCheck
-import com.ismartcoding.plain.preferences.AudioSortByPreference
 import com.ismartcoding.plain.ui.base.AnimatedBottomAction
 import com.ismartcoding.plain.ui.components.MediaTopBar
 import com.ismartcoding.plain.ui.base.NeedPermissionColumn
@@ -168,7 +168,7 @@ fun AudioHomePage(
         scrollToTop = { scope.launch { scrollState.scrollToItem(0) } },
         onSortSelected = { sortBy ->
             scope.launch(Dispatchers.Default) {
-                AudioSortByPreference.putAsync(sortBy)
+                UserPrefs.setAudioSortBy(sortBy)
                 audioVM.sortBy.value = sortBy
                 audioVM.loadAsync(tagsVM)
             }

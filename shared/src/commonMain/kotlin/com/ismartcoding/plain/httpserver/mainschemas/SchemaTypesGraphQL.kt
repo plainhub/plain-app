@@ -39,6 +39,7 @@ import com.ismartcoding.plain.httpserver.models.MergeTaskStatus
 import kotlin.time.Instant
 
 fun SchemaBuilder.addMainSchemaTypes() {
+    jsonScalar()
     // Main is a superset of the peer schema (peer chat items also flow through
     // the authenticated schema), so reuse its shared types without duplicating.
     addPeerSchemaTypes()

@@ -26,6 +26,13 @@ open class ArgumentTransformer(val schema : DefaultSchema) {
                     transformValue(type, subValue, variables)
                 }
             }
+            type.unwrapped().kClass == kotlinx.serialization.json.JsonElement::class -> {
+                @Suppress("UNCHECKED_CAST")
+                deserializeScalar(
+                    schema.model.scalars[kType.kClass()] as Type.Scalar<Any>,
+                    value,
+                )
+            }
             value is ValueNode.ObjectValueNode -> {
                 val kClass = type.unwrapped().kClass ?: throw GraphQLError("Cannot get KClass from type", value)
 

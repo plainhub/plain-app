@@ -1,5 +1,7 @@
 package com.ismartcoding.plain.ui.components
 
+import com.ismartcoding.plain.preferences.*
+
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -23,16 +25,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import com.ismartcoding.plain.TempData
-import com.ismartcoding.plain.preferences.HttpsPreference
 import kotlinx.coroutines.launch
 
 /**
  * Swipeable http/https address pager with page indicator dots. The selected
- * page is persisted to HttpsPreference so every placement stays in sync.
+ * page is persisted to UserPrefs.https so every placement stays in sync.
  */
 @Composable
 fun WebAddressPager(modifier: Modifier = Modifier) {
-    val isHttps = TempData.webHttps.collectAsState()
+    val isHttps = UserPrefs.https.collectAsState()
     val pagerState = rememberPagerState(
         initialPage = if (isHttps.value) 1 else 0,
         pageCount = { 2 },
@@ -42,7 +43,7 @@ fun WebAddressPager(modifier: Modifier = Modifier) {
         snapshotFlow { pagerState.currentPage }.collect { page ->
             val https = page == 1
             if (isHttps.value != https) {
-                scope.launch { HttpsPreference.putAsync(https) }
+                scope.launch { UserPrefs.https.value = https }
             }
         }
     }

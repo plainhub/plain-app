@@ -1,5 +1,7 @@
 package com.ismartcoding.plain.ui.page.home
 
+import com.ismartcoding.plain.preferences.*
+
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.SizeTransform
 import androidx.compose.animation.core.tween
@@ -95,7 +97,7 @@ fun HomePage(
     channelVM: ChannelViewModel,
     onTabSelected: (Int) -> Unit,
 ) {
-    val serviceEnabled = TempData.serviceEnabled.collectAsStateValue()
+    val serviceEnabled = UserPrefs.service.collectAsStateValue()
     var systemAlertWindow by remember { mutableStateOf(Permission.SYSTEM_ALERT_WINDOW.isGranted()) }
     val refreshState = rememberRefreshLayoutState {
         PeerStatusManager.reconnectNow("home_pull_refresh")
@@ -158,7 +160,7 @@ fun HomePage(
                     // (LaunchedEffect(serviceEnabled) won't refire) — restart
                     // the server if the preference is on but it went down
                     // while away.
-                    if (event.hasFocus && TempData.serviceEnabled.value) {
+                    if (event.hasFocus && UserPrefs.service.value) {
                         HttpServerManager.ensureStarted()
                     }
                 }

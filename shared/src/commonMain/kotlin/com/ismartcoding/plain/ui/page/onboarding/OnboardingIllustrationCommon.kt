@@ -1,5 +1,9 @@
 package com.ismartcoding.plain.ui.page.onboarding
 
+import com.ismartcoding.plain.ui.extensions.collectAsStateValue
+
+import com.ismartcoding.plain.preferences.*
+
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.animateFloat
@@ -19,7 +23,6 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.ismartcoding.plain.enums.DarkTheme
 import com.ismartcoding.plain.i18n.*
-import com.ismartcoding.plain.preferences.LocalDarkTheme
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.painterResource
 import com.ismartcoding.plain.ui.resources.Res as UiRes
@@ -33,7 +36,7 @@ import com.ismartcoding.plain.ui.resources.demo_photo_6 as ui_drawable_demo_phot
 // The dark surface ramp is compressed, so containers tuned for light need a
 // visibly lifted dark equivalent to keep the illustrations readable.
 @Composable
-internal fun isDarkTheme() = DarkTheme.isDarkTheme(LocalDarkTheme.current)
+internal fun isDarkTheme() = DarkTheme.isDarkTheme(UserPrefs.darkTheme.collectAsStateValue())
 
 @Composable
 internal fun loopProgress(durationMillis: Int): State<Float> {

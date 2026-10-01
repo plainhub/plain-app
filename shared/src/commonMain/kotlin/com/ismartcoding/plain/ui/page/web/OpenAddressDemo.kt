@@ -1,5 +1,7 @@
 package com.ismartcoding.plain.ui.page.web
 
+import com.ismartcoding.plain.preferences.*
+
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -44,8 +46,8 @@ private const val DEMO_TYPING_MS = 2800L
 
 @Composable
 fun OpenAddressDemo() {
-    val isHttps = TempData.webHttps.collectAsState()
-    val port = if (isHttps.value) TempData.httpsPort.collectAsState() else TempData.httpPort.collectAsState()
+    val isHttps = UserPrefs.https.collectAsState()
+    val port = if (isHttps.value) UserPrefs.httpsPort.collectAsState() else UserPrefs.httpPort.collectAsState()
     val url = remember(isHttps.value, port.value) {
         UrlHelper.buildUrl(if (isHttps.value) "https" else "http", demoServerIp(), port.value)
     }

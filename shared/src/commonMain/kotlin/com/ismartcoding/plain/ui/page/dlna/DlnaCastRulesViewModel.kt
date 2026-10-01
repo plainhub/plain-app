@@ -1,4 +1,6 @@
 package com.ismartcoding.plain.ui.page.dlna
+
+import com.ismartcoding.plain.preferences.*
 import com.ismartcoding.plain.ui.theme.PlainTheme
 
 import com.ismartcoding.plain.i18n.*
@@ -22,9 +24,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
-import com.ismartcoding.plain.preferences.DlnaAllowedSendersPreference
-import com.ismartcoding.plain.preferences.DlnaDeniedSendersPreference
-import com.ismartcoding.plain.preferences.decodeSenderEntry
 import com.ismartcoding.plain.ui.base.BottomSpace
 import com.ismartcoding.plain.ui.base.NoDataColumn
 import com.ismartcoding.plain.ui.base.PCard
@@ -45,21 +44,21 @@ class DlnaCastRulesViewModel : ViewModel() {
 
     fun load() {
         viewModelScope.launchSafe {
-            allowedFlow.value = DlnaAllowedSendersPreference.getAsync().map { decodeSenderEntry(it) }
-            deniedFlow.value = DlnaDeniedSendersPreference.getAsync().map { decodeSenderEntry(it) }
+            allowedFlow.value = UserPrefs.dlnaAllowedSenders.value.map { Prefs.decodeSenderEntry(it) }
+            deniedFlow.value = UserPrefs.dlnaDeniedSenders.value.map { Prefs.decodeSenderEntry(it) }
         }
     }
 
     fun removeAllowed(ip: String) {
         viewModelScope.launchSafe {
-            DlnaAllowedSendersPreference.removeAsync(ip)
+            UserPrefs.removeAllowedDlnaSender(ip)
             allowedFlow.value = allowedFlow.value.filter { it.first != ip }
         }
     }
 
     fun removeDenied(ip: String) {
         viewModelScope.launchSafe {
-            DlnaDeniedSendersPreference.removeAsync(ip)
+            UserPrefs.removeDeniedDlnaSender(ip)
             deniedFlow.value = deniedFlow.value.filter { it.first != ip }
         }
     }

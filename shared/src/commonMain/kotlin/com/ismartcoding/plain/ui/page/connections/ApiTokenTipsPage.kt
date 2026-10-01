@@ -1,4 +1,6 @@
 package com.ismartcoding.plain.ui.page.connections
+
+import com.ismartcoding.plain.preferences.*
 import com.ismartcoding.plain.ui.theme.PlainTheme
 
 import com.ismartcoding.plain.i18n.*
@@ -37,7 +39,7 @@ fun ApiTokenTipsPage(
     token: String,
 ) {
     val hostname = remember { TempData.mdnsHostname }
-    val httpPort = TempData.httpPort.collectAsState()
+    val httpPort = UserPrefs.httpPort.collectAsState()
 
     val curlReal = remember(clientId, token, hostname, httpPort.value) {
         """curl -X POST "${UrlHelper.buildUrl("http", hostname, httpPort.value, "/graphql")}" -H "c-id: $clientId" -H "Authorization: Bearer $token" -H "Content-Type: application/json" --data '{"query":"{ app { appVersion } }"}'"""

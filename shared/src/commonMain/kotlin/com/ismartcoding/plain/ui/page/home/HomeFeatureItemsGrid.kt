@@ -37,8 +37,6 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.ismartcoding.plain.enums.AppFeatureType
-import com.ismartcoding.plain.preferences.HomeFeaturesPreference
-import com.ismartcoding.plain.preferences.appPreferences
 import com.ismartcoding.plain.ui.base.reorderable.ReorderableItem
 import com.ismartcoding.plain.ui.base.reorderable.rememberReorderableLazyGridState
 import com.ismartcoding.plain.ui.extensions.collectAsStateValue
@@ -55,18 +53,16 @@ fun HomeFeatureItemsGrid(
 ) {
     val scope = rememberCoroutineScope()
 
-    val featuresStr = remember {
-        appPreferences.snapshots.map { HomeFeaturesPreference.get(it) }
-    }.collectAsStateValue(initial = HomeFeaturesPreference.default)
+    val featuresStr = UserPrefs.homeFeatures.collectAsStateValue()
 
     var enabledIds by remember(featuresStr) {
-        mutableStateOf(HomeFeaturesPreference.parseList(featuresStr.ifEmpty { HomeFeaturesPreference.default }))
+        mutableStateOf(UserPrefs.parseFeatures(featuresStr.ifEmpty { UserPrefs.homeFeatures.default }))
     }
 
     fun persist(newList: List<String>) {
         enabledIds = newList
         scope.launch(Dispatchers.Default) {
-            HomeFeaturesPreference.putAsync(HomeFeaturesPreference.formatList(newList))
+            UserPrefs.setHomeFeatures(UserPrefs.formatFeatures(newList))
         }
     }
 

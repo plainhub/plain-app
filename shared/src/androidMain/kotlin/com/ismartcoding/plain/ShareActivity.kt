@@ -1,5 +1,9 @@
 package com.ismartcoding.plain
 
+import com.ismartcoding.plain.ui.extensions.collectAsStateValue
+
+import com.ismartcoding.plain.preferences.*
+
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
@@ -24,8 +28,6 @@ import com.ismartcoding.plain.lib.extensions.parcelable
 import com.ismartcoding.plain.lib.extensions.parcelableArrayList
 import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.platform.LocaleHelper
-import com.ismartcoding.plain.preferences.LocalDarkTheme
-import com.ismartcoding.plain.preferences.SettingsProvider
 import com.ismartcoding.plain.ui.models.ShareViewModel
 import com.ismartcoding.plain.ui.page.share.ShareSheet
 import com.ismartcoding.plain.ui.theme.AppTheme
@@ -52,21 +54,19 @@ class ShareActivity : ComponentActivity() {
         })
         parseIntent(intent)
         setContent {
-            SettingsProvider {
-                AppTheme(
-                    useDarkTheme = DarkTheme.isDarkTheme(LocalDarkTheme.current),
-                    amoledDarkTheme = com.ismartcoding.plain.preferences.LocalAmoledDarkTheme.current,
-                ) {
-                    ShareSheet(
-                        vm,
-                        onDismiss = { finish() },
-                        onSend = { sendAsync() },
-                        onOpen = { openFile() },
-                        onSaveToFiles = { saveToFilesAsync() },
-                        onSaveAsNote = { saveAsNoteAsync() },
-                        onOpenAsText = { openTextAsFile() },
-                    )
-                }
+            AppTheme(
+                useDarkTheme = DarkTheme.isDarkTheme(UserPrefs.darkTheme.collectAsStateValue()),
+                amoledDarkTheme = UserPrefs.amoledDarkTheme.collectAsStateValue(),
+            ) {
+                ShareSheet(
+                    vm,
+                    onDismiss = { finish() },
+                    onSend = { sendAsync() },
+                    onOpen = { openFile() },
+                    onSaveToFiles = { saveToFilesAsync() },
+                    onSaveAsNote = { saveAsNoteAsync() },
+                    onOpenAsText = { openTextAsFile() },
+                )
             }
         }
     }

@@ -1,5 +1,9 @@
 package com.ismartcoding.plain.ui.base
 
+import com.ismartcoding.plain.ui.extensions.collectAsStateValue
+
+import com.ismartcoding.plain.preferences.*
+
 import com.ismartcoding.plain.i18n.*
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.tween
@@ -32,7 +36,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.ismartcoding.plain.preferences.LocalDarkTheme
 import com.ismartcoding.plain.enums.DarkTheme
 import com.ismartcoding.plain.ui.resources.Res as UiRes
 import com.ismartcoding.plain.ui.resources.circle_alert as ui_drawable_circle_alert
@@ -81,7 +84,7 @@ fun PToast(
                     },
                 shape = RoundedCornerShape(10.dp),
                 colors = CardDefaults.cardColors(
-                    containerColor = if (DarkTheme.isDarkTheme(LocalDarkTheme.current)) Color(0xCC3A3A3C) else Color(0xCC1C1C1E)
+                    containerColor = if (DarkTheme.isDarkTheme(UserPrefs.darkTheme.collectAsStateValue())) Color(0xCC3A3A3C) else Color(0xCC1C1C1E)
                 ),
                 elevation = CardDefaults.cardElevation(
                     defaultElevation = 6.dp

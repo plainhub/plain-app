@@ -1,5 +1,6 @@
 package com.ismartcoding.plain.ui.page.audio
 
+import com.ismartcoding.plain.preferences.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.rememberCoroutineScope
@@ -8,7 +9,6 @@ import com.ismartcoding.plain.platform.isGestureInteractionMode
 import com.ismartcoding.plain.enums.AppFeatureType
 import com.ismartcoding.plain.enums.hasPermission
 import com.ismartcoding.plain.events.PermissionsResultEvent
-import com.ismartcoding.plain.preferences.AudioSortByPreference
 import com.ismartcoding.plain.ui.base.StoragePermissionResumeEffect
 import com.ismartcoding.plain.ui.base.refreshStoragePermission
 import com.ismartcoding.plain.ui.extensions.reset
@@ -33,7 +33,7 @@ internal fun AudioPageEffects(
     val sharedFlow = Channel.sharedFlow
     val reloadAfterGrant: () -> Unit = {
         scope.launch(Dispatchers.Default) {
-            audioVM.sortBy.value = AudioSortByPreference.getValueAsync()
+            audioVM.sortBy.value = UserPrefs.audioSortByValue()
             audioVM.loadAsync(tagsVM)
             audioQueueVM.loadAsync()
             mediaFoldersVM.loadAsync()

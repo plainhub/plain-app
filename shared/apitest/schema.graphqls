@@ -18,9 +18,8 @@ type Query {
   tagRelations(type: DataType!, keys: [String!]!): [TagRelation!]!
   appLogs(offset: Int!, limit: Int!, query: String!): [String!]!
   appLogPath: String!
-  prefs: [KeyValuePair!]!
-  prefsPath: String!
-  prefEntries: [KeyValuePair!]!
+  userPrefs: JSON!
+  systemPrefs: JSON!
   isScreenMirroring: Boolean!
   screenMirrorVideoCodec: ScreenMirrorVideoCodec
   screenMirrorControlEnabled: Boolean!
@@ -135,9 +134,8 @@ type Mutation {
   cancelPairing(deviceId: ID!): Boolean!
   """Respond to an incoming pairing request — accept or reject."""
   respondToPairing(input: PairingRequestInput!, accepted: Boolean!): Boolean!
-  setPref(key: String!, value: String!): KeyValuePair!
-  deletePref(key: String!): Boolean!
-  deletePrefEntry(key: String!): Boolean!
+  setUserPref(key: String!, value: JSON!): Boolean!
+  removeUserPref(key: String!): Boolean!
   startScreenMirror(audio: Boolean!): Boolean!
   requestScreenMirrorAudio: Boolean!
   stopScreenMirror: Boolean!
@@ -925,6 +923,8 @@ enum ImageSearchStatusType {
 
 """ISO-8601 / RFC 3339 UTC timestamp string, e.g. 2026-09-20T12:34:56.789Z"""
 scalar Instant
+
+scalar JSON
 
 type KeyValuePair {
   key: String!

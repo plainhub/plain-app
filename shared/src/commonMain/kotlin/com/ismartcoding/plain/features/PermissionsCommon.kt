@@ -1,11 +1,12 @@
 package com.ismartcoding.plain.features
+
+import com.ismartcoding.plain.preferences.*
 import com.ismartcoding.plain.platform.isGranted
 import com.ismartcoding.plain.platform.Permission
 
 import com.ismartcoding.plain.enums.AppFeatureType
 import com.ismartcoding.plain.enums.has
 import com.ismartcoding.plain.i18n.*
-import com.ismartcoding.plain.preferences.ApiPermissionsPreference
 import com.ismartcoding.plain.ui.resources.Res as UiRes
 import com.ismartcoding.plain.ui.resources.call_log as ui_drawable_call_log
 import com.ismartcoding.plain.ui.resources.contact_round as ui_drawable_contact_round
@@ -17,7 +18,7 @@ import com.ismartcoding.plain.ui.resources.phone_call as ui_drawable_phone_call
 import com.ismartcoding.plain.i18n.folder
 
 suspend fun checkEnabledAsync(permissions: Set<Permission>) {
-    val apiPermissions = ApiPermissionsPreference.getAsync().toMutableSet()
+    val apiPermissions = SystemPrefs.apiPermissions.value.toMutableSet()
     if (apiPermissions.contains(Permission.WRITE_CONTACTS.toString())) {
         apiPermissions.add(Permission.READ_CONTACTS.toString())
     }
@@ -62,7 +63,7 @@ fun getWebList(): List<PermissionItem> {
  * snapshot.
  */
 suspend fun getGrantedWebPermissionsAsync(): List<Permission> {
-    val apiPermissions = ApiPermissionsPreference.getAsync()
+    val apiPermissions = SystemPrefs.apiPermissions.value
     val granted = Permission.entries.filter { apiPermissions.contains(it.name) && it.isGranted() }.toMutableList()
     if (Permission.RECORD_AUDIO.isGranted() && !granted.contains(Permission.RECORD_AUDIO)) {
         granted.add(Permission.RECORD_AUDIO)

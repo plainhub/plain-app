@@ -5,7 +5,7 @@ import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.enums.DarkTheme
 import com.ismartcoding.plain.platform.randomPassword
 
-fun DarkThemePreference.setDarkMode(theme: DarkTheme) {
+fun SystemPrefs.setDarkMode(theme: DarkTheme) {
     when (theme) {
         DarkTheme.ON -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
         DarkTheme.OFF -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
@@ -13,15 +13,10 @@ fun DarkThemePreference.setDarkMode(theme: DarkTheme) {
     }
 }
 
-suspend fun DarkThemePreference.putAsync(value: DarkTheme) {
-    putAsync(value.value)   // calls the base member putAsync(Int)
-    setDarkMode(value)
-}
-
-suspend fun AdbTokenPreference.ensureValueAsync(preferences: PreferenceSnapshot) {
-    TempData.adbToken = get(preferences)
+fun SystemPrefs.ensureAdbToken() {
+    TempData.adbToken = SystemPrefs.adbToken.value
     if (TempData.adbToken.isEmpty()) {
         TempData.adbToken = randomPassword(32)
-        putAsync(TempData.adbToken)
+        adbToken.value = TempData.adbToken
     }
 }

@@ -19,7 +19,7 @@ import java.io.File
  * URIs, derives the extension from the DAppFile mimeType, renames the file on
  * disk, updates DAppFile.realPath, and rewrites the DChat content.
  *
- * Guarded by [FidUriExtMigratedPreference] so it only runs once.
+ * Guarded by [SystemPrefs.fidUriExtMigrated] so it only runs once.
  */
 object ChatFidUriMigration {
 

@@ -1,5 +1,7 @@
 package com.ismartcoding.plain.ui.page.videos
 
+import com.ismartcoding.plain.preferences.*
+
 import com.ismartcoding.plain.i18n.*
 import com.ismartcoding.plain.platform.PBackHandler
 import androidx.compose.animation.AnimatedVisibility
@@ -45,8 +47,6 @@ import com.ismartcoding.plain.features.file.FileSortBy
 import com.ismartcoding.plain.platform.LocaleHelper
 import com.ismartcoding.plain.platform.isGestureInteractionMode
 import com.ismartcoding.plain.lib.Channel
-import com.ismartcoding.plain.preferences.VideoGridCellsPerRowPreference
-import com.ismartcoding.plain.preferences.VideoSortByPreference
 import com.ismartcoding.plain.ui.base.AnimatedBottomAction
 import com.ismartcoding.plain.ui.base.BottomSpace
 import com.ismartcoding.plain.ui.components.MediaTopBar
@@ -118,7 +118,7 @@ fun VideosPage(
     val previewerState = rememberPreviewerState()
     val tagsMapState by tagsVM.tagsMapFlow.collectAsState()
     val bucketsMap by mediaFoldersVM.bucketsMapFlow.collectAsState()
-    val cellsPerRow = remember { mutableIntStateOf(VideoGridCellsPerRowPreference.default) }
+    val cellsPerRow = remember { mutableIntStateOf(UserPrefs.videoGridCellsPerRow.default) }
     val windowInfo = LocalWindowInfo.current
     val imageWidthPx = remember(cellsPerRow.value, windowInfo.containerSize.width) {
         with(density) {
@@ -147,8 +147,8 @@ fun VideosPage(
 
     val reloadAfterGrant: () -> Unit = {
         scope.launch(Dispatchers.Default) {
-            cellsPerRow.value = VideoGridCellsPerRowPreference.getAsync()
-            videosVM.sortBy.value = VideoSortByPreference.getValueAsync()
+            cellsPerRow.value = UserPrefs.videoGridCellsPerRow.value
+            videosVM.sortBy.value = UserPrefs.videoSortByValue()
             videosVM.loadAsync(tagsVM)
             mediaFoldersVM.loadAsync()
         }
@@ -201,7 +201,7 @@ fun VideosPage(
                 scrollToTop = { scope.launch { scrollState.scrollToItem(0) } },
                 onSortSelected = { sortBy ->
                     scope.launch(Dispatchers.Default) {
-                        VideoSortByPreference.putAsync(sortBy)
+                        UserPrefs.setVideoSortBy(sortBy)
                         videosVM.sortBy.value = sortBy
                         videosVM.loadAsync(tagsVM)
                     }
@@ -244,7 +244,7 @@ fun VideosPage(
                                     .nestedScroll(scrollBehavior.nestedScrollConnection)
                                     .gridDragSelect(items = itemsState, state = dragSelectState)
                                     .pinchZoomGrid(cellsPerRow = cellsPerRow, hapticFeedback = hapticFeedback, scope = scope) {
-                                        VideoGridCellsPerRowPreference.putAsync(it)
+                                        UserPrefs.videoGridCellsPerRow.value = it
                                     },
                                 horizontalArrangement = Arrangement.spacedBy(2.dp),
                                 verticalArrangement = Arrangement.spacedBy(2.dp),

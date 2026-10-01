@@ -1,4 +1,6 @@
 package com.ismartcoding.plain.services
+
+import com.ismartcoding.plain.preferences.*
 import com.ismartcoding.plain.appContext
 
 import android.app.PendingIntent
@@ -20,7 +22,6 @@ import androidx.media3.session.MediaSession
 import com.ismartcoding.plain.lib.coMain
 import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.TempData
-import com.ismartcoding.plain.preferences.AudioPlayingPreference
 import com.ismartcoding.plain.enums.AudioAction
 import com.ismartcoding.plain.audio.AudioPlayer
 import com.ismartcoding.plain.enums.AudioServiceAction
@@ -45,10 +46,10 @@ class AudioPlayerService : MediaLibraryService() {
                     val context = appContext
                     val mediaItem = player.currentMediaItem
                     if (mediaItem == null) {
-                        AudioPlayingPreference.putAsync("")
+                        SystemPrefs.setAudioPlaying("")
                         return@coMain
                     }
-                    AudioPlayingPreference.putAsync(mediaItem.mediaId)
+                    SystemPrefs.setAudioPlaying(mediaItem.mediaId)
                     AudioPlayer.setChangedNotify(AudioAction.MEDIA_ITEM_TRANSITION)
                 }
             }
@@ -60,7 +61,7 @@ class AudioPlayerService : MediaLibraryService() {
 
         override fun onPlaybackStateChanged(playbackState: Int) {
             if (playbackState == Player.STATE_ENDED) {
-                if (TempData.audioPlayMode.value == MediaPlayMode.REPEAT_ONE) {
+                if (UserPrefs.audioPlayMode.value == MediaPlayMode.REPEAT_ONE) {
                     AudioPlayer.seekTo(0L)
                 } else {
                     AudioPlayer.skipToNext()

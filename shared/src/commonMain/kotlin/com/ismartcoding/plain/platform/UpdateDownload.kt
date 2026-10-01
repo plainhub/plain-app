@@ -1,10 +1,10 @@
 package com.ismartcoding.plain.platform
 
 /**
- * Download the latest app update from the URL stored in `UpdateInfoPreference`
+ * Download the latest app update from the URL stored in `SystemPrefs.updateInfo`
  * to the platform's cache directory. Reports progress via `UpdateDownloadProgressEvent`,
  * completion via `UpdateDownloadCompleteEvent`, and failures via
- * `UpdateDownloadFailedEvent`. Updates `UpdateInfoPreference.downloadedApkPath`
+ * `UpdateDownloadFailedEvent`. Updates the saved update info's downloadedApkPath.
  * on completion.
  *
  * No-op (emits `UpdateDownloadFailedEvent`) on platforms without an installer

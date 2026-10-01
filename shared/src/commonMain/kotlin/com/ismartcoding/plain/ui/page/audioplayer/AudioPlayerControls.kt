@@ -1,5 +1,7 @@
 package com.ismartcoding.plain.ui.page.audioplayer
 
+import com.ismartcoding.plain.preferences.*
+
 import com.ismartcoding.plain.i18n.*
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -21,8 +23,6 @@ import androidx.compose.ui.unit.dp
 import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.enums.MediaPlayMode
 import com.ismartcoding.plain.platform.audioSetPlaybackSpeed
-import com.ismartcoding.plain.preferences.AudioPlayModePreference
-import com.ismartcoding.plain.preferences.AudioPlaybackSpeedPreference
 import com.ismartcoding.plain.ui.components.mediaviewer.PlaybackSpeedButton
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -66,9 +66,8 @@ fun AudioPlayerControls(
                         MediaPlayMode.REPEAT_ONE -> MediaPlayMode.SHUFFLE
                         MediaPlayMode.SHUFFLE -> MediaPlayMode.REPEAT
                     }
-                    TempData.audioPlayMode.value = nextMode
+                    UserPrefs.audioPlayMode.value = nextMode
                     onPlayModeChange(nextMode)
-                    AudioPlayModePreference.putAsync(nextMode)
                 }
             },
             modifier = Modifier.size(44.dp).clip(CircleShape).background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)),
@@ -140,7 +139,7 @@ fun AudioPlayerControls(
 private fun SpeedButton(speed: Float, scope: CoroutineScope) {
     fun applySpeed(s: Float) {
         audioSetPlaybackSpeed(s)
-        scope.launch { AudioPlaybackSpeedPreference.putAsync(s) }
+        scope.launch { UserPrefs.audioPlaybackSpeed.value = s }
     }
     PlaybackSpeedButton(
         speed = speed,

@@ -1,5 +1,6 @@
 package com.ismartcoding.plain.ui.page.home
 
+import com.ismartcoding.plain.preferences.*
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -44,7 +45,6 @@ import com.ismartcoding.plain.platform.Permission
 import com.ismartcoding.plain.platform.isAppForegrounded
 import com.ismartcoding.plain.platform.isGranted
 import com.ismartcoding.plain.platform.shouldShowRationale
-import com.ismartcoding.plain.preferences.ApiPermissionsPreference
 import com.ismartcoding.plain.ui.base.BottomSpace
 import com.ismartcoding.plain.ui.base.PCard
 import com.ismartcoding.plain.ui.base.PFilledButton
@@ -344,7 +344,7 @@ fun ServiceOnboardingWizard(
                                 busy = true
                                 storageRequest++
                                 scope.launch {
-                                    ApiPermissionsPreference.putAsync(Permission.WRITE_EXTERNAL_STORAGE, true)
+                                    SystemPrefs.setApiPermission(Permission.WRITE_EXTERNAL_STORAGE, true)
                                     sendEvent(RequestPermissionsEvent(Permission.WRITE_EXTERNAL_STORAGE))
                                 }
                             },

@@ -1,5 +1,7 @@
 package com.ismartcoding.plain.ui.page.files
 
+import com.ismartcoding.plain.preferences.*
+
 import com.ismartcoding.plain.i18n.*
 
 import androidx.compose.foundation.ExperimentalFoundationApi
@@ -31,8 +33,6 @@ import com.ismartcoding.plain.platform.appDir
 import com.ismartcoding.plain.platform.getInternalStoragePath
 import com.ismartcoding.plain.platform.openFileExternal
 import com.ismartcoding.plain.platform.shareFile
-import com.ismartcoding.plain.preferences.FileSortByPreference
-import com.ismartcoding.plain.preferences.ShowHiddenFilesPreference
 import com.ismartcoding.plain.ui.base.ActionButtonMoreWithMenu
 import com.ismartcoding.plain.ui.base.ActionButtonSort
 import com.ismartcoding.plain.ui.base.NavigationBackIcon
@@ -81,7 +81,7 @@ fun ZipFilePage(
             val type = if (path.startsWith(appDataPath)) FilesType.APP else FilesType.INTERNAL_STORAGE
             val rootPath = when (type) { FilesType.APP -> appDataPath; else -> getInternalStoragePath() }
             filesVM.initSelectedPath(rootPath, type, zipVirtualRoot, zipVirtualRoot)
-            filesVM.sortBy.value = FileSortByPreference.getValueAsync()
+            filesVM.sortBy.value = UserPrefs.fileSortByValue()
             filesVM.loadAsync()
             audioQueueVM.loadAsync()
         }
@@ -108,7 +108,7 @@ fun ZipFilePage(
 
     if (filesVM.showSortDialog.value) {
         FileSortDialog(filesVM.sortBy, onSelected = {
-            scope.launch(Dispatchers.Default) { FileSortByPreference.putAsync(it); filesVM.sortBy.value = it; filesVM.loadAsync() }
+            scope.launch(Dispatchers.Default) { UserPrefs.setFileSortBy(it); filesVM.sortBy.value = it; filesVM.loadAsync() }
         }, onDismiss = { filesVM.showSortDialog.value = false })
     }
 
@@ -132,7 +132,7 @@ fun ZipFilePage(
                     ActionButtonMoreWithMenu { dismiss ->
                         var showHiddenFiles by remember { mutableStateOf(false) }
                         LaunchedEffect(Unit) {
-                            showHiddenFiles = ShowHiddenFilesPreference.getAsync()
+                            showHiddenFiles = UserPrefs.showHiddenFiles.value
                         }
                         PDropdownMenuItem(
                             text = { Text(stringResource(Res.string.show_hidden_files)) },
@@ -143,7 +143,7 @@ fun ZipFilePage(
                                 dismiss()
                                 scope.launch(Dispatchers.Default) {
                                     val nv = !showHiddenFiles
-                                    ShowHiddenFilesPreference.putAsync(nv)
+                                    UserPrefs.showHiddenFiles.value = nv
                                     showHiddenFiles = nv; filesVM.loadAsync()
                                 }
                             })

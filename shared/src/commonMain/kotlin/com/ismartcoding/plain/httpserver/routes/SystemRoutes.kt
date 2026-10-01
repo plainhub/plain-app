@@ -1,5 +1,6 @@
 package com.ismartcoding.plain.httpserver.routes
 
+import com.ismartcoding.plain.preferences.*
 import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.enums.PasswordType
 import com.ismartcoding.plain.helpers.SignatureHelper
@@ -7,7 +8,6 @@ import com.ismartcoding.plain.lib.coIO
 import com.ismartcoding.plain.platform.chaCha20Decrypt
 import com.ismartcoding.plain.platform.finishHttpServerStopAsync
 import com.ismartcoding.plain.platform.getOwnPackageName
-import com.ismartcoding.plain.preferences.PasswordTypePreference
 import com.ismartcoding.plain.httpserver.HttpServerManager
 import com.ismartcoding.plain.httpserver.closeAllWsSessions
 import com.ismartcoding.plain.httpserver.http.HttpRouter
@@ -90,7 +90,7 @@ fun HttpRouter.addSystemRoutes() {
         }
 
         val signaturePublicKey = SignatureHelper.getRawPublicKeyBase64Async()
-        if (PasswordTypePreference.getValueAsync() == PasswordType.NONE) {
+        if (SystemPrefs.passwordTypeValue() == PasswordType.NONE) {
             val password = HttpServerManager.resetPasswordAsync()
             call.respondJson(InitResponse(signaturePublicKey, password))
         } else {

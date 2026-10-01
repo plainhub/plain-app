@@ -1,5 +1,7 @@
 package com.ismartcoding.plain.features.feed
 
+import com.ismartcoding.plain.preferences.*
+
 import com.ismartcoding.plain.db.DFeed
 import com.ismartcoding.plain.events.EventType
 import com.ismartcoding.plain.events.FeedStatusEvent
@@ -15,7 +17,6 @@ import com.ismartcoding.plain.platform.fetchContentAsync
 import com.ismartcoding.plain.platform.fetchFeedLogoAsync
 import com.ismartcoding.plain.platform.fetchRssChannel
 import com.ismartcoding.plain.platform.getNetworkType
-import com.ismartcoding.plain.preferences.FeedAutoRefreshOnlyWifiPreference
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
@@ -60,7 +61,7 @@ object FeedFetcher {
         supervisorScope {
             if (shouldSkipAutoRefresh(
                     autoRefresh,
-                    FeedAutoRefreshOnlyWifiPreference.getAsync(),
+                    UserPrefs.feedAutoRefreshOnlyWifi.value,
                     getNetworkType(),
                 )
             ) {

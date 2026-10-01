@@ -1,5 +1,7 @@
 package com.ismartcoding.plain.httpserver
 
+import com.ismartcoding.plain.preferences.*
+
 import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.platform.isDebugBuild
 
@@ -14,7 +16,7 @@ import com.ismartcoding.plain.platform.isDebugBuild
  *
  * There is no hardcoded origin allowlist: debug builds always accept any
  * origin, and release builds only accept any origin when the user enables
- * "Allow any host" in Developer settings ([TempData.allowAnyHost]).
+ * "Allow any host" in Developer settings ([UserPrefs.allowAnyHost]).
  * Same-origin requests skip CORS processing (Ktor's
  * `allowSameOrigin` default of `true`). Custom headers prefixed with `c-`
  * (e.g. `c-token`) are advertised as allowed in preflight responses.

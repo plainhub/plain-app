@@ -1,5 +1,7 @@
 package com.ismartcoding.plain.ui.page.cast
 
+import com.ismartcoding.plain.preferences.*
+
 import com.ismartcoding.plain.i18n.*
 
 import androidx.compose.foundation.layout.Arrangement
@@ -27,7 +29,6 @@ import com.ismartcoding.plain.features.dlna.sender.DlnaDeviceScanner
 import com.ismartcoding.plain.events.StartHttpServerEvent
 import com.ismartcoding.plain.lib.sendEvent
 import com.ismartcoding.plain.platform.audioPause
-import com.ismartcoding.plain.preferences.ServicePreference
 import com.ismartcoding.plain.ui.base.BottomSpace
 import com.ismartcoding.plain.ui.base.PBottomSheetTopAppBar
 import com.ismartcoding.plain.ui.base.PModalBottomSheet
@@ -88,8 +89,8 @@ fun CastDialog(castVM: CastViewModel, onDeviceSelected: (() -> Unit)? = null) {
                                 castVM.selectDevice(device.hostAddress)
                                 audioPause()
                                 scope.launch(Dispatchers.Default) {
-                                    if (!ServicePreference.getAsync()) {
-                                        ServicePreference.putAsync(true)
+                                    if (!UserPrefs.service.value) {
+                                        UserPrefs.service.value = true
                                         sendEvent(StartHttpServerEvent())
                                     }
                                 }

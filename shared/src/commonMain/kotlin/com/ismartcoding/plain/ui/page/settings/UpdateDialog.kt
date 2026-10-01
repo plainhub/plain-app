@@ -1,5 +1,9 @@
 package com.ismartcoding.plain.ui.page.settings
 
+import com.ismartcoding.plain.ui.extensions.collectAsStateValue
+
+import com.ismartcoding.plain.preferences.*
+
 import com.ismartcoding.plain.i18n.*
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.heightIn
@@ -25,12 +29,7 @@ import com.ismartcoding.plain.enums.ButtonSize
 import com.ismartcoding.plain.events.DownloadUpdateEvent
 import com.ismartcoding.plain.lib.sendEvent
 import com.ismartcoding.plain.platform.formatDateTime
-import com.ismartcoding.plain.preferences.LocalNewVersion
 import com.ismartcoding.plain.ui.base.PFilledButton
-import com.ismartcoding.plain.preferences.LocalNewVersionLog
-import com.ismartcoding.plain.preferences.LocalNewVersionPublishDate
-import com.ismartcoding.plain.preferences.LocalNewVersionSize
-import com.ismartcoding.plain.preferences.UpdateInfoPreference
 import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.models.UpdateViewModel
 import com.ismartcoding.plain.ui.theme.dialogSheetBackground
@@ -42,10 +41,11 @@ import com.ismartcoding.plain.ui.resources.rocket as ui_drawable_rocket
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun UpdateDialog(updateVM: UpdateViewModel) {
-    val newVersion = LocalNewVersion.current.toVersion()
-    val newVersionPublishDate = LocalNewVersionPublishDate.current
-    val newVersionLog = LocalNewVersionLog.current
-    val newVersionSize = LocalNewVersionSize.current
+    val updateInfo = SystemPrefs.parseUpdateInfo(SystemPrefs.updateInfo.collectAsStateValue())
+    val newVersion = updateInfo.newVersion.toVersion()
+    val newVersionPublishDate = updateInfo.publishDate
+    val newVersionLog = updateInfo.log
+    val newVersionSize = updateInfo.size
     val scope = rememberCoroutineScope()
 
     if (updateVM.updateDialogVisible.value) {
@@ -97,7 +97,7 @@ fun UpdateDialog(updateVM: UpdateViewModel) {
                     text = stringResource(Res.string.skip_this_version),
                     onClick = {
                         scope.launch {
-                            UpdateInfoPreference.updateAsync { it.copy(skipVersion = newVersion.toString()) }
+                            SystemPrefs.updateInfo { it.copy(skipVersion = newVersion.toString()) }
                             updateVM.hideDialog()
                         }
                     },

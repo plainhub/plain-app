@@ -1,5 +1,6 @@
 package com.ismartcoding.plain.platform
 
+import com.ismartcoding.plain.preferences.*
 import com.ismartcoding.plain.appContext
 import com.ismartcoding.plain.i18n.*
 import android.annotation.SuppressLint
@@ -24,7 +25,6 @@ import com.ismartcoding.plain.audio.AudioPlayer
 import com.ismartcoding.plain.audio.fromPath
 import com.ismartcoding.plain.helpers.NotificationHelper
 import com.ismartcoding.plain.lib.TimeHelper
-import com.ismartcoding.plain.preferences.PomodoroSettingsPreference
 import com.ismartcoding.plain.MainActivity
 import com.ismartcoding.plain.ui.page.pomodoro.PomodoroState
 import kotlinx.datetime.TimeZone
@@ -38,7 +38,7 @@ import kotlin.math.sin
 @SuppressLint("MissingPermission")
 actual suspend fun showPomodoroNotification(state: PomodoroState) {
     val context = appContext
-    val settings = PomodoroSettingsPreference.getValueAsync()
+    val settings = UserPrefs.pomodoroSettingsValue()
     if (!settings.showNotification) {
         return
     }

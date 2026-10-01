@@ -3,6 +3,7 @@ package com.ismartcoding.plain.lib.kgraphql
 import com.ismartcoding.plain.lib.kgraphql.context
 import com.ismartcoding.plain.lib.kgraphql.generated.GeneratedSchemaRegistry
 import com.ismartcoding.plain.lib.kgraphql.schema.Schema
+import com.ismartcoding.plain.lib.kgraphql.schema.execution.Executor
 import com.ismartcoding.plain.lib.kgraphql.schema.dsl.SchemaBuilder
 import com.ismartcoding.plain.lib.kgraphql.schema.dsl.types.TypeDSL
 import kotlinx.coroutines.runBlocking
@@ -10,6 +11,7 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonArray
+import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
 import kotlinx.serialization.json.contentOrNull
@@ -250,6 +252,42 @@ class KGraphQLTest {
         val result = executeQuery(schema, "{ isActive }")
         val data = parseData(result)
         assertEquals(true, data["isActive"]?.jsonPrimitive?.booleanOrNull)
+    }
+
+    @Test
+    fun `JSON scalar preserves literal and variable values`() {
+        val schema = KGraphQL.schema {
+            configure { executor = Executor.DataLoaderPrepared }
+            jsonScalar()
+            query("echo") {
+                resolver("value") { value: JsonElement -> value }
+            }
+        }
+
+        val literal = executeQuery(schema, "{ echo(value: {name: \"Ada\", active: true, items: [1, null, \"x\"]}) }")
+        assertEquals(
+            Json.parseToJsonElement("""{"name":"Ada","active":true,"items":[1,null,"x"]}"""),
+            parseData(literal)["echo"],
+        )
+
+        val variable = executeQuery(
+            schema,
+            "query Echo(\$value: JSON!) { echo(value: \$value) }",
+            """{"value":{"nested":[false,2.5]}}""",
+        )
+        assertEquals(
+            Json.parseToJsonElement("""{"nested":[false,2.5]}"""),
+            parseData(variable)["echo"],
+        )
+
+        val array = executeQuery(schema, "{ echo(value: [1, null, \"x\"]) }")
+        assertEquals(
+            Json.parseToJsonElement("[1,null,\"x\"]"),
+            parseData(array)["echo"],
+        )
+
+        val primitive = executeQuery(schema, "{ echo(value: true) }")
+        assertEquals(Json.parseToJsonElement("true"), parseData(primitive)["echo"])
     }
 
     @Test

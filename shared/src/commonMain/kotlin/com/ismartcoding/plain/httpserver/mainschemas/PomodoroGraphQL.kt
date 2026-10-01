@@ -1,5 +1,6 @@
 package com.ismartcoding.plain.httpserver.mainschemas
 
+import com.ismartcoding.plain.preferences.*
 import com.ismartcoding.plain.lib.kgraphql.annotations.GraphQLMutation
 import com.ismartcoding.plain.lib.kgraphql.annotations.GraphQLQuery
 import com.ismartcoding.plain.lib.kgraphql.schema.dsl.SchemaBuilder
@@ -9,7 +10,6 @@ import com.ismartcoding.plain.events.HPomodoroStartEvent
 import com.ismartcoding.plain.events.HPomodoroStopEvent
 import com.ismartcoding.plain.lib.TimeHelper
 import com.ismartcoding.plain.lib.sendEvent
-import com.ismartcoding.plain.preferences.PomodoroSettingsPreference
 import com.ismartcoding.plain.ui.page.pomodoro.PomodoroState
 import com.ismartcoding.plain.httpserver.models.PomodoroSettings
 import com.ismartcoding.plain.httpserver.models.PomodoroToday
@@ -21,7 +21,7 @@ import kotlinx.datetime.toLocalDateTime
 
 @GraphQLQuery
 suspend fun pomodoroSettings(): PomodoroSettings {
-    return PomodoroSettingsPreference.getValueAsync().toModel()
+    return UserPrefs.pomodoroSettingsValue().toModel()
 }
 
 @GraphQLQuery

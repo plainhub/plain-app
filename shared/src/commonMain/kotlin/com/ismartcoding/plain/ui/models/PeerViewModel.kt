@@ -1,16 +1,16 @@
 package com.ismartcoding.plain.ui.models
 
+import com.ismartcoding.plain.preferences.*
+
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.chat.peer.PeerManager
-import com.ismartcoding.plain.preferences.NearbyDiscoverablePreference
 
 class PeerViewModel : ViewModel() {
     fun updateDiscoverable(discoverable: Boolean) {
         viewModelScope.launchSafe {
-            NearbyDiscoverablePreference.putAsync(discoverable)
-            TempData.nearbyDiscoverable = discoverable
+            UserPrefs.nearbyDiscoverable.value = discoverable
         }
     }
 

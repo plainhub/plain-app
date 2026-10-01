@@ -1,9 +1,9 @@
 package com.ismartcoding.plain.features.share
 
+import com.ismartcoding.plain.preferences.*
 import com.ismartcoding.plain.helpers.StringHelper
 import com.ismartcoding.plain.lib.crypto.hmacSha256
 import com.ismartcoding.plain.platform.generateChaCha20Key
-import com.ismartcoding.plain.preferences.MasterSecretPreference
 import kotlin.io.encoding.Base64
 import kotlin.io.encoding.ExperimentalEncodingApi
 
@@ -18,7 +18,7 @@ import kotlin.io.encoding.ExperimentalEncodingApi
 object ShareCrypto {
     @OptIn(ExperimentalEncodingApi::class)
     suspend fun masterSecret(): ByteArray {
-        return Base64.decode(MasterSecretPreference.ensureValueAsync())
+        return Base64.decode(SystemPrefs.ensureMasterSecret())
     }
 
     /**

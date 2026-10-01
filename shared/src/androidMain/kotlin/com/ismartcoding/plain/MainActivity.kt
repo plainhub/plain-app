@@ -1,5 +1,9 @@
 package com.ismartcoding.plain
 
+import com.ismartcoding.plain.ui.extensions.collectAsStateValue
+
+import com.ismartcoding.plain.preferences.*
+
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Intent
@@ -38,8 +42,6 @@ import com.ismartcoding.plain.platform.Permission
 import com.ismartcoding.plain.features.Permissions
 import com.ismartcoding.plain.features.bluetooth.client.BluetoothPermission
 import com.ismartcoding.plain.platform.isGranted
-import com.ismartcoding.plain.preferences.SettingsProvider
-import com.ismartcoding.plain.preferences.LauncherShortcutsPreference
 import com.ismartcoding.plain.platform.publishLauncherShortcuts
 import com.ismartcoding.plain.receivers.NetworkStateReceiver
 import com.ismartcoding.plain.receivers.PlugInControlReceiver
@@ -53,7 +55,6 @@ import com.ismartcoding.plain.ui.models.PeerViewModel
 import com.ismartcoding.plain.ui.models.PomodoroViewModel
 import com.ismartcoding.plain.enums.DarkTheme
 import com.ismartcoding.plain.lib.sendEvent
-import com.ismartcoding.plain.preferences.LocalDarkTheme
 import com.ismartcoding.plain.ui.page.CrashReportDialog
 import com.ismartcoding.plain.ui.nav.Routing
 import com.ismartcoding.plain.ui.page.Main
@@ -168,27 +169,25 @@ class MainActivity : AppCompatActivity() {
             registerReceiver(plugInReceiver, powerFilter); registerReceiver(networkStateReceiver, IntentFilter(WifiManager.NETWORK_STATE_CHANGED_ACTION))
         }
         setContent {
-            SettingsProvider {
-                AppTheme(
-                    useDarkTheme = DarkTheme.isDarkTheme(LocalDarkTheme.current),
-                    amoledDarkTheme = com.ismartcoding.plain.preferences.LocalAmoledDarkTheme.current,
-                ) {
-                    Main(
-                        navControllerState, onLaunched = { handleIntent(intent) },
-                        mainVM, audioQueueVM, pomodoroVM,
-                        peerVM = peerVM,
-                        channelVM = channelVM
-                    )
-                    pendingCrashReport?.let { report ->
-                        CrashReportDialog(crashReport = report, navController = navControllerState.value, onDismiss = { pendingCrashReport = null })
-                    }
+            AppTheme(
+                useDarkTheme = DarkTheme.isDarkTheme(UserPrefs.darkTheme.collectAsStateValue()),
+                amoledDarkTheme = UserPrefs.amoledDarkTheme.collectAsStateValue(),
+            ) {
+                Main(
+                    navControllerState, onLaunched = { handleIntent(intent) },
+                    mainVM, audioQueueVM, pomodoroVM,
+                    peerVM = peerVM,
+                    channelVM = channelVM
+                )
+                pendingCrashReport?.let { report ->
+                    CrashReportDialog(crashReport = report, navController = navControllerState.value, onDismiss = { pendingCrashReport = null })
                 }
             }
         }
         AudioPlayer.ensurePlayer(this)
         HttpServerManager.ensureStarted()
         lifecycleScope.launch(Dispatchers.Default) {
-            publishLauncherShortcuts(LauncherShortcutsPreference.selected(LauncherShortcutsPreference.getAsync()))
+            publishLauncherShortcuts(UserPrefs.selectedLauncherShortcuts(UserPrefs.launcherShortcuts.value))
         }
     }
 

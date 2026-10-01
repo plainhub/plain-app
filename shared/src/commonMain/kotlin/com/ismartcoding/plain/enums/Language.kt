@@ -1,9 +1,8 @@
 package com.ismartcoding.plain.enums
 
+import com.ismartcoding.plain.preferences.*
 import com.ismartcoding.plain.platform.Locale
 import com.ismartcoding.plain.platform.setSystemLocale
-import com.ismartcoding.plain.preferences.LanguagePreference
-import com.ismartcoding.plain.preferences.getLocaleAsync
 
 object Language {
     val locales =
@@ -28,7 +27,7 @@ object Language {
         )
 
     suspend fun initLocaleAsync() {
-        val locale = LanguagePreference.getLocaleAsync()
+        val locale = UserPrefs.localeValue()
         if (locale != null) {
             setSystemLocale(locale)
         }

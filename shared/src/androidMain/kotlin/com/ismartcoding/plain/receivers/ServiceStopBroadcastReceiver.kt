@@ -1,5 +1,7 @@
 package com.ismartcoding.plain.receivers
 
+import com.ismartcoding.plain.preferences.*
+
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -7,9 +9,7 @@ import android.os.Binder
 import androidx.core.content.ContextCompat
 import com.ismartcoding.plain.lib.coIO
 import com.ismartcoding.plain.AppIntents
-import com.ismartcoding.plain.preferences.AdbTokenPreference
 import com.ismartcoding.plain.platform.stopHttpServiceAsync
-import com.ismartcoding.plain.preferences.ServicePreference
 import com.ismartcoding.plain.services.HttpServerService
 import com.ismartcoding.plain.services.ScreenMirrorService
 
@@ -21,9 +21,9 @@ class ServiceStopBroadcastReceiver : BroadcastReceiver() {
         when (intent.action) {
             AppIntents.ACTION_START_HTTP_SERVER -> {
                 coIO {
-                    val storedToken = AdbTokenPreference.getAsync()
+                    val storedToken = SystemPrefs.adbToken.value
                     if (intent.getStringExtra("token") != storedToken) return@coIO
-                    ServicePreference.putAsync(true)
+                    UserPrefs.service.value = true
                     ContextCompat.startForegroundService(context, Intent(context, HttpServerService::class.java))
                 }
             }
@@ -33,10 +33,10 @@ class ServiceStopBroadcastReceiver : BroadcastReceiver() {
                 val appUid = context.applicationInfo.uid
                 if (callerUid != appUid) {
                     // External caller (ADB, third-party app) — require token
-                    val storedToken = AdbTokenPreference.getAsync()
+                    val storedToken = SystemPrefs.adbToken.value
                     if (intent.getStringExtra("token") != storedToken) return@coIO
                 }
-                ServicePreference.putAsync(false)
+                UserPrefs.service.value = false
                 stopHttpServiceAsync()
             }
 

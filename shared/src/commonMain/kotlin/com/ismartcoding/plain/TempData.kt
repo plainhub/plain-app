@@ -3,19 +3,11 @@ package com.ismartcoding.plain
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
-import com.ismartcoding.plain.enums.MediaPlayMode
 import com.ismartcoding.plain.features.sms.DPendingMms
+import com.ismartcoding.plain.preferences.*
 import kotlinx.coroutines.flow.MutableStateFlow
 
 object TempData {
-    val serviceEnabled = MutableStateFlow(false)
-    val desktopAccessEnabled = MutableStateFlow(false)
-    val webHttps = MutableStateFlow(false)
-    /** Whether the WebAddressBar's backup address list is expanded. Persisted via [com.ismartcoding.plain.preferences.WebAddressBarExpandedPreference]. */
-    val webAddressBarExpanded = MutableStateFlow(false)
-    val httpPort = MutableStateFlow(8080)
-    val httpsPort = MutableStateFlow(8443)
-    val dlnaEnabled = MutableStateFlow(false)
 
     var ip4s = mutableStateOf(emptyList<String>())
     var clientId = ""
@@ -23,19 +15,13 @@ object TempData {
     var urlToken = ByteArray(0) // use to encrypt or decrypt params in url (kept as raw bytes to avoid base64 decode on every encrypt/decrypt)
     var mdnsHostname = "plainapp.local" // mDNS hostname for local network discovery
 
-    val audioPlayMode = MutableStateFlow(MediaPlayMode.REPEAT)
-    val audioPlaybackSpeed = MutableStateFlow(1f)
     val audioPlayerVisible = MutableStateFlow(false)
     /** Media path requested by a home-screen shortcut; null = no preview open. */
     val shortcutMediaPath = MutableStateFlow<String?>(null)
 
     var adbToken = "" // in-memory cache of the ADB automation token
 
-    var nearbyDiscoverable = false
-    var developerMode = false
 
-    /** User toggled "allow any host" (CORS open to all origins) in Developer settings. */
-    val allowAnyHost = MutableStateFlow(false)
 
     val awareRunning = MutableStateFlow(false)
 
@@ -65,14 +51,14 @@ object TempData {
     val pendingMmsMessages = mutableStateListOf<DPendingMms>()
 
     fun canDesktopAccess(): Boolean {
-        return desktopAccessEnabled.value && serviceEnabled.value
+        return UserPrefs.desktopAccess.value && UserPrefs.service.value
     }
 
     fun canChatAccess(): Boolean {
-        return serviceEnabled.value
+        return UserPrefs.service.value
     }
 
     fun canDLNAAccess(): Boolean {
-        return dlnaEnabled.value && serviceEnabled.value
+        return UserPrefs.dlna.value && UserPrefs.service.value
     }
 }

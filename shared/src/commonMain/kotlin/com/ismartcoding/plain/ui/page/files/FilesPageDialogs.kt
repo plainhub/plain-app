@@ -1,5 +1,6 @@
 package com.ismartcoding.plain.ui.page.files
 
+import com.ismartcoding.plain.preferences.*
 import com.ismartcoding.plain.i18n.*
 
 import androidx.compose.runtime.Composable
@@ -8,7 +9,6 @@ import androidx.compose.runtime.remember
 import org.jetbrains.compose.resources.stringResource
 import com.ismartcoding.plain.platform.createDirectory
 import com.ismartcoding.plain.platform.createFile
-import com.ismartcoding.plain.preferences.FileSortByPreference
 import com.ismartcoding.plain.ui.base.TextFieldDialog
 import com.ismartcoding.plain.ui.components.FileSortDialog
 import com.ismartcoding.plain.ui.helpers.DialogHelper
@@ -24,7 +24,7 @@ internal fun FilesPageDialogs(
 ) {
     if (filesVM.showSortDialog.value) {
         FileSortDialog(filesVM.sortBy, onSelected = {
-            scope.launch(Dispatchers.Default) { FileSortByPreference.putAsync(it); filesVM.sortBy.value = it; filesVM.loadAsync() }
+            scope.launch(Dispatchers.Default) { UserPrefs.setFileSortBy(it); filesVM.sortBy.value = it; filesVM.loadAsync() }
         }, onDismiss = { filesVM.showSortDialog.value = false })
     }
 

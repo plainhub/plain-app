@@ -1,4 +1,5 @@
 package com.ismartcoding.plain.ui.page.files
+import com.ismartcoding.plain.preferences.*
 import androidx.compose.foundation.layout.padding
 import androidx.compose.ui.Modifier
 import com.ismartcoding.plain.ui.theme.PlainTheme
@@ -24,7 +25,6 @@ import com.ismartcoding.plain.lib.extensions.getMimeType
 import com.ismartcoding.plain.platform.formatDateTime
 import com.ismartcoding.plain.platform.getFileIconPath
 import com.ismartcoding.plain.platform.renameAndScanFile
-import com.ismartcoding.plain.preferences.FavoriteFoldersPreference
 import com.ismartcoding.plain.data.DFavoriteFolder
 import com.ismartcoding.plain.ui.base.BottomSpace
 import com.ismartcoding.plain.ui.base.CopyIconButton
@@ -55,7 +55,7 @@ fun FileInfoBottomSheet(filesVM: FilesViewModel) {
 
     LaunchedEffect(file.path) {
         if (file.isDir) {
-            isFavorite = FavoriteFoldersPreference.isFavoriteAsync(file.path)
+            isFavorite = UserPrefs.isFavoriteFolder(file.path)
         }
     }
 
@@ -100,10 +100,10 @@ fun FileInfoBottomSheet(filesVM: FilesViewModel) {
                     onFavoriteToggle = {
                         scope.launch(Dispatchers.Default) {
                             if (isFavorite) {
-                                FavoriteFoldersPreference.removeAsync(file.path)
+                                UserPrefs.removeFavoriteFolder(file.path)
                                 isFavorite = false
                             } else {
-                                FavoriteFoldersPreference.addAsync(DFavoriteFolder(rootPath = filesVM.rootPath, fullPath = file.path))
+                                UserPrefs.addFavoriteFolder(DFavoriteFolder(rootPath = filesVM.rootPath, fullPath = file.path))
                                 isFavorite = true
                             }
                             filesVM.favoriteFoldersVersion.value++

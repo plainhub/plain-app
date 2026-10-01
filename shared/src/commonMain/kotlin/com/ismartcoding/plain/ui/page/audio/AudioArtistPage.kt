@@ -1,5 +1,6 @@
 package com.ismartcoding.plain.ui.page.audio
 
+import com.ismartcoding.plain.preferences.*
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -39,7 +40,6 @@ import com.ismartcoding.plain.platform.audioIsPlayingFlow
 import com.ismartcoding.plain.platform.audioJustPlayWithNotificationCheck
 import com.ismartcoding.plain.platform.audioPause
 import com.ismartcoding.plain.platform.audioPlay
-import com.ismartcoding.plain.preferences.AudioSortByPreference
 import com.ismartcoding.plain.platform.searchMedia
 import com.ismartcoding.plain.ui.base.AnimatedBottomAction
 import com.ismartcoding.plain.ui.components.MediaTopBar
@@ -166,7 +166,7 @@ fun AudioArtistPage(
         scrollToTop = { scope.launch { scrollState.scrollToItem(0) } },
         onSortSelected = { sortBy ->
             scope.launch {
-                AudioSortByPreference.putAsync(sortBy)
+                UserPrefs.setAudioSortBy(sortBy)
                 audioVM.sortBy.value = sortBy
             }
         },

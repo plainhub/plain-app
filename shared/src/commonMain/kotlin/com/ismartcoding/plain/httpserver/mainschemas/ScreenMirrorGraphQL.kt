@@ -1,5 +1,6 @@
 package com.ismartcoding.plain.httpserver.mainschemas
 
+import com.ismartcoding.plain.preferences.*
 import com.ismartcoding.plain.lib.kgraphql.annotations.GraphQLMutation
 import com.ismartcoding.plain.lib.kgraphql.annotations.GraphQLQuery
 import com.ismartcoding.plain.lib.kgraphql.schema.dsl.SchemaBuilder
@@ -15,7 +16,6 @@ import com.ismartcoding.plain.platform.isScreenMirrorControlEnabled
 import com.ismartcoding.plain.platform.isScreenMirrorRunning
 import com.ismartcoding.plain.platform.isGranted
 import com.ismartcoding.plain.platform.onScreenMirrorQualityChanged
-import com.ismartcoding.plain.preferences.ScreenMirrorQualityPreference
 import com.ismartcoding.plain.httpserver.models.ScreenMirrorQuality
 import com.ismartcoding.plain.httpserver.models.ScreenMirrorVideoCodec
 import com.ismartcoding.plain.httpserver.models.toModel
@@ -37,7 +37,7 @@ suspend fun screenMirrorControlEnabled(): Boolean {
 
 @GraphQLQuery
 suspend fun screenMirrorQuality(): ScreenMirrorQuality {
-    return ScreenMirrorQualityPreference.getValueAsync().toModel()
+    return UserPrefs.screenMirrorQualityValue().toModel()
 }
 
 @GraphQLMutation
@@ -70,7 +70,7 @@ suspend fun updateScreenMirrorQuality(mode: ScreenMirrorMode): Boolean {
         ScreenMirrorMode.HD -> 1080
     }
     val qualityData = DScreenMirrorQuality(mode, resolution)
-    ScreenMirrorQualityPreference.putAsync(qualityData)
+    UserPrefs.setScreenMirrorQuality(qualityData)
     onScreenMirrorQualityChanged(mode)
     return true
 }

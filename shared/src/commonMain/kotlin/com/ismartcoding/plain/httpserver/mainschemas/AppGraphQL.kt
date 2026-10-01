@@ -1,5 +1,7 @@
 package com.ismartcoding.plain.httpserver.mainschemas
 
+import com.ismartcoding.plain.preferences.*
+
 import com.ismartcoding.plain.buildChannel
 import com.ismartcoding.plain.enums.WebSettingsFeature
 import com.ismartcoding.plain.enums.AppChannelType
@@ -21,8 +23,6 @@ import com.ismartcoding.plain.platform.isDebugBuild
 import com.ismartcoding.plain.discover.MdnsDiscoverManager
 import com.ismartcoding.plain.helpers.TempHelper
 import com.ismartcoding.plain.lib.sendEvent
-import com.ismartcoding.plain.preferences.DeveloperModePreference
-import com.ismartcoding.plain.preferences.DeviceNamePreference
 import com.ismartcoding.plain.httpserver.models.App
 import com.ismartcoding.plain.httpserver.models.DeviceInfo
 import com.ismartcoding.plain.httpserver.models.DeviceStatus
@@ -48,8 +48,8 @@ suspend fun app(): App {
     return App(
         clientId = TempData.clientId,
         urlToken = Base64.encode(TempData.urlToken),
-        httpPort = TempData.httpPort.value,
-        httpsPort = TempData.httpsPort.value,
+        httpPort = UserPrefs.httpPort.value,
+        httpsPort = UserPrefs.httpsPort.value,
         appDir = appDir(),
         deviceName = TempData.deviceName.value,
         deviceType = getDeviceType(),
@@ -57,7 +57,7 @@ suspend fun app(): App {
         AppChannelType.fromString(buildChannel),
         grantedPermissions,
         downloadsDir = getDownloadsDirPath(),
-        developerMode = DeveloperModePreference.getAsync(),
+        developerMode = UserPrefs.developerMode.value,
         debug = isDebugBuild(),
     )
 }
@@ -88,7 +88,7 @@ suspend fun openWebSettings(feature: WebSettingsFeature? = null): Boolean {
 
 @GraphQLMutation
 suspend fun updateDeviceName(name: String): Boolean {
-    DeviceNamePreference.putAsync(name)
+    UserPrefs.deviceName.value = name
     TempData.deviceName.value = name
     MdnsDiscoverManager.updateAdvertisedService()
     return true

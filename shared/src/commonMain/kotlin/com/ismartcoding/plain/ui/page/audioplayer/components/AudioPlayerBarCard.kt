@@ -1,8 +1,11 @@
 package com.ismartcoding.plain.ui.page.audioplayer.components
 
+import com.ismartcoding.plain.ui.extensions.collectAsStateValue
+
+import com.ismartcoding.plain.preferences.*
+
 import com.ismartcoding.plain.i18n.*
 import com.ismartcoding.plain.enums.DarkTheme
-import com.ismartcoding.plain.preferences.LocalDarkTheme
 import androidx.compose.foundation.background
 import androidx.compose.foundation.basicMarquee
 import androidx.compose.foundation.clickable
@@ -57,7 +60,7 @@ fun AudioPlayerBarCard(
 ) {
     // Dark list items use cardBackgroundNormal (#2C2C2E) which equals surfaceVariant,
     // so lift the bar to surfaceContainerHighest to keep it visually apart.
-    val isDark = DarkTheme.isDarkTheme(LocalDarkTheme.current)
+    val isDark = DarkTheme.isDarkTheme(UserPrefs.darkTheme.collectAsStateValue())
     val containerColor =
         if (isDark) MaterialTheme.colorScheme.surfaceContainerHighest else MaterialTheme.colorScheme.surfaceVariant
     ElevatedCard(

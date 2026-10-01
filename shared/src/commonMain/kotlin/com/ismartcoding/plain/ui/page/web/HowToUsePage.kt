@@ -1,5 +1,7 @@
 package com.ismartcoding.plain.ui.page.web
 
+import com.ismartcoding.plain.preferences.*
+
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -24,7 +26,6 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.i18n.*
-import com.ismartcoding.plain.preferences.WebSettingsProvider
 import com.ismartcoding.plain.ui.base.BottomSpace
 import com.ismartcoding.plain.ui.base.FaqItem
 import com.ismartcoding.plain.ui.base.HorizontalSpace
@@ -63,94 +64,92 @@ fun HowToUsePage(
     navController: NavHostController,
     onRunDiagnostics: () -> Unit,
 ) {
-    WebSettingsProvider {
-        val serviceEnabled = TempData.serviceEnabled.collectAsStateValue()
+    val serviceEnabled = UserPrefs.service.collectAsStateValue()
 
-        PScaffold(
-            topBar = {
-                PTopAppBar(onNavigateBack = { navController.navigateUp() }, title = stringResource(Res.string.how_to_use))
-            },
-            content = { paddingValues ->
-                LazyColumn(modifier = Modifier.padding(top = paddingValues.calculateTopPadding())) {
-                    item {
-                        TopSpace()
-                        Subtitle(text = stringResource(Res.string.quick_start))
-                        PCard(modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN)) {
-                            Column(modifier = Modifier.padding(vertical = 8.dp)) {
-                                StepItem(index = 1, title = stringResource(Res.string.step_connect_network_title))
-                                VerticalSpace(dp = 8.dp)
-                                Box(modifier = Modifier.padding(horizontal = 16.dp)) {
-                                    SameNetworkDemo()
-                                }
-                                VerticalSpace(dp = 16.dp)
-                                StepItem(index = 2, title = stringResource(Res.string.step_choose_ip_title))
-                                VerticalSpace(dp = 8.dp)
-                                Box(modifier = Modifier.padding(horizontal = 16.dp)) {
-                                    WebAddressPager()
-                                }
-                                VerticalSpace(dp = 16.dp)
-                                StepItem(index = 3, title = stringResource(Res.string.step_open_url_title))
-                                VerticalSpace(dp = 8.dp)
-                                Box(modifier = Modifier.padding(horizontal = 16.dp)) {
-                                    OpenAddressDemo()
-                                }
+    PScaffold(
+        topBar = {
+            PTopAppBar(onNavigateBack = { navController.navigateUp() }, title = stringResource(Res.string.how_to_use))
+        },
+        content = { paddingValues ->
+            LazyColumn(modifier = Modifier.padding(top = paddingValues.calculateTopPadding())) {
+                item {
+                    TopSpace()
+                    Subtitle(text = stringResource(Res.string.quick_start))
+                    PCard(modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN)) {
+                        Column(modifier = Modifier.padding(vertical = 8.dp)) {
+                            StepItem(index = 1, title = stringResource(Res.string.step_connect_network_title))
+                            VerticalSpace(dp = 8.dp)
+                            Box(modifier = Modifier.padding(horizontal = 16.dp)) {
+                                SameNetworkDemo()
+                            }
+                            VerticalSpace(dp = 16.dp)
+                            StepItem(index = 2, title = stringResource(Res.string.step_choose_ip_title))
+                            VerticalSpace(dp = 8.dp)
+                            Box(modifier = Modifier.padding(horizontal = 16.dp)) {
+                                WebAddressPager()
+                            }
+                            VerticalSpace(dp = 16.dp)
+                            StepItem(index = 3, title = stringResource(Res.string.step_open_url_title))
+                            VerticalSpace(dp = 8.dp)
+                            Box(modifier = Modifier.padding(horizontal = 16.dp)) {
+                                OpenAddressDemo()
                             }
                         }
-                        VerticalSpace(dp = 16.dp)
-                        PCard(modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN)) {
-                            PListItem(
-                                modifier = Modifier.clickable { navController.navigate(Routing.Onboarding) },
-                                icon = UiRes.drawable.ui_drawable_refresh_ccw,
-                                title = stringResource(Res.string.onboarding_replay),
-                                showMore = true,
-                            )
-                        }
-                        VerticalSpace(dp = 16.dp)
                     }
-                    item {
-                        Subtitle(text = stringResource(Res.string.troubleshooting))
-                        PCard(modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN)) {
-                            FaqItem(
-                                icon = UiRes.drawable.ui_drawable_circle_alert,
-                                tint = MaterialTheme.colorScheme.error,
-                                question = stringResource(Res.string.faq_cannot_open_q),
-                                answer = stringResource(Res.string.faq_cannot_open_a),
-                            ) {
-                                RunDiagnosticsChip(onClick = onRunDiagnostics)
-                            }
-                            FaqItem(
-                                icon = UiRes.drawable.ui_drawable_lock,
-                                tint = MaterialTheme.colorScheme.orange,
-                                question = stringResource(Res.string.faq_https_warning_q),
-                                answer = stringResource(Res.string.browser_https_error_tips),
-                                answerFooter = { FaqCertDemo() },
-                                answerFooterFullWidth = true,
-                            )
-                            FaqItem(
-                                icon = UiRes.drawable.ui_drawable_smartphone,
-                                tint = MaterialTheme.colorScheme.orange,
-                                question = stringResource(Res.string.faq_stay_online_q),
-                                answer = stringResource(Res.string.faq_stay_online_a),
-                                answerFooter = { FaqStayOnlineDemo() },
-                                answerFooterFullWidth = true,
-                            )
-                        }
-                        VerticalSpace(dp = 16.dp)
-                        PCard(modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN)) {
-                            PListItem(
-                                modifier = Modifier.clickable { WebHelper.open(TROUBLESHOOTING_GUIDE_URL) },
-                                icon = UiRes.drawable.ui_drawable_circle_help,
-                                title = stringResource(Res.string.more_help),
-                                subtitle = TROUBLESHOOTING_GUIDE_URL.removePrefix("https://"),
-                                showMore = true,
-                            )
-                        }
-                        BottomSpace(paddingValues)
+                    VerticalSpace(dp = 16.dp)
+                    PCard(modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN)) {
+                        PListItem(
+                            modifier = Modifier.clickable { navController.navigate(Routing.Onboarding) },
+                            icon = UiRes.drawable.ui_drawable_refresh_ccw,
+                            title = stringResource(Res.string.onboarding_replay),
+                            showMore = true,
+                        )
                     }
+                    VerticalSpace(dp = 16.dp)
                 }
-            },
-        )
-    }
+                item {
+                    Subtitle(text = stringResource(Res.string.troubleshooting))
+                    PCard(modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN)) {
+                        FaqItem(
+                            icon = UiRes.drawable.ui_drawable_circle_alert,
+                            tint = MaterialTheme.colorScheme.error,
+                            question = stringResource(Res.string.faq_cannot_open_q),
+                            answer = stringResource(Res.string.faq_cannot_open_a),
+                        ) {
+                            RunDiagnosticsChip(onClick = onRunDiagnostics)
+                        }
+                        FaqItem(
+                            icon = UiRes.drawable.ui_drawable_lock,
+                            tint = MaterialTheme.colorScheme.orange,
+                            question = stringResource(Res.string.faq_https_warning_q),
+                            answer = stringResource(Res.string.browser_https_error_tips),
+                            answerFooter = { FaqCertDemo() },
+                            answerFooterFullWidth = true,
+                        )
+                        FaqItem(
+                            icon = UiRes.drawable.ui_drawable_smartphone,
+                            tint = MaterialTheme.colorScheme.orange,
+                            question = stringResource(Res.string.faq_stay_online_q),
+                            answer = stringResource(Res.string.faq_stay_online_a),
+                            answerFooter = { FaqStayOnlineDemo() },
+                            answerFooterFullWidth = true,
+                        )
+                    }
+                    VerticalSpace(dp = 16.dp)
+                    PCard(modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN)) {
+                        PListItem(
+                            modifier = Modifier.clickable { WebHelper.open(TROUBLESHOOTING_GUIDE_URL) },
+                            icon = UiRes.drawable.ui_drawable_circle_help,
+                            title = stringResource(Res.string.more_help),
+                            subtitle = TROUBLESHOOTING_GUIDE_URL.removePrefix("https://"),
+                            showMore = true,
+                        )
+                    }
+                    BottomSpace(paddingValues)
+                }
+            }
+        },
+    )
 }
 
 @Composable

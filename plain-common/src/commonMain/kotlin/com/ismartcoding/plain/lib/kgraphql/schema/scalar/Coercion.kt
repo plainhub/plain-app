@@ -16,12 +16,25 @@ import com.ismartcoding.plain.lib.kgraphql.schema.builtin.LONG_COERCION
 import com.ismartcoding.plain.lib.kgraphql.schema.builtin.SHORT_COERCION
 import com.ismartcoding.plain.lib.kgraphql.schema.builtin.STRING_COERCION
 import kotlinx.serialization.json.JsonElement
+import kotlinx.serialization.json.JsonArray
+import kotlinx.serialization.json.JsonNull
+import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonPrimitive
+
+internal object JsonElementScalarCoercion : ScalarCoercion<JsonElement, JsonElement> {
+    override fun serialize(instance: JsonElement): JsonElement = instance
+
+    override fun deserialize(raw: JsonElement, valueNode: ValueNode?): JsonElement = raw
+}
 
 @Suppress("UNCHECKED_CAST")
 // TODO: Re-structure scalars, as it's a bit too complicated now.
 fun <T : Any> deserializeScalar(scalar: Type.Scalar<T>, value : ValueNode): T {
     try {
+        if (scalar.kClass == JsonElement::class) {
+            @Suppress("UNCHECKED_CAST")
+            return value.toJsonElement() as T
+        }
         return when(scalar.coercion){
             //built in scalars
             STRING_COERCION -> STRING_COERCION.deserialize(value.valueNodeName, value as ValueNode.StringValueNode) as T
@@ -53,8 +66,21 @@ fun <T : Any> deserializeScalar(scalar: Type.Scalar<T>, value : ValueNode): T {
     }
 }
 
+private fun ValueNode.toJsonElement(): JsonElement = when (this) {
+    is StringValueNode -> JsonPrimitive(value)
+    is NumberValueNode -> JsonPrimitive(value)
+    is DoubleValueNode -> JsonPrimitive(value)
+    is BooleanValueNode -> JsonPrimitive(value)
+    is NullValueNode -> JsonNull
+    is ListValueNode -> JsonArray(values.map { it.toJsonElement() })
+    is ObjectValueNode -> JsonObject(fields.associate { it.name.value to it.value.toJsonElement() })
+    else -> throw GraphQLError("Invalid JSON literal", this)
+}
+
 @Suppress("UNCHECKED_CAST")
 fun <T> serializeScalar(scalar: Type.Scalar<*>, value: T, executionNode: Execution): JsonElement = when (scalar.coercion) {
+    JsonElementScalarCoercion -> value as? JsonElement
+        ?: throw ExecutionException("Invalid JSON scalar value", executionNode)
     is StringScalarCoercion<*> -> {
         JsonPrimitive((scalar.coercion as StringScalarCoercion<T>).serialize(value))
     }

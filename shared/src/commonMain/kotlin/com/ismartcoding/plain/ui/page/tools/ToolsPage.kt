@@ -1,5 +1,7 @@
 package com.ismartcoding.plain.ui.page.tools
 
+import com.ismartcoding.plain.preferences.*
+
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
@@ -42,8 +44,6 @@ import com.ismartcoding.plain.ui.base.PTopAppBar
 import com.ismartcoding.plain.ui.base.StatusIndicator
 import com.ismartcoding.plain.ui.base.TopSpace
 import com.ismartcoding.plain.ui.base.VerticalSpace
-import com.ismartcoding.plain.preferences.HomeFeaturesPreference
-import com.ismartcoding.plain.preferences.appPreferences
 import com.ismartcoding.plain.ui.components.QuickNoteCard
 import com.ismartcoding.plain.ui.extensions.collectAsStateValue
 import com.ismartcoding.plain.ui.nav.Routing
@@ -66,11 +66,9 @@ fun ToolsPage(
 ) {
     val currentUri by CastPlayer.currentUri.collectAsState()
     val featuresStr =
-        remember {
-            appPreferences.snapshots.map { HomeFeaturesPreference.get(it) }
-        }.collectAsStateValue(initial = HomeFeaturesPreference.default)
+        UserPrefs.homeFeatures.collectAsStateValue()
     val notesEnabled =
-        HomeFeaturesPreference.parseList(featuresStr.ifEmpty { HomeFeaturesPreference.default })
+        UserPrefs.parseFeatures(featuresStr.ifEmpty { UserPrefs.homeFeatures.default })
             .contains(AppFeatureType.NOTES.name)
 
     MainNavScaffold(

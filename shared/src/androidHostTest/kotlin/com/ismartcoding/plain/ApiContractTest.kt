@@ -186,6 +186,9 @@ class ApiContractTest {
 
     @Test
     fun legacyShapesAreGone() {
+                forbiddenPattern("prefsPath|prefEntries|deletePrefEntry|setPref|deletePref") {
+                    "legacy preference operations must not return; use userPrefs/systemPrefs and setUserPref/removeUserPref: $it"
+                }
         forbiddenPattern("MediaActionResult") { "legacy MediaActionResult must not come back — use ActionResult — $it" }
         forbiddenPattern("smsAllCounts") { "renamed to smsBoxCounts — $it" }
         forbiddenPattern("feedsCount") { "renamed to feedEntryCounts — $it" }

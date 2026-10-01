@@ -1,5 +1,6 @@
 package com.ismartcoding.plain.features.audio
 
+import com.ismartcoding.plain.preferences.*
 import java.io.File
 import kotlin.test.Test
 import kotlin.test.assertTrue
@@ -59,8 +60,8 @@ class PlayAudioQueueOrderGuardTest {
         val body = functionBody(source(graphQlPath), "playAudio")
             ?: fail("playAudio not found in $graphQlPath")
         assertTrue(
-            "AudioPlayingPreference.putAsync(" in body,
-            "playAudio must mark the track current via AudioPlayingPreference",
+            "SystemPrefs.setAudioPlaying(" in body,
+            "playAudio must mark the track current via SystemPrefs",
         )
         assertTrue(
             "enqueue(" !in body && "playNow(" !in body,

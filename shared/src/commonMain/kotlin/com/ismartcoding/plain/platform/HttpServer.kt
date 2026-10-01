@@ -1,5 +1,7 @@
 package com.ismartcoding.plain.platform
 
+import com.ismartcoding.plain.preferences.*
+
 import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.enums.HttpServerState
 import com.ismartcoding.plain.lib.TimeHelper
@@ -12,8 +14,6 @@ import com.ismartcoding.plain.httpserver.HttpServerManager
 import com.ismartcoding.plain.httpserver.closeAllWsSessions
 import com.ismartcoding.plain.httpserver.httpPorts
 import com.ismartcoding.plain.httpserver.httpsPorts
-import com.ismartcoding.plain.preferences.HttpPortPreference
-import com.ismartcoding.plain.preferences.HttpsPortPreference
 import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.sync.Mutex
@@ -224,25 +224,25 @@ private suspend fun startHttpServerAsyncLocked() = withIO {
 
     var started = false
     while (!started) {
-        val httpPort = nextFreePort(TempData.httpPort.value, httpPorts)
-        val httpsPort = nextFreePort(TempData.httpsPort.value, httpsPorts)
+        val httpPort = nextFreePort(UserPrefs.httpPort.value, httpPorts)
+        val httpsPort = nextFreePort(UserPrefs.httpsPort.value, httpsPorts)
         if (httpPort == null || httpsPort == null) {
             HttpServerManager.portsInUse.value =
-                listOf(TempData.httpPort.value, TempData.httpsPort.value).filter { isPortInUse(it) }.toSet()
+                listOf(UserPrefs.httpPort.value, UserPrefs.httpsPort.value).filter { isPortInUse(it) }.toSet()
             break
         }
-        if (httpPort != TempData.httpPort.value) {
-            LogCat.d("HTTP port ${TempData.httpPort.value} in use, falling back to $httpPort")
-            HttpPortPreference.putAsync(httpPort)
+        if (httpPort != UserPrefs.httpPort.value) {
+            LogCat.d("HTTP port ${UserPrefs.httpPort.value} in use, falling back to $httpPort")
+            UserPrefs.httpPort.value = httpPort
         }
-        if (httpsPort != TempData.httpsPort.value) {
-            LogCat.d("HTTPS port ${TempData.httpsPort.value} in use, falling back to $httpsPort")
-            HttpsPortPreference.putAsync(httpsPort)
+        if (httpsPort != UserPrefs.httpsPort.value) {
+            LogCat.d("HTTPS port ${UserPrefs.httpsPort.value} in use, falling back to $httpsPort")
+            UserPrefs.httpsPort.value = httpsPort
         }
         started = startHttpEngineAsync()
         // A failed bind with both ports free is not a port conflict (keystore,
         // engine error…): retrying other ports cannot fix it.
-        if (!started && !isPortInUse(TempData.httpPort.value) && !isPortInUse(TempData.httpsPort.value)) {
+        if (!started && !isPortInUse(UserPrefs.httpPort.value) && !isPortInUse(UserPrefs.httpsPort.value)) {
             break
         }
     }
@@ -257,7 +257,7 @@ private suspend fun startHttpServerAsyncLocked() = withIO {
         onHttpServerStarted()
         LogCat.d("onHttpServerStarted took ${TimeHelper.nowMillis() - tHooks}ms")
         HttpServerManager.serverState.value = HttpServerState.ON
-        LogCat.d("HTTP server started on ports ${TempData.httpPort.value}/${TempData.httpsPort.value}, total ${TimeHelper.nowMillis() - t0}ms")
+        LogCat.d("HTTP server started on ports ${UserPrefs.httpPort.value}/${UserPrefs.httpsPort.value}, total ${TimeHelper.nowMillis() - t0}ms")
         return@withIO
     }
 

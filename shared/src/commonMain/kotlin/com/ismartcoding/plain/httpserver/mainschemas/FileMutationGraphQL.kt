@@ -1,5 +1,6 @@
 package com.ismartcoding.plain.httpserver.mainschemas
 
+import com.ismartcoding.plain.preferences.*
 import com.ismartcoding.plain.lib.kgraphql.annotations.GraphQLMutation
 import com.ismartcoding.plain.lib.kgraphql.schema.dsl.SchemaBuilder
 import com.ismartcoding.plain.extensions.getFinalPath
@@ -15,7 +16,6 @@ import com.ismartcoding.plain.platform.renameAndScanFile
 import com.ismartcoding.plain.platform.scanFiles
 import com.ismartcoding.plain.platform.writeFileText
 import com.ismartcoding.plain.helpers.FilePathValidator
-import com.ismartcoding.plain.preferences.FavoriteFoldersPreference
 import com.ismartcoding.plain.httpserver.models.FavoriteFolder
 import com.ismartcoding.plain.httpserver.models.ActionResult
 import com.ismartcoding.plain.httpserver.models.File
@@ -73,23 +73,23 @@ suspend fun moveFile(src: String, dst: String, overwrite: Boolean): Boolean {
 
 @GraphQLMutation
 suspend fun addFavoriteFolder(rootPath: String, fullPath: String): List<FavoriteFolder> {
-    val current = FavoriteFoldersPreference.getValueAsync()
+    val current = UserPrefs.favoriteFoldersValue()
         .firstOrNull { it.fullPath == fullPath }
     val folder = DFavoriteFolder(rootPath, fullPath, alias = current?.alias)
-    val updatedFolders = FavoriteFoldersPreference.addAsync(folder)
+    val updatedFolders = UserPrefs.addFavoriteFolder(folder)
     return updatedFolders.map { it.toModel() }
 }
 
 @GraphQLMutation
 suspend fun removeFavoriteFolder(fullPath: String): List<FavoriteFolder> {
-    val updatedFolders = FavoriteFoldersPreference.removeAsync(fullPath)
+    val updatedFolders = UserPrefs.removeFavoriteFolder(fullPath)
     return updatedFolders.map { it.toModel() }
 }
 
 @GraphQLMutation
 suspend fun setFavoriteFolderAlias(fullPath: String, alias: String): List<FavoriteFolder> {
     val trimmed = alias.trim()
-    val updated = FavoriteFoldersPreference.getValueAsync()
+    val updated = UserPrefs.favoriteFoldersValue()
         .map {
             if (it.fullPath == fullPath) {
                 it.copy(alias = trimmed)
@@ -97,7 +97,7 @@ suspend fun setFavoriteFolderAlias(fullPath: String, alias: String): List<Favori
                 it
             }
         }
-    FavoriteFoldersPreference.putAsync(updated)
+    UserPrefs.setFavoriteFolders(updated)
     return updated.map { it.toModel() }
 }
 

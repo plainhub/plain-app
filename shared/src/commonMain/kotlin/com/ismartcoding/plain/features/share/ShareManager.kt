@@ -1,5 +1,7 @@
 package com.ismartcoding.plain.features.share
 
+import com.ismartcoding.plain.preferences.*
+
 import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.db.DShare
 import com.ismartcoding.plain.db.ShareRoot
@@ -126,7 +128,7 @@ object ShareManager {
      */
     suspend fun buildLink(share: DShare, host: String = getHost()): String {
         val sharedToken = ShareCrypto.deriveSharedTokenEncoded(share.id)
-        return UrlHelper.buildUrl("https", host, TempData.httpsPort.value, "/s/${share.id}#$sharedToken")
+        return UrlHelper.buildUrl("https", host, UserPrefs.httpsPort.value, "/s/${share.id}#$sharedToken")
     }
 
     /**
@@ -169,7 +171,7 @@ object ShareManager {
      * path outside the roots.
      */
     suspend fun resolveSharedPath(sid: String, id: String): String? {
-        if (!TempData.serviceEnabled.value) return null
+        if (!UserPrefs.service.value) return null
         val share = authCache.get(sid)?.share ?: return null
         if (!share.isActive) return null
         return try {

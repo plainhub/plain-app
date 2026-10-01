@@ -1,12 +1,11 @@
 package com.ismartcoding.plain.features.dlna
 
+import com.ismartcoding.plain.preferences.*
 import com.ismartcoding.plain.lib.TimeHelper
 import com.ismartcoding.plain.lib.coIO
 import com.ismartcoding.plain.lib.dlna.DlnaCommand
 import com.ismartcoding.plain.lib.dlna.DlnaMediaType
 import com.ismartcoding.plain.lib.dlna.PendingCastRequest
-import com.ismartcoding.plain.preferences.DlnaAllowedSendersPreference
-import com.ismartcoding.plain.preferences.DlnaDeniedSendersPreference
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 
@@ -74,8 +73,8 @@ object DlnaRendererState {
         if (playQueued) commandChannel.trySend(DlnaCommand.Play)
         if (rememberChoice && pending.senderIp.isNotEmpty()) {
             coIO {
-                DlnaDeniedSendersPreference.removeAsync(pending.senderIp)
-                DlnaAllowedSendersPreference.addAsync(pending.senderIp, pending.senderName)
+                UserPrefs.removeDeniedDlnaSender(pending.senderIp)
+                UserPrefs.addAllowedDlnaSender(pending.senderIp, pending.senderName)
             }
         }
     }
@@ -90,8 +89,8 @@ object DlnaRendererState {
         pendingPlayQueued.value = false
         if (rememberChoice && pending.senderIp.isNotEmpty()) {
             coIO {
-                DlnaAllowedSendersPreference.removeAsync(pending.senderIp)
-                DlnaDeniedSendersPreference.addAsync(pending.senderIp, pending.senderName)
+                UserPrefs.removeAllowedDlnaSender(pending.senderIp)
+                UserPrefs.addDeniedDlnaSender(pending.senderIp, pending.senderName)
             }
         }
     }

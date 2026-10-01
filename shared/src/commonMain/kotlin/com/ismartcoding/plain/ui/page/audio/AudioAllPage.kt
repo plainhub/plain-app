@@ -2,6 +2,7 @@ package com.ismartcoding.plain.ui.page.audio
 
 /** The flat "all items" list, kept as the [com.ismartcoding.plain.ui.nav.Routing.AudioAll] page. */
 
+import com.ismartcoding.plain.preferences.*
 import com.ismartcoding.plain.i18n.*
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Box
@@ -32,7 +33,6 @@ import com.ismartcoding.plain.enums.has
 import com.ismartcoding.plain.platform.PBackHandler
 import com.ismartcoding.plain.platform.LocaleHelper
 import com.ismartcoding.plain.platform.audioIsPlayingFlow
-import com.ismartcoding.plain.preferences.AudioSortByPreference
 import com.ismartcoding.plain.ui.base.AnimatedBottomAction
 import com.ismartcoding.plain.ui.components.MediaTopBar
 import com.ismartcoding.plain.ui.base.ActionButtonSearch
@@ -138,7 +138,7 @@ fun AudioAllPage(
                 scrollToTop = { scope.launch { scrollState.scrollToItem(0) } },
                 onSortSelected = { sortBy ->
                     scope.launch(Dispatchers.Default) {
-                        AudioSortByPreference.putAsync(sortBy)
+                        UserPrefs.setAudioSortBy(sortBy)
                         audioVM.sortBy.value = sortBy
                         audioVM.loadAsync(tagsVM)
                     }

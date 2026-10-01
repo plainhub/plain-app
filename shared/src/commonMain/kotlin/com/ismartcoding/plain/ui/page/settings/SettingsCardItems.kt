@@ -1,4 +1,6 @@
 package com.ismartcoding.plain.ui.page.settings
+
+import com.ismartcoding.plain.ui.extensions.collectAsStateValue
 import androidx.compose.foundation.layout.padding
 import com.ismartcoding.plain.ui.theme.PlainTheme
 import com.ismartcoding.plain.preferences.*
@@ -11,8 +13,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import com.ismartcoding.plain.enums.DarkTheme
-import com.ismartcoding.plain.preferences.DarkThemePreference
-import com.ismartcoding.plain.preferences.LocalDarkTheme
 import com.ismartcoding.plain.ui.base.PCard
 import com.ismartcoding.plain.ui.base.PListItem
 import com.ismartcoding.plain.ui.base.PSwitch
@@ -28,7 +28,7 @@ import com.ismartcoding.plain.ui.resources.sun_moon as ui_drawable_sun_moon
 
 @Composable
 internal fun SettingsCardItems(navController: NavHostController) {
-    val darkTheme = LocalDarkTheme.current
+    val darkTheme = UserPrefs.darkTheme.collectAsStateValue()
     val scope = rememberCoroutineScope()
 
     PCard(modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN)) {
@@ -45,7 +45,7 @@ internal fun SettingsCardItems(navController: NavHostController) {
                 activated = DarkTheme.isDarkTheme(darkTheme),
             ) {
                 scope.launch {
-                    DarkThemePreference.putAsync(if (it) DarkTheme.ON.value else DarkTheme.OFF.value)
+                    UserPrefs.setDarkThemeValue(if (it) DarkTheme.ON.value else DarkTheme.OFF.value)
                 }
             }
             HorizontalSpace(8.dp)
@@ -58,7 +58,7 @@ internal fun SettingsCardItems(navController: NavHostController) {
                 navController.navigate(Routing.Language)
             },
             title = stringResource(Res.string.language),
-            subtitle = LocalLocale.current?.getElegantDisplayName() ?: stringResource(Res.string.use_device_language),
+            subtitle = Prefs.parseLocale(UserPrefs.locale.collectAsStateValue())?.getElegantDisplayName() ?: stringResource(Res.string.use_device_language),
             icon = UiRes.drawable.ui_drawable_languages,
             showMore = true,
         )

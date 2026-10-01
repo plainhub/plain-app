@@ -1,5 +1,9 @@
 package com.ismartcoding.plain.ui.page.onboarding
 
+import com.ismartcoding.plain.ui.extensions.collectAsStateValue
+
+import com.ismartcoding.plain.preferences.*
+
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -37,9 +41,7 @@ import androidx.navigation.NavHostController
 import com.ismartcoding.plain.enums.ButtonSize
 import com.ismartcoding.plain.enums.DarkTheme
 import com.ismartcoding.plain.i18n.*
-import com.ismartcoding.plain.preferences.LocalDarkTheme
 import com.ismartcoding.plain.platform.PBackHandler
-import com.ismartcoding.plain.preferences.OnboardingPreference
 import com.ismartcoding.plain.ui.base.PFilledButton
 import com.ismartcoding.plain.ui.base.StepNumber
 import com.ismartcoding.plain.ui.base.VerticalSpace
@@ -62,7 +64,7 @@ fun OnboardingPage(navController: NavHostController) {
     val pagerState = rememberPagerState(pageCount = { PAGE_COUNT })
     // outline is near-invisible against the dark background; the inactive
     // dots need the mid gray there.
-    val inactiveDot = if (DarkTheme.isDarkTheme(LocalDarkTheme.current)) {
+    val inactiveDot = if (DarkTheme.isDarkTheme(UserPrefs.darkTheme.collectAsStateValue())) {
         MaterialTheme.colorScheme.onSurfaceVariant
     } else {
         MaterialTheme.colorScheme.outline
@@ -70,7 +72,7 @@ fun OnboardingPage(navController: NavHostController) {
 
     fun complete(navigateToHowToUse: Boolean) {
         scope.launch {
-            OnboardingPreference.putAsync(true)
+            SystemPrefs.onboarding.value = true
             if (navigateToHowToUse) {
                 navController.navigate(Routing.HowToUse) {
                     popUpTo(Routing.Onboarding) { inclusive = true }

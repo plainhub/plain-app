@@ -1,5 +1,7 @@
 package com.ismartcoding.plain
 
+import com.ismartcoding.plain.preferences.*
+
 import android.app.Application
 import android.media.AudioAttributes
 import android.view.textclassifier.TextClassificationManager
@@ -24,15 +26,8 @@ import com.ismartcoding.plain.platform.isQPlus
 import com.ismartcoding.plain.platform.isUPlus
 import com.ismartcoding.plain.lib.sendEvent
 import com.ismartcoding.plain.platform.initDiskLogging
-import com.ismartcoding.plain.preferences.AdbTokenPreference
-import com.ismartcoding.plain.preferences.DarkThemePreference
-import com.ismartcoding.plain.preferences.FeedAutoRefreshPreference
-import com.ismartcoding.plain.preferences.FidUriExtMigratedPreference
-import com.ismartcoding.plain.preferences.UpdateInfoPreference
-import com.ismartcoding.plain.platform.prefsFilePath
-import com.ismartcoding.plain.preferences.ensureValueAsync
-import com.ismartcoding.plain.preferences.initPreferences
 import com.ismartcoding.plain.preferences.setDarkMode
+import com.ismartcoding.plain.preferences.ensureAdbToken
 import com.ismartcoding.plain.receivers.PlugInControlReceiver
 import com.ismartcoding.plain.platform.newImageLoader
 import com.ismartcoding.plain.httpserver.warmUpHttpServer
@@ -45,7 +40,7 @@ object MainAppHelper {
 
     fun init(app: Application) {
         com.ismartcoding.plain.thumbnail.ThumbnailProvider.instance = com.ismartcoding.plain.thumbnail.ThumbnailGenerator
-        initPreferences(prefsFilePath())
+        Prefs.load()
         initDatabase(
             buildAppDatabase(Constants.DATABASE_NAME)
                 .addCallback(object : RoomDatabase.Callback() {
@@ -95,24 +90,24 @@ object MainAppHelper {
                 TempData.mediaDurationMap["${it.mediaType}:${it.mediaId}"] = it.durationMs
             }
 
-            val preferences = initCommonPreferences()
+            initCommonPreferences()
             // Must run after initCommonPreferences: the keystore warm-up loads
             // keystore.bks with the stored password, which only exists once
-            // KeyStorePasswordPreference.ensureValueAsync has run — warming up
+            // SystemPrefs.ensureKeyStorePassword has run — warming up
             // earlier creates the file with an empty password and forces a
             // regenerate cycle on the first server start.
             warmUpHttpServer()
-            DarkThemePreference.setDarkMode(DarkTheme.parse(DarkThemePreference.get(preferences)))
-            AdbTokenPreference.ensureValueAsync(preferences)
-            if (TempData.serviceEnabled.value && PlugInControlReceiver.isUSBConnected(app)) {
+            SystemPrefs.setDarkMode(DarkTheme.parse(UserPrefs.darkTheme.value))
+            SystemPrefs.ensureAdbToken()
+            if (UserPrefs.service.value && PlugInControlReceiver.isUSBConnected(app)) {
                 sendEvent(PowerConnectedEvent())
             }
 
-            if (!FidUriExtMigratedPreference.get(preferences)) {
+            if (!SystemPrefs.fidUriExtMigrated.value) {
                 ChatFidUriMigration.run(app)
-                FidUriExtMigratedPreference.putAsync(true)
+                SystemPrefs.fidUriExtMigrated.value = true
             }
-            if (FeedAutoRefreshPreference.get(preferences)) {
+            if (UserPrefs.feedAutoRefresh.value) {
                 FeedFetchWorker.startRepeatWorkerAsync(app)
             }
             ImageSearchManager.restoreIfEnabled()
@@ -121,7 +116,7 @@ object MainAppHelper {
                 TempData.videoPlayProgressMap[it.mediaId] = it.positionMs
             }
 
-            val updateInfo = UpdateInfoPreference.getValueAsync()
+            val updateInfo = SystemPrefs.updateInfoValue()
             val checkUpdateTime = updateInfo.checkUpdateTime
             val autoCheckUpdate = updateInfo.autoCheckUpdate
             if (AppFeatureType.CHECK_UPDATES.has() && autoCheckUpdate && checkUpdateTime < System.currentTimeMillis() - Constants.ONE_DAY_MS) {

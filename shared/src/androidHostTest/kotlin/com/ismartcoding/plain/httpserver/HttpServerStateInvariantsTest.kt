@@ -1,5 +1,7 @@
 package com.ismartcoding.plain.httpserver
 
+import com.ismartcoding.plain.preferences.*
+
 import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.enums.HttpServerState
 import com.ismartcoding.plain.platform.startHttpServerAsync
@@ -45,8 +47,8 @@ class HttpServerStateInvariantsTest {
         // preferences, unavailable in host tests) — the failure must come from
         // the engine create itself.
         val ports = freePorts(2)
-        TempData.httpPort.value = ports[0]
-        TempData.httpsPort.value = ports[1]
+        UserPrefs.httpPort.value = ports[0]
+        UserPrefs.httpsPort.value = ports[1]
 
         startHttpServerAsync()
 

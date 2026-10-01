@@ -1,5 +1,7 @@
 package com.ismartcoding.plain.features.audio
 
+import com.ismartcoding.plain.preferences.*
+
 import com.ismartcoding.plain.audio.DAudio
 import com.ismartcoding.plain.audio.DPlaylistAudio
 import com.ismartcoding.plain.db.AudioPlaySource
@@ -10,10 +12,6 @@ import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.platform.AppDatabase
 import com.ismartcoding.plain.platform.countMedia
 import com.ismartcoding.plain.platform.searchMedia
-import com.ismartcoding.plain.preferences.AudioPlayingPreference
-import com.ismartcoding.plain.preferences.AudioPlaylistPreference
-import com.ismartcoding.plain.preferences.AudioQueueMigratedPreference
-import com.ismartcoding.plain.preferences.AudioSortByPreference
 import kotlin.random.Random
 
 /**
@@ -54,13 +52,13 @@ object AudioQueueManager {
 
     /** One-shot import of the old preference queue into the manual queue table. */
     suspend fun ensureMigrated() {
-        if (AudioQueueMigratedPreference.getAsync()) return
-        val legacy = AudioPlaylistPreference.getValueAsync()
+        if (SystemPrefs.audioQueueMigrated.value) return
+        val legacy = UserPrefs.audioPlaylistValue()
         val rows = legacy.mapIndexed { i, a -> a.toQueueItem(i) }
         queueDao.insertAll(rows)
-        saveSource(DAudioQueueSource(currentPath = AudioPlayingPreference.getValueAsync()))
-        AudioQueueMigratedPreference.putAsync(true)
-        AudioPlaylistPreference.putAsync(listOf())
+        saveSource(DAudioQueueSource(currentPath = SystemPrefs.audioPlayingValue()))
+        SystemPrefs.audioQueueMigrated.value = true
+        UserPrefs.setAudioPlaylist(listOf())
         LogCat.d("AudioQueueManager: imported legacy queue, ${rows.size} items")
     }
 
@@ -95,7 +93,7 @@ object AudioQueueManager {
             saveSource(DAudioQueueSource())
             return null
         }
-        val sortBy = AudioSortByPreference.getValueAsync()
+        val sortBy = UserPrefs.audioSortByValue()
         var startIndex = 0
         val start = if (shuffle) {
             startIndex = Random.nextInt(size)
@@ -319,7 +317,7 @@ object AudioQueueManager {
     }
 
     private suspend fun librarySortOf(src: DAudioQueueSource): FileSortBy =
-        FileSortBy.entries.firstOrNull { it.name == src.sortBy } ?: AudioSortByPreference.getValueAsync()
+        FileSortBy.entries.firstOrNull { it.name == src.sortBy } ?: UserPrefs.audioSortByValue()
 
     /** Rank of the current track in the playback order, -1 if unknown. */
     private suspend fun currentRank(order: Order): Int {
@@ -442,7 +440,7 @@ object AudioQueueManager {
 
     private suspend fun libraryTrackAt(index: Int): DAudio? {
         if (index < 0) return null
-        return searchMedia(DataType.AUDIO, "", 1, index, AudioSortByPreference.getValueAsync())
+        return searchMedia(DataType.AUDIO, "", 1, index, UserPrefs.audioSortByValue())
             .filterIsInstance<DAudio>()
             .firstOrNull()
     }

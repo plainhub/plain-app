@@ -1,5 +1,6 @@
 package com.ismartcoding.plain.ui.page.docs
 
+import com.ismartcoding.plain.preferences.*
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -21,7 +22,6 @@ import com.ismartcoding.plain.lib.withIO
 import com.ismartcoding.plain.i18n.*
 import com.ismartcoding.plain.platform.PBackHandler
 import com.ismartcoding.plain.enums.AppFeatureType
-import com.ismartcoding.plain.preferences.DocSortByPreference
 import com.ismartcoding.plain.ui.base.AnimatedBottomAction
 import com.ismartcoding.plain.ui.components.MediaTopBar
 import com.ismartcoding.plain.ui.base.NeedPermissionColumn
@@ -107,7 +107,7 @@ fun DocsPage(
                 scrollToTop = { scope.launch { scrollState.scrollToItem(0) } },
                 onSortSelected = { sortBy ->
                     scope.launch(Dispatchers.Default) {
-                        DocSortByPreference.putAsync(sortBy)
+                        UserPrefs.setDocSortBy(sortBy)
                         docsVM.sortBy.value = sortBy
                         docsVM.loadAsync(tagsVM)
                     }

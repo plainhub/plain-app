@@ -2,27 +2,27 @@ package com.ismartcoding.plain.features.sms
 
 import com.ismartcoding.plain.events.SmsSendResultData
 import com.ismartcoding.plain.lib.JsonHelper
-import com.ismartcoding.plain.preferences.Prefs
+import com.ismartcoding.plain.preferences.*
 import kotlinx.serialization.json.JsonPrimitive
 
 private class RustSmsSendStateStore : SmsSendStateStore {
     override fun read(requestId: String): SmsPendingSendState? {
-        val encoded = Prefs.string(KEY_PREFIX + requestId)
+        val encoded = Prefs.systemString(KEY_PREFIX + requestId)
         return encoded?.let { runCatching { JsonHelper.jsonDecode<SmsPendingSendState>(it) }.getOrNull() }
     }
 
     override fun readAll(): List<SmsPendingSendState> {
-        return Prefs.snapshot.mapNotNull { (key, value) ->
+        return Prefs.systemSnapshot.mapNotNull { (key, value) ->
             if (!key.startsWith(KEY_PREFIX) || value !is JsonPrimitive || !value.isString) null else runCatching { JsonHelper.jsonDecode<SmsPendingSendState>(value.content) }.getOrNull()
         }
     }
 
     override fun write(state: SmsPendingSendState) {
-        Prefs.setString(KEY_PREFIX + state.requestId, JsonHelper.jsonEncode(state))
+        Prefs.setSystemString(KEY_PREFIX + state.requestId, JsonHelper.jsonEncode(state))
     }
 
     override fun remove(requestId: String) {
-        Prefs.remove(KEY_PREFIX + requestId)
+        Prefs.removeSystemPref(KEY_PREFIX + requestId)
     }
 
     private companion object {

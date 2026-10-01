@@ -1,5 +1,6 @@
 package com.ismartcoding.plain.platform
 
+import com.ismartcoding.plain.preferences.*
 import com.ismartcoding.plain.api.OkHttpClientFactory
 import com.ismartcoding.plain.appContext
 import com.ismartcoding.plain.events.UpdateDownloadCompleteEvent
@@ -8,7 +9,6 @@ import com.ismartcoding.plain.events.UpdateDownloadProgressEvent
 import com.ismartcoding.plain.lib.coIO
 import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.lib.sendEvent
-import com.ismartcoding.plain.preferences.UpdateInfoPreference
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.ensureActive
@@ -22,7 +22,7 @@ actual fun downloadUpdateAsync() {
     downloadJob?.cancel()
     downloadJob = coIO {
         val context = appContext
-        val url = UpdateInfoPreference.getValueAsync().downloadUrl
+        val url = SystemPrefs.updateInfoValue().downloadUrl
         if (url.isEmpty()) {
             sendEvent(UpdateDownloadFailedEvent())
             return@coIO
@@ -50,7 +50,7 @@ actual fun downloadUpdateAsync() {
                     }
                 }
             }
-            UpdateInfoPreference.updateAsync { it.copy(downloadedApkPath = outputFile.absolutePath) }
+            SystemPrefs.updateInfo { it.copy(downloadedApkPath = outputFile.absolutePath) }
             sendEvent(UpdateDownloadCompleteEvent(outputFile.absolutePath))
         } catch (e: CancellationException) {
             call.cancel()
@@ -68,5 +68,5 @@ actual fun downloadUpdateAsync() {
 actual fun cancelUpdateDownloadAsync() {
     downloadJob?.cancel()
     downloadJob = null
-    coIO { UpdateInfoPreference.updateAsync { it.copy(downloadedApkPath = "") } }
+    coIO { SystemPrefs.updateInfo { it.copy(downloadedApkPath = "") } }
 }

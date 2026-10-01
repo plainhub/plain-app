@@ -1,5 +1,7 @@
 package com.ismartcoding.plain.platform
 
+import com.ismartcoding.plain.preferences.*
+
 import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.lib.kgraphql.GraphQLError
 import com.ismartcoding.plain.lib.logcat.LogCat
@@ -55,7 +57,7 @@ object IosRequestProcessor {
             // Ktor CORS plugin on Android. Without this the browser blocks
             // every cross-origin request to the iOS SwiftNIO server.
             val origin = ctx.getRequestHeader("origin")
-            if (origin != null && TempData.allowAnyHost.value) {
+            if (origin != null && UserPrefs.allowAnyHost.value) {
                 // Credentials are not enabled, so the wildcard is safe — any-host
                 // mode is only active in debug builds or when the user enabled
                 // "Allow any host" in Developer settings.
@@ -84,7 +86,7 @@ object IosRequestProcessor {
             // serviceEnabled=true. Main-UI routes are rejected here; the
             // authoritative check still lives in each route handler so BLE
             // RPC (which bypasses this processor) is also covered.
-            if (!TempData.desktopAccessEnabled.value && !isPeerAccessiblePath(method, ctx.path) && !isDlnaPath(method, ctx.path) && !isSharePath(method, ctx.path)) {
+            if (!UserPrefs.desktopAccess.value && !isPeerAccessiblePath(method, ctx.path) && !isDlnaPath(method, ctx.path) && !isSharePath(method, ctx.path)) {
                 ctx.responseStatus = HttpStatus.NOT_FOUND
                 return
             }

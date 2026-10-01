@@ -27,7 +27,7 @@ actual fun Permission.isGranted(): Boolean = when {
     this == Permission.QUERY_ALL_PACKAGES -> true
     this == Permission.ADB -> ShizukuHelper.isGranted()
     // Clipboard access needs no OS runtime permission; the web-side switch
-    // (ApiPermissionsPreference) is the sole gate.
+    // (SystemPrefs.apiPermissions) is the sole gate.
     this == Permission.CLIPBOARD -> true
     this == Permission.WRITE_EXTERNAL_STORAGE -> FileHelper.hasStoragePermission(appContext)
     this == Permission.POST_NOTIFICATIONS -> {

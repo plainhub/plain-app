@@ -1,5 +1,7 @@
 package com.ismartcoding.plain.chat.peer.transport.aware
 
+import com.ismartcoding.plain.preferences.*
+
 import android.Manifest
 import android.annotation.SuppressLint
 import android.net.ConnectivityManager
@@ -238,7 +240,7 @@ class AwarePeerLink(
         }
         pmk?.let { builder.setPmk(it) }
         if (!isClient) {
-            builder.setPort(TempData.httpsPort.value)
+            builder.setPort(UserPrefs.httpsPort.value)
         }
         LogCat.d("[AWARE] buildSpecifier peer=$peerId role=${if (isClient) "client" else "server"} pmk=${pmk != null}")
         return builder.build()

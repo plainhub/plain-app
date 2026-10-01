@@ -1,4 +1,6 @@
 package com.ismartcoding.plain.services
+
+import com.ismartcoding.plain.preferences.*
 import com.ismartcoding.plain.appContext
 
 import com.ismartcoding.plain.platform.LocaleHelper
@@ -13,7 +15,6 @@ import androidx.core.content.ContextCompat
 import com.ismartcoding.plain.enums.HttpServerState
 import com.ismartcoding.plain.platform.stopHttpServiceAsync
 import com.ismartcoding.plain.httpserver.HttpServerManager
-import com.ismartcoding.plain.preferences.ServicePreference
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -95,7 +96,7 @@ class QSTileService : TileService() {
                 // external caller (e.g. `adb shell am start --ez start_web_service true`).
                 serviceScope.launch(Dispatchers.IO) {
                     val appContext = applicationContext
-                    ServicePreference.putAsync(true)
+                    UserPrefs.service.value = true
                     ContextCompat.startForegroundService(
                         appContext,
                         Intent(appContext, HttpServerService::class.java),
@@ -109,7 +110,7 @@ class QSTileService : TileService() {
                 qsTile?.updateTile()
 
                 serviceScope.launch(Dispatchers.IO) {
-                    ServicePreference.putAsync(false)
+                    UserPrefs.service.value = false
                     stopHttpServiceAsync()
                     withContext(Dispatchers.Main.immediate) {
                         setState(Tile.STATE_INACTIVE)

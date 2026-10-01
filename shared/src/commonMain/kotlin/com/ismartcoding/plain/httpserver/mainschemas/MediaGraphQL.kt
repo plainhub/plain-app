@@ -1,5 +1,6 @@
 package com.ismartcoding.plain.httpserver.mainschemas
 
+import com.ismartcoding.plain.preferences.*
 import com.ismartcoding.plain.platform.isRPlus
 import com.ismartcoding.plain.lib.kgraphql.annotations.GraphQLMutation
 import com.ismartcoding.plain.lib.kgraphql.annotations.GraphQLQuery
@@ -25,7 +26,6 @@ import com.ismartcoding.plain.platform.moveMedia
 import com.ismartcoding.plain.helpers.FilePathValidator
 import com.ismartcoding.plain.helpers.QueryHelper
 import com.ismartcoding.plain.features.audio.AudioQueueManager
-import com.ismartcoding.plain.preferences.VideoPlaylistPreference
 import com.ismartcoding.plain.httpserver.models.ActionResult
 import com.ismartcoding.plain.httpserver.models.MediaBucket
 import com.ismartcoding.plain.httpserver.models.toModel
@@ -71,7 +71,7 @@ suspend fun trashMediaItems(type: MediaDataType, query: String): ActionResult {
         MediaDataType.VIDEO -> {
             val paths = getMediaPathsByIds(dataType, ids)
             trashMedia(dataType, ids)
-            VideoPlaylistPreference.deleteAsync(paths)
+            UserPrefs.deleteVideos(paths)
         }
 
         MediaDataType.IMAGE -> {

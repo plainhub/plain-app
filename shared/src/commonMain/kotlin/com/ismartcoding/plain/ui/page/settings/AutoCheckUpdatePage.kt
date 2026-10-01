@@ -1,4 +1,8 @@
 package com.ismartcoding.plain.ui.page.settings
+
+import com.ismartcoding.plain.ui.extensions.collectAsStateValue
+
+import com.ismartcoding.plain.preferences.*
 import com.ismartcoding.plain.ui.theme.PlainTheme
 
 import androidx.compose.foundation.layout.padding
@@ -12,8 +16,6 @@ import androidx.navigation.NavHostController
 import com.ismartcoding.plain.i18n.Res
 import com.ismartcoding.plain.i18n.auto_check_update
 import com.ismartcoding.plain.i18n.auto_check_update_desc
-import com.ismartcoding.plain.preferences.LocalAutoCheckUpdate
-import com.ismartcoding.plain.preferences.UpdateInfoPreference
 import com.ismartcoding.plain.ui.base.BottomSpace
 import com.ismartcoding.plain.ui.base.HorizontalSpace
 import com.ismartcoding.plain.ui.base.PCard
@@ -31,7 +33,7 @@ import org.jetbrains.compose.resources.stringResource
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AutoCheckUpdatePage(navController: NavHostController, updateViewModel: UpdateViewModel) {
-    val autoCheckUpdate = LocalAutoCheckUpdate.current
+    val autoCheckUpdate = SystemPrefs.parseUpdateInfo(SystemPrefs.updateInfo.collectAsStateValue()).autoCheckUpdate
     val scope = rememberCoroutineScope()
 
     UpdateDialog(updateViewModel)
@@ -52,7 +54,7 @@ fun AutoCheckUpdatePage(navController: NavHostController, updateViewModel: Updat
                     PCard(modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN)) {
                         PListItem(title = stringResource(Res.string.auto_check_update), subtitle = stringResource(Res.string.auto_check_update_desc)) {
                             PSwitch(activated = autoCheckUpdate) { newValue -> scope.launch(Dispatchers.Default) {
-                                UpdateInfoPreference.updateAsync { it.copy(autoCheckUpdate = newValue) } }
+                                SystemPrefs.updateInfo { it.copy(autoCheckUpdate = newValue) } }
                             }
                             HorizontalSpace(8.dp)
                         }

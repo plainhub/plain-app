@@ -1,4 +1,6 @@
 package com.ismartcoding.plain.audio
+
+import com.ismartcoding.plain.preferences.*
 import com.ismartcoding.plain.appContext
 
 import android.content.ComponentName
@@ -16,7 +18,6 @@ import com.ismartcoding.plain.enums.MediaPlayMode
 import com.ismartcoding.plain.events.AudioActionEvent
 import com.ismartcoding.plain.features.audio.AudioQueueManager
 import com.ismartcoding.plain.lib.sendEvent
-import com.ismartcoding.plain.preferences.AudioPlayingPreference
 import com.ismartcoding.plain.services.AudioPlayerService
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -89,7 +90,7 @@ object AudioPlayer {
             player = mediaControllerFuture.get().also {
                 it.addListener(playerListener)
                 refreshPlayingState()
-                it.setPlaybackSpeed(TempData.audioPlaybackSpeed.value)
+                it.setPlaybackSpeed(UserPrefs.audioPlaybackSpeed.value)
             }
             coMain {
                 callback()
@@ -132,7 +133,7 @@ object AudioPlayer {
             }
 
             val context = appContext
-            val path = AudioPlayingPreference.getValueAsync()
+            val path = SystemPrefs.audioPlayingValue()
             if (path.isEmpty()) {
                 return@coMain
             }
@@ -181,7 +182,7 @@ object AudioPlayer {
         coIO {
             val audio = AudioQueueManager.resolveNext(
                 isNext = isNext,
-                shuffle = TempData.audioPlayMode.value == MediaPlayMode.SHUFFLE,
+                shuffle = UserPrefs.audioPlayMode.value == MediaPlayMode.SHUFFLE,
             )
             if (audio == null) {
                 LogCat.d("skipTo: nothing to play, queue is empty")
@@ -219,7 +220,7 @@ object AudioPlayer {
 
     fun setPlaybackSpeed(speed: Float) {
         coMain {
-            TempData.audioPlaybackSpeed.value = speed
+            UserPrefs.audioPlaybackSpeed.value = speed
             player?.setPlaybackSpeed(speed)
         }
     }
@@ -237,7 +238,7 @@ object AudioPlayer {
         player?.setMediaItem(audio.toMediaItem())
         player?.prepare()
         player?.seekTo(TempData.audioPlayPosition)
-        player?.setPlaybackSpeed(TempData.audioPlaybackSpeed.value)
+        player?.setPlaybackSpeed(UserPrefs.audioPlaybackSpeed.value)
         player?.play()
         coIO { AudioQueueManager.onPlaying(audio.path, audio.title, audio.artist, audio.durationMs) }
     }

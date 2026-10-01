@@ -1,5 +1,6 @@
 package com.ismartcoding.plain.helpers
 
+import com.ismartcoding.plain.preferences.*
 import android.app.ActivityManager
 import android.app.ActivityManager.RunningAppProcessInfo.IMPORTANCE_FOREGROUND
 import android.app.ActivityManager.RunningAppProcessInfo.IMPORTANCE_VISIBLE
@@ -18,7 +19,6 @@ import com.ismartcoding.plain.i18n.rate_limit
 import com.ismartcoding.plain.platform.HttpStatusCode
 import com.ismartcoding.plain.platform.createHttpClient
 import com.ismartcoding.plain.platform.get
-import com.ismartcoding.plain.preferences.UpdateInfoPreference
 import com.ismartcoding.plain.ui.helpers.DialogHelper
 import java.io.File
 
@@ -43,7 +43,7 @@ object AppHelper {
         return try {
             val r = createHttpClient().get(Constants.LATEST_RELEASE_URL)
             r.use {
-                UpdateInfoPreference.updateAsync { it.copy(checkUpdateTime = System.currentTimeMillis()) }
+                SystemPrefs.updateInfo { it.copy(checkUpdateTime = System.currentTimeMillis()) }
                 if (it.status == HttpStatusCode.Forbidden) {
                     if (showToast) {
                         DialogHelper.showMessage(Res.string.rate_limit)
@@ -60,7 +60,7 @@ object AppHelper {
                 }
 
                 val latest = jsonDecode<LatestRelease>(latestJSON)
-                val current = UpdateInfoPreference.getValueAsync()
+                val current = SystemPrefs.updateInfoValue()
                 val skipVersion = Version(current.skipVersion)
                 val currentVersion = Version(getAppVersionName())
                 val latestVersion = Version(latest.tagName.substring(1))
@@ -75,7 +75,7 @@ object AppHelper {
                             it.name.contains("Recommended")
                         }
                     }
-                    UpdateInfoPreference.updateAsync {
+                    SystemPrefs.updateInfo {
                         it.copy(
                             newVersion = latestVersion.toString(),
                             log = latest.body,

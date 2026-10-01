@@ -1,5 +1,6 @@
 package com.ismartcoding.plain.ui.page.scan
 
+import com.ismartcoding.plain.preferences.*
 import com.ismartcoding.plain.i18n.*
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -53,7 +54,6 @@ import com.ismartcoding.plain.events.PickFileResultEvent
 import com.ismartcoding.plain.events.RequestPermissionsEvent
 import com.ismartcoding.plain.lib.sendEvent
 import com.ismartcoding.plain.platform.LocaleHelper
-import com.ismartcoding.plain.preferences.ScanHistoryPreference
 import com.ismartcoding.plain.ui.base.NavigationCloseIcon
 import com.ismartcoding.plain.ui.base.PIconButton
 import com.ismartcoding.plain.ui.base.PScaffold
@@ -324,9 +324,9 @@ fun ScanPage(navController: NavHostController) {
 
 private fun addScanResult(scope: CoroutineScope, value: String) {
     scope.launch {
-        val results = ScanHistoryPreference.getValueAsync().toMutableList()
+        val results = UserPrefs.scanHistoryValue().toMutableList()
         results.removeAll { it == value }
         results.add(0, value)
-        ScanHistoryPreference.putAsync(results)
+        UserPrefs.setScanHistory(results)
     }
 }

@@ -1,5 +1,6 @@
 package com.ismartcoding.plain.ui.components
 
+import com.ismartcoding.plain.preferences.*
 import com.ismartcoding.plain.enums.FilesType
 import com.ismartcoding.plain.lib.extensions.getFilenameFromPath
 import com.ismartcoding.plain.platform.appDir
@@ -8,7 +9,6 @@ import com.ismartcoding.plain.platform.getInternalStorageName
 import com.ismartcoding.plain.platform.getInternalStoragePath
 import com.ismartcoding.plain.platform.getSDCardPath
 import com.ismartcoding.plain.platform.getUsbDiskPaths
-import com.ismartcoding.plain.preferences.FavoriteFoldersPreference
 import com.ismartcoding.plain.ui.models.FilesViewModel
 import com.ismartcoding.plain.ui.models.FolderOption
 import com.ismartcoding.plain.lib.withIO
@@ -25,7 +25,7 @@ suspend fun buildFolderOptions(
     val externalFilesDirPath = appDir()
     val sdCardPath = getSDCardPath()
     val usbPaths = getUsbDiskPaths()
-    val favoriteFolders = FavoriteFoldersPreference.getValueAsync()
+    val favoriteFolders = UserPrefs.favoriteFoldersValue()
 
     val allPaths = mutableListOf(internalStoragePath, externalFilesDirPath)
     if (sdCardPath.isNotEmpty()) allPaths.add(sdCardPath)

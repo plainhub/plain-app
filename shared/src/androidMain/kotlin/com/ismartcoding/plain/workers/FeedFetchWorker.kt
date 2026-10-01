@@ -1,5 +1,7 @@
 package com.ismartcoding.plain.workers
 
+import com.ismartcoding.plain.preferences.*
+
 import com.ismartcoding.plain.appContext
 import com.ismartcoding.plain.features.feed.FeedFetcher
 import android.content.Context
@@ -12,7 +14,6 @@ import androidx.work.WorkManager
 import androidx.work.WorkerParameters
 import androidx.work.workDataOf
 import com.ismartcoding.plain.lib.withIO
-import com.ismartcoding.plain.preferences.FeedAutoRefreshIntervalPreference
 import java.util.concurrent.TimeUnit
 
 class FeedFetchWorker(
@@ -50,7 +51,7 @@ class FeedFetchWorker(
         suspend fun startRepeatWorkerAsync(context: Context) = withIO {
             val request =
                 PeriodicWorkRequestBuilder<FeedFetchWorker>(
-                    FeedAutoRefreshIntervalPreference.getAsync().toLong(),
+                    UserPrefs.feedAutoRefreshInterval.value.toLong(),
                     TimeUnit.SECONDS,
                 ).setInputData(workDataOf("auto_refresh" to true))
                     .setConstraints(Constraints.Builder().build())

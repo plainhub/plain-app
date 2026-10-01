@@ -1,4 +1,6 @@
 package com.ismartcoding.plain.ui.models
+
+import com.ismartcoding.plain.preferences.*
 import com.ismartcoding.plain.platform.LocaleHelper
 
 import com.ismartcoding.plain.i18n.*
@@ -11,7 +13,6 @@ import com.ismartcoding.plain.lib.sendEvent
 import com.ismartcoding.plain.platform.checkHttpServerAsync
 import com.ismartcoding.plain.platform.isIgnoringBatteryOptimizations
 import com.ismartcoding.plain.platform.relaunchApp
-import com.ismartcoding.plain.preferences.KeepAwakePreference
 import com.ismartcoding.plain.ui.helpers.DialogHelper
 import kotlinx.coroutines.launch
 
@@ -43,7 +44,7 @@ class DesktopAccessSettingsViewModel : ViewModel() {
 
     fun enableKeepAwake(enable: Boolean) {
         viewModelScope.launchSafe {
-            KeepAwakePreference.putAsync(enable)
+            UserPrefs.keepAwake.value = enable
             sendEvent(KeepAwakeChangedEvent(enable))
         }
     }

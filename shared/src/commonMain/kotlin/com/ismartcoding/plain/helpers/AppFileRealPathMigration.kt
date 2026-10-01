@@ -14,7 +14,7 @@ import com.ismartcoding.plain.lib.withIO
  * platform-specific prefix. Idempotent — rows already storing a relative
  * path (not starting with `/`) are left untouched.
  *
- * Guarded by [com.ismartcoding.plain.preferences.AppFileRealPathMigratedPreference]
+ * Guarded by [com.ismartcoding.plain.preferences.SystemPrefs.appFileRealPathMigrated]
  * so it only runs once.
  */
 object AppFileRealPathMigration {

@@ -1,5 +1,7 @@
 package com.ismartcoding.plain.ui.page.images
 
+import com.ismartcoding.plain.preferences.*
+
 import com.ismartcoding.plain.i18n.*
 import com.ismartcoding.plain.platform.PBackHandler
 import androidx.compose.animation.AnimatedVisibility
@@ -44,8 +46,6 @@ import com.ismartcoding.plain.features.file.FileSortBy
 import com.ismartcoding.plain.platform.LocaleHelper
 import com.ismartcoding.plain.platform.isGestureInteractionMode
 import com.ismartcoding.plain.lib.Channel
-import com.ismartcoding.plain.preferences.ImageGridCellsPerRowPreference
-import com.ismartcoding.plain.preferences.ImageSortByPreference
 import com.ismartcoding.plain.ui.base.AnimatedBottomAction
 import com.ismartcoding.plain.ui.base.BottomSpace
 import com.ismartcoding.plain.ui.components.MediaTopBar
@@ -113,7 +113,7 @@ fun ImagesPage(
     val previewerState = rememberPreviewerState()
     val tagsMapState by tagsVM.tagsMapFlow.collectAsState()
     val bucketsMap by mediaFoldersVM.bucketsMapFlow.collectAsState()
-    val cellsPerRow = remember { mutableIntStateOf(ImageGridCellsPerRowPreference.default) }
+    val cellsPerRow = remember { mutableIntStateOf(UserPrefs.imageGridCellsPerRow.default) }
     val density = LocalDensity.current
     val windowInfo = LocalWindowInfo.current
     val imageWidthPx = remember(cellsPerRow.value, windowInfo.containerSize.width) {
@@ -146,8 +146,8 @@ fun ImagesPage(
 
     val reloadAfterGrant: () -> Unit = {
         scope.launch {
-            cellsPerRow.value = ImageGridCellsPerRowPreference.getAsync()
-            imagesVM.sortBy.value = ImageSortByPreference.getValueAsync()
+            cellsPerRow.value = UserPrefs.imageGridCellsPerRow.value
+            imagesVM.sortBy.value = UserPrefs.imageSortByValue()
             imagesVM.loadAsync(tagsVM)
             mediaFoldersVM.loadAsync()
         }
@@ -211,7 +211,7 @@ fun ImagesPage(
                 },
                 onSortSelected = { sortBy ->
                     scope.launch {
-                        ImageSortByPreference.putAsync(sortBy)
+                        UserPrefs.setImageSortBy(sortBy)
                         imagesVM.sortBy.value = sortBy
                         imagesVM.loadAsync(tagsVM)
                     }
@@ -256,7 +256,7 @@ fun ImagesPage(
                                     .nestedScroll(scrollBehavior.nestedScrollConnection)
                                     .gridDragSelect(items = itemsState, state = dragSelectState)
                                     .pinchZoomGrid(cellsPerRow = cellsPerRow, hapticFeedback = hapticFeedback, scope = scope) {
-                                        ImageGridCellsPerRowPreference.putAsync(it)
+                                        UserPrefs.imageGridCellsPerRow.value = it
                                     },
                                 horizontalArrangement = Arrangement.spacedBy(2.dp),
                                 verticalArrangement = Arrangement.spacedBy(2.dp)

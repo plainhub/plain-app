@@ -13,6 +13,7 @@ import com.ismartcoding.plain.lib.kgraphql.schema.model.EnumValueDef
 import com.ismartcoding.plain.lib.kgraphql.schema.model.MutableSchemaDefinition
 import com.ismartcoding.plain.lib.kgraphql.schema.model.TypeDef
 import com.ismartcoding.plain.lib.kgraphql.schema.structure.SchemaCompilation
+import com.ismartcoding.plain.lib.kgraphql.schema.scalar.JsonElementScalarCoercion
 import com.ismartcoding.plain.lib.kgraphql.schema.dsl.types.BooleanScalarDSL
 import com.ismartcoding.plain.lib.kgraphql.schema.dsl.types.DoubleScalarDSL
 import com.ismartcoding.plain.lib.kgraphql.schema.dsl.types.EnumDSL
@@ -50,6 +51,11 @@ class SchemaBuilder internal constructor() {
 
     fun configure(block: SchemaConfigurationDSL.() -> Unit){
         configuration.update(block)
+    }
+
+    fun jsonScalar(name: String = "JSON", description: String? = null) {
+        configuration.scalarDeserializers[JsonElement::class] = { it }
+        model.addScalar(TypeDef.Scalar(name, JsonElement::class, JsonElementScalarCoercion, description))
     }
 
     //================================================================================

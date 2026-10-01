@@ -1,4 +1,6 @@
 package com.ismartcoding.plain.ui.page
+
+import com.ismartcoding.plain.preferences.*
 import androidx.compose.foundation.layout.padding
 import androidx.compose.ui.Modifier
 import com.ismartcoding.plain.ui.theme.PlainTheme
@@ -156,12 +158,12 @@ private fun EditorDisplayActionsCard(textFileVM: TextFileViewModel, scope: kotli
         ) {
             val next = when (controller.fontSizeSp.value) { 12 -> 14; 14 -> 16; else -> 12 }
             controller.fontSizeSp.value = next
-            scope.launchSafe { com.ismartcoding.plain.preferences.EditorFontSizePreference.putAsync(next) }
+            scope.launchSafe { com.ismartcoding.plain.preferences.UserPrefs.editorFontSize.value = next }
         }
         PListItem(title = stringResource(Res.string.status_bar), action = {
             PSwitch(activated = controller.statusBarVisible.value) {
                 controller.statusBarVisible.value = !controller.statusBarVisible.value
-                scope.launchSafe { com.ismartcoding.plain.preferences.EditorStatusBarPreference.putAsync(controller.statusBarVisible.value) }
+                scope.launchSafe { com.ismartcoding.plain.preferences.UserPrefs.editorStatusBar.value = controller.statusBarVisible.value }
             }
             HorizontalSpace(8.dp)
         })

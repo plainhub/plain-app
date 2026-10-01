@@ -1,5 +1,9 @@
 package com.ismartcoding.plain.platform
 
+import com.ismartcoding.plain.ui.extensions.collectAsStateValue
+
+import com.ismartcoding.plain.preferences.*
+
 import android.net.Uri
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -9,8 +13,6 @@ import com.ismartcoding.plain.lib.pdfviewer.PDFView
 import com.ismartcoding.plain.lib.pdfviewer.listener.OnPageErrorListener
 import com.ismartcoding.plain.lib.pdfviewer.util.FitPolicy
 import com.ismartcoding.plain.enums.DarkTheme
-import com.ismartcoding.plain.preferences.LocalDarkTheme
-import com.ismartcoding.plain.preferences.LocalPdfFollowDarkTheme
 
 @Composable
 actual fun PdfView(
@@ -18,9 +20,9 @@ actual fun PdfView(
     modifier: Modifier,
 ) {
     val parsedUri = Uri.parse(uri)
-    val darkTheme = LocalDarkTheme.current
+    val darkTheme = UserPrefs.darkTheme.collectAsStateValue()
     val isDarkTheme = DarkTheme.isDarkTheme(darkTheme)
-    val pdfFollowDarkTheme = LocalPdfFollowDarkTheme.current
+    val pdfFollowDarkTheme = UserPrefs.pdfFollowDarkTheme.collectAsStateValue()
     AndroidView(
         modifier = modifier,
         factory = { factoryContext ->

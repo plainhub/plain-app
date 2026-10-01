@@ -1,4 +1,6 @@
 package com.ismartcoding.plain.ui.page.dlna
+
+import com.ismartcoding.plain.preferences.*
 import com.ismartcoding.plain.ui.theme.PlainTheme
 
 import com.ismartcoding.plain.i18n.*
@@ -26,7 +28,6 @@ import com.ismartcoding.plain.enums.ButtonSize
 import com.ismartcoding.plain.features.dlna.DlnaRendererState
 import com.ismartcoding.plain.features.dlna.receiver.DlnaReceiverEngine
 import com.ismartcoding.plain.features.dlna.startDlnaRenderer
-import com.ismartcoding.plain.preferences.DlnaPreference
 import com.ismartcoding.plain.ui.base.AlertType
 import com.ismartcoding.plain.ui.base.BottomSpace
 import com.ismartcoding.plain.ui.base.PAlert
@@ -45,7 +46,7 @@ import com.ismartcoding.plain.ui.resources.history as ui_drawable_history
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DlnaReceiverPage(navController: NavHostController) {
-    val enabled by TempData.dlnaEnabled.collectAsState()
+    val enabled by UserPrefs.dlna.collectAsState()
     val startError by DlnaRendererState.startError.collectAsState()
     val isRetrying by DlnaRendererState.isRetrying.collectAsState()
 
@@ -121,7 +122,7 @@ private fun DlnaReceiverDisabledScreen() {
                 text = stringResource(Res.string.dlna_receiver_turn_on),
                 onClick = {
                     scope.launchSafe {
-                        DlnaPreference.putAsync(true)
+                        UserPrefs.dlna.value = true
                         startDlnaRenderer()
                     }
                 },

@@ -1,11 +1,12 @@
 package com.ismartcoding.plain.platform
 
+import com.ismartcoding.plain.preferences.*
+
 import androidx.compose.runtime.Composable
 import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.stringResource
 import com.ismartcoding.plain.i18n.*
 import com.ismartcoding.plain.events.RequestPermissionsEvent
-import com.ismartcoding.plain.preferences.ApiPermissionsPreference
 import com.ismartcoding.plain.lib.coIO
 import com.ismartcoding.plain.lib.sendEvent
 import com.ismartcoding.plain.ui.helpers.DialogHelper
@@ -118,7 +119,7 @@ fun Permission.grant(): Boolean {
 }
 
 suspend fun Permission.isEnabledAsync(): Boolean {
-    return ApiPermissionsPreference.getAsync().contains(name)
+    return SystemPrefs.apiPermissions.value.contains(name)
 }
 
 suspend fun Permission.enabledAndIsGrantedAsync(): Boolean {

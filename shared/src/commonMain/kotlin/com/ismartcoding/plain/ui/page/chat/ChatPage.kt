@@ -1,5 +1,7 @@
 package com.ismartcoding.plain.ui.page.chat
 
+import com.ismartcoding.plain.preferences.*
+
 import com.ismartcoding.plain.platform.handleChatFileSelection
 import com.ismartcoding.plain.chat.ShareSendHelper
 import com.ismartcoding.plain.chat.peer.PeerTransportPrewarmer
@@ -55,7 +57,6 @@ import com.ismartcoding.plain.enums.PickFileType
 import com.ismartcoding.plain.events.PickFileResultEvent
 import com.ismartcoding.plain.platform.LocaleHelper
 import com.ismartcoding.plain.lib.Channel
-import com.ismartcoding.plain.preferences.ChatInputTextPreference
 import com.ismartcoding.plain.ui.base.ActionButtonMore
 import com.ismartcoding.plain.ui.base.AnimatedBottomAction
 import com.ismartcoding.plain.ui.base.BottomActionButtons
@@ -155,7 +156,7 @@ fun ChatPage(
     }
 
     LaunchedEffect(Unit) {
-        inputValue = ChatInputTextPreference.getAsync()
+        inputValue = UserPrefs.chatInputText.value
         scope.launch(Dispatchers.Default) {
             chatVM.initializeTargetAsync(id)
             chatVM.fetchAsync(chatVM.target.value.toId)
@@ -315,7 +316,7 @@ fun ChatPage(
                     onValueChange = {
                         inputValue = it
                         scope.launch(Dispatchers.Default) {
-                            ChatInputTextPreference.putAsync(it)
+                            UserPrefs.chatInputText.value = it
                         }
                     },
                     onSend = {
@@ -323,7 +324,7 @@ fun ChatPage(
                         scope.launch {
                             chatVM.sendTextMessage(inputValue, PeerCacher.getOnlinePeerIds())
                             inputValue = ""
-                            ChatInputTextPreference.putAsync("")
+                            UserPrefs.chatInputText.value = ""
                         }
                     },
                     onShareFolder = { showFolderShareSheet = true })

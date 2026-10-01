@@ -1,5 +1,7 @@
 package com.ismartcoding.plain.httpserver.routes
 
+import com.ismartcoding.plain.preferences.*
+
 import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.enums.MediaPlayMode
 import com.ismartcoding.plain.features.audio.AudioQueueManager
@@ -191,7 +193,7 @@ private suspend fun advanceCastToNextTrack() {
     } else if (currentUri.isAudioFast()) {
         val next = AudioQueueManager.resolveNext(
             isNext = true,
-            shuffle = TempData.audioPlayMode.value == MediaPlayMode.SHUFFLE,
+            shuffle = UserPrefs.audioPlayMode.value == MediaPlayMode.SHUFFLE,
         )
         nextPath = next?.path ?: ""
         nextTitle = next?.title ?: ""

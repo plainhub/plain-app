@@ -1,4 +1,6 @@
 package com.ismartcoding.plain.ui.page.home
+
+import com.ismartcoding.plain.preferences.*
 import com.ismartcoding.plain.ui.theme.PlainTheme
 
 import androidx.compose.foundation.clickable
@@ -23,7 +25,6 @@ import com.ismartcoding.plain.i18n.desktop_access
 import com.ismartcoding.plain.i18n.desktop_access_desc
 import com.ismartcoding.plain.ui.resources.devices as ui_drawable_devices
 import com.ismartcoding.plain.i18n.open_web_address
-import com.ismartcoding.plain.preferences.DesktopAccessPreference
 import com.ismartcoding.plain.ui.base.HorizontalSpace
 import com.ismartcoding.plain.ui.base.PCard
 import com.ismartcoding.plain.ui.base.PDivider
@@ -46,7 +47,7 @@ import com.ismartcoding.plain.i18n.devices
 
 @Composable
 fun DesktopAccessSection(navController: NavHostController) {
-    val desktopAccessEnabled = TempData.desktopAccessEnabled.collectAsStateValue()
+    val desktopAccessEnabled = UserPrefs.desktopAccess.collectAsStateValue()
     val scope = rememberCoroutineScope()
     val onlineCount by onlineClientIds.map { it.size }.collectAsState(0)
 
@@ -54,7 +55,7 @@ fun DesktopAccessSection(navController: NavHostController) {
         PListItem(icon = UiRes.drawable.ui_drawable_devices, title = stringResource(Res.string.desktop_access)) {
             PSwitch(activated = desktopAccessEnabled) { enable ->
                 scope.launchSafe {
-                    DesktopAccessPreference.putAsync(enable)
+                    UserPrefs.desktopAccess.value = enable
                     if (!enable) {
                         // Desktop access disabled: actively close all live WebSocket
                         // sessions so browsers stop talking to a disabled endpoint.

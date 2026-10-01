@@ -1,4 +1,6 @@
 package com.ismartcoding.plain.ui.page.settings
+
+import com.ismartcoding.plain.ui.extensions.collectAsStateValue
 import com.ismartcoding.plain.preferences.*
 
 import com.ismartcoding.plain.i18n.*
@@ -17,9 +19,6 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.ismartcoding.plain.enums.Language
 import com.ismartcoding.plain.platform.Locale
-import com.ismartcoding.plain.preferences.LanguagePreference
-import com.ismartcoding.plain.preferences.LocalLocale
-import com.ismartcoding.plain.preferences.putAsync
 import com.ismartcoding.plain.ui.base.BottomSpace
 import com.ismartcoding.plain.ui.base.PListItem
 import com.ismartcoding.plain.ui.base.PScaffold
@@ -33,7 +32,7 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LanguagePage(navController: NavHostController) {
-    val language = LocalLocale.current
+    val language = Prefs.parseLocale(UserPrefs.locale.collectAsStateValue())
     val scope = rememberCoroutineScope()
     val list = mutableListOf<Locale?>()
     list.add(null)
@@ -54,14 +53,14 @@ fun LanguagePage(navController: NavHostController) {
                             .getCardModifier(index = if (index > 0) index - 1 else 0, size = if (index > 0) list.size - 1 else 1)
                             .clickable {
                                 scope.launch(Dispatchers.Default) {
-                                    LanguagePreference.putAsync(item)
+                                    UserPrefs.setLocale(item)
                                 }
                             },
                         title = item?.getElegantDisplayName() ?: stringResource(Res.string.use_device_language),
                     ) {
                         RadioButton(selected = (item == null && language == null) || (item?.language == language?.language && item?.country == language?.country), onClick = {
                             scope.launch(Dispatchers.Default) {
-                                LanguagePreference.putAsync(item)
+                                UserPrefs.setLocale(item)
                             }
                         })
                     }

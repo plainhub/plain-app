@@ -1,5 +1,7 @@
 package com.ismartcoding.plain.discover
 
+import com.ismartcoding.plain.preferences.*
+
 import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.ble.client.BleGattClient
 import com.ismartcoding.plain.ble.server.BlePairingSessionStore
@@ -45,7 +47,7 @@ object PairingCore {
             id = TempData.clientId,
             name = TempData.deviceName.value.ifEmpty { getDeviceName() },
             deviceType = getDeviceType(),
-            port = TempData.httpsPort.value,
+            port = UserPrefs.httpsPort.value,
             version = getAppVersion(),
             platform = getPlatformName(),
             ips = getDeviceIP4s(),
@@ -126,7 +128,7 @@ object PairingCore {
         val response = DPairingResponse(
             fromId = TempData.clientId,
             toId = request.fromId,
-            port = TempData.httpsPort.value,
+            port = UserPrefs.httpsPort.value,
             deviceType = request.deviceType,
             ecdhPublicKey = "",
             signaturePublicKey = SignatureHelper.getRawPublicKeyBase64Async(),
@@ -164,7 +166,7 @@ object PairingCore {
         val request = DPairingRequest(
             fromId = TempData.clientId,
             fromName = TempData.deviceName.value,
-            port = TempData.httpsPort.value,
+            port = UserPrefs.httpsPort.value,
             deviceType = getDeviceType(),
             ecdhPublicKey = ecdhPublicKey,
             signaturePublicKey = SignatureHelper.getRawPublicKeyBase64Async(),
@@ -193,7 +195,7 @@ object PairingCore {
         val response = DPairingResponse(
             fromId = TempData.clientId,
             toId = request.fromId,
-            port = TempData.httpsPort.value,
+            port = UserPrefs.httpsPort.value,
             deviceType = getDeviceType(),
             ecdhPublicKey = Base64.encode(keyPair.publicKeyEncoded),
             signaturePublicKey = SignatureHelper.getRawPublicKeyBase64Async(),

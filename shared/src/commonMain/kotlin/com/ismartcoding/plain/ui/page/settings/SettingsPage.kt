@@ -1,4 +1,6 @@
 package com.ismartcoding.plain.ui.page.settings
+
+import com.ismartcoding.plain.preferences.*
 import com.ismartcoding.plain.ui.theme.PlainTheme
 
 import com.ismartcoding.plain.i18n.*
@@ -33,9 +35,6 @@ import com.ismartcoding.plain.platform.getCacheSize
 import com.ismartcoding.plain.platform.getLogFileSize
 import com.ismartcoding.plain.platform.getOSVersion
 import com.ismartcoding.plain.ui.nav.Routing
-import com.ismartcoding.plain.preferences.NearbyDiscoverablePreference
-import com.ismartcoding.plain.preferences.UpdateInfoPreference
-import com.ismartcoding.plain.preferences.appPreferences
 import com.ismartcoding.plain.ui.extensions.collectAsStateValue
 import com.ismartcoding.plain.ui.models.PeerViewModel
 import kotlinx.coroutines.Dispatchers
@@ -63,9 +62,7 @@ fun SettingsPage(navController: NavHostController, updateViewModel: UpdateViewMo
     val listState = rememberLazyListState()
     var cacheSize by remember { mutableLongStateOf(0L) }
     var fileSize by remember { mutableLongStateOf(getLogFileSize()) }
-    val isDiscoverable = remember {
-        appPreferences.snapshots.map { NearbyDiscoverablePreference.get(it) }
-    }.collectAsStateValue(initial = NearbyDiscoverablePreference.default)
+    val isDiscoverable = UserPrefs.nearbyDiscoverable.collectAsStateValue()
     LaunchedEffect(Unit) {
         scope.launch(Dispatchers.Default) {
             cacheSize = getCacheSize()
@@ -124,7 +121,7 @@ fun SettingsPage(navController: NavHostController, updateViewModel: UpdateViewMo
                                 PFilledButton(text = stringResource(Res.string.check_update), buttonSize = ButtonSize.SMALL, onClick = {
                                     scope.launch {
                                         DialogHelper.showMessage(Res.string.checking_updates)
-                                        UpdateInfoPreference.updateAsync { it.copy(skipVersion = "") }
+                                        SystemPrefs.updateInfo { it.copy(skipVersion = "") }
                                         val r = withIO { checkUpdateAsync(true) }
                                         if (r != null) {
                                             if (r) updateViewModel.showDialog()

@@ -1,5 +1,7 @@
 package com.ismartcoding.plain.ui.page.audioplayer
 
+import com.ismartcoding.plain.preferences.*
+
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -67,8 +69,8 @@ fun AudioPlayerPage(audioQueueVM: AudioQueueViewModel, onDismissRequest: () -> U
     val scope = rememberCoroutineScope()
     var progress by remember { mutableFloatStateOf(0f) }
     val isPlaying by audioIsPlayingFlow().collectAsState()
-    val playMode by TempData.audioPlayMode.collectAsState()
-    val playbackSpeed by TempData.audioPlaybackSpeed.collectAsState()
+    val playMode by UserPrefs.audioPlayMode.collectAsState()
+    val playbackSpeed by UserPrefs.audioPlaybackSpeed.collectAsState()
     var showQueue by remember { mutableStateOf(false) }
     var showSleepTimer by remember { mutableStateOf(false) }
     var isDragging by remember { mutableStateOf(false) }

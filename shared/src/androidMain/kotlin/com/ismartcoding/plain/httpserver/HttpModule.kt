@@ -1,5 +1,7 @@
 package com.ismartcoding.plain.httpserver
 
+import com.ismartcoding.plain.preferences.*
+
 import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.lib.kgraphql.GraphQLError
 import com.ismartcoding.plain.httpserver.CorsPolicy
@@ -50,7 +52,7 @@ object HttpModule {
 
     val module: Application.() -> Unit = {
         install(CORS) {
-            if (TempData.allowAnyHost.value) {
+            if (UserPrefs.allowAnyHost.value) {
                 anyHost()
             }
             CorsPolicy.allowedHeaderPrefixes.forEach { allowHeadersPrefixed(it) }
@@ -81,7 +83,7 @@ object HttpModule {
             // serviceEnabled=true. Main-UI routes are rejected here; the
             // authoritative check still lives in each route handler so BLE
             // RPC (which bypasses this intercept) is also covered.
-            if (!TempData.desktopAccessEnabled.value && !isPeerAccessiblePath(method, path) && !isDlnaPath(method, path) && !isSharePath(method, path)) {
+            if (!UserPrefs.desktopAccess.value && !isPeerAccessiblePath(method, path) && !isDlnaPath(method, path) && !isSharePath(method, path)) {
                 call.respond(HttpStatusCode.NotFound)
                 return@intercept finish()
             }

@@ -1,5 +1,7 @@
 package com.ismartcoding.plain.httpserver
 
+import com.ismartcoding.plain.preferences.*
+
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateSetOf
 import com.ismartcoding.plain.TempData
@@ -30,8 +32,6 @@ import com.ismartcoding.plain.platform.randomPassword
 import com.ismartcoding.plain.platform.sendWebLoginNotification
 import com.ismartcoding.plain.platform.sha512
 import com.ismartcoding.plain.platform.stopHttpServiceAsync
-import com.ismartcoding.plain.preferences.PasswordPreference
-import com.ismartcoding.plain.preferences.ServicePreference
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.delay
@@ -168,7 +168,7 @@ object HttpServerManager {
     /** Reset the web console password to a new random value and persist it. */
     suspend fun resetPasswordAsync(): String {
         val password = randomPassword(6)
-        PasswordPreference.putAsync(password)
+        SystemPrefs.password.value = password
         return password
     }
 
@@ -204,7 +204,7 @@ object HttpServerManager {
     /** User intent: persist the service preference and dispatch start/stop. */
     fun setServiceEnabled(enable: Boolean) {
         coIO {
-            ServicePreference.putAsync(enable)
+            UserPrefs.service.value = enable
             if (enable) requestStart(fromUi = true) else stopHttpServiceAsync()
         }
     }
@@ -219,7 +219,7 @@ object HttpServerManager {
     fun ensureStarted() {
         coIO {
             runCatching {
-                if (ServicePreference.getAsync() && serverState.value == HttpServerState.OFF) {
+                if (UserPrefs.service.value && serverState.value == HttpServerState.OFF) {
                     requestStart(fromUi = false)
                 }
             }.onFailure { LogCat.e("ensureStarted failed: ${it.message}") }
@@ -228,7 +228,7 @@ object HttpServerManager {
 
     /** Derive the ChaCha20 token (first 32 bytes of the SHA-512 of the password). */
     suspend fun passwordToToken(): ByteArray {
-        val password = PasswordPreference.getAsync()
+        val password = SystemPrefs.password.value
         return withIO { hashToToken(sha512(password.encodeToByteArray())) }
     }
 
@@ -243,8 +243,8 @@ object HttpServerManager {
      */
     fun getNotificationContent(): String {
         val ip = TempData.mdnsHostname
-        val http = UrlHelper.buildUrl("http", ip, TempData.httpPort.value)
-        val https = UrlHelper.buildUrl("https", ip, TempData.httpsPort.value)
+        val http = UrlHelper.buildUrl("http", ip, UserPrefs.httpPort.value)
+        val https = UrlHelper.buildUrl("https", ip, UserPrefs.httpsPort.value)
         return "$http\n$https"
     }
 

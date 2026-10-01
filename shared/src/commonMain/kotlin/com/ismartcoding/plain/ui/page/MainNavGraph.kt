@@ -1,5 +1,6 @@
 package com.ismartcoding.plain.ui.page
 
+import com.ismartcoding.plain.preferences.*
 import androidx.compose.animation.AnimatedContentScope
 import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
@@ -106,8 +107,6 @@ import com.ismartcoding.plain.platform.getOwnPackageName
 import com.ismartcoding.plain.platform.printText
 import com.ismartcoding.plain.platform.updateChatMessageTextAsync
 import com.ismartcoding.plain.lib.coIO
-import com.ismartcoding.plain.preferences.AdbTokenPreference
-import com.ismartcoding.plain.preferences.resetAsync
 import com.ismartcoding.plain.httpserver.HttpServerManager
 import com.ismartcoding.plain.i18n.*
 import com.ismartcoding.plain.ui.page.scan.ScanHistoryPage
@@ -238,7 +237,7 @@ fun MainNavGraph(
         }
         composable<Routing.WebDev> {
             WebDevPage(navController, packageId = getOwnPackageName(), onResetToken = {
-                coIO { AdbTokenPreference.resetAsync() }
+                coIO { SystemPrefs.resetAdbToken() }
             })
         }
         composable<Routing.WebSecurity> { WebSecurityPage(navController) }

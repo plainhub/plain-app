@@ -1,5 +1,7 @@
 package com.ismartcoding.plain.ui.components
 
+import com.ismartcoding.plain.preferences.*
+
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -13,7 +15,6 @@ import com.ismartcoding.plain.i18n.Res
 import com.ismartcoding.plain.i18n.device_name
 import com.ismartcoding.plain.ui.resources.save as ui_drawable_save
 import com.ismartcoding.plain.lib.sendEvent
-import com.ismartcoding.plain.preferences.DeviceNamePreference
 import com.ismartcoding.plain.ui.base.TextFieldDialog
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
@@ -38,7 +39,7 @@ fun DeviceRenameDialog(name: String, onDismiss: () -> Unit, onDone: (String) -> 
         confirmText = stringResource(Res.string.save),
         onConfirm = {
             scope.launch {
-                DeviceNamePreference.putAsync(newName.value)
+                UserPrefs.deviceName.value = newName.value
                 TempData.deviceName.value = newName.value
                 MdnsDiscoverManager.updateAdvertisedService()
                 sendEvent(WebSocketEvent(EventType.DEVICE_NAME_UPDATED, jsonEncode(newName.value)))

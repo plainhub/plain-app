@@ -1,4 +1,6 @@
 package com.ismartcoding.plain.ui.page.home
+
+import com.ismartcoding.plain.preferences.*
 import com.ismartcoding.plain.ui.theme.PlainTheme
 
 import androidx.compose.foundation.clickable
@@ -17,7 +19,6 @@ import com.ismartcoding.plain.i18n.dlna_receiver_desc
 import com.ismartcoding.plain.features.dlna.startDlnaRenderer
 import com.ismartcoding.plain.features.dlna.stopDlnaRenderer
 import com.ismartcoding.plain.ui.resources.cast as ui_drawable_cast
-import com.ismartcoding.plain.preferences.DlnaPreference
 import com.ismartcoding.plain.ui.base.HorizontalSpace
 import com.ismartcoding.plain.ui.base.PCard
 import com.ismartcoding.plain.ui.base.PListItem
@@ -34,7 +35,7 @@ import com.ismartcoding.plain.i18n.cast
 
 @Composable
 fun DlnaReceiverSection(navController: NavHostController) {
-    val dlnaReceiverEnabled = TempData.dlnaEnabled.collectAsStateValue()
+    val dlnaReceiverEnabled = UserPrefs.dlna.collectAsStateValue()
     val scope = rememberCoroutineScope()
 
     PCard(modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN)) {
@@ -46,7 +47,7 @@ fun DlnaReceiverSection(navController: NavHostController) {
         ) {
             PSwitch(activated = dlnaReceiverEnabled) { enable ->
                 scope.launchSafe {
-                    DlnaPreference.putAsync(enable)
+                    UserPrefs.dlna.value = enable
                     if (enable) startDlnaRenderer() else stopDlnaRenderer()
                 }
             }

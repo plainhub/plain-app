@@ -1,5 +1,7 @@
 package com.ismartcoding.plain.ui.models
 
+import com.ismartcoding.plain.preferences.*
+
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -10,9 +12,6 @@ import com.ismartcoding.plain.Constants
 import com.ismartcoding.plain.enums.DataType
 import com.ismartcoding.plain.features.TagHelper
 import com.ismartcoding.plain.features.feed.FeedEntryHelper
-import com.ismartcoding.plain.preferences.FeedAutoRefreshIntervalPreference
-import com.ismartcoding.plain.preferences.FeedAutoRefreshOnlyWifiPreference
-import com.ismartcoding.plain.preferences.FeedAutoRefreshPreference
 import com.ismartcoding.plain.lib.TimeHelper
 import com.ismartcoding.plain.platform.feedWorkerCancelRepeat
 import com.ismartcoding.plain.platform.feedWorkerStartRepeat
@@ -29,16 +28,16 @@ class FeedSettingsViewModel : ViewModel() {
 
     fun loadSettings() {
         viewModelScope.launch {
-            autoRefresh.value = FeedAutoRefreshPreference.getAsync()
-            autoRefreshInterval.intValue = FeedAutoRefreshIntervalPreference.getAsync()
-            autoRefreshOnlyWifi.value = FeedAutoRefreshOnlyWifiPreference.getAsync()
+            autoRefresh.value = UserPrefs.feedAutoRefresh.value
+            autoRefreshInterval.intValue = UserPrefs.feedAutoRefreshInterval.value
+            autoRefreshOnlyWifi.value = UserPrefs.feedAutoRefreshOnlyWifi.value
         }
     }
 
     fun setAutoRefresh(value: Boolean) {
         autoRefresh.value = value
         viewModelScope.launchSafe {
-            FeedAutoRefreshPreference.putAsync(value)
+            UserPrefs.feedAutoRefresh.value = value
             if (value) {
                 feedWorkerStartRepeat()
             } else {
@@ -50,14 +49,14 @@ class FeedSettingsViewModel : ViewModel() {
     fun setAutoRefreshInterval(value: Int) {
         autoRefreshInterval.value = value
         viewModelScope.launchSafe {
-            FeedAutoRefreshIntervalPreference.putAsync(value)
+            UserPrefs.feedAutoRefreshInterval.value = value
         }
     }
 
     fun setAutoRefreshOnlyWifi(value: Boolean) {
         autoRefreshOnlyWifi.value = value
         viewModelScope.launchSafe {
-            FeedAutoRefreshOnlyWifiPreference.putAsync(value)
+            UserPrefs.feedAutoRefreshOnlyWifi.value = value
         }
     }
 

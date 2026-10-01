@@ -1,5 +1,7 @@
 package com.ismartcoding.plain.ui.models
 
+import com.ismartcoding.plain.preferences.*
+
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -8,9 +10,6 @@ import com.ismartcoding.plain.helpers.launchSafe
 import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.platform.getFileByMediaId
 import com.ismartcoding.plain.platform.isContentUri
-import com.ismartcoding.plain.preferences.EditorFontSizePreference
-import com.ismartcoding.plain.preferences.EditorStatusBarPreference
-import com.ismartcoding.plain.preferences.EditorWrapContentPreference
 import com.ismartcoding.plain.platform.openByteSource
 import com.ismartcoding.plain.platform.writeByteChunksStreaming
 import com.ismartcoding.plain.ui.components.codeeditor.EditorFileIO
@@ -34,9 +33,9 @@ class TextFileViewModel : ViewModel() {
 
     fun loadConfigAsync() {
         viewModelScope.launchSafe {
-            controller.wrapContent.value = EditorWrapContentPreference.getAsync()
-            controller.fontSizeSp.value = EditorFontSizePreference.getAsync()
-            controller.statusBarVisible.value = EditorStatusBarPreference.getAsync()
+            controller.wrapContent.value = UserPrefs.editorWrapContent.value
+            controller.fontSizeSp.value = UserPrefs.editorFontSize.value
+            controller.statusBarVisible.value = UserPrefs.editorStatusBar.value
         }
     }
 
@@ -55,7 +54,7 @@ class TextFileViewModel : ViewModel() {
 
     fun toggleWrapContent() {
         viewModelScope.launchSafe {
-            EditorWrapContentPreference.putAsync(!controller.wrapContent.value)
+            UserPrefs.editorWrapContent.value = !controller.wrapContent.value
         }
         controller.toggleWrap()
     }

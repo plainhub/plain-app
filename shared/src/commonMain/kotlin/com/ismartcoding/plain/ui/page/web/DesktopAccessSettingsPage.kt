@@ -1,5 +1,9 @@
 package com.ismartcoding.plain.ui.page.web
 
+import com.ismartcoding.plain.ui.extensions.collectAsStateValue
+
+import com.ismartcoding.plain.preferences.*
+
 import com.ismartcoding.plain.i18n.*
 
 import androidx.compose.foundation.ExperimentalFoundationApi
@@ -41,9 +45,6 @@ import com.ismartcoding.plain.platform.Permission
 import com.ismartcoding.plain.platform.isGranted
 import com.ismartcoding.plain.platform.isIgnoringBatteryOptimizations
 import com.ismartcoding.plain.platform.openBatteryOptimizationSettings
-import com.ismartcoding.plain.preferences.LocalApiPermissions
-import com.ismartcoding.plain.preferences.LocalKeepAwake
-import com.ismartcoding.plain.preferences.WebSettingsProvider
 import com.ismartcoding.plain.ui.base.BottomSpace
 import com.ismartcoding.plain.ui.base.HorizontalSpace
 import com.ismartcoding.plain.ui.base.PCard
@@ -73,211 +74,210 @@ import com.ismartcoding.plain.i18n.devices
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 fun DesktopAccessSettingsPage(navController: NavHostController, webVM: DesktopAccessSettingsViewModel = viewModel { DesktopAccessSettingsViewModel() }) {
-        WebSettingsProvider {
-            val keepAwake = LocalKeepAwake.current
-        val scope = rememberCoroutineScope()
-        val enabledPermissions = LocalApiPermissions.current
-        val permissionList = remember { mutableStateOf(getWebList()) }
-        val shouldIgnoreOptimize = remember { mutableStateOf(!isIgnoringBatteryOptimizations()) }
-        val systemAlertWindow = remember { mutableStateOf(Permission.SYSTEM_ALERT_WINDOW.isGranted()) }
-        val notificationListenerGranted = remember { mutableStateOf(Permission.NOTIFICATION_LISTENER.isGranted()) }
-        val notificationsCard = AppFeatureType.NOTIFICATIONS.has()
-        val listState = rememberLazyListState()
-        val anchors = remember { mutableStateMapOf<WebSettingsFeature, Rect>() }
-        val switches = remember { mutableStateMapOf<WebSettingsFeature, Rect>() }
-        var listBounds by remember { mutableStateOf<Rect?>(null) }
-        var overlayOrigin by remember { mutableStateOf(Offset.Zero) }
-        var overlaySize by remember { mutableStateOf(IntSize.Zero) }
-        var bubbleFeature by remember { mutableStateOf<WebSettingsFeature?>(null) }
-        val density = LocalDensity.current
+    val keepAwake = UserPrefs.keepAwake.collectAsStateValue()
+    val scope = rememberCoroutineScope()
+    val enabledPermissions = SystemPrefs.apiPermissions.collectAsStateValue()
+    val permissionList = remember { mutableStateOf(getWebList()) }
+    val shouldIgnoreOptimize = remember { mutableStateOf(!isIgnoringBatteryOptimizations()) }
+    val systemAlertWindow = remember { mutableStateOf(Permission.SYSTEM_ALERT_WINDOW.isGranted()) }
+    val notificationListenerGranted = remember { mutableStateOf(Permission.NOTIFICATION_LISTENER.isGranted()) }
+    val notificationsCard = AppFeatureType.NOTIFICATIONS.has()
+    val listState = rememberLazyListState()
+    val anchors = remember { mutableStateMapOf<WebSettingsFeature, Rect>() }
+    val switches = remember { mutableStateMapOf<WebSettingsFeature, Rect>() }
+    var listBounds by remember { mutableStateOf<Rect?>(null) }
+    var overlayOrigin by remember { mutableStateOf(Offset.Zero) }
+    var overlaySize by remember { mutableStateOf(IntSize.Zero) }
+    var bubbleFeature by remember { mutableStateOf<WebSettingsFeature?>(null) }
+    val density = LocalDensity.current
 
-        LaunchedEffect(Unit) {
-            AccessFeatureHighlight.pending.collect { f ->
-                if (f == null) return@collect
-                AccessFeatureHighlight.pending.value = null
-                val index = itemIndexFor(f, permissionList.value, notificationsCard)
-                if (index == null) return@collect
-                delay(300)
-                listState.animateScrollToItem(index)
-                delay(150)
-                with(density) {
-                    val margin = 16.dp.roundToPx().toFloat()
-                    val rect = anchors[f]
-                    val viewport = listBounds
-                    if (rect != null && viewport != null) {
-                        when {
-                            rect.bottom > viewport.bottom - margin -> listState.animateScrollBy(rect.bottom - viewport.bottom + margin)
-                            rect.top < viewport.top + margin -> listState.animateScrollBy(rect.top - viewport.top - margin)
-                        }
-                    }
+    LaunchedEffect(Unit) {
+    AccessFeatureHighlight.pending.collect { f ->
+        if (f == null) return@collect
+        AccessFeatureHighlight.pending.value = null
+        val index = itemIndexFor(f, permissionList.value, notificationsCard)
+        if (index == null) return@collect
+        delay(300)
+        listState.animateScrollToItem(index)
+        delay(150)
+        with(density) {
+            val margin = 16.dp.roundToPx().toFloat()
+            val rect = anchors[f]
+            val viewport = listBounds
+            if (rect != null && viewport != null) {
+                when {
+                    rect.bottom > viewport.bottom - margin -> listState.animateScrollBy(rect.bottom - viewport.bottom + margin)
+                    rect.top < viewport.top + margin -> listState.animateScrollBy(rect.top - viewport.top - margin)
                 }
-                delay(150)
-                bubbleFeature = f
             }
         }
+        delay(150)
+        bubbleFeature = f
+    }
+    }
 
-        WebSettingsEffects(permissionList, shouldIgnoreOptimize, systemAlertWindow, notificationListenerGranted)
+    WebSettingsEffects(permissionList, shouldIgnoreOptimize, systemAlertWindow, notificationListenerGranted)
 
-        PScaffold(topBar = {
-            PTopAppBar(onNavigateBack = { navController.navigateUp() }, title = stringResource(Res.string.access_settings))
-        }, content = { paddingValues ->
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .onGloballyPositioned {
-                        overlayOrigin = it.boundsInRoot().topLeft
-                        overlaySize = it.size
-                    }
-            ) {
-                LazyColumn(
-                    state = listState,
-                    modifier = Modifier
-                        .padding(top = paddingValues.calculateTopPadding())
-                        .onGloballyPositioned { listBounds = it.boundsInRoot() }
+    PScaffold(topBar = {
+    PTopAppBar(onNavigateBack = { navController.navigateUp() }, title = stringResource(Res.string.access_settings))
+    }, content = { paddingValues ->
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .onGloballyPositioned {
+                overlayOrigin = it.boundsInRoot().topLeft
+                overlaySize = it.size
+            }
+    ) {
+        LazyColumn(
+            state = listState,
+            modifier = Modifier
+                .padding(top = paddingValues.calculateTopPadding())
+                .onGloballyPositioned { listBounds = it.boundsInRoot() }
+        ) {
+            item {
+                TopSpace()
+                PCard(modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN)) {
+                    PListItem(
+                        modifier = Modifier.clickable { navController.navigate(Routing.Connections) },
+                        icon = UiRes.drawable.ui_drawable_devices, title = stringResource(Res.string.connections), showMore = true
+                    )
+                    PListItem(
+                        modifier = Modifier.clickable { navController.navigate(Routing.WebSecurity) },
+                        icon = UiRes.drawable.ui_drawable_lock, title = stringResource(Res.string.security), showMore = true
+                    )
+                    PListItem(
+                        modifier = Modifier.clickable { navController.navigate(Routing.HowToUse) },
+                        icon = UiRes.drawable.ui_drawable_info, title = stringResource(Res.string.how_to_use), showMore = true
+                    )
+                }
+                VerticalSpace(dp = 16.dp)
+            }
+            item { Subtitle(text = stringResource(Res.string.features)) }
+            itemsIndexed(permissionList.value) { index, m ->
+                val permission = m.permission
+                val af = permission.accessFeatureOf()
+                val baseModifier = if (af != null) {
+                    Modifier.onGloballyPositioned { anchors[af] = it.boundsInRoot() }
+                } else {
+                    Modifier
+                }
+                PListItem(
+                    modifier = baseModifier
+                        .then(PlainTheme.getCardModifier(index = index, size = permissionList.value.size))
+                        .clickable { togglePermission(scope, m, !enabledPermissions.contains(permission.name)) },
+                    icon = m.icon, title = permission.getText(),
+                    subtitle = stringResource(if (m.granted) Res.string.system_permission_granted else Res.string.system_permission_not_granted)
                 ) {
-                    item {
-                        TopSpace()
-                        PCard(modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN)) {
-                            PListItem(
-                                modifier = Modifier.clickable { navController.navigate(Routing.Connections) },
-                                icon = UiRes.drawable.ui_drawable_devices, title = stringResource(Res.string.connections), showMore = true
-                            )
-                            PListItem(
-                                modifier = Modifier.clickable { navController.navigate(Routing.WebSecurity) },
-                                icon = UiRes.drawable.ui_drawable_lock, title = stringResource(Res.string.security), showMore = true
-                            )
-                            PListItem(
-                                modifier = Modifier.clickable { navController.navigate(Routing.HowToUse) },
-                                icon = UiRes.drawable.ui_drawable_info, title = stringResource(Res.string.how_to_use), showMore = true
-                            )
+                    if (af != null) {
+                        Box(Modifier.onGloballyPositioned { switches[af] = it.boundsInRoot() }) {
+                            PSwitch(activated = enabledPermissions.contains(permission.name)) { enable ->
+                                togglePermission(scope, m, enable)
+                            }
                         }
-                        VerticalSpace(dp = 16.dp)
+                    } else {
+                        PSwitch(activated = enabledPermissions.contains(permission.name)) { enable ->
+                            togglePermission(scope, m, enable)
+                        }
                     }
-                    item { Subtitle(text = stringResource(Res.string.features)) }
-                    itemsIndexed(permissionList.value) { index, m ->
+                    HorizontalSpace(8.dp)
+                }
+            }
+            if (notificationsCard) {
+                item {
+                    VerticalSpace(dp = 16.dp)
+                    PCard(modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN)) {
+                        val m = PermissionItem.create(UiRes.drawable.ui_drawable_bell, Permission.NOTIFICATION_LISTENER)
                         val permission = m.permission
-                        val af = permission.accessFeatureOf()
-                        val baseModifier = if (af != null) {
-                            Modifier.onGloballyPositioned { anchors[af] = it.boundsInRoot() }
-                        } else {
-                            Modifier
-                        }
+                        val enabled = notificationListenerGranted.value && enabledPermissions.contains(permission.name)
                         PListItem(
-                            modifier = baseModifier
-                                .then(PlainTheme.getCardModifier(index = index, size = permissionList.value.size))
-                                .clickable { togglePermission(scope, m, !enabledPermissions.contains(permission.name)) },
+                            modifier = Modifier
+                                .onGloballyPositioned { anchors[WebSettingsFeature.NOTIFICATIONS] = it.boundsInRoot() }
+                                .clickable { navController.navigate(Routing.NotificationSettings) },
                             icon = m.icon, title = permission.getText(),
-                            subtitle = stringResource(if (m.granted) Res.string.system_permission_granted else Res.string.system_permission_not_granted)
+                            subtitle = stringResource(if (notificationListenerGranted.value) Res.string.system_permission_granted else Res.string.system_permission_not_granted),
+                            separatedActions = true
                         ) {
-                            if (af != null) {
-                                Box(Modifier.onGloballyPositioned { switches[af] = it.boundsInRoot() }) {
-                                    PSwitch(activated = enabledPermissions.contains(permission.name)) { enable ->
-                                        togglePermission(scope, m, enable)
-                                    }
-                                }
-                            } else {
-                                PSwitch(activated = enabledPermissions.contains(permission.name)) { enable ->
-                                    togglePermission(scope, m, enable)
-                                }
+                            Box(Modifier.onGloballyPositioned { switches[WebSettingsFeature.NOTIFICATIONS] = it.boundsInRoot() }) {
+                                PSwitch(activated = enabled) { enable -> togglePermission(scope, m, enable) }
                             }
                             HorizontalSpace(8.dp)
                         }
                     }
-                    if (notificationsCard) {
-                        item {
-                            VerticalSpace(dp = 16.dp)
-                            PCard(modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN)) {
-                                val m = PermissionItem.create(UiRes.drawable.ui_drawable_bell, Permission.NOTIFICATION_LISTENER)
-                                val permission = m.permission
-                                val enabled = notificationListenerGranted.value && enabledPermissions.contains(permission.name)
-                                PListItem(
-                                    modifier = Modifier
-                                        .onGloballyPositioned { anchors[WebSettingsFeature.NOTIFICATIONS] = it.boundsInRoot() }
-                                        .clickable { navController.navigate(Routing.NotificationSettings) },
-                                    icon = m.icon, title = permission.getText(),
-                                    subtitle = stringResource(if (notificationListenerGranted.value) Res.string.system_permission_granted else Res.string.system_permission_not_granted),
-                                    separatedActions = true
-                                ) {
-                                    Box(Modifier.onGloballyPositioned { switches[WebSettingsFeature.NOTIFICATIONS] = it.boundsInRoot() }) {
-                                        PSwitch(activated = enabled) { enable -> togglePermission(scope, m, enable) }
-                                    }
-                                    HorizontalSpace(8.dp)
-                                }
-                            }
-                        }
-                    }
-                    item {
-                        VerticalSpace(dp = 16.dp)
-                        val m = remember { PermissionItem.create(UiRes.drawable.ui_drawable_content_paste, Permission.CLIPBOARD) }
-                        val clipboardEnabled = enabledPermissions.contains(m.permission.name)
-                        PCard(modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN)) {
-                            PListItem(
-                                modifier = Modifier
-                                    .onGloballyPositioned { anchors[WebSettingsFeature.CLIPBOARD] = it.boundsInRoot() }
-                                    .clickable { navController.navigate(Routing.ClipboardHistory) },
-                                icon = m.icon, title = stringResource(Res.string.clipboard_sync),
-                                separatedActions = true
-                            ) {
-                                Box(Modifier.onGloballyPositioned { switches[WebSettingsFeature.CLIPBOARD] = it.boundsInRoot() }) {
-                                    PSwitch(activated = clipboardEnabled) { enable -> togglePermission(scope, m, enable) }
-                                }
-                                HorizontalSpace(8.dp)
-                            }
-                        }
-                        if (clipboardEnabled) {
-                            Tips(stringResource(Res.string.clipboard_sync_tips))
-                        }
-                    }
-                    item {
-                        VerticalSpace(dp = 16.dp)
-                        PCard(modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN)) {
-                            PListItem(modifier = Modifier.clickable { openAppSettings() }, title = stringResource(Res.string.open_permission_settings), showMore = true)
-                        }
-                    }
-                    item {
-                        VerticalSpace(dp = 16.dp); Subtitle(text = stringResource(Res.string.performance))
-                        PCard(modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN)) {
-                            PListItem(modifier = Modifier.clickable { webVM.enableKeepAwake(!keepAwake) }, title = stringResource(Res.string.keep_awake)) {
-                                PSwitch(activated = keepAwake) { enable -> webVM.enableKeepAwake(enable) }
-                                HorizontalSpace(8.dp)
-                            }
-                        }
-                        Tips(stringResource(Res.string.keep_awake_tips))
-                        VerticalSpace(dp = 16.dp)
-                        PCard(modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN)) {
-                            PListItem(modifier = Modifier.clickable {
-                                    if (shouldIgnoreOptimize.value) webVM.requestIgnoreBatteryOptimization()
-                                    else openBatteryOptimizationSettings()
-                                }, title = stringResource(if (shouldIgnoreOptimize.value) Res.string.disable_battery_optimization else Res.string.battery_optimization_disabled), showMore = true)
-                        }
-                        Tips(stringResource(Res.string.battery_optimization_tips))
-                    }
-                    item {
-                        VerticalSpace(dp = 16.dp)
-                        PCard(modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN)) {
-                            PListItem(
-                                modifier = Modifier.clickable { navController.navigate(Routing.WebDev) },
-                                icon = UiRes.drawable.ui_drawable_code, title = stringResource(Res.string.adb_automation), showMore = true
-                            )
-                        }
-                    }
-                    item { BottomSpace(paddingValues) }
-                }
-                bubbleFeature?.let { f ->
-                    anchors[f]?.let { rect ->
-                        AccessFeatureBubble(
-                            anchor = rect,
-                            switchAnchor = switches[f],
-                            overlayOrigin = overlayOrigin,
-                            overlaySize = overlaySize,
-                            label = bubbleLabel(f),
-                            onDismiss = { bubbleFeature = null },
-                        )
-                    }
                 }
             }
-        })
+            item {
+                VerticalSpace(dp = 16.dp)
+                val m = remember { PermissionItem.create(UiRes.drawable.ui_drawable_content_paste, Permission.CLIPBOARD) }
+                val clipboardEnabled = enabledPermissions.contains(m.permission.name)
+                PCard(modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN)) {
+                    PListItem(
+                        modifier = Modifier
+                            .onGloballyPositioned { anchors[WebSettingsFeature.CLIPBOARD] = it.boundsInRoot() }
+                            .clickable { navController.navigate(Routing.ClipboardHistory) },
+                        icon = m.icon, title = stringResource(Res.string.clipboard_sync),
+                        separatedActions = true
+                    ) {
+                        Box(Modifier.onGloballyPositioned { switches[WebSettingsFeature.CLIPBOARD] = it.boundsInRoot() }) {
+                            PSwitch(activated = clipboardEnabled) { enable -> togglePermission(scope, m, enable) }
+                        }
+                        HorizontalSpace(8.dp)
+                    }
+                }
+                if (clipboardEnabled) {
+                    Tips(stringResource(Res.string.clipboard_sync_tips))
+                }
+            }
+            item {
+                VerticalSpace(dp = 16.dp)
+                PCard(modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN)) {
+                    PListItem(modifier = Modifier.clickable { openAppSettings() }, title = stringResource(Res.string.open_permission_settings), showMore = true)
+                }
+            }
+            item {
+                VerticalSpace(dp = 16.dp); Subtitle(text = stringResource(Res.string.performance))
+                PCard(modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN)) {
+                    PListItem(modifier = Modifier.clickable { webVM.enableKeepAwake(!keepAwake) }, title = stringResource(Res.string.keep_awake)) {
+                        PSwitch(activated = keepAwake) { enable -> webVM.enableKeepAwake(enable) }
+                        HorizontalSpace(8.dp)
+                    }
+                }
+                Tips(stringResource(Res.string.keep_awake_tips))
+                VerticalSpace(dp = 16.dp)
+                PCard(modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN)) {
+                    PListItem(modifier = Modifier.clickable {
+                            if (shouldIgnoreOptimize.value) webVM.requestIgnoreBatteryOptimization()
+                            else openBatteryOptimizationSettings()
+                        }, title = stringResource(if (shouldIgnoreOptimize.value) Res.string.disable_battery_optimization else Res.string.battery_optimization_disabled), showMore = true)
+                }
+                Tips(stringResource(Res.string.battery_optimization_tips))
+            }
+            item {
+                VerticalSpace(dp = 16.dp)
+                PCard(modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN)) {
+                    PListItem(
+                        modifier = Modifier.clickable { navController.navigate(Routing.WebDev) },
+                        icon = UiRes.drawable.ui_drawable_code, title = stringResource(Res.string.adb_automation), showMore = true
+                    )
+                }
+            }
+            item { BottomSpace(paddingValues) }
+        }
+        bubbleFeature?.let { f ->
+            anchors[f]?.let { rect ->
+                AccessFeatureBubble(
+                    anchor = rect,
+                    switchAnchor = switches[f],
+                    overlayOrigin = overlayOrigin,
+                    overlaySize = overlaySize,
+                    label = bubbleLabel(f),
+                    onDismiss = { bubbleFeature = null },
+                )
+            }
+        }
     }
+    })
+
 }
 
 private fun Permission.accessFeatureOf(): WebSettingsFeature? = when (this) {

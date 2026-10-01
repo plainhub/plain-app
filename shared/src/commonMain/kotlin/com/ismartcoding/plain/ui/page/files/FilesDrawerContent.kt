@@ -1,5 +1,6 @@
 package com.ismartcoding.plain.ui.page.files
 
+import com.ismartcoding.plain.preferences.*
 import com.ismartcoding.plain.i18n.*
 
 import androidx.compose.foundation.layout.Box
@@ -33,7 +34,6 @@ import com.ismartcoding.plain.enums.FilesType
 import com.ismartcoding.plain.events.FolderKanbanSelectEvent
 import com.ismartcoding.plain.features.share.ShareManager
 import com.ismartcoding.plain.lib.sendEvent
-import com.ismartcoding.plain.preferences.FavoriteFoldersPreference
 import com.ismartcoding.plain.ui.base.PDropdownMenu
 import com.ismartcoding.plain.ui.base.PDropdownMenuItem
 import com.ismartcoding.plain.ui.base.PDropdownMenuItemDelete
@@ -88,7 +88,7 @@ fun FilesDrawerContent(
 
     val removeFavorite: (String) -> Unit = { fullPath ->
         scope.launch {
-            FavoriteFoldersPreference.removeAsync(fullPath)
+            UserPrefs.removeFavoriteFolder(fullPath)
             filesVM.favoriteFoldersVersion.value++
         }
     }
@@ -224,7 +224,7 @@ fun FilesDrawerContent(
             onDismissRequest = { renameFavorite = null },
             onConfirm = { name ->
                 scope.launch {
-                    FavoriteFoldersPreference.renameAsync(favorite.fullPath, name)
+                    UserPrefs.renameFavoriteFolder(favorite.fullPath, name)
                     filesVM.favoriteFoldersVersion.value++
                 }
                 renameFavorite = null

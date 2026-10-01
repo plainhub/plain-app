@@ -1,5 +1,6 @@
 package com.ismartcoding.plain.ui.models
 
+import com.ismartcoding.plain.preferences.*
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import com.ismartcoding.plain.audio.DAudio
@@ -8,7 +9,6 @@ import com.ismartcoding.plain.features.audio.AudioPlaylistManager
 import com.ismartcoding.plain.features.audio.AudioQueueManager
 import com.ismartcoding.plain.lib.withIO
 import com.ismartcoding.plain.platform.searchMedia
-import com.ismartcoding.plain.preferences.AudioSortByPreference
 
 /**
  * Picker state for adding library tracks to a playlist: search input plus the
@@ -34,7 +34,7 @@ class PlaylistAddItemsViewModel : ViewModel(), ISearchableViewModel<DAudio> {
 
     suspend fun searchAsync() {
         items.value = withIO {
-            searchMedia(DataType.AUDIO, queryText.value, 500, 0, AudioSortByPreference.getValueAsync())
+            searchMedia(DataType.AUDIO, queryText.value, 500, 0, UserPrefs.audioSortByValue())
         }.filterIsInstance<DAudio>()
     }
 }

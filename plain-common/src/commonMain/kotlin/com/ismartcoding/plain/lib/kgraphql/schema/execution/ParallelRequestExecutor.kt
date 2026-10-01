@@ -112,6 +112,7 @@ class ParallelRequestExecutor(val schema: DefaultSchema) : RequestExecutor {
         }
 
         return when {
+            value is JsonElement -> createSimpleValueNode(returnType, value, node)
             //check value, not returnType, because this method can be invoked with element value
             value is Collection<*> || value is Array<*> -> {
                 val values: Collection<*> = when (value) {

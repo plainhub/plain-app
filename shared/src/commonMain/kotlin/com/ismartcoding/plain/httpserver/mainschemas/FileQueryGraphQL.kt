@@ -1,5 +1,6 @@
 package com.ismartcoding.plain.httpserver.mainschemas
 
+import com.ismartcoding.plain.preferences.*
 import com.ismartcoding.plain.lib.kgraphql.annotations.GraphQLQuery
 import com.ismartcoding.plain.lib.kgraphql.schema.dsl.SchemaBuilder
 import com.ismartcoding.plain.extensions.getFinalPath
@@ -14,7 +15,6 @@ import com.ismartcoding.plain.features.file.FileSortBy
 import com.ismartcoding.plain.platform.searchFilesInDir
 import com.ismartcoding.plain.platform.getRecentFiles
 import com.ismartcoding.plain.platform.statFile
-import com.ismartcoding.plain.preferences.FavoriteFoldersPreference
 import com.ismartcoding.plain.httpserver.loaders.MountsLoader
 import com.ismartcoding.plain.httpserver.models.FavoriteFolder
 import com.ismartcoding.plain.httpserver.models.File
@@ -85,7 +85,7 @@ suspend fun pathKind(path: String): PathKind? {
 
 @GraphQLQuery
 suspend fun favoriteFolders(): List<FavoriteFolder> {
-    return FavoriteFoldersPreference.getValueAsync().map { it.toModel() }
+    return UserPrefs.favoriteFoldersValue().map { it.toModel() }
 }
 
 fun SchemaBuilder.addFileQuerySchema() {

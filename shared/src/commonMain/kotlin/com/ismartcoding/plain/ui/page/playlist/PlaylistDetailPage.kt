@@ -1,5 +1,6 @@
 package com.ismartcoding.plain.ui.page.playlist
 
+import com.ismartcoding.plain.preferences.*
 import com.ismartcoding.plain.ui.components.MediaTopBar
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -37,7 +38,6 @@ import com.ismartcoding.plain.platform.PBackHandler
 import com.ismartcoding.plain.platform.audioIsPlayingFlow
 import com.ismartcoding.plain.platform.audioPause
 import com.ismartcoding.plain.platform.audioPlay
-import com.ismartcoding.plain.preferences.AudioSortByPreference
 import com.ismartcoding.plain.ui.base.*
 import com.ismartcoding.plain.ui.base.dragselect.listDragSelect
 import com.ismartcoding.plain.ui.base.dragselect.rememberListDragSelectState
@@ -224,7 +224,7 @@ fun PlaylistDetailPage(
         scrollToTop = { scope.launch { scrollState.scrollToItem(0) } },
         onSortSelected = { sortBy ->
             scope.launch {
-                AudioSortByPreference.putAsync(sortBy)
+                UserPrefs.setAudioSortBy(sortBy)
                 audioVM.sortBy.value = sortBy
             }
         },

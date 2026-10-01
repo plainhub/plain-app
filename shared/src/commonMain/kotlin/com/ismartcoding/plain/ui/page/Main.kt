@@ -1,4 +1,6 @@
 package com.ismartcoding.plain.ui.page
+
+import com.ismartcoding.plain.ui.extensions.collectAsStateValue
 import com.ismartcoding.plain.preferences.*
 
 import androidx.compose.foundation.background
@@ -29,7 +31,6 @@ import com.ismartcoding.plain.events.ShowPermissionWizardEvent
 import com.ismartcoding.plain.httpserver.HttpServerManager
 import com.ismartcoding.plain.lib.Channel
 import com.ismartcoding.plain.TempData
-import com.ismartcoding.plain.preferences.LocalDarkTheme
 import com.ismartcoding.plain.ui.base.DebugCornerBadge
 import com.ismartcoding.plain.ui.base.ToastEvent
 import com.ismartcoding.plain.ui.models.AudioQueueViewModel
@@ -66,7 +67,7 @@ fun Main(
     val scope = rememberCoroutineScope()
     val navController = rememberNavController()
     navControllerState.value = navController
-    val useDarkTheme = DarkTheme.isDarkTheme(LocalDarkTheme.current)
+    val useDarkTheme = DarkTheme.isDarkTheme(UserPrefs.darkTheme.collectAsStateValue())
 
     var confirmDialogEvent by remember { mutableStateOf<ConfirmDialogEvent?>(null) }
     var loadingDialogEvent by remember { mutableStateOf<LoadingDialogEvent?>(null) }
@@ -91,7 +92,7 @@ fun Main(
     }
 
     LaunchedEffect(Unit) {
-        if (!OnboardingPreference.getAsync()) {
+        if (!SystemPrefs.onboarding.value) {
             // singleTop: this effect re-runs on activity recreation while the
             // onboarding is still showing and the pref is not yet written
             navController.navigate(Routing.Onboarding) {

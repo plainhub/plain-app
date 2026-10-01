@@ -22,12 +22,11 @@ class DocsViewModel : BaseMediaViewModel<DDoc>() {
     override val showFoldersAsList = true
     val scrollStateMap = mutableStateMapOf<Int, LazyListState>()
     val fileType = mutableStateOf("")
-    var tabsShowTags = mutableStateOf(false)
     var tabs = mutableStateOf(listOf<VTabData>())
 
     override suspend fun getQuery(): String {
         val query = super.getQuery()
-        if (!tabsShowTags.value && fileType.value.isNotEmpty()) {
+        if (fileType.value.isNotEmpty()) {
             return "$query ext:${fileType.value}"
         }
         return query
@@ -43,13 +42,8 @@ class DocsViewModel : BaseMediaViewModel<DDoc>() {
         if (!trash.value) {
             val extGroups = getDocExtGroups(super.getQuery())
             val trashTabs = if (AppFeatureType.MEDIA_TRASH.has()) listOf(VTabData(LocaleHelper.getStringAsync(Res.string.trash), "trash", totalTrash.intValue)) else emptyList()
-            if (tabsShowTags.value) {
-                val tagsState = tagsVM.itemsFlow.value
-                tabs.value = listOf(VTabData(LocaleHelper.getStringAsync(Res.string.all), "all", total.intValue)) + trashTabs + tagsState.map { VTabData(it.name, it.id, it.count) }
-            } else {
-                val extensions = extGroups.map { VTabData(it.first, it.first.lowercase(), it.second) }
-                tabs.value = listOf(VTabData(LocaleHelper.getStringAsync(Res.string.all), "", total.intValue)) + trashTabs + extensions
-            }
+            val extensions = extGroups.map { VTabData(it.first, it.first.lowercase(), it.second) }
+            tabs.value = listOf(VTabData(LocaleHelper.getStringAsync(Res.string.all), "", total.intValue)) + trashTabs + extensions
         }
         showLoading.value = false
     }

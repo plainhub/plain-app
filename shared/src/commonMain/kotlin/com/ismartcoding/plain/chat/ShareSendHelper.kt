@@ -1,5 +1,7 @@
 package com.ismartcoding.plain.chat
 
+import com.ismartcoding.plain.preferences.*
+
 import com.ismartcoding.plain.chat.data.ChatTarget
 import com.ismartcoding.plain.chat.peer.PeerCacher
 import com.ismartcoding.plain.db.DMessageContent
@@ -136,7 +138,7 @@ object ShareSendHelper {
                 peerInfo = DSharePeerInfo(
                     id = TempData.clientId,
                     ip = getDeviceIP4(),
-                    port = TempData.httpsPort.value,
+                    port = UserPrefs.httpsPort.value,
                 ),
                 name = share.name,
                 itemCount = itemCount,

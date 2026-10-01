@@ -1,11 +1,11 @@
 package com.ismartcoding.plain.ui.models
 
+import com.ismartcoding.plain.preferences.*
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.ismartcoding.plain.preferences.RecentSearchesPreference
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
@@ -35,7 +35,7 @@ class GlobalSearchViewModel : ViewModel() {
 
     init {
         viewModelScope.launch {
-            recentQueries.value = RecentSearchesPreference.getValueAsync()
+            recentQueries.value = UserPrefs.recentSearchesValue()
         }
     }
 
@@ -71,20 +71,20 @@ class GlobalSearchViewModel : ViewModel() {
 
     fun removeRecent(q: String) {
         viewModelScope.launch {
-            recentQueries.value = RecentSearchesPreference.removeAsync(q)
+            recentQueries.value = UserPrefs.removeRecentSearch(q)
         }
     }
 
     fun clearRecent() {
         viewModelScope.launch {
-            RecentSearchesPreference.clearAsync()
+            UserPrefs.clearRecentSearches()
             recentQueries.value = emptyList()
         }
     }
 
     private fun recordRecent(q: String) {
         viewModelScope.launch {
-            recentQueries.value = RecentSearchesPreference.recordAsync(q)
+            recentQueries.value = UserPrefs.recordRecentSearch(q)
         }
     }
 

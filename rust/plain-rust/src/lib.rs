@@ -1,41 +1,72 @@
-use plain_rs::prefs::{Prefs, set_global, try_get_default};
+use plain_rs::prefs::Prefs;
 use serde_json::{Map, Value};
 use std::ffi::{CStr, CString, c_char};
 use std::path::Path;
-use std::sync::Mutex;
+use std::sync::{Arc, Mutex};
 
-static INIT: Mutex<()> = Mutex::new(());
-
-fn prefs() -> Result<std::sync::Arc<Prefs>, String> {
-    try_get_default().ok_or_else(|| "Rust preferences are not initialized".to_string())
+struct PrefsPair {
+    system: Prefs,
+    user: Prefs,
 }
 
-fn open(path: &str) -> Result<(), String> {
-    let _guard = INIT.lock().map_err(|e| e.to_string())?;
-    if let Some(existing) = try_get_default() {
-        if existing.path() == Path::new(path) {
+static PREFS: Mutex<Option<Arc<PrefsPair>>> = Mutex::new(None);
+
+fn prefs() -> Result<Arc<PrefsPair>, String> {
+    PREFS
+        .lock()
+        .map_err(|e| e.to_string())?
+        .clone()
+        .ok_or_else(|| "Rust preferences are not initialized".to_string())
+}
+
+fn open(system_path: &str, user_path: &str) -> Result<(), String> {
+    let mut guard = PREFS.lock().map_err(|e| e.to_string())?;
+    if let Some(existing) = guard.as_ref() {
+        if existing.system.path() == Path::new(system_path)
+            && existing.user.path() == Path::new(user_path)
+        {
             return Ok(());
         }
         return Err("Rust preferences were initialized with another path".to_string());
     }
-    let loaded = std::sync::Arc::new(Prefs::load(Path::new(path)).map_err(|e| e.to_string())?);
-    set_global(loaded);
+    let loaded = PrefsPair {
+        system: Prefs::load(Path::new(system_path)).map_err(|e| e.to_string())?,
+        user: Prefs::load(Path::new(user_path)).map_err(|e| e.to_string())?,
+    };
+    *guard = Some(Arc::new(loaded));
     Ok(())
 }
 
-fn snapshot() -> Result<String, String> {
-    let entries: Map<String, Value> = prefs()?.entries().into_iter().collect();
+fn snapshot(is_user_pref: bool) -> Result<String, String> {
+    let prefs = prefs()?;
+    let entries: Map<String, Value> = if is_user_pref {
+        prefs.user.entries()
+    } else {
+        prefs.system.entries()
+    }
+    .into_iter()
+    .collect();
     serde_json::to_string(&entries).map_err(|e| e.to_string())
 }
 
-fn set(key: &str, value_json: &str) -> Result<(), String> {
+fn set(is_user_pref: bool, key: &str, value_json: &str) -> Result<(), String> {
     let value: Value = serde_json::from_str(value_json).map_err(|e| e.to_string())?;
-    prefs()?.set(key, value).map_err(|e| e.to_string())?;
+    let prefs = prefs()?;
+    if is_user_pref {
+        prefs.user.set(key, value).map_err(|e| e.to_string())?;
+    } else {
+        prefs.system.set(key, value).map_err(|e| e.to_string())?;
+    }
     Ok(())
 }
 
-fn remove(key: &str) -> Result<(), String> {
-    prefs()?.remove(key).map_err(|e| e.to_string())?;
+fn remove(is_user_pref: bool, key: &str) -> Result<(), String> {
+    let prefs = prefs()?;
+    if is_user_pref {
+        prefs.user.remove(key).map_err(|e| e.to_string())?;
+    } else {
+        prefs.system.remove(key).map_err(|e| e.to_string())?;
+    }
     Ok(())
 }
 
@@ -55,32 +86,67 @@ fn input(pointer: *const c_char) -> Result<String, String> {
 }
 
 #[unsafe(no_mangle)]
-pub extern "C" fn plain_prefs_open(path: *const c_char) -> *mut c_char {
-    match input(path).and_then(|path| open(&path)) {
+pub extern "C" fn plain_prefs_open(
+    system_path: *const c_char,
+    user_path: *const c_char,
+) -> *mut c_char {
+    match input(system_path).and_then(|system_path| {
+        input(user_path).and_then(|user_path| open(&system_path, &user_path))
+    }) {
         Ok(()) => std::ptr::null_mut(),
         Err(error) => c_string(error),
     }
 }
 
 #[unsafe(no_mangle)]
-pub extern "C" fn plain_prefs_snapshot() -> *mut c_char {
-    match snapshot() {
+pub extern "C" fn plain_prefs_system_snapshot() -> *mut c_char {
+    match snapshot(false) {
         Ok(json) => c_string(json),
         Err(error) => c_string(format!("ERROR:{error}")),
     }
 }
 
 #[unsafe(no_mangle)]
-pub extern "C" fn plain_prefs_set(key: *const c_char, value_json: *const c_char) -> *mut c_char {
-    match input(key).and_then(|key| input(value_json).and_then(|value| set(&key, &value))) {
+pub extern "C" fn plain_prefs_user_snapshot() -> *mut c_char {
+    match snapshot(true) {
+        Ok(json) => c_string(json),
+        Err(error) => c_string(format!("ERROR:{error}")),
+    }
+}
+
+#[unsafe(no_mangle)]
+pub extern "C" fn plain_prefs_set_system(
+    key: *const c_char,
+    value_json: *const c_char,
+) -> *mut c_char {
+    match input(key).and_then(|key| input(value_json).and_then(|value| set(false, &key, &value))) {
         Ok(()) => std::ptr::null_mut(),
         Err(error) => c_string(error),
     }
 }
 
 #[unsafe(no_mangle)]
-pub extern "C" fn plain_prefs_remove(key: *const c_char) -> *mut c_char {
-    match input(key).and_then(|key| remove(&key)) {
+pub extern "C" fn plain_prefs_set_user(
+    key: *const c_char,
+    value_json: *const c_char,
+) -> *mut c_char {
+    match input(key).and_then(|key| input(value_json).and_then(|value| set(true, &key, &value))) {
+        Ok(()) => std::ptr::null_mut(),
+        Err(error) => c_string(error),
+    }
+}
+
+#[unsafe(no_mangle)]
+pub extern "C" fn plain_prefs_remove_system(key: *const c_char) -> *mut c_char {
+    match input(key).and_then(|key| remove(false, &key)) {
+        Ok(()) => std::ptr::null_mut(),
+        Err(error) => c_string(error),
+    }
+}
+
+#[unsafe(no_mangle)]
+pub extern "C" fn plain_prefs_remove_user(key: *const c_char) -> *mut c_char {
+    match input(key).and_then(|key| remove(true, &key)) {
         Ok(()) => std::ptr::null_mut(),
         Err(error) => c_string(error),
     }
@@ -131,22 +197,23 @@ mod android {
     pub extern "system" fn Java_com_ismartcoding_plain_preferences_RustPrefsBridge_openNative(
         mut env: EnvUnowned<'_>,
         _: JObject<'_>,
-        path: JString<'_>,
+        system_path: JString<'_>,
+        user_path: JString<'_>,
     ) {
         env.with_env(|_| -> BridgeResult<()> {
-            open(&path.to_string()).map_err(BridgeError::Prefs)?;
+            open(&system_path.to_string(), &user_path.to_string()).map_err(BridgeError::Prefs)?;
             Ok(())
         })
         .resolve::<ThrowRuntimeExAndDefault>();
     }
 
     #[unsafe(no_mangle)]
-    pub extern "system" fn Java_com_ismartcoding_plain_preferences_RustPrefsBridge_snapshotNative(
+    pub extern "system" fn Java_com_ismartcoding_plain_preferences_RustPrefsBridge_systemSnapshotNative(
         mut env: EnvUnowned<'_>,
         _: JObject<'_>,
     ) -> jstring {
         env.with_env(|env| -> BridgeResult<_> {
-            let json = snapshot().map_err(BridgeError::Prefs)?;
+            let json = snapshot(false).map_err(BridgeError::Prefs)?;
             Ok(env.new_string(json)?)
         })
         .resolve::<ThrowRuntimeExAndDefault>()
@@ -154,27 +221,67 @@ mod android {
     }
 
     #[unsafe(no_mangle)]
-    pub extern "system" fn Java_com_ismartcoding_plain_preferences_RustPrefsBridge_setNative(
+    pub extern "system" fn Java_com_ismartcoding_plain_preferences_RustPrefsBridge_userSnapshotNative(
+        mut env: EnvUnowned<'_>,
+        _: JObject<'_>,
+    ) -> jstring {
+        env.with_env(|env| -> BridgeResult<_> {
+            let json = snapshot(true).map_err(BridgeError::Prefs)?;
+            Ok(env.new_string(json)?)
+        })
+        .resolve::<ThrowRuntimeExAndDefault>()
+        .into_raw()
+    }
+
+    #[unsafe(no_mangle)]
+    pub extern "system" fn Java_com_ismartcoding_plain_preferences_RustPrefsBridge_setSystemNative(
         mut env: EnvUnowned<'_>,
         _: JObject<'_>,
         key: JString<'_>,
         value: JString<'_>,
     ) {
         env.with_env(|_| -> BridgeResult<()> {
-            set(&key.to_string(), &value.to_string()).map_err(BridgeError::Prefs)?;
+            set(false, &key.to_string(), &value.to_string()).map_err(BridgeError::Prefs)?;
             Ok(())
         })
         .resolve::<ThrowRuntimeExAndDefault>();
     }
 
     #[unsafe(no_mangle)]
-    pub extern "system" fn Java_com_ismartcoding_plain_preferences_RustPrefsBridge_removeNative(
+    pub extern "system" fn Java_com_ismartcoding_plain_preferences_RustPrefsBridge_setUserNative(
+        mut env: EnvUnowned<'_>,
+        _: JObject<'_>,
+        key: JString<'_>,
+        value: JString<'_>,
+    ) {
+        env.with_env(|_| -> BridgeResult<()> {
+            set(true, &key.to_string(), &value.to_string()).map_err(BridgeError::Prefs)?;
+            Ok(())
+        })
+        .resolve::<ThrowRuntimeExAndDefault>();
+    }
+
+    #[unsafe(no_mangle)]
+    pub extern "system" fn Java_com_ismartcoding_plain_preferences_RustPrefsBridge_removeSystemNative(
         mut env: EnvUnowned<'_>,
         _: JObject<'_>,
         key: JString<'_>,
     ) {
         env.with_env(|_| -> BridgeResult<()> {
-            remove(&key.to_string()).map_err(BridgeError::Prefs)?;
+            remove(false, &key.to_string()).map_err(BridgeError::Prefs)?;
+            Ok(())
+        })
+        .resolve::<ThrowRuntimeExAndDefault>();
+    }
+
+    #[unsafe(no_mangle)]
+    pub extern "system" fn Java_com_ismartcoding_plain_preferences_RustPrefsBridge_removeUserNative(
+        mut env: EnvUnowned<'_>,
+        _: JObject<'_>,
+        key: JString<'_>,
+    ) {
+        env.with_env(|_| -> BridgeResult<()> {
+            remove(true, &key.to_string()).map_err(BridgeError::Prefs)?;
             Ok(())
         })
         .resolve::<ThrowRuntimeExAndDefault>();
@@ -187,10 +294,12 @@ mod tests {
 
     #[test]
     fn rust_prefs_bridge_persists_typed_values() {
-        let path =
-            std::env::temp_dir().join(format!("plain-rust-{}.json", std::process::id()));
-        let path_c = CString::new(path.to_str().unwrap()).unwrap();
-        assert!(plain_prefs_open(path_c.as_ptr()).is_null());
+        let dir = std::env::temp_dir().join(format!("plain-rust-{}", std::process::id()));
+        let system_path = dir.join("system_prefs.json");
+        let user_path = dir.join("user_prefs.json");
+        let system_path_c = CString::new(system_path.to_str().unwrap()).unwrap();
+        let user_path_c = CString::new(user_path.to_str().unwrap()).unwrap();
+        assert!(plain_prefs_open(system_path_c.as_ptr(), user_path_c.as_ptr()).is_null());
         for (key, json) in [
             ("enabled", "true"),
             ("count", "7"),
@@ -200,24 +309,30 @@ mod tests {
         ] {
             let key = CString::new(key).unwrap();
             let json = CString::new(json).unwrap();
-            assert!(plain_prefs_set(key.as_ptr(), json.as_ptr()).is_null());
+            assert!(plain_prefs_set_system(key.as_ptr(), json.as_ptr()).is_null());
         }
-        let text = std::fs::read_to_string(&path).unwrap();
+        let key = CString::new("theme").unwrap();
+        let json = CString::new(r#"{"dark":true}"#).unwrap();
+        assert!(plain_prefs_set_user(key.as_ptr(), json.as_ptr()).is_null());
+        let text = std::fs::read_to_string(&system_path).unwrap();
         let stored: Value = serde_json::from_str(&text).unwrap();
         assert_eq!(stored["enabled"], true);
         assert_eq!(stored["count"], 7);
         assert_eq!(stored["speed"], 1.25);
         assert_eq!(stored["name"], "plain");
         assert_eq!(stored["set"], serde_json::json!(["a", "b"]));
+        let user_text = std::fs::read_to_string(&user_path).unwrap();
+        let user_stored: Value = serde_json::from_str(&user_text).unwrap();
+        assert_eq!(user_stored["theme"], serde_json::json!({"dark": true}));
         let key = CString::new("count").unwrap();
-        assert!(plain_prefs_remove(key.as_ptr()).is_null());
+        assert!(plain_prefs_remove_system(key.as_ptr()).is_null());
         assert!(
-            Prefs::load(&path)
+            Prefs::load(&system_path)
                 .unwrap()
                 .get::<i32>("count")
                 .unwrap()
                 .is_none()
         );
-        std::fs::remove_file(path).unwrap();
+        std::fs::remove_dir_all(dir).unwrap();
     }
 }

@@ -2,6 +2,7 @@
 
 package com.ismartcoding.plain.ui.components
 
+import com.ismartcoding.plain.preferences.*
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -27,7 +28,6 @@ import com.ismartcoding.plain.i18n.download_to_downloads
 import com.ismartcoding.plain.i18n.download_zip
 import com.ismartcoding.plain.i18n.pick_directory
 import com.ismartcoding.plain.platform.getDownloadsDirPath
-import com.ismartcoding.plain.preferences.RecentSaveDirsPreference
 import com.ismartcoding.plain.ui.base.BottomSpace
 import com.ismartcoding.plain.ui.base.PBottomSheetTopAppBar
 import com.ismartcoding.plain.ui.base.PListItem
@@ -48,7 +48,7 @@ import com.ismartcoding.plain.i18n.folder
 /**
  * Reusable "save to this device" bottom sheet for any feature that writes
  * files locally. Offers the public Downloads dir, up to five recently used
- * custom folders (LRU via [RecentSaveDirsPreference], recorded here), the
+ * custom folders (LRU via SystemPrefs, recorded here), the
  * folder picker, and — when [onZip] is set — a ZIP download. Pages only
  * supply the entry [title] and destination callbacks; the transfer itself
  * stays page-side.
@@ -71,12 +71,12 @@ fun SaveToSheet(
     var showFolderPick by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
-        recentDirs = RecentSaveDirsPreference.getValueAsync()
+        recentDirs = UserPrefs.recentSaveDirsValue()
     }
 
     fun useDirectory(dir: String) {
         onDismiss()
-        scope.launch { recentDirs = RecentSaveDirsPreference.recordAsync(dir) }
+        scope.launch { recentDirs = UserPrefs.recordRecentSaveDir(dir) }
         onDirectory(dir)
     }
 

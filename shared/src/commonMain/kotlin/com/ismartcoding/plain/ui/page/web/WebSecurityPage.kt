@@ -1,5 +1,7 @@
 package com.ismartcoding.plain.ui.page.web
 
+import com.ismartcoding.plain.ui.extensions.collectAsStateValue
+
 import com.ismartcoding.plain.ui.theme.PlainTheme
 
 import com.ismartcoding.plain.preferences.*
@@ -37,17 +39,6 @@ import com.ismartcoding.plain.platform.generateSSLKeyStore
 import com.ismartcoding.plain.platform.getSSLSignature
 import com.ismartcoding.plain.platform.resetPasswordAsync
 import com.ismartcoding.plain.platform.restartServer
-import com.ismartcoding.plain.preferences.AuthTwoFactorPreference
-import com.ismartcoding.plain.preferences.KeyStorePasswordPreference
-import com.ismartcoding.plain.preferences.LocalAuthTwoFactor
-import com.ismartcoding.plain.preferences.LocalPassword
-import com.ismartcoding.plain.preferences.LocalPasswordType
-import com.ismartcoding.plain.preferences.LocalRotateUrlTokenOnRestart
-import com.ismartcoding.plain.preferences.PasswordPreference
-import com.ismartcoding.plain.preferences.PasswordTypePreference
-import com.ismartcoding.plain.preferences.RotateUrlTokenOnRestartPreference
-import com.ismartcoding.plain.preferences.UrlTokenPreference
-import com.ismartcoding.plain.preferences.WebSettingsProvider
 import com.ismartcoding.plain.ui.base.*
 import com.ismartcoding.plain.ui.helpers.DialogHelper
 import com.ismartcoding.plain.ui.nav.Routing
@@ -57,147 +48,145 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalEncodingApi::class)
 @Composable
 fun WebSecurityPage(navController: NavHostController) {
-    WebSettingsProvider {
-        val scope = rememberCoroutineScope()
-        val passwordType = LocalPasswordType.current
-        val password = LocalPassword.current
-        val authTwoFactor = LocalAuthTwoFactor.current
-        val rotateUrlTokenOnRestart = LocalRotateUrlTokenOnRestart.current
-        var urlToken by remember { mutableStateOf(Base64.encode(TempData.urlToken)) }
-        var keyStorePassword by remember { mutableStateOf("") }
-        var sslSignature by remember { mutableStateOf("") }
-        val editPassword = remember { mutableStateOf("") }
+    val scope = rememberCoroutineScope()
+    val passwordType = SystemPrefs.passwordType.collectAsStateValue()
+    val password = SystemPrefs.password.collectAsStateValue()
+    val authTwoFactor = SystemPrefs.authTwoFactor.collectAsStateValue()
+    val rotateUrlTokenOnRestart = SystemPrefs.rotateUrlTokenOnRestart.collectAsStateValue()
+    var urlToken by remember { mutableStateOf(Base64.encode(TempData.urlToken)) }
+    var keyStorePassword by remember { mutableStateOf("") }
+    var sslSignature by remember { mutableStateOf("") }
+    val editPassword = remember { mutableStateOf("") }
 
-        LaunchedEffect(password) {
-            if (editPassword.value != password) editPassword.value = password
-            scope.launch(Dispatchers.Default) {
-                keyStorePassword = KeyStorePasswordPreference.getAsync()
-                try {
-                    sslSignature = getSSLSignature(keyStorePassword).toSignature()
-                } catch (ex: Exception) {
-                    LogCat.e("Failed to get SSL signature: ${ex.message}"); ex.printStackTrace()
-                }
+    LaunchedEffect(password) {
+        if (editPassword.value != password) editPassword.value = password
+        scope.launch(Dispatchers.Default) {
+            keyStorePassword = SystemPrefs.keyStorePassword.value
+            try {
+                sslSignature = getSSLSignature(keyStorePassword).toSignature()
+            } catch (ex: Exception) {
+                LogCat.e("Failed to get SSL signature: ${ex.message}"); ex.printStackTrace()
             }
         }
+    }
 
-        PScaffold(
-            topBar = { PTopAppBar(onNavigateBack = { navController.navigateUp() }, title = stringResource(Res.string.security)) },
-            content = { paddingValues ->
-                LazyColumn(modifier = Modifier.padding(top = paddingValues.calculateTopPadding())) {
-                    item { TopSpace() }
-                    item {
-                        PCard(modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN)) {
-                            PListItem(modifier = Modifier.clickable {
+    PScaffold(
+        topBar = { PTopAppBar(onNavigateBack = { navController.navigateUp() }, title = stringResource(Res.string.security)) },
+        content = { paddingValues ->
+            LazyColumn(modifier = Modifier.padding(top = paddingValues.calculateTopPadding())) {
+                item { TopSpace() }
+                item {
+                    PCard(modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN)) {
+                        PListItem(modifier = Modifier.clickable {
+                            scope.launch(Dispatchers.Default) {
+                                SystemPrefs.setPasswordType(
+                                    if (passwordType == PasswordType.NONE.value) PasswordType.FIXED else PasswordType.NONE
+                                )
+                            }
+                        }, title = stringResource(Res.string.require_password)) {
+                            PSwitch(activated = passwordType != PasswordType.NONE.value) {
                                 scope.launch(Dispatchers.Default) {
-                                    PasswordTypePreference.putAsync(
-                                        if (passwordType == PasswordType.NONE.value) PasswordType.FIXED.value else PasswordType.NONE.value
+                                    SystemPrefs.setPasswordType(
+                                        if (passwordType == PasswordType.NONE.value) PasswordType.FIXED else PasswordType.NONE
                                     )
                                 }
-                            }, title = stringResource(Res.string.require_password)) {
-                                PSwitch(activated = passwordType != PasswordType.NONE.value) {
-                                    scope.launch(Dispatchers.Default) {
-                                        PasswordTypePreference.putAsync(
-                                            if (passwordType == PasswordType.NONE.value) PasswordType.FIXED.value else PasswordType.NONE.value
-                                        )
-                                    }
-                                }
-                                HorizontalSpace(8.dp)
                             }
-                            if (passwordType != PasswordType.NONE.value) {
-                                PasswordTextField(
-                                    value = editPassword.value, isChanged = { editPassword.value != password },
-                                    onValueChange = { editPassword.value = it }, onConfirm = { scope.launch(Dispatchers.Default) { PasswordPreference.putAsync(it) } })
-                                PFilledButton(
-                                    modifier = Modifier.padding(start = 16.dp, top = 8.dp, bottom = 16.dp),
-                                    text = stringResource(Res.string.generate_password),
-                                    buttonSize = ButtonSize.MEDIUM,
-                                    onClick = { scope.launch(Dispatchers.Default) { editPassword.value = resetPasswordAsync() } })
-                            }
+                            HorizontalSpace(8.dp)
                         }
-                    }
-                    item {
-                        VerticalSpace(dp = 16.dp)
-                        PCard(modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN)) {
-                            PListItem(
-                                modifier = Modifier.clickable { scope.launch(Dispatchers.Default) { AuthTwoFactorPreference.putAsync(!authTwoFactor) } },
-                                title = stringResource(Res.string.require_confirmation)
-                            ) {
-                                PSwitch(activated = authTwoFactor) {
-                                    scope.launch(Dispatchers.Default) { AuthTwoFactorPreference.putAsync(it) }
-                                }
-                                HorizontalSpace(8.dp)
-                            }
+                        if (passwordType != PasswordType.NONE.value) {
+                            PasswordTextField(
+                                value = editPassword.value, isChanged = { editPassword.value != password },
+                                onValueChange = { editPassword.value = it }, onConfirm = { scope.launch(Dispatchers.Default) { SystemPrefs.password.value = it } })
+                            PFilledButton(
+                                modifier = Modifier.padding(start = 16.dp, top = 8.dp, bottom = 16.dp),
+                                text = stringResource(Res.string.generate_password),
+                                buttonSize = ButtonSize.MEDIUM,
+                                onClick = { scope.launch(Dispatchers.Default) { editPassword.value = resetPasswordAsync() } })
                         }
-                        Tips(text = stringResource(Res.string.two_factor_auth_tips)); VerticalSpace(dp = 24.dp)
-                    }
-                    item {
-                        Subtitle(text = stringResource(Res.string.https_certificate_signature))
-                        CornerCopyCard(
-                            label = stringResource(Res.string.https_certificate_signature),
-                            modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN),
-                            text = sslSignature
-                        )
-                        VerticalSpace(dp = 16.dp)
-                        PFilledButton(
-                            modifier = Modifier
-                                .padding(horizontal = 16.dp)
-                                .fillMaxWidth(),
-                            text = stringResource(Res.string.reset_ssl_certificate),
-                            type = ButtonType.DANGER, onClick = {
-                                scope.launch(Dispatchers.Default) {
-                                    DialogHelper.showLoading()
-                                    KeyStorePasswordPreference.resetAsync()
-                                    keyStorePassword = KeyStorePasswordPreference.getAsync()
-                                    generateSSLKeyStore(keyStorePassword)
-                                    sslSignature = getSSLSignature(keyStorePassword).toSignature()
-                                    restartServer()
-                                    DialogHelper.hideLoading()
-                                    DialogHelper.showConfirmDialog("", LocaleHelper.getStringAsync(Res.string.ssl_certificate_reset))
-                                }
-                            })
-                        VerticalSpace(dp = 16.dp)
-                        PFilledButton(
-                            modifier = Modifier
-                                .padding(horizontal = 16.dp)
-                                .fillMaxWidth(),
-                            text = stringResource(Res.string.replace_ssl_certificate),
-                            onClick = { navController.navigate(Routing.ReplaceSslCertificate) })
-                        VerticalSpace(dp = 24.dp)
-                        Subtitle(text = stringResource(Res.string.url_token))
-                        CornerCopyCard(
-                            label = stringResource(Res.string.url_token),
-                            modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN),
-                            text = urlToken
-                        )
-                        Tips(text = stringResource(Res.string.url_token_tips))
-                        VerticalSpace(dp = 16.dp)
-                        PCard(modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN)) {
-                            PListItem(modifier = Modifier.clickable {
-                                scope.launch(Dispatchers.Default) { RotateUrlTokenOnRestartPreference.putAsync(!rotateUrlTokenOnRestart) }
-                            }, title = stringResource(Res.string.rotate_url_token_on_restart)) {
-                                PSwitch(activated = rotateUrlTokenOnRestart) {
-                                    scope.launch(Dispatchers.Default) { RotateUrlTokenOnRestartPreference.putAsync(it) }
-                                }
-                                HorizontalSpace(8.dp)
-                            }
-                        }
-                        Tips(text = stringResource(Res.string.rotate_url_token_on_restart_tips)); VerticalSpace(dp = 16.dp)
-                        PFilledButton(
-                            modifier = Modifier
-                                .padding(horizontal = 16.dp)
-                                .fillMaxWidth(),
-                            text = stringResource(Res.string.reset_token),
-                            type = ButtonType.DANGER,
-                            onClick = {
-                                scope.launch(Dispatchers.Default) {
-                                    UrlTokenPreference.resetAsync()
-                                    urlToken = Base64.encode(TempData.urlToken)
-                                    DialogHelper.showMessage(Res.string.the_token_is_reset)
-                                }
-                            })
-                        BottomSpace(paddingValues)
                     }
                 }
-            })
-    }
+                item {
+                    VerticalSpace(dp = 16.dp)
+                    PCard(modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN)) {
+                        PListItem(
+                            modifier = Modifier.clickable { scope.launch(Dispatchers.Default) { SystemPrefs.authTwoFactor.value = !authTwoFactor } },
+                            title = stringResource(Res.string.require_confirmation)
+                        ) {
+                            PSwitch(activated = authTwoFactor) {
+                                scope.launch(Dispatchers.Default) { SystemPrefs.authTwoFactor.value = it }
+                            }
+                            HorizontalSpace(8.dp)
+                        }
+                    }
+                    Tips(text = stringResource(Res.string.two_factor_auth_tips)); VerticalSpace(dp = 24.dp)
+                }
+                item {
+                    Subtitle(text = stringResource(Res.string.https_certificate_signature))
+                    CornerCopyCard(
+                        label = stringResource(Res.string.https_certificate_signature),
+                        modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN),
+                        text = sslSignature
+                    )
+                    VerticalSpace(dp = 16.dp)
+                    PFilledButton(
+                        modifier = Modifier
+                            .padding(horizontal = 16.dp)
+                            .fillMaxWidth(),
+                        text = stringResource(Res.string.reset_ssl_certificate),
+                        type = ButtonType.DANGER, onClick = {
+                            scope.launch(Dispatchers.Default) {
+                                DialogHelper.showLoading()
+                                SystemPrefs.resetKeyStorePassword()
+                                keyStorePassword = SystemPrefs.keyStorePassword.value
+                                generateSSLKeyStore(keyStorePassword)
+                                sslSignature = getSSLSignature(keyStorePassword).toSignature()
+                                restartServer()
+                                DialogHelper.hideLoading()
+                                DialogHelper.showConfirmDialog("", LocaleHelper.getStringAsync(Res.string.ssl_certificate_reset))
+                            }
+                        })
+                    VerticalSpace(dp = 16.dp)
+                    PFilledButton(
+                        modifier = Modifier
+                            .padding(horizontal = 16.dp)
+                            .fillMaxWidth(),
+                        text = stringResource(Res.string.replace_ssl_certificate),
+                        onClick = { navController.navigate(Routing.ReplaceSslCertificate) })
+                    VerticalSpace(dp = 24.dp)
+                    Subtitle(text = stringResource(Res.string.url_token))
+                    CornerCopyCard(
+                        label = stringResource(Res.string.url_token),
+                        modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN),
+                        text = urlToken
+                    )
+                    Tips(text = stringResource(Res.string.url_token_tips))
+                    VerticalSpace(dp = 16.dp)
+                    PCard(modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN)) {
+                        PListItem(modifier = Modifier.clickable {
+                            scope.launch(Dispatchers.Default) { SystemPrefs.rotateUrlTokenOnRestart.value = !rotateUrlTokenOnRestart }
+                        }, title = stringResource(Res.string.rotate_url_token_on_restart)) {
+                            PSwitch(activated = rotateUrlTokenOnRestart) {
+                                scope.launch(Dispatchers.Default) { SystemPrefs.rotateUrlTokenOnRestart.value = it }
+                            }
+                            HorizontalSpace(8.dp)
+                        }
+                    }
+                    Tips(text = stringResource(Res.string.rotate_url_token_on_restart_tips)); VerticalSpace(dp = 16.dp)
+                    PFilledButton(
+                        modifier = Modifier
+                            .padding(horizontal = 16.dp)
+                            .fillMaxWidth(),
+                        text = stringResource(Res.string.reset_token),
+                        type = ButtonType.DANGER,
+                        onClick = {
+                            scope.launch(Dispatchers.Default) {
+                                SystemPrefs.resetUrlToken()
+                                urlToken = Base64.encode(TempData.urlToken)
+                                DialogHelper.showMessage(Res.string.the_token_is_reset)
+                            }
+                        })
+                    BottomSpace(paddingValues)
+                }
+            }
+        })
 }

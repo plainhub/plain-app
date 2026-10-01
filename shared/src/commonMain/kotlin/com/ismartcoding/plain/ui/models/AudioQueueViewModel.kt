@@ -1,5 +1,6 @@
 package com.ismartcoding.plain.ui.models
 
+import com.ismartcoding.plain.preferences.*
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import com.ismartcoding.plain.audio.DAudio
@@ -10,7 +11,6 @@ import com.ismartcoding.plain.features.audio.AudioQueueManager
 import com.ismartcoding.plain.lib.sendEvent
 import com.ismartcoding.plain.platform.audioClear
 import com.ismartcoding.plain.platform.audioJustPlay
-import com.ismartcoding.plain.preferences.AudioPlayingPreference
 
 class AudioQueueViewModel : ViewModel(), AudioQueueViewModelBase {
     val queueItems = mutableStateOf<List<DPlaylistAudio>>(listOf())
@@ -30,7 +30,7 @@ class AudioQueueViewModel : ViewModel(), AudioQueueViewModelBase {
     private val pageLimit = 200
 
     suspend fun loadAsync() {
-        selectedPath.value = AudioPlayingPreference.getValueAsync()
+        selectedPath.value = SystemPrefs.audioPlayingValue()
         refreshWindow()
     }
 
@@ -63,7 +63,7 @@ class AudioQueueViewModel : ViewModel(), AudioQueueViewModelBase {
 
     suspend fun clearAsync() {
         AudioQueueManager.clearQueue()
-        AudioPlayingPreference.putAsync("")
+        SystemPrefs.setAudioPlaying("")
         audioClear()
         setCurrentPlaying("")
         refreshWindow()
@@ -77,7 +77,7 @@ class AudioQueueViewModel : ViewModel(), AudioQueueViewModelBase {
     }
 
     private suspend fun setCurrentPlaying(path: String) {
-        AudioPlayingPreference.putAsync(path)
+        SystemPrefs.setAudioPlaying(path)
         selectedPath.value = path
     }
 
@@ -103,7 +103,7 @@ class AudioQueueViewModel : ViewModel(), AudioQueueViewModelBase {
         if (path == selectedPath.value) {
             val nextItem = AudioQueueManager.resolveNext(isNext = true, shuffle = false)
             if (nextItem != null) {
-                AudioPlayingPreference.putAsync(nextItem.path)
+                SystemPrefs.setAudioPlaying(nextItem.path)
                 audioJustPlay(nextItem)
                 selectedPath.value = nextItem.path
             }

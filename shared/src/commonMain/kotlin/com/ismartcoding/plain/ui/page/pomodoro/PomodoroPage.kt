@@ -1,5 +1,6 @@
 package com.ismartcoding.plain.ui.page.pomodoro
 
+import com.ismartcoding.plain.preferences.*
 import com.ismartcoding.plain.i18n.*
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -28,7 +29,6 @@ import com.ismartcoding.plain.events.EventType
 import com.ismartcoding.plain.events.WebSocketEvent
 import com.ismartcoding.plain.data.DPomodoroSettings
 import com.ismartcoding.plain.lib.sendEvent
-import com.ismartcoding.plain.preferences.PomodoroSettingsPreference
 import com.ismartcoding.plain.ui.base.BottomSpace
 import com.ismartcoding.plain.ui.base.PCapsuleMoreClose
 import com.ismartcoding.plain.ui.base.PScaffold
@@ -55,7 +55,7 @@ fun PomodoroPage(
         settingsDialog(pomodoroVM.settings.value, { newSettings ->
             scope.launch {
                 pomodoroVM.settings.value = newSettings
-                PomodoroSettingsPreference.putAsync(newSettings)
+                UserPrefs.setPomodoroSettings(newSettings)
                 if (!pomodoroVM.isRunning.value) pomodoroVM.updateTimeForCurrentState()
                 sendEvent(WebSocketEvent(EventType.POMODORO_SETTINGS_UPDATE, JsonHelper.jsonEncode(newSettings)))
             }

@@ -1,5 +1,7 @@
 package com.ismartcoding.plain.httpserver
 
+import com.ismartcoding.plain.preferences.*
+
 import android.content.Context
 import com.ismartcoding.plain.Constants
 import com.ismartcoding.plain.TempData
@@ -9,8 +11,6 @@ import com.ismartcoding.plain.lib.coIO
 import com.ismartcoding.plain.lib.withIO
 import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.platform.createHttpClient
-import com.ismartcoding.plain.preferences.KeyStorePasswordPreference
-import com.ismartcoding.plain.preferences.ServicePreference
 import com.ismartcoding.plain.lib.ktorserver.core.engine.EmbeddedServer
 import com.ismartcoding.plain.lib.ktorserver.core.engine.applicationEnvironment
 import com.ismartcoding.plain.lib.ktorserver.core.engine.connector
@@ -54,7 +54,7 @@ fun warmUpHttpServer() {
             // Always parse the keystore once per process: the result is cached
             // and the cold parse costs seconds, so whichever start comes first
             // (auto-restore or user tap) must not pay it on the critical path.
-            getSslKeyStore(appContext, KeyStorePasswordPreference.getAsync())
+            getSslKeyStore(appContext, SystemPrefs.keyStorePassword.value)
             LogCat.d("SSL keystore warm-up complete")
         } catch (ex: Exception) {
             LogCat.e("SSL keystore warm-up failed: ${ex.message}")
@@ -63,7 +63,7 @@ fun warmUpHttpServer() {
         // warming the route registry / Netty in parallel would just fight the
         // start for JIT-cold classes (measured: racing the warmup nearly
         // doubled the engine-create phase).
-        if (ServicePreference.getAsync()) return@coIO
+        if (UserPrefs.service.value) return@coIO
         try {
             HttpRouteRegistry.mainGraphQL
             HttpRouteRegistry.peerGraphQL
@@ -249,12 +249,12 @@ private fun getSslKeyStore(context: Context, password: String): KeyStore {
  */
 suspend fun createHttpServerAsync(context: Context): EmbeddedServer<NettyApplicationEngine, NettyApplicationEngine.Configuration> {
     val t0 = System.currentTimeMillis()
-    val password = KeyStorePasswordPreference.getAsync()
+    val password = SystemPrefs.keyStorePassword.value
     return withIO {
         val t1 = System.currentTimeMillis()
         val passwordArray = password.toCharArray()
-        val httpPort = TempData.httpPort.value
-        val httpsPort = TempData.httpsPort.value
+        val httpPort = UserPrefs.httpPort.value
+        val httpsPort = UserPrefs.httpsPort.value
         val keyStore = getSslKeyStore(context, password)
         val t2 = System.currentTimeMillis()
         val environment = applicationEnvironment {

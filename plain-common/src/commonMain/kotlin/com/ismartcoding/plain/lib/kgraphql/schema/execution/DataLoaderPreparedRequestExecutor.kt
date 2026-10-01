@@ -95,6 +95,7 @@ class DataLoaderPreparedRequestExecutor(val schema: DefaultSchema) : RequestExec
     ) {
         return when {
             value == null -> node.aliasOrKey toValue createNullNode(node, returnType)
+            value is JsonElement -> node.aliasOrKey toValue createSimpleValueNode(returnType, value, node)
             value is Collection<*> || value is Array<*> -> {
                 if (returnType.isList()) {
                     val values = when (value) {

@@ -2,6 +2,8 @@
 
 package com.ismartcoding.plain.platform
 
+import com.ismartcoding.plain.preferences.*
+
 import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.audio.DPlaylistAudio
 import com.ismartcoding.plain.enums.MediaPlayMode
@@ -132,7 +134,7 @@ private object AVPlayerAudioPlayer : AudioPlayer {
         scope.launch {
             val audio = AudioQueueManager.resolveNext(
                 isNext = isNext,
-                shuffle = TempData.audioPlayMode.value == MediaPlayMode.SHUFFLE,
+                shuffle = UserPrefs.audioPlayMode.value == MediaPlayMode.SHUFFLE,
             )
             if (audio == null) {
                 LogCat.d("skipTo: nothing to play, queue is empty")
@@ -149,7 +151,7 @@ private object AVPlayerAudioPlayer : AudioPlayer {
     }
 
     override fun setPlaybackSpeed(speed: Float) {
-        TempData.audioPlaybackSpeed.value = speed
+        UserPrefs.audioPlaybackSpeed.value = speed
         scope.launch {
             val p = player ?: return@launch
             avPlayerSetRate(p as NSObject, speed)
@@ -162,7 +164,7 @@ private object AVPlayerAudioPlayer : AudioPlayer {
             val url = NSURL.fileURLWithPath(audio.path)
             val item = AVPlayerItem(uRL = url)
             val seekMs = TempData.audioPlayPosition
-            val speed = TempData.audioPlaybackSpeed.value
+            val speed = UserPrefs.audioPlaybackSpeed.value
             val existing = player
             if (existing != null) {
                 avPlayerPerformWithArg(existing as NSObject, "replaceCurrentItemWithPlayerItem:", item)
@@ -218,7 +220,7 @@ private object AVPlayerAudioPlayer : AudioPlayer {
     }
 
     private fun onCompleted() {
-        when (TempData.audioPlayMode.value) {
+        when (UserPrefs.audioPlayMode.value) {
             MediaPlayMode.REPEAT_ONE -> {
                 val audio = currentAudio
                 if (audio != null) {

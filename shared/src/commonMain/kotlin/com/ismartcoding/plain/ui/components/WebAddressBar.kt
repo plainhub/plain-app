@@ -1,5 +1,7 @@
 package com.ismartcoding.plain.ui.components
 
+import com.ismartcoding.plain.preferences.*
+
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.shrinkVertically
@@ -31,7 +33,6 @@ import com.ismartcoding.plain.helpers.UrlHelper
 import com.ismartcoding.plain.i18n.*
 import com.ismartcoding.plain.platform.isLanAddress
 import com.ismartcoding.plain.platform.restartServer
-import com.ismartcoding.plain.preferences.WebAddressBarExpandedPreference
 import com.ismartcoding.plain.ui.base.HorizontalSpace
 import com.ismartcoding.plain.ui.theme.cardBackgroundNormal
 import com.ismartcoding.plain.ui.theme.tipsText
@@ -46,9 +47,9 @@ import com.ismartcoding.plain.ui.resources.expand_more as ui_drawable_expand_mor
 fun WebAddressBar(
     isHttps: Boolean,
 ) {
-    val port = if (isHttps) TempData.httpsPort.collectAsState() else TempData.httpPort.collectAsState()
+    val port = if (isHttps) UserPrefs.httpsPort.collectAsState() else UserPrefs.httpPort.collectAsState()
     // Shared persisted state so the HTTP/HTTPS pager pages stay in sync.
-    val expanded = TempData.webAddressBarExpanded.collectAsState()
+    val expanded = UserPrefs.webAddressBarExpanded.collectAsState()
     var portDialogVisible by remember { mutableStateOf(false) }
     var qrCodeDialogVisible by remember { mutableStateOf(false) }
     var mdnsEditDialogVisible by remember { mutableStateOf(false) }
@@ -108,11 +109,7 @@ fun WebAddressBar(
         ExpandCollapseBar(
             expanded = expanded.value,
             onClick = {
-                // Capture the target value first: re-reading expanded.value inside the
-                // coroutine would race with the synchronous update above and revert it.
-                val newValue = !expanded.value
-                TempData.webAddressBarExpanded.value = newValue
-                scope.launch { WebAddressBarExpandedPreference.putAsync(newValue) }
+                UserPrefs.webAddressBarExpanded.value = !expanded.value
             },
         )
     }

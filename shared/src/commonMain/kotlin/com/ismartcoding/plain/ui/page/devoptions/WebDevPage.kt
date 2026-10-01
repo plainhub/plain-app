@@ -1,5 +1,7 @@
 package com.ismartcoding.plain.ui.page.devoptions
 
+import com.ismartcoding.plain.ui.extensions.collectAsStateValue
+
 import com.ismartcoding.plain.ui.theme.PlainTheme
 import com.ismartcoding.plain.preferences.*
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -15,8 +17,6 @@ import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.ismartcoding.plain.enums.ButtonType
-import com.ismartcoding.plain.preferences.LocalAdbToken
-import com.ismartcoding.plain.preferences.WebSettingsProvider
 import com.ismartcoding.plain.ui.base.BottomSpace
 import com.ismartcoding.plain.ui.base.CornerCopyCard
 import com.ismartcoding.plain.ui.base.PCard
@@ -36,52 +36,50 @@ fun WebDevPage(
     packageId: String,
     onResetToken: () -> Unit,
 ) {
-    WebSettingsProvider {
-        val adbToken = LocalAdbToken.current
+    val adbToken = SystemPrefs.adbToken.collectAsStateValue()
 
-        PScaffold(
-            topBar = {
-                PTopAppBar(
-                    onNavigateBack = { navController.navigateUp() },
-                    title = stringResource(Res.string.adb_automation),
-                )
-            },
-            content = { paddingValues ->
-                LazyColumn(modifier = Modifier.padding(top = paddingValues.calculateTopPadding())) {
-                    item {
-                        TopSpace()
-                        Subtitle(text = stringResource(Res.string.token))
-                        CornerCopyCard(
-                            label = stringResource(Res.string.token),
-                            modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN),
-                            text = adbToken
-                        )
-                        VerticalSpace(dp = 16.dp)
-                        Subtitle(text = stringResource(Res.string.start_service))
-                        CornerCopyCard(
-                            label = stringResource(Res.string.adb_cmd_start),
-                            modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN),
-                            text = "adb shell am broadcast -a $packageId.action.START_HTTP_SERVER -p $packageId --es token $adbToken",
-                        )
-                        VerticalSpace(dp = 16.dp)
-                        Subtitle(text = stringResource(Res.string.stop_service))
-                        CornerCopyCard(
-                            label = stringResource(Res.string.adb_cmd_stop),
-                            modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN),
-                            text = "adb shell am broadcast -a $packageId.action.STOP_HTTP_SERVER -p $packageId --es token $adbToken",
-                        )
-                        Tips(text = stringResource(Res.string.adb_token_desc))
-                        VerticalSpace(dp = 16.dp)
-                        PFilledButton(
-                            modifier = Modifier.padding(horizontal = 16.dp).fillMaxWidth(),
-                            text = stringResource(Res.string.reset_token),
-                            type = ButtonType.DANGER,
-                            onClick = onResetToken,
-                        )
-                        BottomSpace(paddingValues)
-                    }
+    PScaffold(
+        topBar = {
+            PTopAppBar(
+                onNavigateBack = { navController.navigateUp() },
+                title = stringResource(Res.string.adb_automation),
+            )
+        },
+        content = { paddingValues ->
+            LazyColumn(modifier = Modifier.padding(top = paddingValues.calculateTopPadding())) {
+                item {
+                    TopSpace()
+                    Subtitle(text = stringResource(Res.string.token))
+                    CornerCopyCard(
+                        label = stringResource(Res.string.token),
+                        modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN),
+                        text = adbToken
+                    )
+                    VerticalSpace(dp = 16.dp)
+                    Subtitle(text = stringResource(Res.string.start_service))
+                    CornerCopyCard(
+                        label = stringResource(Res.string.adb_cmd_start),
+                        modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN),
+                        text = "adb shell am broadcast -a $packageId.action.START_HTTP_SERVER -p $packageId --es token $adbToken",
+                    )
+                    VerticalSpace(dp = 16.dp)
+                    Subtitle(text = stringResource(Res.string.stop_service))
+                    CornerCopyCard(
+                        label = stringResource(Res.string.adb_cmd_stop),
+                        modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN),
+                        text = "adb shell am broadcast -a $packageId.action.STOP_HTTP_SERVER -p $packageId --es token $adbToken",
+                    )
+                    Tips(text = stringResource(Res.string.adb_token_desc))
+                    VerticalSpace(dp = 16.dp)
+                    PFilledButton(
+                        modifier = Modifier.padding(horizontal = 16.dp).fillMaxWidth(),
+                        text = stringResource(Res.string.reset_token),
+                        type = ButtonType.DANGER,
+                        onClick = onResetToken,
+                    )
+                    BottomSpace(paddingValues)
                 }
-            },
-        )
-    }
+            }
+        },
+    )
 }

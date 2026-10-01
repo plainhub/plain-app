@@ -1,4 +1,6 @@
 package com.ismartcoding.plain.ai
+
+import com.ismartcoding.plain.preferences.*
 import com.ismartcoding.plain.appContext
 import com.ismartcoding.plain.buildChannel
 import com.ismartcoding.plain.enums.AppChannelType
@@ -7,7 +9,6 @@ import com.ismartcoding.plain.lib.withIO
 import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.lib.sendEvent
 import com.ismartcoding.plain.platform.AppDatabase
-import com.ismartcoding.plain.preferences.AiImageSearchEnabledPreference
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import java.io.File
@@ -55,7 +56,7 @@ object ImageSearchManager {
 
     suspend fun restoreIfEnabled() = withIO {
         if (isFdroid()) return@withIO
-        val enabled = AiImageSearchEnabledPreference.getAsync()
+        val enabled = UserPrefs.aiImageSearchEnabled.value
         if (enabled && isModelAvailable()) {
             loadModels()
             ImageIndexManager.startup()
@@ -74,7 +75,7 @@ object ImageSearchManager {
             if (!isModelAvailable()) return@withIO
         }
         loadModels()
-        AiImageSearchEnabledPreference.putAsync(true)
+        UserPrefs.aiImageSearchEnabled.value = true
         ImageIndexManager.startup()
     }
 
@@ -86,7 +87,7 @@ object ImageSearchManager {
         modelsDir.deleteRecursively()
         AppDatabase.instance.imageEmbeddingDao().deleteAll()
         _status.value = ImageSearchStatusType.UNAVAILABLE
-        AiImageSearchEnabledPreference.putAsync(false)
+        UserPrefs.aiImageSearchEnabled.value = false
         emitStatus()
     }
 

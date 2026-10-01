@@ -1,5 +1,7 @@
 package com.ismartcoding.plain.ui.page.sharedfolder
 
+import com.ismartcoding.plain.preferences.*
+
 import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.chat.ChatManager
 import com.ismartcoding.plain.chat.ChatViewModel
@@ -24,12 +26,12 @@ internal class FetchResult(val info: SharedInfoDto, val link: SharedLink)
 /** Device address candidates for a share card: our current local endpoints when the card is our own share, then message endpoint, then the paired peer record. */
 internal fun addressCandidates(msg: DMessageShare): List<SharedLink> {
     val list = mutableListOf<SharedLink>()
-    if (msg.peerInfo.id == TempData.clientId && TempData.httpsPort.value > 0) {
+    if (msg.peerInfo.id == TempData.clientId && UserPrefs.httpsPort.value > 0) {
         // The share server is this device: today's local addresses beat the IP recorded at send time.
         getDeviceIP4sWithPrefixLength().map { it.first }
             .filter { it.isNotEmpty() }
-            .forEach { list += SharedLinkClient.linkOf(msg.shareId, msg.urlToken, it, TempData.httpsPort.value) }
-        list += SharedLinkClient.linkOf(msg.shareId, msg.urlToken, "127.0.0.1", TempData.httpsPort.value)
+            .forEach { list += SharedLinkClient.linkOf(msg.shareId, msg.urlToken, it, UserPrefs.httpsPort.value) }
+        list += SharedLinkClient.linkOf(msg.shareId, msg.urlToken, "127.0.0.1", UserPrefs.httpsPort.value)
     }
     list += SharedLinkClient.linkOf(msg.shareId, msg.urlToken, msg.peerInfo.ip, msg.peerInfo.port)
     PeerCacher.getPeer(msg.peerInfo.id)?.let { peer ->

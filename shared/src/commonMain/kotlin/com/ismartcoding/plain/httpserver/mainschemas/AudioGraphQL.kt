@@ -1,5 +1,7 @@
 package com.ismartcoding.plain.httpserver.mainschemas
 
+import com.ismartcoding.plain.preferences.*
+
 import com.ismartcoding.plain.lib.kgraphql.GraphQLError
 import com.ismartcoding.plain.lib.kgraphql.annotations.GraphQLMutation
 import com.ismartcoding.plain.lib.kgraphql.annotations.GraphQLQuery
@@ -28,9 +30,6 @@ import com.ismartcoding.plain.platform.countMedia
 import com.ismartcoding.plain.platform.getAudioLyrics
 import com.ismartcoding.plain.platform.playlistAudioFromPath
 import com.ismartcoding.plain.platform.searchMedia
-import com.ismartcoding.plain.preferences.AudioPlayModePreference
-import com.ismartcoding.plain.preferences.AudioPlayingPreference
-import com.ismartcoding.plain.preferences.AudioSortByPreference
 import com.ismartcoding.plain.httpserver.loaders.TagsLoader
 import com.ismartcoding.plain.httpserver.models.Audio
 import com.ismartcoding.plain.httpserver.models.AudioPlayback
@@ -67,8 +66,8 @@ suspend fun audioQueueItemCount(): Int {
 @GraphQLQuery
 suspend fun audioPlayback(): AudioPlayback {
     return AudioPlayback(
-        mode = AudioPlayModePreference.getValueAsync(),
-        currentPath = AudioPlayingPreference.getValueAsync(),
+        mode = UserPrefs.audioPlayMode.value,
+        currentPath = SystemPrefs.audioPlayingValue(),
         isPlaying = audioIsPlayingFlow().value,
         positionMs = audioPlayerProgressAsync(),
     )
@@ -78,19 +77,19 @@ suspend fun audioPlayback(): AudioPlayback {
 @GraphQLMutation
 suspend fun playAudio(path: String): AudioItem {
     val audio = playlistAudioFromPath(path)
-    AudioPlayingPreference.putAsync(audio.path)
+    SystemPrefs.setAudioPlaying(audio.path)
     return audio.toModel()
 }
 
 @GraphQLMutation
 suspend fun updateAudioPlayMode(mode: MediaPlayMode): Boolean {
-    AudioPlayModePreference.putAsync(mode)
+    UserPrefs.audioPlayMode.value = mode
     return true
 }
 
 @GraphQLMutation
 suspend fun clearAudioQueue(): Boolean {
-    AudioPlayingPreference.putAsync("")
+    SystemPrefs.setAudioPlaying("")
     AudioQueueManager.clearQueue()
     coMain {
         audioClear()
@@ -108,7 +107,7 @@ suspend fun removeAudioFromQueue(path: String): Boolean {
 @GraphQLMutation
 suspend fun addAudiosToQueue(query: String): Boolean {
     // 1000 items at most
-    val items = searchMedia(DataType.AUDIO, query, 1000, 0, AudioSortByPreference.getValueAsync())
+    val items = searchMedia(DataType.AUDIO, query, 1000, 0, UserPrefs.audioSortByValue())
         .filterIsInstance<DAudio>()
     AudioQueueManager.enqueue(items.map { it.toPlaylistAudio() })
     return true

@@ -1,5 +1,7 @@
 package com.ismartcoding.plain.platform
 
+import com.ismartcoding.plain.preferences.*
+
 import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.discover.PairingCore
 import com.ismartcoding.plain.discover.ensureMdnsInterfacesInstalled
@@ -83,8 +85,8 @@ actual suspend fun startHttpEngineAsync(): Boolean = withIO {
         LogCat.e(HttpServerManager.httpServerError.value)
         return@withIO false
     }
-    val httpPort = TempData.httpPort.value
-    val httpsPort = TempData.httpsPort.value
+    val httpPort = UserPrefs.httpPort.value
+    val httpsPort = UserPrefs.httpsPort.value
     val ok = try {
         bridge.start(httpPort, httpsPort)
     } catch (ex: Exception) {
@@ -109,8 +111,8 @@ actual suspend fun stopHttpEngineAsync(): Unit = withIO {
 actual suspend fun onHttpServerStarted() {
     ensureMdnsInterfacesInstalled()
     // Start mDNS hostname responder so peers can discover this device via its .local name.
-    val httpPort = TempData.httpPort.value
-    val httpsPort = TempData.httpsPort.value
+    val httpPort = UserPrefs.httpPort.value
+    val httpsPort = UserPrefs.httpsPort.value
     if (httpPort > 0 || httpsPort > 0) {
         val hostname = TempData.mdnsHostname
         val service = buildMdnsServiceInfo(PairingCore.buildDiscoverReply(), hostname)

@@ -1,5 +1,7 @@
 package com.ismartcoding.plain.httpserver.routes
 
+import com.ismartcoding.plain.preferences.*
+
 import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.chat.peer.PeerCacher
 import com.ismartcoding.plain.chat.peer.PeerChatParser
@@ -20,8 +22,6 @@ import com.ismartcoding.plain.platform.resetScreenMirrorTouchStream
 import com.ismartcoding.plain.platform.sha512
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import com.ismartcoding.plain.preferences.AuthTwoFactorPreference
-import com.ismartcoding.plain.preferences.PasswordPreference
 import com.ismartcoding.plain.httpserver.AuthRequest
 import com.ismartcoding.plain.httpserver.AuthResponse
 import com.ismartcoding.plain.httpserver.AuthStatus
@@ -168,7 +168,7 @@ private suspend fun handleLoginFrame(
 
     var r: AuthRequest? = null
     val hash = sha512(
-        PasswordPreference.getAsync().encodeToByteArray(),
+        SystemPrefs.password.value.encodeToByteArray(),
     )
     val token = HttpServerManager.hashToToken(hash)
     val decryptedBytes = chaCha20Decrypt(token, frame)
@@ -177,7 +177,7 @@ private suspend fun handleLoginFrame(
     }
     if (r?.password == hash) {
         val event = ConfirmToAcceptLoginEvent(sessionHandle, clientId, r, r.ecdhPublicKey)
-        if (requiresLoginConfirmation(r, AuthTwoFactorPreference.getAsync())) {
+        if (requiresLoginConfirmation(r, SystemPrefs.authTwoFactor.value)) {
             ws.sendBinary(
                 chaCha20Encrypt(
                     token,

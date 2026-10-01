@@ -1,5 +1,7 @@
 package com.ismartcoding.plain.platform
 
+import com.ismartcoding.plain.preferences.*
+
 import android.content.Intent
 import android.net.Uri
 import androidx.core.content.ContextCompat
@@ -16,7 +18,6 @@ import com.ismartcoding.plain.lib.coIO
 import com.ismartcoding.plain.lib.withIO
 import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.mdns.NsdHelper
-import com.ismartcoding.plain.preferences.KeyStorePasswordPreference
 import com.ismartcoding.plain.services.HttpServerService
 import com.ismartcoding.plain.services.PNotificationListenerService
 import com.ismartcoding.plain.httpserver.HttpServerManager
@@ -47,7 +48,7 @@ actual suspend fun replaceSSLKeyStoreAsync(
     password: String,
 ): ByteArray = withIO {
     val file = File(appContext.filesDir, Constants.KEY_STORE_FILE_NAME)
-    val keystorePassword = KeyStorePasswordPreference.getAsync()
+    val keystorePassword = SystemPrefs.keyStorePassword.value
     when (mode) {
         SslCertImportMode.PKCS12 -> {
             val bytes = readUriBytes(firstUri)
@@ -111,7 +112,7 @@ actual suspend fun stopHttpEngineAsync() = withIO {
 //   on reconnect (see onWebSocketSessionStarted).
 actual suspend fun onHttpServerStarted() {
     val service = HttpServerService.instance ?: return
-    NsdHelper.registerServices(TempData.httpPort.value, TempData.httpsPort.value)
+    NsdHelper.registerServices(UserPrefs.httpPort.value, UserPrefs.httpsPort.value)
     PNotificationListenerService.toggle(service, Permission.NOTIFICATION_LISTENER.isEnabledAsync())
     SmsProviderObserver.start(service)
     ClipboardWatcher.start()

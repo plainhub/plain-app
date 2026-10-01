@@ -1,4 +1,8 @@
 package com.ismartcoding.plain.ui.page.home
+
+import com.ismartcoding.plain.ui.extensions.collectAsStateValue
+
+import com.ismartcoding.plain.preferences.*
 import com.ismartcoding.plain.platform.getAppVersionName
 
 import com.ismartcoding.plain.i18n.*
@@ -31,9 +35,6 @@ import com.ismartcoding.plain.lib.sendEvent
 import com.ismartcoding.plain.platform.exitApp
 import com.ismartcoding.plain.platform.fileExists
 import com.ismartcoding.plain.platform.installApk
-import com.ismartcoding.plain.preferences.UpdateInfoPreference
-import com.ismartcoding.plain.preferences.LocalNewVersion
-import com.ismartcoding.plain.preferences.LocalSkipVersion
 import com.ismartcoding.plain.ui.base.PBanner
 import com.ismartcoding.plain.ui.base.PFilledButton
 import com.ismartcoding.plain.ui.base.VerticalSpace
@@ -47,8 +48,9 @@ private const val GITHUB_RELEASES_URL = "https://github.com/plainhub/plain-app/r
 
 @Composable
 fun UpdateBanner(updateVM: UpdateViewModel) {
-    val newVersion = LocalNewVersion.current.toVersion()
-    val skipVersion = LocalSkipVersion.current.toVersion()
+    val updateInfo = SystemPrefs.parseUpdateInfo(SystemPrefs.updateInfo.collectAsStateValue())
+    val newVersion = updateInfo.newVersion.toVersion()
+    val skipVersion = updateInfo.skipVersion.toVersion()
     val currentVersion = Version(getAppVersionName())
     val isDownloading = updateVM.isDownloading.value
     val downloadProgress = updateVM.downloadProgress.intValue
@@ -60,9 +62,7 @@ fun UpdateBanner(updateVM: UpdateViewModel) {
     val needsUpdate = newVersion.whetherNeedUpdate(currentVersion, skipVersion)
 
     LaunchedEffect(Unit) {
-        // Read version info from the persisted snapshot: composition-time LocalNewVersion is
-        // still the default "" on cold start, which would wrongly wipe the downloaded path.
-        val info = UpdateInfoPreference.getValueAsync()
+        val info = SystemPrefs.updateInfoValue()
         val path = info.downloadedApkPath
         if (path.isNotEmpty()) {
             val downloadedVersionNeedsUpdate =
@@ -72,7 +72,7 @@ fun UpdateBanner(updateVM: UpdateViewModel) {
             ) {
                 updateVM.onDownloadComplete(path)
             } else {
-                UpdateInfoPreference.updateAsync { it.copy(downloadedApkPath = "") }
+                SystemPrefs.updateInfo { it.copy(downloadedApkPath = "") }
             }
         }
     }
@@ -97,7 +97,7 @@ fun UpdateBanner(updateVM: UpdateViewModel) {
                     exitApp()
                 },
                 onDismiss = {
-                    scope.launch { UpdateInfoPreference.updateAsync { it.copy(downloadedApkPath = "") } }
+                    scope.launch { SystemPrefs.updateInfo { it.copy(downloadedApkPath = "") } }
                     updateVM.resetDownload()
                 },
             )

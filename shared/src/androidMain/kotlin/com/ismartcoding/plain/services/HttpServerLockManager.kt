@@ -1,4 +1,6 @@
 package com.ismartcoding.plain.services
+
+import com.ismartcoding.plain.preferences.*
 import com.ismartcoding.plain.appContext
 
 import android.content.Context
@@ -12,7 +14,6 @@ import com.ismartcoding.plain.events.PowerDisconnectedEvent
 import com.ismartcoding.plain.events.WebRequestReceivedEvent
 import com.ismartcoding.plain.events.WindowFocusChangedEvent
 import com.ismartcoding.plain.powerManager
-import com.ismartcoding.plain.preferences.KeepAwakePreference
 import com.ismartcoding.plain.receivers.PlugInControlReceiver
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -52,7 +53,7 @@ internal class HttpServerLockManager(private val context: Context) {
     fun start() {
         acquireLocksOnly()
         eventJob = coIO {
-            keepAwake = KeepAwakePreference.getAsync()
+            keepAwake = UserPrefs.keepAwake.value
             scheduleInactivityTimer()
             Channel.sharedFlow.collect { event ->
                 when (event) {

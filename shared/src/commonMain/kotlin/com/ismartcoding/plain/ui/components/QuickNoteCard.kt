@@ -1,5 +1,7 @@
 package com.ismartcoding.plain.ui.components
 
+import com.ismartcoding.plain.preferences.*
+
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.border
@@ -42,7 +44,6 @@ import com.ismartcoding.plain.ui.resources.undo as ui_drawable_undo
 import com.ismartcoding.plain.lib.coIO
 import com.ismartcoding.plain.lib.extensions.getMarkdownTitle
 import com.ismartcoding.plain.lib.withIO
-import com.ismartcoding.plain.preferences.QuickNoteDraftPreference
 import com.ismartcoding.plain.ui.base.PCard
 import com.ismartcoding.plain.ui.base.PIconButton
 import com.ismartcoding.plain.ui.base.ToastManager
@@ -76,7 +77,7 @@ fun QuickNoteCard(
 
     LaunchedEffect(Unit) {
         if (QuickNoteDraftCache.text == null) {
-            val saved = QuickNoteDraftPreference.getAsync()
+            val saved = UserPrefs.quickNoteDraft.value
             QuickNoteDraftCache.text = saved
             text = saved
         }
@@ -88,14 +89,14 @@ fun QuickNoteCard(
             .collectLatest { t ->
                 QuickNoteDraftCache.text = t
                 delay(300)
-                QuickNoteDraftPreference.putAsync(t)
+                UserPrefs.quickNoteDraft.value = t
             }
     }
     DisposableEffect(Unit) {
         onDispose {
             val t = text
             QuickNoteDraftCache.text = t
-            coIO { QuickNoteDraftPreference.putAsync(t) }
+            coIO { UserPrefs.quickNoteDraft.value = t }
         }
     }
 

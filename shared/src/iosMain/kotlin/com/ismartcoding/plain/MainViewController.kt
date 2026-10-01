@@ -1,5 +1,9 @@
 package com.ismartcoding.plain
 
+import com.ismartcoding.plain.ui.extensions.collectAsStateValue
+
+import com.ismartcoding.plain.preferences.*
+
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.window.ComposeUIViewController
@@ -14,12 +18,8 @@ import com.ismartcoding.plain.enums.DarkTheme
 import com.ismartcoding.plain.events.AppEvents
 import com.ismartcoding.plain.lib.coIO
 import com.ismartcoding.plain.platform.buildAppDatabase
-import com.ismartcoding.plain.platform.prefsFilePath
 import com.ismartcoding.plain.platform.initDatabase
 import com.ismartcoding.plain.platform.initDiskLogging
-import com.ismartcoding.plain.preferences.LocalDarkTheme
-import com.ismartcoding.plain.preferences.SettingsProvider
-import com.ismartcoding.plain.preferences.initPreferences
 import com.ismartcoding.plain.ui.models.AudioQueueViewModel
 import com.ismartcoding.plain.ui.models.ChannelViewModel
 import com.ismartcoding.plain.ui.models.MainViewModel
@@ -43,7 +43,7 @@ fun initIosApp() {
     if (initialized) return
     initialized = true
 
-    initPreferences(prefsFilePath())
+    Prefs.load()
 
     // Room database with the same onCreate seed data as Android
     initDatabase(
@@ -90,48 +90,46 @@ fun initIosApp() {
 
 /**
  * Entry point called from Swift. Returns a UIViewController hosting the
- * Compose Multiplatform UI tree (SettingsProvider → AppTheme → Main).
+ * Compose Multiplatform UI tree (AppTheme → Main).
  */
 @Suppress("unused")
 fun MainViewController(): UIViewController {
     initIosApp()
     return ComposeUIViewController {
-        SettingsProvider {
-            AppTheme(
-                useDarkTheme = DarkTheme.isDarkTheme(LocalDarkTheme.current),
-                amoledDarkTheme = com.ismartcoding.plain.preferences.LocalAmoledDarkTheme.current,
-            ) {
-                val navControllerState = remember { mutableStateOf<NavHostController?>(null) }
-                // iOS has no reflection-based default ViewModel factory. Provide an
-                // explicit factory for the top-level ViewModels created here. Page-level
-                // ViewModels use `viewModel { XxxViewModel() }` initializers (already in
-                // commonMain) which work on all platforms.
-                val factory = viewModelFactory {
-                    initializer { MainViewModel() }
-                    initializer { AudioQueueViewModel() }
-                    initializer { PomodoroViewModel() }
-                    initializer { PeerViewModel() }
-                    initializer { ChannelViewModel() }
-                    initializer { TagsViewModel() }
-                }
-                val mainVM: MainViewModel = viewModel(factory = factory)
-                val audioQueueVM: AudioQueueViewModel = viewModel(factory = factory)
-                val pomodoroVM: PomodoroViewModel = viewModel(factory = factory)
-                val peerVM: PeerViewModel = viewModel(factory = factory)
-                val channelVM: ChannelViewModel = viewModel(factory = factory)
-                Main(
-                    navControllerState = navControllerState,
-                    onLaunched = {
-                        // iOS has no Intent to handle; locale init runs in background.
-                        MainScope().launch { com.ismartcoding.plain.enums.Language.initLocaleAsync() }
-                    },
-                    mainVM = mainVM,
-                    audioQueueVM = audioQueueVM,
-                    pomodoroVM = pomodoroVM,
-                    peerVM = peerVM,
-                    channelVM = channelVM,
-                )
+        AppTheme(
+            useDarkTheme = DarkTheme.isDarkTheme(UserPrefs.darkTheme.collectAsStateValue()),
+            amoledDarkTheme = UserPrefs.amoledDarkTheme.collectAsStateValue(),
+        ) {
+            val navControllerState = remember { mutableStateOf<NavHostController?>(null) }
+            // iOS has no reflection-based default ViewModel factory. Provide an
+            // explicit factory for the top-level ViewModels created here. Page-level
+            // ViewModels use `viewModel { XxxViewModel() }` initializers (already in
+            // commonMain) which work on all platforms.
+            val factory = viewModelFactory {
+                initializer { MainViewModel() }
+                initializer { AudioQueueViewModel() }
+                initializer { PomodoroViewModel() }
+                initializer { PeerViewModel() }
+                initializer { ChannelViewModel() }
+                initializer { TagsViewModel() }
             }
+            val mainVM: MainViewModel = viewModel(factory = factory)
+            val audioQueueVM: AudioQueueViewModel = viewModel(factory = factory)
+            val pomodoroVM: PomodoroViewModel = viewModel(factory = factory)
+            val peerVM: PeerViewModel = viewModel(factory = factory)
+            val channelVM: ChannelViewModel = viewModel(factory = factory)
+            Main(
+                navControllerState = navControllerState,
+                onLaunched = {
+                    // iOS has no Intent to handle; locale init runs in background.
+                    MainScope().launch { com.ismartcoding.plain.enums.Language.initLocaleAsync() }
+                },
+                mainVM = mainVM,
+                audioQueueVM = audioQueueVM,
+                pomodoroVM = pomodoroVM,
+                peerVM = peerVM,
+                channelVM = channelVM,
+            )
         }
     }
 }

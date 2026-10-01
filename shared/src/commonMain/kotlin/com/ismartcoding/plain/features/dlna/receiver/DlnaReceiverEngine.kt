@@ -1,5 +1,7 @@
 package com.ismartcoding.plain.features.dlna.receiver
 
+import com.ismartcoding.plain.preferences.*
+
 import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.lib.dlna.DlnaCommand
 import com.ismartcoding.plain.features.dlna.DlnaCastRequestEvent
@@ -16,8 +18,6 @@ import com.ismartcoding.plain.platform.IODispatcher
 import com.ismartcoding.plain.platform.getDeviceIP4
 import com.ismartcoding.plain.features.dlna.startDlnaRenderer
 import com.ismartcoding.plain.features.dlna.stopDlnaRenderer
-import com.ismartcoding.plain.preferences.DlnaAllowedSendersPreference
-import com.ismartcoding.plain.preferences.DlnaDeniedSendersPreference
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
@@ -68,7 +68,7 @@ object DlnaReceiverEngine {
         if (DlnaRendererState.isRunning.value) return
         DlnaRendererState.startError.value = ""
 
-        DlnaRendererState.port.value = TempData.httpPort.value
+        DlnaRendererState.port.value = UserPrefs.httpPort.value
 
         val ssdpSocket = createDlnaSsdpSocket()
         activeSsdpSocket = ssdpSocket
@@ -89,7 +89,7 @@ object DlnaReceiverEngine {
         startCommandProcessing()
         startRuleCheck()
         DlnaRendererState.isRunning.value = true
-        LogCat.d("DlnaReceiverEngine started, web port=${TempData.httpPort.value} uuid=$deviceUuid")
+        LogCat.d("DlnaReceiverEngine started, web port=${UserPrefs.httpPort.value} uuid=$deviceUuid")
     }
 
     /**
@@ -164,10 +164,10 @@ object DlnaReceiverEngine {
     private fun startRuleCheck() {
         ruleCheckJob = scope?.launch {
             DlnaRendererState.rawPendingCastRequest.filterNotNull().collect { pending ->
-                val allowed = DlnaAllowedSendersPreference.getAsync()
-                val denied = DlnaDeniedSendersPreference.getAsync()
+                val allowed = UserPrefs.dlnaAllowedSenders.value
+                val denied = UserPrefs.dlnaDeniedSenders.value
                 when {
-                    DlnaAllowedSendersPreference.containsIp(allowed, pending.senderIp) -> {
+                    UserPrefs.containsDlnaSender(allowed, pending.senderIp) -> {
                         DlnaRendererState.pendingCastRequest.value = null
                         DlnaRendererState.rawPendingCastRequest.value = null
                         val playQueued = DlnaRendererState.pendingPlayQueued.value
@@ -178,7 +178,7 @@ object DlnaReceiverEngine {
                         if (playQueued) DlnaRendererState.commandChannel.trySend(DlnaCommand.Play)
                         sendEvent(DlnaCastRequestEvent())
                     }
-                    DlnaDeniedSendersPreference.containsIp(denied, pending.senderIp) -> {
+                    UserPrefs.containsDlnaSender(denied, pending.senderIp) -> {
                         DlnaRendererState.rawPendingCastRequest.value = null
                         DlnaRendererState.pendingPlayQueued.value = false
                     }

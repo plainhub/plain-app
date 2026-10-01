@@ -1,4 +1,6 @@
 package com.ismartcoding.plain.ui.page.connections
+
+import com.ismartcoding.plain.preferences.*
 import com.ismartcoding.plain.ui.theme.PlainTheme
 
 import com.ismartcoding.plain.i18n.*
@@ -97,7 +99,7 @@ internal fun SessionListItem(
                 },
             )
 
-            if (m.isCustom || TempData.developerMode) {
+            if (m.isCustom || UserPrefs.developerMode.value) {
                 PListItem(
                     title = stringResource(Res.string.client_id),
                     subtitle = m.clientId, action = {

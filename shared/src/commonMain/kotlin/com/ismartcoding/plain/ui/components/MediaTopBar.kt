@@ -27,7 +27,6 @@ import com.ismartcoding.plain.enums.DataType
 import com.ismartcoding.plain.features.file.FileSortBy
 import com.ismartcoding.plain.features.media.CastPlayer
 import com.ismartcoding.plain.ui.base.dragselect.DragSelectState
-import com.ismartcoding.plain.ui.components.SortAndBrowseDialog
 import com.ismartcoding.plain.ui.models.CastViewModel
 import com.ismartcoding.plain.ui.models.BaseMediaViewModel
 import com.ismartcoding.plain.ui.models.MediaFoldersViewModel
@@ -40,7 +39,6 @@ import com.ismartcoding.plain.ui.resources.cast as ui_drawable_cast
 import com.ismartcoding.plain.ui.resources.left_panel_open as ui_drawable_left_panel_open
 import com.ismartcoding.plain.ui.resources.sort as ui_drawable_sort
 import com.ismartcoding.plain.i18n.sort
-import com.ismartcoding.plain.i18n.cast
 
 /**
  * Shared layout for the media pages (Images / Audio / Videos / Docs). Wraps the
@@ -207,10 +205,8 @@ fun <T : IData> MediaTopBar(
     if (mediaVM.showSortAndBrowseDialog.value) {
         SortAndBrowseDialog(
             mediaVM = mediaVM,
-            tagsVM = tagsVM,
             sortByEntries = if (setOf(DataType.IMAGE, DataType.VIDEO).contains(mediaVM.dataType)) FileSortBy.entries else FileSortBy.entries.filter { it != FileSortBy.TAKEN_AT_DESC },
             onSortSelected = { sortBy -> onSortSelected(sortBy) },
-            onDismiss = { mediaVM.showSortAndBrowseDialog.value = false },
-        )
+        ) { mediaVM.showSortAndBrowseDialog.value = false }
     }
 }

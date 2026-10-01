@@ -1,5 +1,7 @@
 package com.ismartcoding.plain.ui.page.chat
 
+import com.ismartcoding.plain.preferences.*
+
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -87,7 +89,7 @@ fun ChatListPage(
 ) {
     val pairedPeers = PeerCacher.pairedPeers.collectAsStateValue()
     val unpairedPeers = PeerCacher.unpairedPeers.collectAsStateValue()
-    val serviceEnabled = TempData.serviceEnabled.collectAsStateValue()
+    val serviceEnabled = UserPrefs.service.collectAsStateValue()
     val refreshState = rememberRefreshLayoutState {
         PeerStatusManager.reconnectNow("chat_list_pull_refresh")
         peerVM.load()

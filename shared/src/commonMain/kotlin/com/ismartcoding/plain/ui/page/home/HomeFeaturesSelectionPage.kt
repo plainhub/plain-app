@@ -24,8 +24,6 @@ import androidx.compose.ui.Modifier
 import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
-import com.ismartcoding.plain.preferences.HomeFeaturesPreference
-import com.ismartcoding.plain.preferences.appPreferences
 import com.ismartcoding.plain.ui.base.BottomSpace
 import com.ismartcoding.plain.ui.base.PScaffold
 import com.ismartcoding.plain.ui.base.PTopAppBar
@@ -43,20 +41,18 @@ fun HomeFeaturesSelectionPage(navController: NavHostController) {
     val scope = rememberCoroutineScope()
     val allFeatureItems = remember { FeatureItem.getList(navController) }
 
-    val featuresStr = remember {
-        appPreferences.snapshots.map { HomeFeaturesPreference.get(it) }
-    }.collectAsStateValue(initial = HomeFeaturesPreference.default)
+    val featuresStr = UserPrefs.homeFeatures.collectAsStateValue()
 
     var enabledIds by remember(featuresStr) {
         mutableStateOf(
-            HomeFeaturesPreference.parseList(featuresStr.ifEmpty { HomeFeaturesPreference.default })
+            UserPrefs.parseFeatures(featuresStr.ifEmpty { UserPrefs.homeFeatures.default })
         )
     }
 
     fun persist(newList: List<String>) {
         enabledIds = newList
         scope.launch(Dispatchers.Default) {
-            HomeFeaturesPreference.putAsync(HomeFeaturesPreference.formatList(newList))
+            UserPrefs.setHomeFeatures(UserPrefs.formatFeatures(newList))
         }
     }
 

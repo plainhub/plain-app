@@ -1,5 +1,7 @@
 package com.ismartcoding.plain.ui.page.tools
 
+import com.ismartcoding.plain.preferences.*
+
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -22,8 +24,6 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.ismartcoding.plain.enums.AppFeatureType
 import com.ismartcoding.plain.i18n.*
-import com.ismartcoding.plain.preferences.LauncherShortcutsPreference
-import com.ismartcoding.plain.preferences.appPreferences
 import com.ismartcoding.plain.ui.base.BottomSpace
 import com.ismartcoding.plain.ui.base.PScaffold
 import com.ismartcoding.plain.ui.base.PTopAppBar
@@ -50,19 +50,17 @@ fun LauncherShortcutsPage(navController: NavHostController) {
         LauncherShortcutTools.ALL.associateWith { LauncherShortcutTools.featureItem(it) }
     }
 
-    val stored = remember {
-        appPreferences.snapshots.map { LauncherShortcutsPreference.get(it) }
-    }.collectAsStateValue(initial = LauncherShortcutsPreference.default)
+    val stored = UserPrefs.launcherShortcuts.collectAsStateValue()
 
     // Selected list order = shortcut display order (rank).
     var selected by remember(stored) {
-        mutableStateOf(LauncherShortcutsPreference.selected(stored))
+        mutableStateOf(UserPrefs.selectedLauncherShortcuts(stored))
     }
 
     fun persist(newTools: List<AppFeatureType>) {
         selected = newTools
         scope.launch(Dispatchers.Default) {
-            LauncherShortcutsPreference.putAsync(LauncherShortcutsPreference.formatList(newTools))
+            UserPrefs.setLauncherShortcuts(UserPrefs.formatLauncherShortcuts(newTools))
             publishLauncherShortcuts(newTools)
         }
     }
