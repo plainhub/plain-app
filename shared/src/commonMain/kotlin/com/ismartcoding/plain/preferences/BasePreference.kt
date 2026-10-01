@@ -1,21 +1,20 @@
 package com.ismartcoding.plain.preferences
 
-import androidx.datastore.preferences.core.Preferences
 import com.ismartcoding.plain.lib.withIO
 
 abstract class BasePreference<T> {
     abstract val default: T
-    abstract val key: Preferences.Key<T>
+    abstract val key: PreferenceKey<T>
 
-    fun get(preferences: Preferences): T {
+    fun get(preferences: PreferenceSnapshot): T {
         return preferences[key] ?: default
     }
 
     suspend fun getAsync(): T = withIO {
-        appDataStore.getAsync(key) ?: default
+        appPreferences.snapshot[key] ?: default
     }
 
     open suspend fun putAsync(value: T) = withIO {
-        appDataStore.put(key, value)
+        appPreferences.put(key, value)
     }
 }

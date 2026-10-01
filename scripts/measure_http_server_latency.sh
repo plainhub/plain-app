@@ -36,15 +36,11 @@ sleep 1
 "${ADB[@]}" shell am start -n "$PACKAGE/com.ismartcoding.plain.MainActivity" >/dev/null
 sleep 8
 
-# The automation token is re-randomized on every app launch; read it from the
-# debug app's datastore (run-as works on debug builds only).
-TOKEN=$("${ADB[@]}" shell "run-as $PACKAGE cat files/datastore/settings.preferences_pb" | python3 -c '
-import sys, re
-data = sys.stdin.buffer.read().replace(b"\r", b"")
-i = data.find(b"adb_token")
-m = re.search(rb"[A-Za-z0-9]{32}", data[i + len(b"adb_token"):i + 80]) if i >= 0 else None
-print(m.group(0).decode() if m else "")')
-[ -n "$TOKEN" ] || fail "could not read adb_token from $PACKAGE datastore (open the app once, then retry)"
+# The automation token is re-randomized on every app launch.
+TOKEN=$("${ADB[@]}" shell "run-as $PACKAGE cat files/prefs.json" | python3 -c '
+import json, sys
+print(json.load(sys.stdin).get("adb_token", ""))')
+[ -n "$TOKEN" ] || fail "could not read adb_token from $PACKAGE prefs (open the app once, then retry)"
 
 # Ensure a known OFF state (idempotent).
 "${ADB[@]}" shell am broadcast -a "$PACKAGE.action.STOP_HTTP_SERVER" -p "$PACKAGE" --es token "$TOKEN" >/dev/null

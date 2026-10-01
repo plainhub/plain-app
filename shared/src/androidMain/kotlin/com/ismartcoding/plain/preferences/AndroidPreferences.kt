@@ -1,7 +1,6 @@
 package com.ismartcoding.plain.preferences
 
 import androidx.appcompat.app.AppCompatDelegate
-import androidx.datastore.preferences.core.Preferences
 import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.enums.DarkTheme
 import com.ismartcoding.plain.platform.randomPassword
@@ -19,7 +18,7 @@ suspend fun DarkThemePreference.putAsync(value: DarkTheme) {
     setDarkMode(value)
 }
 
-suspend fun AdbTokenPreference.ensureValueAsync(preferences: Preferences) {
+suspend fun AdbTokenPreference.ensureValueAsync(preferences: PreferenceSnapshot) {
     TempData.adbToken = get(preferences)
     if (TempData.adbToken.isEmpty()) {
         TempData.adbToken = randomPassword(32)

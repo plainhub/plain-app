@@ -35,8 +35,7 @@ import com.ismartcoding.plain.platform.getOSVersion
 import com.ismartcoding.plain.ui.nav.Routing
 import com.ismartcoding.plain.preferences.NearbyDiscoverablePreference
 import com.ismartcoding.plain.preferences.UpdateInfoPreference
-import com.ismartcoding.plain.preferences.appDataStore
-import com.ismartcoding.plain.preferences.dataFlow
+import com.ismartcoding.plain.preferences.appPreferences
 import com.ismartcoding.plain.ui.extensions.collectAsStateValue
 import com.ismartcoding.plain.ui.models.PeerViewModel
 import kotlinx.coroutines.Dispatchers
@@ -65,7 +64,7 @@ fun SettingsPage(navController: NavHostController, updateViewModel: UpdateViewMo
     var cacheSize by remember { mutableLongStateOf(0L) }
     var fileSize by remember { mutableLongStateOf(getLogFileSize()) }
     val isDiscoverable = remember {
-        appDataStore.dataFlow.map { NearbyDiscoverablePreference.get(it) }
+        appPreferences.snapshots.map { NearbyDiscoverablePreference.get(it) }
     }.collectAsStateValue(initial = NearbyDiscoverablePreference.default)
     LaunchedEffect(Unit) {
         scope.launch(Dispatchers.Default) {

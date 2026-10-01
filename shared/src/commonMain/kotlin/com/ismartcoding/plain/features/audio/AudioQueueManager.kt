@@ -52,7 +52,7 @@ object AudioQueueManager {
 
     // ---------- legacy import ----------
 
-    /** One-shot import of the old DataStore queue into the manual queue table. */
+    /** One-shot import of the old preference queue into the manual queue table. */
     suspend fun ensureMigrated() {
         if (AudioQueueMigratedPreference.getAsync()) return
         val legacy = AudioPlaylistPreference.getValueAsync()

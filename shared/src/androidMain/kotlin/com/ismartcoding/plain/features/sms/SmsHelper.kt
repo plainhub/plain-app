@@ -73,7 +73,6 @@ object SmsHelper {
         val parts = manager.divideMessage(message)
         val requestId = UUID.randomUUID().toString()
         SmsSendResultTracker.register(
-            appContext,
             requestId,
             clientId,
             clientRequestId,
@@ -103,7 +102,7 @@ object SmsHelper {
                 manager.sendTextMessage(to, null, message, sentIntents.single(), null)
             }
         } catch (e: Exception) {
-            SmsSendResultTracker.cancel(appContext, requestId)
+            SmsSendResultTracker.cancel(requestId)
             throw e
         }
         scheduleSmsTimeout(requestId, SMS_SEND_TIMEOUT_MILLIS)
@@ -113,7 +112,7 @@ object SmsHelper {
         smsTimeoutJobs.remove(requestId)?.cancel()
         val job = coIO {
             delay(delayMillis.coerceAtLeast(0L))
-            val result = SmsSendResultTracker.expire(appContext, requestId, TimeHelper.nowMillis()) ?: return@coIO
+            val result = SmsSendResultTracker.expire(requestId, TimeHelper.nowMillis()) ?: return@coIO
             dispatchSmsSendResult(requestId, result)
         }
         trackSmsJob(requestId, job)
@@ -123,7 +122,7 @@ object SmsHelper {
         smsTimeoutJobs.remove(requestId)?.cancel()
         val job = coIO {
             delay(delayMillis.coerceAtLeast(0L))
-            SmsSendResultTracker.acknowledge(appContext, requestId)
+            SmsSendResultTracker.acknowledge(requestId)
         }
         trackSmsJob(requestId, job)
     }
@@ -136,7 +135,7 @@ object SmsHelper {
 
     fun restoreSmsSendTracking() {
         val now = TimeHelper.nowMillis()
-        SmsSendResultTracker.pending(appContext).forEach { state ->
+        SmsSendResultTracker.pending().forEach { state ->
             if (state.terminalResultCode != null) {
                 val terminalAtMillis = state.terminalAtMillis ?: state.createdAtMillis
                 val elapsed = (now - terminalAtMillis).coerceAtLeast(0L)
@@ -166,7 +165,7 @@ object SmsHelper {
     }
 
     suspend fun replayTerminalSmsSendResults() {
-        SmsSendResultTracker.terminalResults(appContext).forEach { result ->
+        SmsSendResultTracker.terminalResults().forEach { result ->
             sendSmsResultEvent(result)
         }
     }

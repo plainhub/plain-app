@@ -48,7 +48,7 @@ See `docs/api-test-plan.md` for the full list. TL;DR:
 | Group            | Schemas |
 |------------------|---------|
 | `setup`          | `AppGraphQL` + introspection |
-| `device-read`    | `Package`, `DataStore`, `Db` |
+| `device-read`    | `Package`, `Prefs`, `Db` |
 | `content-provider` | `Contact`, `Sms`, `Call` |
 | `notes`          | `Note`, `Tag`, `Feed` |
 | `media`          | `Audio`, `Video`, `Image`, `Media`, `Doc` |

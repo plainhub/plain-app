@@ -1,19 +1,19 @@
 #!/usr/bin/env bash
-# Group 1 — device-wide read: Package + DataStore + Db
+# Group 1 — device-wide read: Package + Prefs + Db
 # Source-only; the runner sources this file.
 #
 # Schemas covered:
 #   PackageGraphQL  : packages, packageStatuses, packageCount
-#   DataStoreGraphQL: dataStorePath, dataStoreEntries, prefs
+#   PrefsGraphQL: prefsPath, prefEntries, prefs
 #   DbGraphQL       : dbPath, dbTables, dbTableRowCount, dbTableRows, dbTableInfo
 #
 # Destructive endpoints (uninstallPackages, installPackage,
-# deleteDataStoreEntry, createDbTableRow, deleteDbTableRows) are
+# deletePrefEntry, createDbTableRow, deleteDbTableRows) are
 # intentionally NOT exercised here — Group 1 is read-only by design.
 #
 # See docs/api-test-plan.md for the full case list.
 
-run_group "device-read" "device-wide read (Package + DataStore + Db)" "docs/api-test-plan.md#device-wide-read"
+run_group "device-read" "device-wide read (Package + Prefs + Db)" "docs/api-test-plan.md#device-wide-read"
 
 # Helper: pull the device's plain.db (with WAL checkpoint) so we can
 # cross-check row counts. The `-wal` and `-shm` files are dropped so
@@ -148,31 +148,31 @@ else
 fi
 
 # ----------------------------------------------------------------------------
-# device-read-C07  dataStorePath file exists on device
+# device-read-C07  prefsPath file exists on device
 # ----------------------------------------------------------------------------
-DSP=$(call_gql '{ dataStorePath }')
-api_dsp=$(printf '%s' "$DSP" | jq -r '.data.dataStorePath')
+DSP=$(call_gql '{ prefsPath }')
+api_dsp=$(printf '%s' "$DSP" | jq -r '.data.prefsPath')
 # Strip the leading slash segments the API returns and check existence via run-as
 adb_dsp_exists=$(adb_sh "run-as com.ismartcoding.plain.debug test -f $api_dsp && echo yes || echo no" 2>/dev/null | tr -d '\r')
 if [[ "$adb_dsp_exists" == "yes" ]]; then
-  pass "device-read-C07 dataStorePath ($api_dsp) exists on device"
+  pass "device-read-C07 prefsPath ($api_dsp) exists on device"
 else
-  fail "device-read-C07 dataStorePath ($api_dsp) does not exist on device"
+  fail "device-read-C07 prefsPath ($api_dsp) does not exist on device"
 fi
 
 # ----------------------------------------------------------------------------
-# device-read-C08  dataStoreEntries returns a list (possibly empty)
+# device-read-C08  prefEntries returns a list (possibly empty)
 # ----------------------------------------------------------------------------
-DSE=$(call_gql '{ dataStoreEntries { key value } }')
-echo "$DSE" > "$RESULTS_DIR/device-read-datastore.json"
-api_dse_count=$(printf '%s' "$DSE" | jq '.data.dataStoreEntries | length')
-[[ "$api_dse_count" -ge 0 ]] && pass "device-read-C08 dataStoreEntries returns a list (length=$api_dse_count)" \
-                             || fail "device-read-C08 dataStoreEntries not a list"
+DSE=$(call_gql '{ prefEntries { key value } }')
+echo "$DSE" > "$RESULTS_DIR/device-read-prefs.json"
+api_dse_count=$(printf '%s' "$DSE" | jq '.data.prefEntries | length')
+[[ "$api_dse_count" -ge 0 ]] && pass "device-read-C08 prefEntries returns a list (length=$api_dse_count)" \
+                             || fail "device-read-C08 prefEntries not a list"
 
 # device-read-C08b  every entry has a non-empty key
-api_dse_nokey=$(printf '%s' "$DSE" | jq '[.data.dataStoreEntries[] | select(.key == "" or .key == null)] | length')
-[[ "$api_dse_nokey" == "0" ]] && pass "device-read-C08b dataStoreEntries every entry has a key ($api_dse_count entries)" \
-                                || fail "device-read-C08b dataStoreEntries has $api_dse_nokey entries with no key"
+api_dse_nokey=$(printf '%s' "$DSE" | jq '[.data.prefEntries[] | select(.key == "" or .key == null)] | length')
+[[ "$api_dse_nokey" == "0" ]] && pass "device-read-C08b prefEntries every entry has a key ($api_dse_count entries)" \
+                                || fail "device-read-C08b prefEntries has $api_dse_nokey entries with no key"
 
 PREFS=$(call_gql '{ prefs { key value } }')
 api_prefs_invalid=$(printf '%s' "$PREFS" | jq '[.data.prefs[] | select(.key == "" or (.key | startswith("admin.")))] | length')

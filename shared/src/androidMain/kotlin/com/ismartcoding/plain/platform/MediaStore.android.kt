@@ -49,7 +49,7 @@ private fun claimSentMmsId(id: Long): Boolean = synchronized(claimedSentMmsIds) 
 }
 
 private fun dispatchMmsTerminalResult(result: MmsSendResultData, legacySuccessEvent: Boolean = false) {
-    MmsSendResultTracker.record(appContext, result, TimeHelper.nowMillis())
+    MmsSendResultTracker.record(result, TimeHelper.nowMillis())
     val data = if (legacySuccessEvent) {
         JsonHelper.jsonEncode(result.pendingId)
     } else {
@@ -65,7 +65,6 @@ private fun dispatchMmsTerminalResult(result: MmsSendResultData, legacySuccessEv
 
 suspend fun replayTerminalMmsSendResults() {
     MmsSendResultTracker.replayable(
-        appContext,
         TimeHelper.nowMillis(),
         MMS_TERMINAL_RESULT_TTL_MILLIS,
     ).forEach { result ->

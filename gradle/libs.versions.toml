@@ -12,7 +12,6 @@ composeBom = "2026.09.00"
 coreSplashscreenVersion = "1.2.0"
 exifinterfaceVersion = "1.4.2"
 coreVersion = "3.5.4"
-datastorePreferencesVersion = "1.2.1"
 
 jsonVersion="20260814"
 junitVersion="4.13.2"
@@ -77,8 +76,6 @@ androidx-transition = { module = "androidx.transition:transition", version.ref =
 androidx-exifinterface = { module = "androidx.exifinterface:exifinterface", version.ref = "exifinterfaceVersion" }
 gradle = { module = "com.android.tools.build:gradle", version.ref = "gradle" }
 androidx-core-splashscreen = { module = "androidx.core:core-splashscreen", version.ref = "coreSplashscreenVersion" }
-androidx-datastore-preferences = { module = "androidx.datastore:datastore-preferences", version.ref = "datastorePreferencesVersion" }
-androidx-datastore-preferences-core = { module = "androidx.datastore:datastore-preferences-core", version.ref = "datastorePreferencesVersion" }
 
 # camera
 camera-camera2 = { module = "androidx.camera:camera-camera2", version.ref = "cameraCoreVersion" }

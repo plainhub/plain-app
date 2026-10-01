@@ -1,15 +1,15 @@
 package com.ismartcoding.plain.httpserver.mainschemas
 
-import androidx.datastore.preferences.core.edit
-import androidx.datastore.preferences.core.stringPreferencesKey
 import com.ismartcoding.plain.lib.kgraphql.GraphQLError
 import com.ismartcoding.plain.lib.kgraphql.annotations.GraphQLMutation
 import com.ismartcoding.plain.lib.kgraphql.annotations.GraphQLQuery
 import com.ismartcoding.plain.lib.kgraphql.schema.dsl.SchemaBuilder
 import com.ismartcoding.plain.platform.prefsFilePath
-import com.ismartcoding.plain.preferences.appDataStore
-import com.ismartcoding.plain.preferences.getPreferencesAsync
+import com.ismartcoding.plain.preferences.appPreferences
+import com.ismartcoding.plain.preferences.getPreferences
 import com.ismartcoding.plain.httpserver.models.KeyValuePair
+import com.ismartcoding.plain.preferences.stringPreferenceKey
+import kotlinx.serialization.json.JsonPrimitive
 
 private const val PREF_PREFIX = "admin."
 
@@ -25,9 +25,9 @@ private fun prefKey(key: String): String {
 
 @GraphQLQuery
 suspend fun prefs(): List<KeyValuePair> =
-    getPreferencesAsync().asMap().mapNotNull { (key, value) ->
-        if (key.name.startsWith(PREF_PREFIX) && value is String) {
-            KeyValuePair(key.name.removePrefix(PREF_PREFIX), value)
+    getPreferences().entries.mapNotNull { (key, value) ->
+        if (key.startsWith(PREF_PREFIX) && value is JsonPrimitive && value.isString) {
+            KeyValuePair(key.removePrefix(PREF_PREFIX), value.content)
         } else {
             null
         }
@@ -36,39 +36,34 @@ suspend fun prefs(): List<KeyValuePair> =
 @GraphQLMutation
 suspend fun setPref(key: String, value: String): KeyValuePair {
     if (value.encodeToByteArray().size > 65536) throw GraphQLError("invalid_pref_value")
-    appDataStore.edit { it[stringPreferencesKey(prefKey(key))] = value }
+    appPreferences.put(stringPreferenceKey(prefKey(key)), value)
     return KeyValuePair(key, value)
 }
 
 @GraphQLMutation
 suspend fun deletePref(key: String): Boolean {
-    appDataStore.edit { it.remove(stringPreferencesKey(prefKey(key))) }
+    appPreferences.remove(prefKey(key))
     return true
 }
 
 @GraphQLQuery
-suspend fun dataStorePath(): String {
+suspend fun prefsPath(): String {
     return prefsFilePath()
 }
 
 @GraphQLQuery
-suspend fun dataStoreEntries(): List<KeyValuePair> {
-    val prefs = getPreferencesAsync()
-    return prefs.asMap().map { (key, value) ->
-        KeyValuePair(key.name, value.toString())
+suspend fun prefEntries(): List<KeyValuePair> {
+    val prefs = getPreferences()
+    return prefs.entries.map { (key, value) ->
+        KeyValuePair(key, if (value is JsonPrimitive && value.isString) value.content else value.toString())
     }.sortedBy { it.key }
 }
 
 @GraphQLMutation
-suspend fun deleteDataStoreEntry(key: String): Boolean {
-    appDataStore.edit { prefs ->
-        val target = prefs.asMap().keys.find { it.name == key }
-        if (target != null) {
-            prefs.remove(target)
-        }
-    }
+suspend fun deletePrefEntry(key: String): Boolean {
+    appPreferences.remove(key)
     return true
 }
 
-fun SchemaBuilder.addDataStoreSchema() {
+fun SchemaBuilder.addPrefsSchema() {
 }

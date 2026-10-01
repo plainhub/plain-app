@@ -38,7 +38,7 @@ fun SchemaBuilder.applyMainSchema() {
     addAppSchema()
     addAppFileSchema()
     addAppLogsSchema()
-    addDataStoreSchema()
+    addPrefsSchema()
     addDbSchema()
     addDiscoverSchema()
     addBookmarkSchema()

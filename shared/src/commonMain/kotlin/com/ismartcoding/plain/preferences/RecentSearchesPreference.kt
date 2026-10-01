@@ -1,6 +1,5 @@
 package com.ismartcoding.plain.preferences
 
-import androidx.datastore.preferences.core.stringPreferencesKey
 import kotlinx.serialization.encodeToString
 
 /**
@@ -8,7 +7,7 @@ import kotlinx.serialization.encodeToString
  */
 object RecentSearchesPreference : BasePreference<String>() {
     override val default = ""
-    override val key = stringPreferencesKey("recent_searches")
+    override val key = stringPreferenceKey("recent_searches")
 
     private const val MAX = 10
 

@@ -25,8 +25,7 @@ import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.ismartcoding.plain.preferences.HomeFeaturesPreference
-import com.ismartcoding.plain.preferences.appDataStore
-import com.ismartcoding.plain.preferences.dataFlow
+import com.ismartcoding.plain.preferences.appPreferences
 import com.ismartcoding.plain.ui.base.BottomSpace
 import com.ismartcoding.plain.ui.base.PScaffold
 import com.ismartcoding.plain.ui.base.PTopAppBar
@@ -45,7 +44,7 @@ fun HomeFeaturesSelectionPage(navController: NavHostController) {
     val allFeatureItems = remember { FeatureItem.getList(navController) }
 
     val featuresStr = remember {
-        appDataStore.dataFlow.map { HomeFeaturesPreference.get(it) }
+        appPreferences.snapshots.map { HomeFeaturesPreference.get(it) }
     }.collectAsStateValue(initial = HomeFeaturesPreference.default)
 
     var enabledIds by remember(featuresStr) {

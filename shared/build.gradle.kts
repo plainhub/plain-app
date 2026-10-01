@@ -96,7 +96,6 @@ kotlin {
             implementation(libs.jetbrains.lifecycle.viewmodel.compose)
             implementation(libs.compose.lifecycle.runtime)
             implementation(libs.kotlinx.datetime)
-            implementation(libs.androidx.datastore.preferences.core)
             api(libs.room.runtime)
             // ktor-io only (ByteReadChannel streaming) — no HTTP client dependency from ktor
             implementation(libs.ktor.io)
@@ -124,7 +123,6 @@ kotlin {
             implementation(libs.tink.android)
             implementation(libs.androidx.exifinterface)
             implementation(libs.androidx.appcompat)
-            implementation(libs.androidx.datastore.preferences)
             implementation(libs.coil)
             implementation(libs.coil.svg)
             implementation(libs.coil.gif)

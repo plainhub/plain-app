@@ -42,7 +42,7 @@ class HttpServerStateInvariantsTest {
     @Test
     fun startOrchestratorRecordsTerminalStateWhenEngineCreateFails() = runBlocking {
         // Free ephemeral ports so the port fallback does not run (it would hit
-        // DataStore, unavailable in host tests) — the failure must come from
+        // preferences, unavailable in host tests) — the failure must come from
         // the engine create itself.
         val ports = freePorts(2)
         TempData.httpPort.value = ports[0]

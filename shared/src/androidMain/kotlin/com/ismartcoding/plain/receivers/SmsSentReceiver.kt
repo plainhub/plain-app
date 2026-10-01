@@ -22,7 +22,6 @@ class SmsSentReceiver : BroadcastReceiver() {
         receiverScope.launch {
             try {
                 val result = SmsSendResultTracker.record(
-                    context = context.applicationContext,
                     requestId = requestId,
                     partIndex = partIndex,
                     partCount = partCount,

@@ -23,8 +23,7 @@ import androidx.navigation.NavHostController
 import com.ismartcoding.plain.enums.AppFeatureType
 import com.ismartcoding.plain.i18n.*
 import com.ismartcoding.plain.preferences.LauncherShortcutsPreference
-import com.ismartcoding.plain.preferences.appDataStore
-import com.ismartcoding.plain.preferences.dataFlow
+import com.ismartcoding.plain.preferences.appPreferences
 import com.ismartcoding.plain.ui.base.BottomSpace
 import com.ismartcoding.plain.ui.base.PScaffold
 import com.ismartcoding.plain.ui.base.PTopAppBar
@@ -52,7 +51,7 @@ fun LauncherShortcutsPage(navController: NavHostController) {
     }
 
     val stored = remember {
-        appDataStore.dataFlow.map { LauncherShortcutsPreference.get(it) }
+        appPreferences.snapshots.map { LauncherShortcutsPreference.get(it) }
     }.collectAsStateValue(initial = LauncherShortcutsPreference.default)
 
     // Selected list order = shortcut display order (rank).

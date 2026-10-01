@@ -1,6 +1,5 @@
 package com.ismartcoding.plain.preferences
 
-import androidx.datastore.preferences.core.stringPreferencesKey
 import kotlinx.serialization.encodeToString
 
 /**
@@ -9,7 +8,7 @@ import kotlinx.serialization.encodeToString
  */
 object RecentSaveDirsPreference : BasePreference<String>() {
     override val default = ""
-    override val key = stringPreferencesKey("recent_save_dirs")
+    override val key = stringPreferenceKey("recent_save_dirs")
 
     private const val MAX = 5
 

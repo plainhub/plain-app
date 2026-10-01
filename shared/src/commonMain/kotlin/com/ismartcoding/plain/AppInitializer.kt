@@ -1,6 +1,5 @@
 package com.ismartcoding.plain
 
-import androidx.datastore.preferences.core.Preferences
 import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.chat.ChatCacher
 import com.ismartcoding.plain.chat.channel.ChannelCacher
@@ -24,6 +23,7 @@ import com.ismartcoding.plain.preferences.KeyStorePasswordPreference
 import com.ismartcoding.plain.preferences.MdnsHostnamePreference
 import com.ismartcoding.plain.preferences.NearbyDiscoverablePreference
 import com.ismartcoding.plain.preferences.PasswordPreference
+import com.ismartcoding.plain.preferences.PreferenceSnapshot
 import com.ismartcoding.plain.preferences.SignatureKeyPreference
 import com.ismartcoding.plain.preferences.UrlTokenPreference
 import com.ismartcoding.plain.preferences.DesktopAccessPreference
@@ -32,7 +32,7 @@ import com.ismartcoding.plain.preferences.ServicePreference
 import com.ismartcoding.plain.preferences.WebAddressBarExpandedPreference
 import com.ismartcoding.plain.helpers.AppFileRealPathMigration
 import com.ismartcoding.plain.preferences.AppFileRealPathMigratedPreference
-import com.ismartcoding.plain.preferences.getPreferencesAsync
+import com.ismartcoding.plain.preferences.getPreferences
 import com.ismartcoding.plain.httpserver.HttpServerManager
 
 /**
@@ -43,8 +43,8 @@ import com.ismartcoding.plain.httpserver.HttpServerManager
  * FeedFetchWorker, etc.) stays in the platform modules and is called before
  * or after this function as needed.
  */
-suspend fun initCommonPreferences(): Preferences {
-    val preferences = getPreferencesAsync()
+suspend fun initCommonPreferences(): PreferenceSnapshot {
+    val preferences = getPreferences()
     TempData.dlnaEnabled.value = DlnaPreference.get(preferences)
     TempData.nearbyDiscoverable = NearbyDiscoverablePreference.getAsync()
     TempData.developerMode = DeveloperModePreference.get(preferences)

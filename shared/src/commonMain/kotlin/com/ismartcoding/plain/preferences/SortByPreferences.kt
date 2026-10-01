@@ -1,6 +1,5 @@
 package com.ismartcoding.plain.preferences
 
-import androidx.datastore.preferences.core.intPreferencesKey
 import com.ismartcoding.plain.features.file.FileSortBy
 
 abstract class BaseSortByPreference(
@@ -8,7 +7,7 @@ abstract class BaseSortByPreference(
     private val defaultSort: FileSortBy = FileSortBy.DATE_DESC
 ) : BasePreference<Int>() {
     override val default = defaultSort.ordinal
-    override val key = intPreferencesKey("${prefix}_sort_by")
+    override val key = intPreferenceKey("${prefix}_sort_by")
 
     suspend fun putAsync(value: FileSortBy) {
         putAsync(value.ordinal)

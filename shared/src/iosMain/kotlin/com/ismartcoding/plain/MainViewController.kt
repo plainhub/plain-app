@@ -19,7 +19,7 @@ import com.ismartcoding.plain.platform.initDatabase
 import com.ismartcoding.plain.platform.initDiskLogging
 import com.ismartcoding.plain.preferences.LocalDarkTheme
 import com.ismartcoding.plain.preferences.SettingsProvider
-import com.ismartcoding.plain.preferences.initDataStore
+import com.ismartcoding.plain.preferences.initPreferences
 import com.ismartcoding.plain.ui.models.AudioQueueViewModel
 import com.ismartcoding.plain.ui.models.ChannelViewModel
 import com.ismartcoding.plain.ui.models.MainViewModel
@@ -43,7 +43,7 @@ fun initIosApp() {
     if (initialized) return
     initialized = true
 
-    initDataStore(prefsFilePath())
+    initPreferences(prefsFilePath())
 
     // Room database with the same onCreate seed data as Android
     initDatabase(

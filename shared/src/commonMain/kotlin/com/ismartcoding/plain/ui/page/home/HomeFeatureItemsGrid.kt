@@ -38,8 +38,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.ismartcoding.plain.enums.AppFeatureType
 import com.ismartcoding.plain.preferences.HomeFeaturesPreference
-import com.ismartcoding.plain.preferences.appDataStore
-import com.ismartcoding.plain.preferences.dataFlow
+import com.ismartcoding.plain.preferences.appPreferences
 import com.ismartcoding.plain.ui.base.reorderable.ReorderableItem
 import com.ismartcoding.plain.ui.base.reorderable.rememberReorderableLazyGridState
 import com.ismartcoding.plain.ui.extensions.collectAsStateValue
@@ -57,7 +56,7 @@ fun HomeFeatureItemsGrid(
     val scope = rememberCoroutineScope()
 
     val featuresStr = remember {
-        appDataStore.dataFlow.map { HomeFeaturesPreference.get(it) }
+        appPreferences.snapshots.map { HomeFeaturesPreference.get(it) }
     }.collectAsStateValue(initial = HomeFeaturesPreference.default)
 
     var enabledIds by remember(featuresStr) {

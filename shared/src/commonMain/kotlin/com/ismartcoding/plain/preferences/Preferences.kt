@@ -1,11 +1,5 @@
 package com.ismartcoding.plain.preferences
 
-import androidx.datastore.preferences.core.Preferences
-import androidx.datastore.preferences.core.booleanPreferencesKey
-import androidx.datastore.preferences.core.floatPreferencesKey
-import androidx.datastore.preferences.core.intPreferencesKey
-import androidx.datastore.preferences.core.stringPreferencesKey
-import androidx.datastore.preferences.core.stringSetPreferencesKey
 import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.audio.DPlaylistAudio
 import com.ismartcoding.plain.data.DFavoriteFolder
@@ -35,18 +29,18 @@ internal val preferencesJson = Json { ignoreUnknownKeys = true }
 
 object PasswordPreference : BasePreference<String>() {
     override val default = ""
-    override val key = stringPreferencesKey("password")
+    override val key = stringPreferenceKey("password")
 }
 
 object PasswordTypePreference : BasePreference<Int>() {
     override val default = PasswordType.NONE.value
-    override val key = intPreferencesKey("password_type")
+    override val key = intPreferenceKey("password_type")
 
     suspend fun putAsync(value: PasswordType) {
         putAsync(value.value)
     }
 
-    fun getValue(preferences: Preferences): PasswordType {
+    fun getValue(preferences: PreferenceSnapshot): PasswordType {
         return PasswordType.parse(get(preferences))
     }
 
@@ -57,22 +51,22 @@ object PasswordTypePreference : BasePreference<Int>() {
 
 object AuthTwoFactorPreference : BasePreference<Boolean>() {
     override val default = true
-    override val key = booleanPreferencesKey("auth_two_factor")
+    override val key = booleanPreferenceKey("auth_two_factor")
 }
 
 object RotateUrlTokenOnRestartPreference : BasePreference<Boolean>() {
     override val default = false
-    override val key = booleanPreferencesKey("rotate_url_token_on_restart")
+    override val key = booleanPreferenceKey("rotate_url_token_on_restart")
 }
 
 object AuthDevTokenPreference : BasePreference<String>() {
     override val default = ""
-    override val key = stringPreferencesKey("auth_dev_token")
+    override val key = stringPreferenceKey("auth_dev_token")
 }
 
 object AdbTokenPreference : BasePreference<String>() {
     override val default = ""
-    override val key = stringPreferencesKey("adb_token")
+    override val key = stringPreferenceKey("adb_token")
 }
 
 suspend fun AdbTokenPreference.resetAsync() {
@@ -82,9 +76,9 @@ suspend fun AdbTokenPreference.resetAsync() {
 
 object UpdateInfoPreference : BasePreference<String>() {
     override val default = ""
-    override val key = stringPreferencesKey("update_info")
+    override val key = stringPreferenceKey("update_info")
 
-    fun getValue(preferences: Preferences): DUpdateInfo {
+    fun getValue(preferences: PreferenceSnapshot): DUpdateInfo {
         val str = get(preferences)
         if (str.isEmpty()) return DUpdateInfo()
         return try {
@@ -115,9 +109,9 @@ object UpdateInfoPreference : BasePreference<String>() {
 
 object UrlTokenPreference : BasePreference<String>() {
     override val default = ""
-    override val key = stringPreferencesKey("url_token")
+    override val key = stringPreferenceKey("url_token")
 
-    suspend fun ensureValueAsync(preferences: Preferences) {
+    suspend fun ensureValueAsync(preferences: PreferenceSnapshot) {
         val rotateOnRestart = RotateUrlTokenOnRestartPreference.get(preferences)
         if (rotateOnRestart) {
             val keyStr = com.ismartcoding.plain.platform.generateChaCha20Key()
@@ -145,7 +139,7 @@ object UrlTokenPreference : BasePreference<String>() {
 
 object MasterSecretPreference : BasePreference<String>() {
     override val default = ""
-    override val key = stringPreferencesKey("master_secret")
+    override val key = stringPreferenceKey("master_secret")
 
     /** Returns the per-install 32-byte master secret (base64), generating and persisting it on first use. */
     suspend fun ensureValueAsync(): String {
@@ -158,7 +152,7 @@ object MasterSecretPreference : BasePreference<String>() {
 
 object ApiPermissionsPreference : BasePreference<Set<String>>() {
     override val default = setOf<String>()
-    override val key = stringSetPreferencesKey("api_permissions")
+    override val key = stringSetPreferenceKey("api_permissions")
 
     suspend fun putAsync(permission: Permission, enable: Boolean) {
         val permissions = getAsync().toMutableSet()
@@ -169,7 +163,7 @@ object ApiPermissionsPreference : BasePreference<Set<String>>() {
 
 object HttpPortPreference : BasePreference<Int>() {
     override val default = 8080
-    override val key = intPreferencesKey("http_port")
+    override val key = intPreferenceKey("http_port")
 
     override suspend fun putAsync(value: Int) {
         super.putAsync(value)
@@ -179,7 +173,7 @@ object HttpPortPreference : BasePreference<Int>() {
 
 object HttpsPortPreference : BasePreference<Int>() {
     override val default = 8443
-    override val key = intPreferencesKey("https_port")
+    override val key = intPreferenceKey("https_port")
 
     override suspend fun putAsync(value: Int) {
         super.putAsync(value)
@@ -189,32 +183,32 @@ object HttpsPortPreference : BasePreference<Int>() {
 
 object DarkThemePreference : BasePreference<Int>() {
     override val default = DarkTheme.UseDeviceTheme.value
-    override val key = intPreferencesKey("dark_theme")
+    override val key = intPreferenceKey("dark_theme")
 }
 
 object AmoledDarkThemePreference : BasePreference<Boolean>() {
     override val default = false
-    override val key = booleanPreferencesKey("amoled_dark_theme")
+    override val key = booleanPreferenceKey("amoled_dark_theme")
 }
 
 object PdfFollowDarkThemePreference : BasePreference<Boolean>() {
     override val default = false
-    override val key = booleanPreferencesKey("pdf_follow_dark_theme")
+    override val key = booleanPreferenceKey("pdf_follow_dark_theme")
 }
 
 object KeepAwakePreference : BasePreference<Boolean>() {
     override val default = true
-    override val key = booleanPreferencesKey("keep_awake")
+    override val key = booleanPreferenceKey("keep_awake")
 }
 
 object LanguagePreference : BasePreference<String>() {
     override val default = ""
-    override val key = stringPreferencesKey("locale")
+    override val key = stringPreferenceKey("locale")
 }
 
 object ServicePreference : BasePreference<Boolean>() {
     override val default = false
-    override val key = booleanPreferencesKey("service")
+    override val key = booleanPreferenceKey("service")
 
     override suspend fun putAsync(value: Boolean) {
         super.putAsync(value)
@@ -224,12 +218,12 @@ object ServicePreference : BasePreference<Boolean>() {
 
 object OnboardingPreference : BasePreference<Boolean>() {
     override val default = false
-    override val key = booleanPreferencesKey("onboarding_completed")
+    override val key = booleanPreferenceKey("onboarding_completed")
 }
 
 object DesktopAccessPreference : BasePreference<Boolean>() {
     override val default = true
-    override val key = booleanPreferencesKey("desktop_access")
+    override val key = booleanPreferenceKey("desktop_access")
 
     override suspend fun putAsync(value: Boolean) {
         super.putAsync(value)
@@ -239,7 +233,7 @@ object DesktopAccessPreference : BasePreference<Boolean>() {
 
 object DlnaPreference : BasePreference<Boolean>() {
     override val default = false
-    override val key = booleanPreferencesKey("dlna")
+    override val key = booleanPreferenceKey("dlna")
 
     override suspend fun putAsync(value: Boolean) {
         super.putAsync(value)
@@ -249,12 +243,12 @@ object DlnaPreference : BasePreference<Boolean>() {
 
 object DeveloperModePreference : BasePreference<Boolean>() {
     override val default = false
-    override val key = booleanPreferencesKey("developer_mode")
+    override val key = booleanPreferenceKey("developer_mode")
 }
 
 object AllowAnyHostPreference : BasePreference<Boolean>() {
     override val default = false
-    override val key = booleanPreferencesKey("allow_any_host")
+    override val key = booleanPreferenceKey("allow_any_host")
 
     override suspend fun putAsync(value: Boolean) {
         super.putAsync(value)
@@ -264,12 +258,12 @@ object AllowAnyHostPreference : BasePreference<Boolean>() {
 
 object DeviceNamePreference : BasePreference<String>() {
     override val default = ""
-    override val key = stringPreferencesKey("device_name")
+    override val key = stringPreferenceKey("device_name")
 }
 
 object HttpsPreference : BasePreference<Boolean>() {
     override val default = false
-    override val key = booleanPreferencesKey("https")
+    override val key = booleanPreferenceKey("https")
 
     override suspend fun putAsync(value: Boolean) {
         super.putAsync(value)
@@ -279,7 +273,7 @@ object HttpsPreference : BasePreference<Boolean>() {
 
 object WebAddressBarExpandedPreference : BasePreference<Boolean>() {
     override val default = false
-    override val key = booleanPreferencesKey("web_address_bar_expanded")
+    override val key = booleanPreferenceKey("web_address_bar_expanded")
 
     override suspend fun putAsync(value: Boolean) {
         super.putAsync(value)
@@ -289,7 +283,7 @@ object WebAddressBarExpandedPreference : BasePreference<Boolean>() {
 
 object ScreenMirrorQualityPreference : BasePreference<String>() {
     override val default = ""
-    override val key = stringPreferencesKey("screen_mirror_quality")
+    override val key = stringPreferenceKey("screen_mirror_quality")
 
     suspend fun getValueAsync(): DScreenMirrorQuality {
         val str = getAsync()
@@ -308,9 +302,9 @@ object ScreenMirrorQualityPreference : BasePreference<String>() {
 
 object ClientIdPreference : BasePreference<String>() {
     override val default = ""
-    override val key = stringPreferencesKey("client_id")
+    override val key = stringPreferenceKey("client_id")
 
-    suspend fun ensureValueAsync(preferences: Preferences) {
+    suspend fun ensureValueAsync(preferences: PreferenceSnapshot) {
         TempData.clientId = get(preferences)
         if (TempData.clientId.isEmpty()) {
             TempData.clientId = StringHelper.shortUUID()
@@ -321,9 +315,9 @@ object ClientIdPreference : BasePreference<String>() {
 
 object KeyStorePasswordPreference : BasePreference<String>() {
     override val default = ""
-    override val key = stringPreferencesKey("key_store_password")
+    override val key = stringPreferenceKey("key_store_password")
 
-    suspend fun ensureValueAsync(preferences: Preferences) {
+    suspend fun ensureValueAsync(preferences: PreferenceSnapshot) {
         var password = get(preferences)
         if (password.isEmpty()) {
             password = StringHelper.shortUUID()
@@ -338,14 +332,14 @@ object KeyStorePasswordPreference : BasePreference<String>() {
 
 object AudioPlayModePreference : BasePreference<Int>() {
     override val default = MediaPlayMode.REPEAT.ordinal
-    override val key = intPreferencesKey("audio_play_mode")
+    override val key = intPreferenceKey("audio_play_mode")
 
     suspend fun getValueAsync(): MediaPlayMode {
         val value = getAsync()
         return MediaPlayMode.entries.find { it.ordinal == value } ?: MediaPlayMode.REPEAT
     }
 
-    fun getValue(preferences: Preferences): MediaPlayMode {
+    fun getValue(preferences: PreferenceSnapshot): MediaPlayMode {
         val value = preferences[key]
         return MediaPlayMode.entries.find { it.ordinal == value } ?: MediaPlayMode.REPEAT
     }
@@ -358,9 +352,9 @@ object AudioPlayModePreference : BasePreference<Int>() {
 
 object AudioPlaybackSpeedPreference : BasePreference<Float>() {
     override val default = 1f
-    override val key = floatPreferencesKey("audio_playback_speed")
+    override val key = floatPreferenceKey("audio_playback_speed")
 
-    fun getValue(preferences: Preferences): Float = preferences[key] ?: default
+    fun getValue(preferences: PreferenceSnapshot): Float = preferences[key] ?: default
 
     override suspend fun putAsync(value: Float) {
         super.putAsync(value)
@@ -370,72 +364,72 @@ object AudioPlaybackSpeedPreference : BasePreference<Float>() {
 
 object ImageGridCellsPerRowPreference : BasePreference<Int>() {
     override val default = 3
-    override val key = intPreferencesKey("image_grid_cells_per_row")
+    override val key = intPreferenceKey("image_grid_cells_per_row")
 }
 
 object VideoGridCellsPerRowPreference : BasePreference<Int>() {
     override val default = 3
-    override val key = intPreferencesKey("video_grid_cells_per_row")
+    override val key = intPreferenceKey("video_grid_cells_per_row")
 }
 
 object ShowHiddenFilesPreference : BasePreference<Boolean>() {
     override val default = false
-    override val key = booleanPreferencesKey("show_hidden_files")
+    override val key = booleanPreferenceKey("show_hidden_files")
 }
 
 object NoteEditModePreference : BasePreference<Boolean>() {
     override val default = true
-    override val key = booleanPreferencesKey("note_edit_mode")
+    override val key = booleanPreferenceKey("note_edit_mode")
 }
 
 object FeedAutoRefreshPreference : BasePreference<Boolean>() {
     override val default = true
-    override val key = booleanPreferencesKey("feed_auto_refresh")
+    override val key = booleanPreferenceKey("feed_auto_refresh")
 }
 
 object FeedAutoRefreshIntervalPreference : BasePreference<Int>() {
     override val default = 7200
-    override val key = intPreferencesKey("feed_auto_refresh_interval")
+    override val key = intPreferenceKey("feed_auto_refresh_interval")
 }
 
 object FeedAutoRefreshOnlyWifiPreference : BasePreference<Boolean>() {
     override val default = false
-    override val key = booleanPreferencesKey("feed_auto_refresh_only_wifi")
+    override val key = booleanPreferenceKey("feed_auto_refresh_only_wifi")
 }
 
 object FeedFontScalePreference : BasePreference<Int>() {
     override val default = 1
-    override val key = intPreferencesKey("feed_font_scale")
+    override val key = intPreferenceKey("feed_font_scale")
 }
 
 object EditorWrapContentPreference : BasePreference<Boolean>() {
     override val default = true
-    override val key = booleanPreferencesKey("editor_wrap_content")
+    override val key = booleanPreferenceKey("editor_wrap_content")
 }
 
 object EditorFontSizePreference : BasePreference<Int>() {
     override val default = 14
-    override val key = intPreferencesKey("editor_font_size")
+    override val key = intPreferenceKey("editor_font_size")
 }
 
 object EditorStatusBarPreference : BasePreference<Boolean>() {
     override val default = true
-    override val key = booleanPreferencesKey("editor_status_bar")
+    override val key = booleanPreferenceKey("editor_status_bar")
 }
 
 object AudioSleepTimerMinutesPreference : BasePreference<Int>() {
     override val default = 30
-    override val key = intPreferencesKey("audio_sleep_timer_minutes")
+    override val key = intPreferenceKey("audio_sleep_timer_minutes")
 }
 
 object AudioSleepTimerFinishLastPreference : BasePreference<Boolean>() {
     override val default = false
-    override val key = booleanPreferencesKey("audio_sleep_timer_finish_last")
+    override val key = booleanPreferenceKey("audio_sleep_timer_finish_last")
 }
 
 object LastFilePathPreference : BasePreference<String>() {
     override val default = ""
-    override val key = stringPreferencesKey("last_file_path")
+    override val key = stringPreferenceKey("last_file_path")
 
     suspend fun getValueAsync(): FilePathData {
         val str = getAsync()
@@ -454,7 +448,7 @@ object LastFilePathPreference : BasePreference<String>() {
 
 object FavoriteFoldersPreference : BasePreference<String>() {
     override val default = ""
-    override val key = stringPreferencesKey("favorite_folders")
+    override val key = stringPreferenceKey("favorite_folders")
 
     suspend fun getValueAsync(): List<DFavoriteFolder> {
         val str = getAsync()
@@ -503,7 +497,7 @@ object FavoriteFoldersPreference : BasePreference<String>() {
 
 object ScanHistoryPreference : BasePreference<String>() {
     override val default = ""
-    override val key = stringPreferencesKey("scan_history")
+    override val key = stringPreferenceKey("scan_history")
 
     suspend fun getValueAsync(): List<String> {
         val str = getAsync()
@@ -522,7 +516,7 @@ object ScanHistoryPreference : BasePreference<String>() {
 
 object AudioPlayingPreference : BasePreference<String>() {
     override val default = ""
-    override val key = stringPreferencesKey("audio_playing")
+    override val key = stringPreferenceKey("audio_playing")
 
     suspend fun getValueAsync(): String {
         val str = getAsync()
@@ -534,12 +528,12 @@ object AudioPlayingPreference : BasePreference<String>() {
 /** One-shot flag: legacy audio_playlist JSON imported into the Room queue tables. */
 object AudioQueueMigratedPreference : BasePreference<Boolean>() {
     override val default = false
-    override val key = booleanPreferencesKey("audio_queue_migrated")
+    override val key = booleanPreferenceKey("audio_queue_migrated")
 }
 
 object AudioPlaylistPreference : BasePreference<String>() {
     override val default = ""
-    override val key = stringPreferencesKey("audio_playlist")
+    override val key = stringPreferenceKey("audio_playlist")
 
     suspend fun getValueAsync(): List<DPlaylistAudio> {
         val str = getAsync()
@@ -573,19 +567,19 @@ object AudioPlaylistPreference : BasePreference<String>() {
 
 object ChatInputTextPreference : BasePreference<String>() {
     override val default = ""
-    override val key = stringPreferencesKey("chat_input_text")
+    override val key = stringPreferenceKey("chat_input_text")
 }
 
 object NearbyDiscoverablePreference : BasePreference<Boolean>() {
     override val default = true
-    override val key = booleanPreferencesKey("nearby_discoverable")
+    override val key = booleanPreferenceKey("nearby_discoverable")
 }
 
 object MdnsHostnamePreference : BasePreference<String>() {
     override val default = "plainapp.local"
-    override val key = stringPreferencesKey("mdns_hostname")
+    override val key = stringPreferenceKey("mdns_hostname")
 
-    suspend fun ensureValueAsync(preferences: Preferences) {
+    suspend fun ensureValueAsync(preferences: PreferenceSnapshot) {
         val stored = preferences[key]
         if (stored.isNullOrEmpty()) {
             val allowedChars = ('a'..'z').filter { it !in listOf('i', 'l', 'o', 'v') }
@@ -602,27 +596,27 @@ object MdnsHostnamePreference : BasePreference<String>() {
 
 object AiImageSearchEnabledPreference : BasePreference<Boolean>() {
     override val default = false
-    override val key = booleanPreferencesKey("ai_image_search_enabled")
+    override val key = booleanPreferenceKey("ai_image_search_enabled")
 }
 
 object DocTabsModePreference : BasePreference<Boolean>() {
     override val default = false
-    override val key = booleanPreferencesKey("doc_tabs_mode")
+    override val key = booleanPreferenceKey("doc_tabs_mode")
 }
 
 object FidUriExtMigratedPreference : BasePreference<Boolean>() {
     override val default = false
-    override val key = booleanPreferencesKey("fid_uri_ext_migrated")
+    override val key = booleanPreferenceKey("fid_uri_ext_migrated")
 }
 
 object AppFileRealPathMigratedPreference : BasePreference<Boolean>() {
     override val default = false
-    override val key = booleanPreferencesKey("app_file_real_path_migrated")
+    override val key = booleanPreferenceKey("app_file_real_path_migrated")
 }
 
 object NotificationFilterPreference : BasePreference<String>() {
     override val default = ""
-    override val key = stringPreferencesKey("notification_filter")
+    override val key = stringPreferenceKey("notification_filter")
 
     suspend fun getValueAsync(): NotificationFilterData {
         val str = getAsync()
@@ -662,7 +656,7 @@ object NotificationFilterPreference : BasePreference<String>() {
 
 object PomodoroSettingsPreference : BasePreference<String>() {
     override val default = ""
-    override val key = stringPreferencesKey("pomodoro_settings")
+    override val key = stringPreferenceKey("pomodoro_settings")
 
     suspend fun getValueAsync(): DPomodoroSettings {
         val str = getAsync()
@@ -681,7 +675,7 @@ object PomodoroSettingsPreference : BasePreference<String>() {
 
 object SignatureKeyPreference : BasePreference<String>() {
     override val default = ""
-    override val key = stringPreferencesKey("signature_key_pair")
+    override val key = stringPreferenceKey("signature_key_pair")
 
     @OptIn(ExperimentalEncodingApi::class)
     suspend fun ensureKeyPairAsync() {
@@ -708,7 +702,7 @@ object SignatureKeyPreference : BasePreference<String>() {
 
 object VideoPlaylistPreference : BasePreference<String>() {
     override val default = ""
-    override val key = stringPreferencesKey("video_playlist")
+    override val key = stringPreferenceKey("video_playlist")
 
     suspend fun getValueAsync(): List<DVideo> {
         val str = getAsync()
@@ -738,7 +732,7 @@ object VideoPlaylistPreference : BasePreference<String>() {
 
 object DlnaAllowedSendersPreference : BasePreference<Set<String>>() {
     override val default = setOf<String>()
-    override val key = stringSetPreferencesKey("dlna_allowed_senders")
+    override val key = stringSetPreferenceKey("dlna_allowed_senders")
 
     suspend fun addAsync(ip: String, name: String) {
         val current = getAsync().toMutableSet()
@@ -758,7 +752,7 @@ object DlnaAllowedSendersPreference : BasePreference<Set<String>>() {
 
 object DlnaDeniedSendersPreference : BasePreference<Set<String>>() {
     override val default = setOf<String>()
-    override val key = stringSetPreferencesKey("dlna_denied_senders")
+    override val key = stringSetPreferenceKey("dlna_denied_senders")
 
     suspend fun addAsync(ip: String, name: String) {
         val current = getAsync().toMutableSet()
@@ -792,7 +786,7 @@ object HomeFeaturesPreference : BasePreference<String>() {
         AppFeatureType.IMAGES, AppFeatureType.VIDEOS, AppFeatureType.AUDIO,
         AppFeatureType.DOCS, AppFeatureType.FILES, AppFeatureType.NOTES, AppFeatureType.FEEDS,
     ).joinToString(SEPARATOR) { it.name }
-    override val key = stringPreferencesKey("home_features_v2")
+    override val key = stringPreferenceKey("home_features_v2")
 
     fun parseList(value: String): List<String> =
         if (value.isEmpty()) emptyList() else value.split(SEPARATOR).filter { it.isNotBlank() }
@@ -802,13 +796,13 @@ object HomeFeaturesPreference : BasePreference<String>() {
 
 object QuickNoteDraftPreference : BasePreference<String>() {
     override val default = ""
-    override val key = stringPreferencesKey("quick_note_draft")
+    override val key = stringPreferenceKey("quick_note_draft")
 }
 
 object LauncherShortcutsPreference : BasePreference<String>() {
     private const val SEPARATOR = "|"
     override val default = com.ismartcoding.plain.ui.nav.LauncherShortcutTools.DEFAULT.joinToString(SEPARATOR) { it.name }
-    override val key = stringPreferencesKey("launcher_shortcuts_v1")
+    override val key = stringPreferenceKey("launcher_shortcuts_v1")
 
     fun parseList(value: String): List<String> =
         if (value.isEmpty()) emptyList() else value.split(SEPARATOR).filter { it.isNotBlank() }
@@ -825,9 +819,9 @@ object LauncherShortcutsPreference : BasePreference<String>() {
 
 object HomeSectionCollapsedPreference : BasePreference<String>() {
     override val default = ""
-    override val key = stringPreferencesKey("home_section_collapsed")
+    override val key = stringPreferenceKey("home_section_collapsed")
 
-    fun get(preferences: Preferences, feature: AppFeatureType): Boolean {
+    fun get(preferences: PreferenceSnapshot, feature: AppFeatureType): Boolean {
         return parseMap(get(preferences))[feature] ?: false
     }
 

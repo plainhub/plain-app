@@ -29,7 +29,7 @@ fun SettingsProvider(content: @Composable () -> Unit) {
         updateInfo = DUpdateInfo(),
     )
     val settings = remember {
-        appDataStore.dataFlow.map {
+        appPreferences.snapshots.map {
             Settings(
                 darkTheme = DarkThemePreference.get(it),
                 amoledDarkTheme = AmoledDarkThemePreference.get(it),

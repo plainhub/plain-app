@@ -18,6 +18,9 @@ type Query {
   tagRelations(type: DataType!, keys: [String!]!): [TagRelation!]!
   appLogs(offset: Int!, limit: Int!, query: String!): [String!]!
   appLogPath: String!
+  prefs: [KeyValuePair!]!
+  prefsPath: String!
+  prefEntries: [KeyValuePair!]!
   isScreenMirroring: Boolean!
   screenMirrorVideoCodec: ScreenMirrorVideoCodec
   screenMirrorControlEnabled: Boolean!
@@ -66,9 +69,6 @@ type Query {
   isDiscovering: Boolean!
   pomodoroSettings: PomodoroSettings!
   pomodoroToday: PomodoroToday!
-  prefs: [KeyValuePair!]!
-  dataStorePath: String!
-  dataStoreEntries: [KeyValuePair!]!
   imageEditorProjects: [ImageEditorProjectSummary!]!
   imageEditorProject(id: ID!): ImageEditorProject
   packages(offset: Int!, limit: Int!, query: String!, sortBy: FileSortBy!): [Package!]!
@@ -135,6 +135,9 @@ type Mutation {
   cancelPairing(deviceId: ID!): Boolean!
   """Respond to an incoming pairing request — accept or reject."""
   respondToPairing(input: PairingRequestInput!, accepted: Boolean!): Boolean!
+  setPref(key: String!, value: String!): KeyValuePair!
+  deletePref(key: String!): Boolean!
+  deletePrefEntry(key: String!): Boolean!
   startScreenMirror(audio: Boolean!): Boolean!
   requestScreenMirrorAudio: Boolean!
   stopScreenMirror: Boolean!
@@ -220,9 +223,6 @@ type Mutation {
   startPomodoro(durationSec: Int!): Boolean!
   pausePomodoro: Boolean!
   stopPomodoro: Boolean!
-  setPref(key: String!, value: String!): KeyValuePair!
-  deletePref(key: String!): Boolean!
-  deleteDataStoreEntry(key: String!): Boolean!
   saveImageEditorProject(id: ID!, input: ImageEditorProjectInput!): ImageEditorProject!
   deleteImageEditorProject(id: ID!): Boolean!
   broadcastImageEditorUpdate(id: ID!, update: String!): Boolean!

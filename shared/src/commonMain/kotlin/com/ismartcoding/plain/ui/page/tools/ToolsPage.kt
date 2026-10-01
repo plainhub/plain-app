@@ -43,8 +43,7 @@ import com.ismartcoding.plain.ui.base.StatusIndicator
 import com.ismartcoding.plain.ui.base.TopSpace
 import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.preferences.HomeFeaturesPreference
-import com.ismartcoding.plain.preferences.appDataStore
-import com.ismartcoding.plain.preferences.dataFlow
+import com.ismartcoding.plain.preferences.appPreferences
 import com.ismartcoding.plain.ui.components.QuickNoteCard
 import com.ismartcoding.plain.ui.extensions.collectAsStateValue
 import com.ismartcoding.plain.ui.nav.Routing
@@ -68,7 +67,7 @@ fun ToolsPage(
     val currentUri by CastPlayer.currentUri.collectAsState()
     val featuresStr =
         remember {
-            appDataStore.dataFlow.map { HomeFeaturesPreference.get(it) }
+            appPreferences.snapshots.map { HomeFeaturesPreference.get(it) }
         }.collectAsStateValue(initial = HomeFeaturesPreference.default)
     val notesEnabled =
         HomeFeaturesPreference.parseList(featuresStr.ifEmpty { HomeFeaturesPreference.default })

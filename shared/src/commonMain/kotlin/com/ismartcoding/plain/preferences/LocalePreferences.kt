@@ -1,10 +1,9 @@
 package com.ismartcoding.plain.preferences
 
-import androidx.datastore.preferences.core.Preferences
 import com.ismartcoding.plain.platform.Locale
 import com.ismartcoding.plain.platform.setSystemLocale
 
-fun LanguagePreference.getLocale(preferences: Preferences): Locale? {
+fun LanguagePreference.getLocale(preferences: PreferenceSnapshot): Locale? {
     return parseLocale(get(preferences))
 }
 
