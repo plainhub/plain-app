@@ -110,7 +110,7 @@ import com.ismartcoding.plain.lib.coIO
 import com.ismartcoding.plain.httpserver.HttpServerManager
 import com.ismartcoding.plain.i18n.*
 import com.ismartcoding.plain.ui.page.scan.ScanHistoryPage
-import com.ismartcoding.plain.ui.page.scan.ScanPage
+import com.ismartcoding.plain.ui.page.scan.ScanPageHost
 import com.ismartcoding.plain.ui.page.search.GlobalSearchPage
 import com.ismartcoding.plain.ui.page.settings.AutoCheckUpdatePage
 import com.ismartcoding.plain.ui.page.settings.BackupRestorePage
@@ -256,7 +256,7 @@ fun MainNavGraph(
             }
         }
         composable<Routing.ScanHistory> { ScanHistoryPage(navController) }
-        composable<Routing.Scan> { ScanPage(navController) }
+        composable<Routing.Scan> { ScanPageHost(navController) }
         composable<Routing.FeedSettings> { FeedSettingsPage(navController) }
         composable<Routing.FeedCatalog> { FeedCatalogPage(navController) }
         composable<Routing.HowToUse> {

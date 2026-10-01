@@ -1,4 +1,4 @@
-package com.ismartcoding.plain.ui.page.scan.components
+package com.ismartcoding.plain.ui.scanner.components
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
@@ -10,7 +10,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.IntOffset
-import com.ismartcoding.plain.platform.ScannedCode
+import com.ismartcoding.plain.ui.scanner.ScannedCode
 import kotlin.math.roundToInt
 
 /**

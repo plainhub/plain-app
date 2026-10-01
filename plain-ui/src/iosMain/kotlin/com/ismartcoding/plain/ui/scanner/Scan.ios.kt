@@ -1,6 +1,6 @@
 @file:OptIn(ExperimentalForeignApi::class)
 
-package com.ismartcoding.plain.platform
+package com.ismartcoding.plain.ui.scanner
 
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
@@ -206,7 +206,12 @@ private class ScanMetadataDelegate(
     }
 }
 
-actual suspend fun decodeQrFromUri(uri: String): ScannedImage? {
+@Composable
+actual fun rememberQrImageDecoder(): suspend (String) -> ScannedImage? = remember {
+    { uri -> decodeQrFromUri(uri) }
+}
+
+private suspend fun decodeQrFromUri(uri: String): ScannedImage? {
     return try {
         withContext(Dispatchers.Default) {
             val nsUrl: NSURL = NSURL.URLWithString(uri) ?: return@withContext null

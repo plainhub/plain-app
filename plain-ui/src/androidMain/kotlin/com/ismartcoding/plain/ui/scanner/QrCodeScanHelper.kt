@@ -1,10 +1,7 @@
-package com.ismartcoding.plain.helpers
+package com.ismartcoding.plain.ui.scanner
 
 import android.graphics.Bitmap
-import com.ismartcoding.plain.platform.ScannedCode
-import com.ismartcoding.plain.platform.ScannedImage
-import com.ismartcoding.plain.ui.scanner.QrScanPipeline
-import com.ismartcoding.plain.lib.extensions.scaleDown
+import kotlin.math.roundToInt
 
 object QrCodeScanHelper {
     // decode largest first; tiny down-scales misdecode dense codes, so the ladder stops at 900
@@ -48,5 +45,15 @@ object QrCodeScanHelper {
             luminance[i] = ((r * 299 + g * 587 + b * 114) / 1000).toByte()
         }
         return luminance
+    }
+
+    private fun Bitmap.scaleDown(maxDimension: Int): Bitmap {
+        val scale = maxDimension.toFloat() / maxOf(width, height)
+        return Bitmap.createScaledBitmap(
+            this,
+            (width * scale).roundToInt().coerceAtLeast(1),
+            (height * scale).roundToInt().coerceAtLeast(1),
+            true,
+        )
     }
 }

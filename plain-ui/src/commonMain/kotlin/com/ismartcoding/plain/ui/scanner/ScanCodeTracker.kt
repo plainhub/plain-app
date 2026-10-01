@@ -1,6 +1,4 @@
-package com.ismartcoding.plain.ui.page.scan
-
-import com.ismartcoding.plain.platform.ScannedCode
+package com.ismartcoding.plain.ui.scanner
 
 /**
  * Confirms codes across consecutive camera frames so a single misdecoded frame never

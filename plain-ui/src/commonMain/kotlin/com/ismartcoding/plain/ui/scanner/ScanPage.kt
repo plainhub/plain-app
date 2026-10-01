@@ -1,7 +1,5 @@
-package com.ismartcoding.plain.ui.page.scan
+package com.ismartcoding.plain.ui.scanner
 
-import com.ismartcoding.plain.preferences.*
-import com.ismartcoding.plain.i18n.*
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -16,6 +14,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -32,51 +31,51 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavHostController
 import org.jetbrains.compose.resources.painterResource
-import org.jetbrains.compose.resources.stringResource
-import com.ismartcoding.plain.lib.Channel
-import com.ismartcoding.plain.lib.coIO
-import com.ismartcoding.plain.discover.PairingInitiator
-import com.ismartcoding.plain.discover.QrPairPayload
-import com.ismartcoding.plain.enums.PickFileTag
-import com.ismartcoding.plain.enums.PickFileType
-import com.ismartcoding.plain.platform.Permission
-import com.ismartcoding.plain.platform.ScanCameraView
-import com.ismartcoding.plain.platform.ScannedCode
-import com.ismartcoding.plain.platform.ScannedFrame
-import com.ismartcoding.plain.platform.ScannedImage
-import com.ismartcoding.plain.platform.decodeQrFromUri
-import com.ismartcoding.plain.platform.isGranted
-import com.ismartcoding.plain.events.PermissionsResultEvent
-import com.ismartcoding.plain.events.PickFileEvent
-import com.ismartcoding.plain.events.PickFileResultEvent
-import com.ismartcoding.plain.events.RequestPermissionsEvent
-import com.ismartcoding.plain.lib.sendEvent
-import com.ismartcoding.plain.platform.LocaleHelper
-import com.ismartcoding.plain.ui.base.NavigationCloseIcon
-import com.ismartcoding.plain.ui.base.PIconButton
 import com.ismartcoding.plain.ui.base.PScaffold
 import com.ismartcoding.plain.ui.base.PTopAppBar
-import com.ismartcoding.plain.ui.components.QrScanResultBottomSheet
-import com.ismartcoding.plain.ui.helpers.DialogHelper
-import com.ismartcoding.plain.ui.nav.Routing
-import com.ismartcoding.plain.ui.page.scan.components.ScanCodeTags
-import com.ismartcoding.plain.ui.page.scan.components.ScanImageCodePicker
+import com.ismartcoding.plain.ui.scanner.components.QrScanResultBottomSheet
+import com.ismartcoding.plain.ui.scanner.components.ScanCodeTags
+import com.ismartcoding.plain.ui.scanner.components.ScanImageCodePicker
 import com.ismartcoding.plain.ui.theme.darkMask
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import com.ismartcoding.plain.ui.resources.Res as UiRes
 import com.ismartcoding.plain.ui.resources.history as ui_drawable_history
 import com.ismartcoding.plain.ui.resources.image as ui_drawable_image
-import com.ismartcoding.plain.i18n.image
+import com.ismartcoding.plain.ui.resources.close as ui_drawable_close
+
+data class ScanPageTexts(
+    val scanTitle: String,
+    val scanHistory: String,
+    val close: String,
+    val multipleCodesHint: String,
+    val imagePickerDescription: String,
+    val scanResultTitle: String,
+    val scanResultCopyLabel: String,
+)
+
+data class ScanPageActions(
+    val requestCameraPermission: () -> Unit,
+    val navigateBack: () -> Unit,
+    val openHistory: () -> Unit,
+    val pickImage: ((String) -> Unit) -> Unit,
+    val recordScanResult: (String) -> Unit,
+    val handleSpecialCode: (String, () -> Unit) -> Boolean,
+    val showNoCodeFound: () -> Unit,
+    val showImageLoading: () -> Unit,
+    val hideImageLoading: () -> Unit,
+)
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ScanPage(navController: NavHostController) {
+fun ScanPage(
+    cameraPermissionGranted: Boolean,
+    texts: ScanPageTexts,
+    actions: ScanPageActions,
+) {
     val scope = rememberCoroutineScope()
+    val decodeQrImage = rememberQrImageDecoder()
     val cameraDetecting = remember { mutableStateOf(true) }
-    var hasCamPermission by remember { mutableStateOf(Permission.CAMERA.isGranted()) }
     var showScanResultSheet by remember { mutableStateOf(false) }
     var scanResult by remember { mutableStateOf("") }
     // frozen multi-code frame: recognition stops until cancelled, so tags never jitter
@@ -114,43 +113,22 @@ fun ScanPage(navController: NavHostController) {
 
     fun openResult(text: String) {
         scanResult = text
-        addScanResult(scope, text)
+        actions.recordScanResult(text)
         cameraDetecting.value = false
         showScanResultSheet = true
     }
 
-    fun startQrPairing(payload: QrPairPayload) {
+    fun handleScanResult(text: String) {
         pairingInFlight = true
         cameraDetecting.value = false
-        scope.launch {
-            val title = LocaleHelper.getStringFAsync(Res.string.pair_with_device, payload.name)
-            val message = LocaleHelper.getStringFAsync(Res.string.confirm_pair_with_device, payload.name)
-            DialogHelper.showConfirmDialog(
-                title = title,
-                message = message,
-                confirmButton = Pair(LocaleHelper.getStringAsync(Res.string.confirm)) {
-                    pairingInFlight = false
-                    resumeIfIdle()
-                    coIO {
-                        PairingInitiator.start(payload.toDevice())
-                        DialogHelper.showSuccess(Res.string.qr_pair_request_sent)
-                    }
-                },
-                dismissButton = Pair(LocaleHelper.getStringAsync(Res.string.cancel)) {
-                    pairingInFlight = false
-                    resumeIfIdle()
-                },
-            )
+        val handled = actions.handleSpecialCode(text) {
+            pairingInFlight = false
+            resumeIfIdle()
         }
-    }
-
-    fun handleScanResult(text: String) {
-        val qrPairPayload = QrPairPayload.parse(text)
-        if (qrPairPayload != null) {
-            startQrPairing(qrPairPayload)
-            return
+        if (!handled) {
+            pairingInFlight = false
+            openResult(text)
         }
-        openResult(text)
     }
 
     /**
@@ -183,44 +161,12 @@ fun ScanPage(navController: NavHostController) {
         }
     }
 
-    LaunchedEffect(Channel.sharedFlow) {
-        Channel.sharedFlow.collect { event ->
-            when (event) {
-                is PermissionsResultEvent -> {
-                    hasCamPermission = Permission.CAMERA.isGranted(); if (!hasCamPermission) DialogHelper.showMessage(LocaleHelper.getStringAsync(Res.string.scan_needs_camera_warning))
-                }
-
-                is PickFileResultEvent -> {
-                    if (event.tag != PickFileTag.SCAN) return@collect
-                    coIO {
-                        try {
-                            cameraDetecting.value = false; DialogHelper.showLoading()
-                            val result = decodeQrFromUri(event.uris.first())
-                            DialogHelper.hideLoading()
-                            when {
-                                result == null -> {
-                                    DialogHelper.showMessage(LocaleHelper.getStringAsync(Res.string.scan_no_code_found))
-                                    resumeIfIdle()
-                                }
-
-                                result.codes.size == 1 -> handleScanResult(result.codes.first().text)
-
-                                else -> {
-                                    pickedImageUri = event.uris.first()
-                                    pickedImage = result
-                                }
-                            }
-                        } catch (ex: Exception) {
-                            DialogHelper.hideLoading(); resumeIfIdle(); ex.printStackTrace()
-                        }
-                    }
-                }
-            }
-        }
+    LaunchedEffect(cameraPermissionGranted) {
+        if (!cameraPermissionGranted) actions.requestCameraPermission()
     }
-    if (!hasCamPermission) sendEvent(RequestPermissionsEvent(Permission.CAMERA))
+
     if (showScanResultSheet) {
-        QrScanResultBottomSheet(scanResult) {
+        QrScanResultBottomSheet(scanResult, texts.scanResultTitle, texts.scanResultCopyLabel) {
             showScanResultSheet = false
             resumeIfIdle()
         }
@@ -228,28 +174,38 @@ fun ScanPage(navController: NavHostController) {
 
     PScaffold(topBar = {
         PTopAppBar(
-            onNavigateBack = { navController.navigateUp() },
+            onNavigateBack = actions.navigateBack,
             navigationIcon = if (multiFrozen || showingPicker) {
                 {
-                    NavigationCloseIcon {
-                        if (showingPicker) {
-                            pickedImage = null
-                            resumeIfIdle()
-                        } else {
-                            resumeScanning()
+                    IconButton(
+                        onClick = {
+                            if (showingPicker) {
+                                pickedImage = null
+                                resumeIfIdle()
+                            } else {
+                                resumeScanning()
+                            }
                         }
+                    ) {
+                        Icon(
+                            painter = painterResource(UiRes.drawable.ui_drawable_close),
+                            contentDescription = texts.close,
+                            tint = MaterialTheme.colorScheme.onSurface,
+                        )
                     }
                 }
             } else {
                 null
             },
-            title = stringResource(Res.string.scan_qrcode),
+            title = texts.scanTitle,
             actions = {
-                PIconButton(
-                    icon = UiRes.drawable.ui_drawable_history,
-                    contentDescription = stringResource(Res.string.scan_history),
-                    tint = MaterialTheme.colorScheme.onSurface
-                ) { navController.navigate(Routing.ScanHistory) }
+                IconButton(onClick = actions.openHistory) {
+                    Icon(
+                        painter = painterResource(UiRes.drawable.ui_drawable_history),
+                        contentDescription = texts.scanHistory,
+                        tint = MaterialTheme.colorScheme.onSurface,
+                    )
+                }
             })
     }, content = { paddingValues ->
         Box(
@@ -257,7 +213,7 @@ fun ScanPage(navController: NavHostController) {
                 .fillMaxSize()
                 .padding(top = paddingValues.calculateTopPadding())
         ) {
-            if (hasCamPermission) {
+            if (cameraPermissionGranted) {
                 ScanCameraView(cameraDetecting, freezeFrame, onScanResult = { onFrameCodes(it) })
                 // freeze the detected frame over the live preview (WeChat-style);
                 // tag positions come from the snapshot so they match the image
@@ -285,7 +241,7 @@ fun ScanPage(navController: NavHostController) {
                         horizontalArrangement = Arrangement.Center,
                     ) {
                         Text(
-                            text = stringResource(Res.string.scan_multiple_codes_hint),
+                            text = texts.multipleCodesHint,
                             color = Color.White,
                             textAlign = TextAlign.Center,
                             style = MaterialTheme.typography.labelLarge,
@@ -303,10 +259,37 @@ fun ScanPage(navController: NavHostController) {
                         .size(56.dp)
                         .clip(CircleShape)
                         .background(MaterialTheme.colorScheme.darkMask(0.2f))
-                        .clickable { sendEvent(PickFileEvent(PickFileTag.SCAN, PickFileType.IMAGE, multiple = false)) },
+                        .clickable {
+                            actions.pickImage { uri ->
+                                scope.launch {
+                                    cameraDetecting.value = false
+                                    actions.showImageLoading()
+                                    try {
+                                        val result = decodeQrImage(uri)
+                                        when {
+                                            result == null -> {
+                                                actions.showNoCodeFound()
+                                                resumeIfIdle()
+                                            }
+
+                                            result.codes.size == 1 -> handleScanResult(result.codes.first().text)
+
+                                            else -> {
+                                                pickedImageUri = uri
+                                                pickedImage = result
+                                            }
+                                        }
+                                    } catch (e: Exception) {
+                                        resumeIfIdle()
+                                    } finally {
+                                        actions.hideImageLoading()
+                                    }
+                                }
+                            }
+                        },
                     contentAlignment = Alignment.Center,
                 ) {
-                    Icon(painter = painterResource(UiRes.drawable.ui_drawable_image), contentDescription = stringResource(Res.string.images), tint = Color.White)
+                    Icon(painter = painterResource(UiRes.drawable.ui_drawable_image), contentDescription = texts.imagePickerDescription, tint = Color.White)
                 }
             }
             pickedImage?.let { image ->
@@ -320,13 +303,4 @@ fun ScanPage(navController: NavHostController) {
             }
         }
     })
-}
-
-private fun addScanResult(scope: CoroutineScope, value: String) {
-    scope.launch {
-        val results = UserPrefs.scanHistoryValue().toMutableList()
-        results.removeAll { it == value }
-        results.add(0, value)
-        UserPrefs.setScanHistory(results)
-    }
 }

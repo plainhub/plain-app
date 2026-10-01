@@ -1,7 +1,7 @@
-package com.ismartcoding.plain.tests
+package com.ismartcoding.plain.ui.scanner
 
-import com.ismartcoding.plain.ui.page.scan.components.FitRect
-import com.ismartcoding.plain.ui.page.scan.components.ScanImageLayout
+import com.ismartcoding.plain.ui.scanner.components.FitRect
+import com.ismartcoding.plain.ui.scanner.components.ScanImageLayout
 import kotlin.test.Test
 import kotlin.test.assertEquals
 

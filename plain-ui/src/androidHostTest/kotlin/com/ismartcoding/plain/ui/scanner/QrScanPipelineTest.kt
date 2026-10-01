@@ -1,9 +1,4 @@
-package com.ismartcoding.plain.helpers
-
-import com.ismartcoding.plain.ui.scanner.QrScanPipeline
-import com.ismartcoding.plain.ui.scanner.ScanCoordMapper
-import com.ismartcoding.plain.ui.scanner.DecodedCode
-import com.ismartcoding.plain.ui.scanner.YPlane
+package com.ismartcoding.plain.ui.scanner
 
 import com.google.zxing.BarcodeFormat
 import com.google.zxing.MultiFormatWriter

@@ -36,7 +36,7 @@ import com.ismartcoding.plain.ui.components.FileRenameDialog
 import com.ismartcoding.plain.platform.renameAndScanFile
 import com.ismartcoding.plain.platform.formatImageMetaTexts
 import com.ismartcoding.plain.platform.ImageMetaRows
-import com.ismartcoding.plain.ui.components.QrScanResultBottomSheet
+import com.ismartcoding.plain.ui.scanner.components.QrScanResultBottomSheet
 import com.ismartcoding.plain.ui.components.TagSelector
 import com.ismartcoding.plain.ui.models.ImagesViewModel
 import com.ismartcoding.plain.ui.models.TagsViewModel
@@ -121,6 +121,10 @@ fun ViewImageBottomSheet(
     }
 
     if (showQrScanResult) {
-        QrScanResultBottomSheet(qrScanResult) { showQrScanResult = false }
+        QrScanResultBottomSheet(
+            qrScanResult,
+            title = stringResource(Res.string.scan_result),
+            copyLabel = stringResource(Res.string.scan_result),
+        ) { showQrScanResult = false }
     }
 }

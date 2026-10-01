@@ -1,4 +1,4 @@
-package com.ismartcoding.plain.ui.page.scan
+package com.ismartcoding.plain.ui.scanner
 
 /**
  * Decides when a confirmed single code may auto-open its result. If the frame also

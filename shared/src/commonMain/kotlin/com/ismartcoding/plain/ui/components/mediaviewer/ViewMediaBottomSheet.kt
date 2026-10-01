@@ -38,7 +38,7 @@ import com.ismartcoding.plain.ui.base.Subtitle
 import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.components.FileRenameDialog
 import com.ismartcoding.plain.platform.ImageMetaRows
-import com.ismartcoding.plain.ui.components.QrScanResultBottomSheet
+import com.ismartcoding.plain.ui.scanner.components.QrScanResultBottomSheet
 import com.ismartcoding.plain.ui.components.TagSelector
 import com.ismartcoding.plain.ui.components.VideoMetaRows
 import com.ismartcoding.plain.platform.formatImageMetaTexts
@@ -165,6 +165,10 @@ fun ViewMediaBottomSheet(
     }
 
     if (showQrScanResult) {
-        QrScanResultBottomSheet(qrScanResult) { showQrScanResult = false }
+        QrScanResultBottomSheet(
+            qrScanResult,
+            title = stringResource(Res.string.scan_result),
+            copyLabel = stringResource(Res.string.scan_result),
+        ) { showQrScanResult = false }
     }
 }

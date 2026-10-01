@@ -1,5 +1,6 @@
-package com.ismartcoding.plain.platform
+package com.ismartcoding.plain.ui.scanner
 
+import android.net.Uri
 import android.graphics.ImageFormat
 import android.util.Size
 import androidx.camera.compose.CameraXViewfinder
@@ -31,12 +32,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.IntSize
 import androidx.core.content.ContextCompat
 import com.google.zxing.MultiFormatReader
-import com.ismartcoding.plain.appContext
 import com.ismartcoding.plain.helpers.QrCodeBitmapHelper
-import com.ismartcoding.plain.helpers.QrCodeScanHelper
-import com.ismartcoding.plain.ui.scanner.QrScanPipeline
-import com.ismartcoding.plain.ui.scanner.ScanCoordMapper
-import com.ismartcoding.plain.ui.scanner.YPlane
 import com.ismartcoding.plain.lib.logcat.LogCat
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -224,13 +220,19 @@ private class ScanFrameAnalyzer(
     }
 }
 
-actual suspend fun decodeQrFromUri(uri: String): ScannedImage? {
-    return try {
-        withContext(Dispatchers.Default) {
-            val img = QrCodeBitmapHelper.getBitmapFromUri(appContext, android.net.Uri.parse(uri))
-            QrCodeScanHelper.decodeAll(img)
+@Composable
+actual fun rememberQrImageDecoder(): suspend (String) -> ScannedImage? {
+    val context = LocalContext.current
+    return remember(context) {
+        { uri ->
+            try {
+                withContext(Dispatchers.Default) {
+                    val img = QrCodeBitmapHelper.getBitmapFromUri(context, Uri.parse(uri))
+                    QrCodeScanHelper.decodeAll(img)
+                }
+            } catch (e: Exception) {
+                null
+            }
         }
-    } catch (e: Exception) {
-        null
     }
 }

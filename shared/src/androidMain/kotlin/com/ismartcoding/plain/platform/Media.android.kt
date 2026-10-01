@@ -14,7 +14,7 @@ import com.ismartcoding.plain.helpers.ImageHelper
 import com.ismartcoding.plain.helpers.MediaShortcutHelper
 import com.ismartcoding.plain.helpers.Mp4Helper
 import com.ismartcoding.plain.helpers.QrCodeGenerateHelper
-import com.ismartcoding.plain.helpers.QrCodeScanHelper
+import com.ismartcoding.plain.ui.scanner.QrCodeScanHelper
 import com.ismartcoding.plain.helpers.SvgHelper
 import com.ismartcoding.plain.helpers.VideoHelper
 import java.io.File

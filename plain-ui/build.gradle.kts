@@ -53,6 +53,12 @@ kotlin {
         }
         androidMain.dependencies {
             api(libs.zxing.core)
+            implementation(libs.camera.core)
+            implementation(libs.camera.camera2)
+            implementation(libs.camera.lifecycle)
+            implementation(libs.camera.view)
+            implementation(libs.camera.compose)
+            implementation(libs.compose.lifecycle.runtime)
         }
     }
 }
