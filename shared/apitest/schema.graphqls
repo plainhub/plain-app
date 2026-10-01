@@ -87,7 +87,7 @@ type Query {
   clipboardItemCount(query: String!): Int!
   bookmarks: [Bookmark!]!
   bookmarkGroups: [BookmarkGroup!]!
-  mounts: [StorageMount!]!
+  mounts: [Mount!]!
   recentFiles: [File!]!
   files(root: String!, offset: Int!, limit: Int!, query: String!, sortBy: FileSortBy!): [File!]!
   fileCount(root: String!, query: String!): Int!
@@ -331,7 +331,7 @@ type AudioPlayHistory {
   title: String!
   artist: String!
   durationMs: Long!
-  playCount: Long!
+  playCount: Int!
   playedAt: Instant!
 }
 
@@ -990,6 +990,21 @@ enum MergeTaskStatus {
   FAILED
 }
 
+type Mount {
+  id: ID!
+  name: String!
+  path: String!
+  mountPoint: String!
+  fsType: String!
+  totalBytes: Long!
+  usedBytes: Long!
+  freeBytes: Long!
+  remote: Boolean!
+  alias: String!
+  driveType: DriveType!
+  diskId: String!
+}
+
 type Note {
   id: ID!
   title: String!
@@ -1289,21 +1304,6 @@ enum SmsType {
   FAILED
   QUEUED
   UNKNOWN
-}
-
-type StorageMount {
-  id: ID!
-  name: String!
-  path: String!
-  mountPoint: String!
-  fsType: String!
-  totalBytes: Long!
-  usedBytes: Long!
-  freeBytes: Long!
-  remote: Boolean!
-  alias: String!
-  driveType: DriveType!
-  diskId: String!
 }
 
 type Tag {

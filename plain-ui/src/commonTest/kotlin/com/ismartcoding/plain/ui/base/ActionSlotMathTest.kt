@@ -1,8 +1,5 @@
-package com.ismartcoding.plain.tests
+package com.ismartcoding.plain.ui.base
 
-import com.ismartcoding.plain.ui.base.MAX_PSheetPrimaryActionsPerRow
-import com.ismartcoding.plain.ui.base.actionSlotColumns
-import com.ismartcoding.plain.ui.base.actionSlotWidthPx
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
