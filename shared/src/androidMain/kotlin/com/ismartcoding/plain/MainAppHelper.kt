@@ -29,7 +29,7 @@ import com.ismartcoding.plain.preferences.DarkThemePreference
 import com.ismartcoding.plain.preferences.FeedAutoRefreshPreference
 import com.ismartcoding.plain.preferences.FidUriExtMigratedPreference
 import com.ismartcoding.plain.preferences.UpdateInfoPreference
-import com.ismartcoding.plain.preferences.dataStore
+import com.ismartcoding.plain.platform.prefsFilePath
 import com.ismartcoding.plain.preferences.ensureValueAsync
 import com.ismartcoding.plain.preferences.initDataStore
 import com.ismartcoding.plain.preferences.setDarkMode
@@ -45,7 +45,7 @@ object MainAppHelper {
 
     fun init(app: Application) {
         com.ismartcoding.plain.thumbnail.ThumbnailProvider.instance = com.ismartcoding.plain.thumbnail.ThumbnailGenerator
-        initDataStore(app.dataStore)
+        initDataStore(prefsFilePath())
         initDatabase(
             buildAppDatabase(Constants.DATABASE_NAME)
                 .addCallback(object : RoomDatabase.Callback() {

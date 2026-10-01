@@ -3,7 +3,6 @@ package com.ismartcoding.plain
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.window.ComposeUIViewController
-import androidx.datastore.preferences.core.PreferenceDataStoreFactory
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
@@ -15,7 +14,7 @@ import com.ismartcoding.plain.enums.DarkTheme
 import com.ismartcoding.plain.events.AppEvents
 import com.ismartcoding.plain.lib.coIO
 import com.ismartcoding.plain.platform.buildAppDatabase
-import com.ismartcoding.plain.platform.dataStoreFilePath
+import com.ismartcoding.plain.platform.prefsFilePath
 import com.ismartcoding.plain.platform.initDatabase
 import com.ismartcoding.plain.platform.initDiskLogging
 import com.ismartcoding.plain.preferences.LocalDarkTheme
@@ -31,17 +30,12 @@ import com.ismartcoding.plain.ui.page.Main
 import com.ismartcoding.plain.ui.theme.AppTheme
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
-import okio.Path.Companion.toPath
-import platform.Foundation.NSFileManager
-import platform.Foundation.NSSearchPathForDirectoriesInDomains
-import platform.Foundation.NSDocumentDirectory
-import platform.Foundation.NSUserDomainMask
 import platform.UIKit.UIViewController
 
 private var initialized = false
 
 /**
- * One-time iOS app initialization: DataStore, Room database, log adapters,
+ * One-time iOS app initialization: Rust preferences, Room database, log adapters,
  * and event collectors. Idempotent — safe to call multiple times.
  */
 @OptIn(kotlinx.cinterop.ExperimentalForeignApi::class)
@@ -49,16 +43,7 @@ fun initIosApp() {
     if (initialized) return
     initialized = true
 
-    // Ensure the datastore directory exists before OkioStorage tries to write
-    val docsDir = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, true)[0] as String
-    val datastoreDir = "$docsDir/datastore"
-    NSFileManager.defaultManager.createDirectoryAtPath(datastoreDir, withIntermediateDirectories = true, attributes = null, error = null)
-
-    // DataStore (multiplatform Preferences DataStore backed by okio)
-    val dataStore = PreferenceDataStoreFactory.createWithPath(
-        produceFile = { dataStoreFilePath().toPath() },
-    )
-    initDataStore(dataStore)
+    initDataStore(prefsFilePath())
 
     // Room database with the same onCreate seed data as Android
     initDatabase(

@@ -176,7 +176,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "cd \"$SRCROOT/..\"\n\n# Use Android Studio JBR if JAVA_HOME is not set or points to invalid path\nif [ -z \"$JAVA_HOME\" ] || [ ! -d \"$JAVA_HOME\" ]; then\n    export JAVA_HOME=\"/Applications/Android Studio.app/Contents/jbr/Contents/Home\"\nfi\n\n# Skip the Gradle call entirely when no Kotlin/source file is newer than the\n# embedded framework. This avoids the ~10s Gradle daemon + configuration-cache\n# warm-up cost on every Xcode build that only touched Swift code.\nFRAMEWORK=\"$SRCROOT/../shared/build/xcode-frameworks/PlainShared.framework\"\nif [ -d \"$FRAMEWORK\" ]; then\n    NEWEST_FW=$(find \"$FRAMEWORK\" -type f -exec stat -f '%m' {} + | sort -rn | head -1)\n    # Check commonMain, iosMain, androidMain (affects metadata) and build.gradle.kts\n    NEWEST_SRC=$(find \"$SRCROOT/../shared/src\" \"$SRCROOT/../shared/build.gradle.kts\" \\\n        -name '*.kt' -o -name '*.kts' 2>/dev/null | xargs stat -f '%m' 2>/dev/null | sort -rn | head -1)\n    if [ -n \"$NEWEST_SRC\" ] && [ -n \"$NEWEST_FW\" ] && [ \"$NEWEST_SRC\" -le \"$NEWEST_FW\" ]; then\n        echo \"Kotlin sources unchanged — skipping Gradle framework build.\"\n        exit 0\n    fi\nfi\n\n./gradlew :shared:embedAndSignAppleFrameworkForXcode\n";
+			shellScript = "cd \"$SRCROOT/..\"\n\n# Use Android Studio JBR if JAVA_HOME is not set or points to invalid path\nif [ -z \"$JAVA_HOME\" ] || [ ! -d \"$JAVA_HOME\" ]; then\n    export JAVA_HOME=\"/Applications/Android Studio.app/Contents/jbr/Contents/Home\"\nfi\n\n# Skip the Gradle call entirely when no Kotlin/source file is newer than the\n# embedded framework. This avoids the ~10s Gradle daemon + configuration-cache\n# warm-up cost on every Xcode build that only touched Swift code.\nFRAMEWORK=\"$SRCROOT/../shared/build/xcode-frameworks/PlainShared.framework\"\nif [ -d \"$FRAMEWORK\" ]; then\n    NEWEST_FW=$(find \"$FRAMEWORK\" -type f -exec stat -f '%m' {} + | sort -rn | head -1)\n    # Check shared and Rust sources before reusing the embedded framework\n    NEWEST_SRC=$(find \"$SRCROOT/../shared/src\" \"$SRCROOT/../shared/build.gradle.kts\" \"$SRCROOT/../rust/plain-prefs-mobile/src\" \"$SRCROOT/../rust/plain-prefs-mobile/include\" \"$SRCROOT/../rust/plain-prefs-mobile/Cargo.toml\" \"$SRCROOT/../rust/plain-prefs-mobile/Cargo.lock\" -type f 2>/dev/null | xargs stat -f '%m' 2>/dev/null | sort -rn | head -1)\n    if [ -n \"$NEWEST_SRC\" ] && [ -n \"$NEWEST_FW\" ] && [ \"$NEWEST_SRC\" -le \"$NEWEST_FW\" ]; then\n        echo \"Kotlin sources unchanged — skipping Gradle framework build.\"\n        exit 0\n    fi\nfi\n\n./gradlew :shared:embedAndSignAppleFrameworkForXcode\n";
 		};
 		BB0000C0000000000000001 /* Copy Web Resources */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -365,6 +365,10 @@
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "Portrait PortraitUpsideDown LandscapeLeft LandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "Portrait LandscapeLeft LandscapeRight";
+				"LIBRARY_SEARCH_PATHS[sdk=iphoneos*]" = "$(SRCROOT)/../shared/build/rust-target/aarch64-apple-ios/release";
+				"LIBRARY_SEARCH_PATHS[sdk=iphonesimulator*]" = "$(SRCROOT)/../shared/build/rust-target/aarch64-apple-ios-sim/release";
+				"RUST_PREFS_LIBRARY[sdk=iphoneos*]" = "$(SRCROOT)/../shared/build/rust-target/aarch64-apple-ios/release/libplain_prefs_mobile.a";
+				"RUST_PREFS_LIBRARY[sdk=iphonesimulator*]" = "$(SRCROOT)/../shared/build/rust-target/aarch64-apple-ios-sim/release/libplain_prefs_mobile.a";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -374,6 +378,7 @@
 					"$(inherited)",
 					"-framework",
 					PlainShared,
+					"-Wl,-force_load,$(RUST_PREFS_LIBRARY)",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.ismartcoding.plain.ios;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -406,6 +411,10 @@
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "Portrait PortraitUpsideDown LandscapeLeft LandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "Portrait LandscapeLeft LandscapeRight";
+				"LIBRARY_SEARCH_PATHS[sdk=iphoneos*]" = "$(SRCROOT)/../shared/build/rust-target/aarch64-apple-ios/release";
+				"LIBRARY_SEARCH_PATHS[sdk=iphonesimulator*]" = "$(SRCROOT)/../shared/build/rust-target/aarch64-apple-ios-sim/release";
+				"RUST_PREFS_LIBRARY[sdk=iphoneos*]" = "$(SRCROOT)/../shared/build/rust-target/aarch64-apple-ios/release/libplain_prefs_mobile.a";
+				"RUST_PREFS_LIBRARY[sdk=iphonesimulator*]" = "$(SRCROOT)/../shared/build/rust-target/aarch64-apple-ios-sim/release/libplain_prefs_mobile.a";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -415,6 +424,7 @@
 					"$(inherited)",
 					"-framework",
 					PlainShared,
+					"-Wl,-force_load,$(RUST_PREFS_LIBRARY)",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.ismartcoding.plain.ios;
 				PRODUCT_NAME = "$(TARGET_NAME)";

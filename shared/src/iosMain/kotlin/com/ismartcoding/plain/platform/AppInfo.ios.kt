@@ -56,8 +56,8 @@ actual fun databaseFilePath(name: String): String = appDir() + "/" + name
 actual fun getOwnPackageName(): String =
     NSBundle.mainBundle.bundleIdentifier ?: ""
 
-actual fun dataStoreFilePath(): String =
-    appDir() + "/datastore/settings.preferences_pb"
+actual fun prefsFilePath(): String =
+    appDir() + "/prefs.json"
 
 actual fun getAppVersionCode(): Long {
     val buildNumber = NSBundle.mainBundle.objectForInfoDictionaryKey("CFBundleVersion") as? String ?: ""
@@ -71,4 +71,3 @@ actual fun isDebugBuild(): Boolean {
     val simulatorName = NSProcessInfo.processInfo.environment["SIMULATOR_DEVICE_NAME"]
     return simulatorName != null
 }
-

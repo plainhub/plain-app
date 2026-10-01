@@ -67,10 +67,9 @@ expect fun databaseFilePath(name: String): String
 expect fun getOwnPackageName(): String
 
 /**
- * Absolute path to the preferences DataStore file (settings.preferences_pb).
- * On Android this is `<filesDir>/datastore/settings.preferences_pb`.
+ * Absolute path to the Rust preferences file (`prefs.json`) in app data.
  */
-expect fun dataStoreFilePath(): String
+expect fun prefsFilePath(): String
 
 /**
  * Numeric app version code (e.g. 100). 0 if not available.
@@ -81,4 +80,3 @@ expect fun getAppVersionCode(): Long
  * Whether the running app is a debuggable build.
  */
 expect fun isDebugBuild(): Boolean
-

@@ -37,10 +37,9 @@ actual fun databaseFilePath(name: String): String =
 
 actual fun getOwnPackageName(): String = appContext.packageName
 
-actual fun dataStoreFilePath(): String =
-    appContext.filesDir.absolutePath + "/datastore/settings.preferences_pb"
+actual fun prefsFilePath(): String =
+    appContext.filesDir.absolutePath + "/prefs.json"
 
 actual fun getAppVersionCode(): Long = com.ismartcoding.plain.getAppVersionCode()
 
 actual fun isDebugBuild(): Boolean = com.ismartcoding.plain.isDebugBuild()
-

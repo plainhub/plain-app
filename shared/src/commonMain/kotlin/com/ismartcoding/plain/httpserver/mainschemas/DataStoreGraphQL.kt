@@ -6,7 +6,7 @@ import com.ismartcoding.plain.lib.kgraphql.GraphQLError
 import com.ismartcoding.plain.lib.kgraphql.annotations.GraphQLMutation
 import com.ismartcoding.plain.lib.kgraphql.annotations.GraphQLQuery
 import com.ismartcoding.plain.lib.kgraphql.schema.dsl.SchemaBuilder
-import com.ismartcoding.plain.platform.dataStoreFilePath
+import com.ismartcoding.plain.platform.prefsFilePath
 import com.ismartcoding.plain.preferences.appDataStore
 import com.ismartcoding.plain.preferences.getPreferencesAsync
 import com.ismartcoding.plain.httpserver.models.KeyValuePair
@@ -48,7 +48,7 @@ suspend fun deletePref(key: String): Boolean {
 
 @GraphQLQuery
 suspend fun dataStorePath(): String {
-    return dataStoreFilePath()
+    return prefsFilePath()
 }
 
 @GraphQLQuery

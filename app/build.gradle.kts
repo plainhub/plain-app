@@ -1,3 +1,4 @@
+import java.io.File
 import java.io.FileInputStream
 import java.util.Properties
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
@@ -140,6 +141,63 @@ android {
         }
     }
     namespace = "com.ismartcoding.plain"
+    sourceSets.getByName("main").jniLibs.srcDir(layout.buildDirectory.dir("generated/rustJniLibs").get().asFile)
+}
+
+val rustPrefsDir = rootProject.file("rust/plain-prefs-mobile")
+val rustTargetDir = layout.buildDirectory.dir("rust-target")
+val rustAbi = providers.gradleProperty("abiFilters").orNull?.split(';')?.singleOrNull() ?: "arm64-v8a"
+val rustAndroidTarget = when (rustAbi) {
+    "arm64-v8a" -> "aarch64-linux-android"
+    "armeabi-v7a" -> "armv7-linux-androideabi"
+    "x86_64" -> "x86_64-linux-android"
+    "x86" -> "i686-linux-android"
+    else -> error("Unsupported Rust Android ABI: $rustAbi")
+}
+val localSdk = Properties().apply {
+    rootProject.file("local.properties").takeIf { it.exists() }?.inputStream()?.use { load(it) }
+}.getProperty("sdk.dir")
+val androidSdk = File(System.getenv("ANDROID_HOME") ?: System.getenv("ANDROID_SDK_ROOT") ?: localSdk ?: "${System.getProperty("user.home")}/Library/Android/sdk")
+val androidNdk = System.getenv("ANDROID_NDK_HOME")?.let(::File)
+    ?: File(androidSdk, "ndk").listFiles()?.filter { it.isDirectory }?.maxByOrNull { it.name }
+    ?: error("Android NDK is required to build Rust preferences")
+val ndkHost = File(androidNdk, "toolchains/llvm/prebuilt").listFiles()?.firstOrNull { it.isDirectory }
+    ?: error("Android NDK LLVM toolchain was not found")
+val clangTarget = when (rustAndroidTarget) {
+    "armv7-linux-androideabi" -> "armv7a-linux-androideabi"
+    "i686-linux-android" -> "i686-linux-android"
+    else -> rustAndroidTarget
+}
+val androidClang = File(ndkHost, "bin/${clangTarget}28-clang")
+
+val installRustAndroidTarget by tasks.registering(Exec::class) {
+    commandLine("rustup", "target", "add", rustAndroidTarget)
+}
+
+val buildRustPrefsAndroid by tasks.registering(Exec::class) {
+    dependsOn(installRustAndroidTarget)
+    inputs.file(File(rustPrefsDir, "Cargo.toml"))
+    inputs.file(File(rustPrefsDir, "Cargo.lock"))
+    inputs.dir(File(rustPrefsDir, "src"))
+    outputs.file(rustTargetDir.map { it.file("$rustAndroidTarget/release/libplain_prefs_mobile.so") })
+    environment("CARGO_TARGET_DIR", rustTargetDir.get().asFile.absolutePath)
+    environment("CARGO_TARGET_${rustAndroidTarget.uppercase().replace('-', '_')}_LINKER", androidClang.absolutePath)
+    environment("CC_${rustAndroidTarget.replace('-', '_')}", androidClang.absolutePath)
+    environment("AR_${rustAndroidTarget.replace('-', '_')}", File(ndkHost, "bin/llvm-ar").absolutePath)
+    environment("CARGO_TARGET_${rustAndroidTarget.uppercase().replace('-', '_')}_AR", File(ndkHost, "bin/llvm-ar").absolutePath)
+    commandLine("cargo", "build", "--locked", "--manifest-path", File(rustPrefsDir, "Cargo.toml"), "--release", "--target", rustAndroidTarget)
+}
+
+val packageRustPrefsAndroid by tasks.registering(Sync::class) {
+    dependsOn(buildRustPrefsAndroid)
+    from(rustTargetDir.map { it.file("$rustAndroidTarget/release/libplain_prefs_mobile.so") })
+    into(layout.buildDirectory.dir("generated/rustJniLibs"))
+    eachFile { path = "$rustAbi/$name" }
+    includeEmptyDirs = false
+}
+
+tasks.matching { it.name.startsWith("merge") && it.name.endsWith("JniLibFolders") }.configureEach {
+    dependsOn(packageRustPrefsAndroid)
 }
 
 tasks.withType<KotlinCompile>().configureEach {

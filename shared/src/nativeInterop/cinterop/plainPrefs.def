@@ -1,0 +1,2 @@
+headers = plain_prefs_mobile.h
+package = com.ismartcoding.plain.rustprefs

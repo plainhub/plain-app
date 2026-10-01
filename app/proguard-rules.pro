@@ -101,3 +101,4 @@
 -dontwarn okhttp3.internal.platform.**
 -dontwarn org.conscrypt.**
 -dontwarn org.openjsse.**
+-keep class com.ismartcoding.plain.preferences.RustPrefsBridge { *; }
