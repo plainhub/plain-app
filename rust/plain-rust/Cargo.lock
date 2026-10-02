@@ -530,18 +530,9 @@ dependencies = [
 ]
 
 [[package]]
-name = "plain-rust"
-version = "0.1.0"
-dependencies = [
- "jni",
- "plain-rs",
- "serde_json",
-]
-
-[[package]]
 name = "plain-rs"
 version = "0.1.0"
-source = "git+https://github.com/plainhub/plain-desktop.git?rev=2a96cd8e9df15e442a12ef18aa6e69a72e5b3bb8#2a96cd8e9df15e442a12ef18aa6e69a72e5b3bb8"
+source = "git+https://github.com/plainhub/plain-desktop.git?rev=d0af659b522fd56e274178c411614a5424d499a8#d0af659b522fd56e274178c411614a5424d499a8"
 dependencies = [
  "bytes",
  "chacha20poly1305",
@@ -559,6 +550,15 @@ dependencies = [
  "socket2",
  "tokio",
  "uuid",
+]
+
+[[package]]
+name = "plain-rust"
+version = "0.1.0"
+dependencies = [
+ "jni",
+ "plain-rs",
+ "serde_json",
 ]
 
 [[package]]

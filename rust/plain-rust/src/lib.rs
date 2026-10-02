@@ -4,14 +4,9 @@ use std::ffi::{CStr, CString, c_char};
 use std::path::Path;
 use std::sync::{Arc, Mutex};
 
-struct PrefsPair {
-    system: Prefs,
-    user: Prefs,
-}
+static PREFS: Mutex<Option<Arc<Prefs>>> = Mutex::new(None);
 
-static PREFS: Mutex<Option<Arc<PrefsPair>>> = Mutex::new(None);
-
-fn prefs() -> Result<Arc<PrefsPair>, String> {
+fn prefs() -> Result<Arc<Prefs>, String> {
     PREFS
         .lock()
         .map_err(|e| e.to_string())?
@@ -22,17 +17,14 @@ fn prefs() -> Result<Arc<PrefsPair>, String> {
 fn open(system_path: &str, user_path: &str) -> Result<(), String> {
     let mut guard = PREFS.lock().map_err(|e| e.to_string())?;
     if let Some(existing) = guard.as_ref() {
-        if existing.system.path() == Path::new(system_path)
-            && existing.user.path() == Path::new(user_path)
+        if existing.path() == Path::new(system_path) && existing.user_path() == Path::new(user_path)
         {
             return Ok(());
         }
         return Err("Rust preferences were initialized with another path".to_string());
     }
-    let loaded = PrefsPair {
-        system: Prefs::load(Path::new(system_path)).map_err(|e| e.to_string())?,
-        user: Prefs::load(Path::new(user_path)).map_err(|e| e.to_string())?,
-    };
+    let loaded = Prefs::load_pair(Path::new(system_path), Path::new(user_path))
+        .map_err(|e| e.to_string())?;
     *guard = Some(Arc::new(loaded));
     Ok(())
 }
@@ -40,9 +32,9 @@ fn open(system_path: &str, user_path: &str) -> Result<(), String> {
 fn snapshot(is_user_pref: bool) -> Result<String, String> {
     let prefs = prefs()?;
     let entries: Map<String, Value> = if is_user_pref {
-        prefs.user.entries()
+        prefs.user_entries()
     } else {
-        prefs.system.entries()
+        prefs.entries()
     }
     .into_iter()
     .collect();
@@ -53,9 +45,9 @@ fn set(is_user_pref: bool, key: &str, value_json: &str) -> Result<(), String> {
     let value: Value = serde_json::from_str(value_json).map_err(|e| e.to_string())?;
     let prefs = prefs()?;
     if is_user_pref {
-        prefs.user.set(key, value).map_err(|e| e.to_string())?;
+        prefs.set_user(key, value).map_err(|e| e.to_string())?;
     } else {
-        prefs.system.set(key, value).map_err(|e| e.to_string())?;
+        prefs.set(key, value).map_err(|e| e.to_string())?;
     }
     Ok(())
 }
@@ -63,9 +55,9 @@ fn set(is_user_pref: bool, key: &str, value_json: &str) -> Result<(), String> {
 fn remove(is_user_pref: bool, key: &str) -> Result<(), String> {
     let prefs = prefs()?;
     if is_user_pref {
-        prefs.user.remove(key).map_err(|e| e.to_string())?;
+        prefs.remove_user(key).map_err(|e| e.to_string())?;
     } else {
-        prefs.system.remove(key).map_err(|e| e.to_string())?;
+        prefs.remove(key).map_err(|e| e.to_string())?;
     }
     Ok(())
 }
