@@ -144,6 +144,8 @@ term       := [field ":"] value op?
 
 ## 10. 已知待办与既定不动项
 
+- Notes 单条写入只用 `createNote(input)` / `updateNote(id, input)`；过时的 `saveNote` 已删除，禁止重新引入。
+
 - Preferences use separate `system_prefs.json` and `user_prefs.json` stores. GraphQL exposes `userPrefs: JSON!` and `systemPrefs: JSON!`; `setUserPref(key: String!, value: JSON!): Boolean!` and `removeUserPref(key: String!): Boolean!` mutate only user preferences. The legacy `prefs`, `setPref`, `deletePref`, `prefEntries`, and `prefsPath` operations are removed.
 
 - ~~P2：`Message`/`MessageConversation` 命名、sendSms/sendMms 不对称、`ChatItemContent` union 建模、WS 事件协议文档化、`AudioPlayback` 缺 isPlaying/positionMs~~ —— 2026-09-20 第五轮已落地：SMS 域类型改名 `Sms`/`SmsConversation`/`SmsAttachment`；`ChatItemContent` 的 `ChatFiles/ChatImages.ids` → `[ID!]!`、`ChatText.ids` → `linkPreviewImageIds`（文本本体在 `content`）；`AudioPlayback` 补 `isPlaying`/`positionMs` 且 `currentPath` 空串改暴露 null；`Notification.time` → `postedAt`；`BookmarkGroup` 补 `itemCount`；sendSms/sendMms/replyNotification 已加语义 description。事件协议见 §11。

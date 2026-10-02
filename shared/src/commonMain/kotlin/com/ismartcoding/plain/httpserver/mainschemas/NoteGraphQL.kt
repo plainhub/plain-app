@@ -102,9 +102,3 @@ fun SchemaBuilder.addNoteSchema() {
         }
     }
 }
-
-@GraphQLMutation
-suspend fun saveNote(id: ID, input: NoteInput): Note {
-    NoteHelper.saveToNotesAsync(id.value) { title = input.title; content = input.content }
-    return NoteHelper.getById(id.value)?.toModel() ?: throw GraphQLError("Note not found")
-}

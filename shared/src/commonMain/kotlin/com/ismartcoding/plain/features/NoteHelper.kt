@@ -24,10 +24,6 @@ object NoteHelper {
     suspend fun saveFeedEntryAsync(id: String) {
         RustContentApi.mutate("saveFeedEntriesToNotes(query: ${gql(selectionQuery(setOf(id)))})")
     }
-    suspend fun saveToNotesAsync(id: String, updateItem: DNote.() -> Unit): String {
-        val item = (getById(id) ?: DNote(id=id)).apply(updateItem)
-        return RustContentApi.mutate("saveNote(id: ${gql(id)}, input: { title: ${gql(item.title)}, content: ${gql(item.content)} }) { id }").getValue("saveNote").jsonObject.string("id")
-    }
     suspend fun trashAsync(ids: Set<String>) { if (ids.isNotEmpty()) RustContentApi.mutate("trashNotes(query: ${gql(selectionQuery(ids))}) { affectedCount }") }
     suspend fun restoreAsync(ids: Set<String>) { if (ids.isNotEmpty()) RustContentApi.mutate("restoreNotes(query: ${gql(selectionQuery(ids))}) { affectedCount }") }
     suspend fun deleteAsync(ids: Set<String>) { if (ids.isNotEmpty()) RustContentApi.mutate("deleteNotes(query: ${gql(selectionQuery(ids))}) { affectedCount }") }

@@ -105,7 +105,7 @@ class FeedsViewModel : ISelectableViewModel<DFeed>, ViewModel() {
                 return@launchSafe
             }
             try {
-                rssChannel.value = RssChannel(FeedHelper.preview(editUrl.value), null, null, null, null, null, emptyList(), null)
+                rssChannel.value = fetchRssChannel(editUrl.value)
                 rssChannel.value?.let {
                     editName.value = it.title ?: ""
                 }

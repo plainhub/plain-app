@@ -10,7 +10,6 @@ object FeedHelper {
     suspend fun getFeedCounts(): List<DFeedCount> = RustContentApi.query("feedEntryCounts { id count }").getValue("feedEntryCounts").jsonArray.map { DFeedCount(it.jsonObject.string("id"), it.jsonObject.getValue("count").jsonPrimitive.int) }
     suspend fun getById(id: String): DFeed? = RustContentApi.query("feed(id: ${gql(id)}) { $FEED_FIELDS }")["feed"]?.takeUnless { it is JsonNull }?.feed()
     suspend fun getByUrl(url: String): DFeed? = getAll().firstOrNull { it.url == url }
-    suspend fun preview(url: String): String = RustContentApi.query("previewFeed(url: ${gql(url)}) { name }").getValue("previewFeed").jsonObject.string("name")
     suspend fun addAsync(updateItem: DFeed.() -> Unit): String {
         val item = DFeed().apply(updateItem)
         val created = RustContentApi.mutate("createFeed(url: ${gql(item.url)}, fetchContent: ${item.fetchContent}) { $FEED_FIELDS }").getValue("createFeed").feed()

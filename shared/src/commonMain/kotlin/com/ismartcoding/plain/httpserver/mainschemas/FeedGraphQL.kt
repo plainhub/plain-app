@@ -130,9 +130,6 @@ fun SchemaBuilder.addFeedSchema() {
 suspend fun feed(id: ID): Feed? = FeedHelper.getById(id.value)?.toModel()
 
 @GraphQLQuery
-suspend fun previewFeed(url: String): com.ismartcoding.plain.httpserver.models.FeedPreview = com.ismartcoding.plain.httpserver.models.FeedPreview(FeedHelper.preview(url))
-
-@GraphQLQuery
 suspend fun feedSyncStates(): List<com.ismartcoding.plain.httpserver.models.FeedSyncState> = com.ismartcoding.plain.api.RustContentApi.query("feedSyncStates { feedId status error }").getValue("feedSyncStates").let { values ->
     values.jsonArray.map { val row = it.jsonObject; com.ismartcoding.plain.httpserver.models.FeedSyncState(ID(row.getValue("feedId").jsonPrimitive.content), row.getValue("status").jsonPrimitive.content, row.getValue("error").jsonPrimitive.content) }
 }

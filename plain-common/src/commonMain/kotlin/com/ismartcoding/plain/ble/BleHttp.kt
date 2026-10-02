@@ -6,7 +6,7 @@ import kotlinx.serialization.Serializable
 /**
  * Request envelope carried inside [BleRequestData.body] when an RPC client
  * wants to invoke an HTTP API (e.g. `/graphql`, `/peer_graphql`, `/fs`) over
- * the BLE RPC characteristic ([BleUuids.HTTP_CHAR_UUID]).
+ * the BLE RPC HTTP characteristic.
  *
  * The format mirrors a normal HTTP request so the server can route it
  * through the same [com.ismartcoding.plain.httpserver.http.HttpRouter] used by the

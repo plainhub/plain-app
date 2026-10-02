@@ -64,31 +64,6 @@ object LegacyNoteHelper {
         noteDao.getById(id)
     }
 
-    suspend fun saveToNotesAsync(
-        id: String,
-        updateItem: DNote.() -> Unit,
-    ): String = withIO {
-        var item = noteDao.getById(id)
-        var isInsert = false
-        if (item == null) {
-            item = DNote(id)
-            isInsert = true
-        } else {
-            item.updatedAt = TimeHelper.now()
-        }
-
-        updateItem(item)
-
-        if (isInsert) {
-            noteDao.insert(item)
-        } else {
-            noteDao.update(item)
-        }
-
-        item.id
-    }
-
-
     suspend fun addOrUpdateAsync(
         id: String,
         updateItem: DNote.() -> Unit,

@@ -36,7 +36,6 @@ type Query {
   feedEntry(id: ID!): FeedEntry
   feedEntries(offset: Int!, limit: Int!, query: String!): [FeedEntry!]!
   feed(id: ID!): Feed
-  previewFeed(url: String!): FeedPreview!
   feedSyncStates: [FeedSyncState!]!
   peers: [Peer!]!
   """Latest-first page of one conversation, returned oldest-to-newest so clients can render directly. `target` is the chat target id: a bare peer id (an optional `peer:` prefix is accepted), or a `channel:<id>` prefixed channel id."""
@@ -208,7 +207,6 @@ type Mutation {
   restoreNotes(query: String!): ActionResult!
   deleteNotes(query: String!): ActionResult!
   exportNotes(query: String!): String!
-  saveNote(id: ID!, input: NoteInput!): Note!
   deleteMediaItems(type: MediaDataType!, query: String!): ActionResult!
   trashMediaItems(type: MediaDataType!, query: String!): ActionResult!
   restoreMediaItems(type: MediaDataType!, query: String!): ActionResult!
@@ -825,10 +823,6 @@ type FeedEntryCount {
 type FeedError {
   code: String!
   detail: String!
-}
-
-type FeedPreview {
-  name: String!
 }
 
 type FeedSyncState {
