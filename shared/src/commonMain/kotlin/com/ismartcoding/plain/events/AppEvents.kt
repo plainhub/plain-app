@@ -75,6 +75,8 @@ class RestartAppEvent : ChannelEvent()
 
 class FetchLinkPreviewsEvent(val chat: DChat) : ChannelEvent()
 
+class PomodoroChangedEvent(val today: com.ismartcoding.plain.httpserver.models.PomodoroToday) : ChannelEvent()
+
 class FetchBookmarkMetadataEvent(val bookmarkId: String, val url: String) : ChannelEvent()
 
 class WindowFocusChangedEvent(val hasFocus: Boolean) : ChannelEvent()

@@ -82,6 +82,8 @@ fun MainEventCollector(
                     }
                 }
 
+                is com.ismartcoding.plain.events.PomodoroChangedEvent -> pomodoroVM.applySnapshot(event.today)
+
                 is HPomodoroStartEvent -> {
                     pomodoroVM.timeLeft.intValue = event.timeLeft
                     pomodoroVM.startSession()

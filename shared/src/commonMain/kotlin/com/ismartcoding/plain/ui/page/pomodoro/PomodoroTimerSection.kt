@@ -55,12 +55,12 @@ internal fun PomodoroTimerSection(
                         var normalizedAngle = (angle + PI / 2) / (2 * PI)
                         if (normalizedAngle < 0) normalizedAngle += 1
                         val totalDurationSec = pomodoroVM.getTotalSeconds()
-                        pomodoroVM.timeLeft.intValue = (totalDurationSec * (1 - normalizedAngle)).toInt().coerceIn(0, totalDurationSec)
+                        pomodoroVM.timeLeft.intValue = (totalDurationSec * (1 - normalizedAngle)).toInt().coerceIn(1, totalDurationSec)
                         pomodoroVM.adjustJob.value?.cancel()
                         pomodoroVM.adjustJob.value = coIO {
                             delay(500)
                             onCheckNotificationPermission {
-                                scope.launch(Dispatchers.Default) { pomodoroVM.startSession(); sendPomodoroAction("start", pomodoroVM) }
+                                scope.launch(Dispatchers.Default) { pomodoroVM.startSession() }
                             }
                         }
                     }
@@ -92,7 +92,7 @@ internal fun PomodoroTimerSection(
             PFilledButton(
                 modifier = Modifier.weight(1f),
                 text = stringResource(Res.string.pause),
-                onClick = { pomodoroVM.pauseSession(); sendPomodoroAction("pause", pomodoroVM) },
+                onClick = { pomodoroVM.pauseSession() },
             )
             PFilledButton(
                 modifier = Modifier.weight(1f),
@@ -100,7 +100,6 @@ internal fun PomodoroTimerSection(
                 type = ButtonType.DANGER,
                 onClick = {
                     pomodoroVM.resetTimer()
-                    sendPomodoroAction("stop", pomodoroVM)
                 },
             )
         }
@@ -115,7 +114,6 @@ internal fun PomodoroTimerSection(
                 onCheckNotificationPermission {
                     scope.launch(Dispatchers.Default) {
                         pomodoroVM.startSession()
-                        sendPomodoroAction("start", pomodoroVM)
                     }
                 }
             },

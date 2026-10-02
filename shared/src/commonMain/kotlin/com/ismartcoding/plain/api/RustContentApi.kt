@@ -88,7 +88,12 @@ object RustContentApi {
                             EventType.CONTENT_CHANGED.value -> {
                                 refreshSyncStates()
                                 NotesViewModel.reloadAsync()
+                                com.ismartcoding.plain.features.PomodoroHost.refresh()
                                 sendEvent(WebSocketEvent(EventType.CONTENT_CHANGED, payload))
+                            }
+                            EventType.POMODORO_ACTION.value -> {
+                                com.ismartcoding.plain.features.PomodoroHost.refresh()
+                                sendEvent(WebSocketEvent(EventType.POMODORO_ACTION, payload))
                             }
                             EventType.BOOKMARK_UPDATED.value -> sendEvent(WebSocketEvent(EventType.BOOKMARK_UPDATED, payload))
                             EventType.FEEDS_FETCHED.value -> sendEvent(WebSocketEvent(EventType.FEEDS_FETCHED, payload))

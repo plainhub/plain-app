@@ -24,11 +24,8 @@ import com.ismartcoding.plain.data.DPomodoroSettings
 import com.ismartcoding.plain.audio.AudioPlayer
 import com.ismartcoding.plain.audio.fromPath
 import com.ismartcoding.plain.helpers.NotificationHelper
-import com.ismartcoding.plain.lib.TimeHelper
 import com.ismartcoding.plain.MainActivity
 import com.ismartcoding.plain.ui.page.pomodoro.PomodoroState
-import kotlinx.datetime.TimeZone
-import kotlinx.datetime.toLocalDateTime
 import java.io.File
 import kotlin.math.PI
 import kotlin.math.exp
@@ -36,7 +33,7 @@ import kotlin.math.ln
 import kotlin.math.sin
 
 @SuppressLint("MissingPermission")
-actual suspend fun showPomodoroNotification(state: PomodoroState) {
+actual suspend fun showPomodoroNotification(state: PomodoroState, nextState: PomodoroState) {
     val context = appContext
     val settings = UserPrefs.pomodoroSettingsValue()
     if (!settings.showNotification) {
@@ -44,18 +41,9 @@ actual suspend fun showPomodoroNotification(state: PomodoroState) {
     }
 
     NotificationHelper.ensureDefaultChannel()
-    val database = AppDatabase.Companion.instance
-    val pomodoroDao = database.pomodoroItemDao()
-    val today = TimeHelper.now()
-        .toLocalDateTime(TimeZone.currentSystemDefault()).date.toString()
-    val todayRecord = withIO { pomodoroDao.getByDate(today) }
-    val completedPomodoros = todayRecord?.completedCount ?: 0
-
     val (title, message) = when (state) {
         PomodoroState.WORK -> {
-            val newCount = completedPomodoros + 1
-            val shouldBeLongBreak = newCount % settings.pomodorosBeforeLongBreak == 0 && newCount > 0
-            val messageRes = if (shouldBeLongBreak) Res.string.great_job_long_break else Res.string.great_job_short_break
+            val messageRes = if (nextState == PomodoroState.LONG_BREAK) Res.string.great_job_long_break else Res.string.great_job_short_break
             Pair(
                 LocaleHelper.getStringAsync(Res.string.work_session_complete),
                 LocaleHelper.getStringAsync(messageRes)

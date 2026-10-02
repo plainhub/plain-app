@@ -144,18 +144,6 @@ class MainActivity : AppCompatActivity() {
         WindowCompat.getInsetsController(window, window.decorView).systemBarsBehavior = WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
         instance = WeakReference(this)
         com.ismartcoding.plain.mainActivity = this
-        com.ismartcoding.plain.httpserver.models.pomodoroRuntimeInfoProvider = {
-            val vm = pomodoroVM
-            com.ismartcoding.plain.httpserver.models.PomodoroRuntimeInfo(
-                completedCount = vm.completedCount.intValue,
-                currentRound = vm.currentRound.intValue,
-                timeLeft = vm.timeLeft.intValue,
-                totalTime = vm.settings.value.getTotalSeconds(vm.currentState.value),
-                isRunning = vm.isRunning.value,
-                isPaused = vm.isPaused.value,
-                state = vm.currentState.value,
-            )
-        }
         pendingCrashReport = CrashHandler.getPendingReport(this)
         try {
             val f = CursorWindow::class.java.getDeclaredField("sCursorWindowSize"); f.isAccessible = true; f.set(null, 100 * 1024 * 1024)
