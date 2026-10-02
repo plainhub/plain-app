@@ -1,7 +1,6 @@
 package com.ismartcoding.plain.ui.page.web
 
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -21,18 +20,17 @@ import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
-import com.ismartcoding.plain.db.DClipboard
+import com.ismartcoding.plain.events.EventType
+import com.ismartcoding.plain.events.WebSocketEvent
+import com.ismartcoding.plain.lib.Channel
 import com.ismartcoding.plain.i18n.*
-import com.ismartcoding.plain.ui.helpers.DialogHelper
 import com.ismartcoding.plain.platform.LocaleHelper
-import com.ismartcoding.plain.platform.formatDateTime
 import com.ismartcoding.plain.platform.setClipboardText
 import com.ismartcoding.plain.ui.base.ActionButtonMoreWithMenu
 import com.ismartcoding.plain.ui.base.BottomSpace
 import com.ismartcoding.plain.ui.base.NoDataColumn
 import com.ismartcoding.plain.ui.base.PCard
 import com.ismartcoding.plain.ui.base.PDropdownMenuItem
-import com.ismartcoding.plain.ui.base.PListItem
 import com.ismartcoding.plain.ui.base.PScaffold
 import com.ismartcoding.plain.ui.base.PTopAppBar
 import com.ismartcoding.plain.ui.base.TopSpace
@@ -56,8 +54,11 @@ fun ClipboardHistoryPage(
     val scope = rememberCoroutineScope()
     val items by vm.itemsFlow.collectAsState()
 
-    LaunchedEffect(Unit) {
-        scope.launch { vm.loadAsync() }
+    LaunchedEffect(vm) {
+        launch { vm.loadAsync() }
+        Channel.sharedFlow.collect { event ->
+            if (event is WebSocketEvent && event.type == EventType.CONTENT_CHANGED) vm.loadAsync()
+        }
     }
 
     val refreshLayoutState = rememberRefreshLayoutState {
@@ -131,25 +132,4 @@ fun ClipboardHistoryPage(
             }
         }
     }
-}
-
-@Composable
-fun ClipboardHistoryListItem(entry: DClipboard, sourceName: String, onCopy: () -> Unit, onDelete: () -> Unit) {
-    PListItem(
-        modifier = Modifier.clickable { onCopy() },
-        title = if (entry.sensitive) "••••••••" else entry.text.let { if (it.length > 200) it.take(200) + "…" else it },
-        subtitle = buildString {
-            append(entry.createdAt.formatDateTime())
-            append(" · ")
-            append(sourceName.ifBlank { stringResource(Res.string.clipboard_source_local) })
-        },
-        action = {
-            Icon(
-                painter = painterResource(UiRes.drawable.ui_drawable_delete_forever),
-                contentDescription = stringResource(Res.string.delete),
-                tint = MaterialTheme.colorScheme.error,
-                modifier = Modifier.clickable { onDelete() }.padding(8.dp),
-            )
-        },
-    )
 }

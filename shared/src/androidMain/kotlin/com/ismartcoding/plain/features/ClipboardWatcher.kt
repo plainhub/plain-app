@@ -7,7 +7,6 @@ import android.content.Intent
 import android.os.Build
 import com.ismartcoding.plain.appContext
 import com.ismartcoding.plain.clipboardManager
-import com.ismartcoding.plain.db.DClipboard
 import com.ismartcoding.plain.events.ClipboardChangedData
 import com.ismartcoding.plain.events.ClipboardSyncChangedEvent
 import com.ismartcoding.plain.events.WindowFocusChangedEvent
@@ -15,10 +14,7 @@ import com.ismartcoding.plain.events.EventType
 import com.ismartcoding.plain.events.WebSocketEvent
 import com.ismartcoding.plain.lib.Channel
 import com.ismartcoding.plain.lib.JsonHelper
-import com.ismartcoding.plain.lib.TimeHelper
 import com.ismartcoding.plain.lib.coIO
-import com.ismartcoding.plain.lib.crypto.sha256
-import com.ismartcoding.plain.lib.generateId
 import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.lib.sendEvent
 import com.ismartcoding.plain.platform.Permission
@@ -168,19 +164,9 @@ object ClipboardWatcher {
             LogCat.d("ClipboardWatcher: clip too large (${text.length} chars), skipped")
             return
         }
-        val hash = sha256(text.encodeToByteArray()).joinToString("") { it.toString(16).padStart(2, '0') }
-        // Same content already captured — dedup and loop suppression in one step.
-        if (ClipboardHelper.getLatestByHash(hash) != null) return
         val sensitive = Build.VERSION.SDK_INT >= 33 &&
             clip.description.extras?.getBoolean(ClipDescription.EXTRA_IS_SENSITIVE, false) == true
-        val entry = DClipboard(
-            id = generateId(),
-            text = text,
-            hash = hash,
-            sensitive = sensitive,
-            createdAt = TimeHelper.now(),
-        )
-        ClipboardHelper.insert(entry)
+        val entry = ClipboardHelper.record(text, sensitive = sensitive) ?: return
         if (sensitive) return
         sendEvent(
             WebSocketEvent(

@@ -1,10 +1,6 @@
 package com.ismartcoding.plain.httpserver.mainschemas
 
-import com.ismartcoding.plain.db.DClipboard
 import com.ismartcoding.plain.features.ClipboardHelper
-import com.ismartcoding.plain.lib.TimeHelper
-import com.ismartcoding.plain.lib.crypto.sha256
-import com.ismartcoding.plain.lib.generateId
 import com.ismartcoding.plain.lib.kgraphql.GraphQLError
 import com.ismartcoding.plain.lib.kgraphql.annotations.GraphQLMutation
 import com.ismartcoding.plain.lib.kgraphql.annotations.GraphQLQuery
@@ -19,16 +15,11 @@ import com.ismartcoding.plain.platform.Permission
 import com.ismartcoding.plain.platform.isEnabledAsync
 import com.ismartcoding.plain.platform.setClipboardText
 
-private const val MAX_TEXT_LENGTH = 256 * 1024
-
 private suspend fun ensureClipboardEnabled() {
     if (!Permission.CLIPBOARD.isEnabledAsync()) {
         throw GraphQLError("clipboard_sync_disabled")
     }
 }
-
-private fun hashOf(text: String): String =
-    sha256(text.encodeToByteArray()).joinToString("") { it.toString(16).padStart(2, '0') }
 
 /** Paged clipboard history, newest first. Desktop-side aggregation reads this. */
 @GraphQLQuery(description = "Paged clipboard history, newest first.")
@@ -51,21 +42,8 @@ suspend fun clipboardItemCount(query: String): Int {
 @GraphQLMutation(description = "Write text into the system clipboard and record it in the history with the calling client as source; an identical latest entry is skipped (hash dedup).")
 suspend fun setClipboard(text: String, context: Context): Boolean {
     ensureClipboardEnabled()
-    if (text.isBlank() || text.length > MAX_TEXT_LENGTH) {
-        throw GraphQLError("invalid_clipboard_text")
-    }
-    val hash = hashOf(text)
-    if (ClipboardHelper.getLatestByHash(hash) == null) {
-        val ctx = context.get<GraphqlRequestContext>()
-        val entry = DClipboard(
-            id = generateId(),
-            text = text,
-            hash = hash,
-            source = ctx?.header("c-id") ?: "",
-            createdAt = TimeHelper.now(),
-        )
-        ClipboardHelper.insert(entry)
-    }
+    val ctx = context.get<GraphqlRequestContext>()
+    ClipboardHelper.record(text, source = ctx?.header("c-id") ?: "")
     setClipboardText("plain", text)
     return true
 }
@@ -75,8 +53,7 @@ suspend fun setClipboard(text: String, context: Context): Boolean {
 suspend fun deleteClipboardItems(query: String): ActionResult {
     ensureClipboardEnabled()
     QueryHelper.requireExplicitBulkQuery(query)
-    val ids = ClipboardHelper.getIdsAsync(query)
-    return ActionResult(ClipboardHelper.deleteByIds(ids.toList()))
+    return ActionResult(ClipboardHelper.delete(query))
 }
 
 fun SchemaBuilder.addClipboardSchema() {

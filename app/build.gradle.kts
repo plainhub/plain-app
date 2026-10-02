@@ -25,6 +25,7 @@ android {
         applicationId = "com.ismartcoding.plain"
         minSdk = 28
         targetSdk = 36
+        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
         val abiFilterList = if (hasProperty("abiFilters")) property("abiFilters").toString().split(';') else listOf()
         val singleAbiNum =
