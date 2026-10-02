@@ -192,15 +192,7 @@ object AppEvents {
 
                     is FetchBookmarkMetadataEvent -> {
                         coIO {
-                            val updated = BookmarkHelper.fetchAndUpdateSingle(event.bookmarkId)
-                            if (updated != null) {
-                                sendEvent(
-                                    WebSocketEvent(
-                                        EventType.BOOKMARK_UPDATED,
-                                        jsonEncode(listOf(updated.toModel())),
-                                    ),
-                                )
-                            }
+                            BookmarkHelper.fetchAndUpdateSingle(event.bookmarkId)
                         }
                     }
 

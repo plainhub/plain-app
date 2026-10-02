@@ -6,7 +6,6 @@ import com.ismartcoding.plain.lib.kgraphql.annotations.GraphQLQuery
 import com.ismartcoding.plain.lib.kgraphql.schema.dsl.SchemaBuilder
 import com.ismartcoding.plain.events.FetchBookmarkMetadataEvent
 import com.ismartcoding.plain.features.BookmarkHelper
-import com.ismartcoding.plain.platform.AppDatabase
 import com.ismartcoding.plain.lib.sendEvent
 import com.ismartcoding.plain.httpserver.models.ActionResult
 import com.ismartcoding.plain.httpserver.models.Bookmark
@@ -22,7 +21,7 @@ suspend fun bookmarks(): List<Bookmark> {
 
 @GraphQLQuery
 suspend fun bookmarkGroups(): List<BookmarkGroup> {
-    val counts = AppDatabase.instance.bookmarkDao().getGroupItemCount().associate { it.groupId to it.itemCount }
+    val counts = BookmarkHelper.groupItemCounts()
     return BookmarkHelper.getAllGroups().map { it.toModel(counts[it.id] ?: 0) }
 }
 
@@ -68,7 +67,7 @@ suspend fun updateBookmarkGroup(id: ID, name: String, collapsed: Boolean, sortOr
         this.collapsed = collapsed
         this.sortOrder = sortOrder
     }?.let { group ->
-        val counts = AppDatabase.instance.bookmarkDao().getGroupItemCount().associate { it.groupId to it.itemCount }
+        val counts = BookmarkHelper.groupItemCounts()
         group.toModel(counts[group.id] ?: 0)
     } ?: throw GraphQLError("Bookmark group ${id.value} not found")
 }

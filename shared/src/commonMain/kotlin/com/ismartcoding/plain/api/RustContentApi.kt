@@ -90,6 +90,7 @@ object RustContentApi {
                                 NotesViewModel.reloadAsync()
                                 sendEvent(WebSocketEvent(EventType.CONTENT_CHANGED, payload))
                             }
+                            EventType.BOOKMARK_UPDATED.value -> sendEvent(WebSocketEvent(EventType.BOOKMARK_UPDATED, payload))
                             EventType.FEEDS_FETCHED.value -> sendEvent(WebSocketEvent(EventType.FEEDS_FETCHED, payload))
                         }
                     }
