@@ -1,7 +1,6 @@
 package com.ismartcoding.plain.httpserver.mainschemas
 
 import com.ismartcoding.plain.features.ImageEditorProjectHelper
-import com.ismartcoding.plain.lib.kgraphql.GraphQLError
 import com.ismartcoding.plain.lib.kgraphql.annotations.GraphQLMutation
 import com.ismartcoding.plain.lib.kgraphql.annotations.GraphQLQuery
 import com.ismartcoding.plain.lib.kgraphql.schema.dsl.SchemaBuilder
@@ -10,13 +9,12 @@ import com.ismartcoding.plain.httpserver.models.ImageEditorProject
 import com.ismartcoding.plain.httpserver.models.ImageEditorProjectInput
 import com.ismartcoding.plain.httpserver.models.ImageEditorProjectSummary
 import com.ismartcoding.plain.httpserver.models.toModel
-import com.ismartcoding.plain.httpserver.models.toSummary
 
 private const val LIST_LIMIT = 20
 
 @GraphQLQuery
 suspend fun imageEditorProjects(): List<ImageEditorProjectSummary> {
-    return ImageEditorProjectHelper.listAsync(LIST_LIMIT).map { it.toSummary() }
+    return ImageEditorProjectHelper.listAsync(LIST_LIMIT)
 }
 
 @GraphQLQuery
@@ -32,7 +30,7 @@ suspend fun saveImageEditorProject(id: ID, input: ImageEditorProjectInput): Imag
         canvasWidth = input.canvasWidth
         canvasHeight = input.canvasHeight
         layerCount = input.layerCount
-    }?.toModel() ?: throw GraphQLError("Image editor project ${id.value} not found after save")
+    }.toModel()
 }
 
 @GraphQLMutation

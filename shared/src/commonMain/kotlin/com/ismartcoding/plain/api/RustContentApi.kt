@@ -80,6 +80,15 @@ object RustContentApi {
                 client.webSocket(localSession!!.baseUrl.replace("http://", "ws://") + "/events", localSession!!.headers()) { socket ->
                     retryMs = 500L
                     for (frame in socket.incoming) {
+                        frame.binary?.let { bytes ->
+                            if (bytes.size >= 4) {
+                                val type = (0..3).fold(0) { value, index -> value or ((bytes[index].toInt() and 255) shl (index * 8)) }
+                                if (type == EventType.IMAGE_EDITOR_UPDATE.value) {
+                                    com.ismartcoding.plain.httpserver.websocket.WebSocketHelper.sendEventAsync(
+                                        WebSocketEvent(EventType.IMAGE_EDITOR_UPDATE, bytes.copyOfRange(4, bytes.size)))
+                                }
+                            }
+                        }
                         val text = frame.text ?: continue
                         val message = Json.parseToJsonElement(text).jsonObject
                         val type = message.getValue("type").jsonPrimitive.int
