@@ -28,7 +28,7 @@ import kotlin.test.fail
 class AudioCastModeGuardTest {
 
     private val topBarPath =
-        "shared/src/commonMain/kotlin/com/ismartcoding/plain/ui/base/MediaTopBar.kt"
+        "shared/src/commonMain/kotlin/com/ismartcoding/plain/ui/components/MediaTopBar.kt"
     private val homePath =
         "shared/src/commonMain/kotlin/com/ismartcoding/plain/ui/page/audio/AudioHomePage.kt"
     private val allPath =

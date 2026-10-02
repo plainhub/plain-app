@@ -21,15 +21,15 @@ import kotlin.test.fail
  * LIKE with a constant wildcard pattern (Doc MIME probe `LIKE ?` bound to
  * "text/%") is exempt — the arg is code, not user input.
  *
- * Scan scope: shared/src, shared-lib/src, room-db/src, app/src — production
- * source sets only (test sources are excluded; the guard itself contains the
- * patterns it forbids).
+ * Scan scope: plain-common/src, plain-ui/src, shared/src, shared-lib/src,
+ * room-db/src, app/src — production source sets only (test sources are
+ * excluded; the guard itself contains the patterns it forbids).
  */
 class LikeEscapeGuardTest {
 
     /** Files allowed to call escapeLike (the pairing half outside ContentWhere). */
     private val escapeLikeAllowlist = setOf(
-        "shared-lib/src/commonMain/kotlin/com/ismartcoding/plain/helpers/ContentWhere.kt",
+        "plain-common/src/commonMain/kotlin/com/ismartcoding/plain/helpers/ContentWhere.kt",
         "shared/src/commonMain/kotlin/com/ismartcoding/plain/httpserver/mainschemas/ChatMessageGraphQL.kt",
         "shared/src/commonMain/kotlin/com/ismartcoding/plain/httpserver/mainschemas/AppFileGraphQL.kt",
         "shared/src/commonMain/kotlin/com/ismartcoding/plain/features/audio/AudioPlayHistoryManager.kt",
@@ -55,6 +55,8 @@ class LikeEscapeGuardTest {
     private fun productionSources(): List<File> {
         val root = repoRoot()
         val srcRoots = listOf(
+            File(root, "plain-common/src"),
+            File(root, "plain-ui/src"),
             File(root, "shared/src"),
             File(root, "shared-lib/src"),
             File(root, "room-db/src"),

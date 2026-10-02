@@ -20,6 +20,8 @@ class DialogUniformityGuardTest {
     private val allowlist = setOf(
         "shared/src/commonMain/kotlin/com/ismartcoding/plain/ui/components/WebAddressBarEditDialogs.kt",
         "shared/src/commonMain/kotlin/com/ismartcoding/plain/ui/components/ColorPickerDialog.kt",
+        // Sanctioned multi-field: image url + description + width, plus a browse button.
+        "shared/src/commonMain/kotlin/com/ismartcoding/plain/ui/components/mdeditor/MdEditorInsertImageDialog.kt",
         "shared/src/commonMain/kotlin/com/ismartcoding/plain/ui/page/feeds/AddFeedDialog.kt",
         "shared/src/commonMain/kotlin/com/ismartcoding/plain/ui/page/feeds/EditFeedDialog.kt",
         "shared/src/commonMain/kotlin/com/ismartcoding/plain/ui/page/pomodoro/PomodoroSettingsDialog.kt",
