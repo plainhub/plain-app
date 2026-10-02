@@ -25,10 +25,7 @@ import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.IntSize
 import com.ismartcoding.plain.data.DVideo
-import com.ismartcoding.plain.platform.AppDatabase
-import com.ismartcoding.plain.db.DVideoPlayProgress
-import com.ismartcoding.plain.lib.TimeHelper
-import com.ismartcoding.plain.lib.coIO
+import com.ismartcoding.plain.features.VideoProgressHost
 import com.ismartcoding.plain.platform.getVideoMeta
 import com.ismartcoding.plain.platform.rememberVideoPlayerController
 import com.ismartcoding.plain.platform.VideoPlayerSurface
@@ -95,7 +92,7 @@ fun MediaVideo(
     }
 
     val controller = rememberVideoPlayerController()
-    val progressDao = remember { AppDatabase.instance.videoPlayProgressDao() }
+    var wasActive by remember { mutableStateOf(false) }
     var firstFrameRendered by remember { mutableStateOf(false) }
     // Track which media item is already prepared on this controller so an
     // already-preloaded (adjacent) video is not reset when it becomes active.
@@ -132,19 +129,17 @@ fun MediaVideo(
     }
 
     LaunchedEffect(controller, pagerState.settledPage, videoState.isPreviewerOpen) {
+        val isActive = videoState.isPreviewerOpen && pagerState.settledPage == page
+        if (wasActive && !isActive) {
+            VideoProgressHost.save(model.mediaId, controller.currentPositionMs)
+        }
+        wasActive = isActive
         if (!videoState.isPreviewerOpen) {
-            if (model.mediaId.isNotEmpty() && controller.currentPositionMs > 0) {
-                val mediaId = model.mediaId
-                val pos = controller.currentPositionMs
-                TempData.videoPlayProgressMap[mediaId] = pos
-                coIO { progressDao.upsert(DVideoPlayProgress(mediaId, pos, TimeHelper.now())) }
-            }
             controller.abandonAudioFocus()
             controller.stop()
             preparedPath = null
             return@LaunchedEffect
         }
-        val isActive = pagerState.settledPage == page
         if (isActive) {
             videoState.initData(controller)
             val expectedTotalMs = (model.data as? DVideo)?.durationMs ?: 0L
@@ -161,9 +156,7 @@ fun MediaVideo(
                 controller.prepare()
                 preparedPath = model.path
             }
-            if (savedPos != null && savedPos > 0 && !atEnd) {
-                controller.seekTo(savedPos)
-            }
+            controller.seekTo(if (savedPos != null && savedPos > 0 && !atEnd) savedPos else 0L)
             controller.requestAudioFocus()
             controller.play()
         } else if (abs(page - pagerState.settledPage) <= 1) {
@@ -186,12 +179,7 @@ fun MediaVideo(
 
     DisposableEffect(Unit) {
         onDispose {
-            val mediaId = model.mediaId
-            val pos = controller.currentPositionMs
-            if (mediaId.isNotEmpty() && pos > 0) {
-                TempData.videoPlayProgressMap[mediaId] = pos
-                coIO { progressDao.upsert(DVideoPlayProgress(mediaId, pos, TimeHelper.now())) }
-            }
+            if (wasActive) VideoProgressHost.save(model.mediaId, controller.currentPositionMs)
             controller.abandonAudioFocus()
             controller.stop()
             controller.release()

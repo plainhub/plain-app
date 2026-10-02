@@ -32,8 +32,6 @@ import com.ismartcoding.plain.platform.newImageLoader
 import com.ismartcoding.plain.httpserver.warmUpHttpServer
 import com.ismartcoding.plain.workers.FeedFetchWorker
 import dalvik.system.ZipPathValidator
-import kotlin.time.Clock
-import kotlin.time.Duration.Companion.days
 
 object MainAppHelper {
 
@@ -106,10 +104,6 @@ object MainAppHelper {
                 FeedFetchWorker.startRepeatWorkerAsync(app)
             }
             ImageSearchManager.restoreIfEnabled()
-            val thirtyDaysAgo = (Clock.System.now() - 30.days).toString()
-            AppDatabase.instance.videoPlayProgressDao().getRecentProgress(thirtyDaysAgo).forEach {
-                TempData.videoPlayProgressMap[it.mediaId] = it.positionMs
-            }
 
             val updateInfo = SystemPrefs.updateInfoValue()
             val checkUpdateTime = updateInfo.checkUpdateTime
