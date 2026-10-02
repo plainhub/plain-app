@@ -28,6 +28,8 @@
 
 时间字段的**唯一 wire 例外**：`PairingRequestInput.timestamp: Long!`（配对防重放协议的协议层字段，保持协议字节兼容）。
 
+- `Feed.logo` 在所有 GraphQL 端只传原始路径/引用，禁止把 `fileId` 作为 API 值返回或传入；前端用自己的 `urlToken` 按既有规则构造展示用 `fileId`（2026-10-03 用户定）。
+
 ## 2. 单位后缀（无单位名字禁止裸奔）
 
 - 时长：`durationMs` / `durationSec`；分钟设置项：`*Min`（`workDurationMin`）；秒计数：`*Sec`（`timeLeftSec`、`totalTimeSec`、`uptimeSec`）。

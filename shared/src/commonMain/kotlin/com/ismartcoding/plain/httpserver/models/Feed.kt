@@ -18,5 +18,5 @@ data class Feed(
 )
 
 fun DFeed.toModel(): Feed {
-    return Feed(ID(id), name, url, fetchContent, com.ismartcoding.plain.helpers.getFileId(logo), lastSyncAt, FeedError(lastError.code, lastError.detail), createdAt, updatedAt)
+    return Feed(ID(id), name, url, fetchContent, logo, lastSyncAt, FeedError(lastError.code, lastError.detail), createdAt, updatedAt)
 }
