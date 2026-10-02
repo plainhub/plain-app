@@ -70,7 +70,6 @@ object NotesViewModel : ISearchableViewModel<DNote>, ISelectableViewModel<DNote>
 
     fun trash(tagsVM: TagsViewModel, ids: Set<String>) {
         scope.launchSafe {
-            TagHelper.deleteTagRelationByKeys(ids, dataType)
             NoteHelper.trashAsync(ids)
             loadAsync(tagsVM)
         }
@@ -89,7 +88,6 @@ object NotesViewModel : ISearchableViewModel<DNote>, ISelectableViewModel<DNote>
 
     fun restore(tagsVM: TagsViewModel, ids: Set<String>) {
         scope.launchSafe {
-            TagHelper.deleteTagRelationByKeys(ids, dataType)
             NoteHelper.restoreAsync(ids)
             loadAsync(tagsVM)
         }
@@ -97,7 +95,6 @@ object NotesViewModel : ISearchableViewModel<DNote>, ISelectableViewModel<DNote>
 
     fun delete(tagsVM: TagsViewModel, ids: Set<String>) {
         scope.launchSafe {
-            TagHelper.deleteTagRelationByKeys(ids, dataType)
             NoteHelper.deleteAsync(ids)
             loadAsync(tagsVM)
         }

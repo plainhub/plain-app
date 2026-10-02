@@ -41,14 +41,14 @@ object MainAppHelper {
     fun init(app: Application) {
         com.ismartcoding.plain.thumbnail.ThumbnailProvider.instance = com.ismartcoding.plain.thumbnail.ThumbnailGenerator
         Prefs.load()
+        com.ismartcoding.plain.api.RustContentApi.start()
         initDatabase(
             buildAppDatabase(Constants.DATABASE_NAME)
                 .addCallback(object : RoomDatabase.Callback() {
                     override suspend fun onCreate(connection: SQLiteConnection) {
                         DataInitializer(connection).apply {
                             insertWelcome()
-                            insertTags()
-                            insertNotes()
+                            insertTags(includeContent = false)
                         }
                     }
                 })

@@ -55,7 +55,7 @@ internal fun NotePageEffects(
                 if (noteVM.content.value == t) return@collectLatest
                 scope.launch(Dispatchers.Default) {
                     val newItem = NoteHelper.addOrUpdateAsync(id.value) {
-                        title = t.getMarkdownTitle()
+                        title = ""
                         content = t
                         noteVM.content.value = t
                     }

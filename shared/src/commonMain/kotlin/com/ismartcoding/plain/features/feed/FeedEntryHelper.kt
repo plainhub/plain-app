@@ -1,154 +1,20 @@
 package com.ismartcoding.plain.features.feed
 
+import com.ismartcoding.plain.api.*
+import com.ismartcoding.plain.db.DFeedEntry
 import com.ismartcoding.plain.helpers.ContentWhere
 import com.ismartcoding.plain.helpers.FilterField
-import com.ismartcoding.plain.db.rawQuery
-import com.ismartcoding.plain.lib.withIO
-import com.ismartcoding.plain.platform.AppDatabase
-import com.ismartcoding.plain.db.DFeedEntry
-import com.ismartcoding.plain.db.FeedEntryDao
-import com.ismartcoding.plain.helpers.QueryHelper
-import com.ismartcoding.plain.lib.TimeHelper
-import com.ismartcoding.plain.platform.releaseAppFile
-import kotlinx.datetime.TimeZone
-import kotlinx.datetime.atStartOfDayIn
-import kotlinx.datetime.toLocalDateTime
+import kotlinx.serialization.json.*
 
 object FeedEntryHelper {
-    val feedEntryDao: FeedEntryDao by lazy {
-        AppDatabase.instance.feedEntryDao()
-    }
-
-    suspend fun count(query: String): Int = withIO {
-        var sql = "SELECT COUNT(id) FROM feed_entries"
-        val where = ContentWhere()
-        if (query.isNotEmpty()) {
-            parseQuery(where, query)
-            sql += " WHERE ${where.toSelection()}"
-        }
-
-        feedEntryDao.count(rawQuery(sql, where.args.toTypedArray()))
-    }
-
-    suspend fun getIdsAsync(query: String): Set<String> = withIO {
-        var sql = "SELECT id FROM feed_entries"
-        val where = ContentWhere()
-        if (query.isNotEmpty()) {
-            parseQuery(where, query)
-            sql += " WHERE ${where.toSelection()}"
-        }
-
-        feedEntryDao.getIds(rawQuery(sql, where.args.toTypedArray())).map { it.id }.toSet()
-    }
-
-    suspend fun search(
-        query: String,
-        limit: Int,
-        offset: Int,
-    ): List<DFeedEntry> = withIO {
-        var sql = "SELECT * FROM feed_entries"
-        val where = ContentWhere()
-        if (query.isNotEmpty()) {
-            parseQuery(where, query)
-            sql += " WHERE ${where.toSelection()}"
-        }
-
-        sql += if (limit == Int.MAX_VALUE) {
-            " ORDER BY published_at DESC"
-        } else {
-            " ORDER BY published_at DESC LIMIT $limit OFFSET $offset"
-        }
-
-        feedEntryDao.search(rawQuery(sql, where.args.toTypedArray()))
-    }
-
-    suspend fun getAsync(id: String): DFeedEntry? = withIO {
-        feedEntryDao.getById(id)
-    }
-
-    suspend fun updateAsync(
-        id: String,
-        updateItem: DFeedEntry.() -> Unit,
-    ): String = withIO {
-        val item = feedEntryDao.getById(id) ?: return@withIO id
-        item.updatedAt = TimeHelper.now()
-        updateItem(item)
-        feedEntryDao.update(item)
-
-        item.id
-    }
-
-    suspend fun updateAsync(
-        item: DFeedEntry,
-    ) = withIO {
-        item.updatedAt = TimeHelper.now()
-        feedEntryDao.update(item)
-    }
-
-    /** Batch read-state flip; `read` changes must not bump updatedAt. */
-    suspend fun markReadAsync(ids: Set<String>, read: Boolean = true) = withIO {
-        ids.chunked(100).forEach { chunk ->
-            feedEntryDao.updateRead(chunk, read)
-        }
-    }
-
-    suspend fun deleteAsync(ids: Set<String>) = withIO {
-        ids.chunked(50).forEach { chunk ->
-            releaseImageRefs(feedEntryDao.getByIds(chunk.toSet()))
-            feedEntryDao.delete(chunk.toSet())
-        }
-    }
-
-    suspend fun deleteAllAsync() = withIO {
-        releaseImageRefs(feedEntryDao.getAll())
-        feedEntryDao.deleteAll()
-    }
-
-    suspend fun deleteByFeedIdsAsync(ids: Set<String>) = withIO {
-        releaseImageRefs(feedEntryDao.getByFeedIds(ids))
-        feedEntryDao.deleteByFeedIds(ids)
-    }
-
-    /**
-     * Decrement the app-file reference count for every entry image stored as a
-     * `fid:` URI. Files whose count reaches zero are deleted by [releaseAppFile].
-     */
-    private suspend fun releaseImageRefs(entries: List<DFeedEntry>) = withIO {
-        entries.forEach { entry ->
-            if (entry.image.startsWith("fid:", ignoreCase = true)) {
-                releaseAppFile(entry.image.removePrefix("fid:"))
-            }
-        }
-    }
-
-    private suspend fun parseQuery(
-        where: ContentWhere,
-        query: String,
-    ) = withIO {
-        applyFeedEntryFilterFields(where, QueryHelper.parseAsync(query))
-    }
-
-    /** Pure field-application seam (host-testable): parsed query fields → where conditions. */
-    internal fun applyFeedEntryFilterFields(where: ContentWhere, fields: List<FilterField>) {
-        fields.forEach {
-            if (it.name == "text") {
-                where.addLikes(listOf("title", "description", "content"), listOf(it.value, it.value, it.value))
-            } else if (it.name == QueryHelper.BULK_ALL_FIELD) {
-                // explicit whole-table sentinel — no condition
-            } else if (it.name == "feed_id") {
-                where.add("feed_id=?", it.value)
-            } else if (it.name == "today" && it.value == "true") {
-                val currentDateTime = TimeHelper.now()
-                val timeZone = TimeZone.currentSystemDefault()
-                val startOfDay = currentDateTime.toLocalDateTime(timeZone)
-                    .date
-                    .atStartOfDayIn(timeZone)
-                where.add("published_at>=?", startOfDay.toString())
-            } else if (it.name == "ids") {
-                where.addIn("id", it.value.split(","))
-            } else if (it.name == "created_at") {
-                where.add("created_at ${it.op} ?", it.value)
-            }
-        }
-    }
+    suspend fun count(query: String): Int = RustContentApi.query("feedEntryCount(query: ${gql(query)})").getValue("feedEntryCount").jsonPrimitive.int
+    suspend fun search(query: String, limit: Int, offset: Int): List<DFeedEntry> = RustContentApi.query("feedEntries(query: ${gql(query)}, limit: $limit, offset: $offset) { $ENTRY_FIELDS }").getValue("feedEntries").jsonArray.map { it.entry() }
+    suspend fun getIdsAsync(query: String): Set<String> = RustContentApi.query("feedEntries(query: ${gql(query)}, limit: ${Int.MAX_VALUE}, offset: 0) { id }").getValue("feedEntries").jsonArray.map { it.jsonObject.string("id") }.toSet()
+    suspend fun getAsync(id: String): DFeedEntry? = RustContentApi.query("feedEntry(id: ${gql(id)}) { $ENTRY_FIELDS }")["feedEntry"]?.takeUnless { it is JsonNull }?.entry()
+    suspend fun syncContent(id: String): DFeedEntry = RustContentApi.mutate("syncFeedEntryContent(id: ${gql(id)}) { $ENTRY_FIELDS }").getValue("syncFeedEntryContent").entry()
+    suspend fun markReadAsync(ids: Set<String>, read: Boolean = true) { if (ids.isNotEmpty()) RustContentApi.mutate("markFeedEntriesRead(query: ${gql(selectionQuery(ids))}, read: $read) { affectedCount }") }
+    suspend fun deleteAsync(ids: Set<String>) { if (ids.isNotEmpty()) RustContentApi.mutate("deleteFeedEntries(query: ${gql(selectionQuery(ids))}) { affectedCount }") }
+    suspend fun deleteAllAsync() { RustContentApi.mutate("deleteFeedEntries(query: \"all:true\") { affectedCount }") }
+    suspend fun deleteByFeedIdsAsync(ids: Set<String>) { ids.forEach { RustContentApi.mutate("deleteFeedEntries(query: ${gql("feed_id:$it")}) { affectedCount }") } }
+    internal fun applyFeedEntryFilterFields(where: ContentWhere, fields: List<FilterField>) = LegacyFeedEntryHelper.applyFeedEntryFilterFields(where, fields)
 }

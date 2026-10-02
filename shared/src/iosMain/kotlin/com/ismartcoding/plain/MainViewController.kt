@@ -44,6 +44,7 @@ fun initIosApp() {
     initialized = true
 
     Prefs.load()
+    com.ismartcoding.plain.api.RustContentApi.start()
 
     // Room database with the same onCreate seed data as Android
     initDatabase(
@@ -52,8 +53,7 @@ fun initIosApp() {
                 override suspend fun onCreate(connection: SQLiteConnection) {
                     DataInitializer(connection).apply {
                         insertWelcome()
-                        insertTags()
-                        insertNotes()
+                        insertTags(includeContent = false)
                     }
                 }
             })

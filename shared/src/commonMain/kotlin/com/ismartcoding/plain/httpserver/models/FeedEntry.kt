@@ -14,6 +14,7 @@ data class FeedEntry(
     val content: String,
     val feedId: String,
     val rawId: String,
+    val read: Boolean,
     val publishedAt: Instant,
     val createdAt: Instant,
     val updatedAt: Instant,

@@ -5,6 +5,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import com.ismartcoding.plain.lib.Channel
 import com.ismartcoding.plain.events.FeedStatusEvent
+import com.ismartcoding.plain.events.WebSocketEvent
+import com.ismartcoding.plain.events.EventType
 import com.ismartcoding.plain.features.feed.FeedWorkerStatus
 import com.ismartcoding.plain.platform.IODispatcher
 import com.ismartcoding.plain.platform.PBackHandler
@@ -39,6 +41,11 @@ internal fun FeedEntriesPageEffects(
 
     LaunchedEffect(Channel.sharedFlow) {
         Channel.sharedFlow.collect { event ->
+            if (event is WebSocketEvent && event.type == EventType.CONTENT_CHANGED) {
+                feedsVM.loadAsync(withCount = true)
+                feedsVM.refreshSelectedItemAsync()
+                scope.launch(IODispatcher) { feedEntriesVM.loadAsync(tagsVM) }
+            }
             if (event is FeedStatusEvent) {
                 if (event.status == FeedWorkerStatus.COMPLETED || event.status == FeedWorkerStatus.ERROR) {
                     topRefreshLayoutState.setRefreshState(

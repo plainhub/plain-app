@@ -10,4 +10,7 @@ char *plain_prefs_remove_system(const char *key);
 char *plain_prefs_remove_user(const char *key);
 void plain_prefs_string_free(char *pointer);
 
+char *plain_core_start(const char *database_path, const char *token);
+void plain_core_stop(void);
+
 #endif

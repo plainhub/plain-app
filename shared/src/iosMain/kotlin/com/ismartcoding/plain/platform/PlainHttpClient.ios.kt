@@ -309,7 +309,7 @@ private fun PlainRequest.toNSRequest(spec: PlainHttpClientSpec): NSMutableURLReq
     contentType?.let { request.setValue(it, forHTTPHeaderField = "Content-Type") }
     body?.let { request.setHTTPBody(it.toNSData()) }
     if (spec is PlainHttpClientSpec.Browser) {
-        httpLogSink.log("HTTP request: $method $url headers=$headerMap")
+        httpLogSink.log("HTTP request: $method $url headers=${headerMap.mapValues { (name, value) -> if (name?.toString()?.equals("Authorization", ignoreCase = true) == true) "[redacted]" else value }}")
     }
     return request
 }

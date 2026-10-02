@@ -10,10 +10,13 @@ data class Feed(
     val name: String,
     val url: String,
     val fetchContent: Boolean,
+    val logo: String,
+    val lastSyncAt: Instant?,
+    val lastError: FeedError,
     val createdAt: Instant,
     val updatedAt: Instant,
 )
 
 fun DFeed.toModel(): Feed {
-    return Feed(ID(id), name, url, fetchContent, createdAt, updatedAt)
+    return Feed(ID(id), name, url, fetchContent, com.ismartcoding.plain.helpers.getFileId(logo), lastSyncAt, FeedError(lastError.code, lastError.detail), createdAt, updatedAt)
 }

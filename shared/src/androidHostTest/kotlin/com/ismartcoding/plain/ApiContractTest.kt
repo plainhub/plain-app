@@ -44,7 +44,7 @@ class ApiContractTest {
         "deleteNotifications", "deleteClipboardItems", "deleteBookmarks", "deleteFiles",
         "deleteSms", "trashSms", "restoreSms", "deleteCalls", "deleteContacts",
         "deleteChatItems", "trashNotes", "restoreNotes", "deleteNotes",
-        "deleteFeedEntries", "deleteMediaItems", "trashMediaItems",
+        "deleteFeedEntries", "markFeedEntriesRead", "deleteMediaItems", "trashMediaItems",
         "restoreMediaItems", "moveMediaItems",
     )
 
@@ -55,7 +55,7 @@ class ApiContractTest {
     private val bulkQueryMutations = setOf(
         "deleteMediaItems", "trashMediaItems", "restoreMediaItems", "moveMediaItems",
         "trashNotes", "restoreNotes", "deleteNotes", "saveFeedEntriesToNotes",
-        "deleteFeedEntries", "trashSms", "restoreSms", "deleteSms",
+        "deleteFeedEntries", "markFeedEntriesRead", "trashSms", "restoreSms", "deleteSms",
         "deleteCalls", "deleteContacts", "deleteChatItems", "deleteClipboardItems",
     )
 

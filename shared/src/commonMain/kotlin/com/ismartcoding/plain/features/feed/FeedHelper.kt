@@ -1,90 +1,30 @@
 package com.ismartcoding.plain.features.feed
 
-import com.ismartcoding.plain.lib.withIO
-import com.ismartcoding.plain.platform.releaseAppFile
-import com.ismartcoding.plain.platform.AppDatabase
-import com.ismartcoding.plain.db.DFeed
-import com.ismartcoding.plain.db.DFeedCount
-import com.ismartcoding.plain.db.DFeedError
-import com.ismartcoding.plain.db.FeedDao
-import com.ismartcoding.plain.lib.TimeHelper
+import com.ismartcoding.plain.api.*
+import com.ismartcoding.plain.db.*
 import com.ismartcoding.plain.platform.feedWorkerOneTimeRequest
-import kotlin.time.Instant
+import kotlinx.serialization.json.*
 
 object FeedHelper {
-    private val feedDao: FeedDao by lazy {
-        AppDatabase.instance.feedDao()
+    suspend fun getAll(): List<DFeed> = RustContentApi.query("feeds { $FEED_FIELDS }").getValue("feeds").jsonArray.map { it.feed() }
+    suspend fun getFeedCounts(): List<DFeedCount> = RustContentApi.query("feedEntryCounts { id count }").getValue("feedEntryCounts").jsonArray.map { DFeedCount(it.jsonObject.string("id"), it.jsonObject.getValue("count").jsonPrimitive.int) }
+    suspend fun getById(id: String): DFeed? = RustContentApi.query("feed(id: ${gql(id)}) { $FEED_FIELDS }")["feed"]?.takeUnless { it is JsonNull }?.feed()
+    suspend fun getByUrl(url: String): DFeed? = getAll().firstOrNull { it.url == url }
+    suspend fun preview(url: String): String = RustContentApi.query("previewFeed(url: ${gql(url)}) { name }").getValue("previewFeed").jsonObject.string("name")
+    suspend fun addAsync(updateItem: DFeed.() -> Unit): String {
+        val item = DFeed().apply(updateItem)
+        val created = RustContentApi.mutate("createFeed(url: ${gql(item.url)}, fetchContent: ${item.fetchContent}) { $FEED_FIELDS }").getValue("createFeed").feed()
+        if (created.name != item.name && item.name.isNotEmpty()) updateAsync(created.id) { name = item.name }
+        return created.id
     }
-
-    suspend fun getAll(): List<DFeed> = withIO {
-        feedDao.getAll()
+    suspend fun updateAsync(id: String, updateItem: DFeed.() -> Unit): String {
+        val current = getById(id) ?: error("Feed $id not found")
+        val oldUrl = current.url
+        current.updateItem()
+        if (oldUrl != current.url) RustContentApi.mutate("updateFeedUrl(id: ${gql(id)}, url: ${gql(current.url)}) { id }")
+        RustContentApi.mutate("updateFeed(id: ${gql(id)}, name: ${gql(current.name)}, fetchContent: ${current.fetchContent}) { id }")
+        return id
     }
-
-    suspend fun getFeedCounts(): List<DFeedCount> = withIO {
-        feedDao.getFeedCounts()
-    }
-
-    suspend fun getById(id: String): DFeed? = withIO {
-        feedDao.getById(id)
-    }
-
-    suspend fun getByUrl(url: String): DFeed? = withIO {
-        feedDao.getByUrl(url)
-    }
-
-    suspend fun addAsync(updateItem: DFeed.() -> Unit): String = withIO {
-        val item = DFeed()
-        updateItem(item)
-        feedDao.insert(item)
-        item.id
-    }
-
-    suspend fun updateAsync(
-        id: String,
-        updateItem: DFeed.() -> Unit,
-    ): String = withIO {
-        val item = feedDao.getById(id) ?: return@withIO id
-        item.updatedAt = TimeHelper.now()
-        updateItem(item)
-        feedDao.update(item)
-        id
-    }
-
-    suspend fun deleteAsync(ids: Set<String>) = withIO {
-        ids.forEach { FeedWorkerState.clear(it) }
-        feedDao.getByIds(ids).forEach { feed ->
-            if (feed.logo.startsWith("fid:", ignoreCase = true)) {
-                releaseAppFile(feed.logo.removePrefix("fid:"))
-            }
-        }
-        feedDao.delete(ids)
-    }
-
-    suspend fun updateLogoAsync(id: String, logo: String) = withIO {
-        feedDao.getById(id)?.let { item ->
-            item.logo = logo
-            feedDao.update(item)
-        }
-    }
-
-    /**
-     * Persists the outcome of one sync attempt. Success stores an empty code
-     * (never "NONE") so "code non-empty" means "failing" everywhere.
-     */
-    suspend fun updateSyncStatusAsync(
-        id: String,
-        at: Instant,
-        code: FeedSyncErrorCode,
-        detail: String,
-    ) = withIO {
-        val error = DFeedError(
-            code = if (code == FeedSyncErrorCode.NONE) "" else code.name,
-            detail = detail,
-        )
-        feedDao.updateSyncStatus(id, at, error)
-    }
-
-    fun fetchOneTime(feedId: String) {
-        feedWorkerOneTimeRequest(feedId)
-    }
+    suspend fun deleteAsync(ids: Set<String>) { ids.forEach { RustContentApi.mutate("deleteFeed(id: ${gql(it)})"); FeedWorkerState.clear(it) } }
+    fun fetchOneTime(feedId: String) = feedWorkerOneTimeRequest(feedId)
 }

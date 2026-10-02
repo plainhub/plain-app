@@ -1,5 +1,7 @@
 package com.ismartcoding.plain.httpserver.mainschemas
 
+import kotlinx.serialization.json.*
+
 import com.ismartcoding.plain.lib.kgraphql.GraphQLError
 import com.ismartcoding.plain.lib.kgraphql.annotations.GraphQLMutation
 import com.ismartcoding.plain.lib.kgraphql.annotations.GraphQLQuery
@@ -42,7 +44,7 @@ suspend fun feedEntryCount(query: String): Int {
 
 @GraphQLQuery
 suspend fun feedEntry(id: ID): FeedEntry? {
-    val data = FeedEntryHelper.feedEntryDao.getById(id.value)
+    val data = FeedEntryHelper.getAsync(id.value)
     return data?.toModel()
 }
 
@@ -64,14 +66,8 @@ suspend fun updateFeed(id: ID, name: String, fetchContent: Boolean): Feed {
 
 @GraphQLMutation
 suspend fun createFeed(url: String, fetchContent: Boolean): Feed {
-    val syndFeed = fetchRssChannel(url)
-    val id =
-        FeedHelper.addAsync {
-            this.url = url
-            this.name = syndFeed.title ?: ""
-            this.fetchContent = fetchContent
-        }
-    feedWorkerOneTimeRequest(id)
+    val id = FeedHelper.addAsync { this.url = url; this.fetchContent = fetchContent }
+
     return FeedHelper.getById(id)?.toModel() ?: throw GraphQLError("Feed $id not found after create")
 }
 
@@ -88,31 +84,19 @@ suspend fun exportFeeds(): String {
 
 @GraphQLMutation
 suspend fun deleteFeed(id: ID): Boolean {
-    val newIds = setOf(id.value)
-    val entryIds = FeedEntryHelper.feedEntryDao.getIds(newIds)
-    if (entryIds.isNotEmpty()) {
-        TagHelper.deleteTagRelationByKeys(entryIds.toSet(), DataType.FEED_ENTRY)
-        FeedEntryHelper.deleteByFeedIdsAsync(newIds)
-    }
-    FeedHelper.deleteAsync(newIds)
-    return true
+    return com.ismartcoding.plain.api.RustContentApi.mutate("deleteFeed(id: ${com.ismartcoding.plain.api.gql(id.value)})").getValue("deleteFeed").jsonPrimitive.boolean
 }
 
 @GraphQLMutation
 suspend fun syncFeedEntryContent(id: ID): FeedEntry {
-    val feedEntry = FeedEntryHelper.feedEntryDao.getById(id.value)
-        ?: throw GraphQLError("Feed entry ${id.value} not found")
-    feedEntry.fetchContentAsync()
-    return feedEntry.toModel()
+    return FeedEntryHelper.syncContent(id.value).toModel()
 }
 
 @GraphQLMutation
 suspend fun deleteFeedEntries(query: String): ActionResult {
     QueryHelper.requireExplicitBulkQuery(query)
-    val ids = FeedEntryHelper.getIdsAsync(query)
-    TagHelper.deleteTagRelationByKeys(ids, DataType.FEED_ENTRY)
-    FeedEntryHelper.deleteAsync(ids)
-    return ActionResult(ids.size)
+    val result = com.ismartcoding.plain.api.RustContentApi.mutate("deleteFeedEntries(query: ${com.ismartcoding.plain.api.gql(query)}) { affectedCount }")
+    return ActionResult(result.getValue("deleteFeedEntries").jsonObject.getValue("affectedCount").jsonPrimitive.int)
 }
 
 @GraphQLQuery
@@ -140,4 +124,29 @@ fun SchemaBuilder.addFeedSchema() {
             }
         }
     }
+}
+
+@GraphQLQuery
+suspend fun feed(id: ID): Feed? = FeedHelper.getById(id.value)?.toModel()
+
+@GraphQLQuery
+suspend fun previewFeed(url: String): com.ismartcoding.plain.httpserver.models.FeedPreview = com.ismartcoding.plain.httpserver.models.FeedPreview(FeedHelper.preview(url))
+
+@GraphQLQuery
+suspend fun feedSyncStates(): List<com.ismartcoding.plain.httpserver.models.FeedSyncState> = com.ismartcoding.plain.api.RustContentApi.query("feedSyncStates { feedId status error }").getValue("feedSyncStates").let { values ->
+    values.jsonArray.map { val row = it.jsonObject; com.ismartcoding.plain.httpserver.models.FeedSyncState(ID(row.getValue("feedId").jsonPrimitive.content), row.getValue("status").jsonPrimitive.content, row.getValue("error").jsonPrimitive.content) }
+}
+
+@GraphQLMutation
+suspend fun updateFeedUrl(id: ID, url: String): Feed {
+    FeedHelper.updateAsync(id.value) { this.url = url }
+    return FeedHelper.getById(id.value)?.toModel() ?: throw GraphQLError("Feed not found")
+}
+
+@GraphQLMutation
+suspend fun markFeedEntriesRead(query: String, read: Boolean): ActionResult {
+    QueryHelper.requireExplicitBulkQuery(query)
+    val ids = FeedEntryHelper.getIdsAsync(query)
+    FeedEntryHelper.markReadAsync(ids, read)
+    return ActionResult(ids.size)
 }

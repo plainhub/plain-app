@@ -113,7 +113,7 @@ fun QuickNoteCard(
             val id =
                 withIO {
                     NoteHelper.addOrUpdateAsync("") {
-                        title = content.getMarkdownTitle()
+                        title = ""
                         this.content = content
                     }.id
                 }

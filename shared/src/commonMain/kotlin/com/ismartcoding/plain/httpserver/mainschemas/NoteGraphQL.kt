@@ -1,5 +1,9 @@
 package com.ismartcoding.plain.httpserver.mainschemas
 
+import com.ismartcoding.plain.api.RustContentApi
+import com.ismartcoding.plain.api.gql
+import kotlinx.serialization.json.*
+
 import com.ismartcoding.plain.db.DNote
 import com.ismartcoding.plain.platform.AppDatabase
 import com.ismartcoding.plain.lib.kgraphql.GraphQLError
@@ -40,7 +44,7 @@ suspend fun createNote(input: NoteInput): Note {
 
 @GraphQLMutation
 suspend fun updateNote(id: ID, input: NoteInput): Note {
-    if (AppDatabase.instance.noteDao().getById(id.value) == null) {
+    if (NoteHelper.getById(id.value) == null) {
         throw GraphQLError("Note ${'$'}{id.value} not found")
     }
     return upsertNote(id.value) { title = input.title; content = input.content }
@@ -56,59 +60,30 @@ private suspend fun upsertNote(id: String, updateItem: DNote.() -> Unit): Note {
 @GraphQLMutation
 suspend fun saveFeedEntriesToNotes(query: String): List<ID> {
     QueryHelper.requireExplicitBulkQuery(query)
-    val entries = FeedEntryHelper.search(query, Int.MAX_VALUE, 0)
-    val ids = mutableListOf<ID>()
-    entries.forEach { m ->
-        val c = "# ${m.title}\n\n" + m.content.ifEmpty { m.description }
-        NoteHelper.saveToNotesAsync(m.id) {
-            title = c.getMarkdownTitle()
-            content = c
-        }
-        ids.add(ID(m.id))
-    }
-    NotesViewModel.reloadAsync()
-    return ids
+    return RustContentApi.mutate("saveFeedEntriesToNotes(query: ${gql(query)})").getValue("saveFeedEntriesToNotes").jsonArray.map { ID(it.jsonPrimitive.content) }
 }
 
 @GraphQLMutation
 suspend fun trashNotes(query: String): ActionResult {
     QueryHelper.requireExplicitBulkQuery(query)
-    val ids = NoteHelper.getIdsAsync(query)
-    TagHelper.deleteTagRelationByKeys(ids, DataType.NOTE)
-    NoteHelper.trashAsync(ids)
-    NotesViewModel.reloadAsync()
-    return ActionResult(ids.size)
+    return ActionResult(RustContentApi.mutate("trashNotes(query: ${gql(query)}) { affectedCount }").getValue("trashNotes").jsonObject.getValue("affectedCount").jsonPrimitive.int)
 }
 
 @GraphQLMutation
 suspend fun restoreNotes(query: String): ActionResult {
     QueryHelper.requireExplicitBulkQuery(query)
-    val ids = NoteHelper.getTrashedIdsAsync(query)
-    NoteHelper.restoreAsync(ids)
-    NotesViewModel.reloadAsync()
-    return ActionResult(ids.size)
+    return ActionResult(RustContentApi.mutate("restoreNotes(query: ${gql(query)}) { affectedCount }").getValue("restoreNotes").jsonObject.getValue("affectedCount").jsonPrimitive.int)
 }
 
 @GraphQLMutation
 suspend fun deleteNotes(query: String): ActionResult {
     QueryHelper.requireExplicitBulkQuery(query)
-    val ids = NoteHelper.getTrashedIdsAsync(query)
-    TagHelper.deleteTagRelationByKeys(ids, DataType.NOTE)
-    NoteHelper.deleteAsync(ids)
-    NotesViewModel.reloadAsync()
-    return ActionResult(ids.size)
+    return ActionResult(RustContentApi.mutate("deleteNotes(query: ${gql(query)}) { affectedCount }").getValue("deleteNotes").jsonObject.getValue("affectedCount").jsonPrimitive.int)
 }
 
 @GraphQLMutation
 suspend fun exportNotes(query: String): String {
-    val items = NoteHelper.search(query, Int.MAX_VALUE, 0)
-    val keys = items.map { it.id }
-    val allTags = TagHelper.getAll(DataType.NOTE)
-    val map = TagHelper.getTagRelationsByKeys(keys.toSet(), DataType.NOTE).groupBy { it.key }
-    return jsonEncode(items.map {
-        val tagIds = map[it.id]?.map { t -> t.tagId } ?: emptyList()
-        it.toExportModel(if (tagIds.isNotEmpty()) allTags.filter { tagIds.contains(it.id) }.map { t -> t.toModel() } else emptyList())
-    })
+    return RustContentApi.mutate("exportNotes(query: ${gql(query)})").getValue("exportNotes").jsonPrimitive.content
 }
 
 @GraphQLQuery
@@ -126,4 +101,10 @@ fun SchemaBuilder.addNoteSchema() {
             }
         }
     }
+}
+
+@GraphQLMutation
+suspend fun saveNote(id: ID, input: NoteInput): Note {
+    NoteHelper.saveToNotesAsync(id.value) { title = input.title; content = input.content }
+    return NoteHelper.getById(id.value)?.toModel() ?: throw GraphQLError("Note not found")
 }

@@ -118,3 +118,9 @@ suspend fun removeFromTags(type: DataType, tagIds: List<ID>, query: String): Boo
 
 fun SchemaBuilder.addTagSchema() {
 }
+
+@GraphQLQuery
+suspend fun tag(id: ID): Tag? = TagHelper.get(id.value)?.toModel()
+
+@GraphQLQuery
+suspend fun tagKeys(id: ID): List<String> = TagHelper.getKeysByTagId(id.value)

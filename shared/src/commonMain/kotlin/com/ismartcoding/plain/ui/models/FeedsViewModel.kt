@@ -76,11 +76,6 @@ class FeedsViewModel : ISelectableViewModel<DFeed>, ViewModel() {
     }
 
     suspend fun deleteAsync(ids: Set<String>) {
-        val entryIds = FeedEntryHelper.feedEntryDao.getIds(ids)
-        if (entryIds.isNotEmpty()) {
-            TagHelper.deleteTagRelationByKeys(entryIds.toSet(), DataType.FEED_ENTRY)
-            FeedEntryHelper.deleteByFeedIdsAsync(ids)
-        }
         FeedHelper.deleteAsync(ids)
         _itemsFlow.update { it.filterNot { i -> ids.contains(i.id) } }
     }
@@ -93,7 +88,6 @@ class FeedsViewModel : ISelectableViewModel<DFeed>, ViewModel() {
                 this.name = editName.value
                 this.fetchContent = editFetchContent.value
             }
-            FeedHelper.fetchOneTime(id)
             loadAsync(withCount = true)
             showAddDialog.value = false
         }
@@ -111,7 +105,7 @@ class FeedsViewModel : ISelectableViewModel<DFeed>, ViewModel() {
                 return@launchSafe
             }
             try {
-                rssChannel.value = fetchRssChannel(editUrl.value)
+                rssChannel.value = RssChannel(FeedHelper.preview(editUrl.value), null, null, null, null, null, emptyList(), null)
                 rssChannel.value?.let {
                     editName.value = it.title ?: ""
                 }

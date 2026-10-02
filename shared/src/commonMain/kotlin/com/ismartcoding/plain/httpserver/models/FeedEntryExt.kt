@@ -5,6 +5,6 @@ import com.ismartcoding.plain.helpers.getFileId
 
 fun DFeedEntry.toModel(): FeedEntry {
     return FeedEntry(
-        ID(id), title, url, getFileId(image), description, author, content, feedId, rawId, publishedAt, createdAt, updatedAt,
+        ID(id), title, url, getFileId(image), description, author, content, feedId, rawId, read, publishedAt, createdAt, updatedAt,
     )
 }

@@ -68,6 +68,9 @@ kotlin {
             defFile(rootProject.file("shared/src/nativeInterop/cinterop/plainPrefs.def"))
             compilerOpts("-I${rootProject.file("rust/plain-rust/include").absolutePath}")
         }
+        tasks.matching { it.name == "cinteropPlainPrefs${iosTarget.name.replaceFirstChar { c -> c.uppercase() }}" }.configureEach {
+            inputs.file(rootProject.file("rust/plain-rust/include/plain_rust.h"))
+        }
         iosTarget.binaries.framework {
             baseName = "PlainShared"
             isStatic = true

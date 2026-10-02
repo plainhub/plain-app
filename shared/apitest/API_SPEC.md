@@ -193,6 +193,7 @@ GraphQL schema 没有 Subscription；实时变更走专用 WS 旁路。**事件�
 | 37 | MMS_SEND_RESULT | `MmsSendResultData{pendingId, success, resultCode}`（sendMms 返回的 pendingId 在此回结） |
 | 38 | UPLOAD_MERGE_RESULT | `UploadMergeResultData{fileId, ok, value?, mergedSize?, error?}` |
 | 39 | CLIPBOARD_CHANGED | `ClipboardChangedData{text, sensitive, time}`（time=epoch millis 例外，见 docs/clipboard-sync.md） |
+| 47 | CONTENT_CHANGED | `{}`（Notes/Feeds/标签变更后重新查询；本机服务重连时也触发刷新） |
 | 40 | PERMISSIONS_UPDATED | JSON 字符串数组（已授权权限名快照，同 `app.permissions`） |
 
 编号 6/13/28 已跳过不存在，**禁止回收复用**。新增事件顺次取下一个空闲编号。

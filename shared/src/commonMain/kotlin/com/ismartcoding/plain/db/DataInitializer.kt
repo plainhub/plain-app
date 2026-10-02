@@ -45,12 +45,12 @@ class DataInitializer(private val connection: SQLiteConnection) {
             TagItem(Res.string.work, DataType.NOTE),
         )
 
-    fun insertTags() {
+    fun insertTags(includeContent: Boolean = true) {
         val stmt = connection.prepare(
             "INSERT INTO tags (id, name, type, count, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?)",
         )
         try {
-            tags.forEach { tag ->
+            tags.filter { includeContent || it.type != DataType.NOTE }.forEach { tag ->
                 stmt.bindText(1, StringHelper.shortUUID())
                 stmt.bindText(2, LocaleHelper.getString(tag.nameKey))
                 stmt.bindLong(3, tag.type.value.toLong())

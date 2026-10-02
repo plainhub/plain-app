@@ -5,9 +5,9 @@ import com.ismartcoding.plain.platform.PlainResponse
 import kotlinx.coroutines.runBlocking
 import org.jetbrains.compose.resources.getString as getComposeString
 
-data class ApiResult(val response: PlainResponse?, val exception: Throwable? = null) {
+data class ApiResult(val response: PlainResponse?, val exception: Throwable? = null, val success: Boolean? = null) {
     fun isOk(): Boolean {
-        return response?.isOk() == true
+        return success ?: (response?.isOk() == true)
     }
 
     fun errorMessage(): String {

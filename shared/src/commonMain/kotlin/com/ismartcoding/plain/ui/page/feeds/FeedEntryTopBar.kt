@@ -76,8 +76,7 @@ internal fun FeedEntryTopBar(
                     onClick = {
                         dismiss(); val m = feedEntryVM.item.value ?: return@PDropdownMenuItem
                         scope.launch(IODispatcher) {
-                            val c = "# ${m.title}\n\n" + m.content.ifEmpty { m.description }
-                            NoteHelper.saveToNotesAsync(m.id) { title = c.getMarkdownTitle(); content = c }
+                            NoteHelper.saveFeedEntryAsync(m.id)
                             DialogHelper.showMessage(Res.string.saved)
                         }
                     })
