@@ -77,7 +77,9 @@ private object AVPlayerAudioPlayer : AudioPlayer {
                 startPolling()
                 return@launch
             }
-            val audio = currentAudio ?: return@launch
+            val audio = currentAudio ?: AudioQueueManager.source().currentPath
+                .takeIf { it.isNotEmpty() }?.let { playlistAudioFromPath(it) } ?: return@launch
+            currentAudio = audio
             playInternal(audio)
         }
     }

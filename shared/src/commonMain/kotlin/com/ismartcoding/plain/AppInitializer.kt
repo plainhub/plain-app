@@ -6,7 +6,6 @@ import com.ismartcoding.plain.chat.ChatCacher
 import com.ismartcoding.plain.chat.channel.ChannelCacher
 import com.ismartcoding.plain.chat.peer.PeerCacher
 import com.ismartcoding.plain.events.StartNearbyServiceEvent
-import com.ismartcoding.plain.features.audio.AudioQueueManager
 import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.lib.sendEvent
 import com.ismartcoding.plain.platform.getDeviceName
@@ -41,6 +40,5 @@ suspend fun initCommonPreferences() {
     if (TempData.canDLNAAccess()) {
         startDlnaRenderer()
     }
-    AudioQueueManager.ensureMigrated()
     LogCat.d("initCommonPreferences: clientId=${TempData.clientId}, deviceName=${TempData.deviceName.value}")
 }

@@ -64,6 +64,10 @@ object AudioMediaStoreHelper : BaseMediaContentHelper() {
                     )
                 }
 
+                "path" -> {
+                    where.addEqual(MediaStore.Audio.Media.DATA, it.value)
+                }
+
                 "name" -> {
                     where.addEqual(MediaStore.Audio.Media.TITLE, it.value)
                 }

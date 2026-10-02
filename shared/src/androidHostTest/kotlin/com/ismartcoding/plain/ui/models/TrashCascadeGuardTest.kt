@@ -60,10 +60,7 @@ class TrashCascadeGuardTest {
             "AudioViewModel.onTrashed must cascade via AudioQueueManager.removePaths",
         )
         val cascade = functionBody(source(queueManagerPath), "removePaths")
-        listOf("queueDao.deleteByPaths", "AudioPlayHistoryManager.removePaths", "AudioPlaylistManager.removePaths")
-            .forEach { call ->
-                assertTrue(cascade.contains(call), "AudioQueueManager.removePaths must keep cascading: $call")
-            }
+        assertTrue(cascade.contains("audioHostRemovePaths"), "AudioQueueManager.removePaths must call the atomic Rust cascade")
     }
 
     @Test

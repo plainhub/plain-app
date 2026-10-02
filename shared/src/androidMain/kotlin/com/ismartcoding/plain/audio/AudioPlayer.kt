@@ -133,7 +133,7 @@ object AudioPlayer {
             }
 
             val context = appContext
-            val path = SystemPrefs.audioPlayingValue()
+            val path = AudioQueueManager.source().currentPath
             if (path.isEmpty()) {
                 return@coMain
             }

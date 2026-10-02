@@ -43,13 +43,10 @@ class AudioPlayerService : MediaLibraryService() {
             if (events.contains(Player.EVENT_MEDIA_ITEM_TRANSITION)) {
                 LogCat.d("onEvents: EVENT_MEDIA_ITEM_TRANSITION")
                 coMain {
-                    val context = appContext
                     val mediaItem = player.currentMediaItem
                     if (mediaItem == null) {
-                        SystemPrefs.setAudioPlaying("")
                         return@coMain
                     }
-                    SystemPrefs.setAudioPlaying(mediaItem.mediaId)
                     AudioPlayer.setChangedNotify(AudioAction.MEDIA_ITEM_TRANSITION)
                 }
             }

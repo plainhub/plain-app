@@ -60,8 +60,8 @@ class PlayAudioQueueOrderGuardTest {
         val body = functionBody(source(graphQlPath), "playAudio")
             ?: fail("playAudio not found in $graphQlPath")
         assertTrue(
-            "SystemPrefs.setAudioPlaying(" in body,
-            "playAudio must mark the track current via SystemPrefs",
+            "AudioQueueManager.setCurrent(" in body,
+            "playAudio must mark the track current via the Rust queue source",
         )
         assertTrue(
             "enqueue(" !in body && "playNow(" !in body,

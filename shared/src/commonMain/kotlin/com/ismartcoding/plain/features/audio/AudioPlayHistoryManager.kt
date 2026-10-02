@@ -1,49 +1,17 @@
 package com.ismartcoding.plain.features.audio
 
+import com.ismartcoding.plain.api.*
 import com.ismartcoding.plain.db.DAudioPlayHistory
-import com.ismartcoding.plain.helpers.escapeLike
-import com.ismartcoding.plain.lib.TimeHelper
-import com.ismartcoding.plain.platform.AppDatabase
+import kotlinx.serialization.json.*
 
-/** Play history: per-track play count and recents, kept to a bounded window. */
 object AudioPlayHistoryManager {
-    private val historyDao get() = AppDatabase.instance.audioPlayHistoryDao()
-
-    private const val HISTORY_KEEP = 200
-
-    /** Record that [path] started playing (manual jumps included). */
     suspend fun recordHistory(path: String, title: String, artist: String, durationMs: Long) {
-        val existing = historyDao.getByPath(path)
-        historyDao.upsert(
-            if (existing != null) {
-                existing.copy(
-                    playCount = existing.playCount + 1,
-                    playedAt = TimeHelper.now(),
-                    title = title,
-                    artist = artist,
-                    durationMs = durationMs,
-                )
-            } else {
-                DAudioPlayHistory(path = path, title = title, artist = artist, durationMs = durationMs, playCount = 1)
-            },
-        )
-        if (historyDao.count() > HISTORY_KEEP * 5 / 4) {
-            historyDao.trim(HISTORY_KEEP)
-        }
+        RustContentApi.mutate("audioHostRecordHistory(path: ${gql(path)}, title: ${gql(title)}, artist: ${gql(artist)}, durationMs: $durationMs)")
     }
-
-    /** Cascade cleanup when media files are deleted or trashed. */
-    suspend fun removePaths(paths: Collection<String>) {
-        if (paths.isEmpty()) return
-        historyDao.deleteByPaths(paths.toList())
-    }
-
-    /** Total plays per artist, from the play history window. */
-    suspend fun artistPlayCounts(): Map<String, Long> =
-        historyDao.playCountsByArtist().associate { it.artist to it.count }
-
-    suspend fun recentPage(limit: Int, offset: Int): List<DAudioPlayHistory> = historyDao.page(limit, offset)
-
+    suspend fun artistPlayCounts(): Map<String, Long> = RustContentApi.query("audioArtistPlayCounts { artist count }")
+        .getValue("audioArtistPlayCounts").jsonArray.associate { r -> r.jsonObject.string("artist") to r.jsonObject.getValue("count").jsonPrimitive.long }
+    suspend fun recentPage(limit: Int, offset: Int): List<DAudioPlayHistory> = recentPageFiltered("",limit,offset)
     suspend fun recentPageFiltered(text: String, limit: Int, offset: Int): List<DAudioPlayHistory> =
-        historyDao.pageText("%${escapeLike(text)}%", limit, offset)
+        RustContentApi.query("audioHostHistory(offset: $offset, limit: $limit, query: ${gql(text)}) { $AUDIO_HISTORY_FIELDS }")
+            .getValue("audioHostHistory").jsonArray.map { it.audioHistory() }
 }

@@ -67,7 +67,7 @@ suspend fun audioQueueItemCount(): Int {
 suspend fun audioPlayback(): AudioPlayback {
     return AudioPlayback(
         mode = UserPrefs.audioPlayMode.value,
-        currentPath = SystemPrefs.audioPlayingValue(),
+        currentPath = AudioQueueManager.source().currentPath,
         isPlaying = audioIsPlayingFlow().value,
         positionMs = audioPlayerProgressAsync(),
     )
@@ -77,7 +77,7 @@ suspend fun audioPlayback(): AudioPlayback {
 @GraphQLMutation
 suspend fun playAudio(path: String): AudioItem {
     val audio = playlistAudioFromPath(path)
-    SystemPrefs.setAudioPlaying(audio.path)
+    AudioQueueManager.setCurrent(audio.path)
     return audio.toModel()
 }
 
@@ -89,7 +89,6 @@ suspend fun updateAudioPlayMode(mode: MediaPlayMode): Boolean {
 
 @GraphQLMutation
 suspend fun clearAudioQueue(): Boolean {
-    SystemPrefs.setAudioPlaying("")
     AudioQueueManager.clearQueue()
     coMain {
         audioClear()

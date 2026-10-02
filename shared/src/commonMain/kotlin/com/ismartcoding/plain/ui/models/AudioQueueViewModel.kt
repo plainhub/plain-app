@@ -30,7 +30,7 @@ class AudioQueueViewModel : ViewModel(), AudioQueueViewModelBase {
     private val pageLimit = 200
 
     suspend fun loadAsync() {
-        selectedPath.value = SystemPrefs.audioPlayingValue()
+        selectedPath.value = AudioQueueManager.source().currentPath
         refreshWindow()
     }
 
@@ -57,13 +57,12 @@ class AudioQueueViewModel : ViewModel(), AudioQueueViewModelBase {
     suspend fun playSingleAsync(audio: DPlaylistAudio) {
         AudioQueueManager.clearQueue()
         AudioQueueManager.enqueue(listOf(audio))
-        selectedPath.value = audio.path
+        setCurrentPlaying(audio.path)
         refreshWindow()
     }
 
     suspend fun clearAsync() {
         AudioQueueManager.clearQueue()
-        SystemPrefs.setAudioPlaying("")
         audioClear()
         setCurrentPlaying("")
         refreshWindow()
@@ -77,7 +76,7 @@ class AudioQueueViewModel : ViewModel(), AudioQueueViewModelBase {
     }
 
     private suspend fun setCurrentPlaying(path: String) {
-        SystemPrefs.setAudioPlaying(path)
+        AudioQueueManager.setCurrent(path)
         selectedPath.value = path
     }
 
@@ -103,7 +102,7 @@ class AudioQueueViewModel : ViewModel(), AudioQueueViewModelBase {
         if (path == selectedPath.value) {
             val nextItem = AudioQueueManager.resolveNext(isNext = true, shuffle = false)
             if (nextItem != null) {
-                SystemPrefs.setAudioPlaying(nextItem.path)
+                AudioQueueManager.setCurrent(nextItem.path)
                 audioJustPlay(nextItem)
                 selectedPath.value = nextItem.path
             }
