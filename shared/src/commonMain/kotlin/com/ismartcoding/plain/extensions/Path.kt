@@ -9,8 +9,7 @@ fun String.getFinalPath(): String {
     }
 
     if (this.startsWith("fid:", true)) {
-        val hash = this.substring("fid:".length)
-        return "$dir/${hash.substring(0, 2)}/${hash.substring(2, 4)}/$hash"
+        return com.ismartcoding.plain.helpers.AppFileStore.realPathFromId(this.substring(4))
     }
 
     return this
@@ -26,5 +25,5 @@ fun String.getFinalPath(): String {
  */
 fun String.resolveAppFileRealPath(): String {
     if (this.isEmpty() || this.startsWith("/")) return this
-    return appDir() + "/" + this
+    return com.ismartcoding.plain.api.RustContentApi.directory + "/" + this
 }

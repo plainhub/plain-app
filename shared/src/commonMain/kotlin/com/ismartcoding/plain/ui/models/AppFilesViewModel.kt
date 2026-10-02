@@ -4,8 +4,9 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import com.ismartcoding.plain.lib.withIO
-import com.ismartcoding.plain.platform.AppDatabase
-import com.ismartcoding.plain.ui.page.appfiles.AppFileDisplayNameHelper
+import com.ismartcoding.plain.helpers.AppFileStore
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
@@ -20,34 +21,29 @@ class AppFilesViewModel : ViewModel() {
     val noMore = mutableStateOf(false)
     val total = mutableIntStateOf(0)
 
-    private suspend fun fetchPage(pageOffset: Int): List<VAppFile> = withIO {
-        val appFileDao = AppDatabase.instance.appFileDao()
-        val chatDao = AppDatabase.instance.chatDao()
-        val files = appFileDao.getPage(limit.intValue, pageOffset)
-        val nameMap = AppFileDisplayNameHelper.buildNameMap(chatDao.getAll())
-        files.map { file ->
-            VAppFile(
-                appFile = file,
-                fileName = AppFileDisplayNameHelper.resolveDisplayName(file, nameMap),
-            )
+    private val lock = Mutex()
+    private suspend fun fetchPage(pageOffset: Int): List<VAppFile> = AppFileStore.page(pageOffset,limit.intValue)
+
+    suspend fun moreAsync() = withIO {
+        lock.withLock {
+            val nextOffset = offset.intValue + limit.intValue
+            val items = fetchPage(nextOffset)
+            offset.intValue = nextOffset
+            _itemsFlow.update { it + items }
+            noMore.value = items.size < limit.intValue
+            showLoading.value = false
         }
     }
 
-    suspend fun moreAsync() = withIO {
-        offset.intValue += limit.intValue
-        val items = fetchPage(offset.intValue)
-        _itemsFlow.update { it + items }
-        noMore.value = items.size < limit.intValue
-        showLoading.value = false
-    }
-
     suspend fun loadAsync() = withIO {
-        offset.intValue = 0
-        val appFileDao = AppDatabase.instance.appFileDao()
-        total.intValue = appFileDao.count()
-        val items = fetchPage(0)
-        _itemsFlow.value = items
-        noMore.value = items.size < limit.intValue
-        showLoading.value = false
+        lock.withLock {
+            val count = AppFileStore.count()
+            val items = fetchPage(0)
+            offset.intValue = 0
+            total.intValue = count
+            _itemsFlow.value = items
+            noMore.value = items.size < limit.intValue
+            showLoading.value = false
+        }
     }
 }

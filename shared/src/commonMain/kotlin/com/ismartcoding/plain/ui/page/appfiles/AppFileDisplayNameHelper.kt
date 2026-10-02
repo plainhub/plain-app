@@ -2,7 +2,7 @@ package com.ismartcoding.plain.ui.page.appfiles
 
 import com.ismartcoding.plain.platform.getExtensionFromMimeType
 import com.ismartcoding.plain.lib.withIO
-import com.ismartcoding.plain.platform.AppDatabase
+import com.ismartcoding.plain.helpers.AppFileStore
 import com.ismartcoding.plain.db.DAppFile
 import com.ismartcoding.plain.db.DChat
 import com.ismartcoding.plain.db.DMessageFile
@@ -33,10 +33,7 @@ object AppFileDisplayNameHelper {
     suspend fun resolveDisplayNameByPath(path: String, title: String): String = withIO {
         if (title.isNotEmpty()) return@withIO title
         val fileName = path.substringAfterLast('/').substringBeforeLast('.')
-        val appFile = AppDatabase.instance.appFileDao().getById(fileName)
-            ?: return@withIO fileName
-        val nameMap = buildNameMap(AppDatabase.instance.chatDao().getAll())
-        resolveDisplayName(appFile, nameMap)
+        AppFileStore.displayName(fileName).ifEmpty { fileName }
     }
 
     private fun bindItems(items: List<DMessageFile>, map: MutableMap<String, String>) {

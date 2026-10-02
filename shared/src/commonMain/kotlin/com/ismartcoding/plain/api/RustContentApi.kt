@@ -15,28 +15,31 @@ import kotlinx.serialization.json.*
 object RustContentApi {
     private val lock = PlatformLock()
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
-    private val client by lazy { createHttpClient() }
+    private val client by lazy { createPlainHttpClient(PlainHttpClientSpec.Local()) }
+    private val transferClient by lazy { createPlainHttpClient(PlainHttpClientSpec.Local(15 * 60)) }
+    private val eventClient by lazy { createPeerStatusHttpClient() }
     private val statusLock = Mutex()
     private var localSession: ContentApiSession? = null
     private val syncStates = MutableStateFlow<Map<String, Pair<String, String>>>(emptyMap())
 
+    val directory: String get() = "${prefsFilePath().substringBeforeLast('/')}/rust-content"
+
     fun start() = lock.withLock {
         if (localSession != null) return@withLock
         val sessionToken = generateChaCha20Key()
-        val directory = prefsFilePath().substringBeforeLast('/')
-        val port = RustCoreBridge.start("$directory/rust-content/plain-content.db", sessionToken)
+        val port = RustCoreBridge.start("$directory/plain-content.db", sessionToken)
         localSession = ContentApiSession("http://127.0.0.1:$port", "local", sessionToken)
         scope.launch { collectEvents() }
     }
 
     suspend fun query(selection: String, session: ContentApiSession? = null): JsonObject = execute("query { $selection }", session)
-    suspend fun mutate(selection: String, session: ContentApiSession? = null): JsonObject = execute("mutation { $selection }", session)
+    suspend fun mutate(selection: String, session: ContentApiSession? = null, longRunning: Boolean = false): JsonObject = execute("mutation { $selection }", session, longRunning)
 
-    private suspend fun execute(document: String, session: ContentApiSession?): JsonObject {
+    private suspend fun execute(document: String, session: ContentApiSession?, longRunning: Boolean = false): JsonObject {
         if (session == null) start()
         val target = session ?: checkNotNull(localSession)
         val body = buildJsonObject { put("query", document) }.toString()
-        val response = client.postText("${target.baseUrl}/graphql", body, "application/json", target.headers())
+        val response = (if (longRunning) transferClient else client).postText("${target.baseUrl}/graphql", body, "application/json", target.headers())
         response.use {
             check(it.isOk()) { "Rust API returned HTTP ${it.status}" }
             val result = Json.parseToJsonElement(it.bodyAsText()).jsonObject
@@ -77,7 +80,7 @@ object RustContentApi {
         var retryMs = 500L
         while (currentCoroutineContext().isActive) {
             try {
-                client.webSocket(localSession!!.baseUrl.replace("http://", "ws://") + "/events", localSession!!.headers()) { socket ->
+                eventClient.webSocket(localSession!!.baseUrl.replace("http://", "ws://") + "/events", localSession!!.headers()) { socket ->
                     retryMs = 500L
                     for (frame in socket.incoming) {
                         frame.binary?.let { bytes ->

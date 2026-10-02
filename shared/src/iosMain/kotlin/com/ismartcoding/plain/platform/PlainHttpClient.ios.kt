@@ -345,6 +345,11 @@ private fun configurationFor(spec: PlainHttpClientSpec): NSURLSessionConfigurati
             config.setTimeoutIntervalForResource(60.0)
         }
 
+        is PlainHttpClientSpec.Local -> {
+            config.setTimeoutIntervalForRequest(spec.timeoutSeconds.toDouble())
+            config.setTimeoutIntervalForResource(spec.timeoutSeconds.toDouble())
+        }
+
         PlainHttpClientSpec.Browser -> {
             config.setTimeoutIntervalForRequest(PlainHttpTimeouts.BROWSER_MS / 1000.0)
             config.setTimeoutIntervalForResource(60.0)

@@ -210,6 +210,14 @@ internal object SharedOkHttpClients {
 internal fun createOkHttpPlainClient(spec: PlainHttpClientSpec): PlainHttpClient =
     when (spec) {
         PlainHttpClientSpec.Default -> OkHttpPlainClient(SharedOkHttpClients.default)
+        is PlainHttpClientSpec.Local -> OkHttpPlainClient(
+            SharedOkHttpClients.default.newBuilder()
+                .connectTimeout(1, TimeUnit.SECONDS)
+                .callTimeout(spec.timeoutSeconds.toLong(), TimeUnit.SECONDS)
+                .readTimeout(spec.timeoutSeconds.toLong(), TimeUnit.SECONDS)
+                .writeTimeout(spec.timeoutSeconds.toLong(), TimeUnit.SECONDS)
+                .build(),
+        )
         PlainHttpClientSpec.Browser -> OkHttpPlainClient(SharedOkHttpClients.browser)
         PlainHttpClientSpec.Unsafe -> OkHttpPlainClient(SharedOkHttpClients.unsafe)
         PlainHttpClientSpec.Download -> OkHttpPlainClient(SharedOkHttpClients.download)

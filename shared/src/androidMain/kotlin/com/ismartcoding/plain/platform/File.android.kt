@@ -492,15 +492,10 @@ actual suspend fun searchZipItems(type: String, query: String, tempId: String): 
             }
         }
         DataType.APP_FILE.name -> {
-            val appFileDao = AppDatabase.instance.appFileDao()
-            val chatDao = AppDatabase.instance.chatDao()
             val ids = query.removePrefix("ids:").split(",").filter { it.isNotEmpty() }
-            val appFiles = if (ids.isNotEmpty()) appFileDao.getByIds(ids) else appFileDao.getAll()
-            val nameMap = AppFileDisplayNameHelper.buildNameMap(chatDao.getAll())
-            appFiles.map { file ->
-                val displayName = AppFileDisplayNameHelper.resolveDisplayName(file, nameMap)
-                ZipStreamEntry(file.realPath.resolveAppFileRealPath(), displayName)
-            }
+            val files = if (ids.isEmpty()) AppFileStore.page(0, Int.MAX_VALUE)
+                else ids.mapNotNull { id -> AppFileStore.getById(id)?.let { com.ismartcoding.plain.ui.models.VAppFile(it,AppFileStore.displayName(it.id)) } }
+            files.map { ZipStreamEntry(it.appFile.realPath.resolveAppFileRealPath(),it.fileName) }
         }
         DataType.FILE.name -> {
             val value = TempHelper.getValue(tempId)

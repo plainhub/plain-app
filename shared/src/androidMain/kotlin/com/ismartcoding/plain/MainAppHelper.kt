@@ -20,7 +20,6 @@ import com.ismartcoding.plain.enums.has
 import com.ismartcoding.plain.events.AppEvents
 import com.ismartcoding.plain.events.PowerConnectedEvent
 import com.ismartcoding.plain.helpers.AppHelper
-import com.ismartcoding.plain.helpers.ChatFidUriMigration
 import com.ismartcoding.plain.lib.coIO
 import com.ismartcoding.plain.platform.isQPlus
 import com.ismartcoding.plain.platform.isUPlus
@@ -103,10 +102,6 @@ object MainAppHelper {
                 sendEvent(PowerConnectedEvent())
             }
 
-            if (!SystemPrefs.fidUriExtMigrated.value) {
-                ChatFidUriMigration.run(app)
-                SystemPrefs.fidUriExtMigrated.value = true
-            }
             if (UserPrefs.feedAutoRefresh.value) {
                 FeedFetchWorker.startRepeatWorkerAsync(app)
             }

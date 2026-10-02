@@ -45,16 +45,8 @@ fun buildTextFile(path: String, size: Long, updatedAtMillis: Long): DFile = DFil
     mediaId = "",
 )
 
-suspend fun releaseAppFile(fidSuffix: String) = withIO {
-    val hash = fidSuffix.substringBefore(".")
-    val dao = AppDatabase.instance.appFileDao()
-    dao.decrementRefCount(hash)
-    val updated = dao.getById(hash) ?: return@withIO
-    if (updated.refCount <= 0) {
-        dao.delete(hash)
-        deleteFileAt(updated.realPath.resolveAppFileRealPath())
-        LogCat.d("AppFileStore: deleted orphan file $hash")
-    }
+suspend fun releaseAppFile(fidSuffix: String) {
+    AppFileStore.release(fidSuffix)
 }
 
 expect fun deleteFileAt(path: String)

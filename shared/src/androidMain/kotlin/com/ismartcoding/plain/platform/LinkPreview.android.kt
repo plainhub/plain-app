@@ -11,5 +11,5 @@ actual suspend fun getImageDimensions(data: ByteArray): Pair<Int, Int> {
 
 actual suspend fun importImageBytesToFid(data: ByteArray, mimeType: String): String? {
     val dFile = AppFileStore.importBytes(data, mimeType)
-    return AppFileStore.toFidUri(dFile.id, AppFileStore.extFromMime(dFile.mimeType))
+    return AppFileStore.toFidUri(dFile)
 }

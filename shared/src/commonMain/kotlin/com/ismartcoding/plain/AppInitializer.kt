@@ -11,7 +11,6 @@ import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.lib.sendEvent
 import com.ismartcoding.plain.platform.getDeviceName
 import com.ismartcoding.plain.features.dlna.startDlnaRenderer
-import com.ismartcoding.plain.helpers.AppFileRealPathMigration
 import com.ismartcoding.plain.preferences.*
 import com.ismartcoding.plain.httpserver.HttpServerManager
 
@@ -40,10 +39,6 @@ suspend fun initCommonPreferences() {
     sendEvent(StartNearbyServiceEvent())
     if (TempData.canDLNAAccess()) {
         startDlnaRenderer()
-    }
-    if (!SystemPrefs.appFileRealPathMigrated.value) {
-        AppFileRealPathMigration.run()
-        SystemPrefs.appFileRealPathMigrated.value = true
     }
     AudioQueueManager.ensureMigrated()
     LogCat.d("initCommonPreferences: clientId=${TempData.clientId}, deviceName=${TempData.deviceName.value}")

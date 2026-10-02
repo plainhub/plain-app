@@ -42,7 +42,7 @@ object ChatFidUriMigration {
                         if (item.uri.startsWith("fid:") && !item.uri.removePrefix("fid:").contains(".")) {
                             val hash = item.uri.removePrefix("fid:")
                             val dFile = fileDao.getById(hash) ?: return@map item
-                            val ext = AppFileStore.extFromMime(dFile.mimeType)
+                            val ext = LegacyAppFileStore.extFromMime(dFile.mimeType)
                             if (ext.isEmpty()) return@map item
                             if (hash !in renamedHashes) {
                                 renameLegacyFile(context, hash, ext, fileDao, dFile)
@@ -65,7 +65,7 @@ object ChatFidUriMigration {
                         if (item.uri.startsWith("fid:") && !item.uri.removePrefix("fid:").contains(".")) {
                             val hash = item.uri.removePrefix("fid:")
                             val dFile = fileDao.getById(hash) ?: return@map item
-                            val ext = AppFileStore.extFromMime(dFile.mimeType)
+                            val ext = LegacyAppFileStore.extFromMime(dFile.mimeType)
                             if (ext.isEmpty()) return@map item
                             if (hash !in renamedHashes) {
                                 renameLegacyFile(context, hash, ext, fileDao, dFile)
@@ -108,7 +108,7 @@ object ChatFidUriMigration {
             legacyFile.renameTo(newFile)
         }
         // Store the relative portion in the DB; resolve to absolute at use sites.
-        val relativePath = AppFileStore.relativeDestPath(hash, ext)
+        val relativePath = LegacyAppFileStore.relativeDestPath(hash, ext)
         if (dFile.realPath != relativePath) {
             dFile.realPath = relativePath
             fileDao.update(dFile)

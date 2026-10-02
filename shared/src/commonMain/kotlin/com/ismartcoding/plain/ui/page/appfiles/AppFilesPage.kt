@@ -29,7 +29,7 @@ import com.ismartcoding.plain.ui.components.mediaviewer.previewer.rememberPrevie
 import com.ismartcoding.plain.ui.models.AppFilesViewModel
 import com.ismartcoding.plain.ui.models.AudioQueueViewModel
 import com.ismartcoding.plain.ui.page.appfiles.components.AppFileListContent
-import kotlinx.coroutines.launch
+import com.ismartcoding.plain.ui.models.launchSafe
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -46,14 +46,18 @@ fun AppFilesPage(
     val noMore = appFilesVM.noMore.value
 
     val refreshState = rememberRefreshLayoutState {
-        scope.launch {
+        scope.launchSafe {
             appFilesVM.loadAsync()
             setRefreshState(RefreshContentState.Finished)
         }
     }
 
-    LaunchedEffect(Unit) {
-        appFilesVM.loadAsync()
+    LaunchedEffect(appFilesVM) {
+        launchSafe { appFilesVM.loadAsync() }
+        com.ismartcoding.plain.lib.Channel.sharedFlow.collect { event ->
+            if (event is com.ismartcoding.plain.events.WebSocketEvent &&
+                event.type == com.ismartcoding.plain.events.EventType.CONTENT_CHANGED) launchSafe { appFilesVM.loadAsync() }.join()
+        }
     }
 
     PScaffold(
@@ -86,12 +90,12 @@ fun AppFilesPage(
                         previewerState = previewerState,
                         audioQueueVM = audioQueueVM,
                         onRefresh = {
-                            scope.launch {
+                            scope.launchSafe {
                                 appFilesVM.loadAsync()
                             }
                         },
                         onLoadMore = {
-                            scope.launch {
+                            scope.launchSafe {
                                 appFilesVM.moreAsync()
                             }
                         },

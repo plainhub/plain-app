@@ -154,6 +154,7 @@ const val BROWSER_USER_AGENT =
 
 sealed class PlainHttpClientSpec {
     data object Default : PlainHttpClientSpec()
+    data class Local(val timeoutSeconds: Int = 30) : PlainHttpClientSpec()
     data object Browser : PlainHttpClientSpec()
     data object Unsafe : PlainHttpClientSpec()
     data object Download : PlainHttpClientSpec()
