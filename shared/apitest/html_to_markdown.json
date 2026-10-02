@@ -1,0 +1,1062 @@
+[
+  {
+    "name": "empty",
+    "html": "",
+    "markdown": ""
+  },
+  {
+    "name": "spaces",
+    "html": " \t\n\r ",
+    "markdown": ""
+  },
+  {
+    "name": "plain",
+    "html": "hello world",
+    "markdown": "hello world"
+  },
+  {
+    "name": "paragraph",
+    "html": "<p>hello world</p>",
+    "markdown": "hello world"
+  },
+  {
+    "name": "paragraphs",
+    "html": "<p>first</p><p>second</p>",
+    "markdown": "first\n\nsecond"
+  },
+  {
+    "name": "blank_paragraph",
+    "html": "<p>a</p><p> </p><p>b</p>",
+    "markdown": "a\n\nb"
+  },
+  {
+    "name": "whitespace",
+    "html": " <p> a\n b\t c </p> ",
+    "markdown": "a b c"
+  },
+  {
+    "name": "div",
+    "html": "<div>a</div><div>b</div>",
+    "markdown": "a\n\nb"
+  },
+  {
+    "name": "span",
+    "html": "a<span>b</span>c",
+    "markdown": "abc"
+  },
+  {
+    "name": "comments",
+    "html": "a<!-- hidden -->b",
+    "markdown": "ab"
+  },
+  {
+    "name": "comment_unclosed",
+    "html": "a<!--hidden",
+    "markdown": "a"
+  },
+  {
+    "name": "doctype",
+    "html": "<!DOCTYPE html><p>a</p>",
+    "markdown": "a"
+  },
+  {
+    "name": "cdata",
+    "html": "<![CDATA[<b>&amp;</b>]]>",
+    "markdown": "<b>&amp;</b>"
+  },
+  {
+    "name": "cdata_unclosed",
+    "html": "<![CDATA[a<b>",
+    "markdown": "a<b></x-html2md>"
+  },
+  {
+    "name": "unknown",
+    "html": "a<custom>b</custom>c",
+    "markdown": "abc"
+  },
+  {
+    "name": "br",
+    "html": "a<br>b",
+    "markdown": "a  \nb"
+  },
+  {
+    "name": "br_multiple",
+    "html": "a<br><br><br>b",
+    "markdown": "a  \n  \n  \nb"
+  },
+  {
+    "name": "hr",
+    "html": "a<hr>b",
+    "markdown": "a\n\n* * *\n\nb"
+  },
+  {
+    "name": "void_spacing",
+    "html": "a<img src=\"x\"> b",
+    "markdown": "a![](x) b"
+  },
+  {
+    "name": "bold",
+    "html": "<b>hi</b>",
+    "markdown": "**hi**"
+  },
+  {
+    "name": "strong",
+    "html": "<strong>hi</strong>",
+    "markdown": "**hi**"
+  },
+  {
+    "name": "italic",
+    "html": "<i>hi</i>",
+    "markdown": "_hi_"
+  },
+  {
+    "name": "emphasis",
+    "html": "<em>hi</em>",
+    "markdown": "_hi_"
+  },
+  {
+    "name": "nested_emphasis",
+    "html": "<strong>bold <em>italic</em></strong>",
+    "markdown": "**bold _italic_**"
+  },
+  {
+    "name": "flanking",
+    "html": "a<em> b </em>c",
+    "markdown": "a _b_ c"
+  },
+  {
+    "name": "flanking_siblings",
+    "html": "a <b> b </b> c",
+    "markdown": "a **b** c"
+  },
+  {
+    "name": "blank_emphasis",
+    "html": "a<em> </em>b",
+    "markdown": "a b"
+  },
+  {
+    "name": "empty_strong",
+    "html": "a<strong></strong>b",
+    "markdown": "ab"
+  },
+  {
+    "name": "chinese",
+    "html": "<p>你好，世界。</p>",
+    "markdown": "你好，世界。"
+  },
+  {
+    "name": "emoji",
+    "html": "<h1>A😀中</h1>",
+    "markdown": "A😀中\n===="
+  },
+  {
+    "name": "unicode_spaces",
+    "html": "<p>a&nbsp;b</p>",
+    "markdown": "a b"
+  },
+  {
+    "name": "unicode_blank",
+    "html": "<em>&nbsp;</em>",
+    "markdown": ""
+  },
+  {
+    "name": "link",
+    "html": "<a href=\"https://example.org/a\">link</a>",
+    "markdown": "[link](https://example.org/a)"
+  },
+  {
+    "name": "link_title",
+    "html": "<a href=\"/a\" title=\"A &quot;title&quot;\">link</a>",
+    "markdown": "[link](/a \"A \"title\"\")"
+  },
+  {
+    "name": "link_without_href",
+    "html": "<a>link</a>",
+    "markdown": "link"
+  },
+  {
+    "name": "link_empty",
+    "html": "<a href=\"/a\"></a>",
+    "markdown": "[](/a)"
+  },
+  {
+    "name": "link_bold",
+    "html": "<a href=\"/a\"><b>link</b></a>",
+    "markdown": "[**link**](/a)"
+  },
+  {
+    "name": "image",
+    "html": "<img src=\"/a.png\" alt=\"photo\" title=\"caption\">",
+    "markdown": "![photo](/a.png \"caption\")"
+  },
+  {
+    "name": "image_empty_src",
+    "html": "<img alt=\"photo\">",
+    "markdown": ""
+  },
+  {
+    "name": "image_empty_alt",
+    "html": "<img src=\"a\">",
+    "markdown": "![](a)"
+  },
+  {
+    "name": "image_newline",
+    "html": "<img src=\"a\" alt=\"a\n   b\" title=\"a\n\n b\">",
+    "markdown": "![a\nb](a \"a\nb\")"
+  },
+  {
+    "name": "list",
+    "html": "<ul><li>a</li><li>b</li></ul>",
+    "markdown": "*   a\n*   b"
+  },
+  {
+    "name": "ordered",
+    "html": "<ol><li>a</li><li>b</li></ol>",
+    "markdown": "1.  a\n2.  b"
+  },
+  {
+    "name": "ordered_start",
+    "html": "<ol start=\"3\"><li>a</li><li>b</li></ol>",
+    "markdown": "3.  a\n4.  b"
+  },
+  {
+    "name": "ordered_invalid_start",
+    "html": "<ol start=\"x\"><li>a</li><li>b</li></ol>",
+    "markdown": "1.  a\n2.  b"
+  },
+  {
+    "name": "ordered_negative",
+    "html": "<ol start=\"-2\"><li>a</li><li>b</li></ol>",
+    "markdown": "-2.  a\n-1.  b"
+  },
+  {
+    "name": "nested_list",
+    "html": "<ul><li>a<ul><li>b</li><li>c</li></ul></li><li>d</li></ul>",
+    "markdown": "*   a\n    *   b\n    *   c\n*   d"
+  },
+  {
+    "name": "list_paragraphs",
+    "html": "<ul><li><p>a</p><p>b</p></li><li>c</li></ul>",
+    "markdown": "*   a\n    \n    b\n    \n*   c"
+  },
+  {
+    "name": "list_checkboxes",
+    "html": "<ul><li><input type=\"checkbox\" checked>a</li><li><input type=\"checkbox\">b</li></ul>",
+    "markdown": "*   [x] a\n*   [ ] b"
+  },
+  {
+    "name": "input_other",
+    "html": "<input type=\"text\" value=\"x\">",
+    "markdown": ""
+  },
+  {
+    "name": "quote",
+    "html": "<blockquote>quoted</blockquote>",
+    "markdown": "> quoted"
+  },
+  {
+    "name": "quote_paragraphs",
+    "html": "<blockquote><p>a</p><p>b</p></blockquote>",
+    "markdown": "> a\n> \n> b"
+  },
+  {
+    "name": "quote_nested",
+    "html": "<blockquote>a<blockquote>b</blockquote>c</blockquote>",
+    "markdown": "> a\n> \n> > b\n> \n> c"
+  },
+  {
+    "name": "inline_code",
+    "html": "a<code>x*y_z</code>b",
+    "markdown": "a`x*y_z`b"
+  },
+  {
+    "name": "inline_code_spacing",
+    "html": "a<code> x </code>b",
+    "markdown": "a `x` b"
+  },
+  {
+    "name": "inline_code_backticks",
+    "html": "<code>`x`</code>",
+    "markdown": "``` `x` ```"
+  },
+  {
+    "name": "inline_code_runs",
+    "html": "<code>``x``</code>",
+    "markdown": "` ``x`` `"
+  },
+  {
+    "name": "inline_code_multiple",
+    "html": "<code>a`b`c`d</code>",
+    "markdown": "````a`b`c`d````"
+  },
+  {
+    "name": "pre_code",
+    "html": "<pre><code>a\n  b\n</code></pre>",
+    "markdown": "    a\n      b"
+  },
+  {
+    "name": "pre_code_tabs",
+    "html": "<pre><code>\tx\n\t y</code></pre>",
+    "markdown": "    \tx\n    \t y"
+  },
+  {
+    "name": "pre_plain",
+    "html": "<pre>a\n b</pre>",
+    "markdown": "a\n b"
+  },
+  {
+    "name": "pre_code_nested",
+    "html": "<pre><code><b>*x*</b></code></pre>",
+    "markdown": "    *x*"
+  },
+  {
+    "name": "highlight",
+    "html": "<div class=\"highlight-source-rust\"><pre><code>let x = 1;</code></pre></div>",
+    "markdown": "```rust\n<pre><code>let x = 1;</code></pre>\n```"
+  },
+  {
+    "name": "highlight_extra_class",
+    "html": "<div class=\"highlight-source-rust other\"><pre><code>x</code></pre></div>",
+    "markdown": "    x"
+  },
+  {
+    "name": "script",
+    "html": "a<script>var x=1;</script>b",
+    "markdown": "avar x=1;b"
+  },
+  {
+    "name": "style",
+    "html": "a<style>.x {color:red}</style>b",
+    "markdown": "a.x {color:red}b"
+  },
+  {
+    "name": "nav",
+    "html": "<nav>menu</nav><p>text</p>",
+    "markdown": "menu\n\ntext"
+  },
+  {
+    "name": "full_document",
+    "html": "<html><head><title>Title</title></head><body><p>Body</p></body></html>",
+    "markdown": "Title\n\nBody"
+  },
+  {
+    "name": "malformed_unclosed",
+    "html": "<p>a<strong>b",
+    "markdown": "a**b**"
+  },
+  {
+    "name": "malformed_closing",
+    "html": "a</unknown>b",
+    "markdown": "ab"
+  },
+  {
+    "name": "malformed_nested",
+    "html": "<b>a<i>b</b>c</i>",
+    "markdown": "**a_b_**c"
+  },
+  {
+    "name": "malformed_tag",
+    "html": "a < b > c",
+    "markdown": "a < b > c"
+  },
+  {
+    "name": "uppercase",
+    "html": "<P><STRONG>A</STRONG></P>",
+    "markdown": "**A**"
+  },
+  {
+    "name": "unquoted_attr",
+    "html": "<a href=/path>link</a>",
+    "markdown": "[link](/path)"
+  },
+  {
+    "name": "single_quote_attr",
+    "html": "<img src='a' alt='b'>",
+    "markdown": "![b](a)"
+  },
+  {
+    "name": "duplicate_attr",
+    "html": "<a href=\"a\" href=\"b\">x</a>",
+    "markdown": "[x](b)"
+  },
+  {
+    "name": "tag_unclosed",
+    "html": "<b x=\"y",
+    "markdown": ""
+  },
+  {
+    "name": "table",
+    "html": "<table><tr><th>A</th><th>B</th></tr><tr><td>a</td><td>b</td></tr></table>",
+    "markdown": "| A | B |\n| --- | --- |\n| a | b |"
+  },
+  {
+    "name": "table_td_header",
+    "html": "<table><tr><td>A</td></tr><tr><td>B</td></tr></table>",
+    "markdown": "| A |\n| --- |\n| B |"
+  },
+  {
+    "name": "table_sections",
+    "html": "<table><thead><tr><th>A</th></tr></thead><tbody><tr><td>B</td></tr></tbody><tfoot><tr><td>C</td></tr></tfoot></table>",
+    "markdown": "| A |\n| --- |\n| B |\n| C |"
+  },
+  {
+    "name": "table_alignment",
+    "html": "<table><tr><th align=\"left\">A</th><th align=\"RIGHT\">B</th><th align=\"center\">C</th></tr></table>",
+    "markdown": "| A | B | C |\n| :-- | --: | :-: |"
+  },
+  {
+    "name": "table_colspan",
+    "html": "<table><tr><th colspan=\"2\">A</th></tr><tr><td>B</td><td>C</td></tr></table>",
+    "markdown": "| A |  | \n| --- | --- | \n| B | C |"
+  },
+  {
+    "name": "table_invalid_colspan",
+    "html": "<table><tr><td colspan=\"x\">A</td><td colspan=\"0\">B</td></tr></table>",
+    "markdown": "| A | B |\n| --- | --- |"
+  },
+  {
+    "name": "table_escaping",
+    "html": "<table><tr><td>a|b<br>c</td></tr></table>",
+    "markdown": "| a\\|b   c |\n| --- |"
+  },
+  {
+    "name": "table_caption",
+    "html": "<table><caption>Name</caption><tr><td>A</td></tr></table>",
+    "markdown": "Name\n| A |\n| --- |"
+  },
+  {
+    "name": "table_late_caption",
+    "html": "<table><tr><td>A</td></tr><caption>Name</caption></table>",
+    "markdown": "| A |\n| --- |"
+  },
+  {
+    "name": "table_nested",
+    "html": "<table><tr><td>A<table><tr><td>B</td></tr></table></td></tr></table>",
+    "markdown": "| A  \\| B \\| \\| --- \\|   |\n| --- |"
+  },
+  {
+    "name": "table_whitespace",
+    "html": "<table>\n <tr>\n <td>A</td>\n <td>B</td>\n </tr>\n</table>",
+    "markdown": "| A | B |\n| --- | --- |"
+  },
+  {
+    "name": "table_empty",
+    "html": "<table><tr><td></td></tr></table>",
+    "markdown": "|  |\n| --- |"
+  },
+  {
+    "name": "entities",
+    "html": "&amp; &lt; &gt; &quot; &apos; &#65; &#x4e2d;",
+    "markdown": "& < > \" ' A 中"
+  },
+  {
+    "name": "unknown_entities",
+    "html": "&unknown; &amp &AMP;",
+    "markdown": "&unknown; &amp &AMP;"
+  },
+  {
+    "name": "entities_once",
+    "html": "&amp;lt;",
+    "markdown": "&lt;"
+  },
+  {
+    "name": "entity_overflow",
+    "html": "&#999999999999999999999;",
+    "markdown": "&#999999999999999999999;"
+  },
+  {
+    "name": "escape",
+    "html": "\\ * _ [x] `x`",
+    "markdown": "\\\\ \\* \\_ \\[x\\] \\`x\\`"
+  },
+  {
+    "name": "escape_heading",
+    "html": "# heading",
+    "markdown": "\\# heading"
+  },
+  {
+    "name": "escape_heading_seven",
+    "html": "####### heading",
+    "markdown": "####### heading"
+  },
+  {
+    "name": "escape_ordered",
+    "html": "12. item",
+    "markdown": "12\\. item"
+  },
+  {
+    "name": "escape_bullet",
+    "html": "- item",
+    "markdown": "\\- item"
+  },
+  {
+    "name": "escape_plus",
+    "html": "+ item",
+    "markdown": "\\+ item"
+  },
+  {
+    "name": "escape_equals",
+    "html": "===x",
+    "markdown": "\\===x"
+  },
+  {
+    "name": "escape_quote",
+    "html": "> quote",
+    "markdown": "\\> quote"
+  },
+  {
+    "name": "escape_fence",
+    "html": "~~~code",
+    "markdown": "\\~~~code"
+  },
+  {
+    "name": "escaping_per_node",
+    "html": "a<span>- b</span>",
+    "markdown": "a\\- b"
+  },
+  {
+    "name": "content_combination",
+    "html": "<h2>News</h2><p>Hello <strong>world</strong>.</p><ul><li><a href=\"/a\">More</a></li></ul>",
+    "markdown": "News\n----\n\nHello **world**.\n\n*   [More](/a)"
+  },
+  {
+    "name": "heading_1",
+    "html": "<h1>hi</h1>",
+    "markdown": "hi\n=="
+  },
+  {
+    "name": "heading_2",
+    "html": "<h2>hi</h2>",
+    "markdown": "hi\n--"
+  },
+  {
+    "name": "heading_3",
+    "html": "<h3>hi</h3>",
+    "markdown": "### hi"
+  },
+  {
+    "name": "heading_4",
+    "html": "<h4>hi</h4>",
+    "markdown": "#### hi"
+  },
+  {
+    "name": "heading_5",
+    "html": "<h5>hi</h5>",
+    "markdown": "##### hi"
+  },
+  {
+    "name": "heading_6",
+    "html": "<h6>hi</h6>",
+    "markdown": "###### hi"
+  },
+  {
+    "name": "strike_del",
+    "html": "<del>gone</del>",
+    "markdown": "~gone~"
+  },
+  {
+    "name": "strike_s",
+    "html": "<s>gone</s>",
+    "markdown": "~gone~"
+  },
+  {
+    "name": "strike_strike",
+    "html": "<strike>gone</strike>",
+    "markdown": "~gone~"
+  },
+  {
+    "name": "block_section",
+    "html": "<section>a</section>b",
+    "markdown": "a\n\nb"
+  },
+  {
+    "name": "block_article",
+    "html": "<article>a</article>b",
+    "markdown": "a\n\nb"
+  },
+  {
+    "name": "block_main",
+    "html": "<main>a</main>b",
+    "markdown": "a\n\nb"
+  },
+  {
+    "name": "block_header",
+    "html": "<header>a</header>b",
+    "markdown": "a\n\nb"
+  },
+  {
+    "name": "block_footer",
+    "html": "<footer>a</footer>b",
+    "markdown": "a\n\nb"
+  },
+  {
+    "name": "block_form",
+    "html": "<form>a</form>b",
+    "markdown": "a\n\nb"
+  },
+  {
+    "name": "block_address",
+    "html": "<address>a</address>b",
+    "markdown": "a\n\nb"
+  },
+  {
+    "name": "block_figure",
+    "html": "<figure>a</figure>b",
+    "markdown": "a\n\nb"
+  },
+  {
+    "name": "block_figcaption",
+    "html": "<figcaption>a</figcaption>b",
+    "markdown": "a\n\nb"
+  },
+  {
+    "name": "block_dl",
+    "html": "<dl>a</dl>b",
+    "markdown": "a\n\nb"
+  },
+  {
+    "name": "block_dd",
+    "html": "<dd>a</dd>b",
+    "markdown": "a\n\nb"
+  },
+  {
+    "name": "block_dt",
+    "html": "<dt>a</dt>b",
+    "markdown": "a\n\nb"
+  },
+  {
+    "name": "block_audio",
+    "html": "<audio>a</audio>b",
+    "markdown": "a\n\nb"
+  },
+  {
+    "name": "block_video",
+    "html": "<video>a</video>b",
+    "markdown": "ab"
+  },
+  {
+    "name": "block_iframe",
+    "html": "<iframe>a</iframe>b",
+    "markdown": "ab"
+  },
+  {
+    "name": "named_entity_nbsp",
+    "html": "a&nbsp;b",
+    "markdown": "a b"
+  },
+  {
+    "name": "named_entity_copy",
+    "html": "a&copy;b",
+    "markdown": "a©b"
+  },
+  {
+    "name": "named_entity_reg",
+    "html": "a&reg;b",
+    "markdown": "a®b"
+  },
+  {
+    "name": "named_entity_trade",
+    "html": "a&trade;b",
+    "markdown": "a™b"
+  },
+  {
+    "name": "named_entity_mdash",
+    "html": "a&mdash;b",
+    "markdown": "a—b"
+  },
+  {
+    "name": "named_entity_ndash",
+    "html": "a&ndash;b",
+    "markdown": "a–b"
+  },
+  {
+    "name": "named_entity_hellip",
+    "html": "a&hellip;b",
+    "markdown": "a…b"
+  },
+  {
+    "name": "named_entity_lsquo",
+    "html": "a&lsquo;b",
+    "markdown": "a‘b"
+  },
+  {
+    "name": "named_entity_rsquo",
+    "html": "a&rsquo;b",
+    "markdown": "a’b"
+  },
+  {
+    "name": "named_entity_ldquo",
+    "html": "a&ldquo;b",
+    "markdown": "a“b"
+  },
+  {
+    "name": "named_entity_rdquo",
+    "html": "a&rdquo;b",
+    "markdown": "a”b"
+  },
+  {
+    "name": "named_entity_laquo",
+    "html": "a&laquo;b",
+    "markdown": "a«b"
+  },
+  {
+    "name": "named_entity_raquo",
+    "html": "a&raquo;b",
+    "markdown": "a»b"
+  },
+  {
+    "name": "named_entity_deg",
+    "html": "a&deg;b",
+    "markdown": "a°b"
+  },
+  {
+    "name": "named_entity_plusmn",
+    "html": "a&plusmn;b",
+    "markdown": "a±b"
+  },
+  {
+    "name": "named_entity_times",
+    "html": "a&times;b",
+    "markdown": "a×b"
+  },
+  {
+    "name": "named_entity_divide",
+    "html": "a&divide;b",
+    "markdown": "a÷b"
+  },
+  {
+    "name": "named_entity_frac12",
+    "html": "a&frac12;b",
+    "markdown": "a½b"
+  },
+  {
+    "name": "named_entity_frac14",
+    "html": "a&frac14;b",
+    "markdown": "a¼b"
+  },
+  {
+    "name": "named_entity_frac34",
+    "html": "a&frac34;b",
+    "markdown": "a¾b"
+  },
+  {
+    "name": "named_entity_sup2",
+    "html": "a&sup2;b",
+    "markdown": "a²b"
+  },
+  {
+    "name": "named_entity_sup3",
+    "html": "a&sup3;b",
+    "markdown": "a³b"
+  },
+  {
+    "name": "named_entity_micro",
+    "html": "a&micro;b",
+    "markdown": "aµb"
+  },
+  {
+    "name": "named_entity_para",
+    "html": "a&para;b",
+    "markdown": "a¶b"
+  },
+  {
+    "name": "named_entity_middot",
+    "html": "a&middot;b",
+    "markdown": "a·b"
+  },
+  {
+    "name": "named_entity_cent",
+    "html": "a&cent;b",
+    "markdown": "a¢b"
+  },
+  {
+    "name": "named_entity_pound",
+    "html": "a&pound;b",
+    "markdown": "a£b"
+  },
+  {
+    "name": "named_entity_yen",
+    "html": "a&yen;b",
+    "markdown": "a¥b"
+  },
+  {
+    "name": "named_entity_euro",
+    "html": "a&euro;b",
+    "markdown": "a€b"
+  },
+  {
+    "name": "named_entity_sect",
+    "html": "a&sect;b",
+    "markdown": "a§b"
+  },
+  {
+    "name": "named_entity_bull",
+    "html": "a&bull;b",
+    "markdown": "a•b"
+  },
+  {
+    "name": "named_entity_dagger",
+    "html": "a&dagger;b",
+    "markdown": "a†b"
+  },
+  {
+    "name": "named_entity_Dagger",
+    "html": "a&Dagger;b",
+    "markdown": "a‡b"
+  },
+  {
+    "name": "named_entity_permil",
+    "html": "a&permil;b",
+    "markdown": "a‰b"
+  },
+  {
+    "name": "named_entity_prime",
+    "html": "a&prime;b",
+    "markdown": "a′b"
+  },
+  {
+    "name": "named_entity_Prime",
+    "html": "a&Prime;b",
+    "markdown": "a″b"
+  },
+  {
+    "name": "named_entity_infin",
+    "html": "a&infin;b",
+    "markdown": "a∞b"
+  },
+  {
+    "name": "named_entity_ne",
+    "html": "a&ne;b",
+    "markdown": "a≠b"
+  },
+  {
+    "name": "named_entity_le",
+    "html": "a&le;b",
+    "markdown": "a≤b"
+  },
+  {
+    "name": "named_entity_ge",
+    "html": "a&ge;b",
+    "markdown": "a≥b"
+  },
+  {
+    "name": "named_entity_larr",
+    "html": "a&larr;b",
+    "markdown": "a←b"
+  },
+  {
+    "name": "named_entity_uarr",
+    "html": "a&uarr;b",
+    "markdown": "a↑b"
+  },
+  {
+    "name": "named_entity_rarr",
+    "html": "a&rarr;b",
+    "markdown": "a→b"
+  },
+  {
+    "name": "named_entity_darr",
+    "html": "a&darr;b",
+    "markdown": "a↓b"
+  },
+  {
+    "name": "named_entity_harr",
+    "html": "a&harr;b",
+    "markdown": "a↔b"
+  },
+  {
+    "name": "named_entity_spades",
+    "html": "a&spades;b",
+    "markdown": "a♠b"
+  },
+  {
+    "name": "named_entity_clubs",
+    "html": "a&clubs;b",
+    "markdown": "a♣b"
+  },
+  {
+    "name": "named_entity_hearts",
+    "html": "a&hearts;b",
+    "markdown": "a♥b"
+  },
+  {
+    "name": "named_entity_diams",
+    "html": "a&diams;b",
+    "markdown": "a♦b"
+  },
+  {
+    "name": "named_entity_alpha",
+    "html": "a&alpha;b",
+    "markdown": "aαb"
+  },
+  {
+    "name": "named_entity_beta",
+    "html": "a&beta;b",
+    "markdown": "aβb"
+  },
+  {
+    "name": "named_entity_gamma",
+    "html": "a&gamma;b",
+    "markdown": "aγb"
+  },
+  {
+    "name": "named_entity_delta",
+    "html": "a&delta;b",
+    "markdown": "aδb"
+  },
+  {
+    "name": "named_entity_epsilon",
+    "html": "a&epsilon;b",
+    "markdown": "aεb"
+  },
+  {
+    "name": "named_entity_pi",
+    "html": "a&pi;b",
+    "markdown": "aπb"
+  },
+  {
+    "name": "named_entity_omega",
+    "html": "a&omega;b",
+    "markdown": "aωb"
+  },
+  {
+    "name": "named_entity_Alpha",
+    "html": "a&Alpha;b",
+    "markdown": "aΑb"
+  },
+  {
+    "name": "named_entity_Beta",
+    "html": "a&Beta;b",
+    "markdown": "aΒb"
+  },
+  {
+    "name": "named_entity_Gamma",
+    "html": "a&Gamma;b",
+    "markdown": "aΓb"
+  },
+  {
+    "name": "named_entity_Delta",
+    "html": "a&Delta;b",
+    "markdown": "aΔb"
+  },
+  {
+    "name": "named_entity_Omega",
+    "html": "a&Omega;b",
+    "markdown": "aΩb"
+  },
+  {
+    "name": "named_entity_amp",
+    "html": "a&amp;b",
+    "markdown": "a&b"
+  },
+  {
+    "name": "named_entity_lt",
+    "html": "a&lt;b",
+    "markdown": "a<b"
+  },
+  {
+    "name": "named_entity_gt",
+    "html": "a&gt;b",
+    "markdown": "a>b"
+  },
+  {
+    "name": "named_entity_quot",
+    "html": "a&quot;b",
+    "markdown": "a\"b"
+  },
+  {
+    "name": "named_entity_apos",
+    "html": "a&apos;b",
+    "markdown": "a'b"
+  },
+  {
+    "name": "nbsp_trailing",
+    "html": "a ",
+    "markdown": "a "
+  },
+  {
+    "name": "nbsp_leading",
+    "html": " a",
+    "markdown": " a"
+  },
+  {
+    "name": "nbsp_emphasis",
+    "html": "a<em> b </em>c",
+    "markdown": "a_ b _c"
+  },
+  {
+    "name": "nbsp_bold",
+    "html": "a<b> b </b>c",
+    "markdown": "a** b **c"
+  },
+  {
+    "name": "nbsp_code",
+    "html": "a<code> b </code>c",
+    "markdown": "a` b `c"
+  },
+  {
+    "name": "nbsp_attribute",
+    "html": "<img src=\"a\" alt=\"x\n y\">",
+    "markdown": "![x\n y](a)"
+  },
+  {
+    "name": "em_space_trailing",
+    "html": "a ",
+    "markdown": "a "
+  },
+  {
+    "name": "em_space_leading",
+    "html": " a",
+    "markdown": " a"
+  },
+  {
+    "name": "em_space_emphasis",
+    "html": "a<em> b </em>c",
+    "markdown": "a_ b _c"
+  },
+  {
+    "name": "em_space_bold",
+    "html": "a<b> b </b>c",
+    "markdown": "a** b **c"
+  },
+  {
+    "name": "em_space_code",
+    "html": "a<code> b </code>c",
+    "markdown": "a` b `c"
+  },
+  {
+    "name": "em_space_attribute",
+    "html": "<img src=\"a\" alt=\"x\n y\">",
+    "markdown": "![x\n y](a)"
+  },
+  {
+    "name": "line_separator_trailing",
+    "html": "a ",
+    "markdown": "a "
+  },
+  {
+    "name": "line_separator_leading",
+    "html": " a",
+    "markdown": " a"
+  },
+  {
+    "name": "line_separator_emphasis",
+    "html": "a<em> b </em>c",
+    "markdown": "a_ b _c"
+  },
+  {
+    "name": "line_separator_bold",
+    "html": "a<b> b </b>c",
+    "markdown": "a** b **c"
+  },
+  {
+    "name": "line_separator_code",
+    "html": "a<code> b </code>c",
+    "markdown": "a` b `c"
+  },
+  {
+    "name": "line_separator_attribute",
+    "html": "<img src=\"a\" alt=\"x\n y\">",
+    "markdown": "![x\n y](a)"
+  }
+]
