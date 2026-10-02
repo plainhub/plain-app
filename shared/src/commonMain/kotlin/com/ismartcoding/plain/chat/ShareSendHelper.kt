@@ -134,7 +134,7 @@ object ShareSendHelper {
             MessageType.SHARE,
             DMessageShare(
                 shareId = share.id,
-                urlToken = ShareCrypto.deriveSharedTokenEncoded(share.id),
+                urlToken = ShareManager.sharedToken(share.id),
                 peerInfo = DSharePeerInfo(
                     id = TempData.clientId,
                     ip = getDeviceIP4(),

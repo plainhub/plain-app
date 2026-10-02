@@ -364,14 +364,14 @@ actual suspend fun getThumbnailBytes(
     ThumbnailProvider.instance?.toThumbBytesAsync(appContext, file, width, height, centerCrop, mediaId, fileName)
 }
 
-actual suspend fun streamZipToSink(items: List<ZipStreamEntry>, sink: StreamSink): Boolean = withIO {
+actual suspend fun streamZipToSink(items: List<ZipStreamEntry>, sink: StreamSink, recursive: Boolean): Boolean = withIO {
     val os = object : OutputStream() {
         override fun write(b: Int) { runBlocking { sink.write(byteArrayOf(b.toByte())) } }
         override fun write(b: ByteArray, off: Int, len: Int) { runBlocking { sink.write(b, off, len) } }
     }
     try {
         ZipOutputStream(os).use { zip ->
-            val dirs = items.filter { File(it.sourcePath).isDirectory }
+            val dirs = if (recursive) items.filter { File(it.sourcePath).isDirectory } else emptyList()
             items.forEach { item ->
                 val file = File(item.sourcePath)
                 if (!file.exists()) return@forEach
@@ -381,8 +381,8 @@ actual suspend fun streamZipToSink(items: List<ZipStreamEntry>, sink: StreamSink
                 if (skip) return@forEach
                 val entryName = item.entryName.ifEmpty { file.name }
                 if (file.isDirectory) {
-                    zip.putNextEntry(ZipEntry("$entryName/"))
-                    ZipHelper.zipFolderToStreamAsync(file, zip, entryName)
+                    zip.putNextEntry(ZipEntry("${entryName.trimEnd('/')}/"))
+                    if (recursive) ZipHelper.zipFolderToStreamAsync(file, zip, entryName)
                 } else {
                     zip.putNextEntry(ZipEntry(entryName))
                     file.inputStream().copyTo(zip)

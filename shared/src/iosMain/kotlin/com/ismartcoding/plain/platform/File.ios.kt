@@ -426,7 +426,7 @@ actual suspend fun getThumbnailBytes(
     }
 }
 
-actual suspend fun streamZipToSink(items: List<ZipStreamEntry>, sink: StreamSink): Boolean = false
+actual suspend fun streamZipToSink(items: List<ZipStreamEntry>, sink: StreamSink, recursive: Boolean): Boolean = false
 
 actual suspend fun streamZipFolderToSink(folderPath: String, sink: StreamSink): Boolean = false
 

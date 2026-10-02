@@ -61,11 +61,7 @@ class GuestGraphQLService private constructor(
             return
         }
 
-        // Gate on an active share for this id. The share snapshot + derived
-        // token are cached per shared_id; a negative (unknown) entry rejects
-        // fast without hitting the DB, and `isActive` is still evaluated from
-        // the snapshot's `expiresAt` at request time.
-        val auth = ShareManager.authCache.get(sharedId)
+        val auth = ShareManager.loadAuth(sharedId)
         if (auth == null || !auth.share.isActive) {
             LogCat.w("[GuestGraphQL] reject inactive share id=$sharedId")
             call.respondNoBody(HttpStatus.FORBIDDEN)

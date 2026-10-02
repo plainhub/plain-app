@@ -382,7 +382,7 @@ expect suspend fun getThumbnailBytes(
  * is a pair of (sourcePath, entryName). Directories are included recursively.
  * Returns true on success.
  */
-expect suspend fun streamZipToSink(items: List<ZipStreamEntry>, sink: StreamSink): Boolean
+expect suspend fun streamZipToSink(items: List<ZipStreamEntry>, sink: StreamSink, recursive: Boolean = true): Boolean
 
 /**
  * Recursively zip the folder at [folderPath] into [sink]. Returns true on success.

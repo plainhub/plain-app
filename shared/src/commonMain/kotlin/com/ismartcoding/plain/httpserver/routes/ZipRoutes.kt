@@ -70,7 +70,11 @@ fun HttpRouter.addZipRoutes() {
                     call.respondNoBody(HttpStatus.FORBIDDEN)
                     return@get
                 }
-                call.respondZipDir(realPath, jsonName = "")
+                val entries = ShareManager.zipEntries(sid, id)
+                val fileName = "${realPath.substringAfterLast('/')}.zip".urlEncode()
+                call.respondStream(contentType = "application/zip", headers = mapOf("Content-Disposition" to "attachment;filename=\"$fileName\"")) { sink ->
+                    streamZipToSink(entries, sink, recursive = false)
+                }
                 return@get
             }
 

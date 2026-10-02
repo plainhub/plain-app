@@ -26,6 +26,7 @@ object RustContentApi {
 
     fun start() = lock.withLock {
         if (localSession != null) return@withLock
+        com.ismartcoding.plain.preferences.SystemPrefs.ensureMasterSecret()
         val sessionToken = generateChaCha20Key()
         val port = RustCoreBridge.start("$directory/plain-content.db", sessionToken)
         localSession = ContentApiSession("http://127.0.0.1:$port", "local", sessionToken)

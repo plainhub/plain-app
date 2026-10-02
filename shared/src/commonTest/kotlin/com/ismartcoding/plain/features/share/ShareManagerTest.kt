@@ -23,8 +23,8 @@ class ShareManagerTest {
     @Test
     fun root_request_returns_first_root_real_path() {
         val s = share(listOf(photosRoot))
-        assertEquals("/storage/emulated/0/photos", ShareManager.resolveVirtualPath(s, "/"))
-        assertEquals("/storage/emulated/0/photos", ShareManager.resolveVirtualPath(s, ""))
+        assertEquals("/storage/emulated/0/photos", LegacyShareManager.resolveVirtualPath(s, "/"))
+        assertEquals("/storage/emulated/0/photos", LegacyShareManager.resolveVirtualPath(s, ""))
     }
 
     @Test
@@ -32,7 +32,7 @@ class ShareManagerTest {
         val s = share(listOf(photosRoot))
         assertEquals(
             "/storage/emulated/0/photos/IMG_1.jpg",
-            ShareManager.resolveVirtualPath(s, "photos/IMG_1.jpg"),
+            LegacyShareManager.resolveVirtualPath(s, "photos/IMG_1.jpg"),
         )
     }
 
@@ -41,33 +41,33 @@ class ShareManagerTest {
         val s = share(listOf(photosRoot))
         assertEquals(
             "/storage/emulated/0/photos/2026/vacation.jpg",
-            ShareManager.resolveVirtualPath(s, "photos/2026/vacation.jpg"),
+            LegacyShareManager.resolveVirtualPath(s, "photos/2026/vacation.jpg"),
         )
     }
 
     @Test
     fun multiple_roots_resolve_independently() {
         val s = share(listOf(photosRoot, ShareRoot(virtualPath = "docs/", realPath = "/storage/emulated/0/Documents", isDir = true)))
-        assertEquals("/storage/emulated/0/Documents/report.pdf", ShareManager.resolveVirtualPath(s, "docs/report.pdf"))
-        assertEquals("/storage/emulated/0/photos/a.jpg", ShareManager.resolveVirtualPath(s, "photos/a.jpg"))
+        assertEquals("/storage/emulated/0/Documents/report.pdf", LegacyShareManager.resolveVirtualPath(s, "docs/report.pdf"))
+        assertEquals("/storage/emulated/0/photos/a.jpg", LegacyShareManager.resolveVirtualPath(s, "photos/a.jpg"))
     }
 
     @Test
     fun unknown_top_level_root_is_rejected() {
         val s = share(listOf(photosRoot))
-        assertNull(ShareManager.resolveVirtualPath(s, "videos/movie.mp4"))
+        assertNull(LegacyShareManager.resolveVirtualPath(s, "videos/movie.mp4"))
     }
 
     @Test
     fun traversal_via_double_dot_is_blocked() {
         val s = share(listOf(photosRoot))
-        assertNull(ShareManager.resolveVirtualPath(s, "photos/../secret.txt"))
+        assertNull(LegacyShareManager.resolveVirtualPath(s, "photos/../secret.txt"))
     }
 
     @Test
     fun deep_traversal_escaping_root_is_blocked() {
         val s = share(listOf(photosRoot))
-        assertNull(ShareManager.resolveVirtualPath(s, "photos/../../../etc/passwd"))
+        assertNull(LegacyShareManager.resolveVirtualPath(s, "photos/../../../etc/passwd"))
     }
 
     @Test
@@ -75,7 +75,7 @@ class ShareManagerTest {
         val s = share(listOf(photosRoot))
         assertEquals(
             "/storage/emulated/0/photos/a.jpg",
-            ShareManager.resolveVirtualPath(s, "photos/./a.jpg"),
+            LegacyShareManager.resolveVirtualPath(s, "photos/./a.jpg"),
         )
     }
 
@@ -83,7 +83,7 @@ class ShareManagerTest {
     fun expired_share_rejects_all_requests() {
         val expiredAt = Instant.fromEpochMilliseconds(0) // 1970-01-01
         val s = share(listOf(photosRoot), expiresAt = expiredAt)
-        assertNull(ShareManager.resolveVirtualPath(s, "/"))
-        assertNull(ShareManager.resolveVirtualPath(s, "photos/IMG_1.jpg"))
+        assertNull(LegacyShareManager.resolveVirtualPath(s, "/"))
+        assertNull(LegacyShareManager.resolveVirtualPath(s, "photos/IMG_1.jpg"))
     }
 }
