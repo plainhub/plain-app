@@ -1,6 +1,5 @@
 package com.ismartcoding.plain.ui.page.files
 
-import com.ismartcoding.plain.preferences.*
 import com.ismartcoding.plain.i18n.*
 
 import androidx.compose.foundation.layout.Box
@@ -17,6 +16,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationDrawerItemDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
@@ -48,6 +48,8 @@ import com.ismartcoding.plain.ui.models.FolderOption
 import com.ismartcoding.plain.ui.nav.Routing
 import com.ismartcoding.plain.ui.page.shares.expiryLabel
 import kotlinx.coroutines.launch
+import com.ismartcoding.plain.features.FavoriteFolderHelper
+import com.ismartcoding.plain.ui.models.launchSafe
 import com.ismartcoding.plain.ui.resources.Res as UiRes
 import com.ismartcoding.plain.ui.resources.folder as ui_drawable_folder
 import com.ismartcoding.plain.ui.resources.history as ui_drawable_history
@@ -77,6 +79,7 @@ fun FilesDrawerContent(
     val usbStorageText = stringResource(Res.string.usb_storage)
     val fileTransferAssistantText = stringResource(Res.string.app_data)
     val scope = rememberCoroutineScope()
+    val favoriteFolders by FavoriteFolderHelper.items.collectAsState()
     val options = remember { mutableStateListOf<FolderOption>() }
     var shares by remember { mutableStateOf<List<DShare>>(emptyList()) }
     var contextMenuPath by remember { mutableStateOf<String?>(null) }
@@ -87,16 +90,19 @@ fun FilesDrawerContent(
     var sharesExpanded by remember { mutableStateOf(true) }
 
     val removeFavorite: (String) -> Unit = { fullPath ->
-        scope.launch {
-            UserPrefs.removeFavoriteFolder(fullPath)
+        scope.launchSafe {
+            FavoriteFolderHelper.remove(fullPath)
             filesVM.favoriteFoldersVersion.value++
         }
     }
 
-    LaunchedEffect(filesVM.favoriteFoldersVersion.intValue, filesVM.selectedPathVersion.intValue) {
-        val items = buildFolderOptions(filesVM, recentsText, internalStorageText, sdcardText, usbStorageText, fileTransferAssistantText)
-        options.clear()
-        options.addAll(items)
+    LaunchedEffect(favoriteFolders, filesVM.favoriteFoldersVersion.intValue, filesVM.selectedPathVersion.intValue) {
+        try {
+            val items = buildFolderOptions(filesVM, recentsText, internalStorageText, sdcardText, usbStorageText, fileTransferAssistantText)
+            options.clear()
+            options.addAll(items)
+        } catch (cancelled: kotlinx.coroutines.CancellationException) { throw cancelled }
+        catch (error: Exception) { com.ismartcoding.plain.ui.helpers.DialogHelper.showMessage(error) }
     }
 
     // Reload shares whenever the drawer opens or the share list changes
@@ -223,8 +229,8 @@ fun FilesDrawerContent(
             onValueChange = { renameValue = it },
             onDismissRequest = { renameFavorite = null },
             onConfirm = { name ->
-                scope.launch {
-                    UserPrefs.renameFavoriteFolder(favorite.fullPath, name)
+                scope.launchSafe {
+                    FavoriteFolderHelper.rename(favorite.fullPath, name)
                     filesVM.favoriteFoldersVersion.value++
                 }
                 renameFavorite = null

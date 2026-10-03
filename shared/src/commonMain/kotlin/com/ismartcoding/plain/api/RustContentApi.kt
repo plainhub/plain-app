@@ -100,6 +100,9 @@ object RustContentApi {
                         val payload = message.getValue("payload").jsonPrimitive.content
                         when (type) {
                             EventType.CONTENT_CHANGED.value -> {
+                                try { com.ismartcoding.plain.features.FavoriteFolderHelper.refresh() }
+                                catch (cancelled: CancellationException) { throw cancelled }
+                                catch (error: Exception) { com.ismartcoding.plain.lib.logcat.LogCat.e("Favorite folders refresh",error) }
                                 refreshSyncStates()
                                 NotesViewModel.reloadAsync()
                                 com.ismartcoding.plain.features.PomodoroHost.refresh()

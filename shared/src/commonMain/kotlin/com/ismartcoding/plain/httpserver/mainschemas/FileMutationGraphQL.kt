@@ -4,7 +4,6 @@ import com.ismartcoding.plain.preferences.*
 import com.ismartcoding.plain.lib.kgraphql.annotations.GraphQLMutation
 import com.ismartcoding.plain.lib.kgraphql.schema.dsl.SchemaBuilder
 import com.ismartcoding.plain.extensions.getFinalPath
-import com.ismartcoding.plain.data.DFavoriteFolder
 import com.ismartcoding.plain.platform.Permission
 import com.ismartcoding.plain.platform.checkEnabledAsync
 import com.ismartcoding.plain.platform.copyFileOrDir
@@ -72,34 +71,16 @@ suspend fun moveFile(src: String, dst: String, overwrite: Boolean): Boolean {
 }
 
 @GraphQLMutation
-suspend fun addFavoriteFolder(rootPath: String, fullPath: String): List<FavoriteFolder> {
-    val current = UserPrefs.favoriteFoldersValue()
-        .firstOrNull { it.fullPath == fullPath }
-    val folder = DFavoriteFolder(rootPath, fullPath, alias = current?.alias)
-    val updatedFolders = UserPrefs.addFavoriteFolder(folder)
-    return updatedFolders.map { it.toModel() }
-}
+suspend fun addFavoriteFolder(rootPath: String, fullPath: String): List<FavoriteFolder> =
+    com.ismartcoding.plain.features.FavoriteFolderHelper.add(rootPath,fullPath).map { it.toModel() }
 
 @GraphQLMutation
-suspend fun removeFavoriteFolder(fullPath: String): List<FavoriteFolder> {
-    val updatedFolders = UserPrefs.removeFavoriteFolder(fullPath)
-    return updatedFolders.map { it.toModel() }
-}
+suspend fun removeFavoriteFolder(fullPath: String): List<FavoriteFolder> =
+    com.ismartcoding.plain.features.FavoriteFolderHelper.remove(fullPath).map { it.toModel() }
 
 @GraphQLMutation
-suspend fun setFavoriteFolderAlias(fullPath: String, alias: String): List<FavoriteFolder> {
-    val trimmed = alias.trim()
-    val updated = UserPrefs.favoriteFoldersValue()
-        .map {
-            if (it.fullPath == fullPath) {
-                it.copy(alias = trimmed)
-            } else {
-                it
-            }
-        }
-    UserPrefs.setFavoriteFolders(updated)
-    return updated.map { it.toModel() }
-}
+suspend fun setFavoriteFolderAlias(fullPath: String, alias: String): List<FavoriteFolder> =
+    com.ismartcoding.plain.features.FavoriteFolderHelper.rename(fullPath,alias).map { it.toModel() }
 
 fun SchemaBuilder.addFileMutationSchema() {
 }

@@ -1,6 +1,5 @@
 package com.ismartcoding.plain.preferences
 
-import com.ismartcoding.plain.data.DFavoriteFolder
 import com.ismartcoding.plain.enums.MediaPlayMode
 import com.ismartcoding.plain.features.file.FileSortBy
 import com.ismartcoding.plain.platform.Permission
@@ -155,15 +154,6 @@ class PrefsTest {
     fun complexSettingsAndRecentSearchesKeepTheirBehavior() {
         val backend = FakeBackend("{}")
         Prefs.load("system_prefs.json", "user_prefs.json", backend)
-        val folder = DFavoriteFolder(rootPath = "/root", fullPath = "/root/music")
-
-        UserPrefs.addFavoriteFolder(folder)
-        UserPrefs.addFavoriteFolder(folder.copy(alias = "Music"))
-        assertEquals(listOf("Music"), UserPrefs.favoriteFoldersValue().map { it.alias })
-        assertTrue(UserPrefs.isFavoriteFolder(folder.fullPath))
-        UserPrefs.removeFavoriteFolder(folder.fullPath)
-        assertFalse(UserPrefs.isFavoriteFolder(folder.fullPath))
-
         SystemPrefs.setApiPermission(Permission.ADB, true)
         SystemPrefs.setApiPermission(Permission.CAMERA, true)
         SystemPrefs.setApiPermission(Permission.ADB, false)

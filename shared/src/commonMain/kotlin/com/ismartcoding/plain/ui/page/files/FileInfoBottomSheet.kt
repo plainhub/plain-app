@@ -1,5 +1,4 @@
 package com.ismartcoding.plain.ui.page.files
-import com.ismartcoding.plain.preferences.*
 import androidx.compose.foundation.layout.padding
 import androidx.compose.ui.Modifier
 import com.ismartcoding.plain.ui.theme.PlainTheme
@@ -9,12 +8,12 @@ import com.ismartcoding.plain.i18n.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import org.jetbrains.compose.resources.pluralStringResource
 import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.unit.dp
@@ -25,7 +24,6 @@ import com.ismartcoding.plain.lib.extensions.getMimeType
 import com.ismartcoding.plain.platform.formatDateTime
 import com.ismartcoding.plain.platform.getFileIconPath
 import com.ismartcoding.plain.platform.renameAndScanFile
-import com.ismartcoding.plain.data.DFavoriteFolder
 import com.ismartcoding.plain.ui.base.BottomSpace
 import com.ismartcoding.plain.ui.base.CopyIconButton
 import com.ismartcoding.plain.ui.base.PCard
@@ -36,8 +34,9 @@ import com.ismartcoding.plain.ui.base.PSheetHeaderThumb
 import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.components.FileRenameDialog
 import com.ismartcoding.plain.ui.models.FilesViewModel
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import com.ismartcoding.plain.features.FavoriteFolderHelper
+import com.ismartcoding.plain.ui.models.launchSafe
 import com.ismartcoding.plain.ui.resources.Res as UiRes
 import com.ismartcoding.plain.ui.resources.file as ui_drawable_file
 import com.ismartcoding.plain.i18n.file
@@ -50,12 +49,13 @@ fun FileInfoBottomSheet(filesVM: FilesViewModel) {
     // Scoped to this sheet instance: a fresh long-press always starts with the dialog
     // closed, so a stale flag can never pop rename together with the sheet.
     val showRenameDialog = remember { mutableStateOf(false) }
-    var isFavorite by remember { mutableStateOf(false) }
+    val favorites by FavoriteFolderHelper.items.collectAsState()
+    val isFavorite = favorites.any { it.fullPath == file.path }
     val onDismiss = { filesVM.selectedFile.value = null }
 
     LaunchedEffect(file.path) {
         if (file.isDir) {
-            isFavorite = UserPrefs.isFavoriteFolder(file.path)
+            scope.launchSafe { FavoriteFolderHelper.refresh() }
         }
     }
 
@@ -98,13 +98,11 @@ fun FileInfoBottomSheet(filesVM: FilesViewModel) {
                 FileInfoSecondaryActions(
                     file = file, filesVM = filesVM, isFavorite = isFavorite,
                     onFavoriteToggle = {
-                        scope.launch(Dispatchers.Default) {
+                        scope.launchSafe {
                             if (isFavorite) {
-                                UserPrefs.removeFavoriteFolder(file.path)
-                                isFavorite = false
+                                FavoriteFolderHelper.remove(file.path)
                             } else {
-                                UserPrefs.addFavoriteFolder(DFavoriteFolder(rootPath = filesVM.rootPath, fullPath = file.path))
-                                isFavorite = true
+                                FavoriteFolderHelper.add(filesVM.rootPath,file.path)
                             }
                             filesVM.favoriteFoldersVersion.value++
                         }

@@ -1,6 +1,5 @@
 package com.ismartcoding.plain.preferences
 
-import com.ismartcoding.plain.data.DFavoriteFolder
 import com.ismartcoding.plain.data.DPomodoroSettings
 import com.ismartcoding.plain.data.DScreenMirrorQuality
 import com.ismartcoding.plain.data.DVideo
@@ -56,7 +55,6 @@ object UserPrefs {
     val editorFontSize = flow("editor_font_size", 14)
     val editorStatusBar = flow("editor_status_bar", true)
     val lastFilePath = flow("last_file_path", "")
-    val favoriteFolders = flow("favorite_folders", "")
     val scanHistory = flow("scan_history", "")
     val audioPlaylist = flow("audio_playlist", "")
     val chatInputText = flow("chat_input_text", "")
@@ -98,26 +96,6 @@ object UserPrefs {
 
     fun lastFilePathValue(): FilePathData = Prefs.decodeOrDefault(lastFilePath.value) { FilePathData("", "", "") }
     fun setLastFilePath(value: FilePathData) { lastFilePath.value = Prefs.json.encodeToString(value) }
-
-    fun favoriteFoldersValue(): List<DFavoriteFolder> = Prefs.decodeOrDefault(favoriteFolders.value) { emptyList() }
-    fun setFavoriteFolders(value: List<DFavoriteFolder>) { favoriteFolders.value = Prefs.json.encodeToString(value) }
-    fun addFavoriteFolder(folder: DFavoriteFolder): List<DFavoriteFolder> = favoriteFoldersValue().toMutableList().also {
-        it.removeAll { item -> item.fullPath == folder.fullPath }
-        it.add(folder)
-        setFavoriteFolders(it)
-    }
-    fun removeFavoriteFolder(fullPath: String): List<DFavoriteFolder> = favoriteFoldersValue().toMutableList().also {
-        it.removeAll { item -> item.fullPath == fullPath }
-        setFavoriteFolders(it)
-    }
-    fun renameFavoriteFolder(fullPath: String, alias: String): List<DFavoriteFolder> = favoriteFoldersValue().toMutableList().also {
-        val index = it.indexOfFirst { item -> item.fullPath == fullPath }
-        if (index >= 0) {
-            it[index] = it[index].copy(alias = alias.trim().ifEmpty { null })
-            setFavoriteFolders(it)
-        }
-    }
-    fun isFavoriteFolder(fullPath: String) = favoriteFoldersValue().any { it.fullPath == fullPath }
 
     fun scanHistoryValue(): List<String> = Prefs.decodeOrDefault(scanHistory.value) { emptyList() }
     fun setScanHistory(value: List<String>) { scanHistory.value = Prefs.json.encodeToString(value) }

@@ -85,7 +85,7 @@ suspend fun pathKind(path: String): PathKind? {
 
 @GraphQLQuery
 suspend fun favoriteFolders(): List<FavoriteFolder> {
-    return UserPrefs.favoriteFoldersValue().map { it.toModel() }
+    return com.ismartcoding.plain.features.FavoriteFolderHelper.refresh().map { it.toModel() }
 }
 
 fun SchemaBuilder.addFileQuerySchema() {
