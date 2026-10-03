@@ -14,6 +14,21 @@ object FileTaskHost {
                 FilePathValidator.requireAllSafe(canonical.filterNot(::isPrivate))
                 if (canonical.any { !isPrivate(it) }) check(Permission.WRITE_EXTERNAL_STORAGE.isGranted()) { "File access permission denied" }
             }
+            "fileTaskZipEntries" -> {
+                require(paths.size == 1)
+                val path = paths.single()
+                val archive = ZipBrowserHelper.getZipFilePath(path)
+                FilePathValidator.requireAllSafe(listOf(getCanonicalPath(archive)).filterNot(::isPrivate))
+                if (!isPrivate(getCanonicalPath(archive))) check(Permission.WRITE_EXTERNAL_STORAGE.isGranted()) { "File access permission denied" }
+                return@withIO buildJsonArray {
+                    listZipEntries(path, FileSortBy.NAME_ASC).forEach { row -> add(buildJsonObject {
+                        put("name", row.name); put("path", row.path); put("permission", row.permission)
+                        put("createdAt", row.createdAt?.toEpochMilliseconds()?.let(::JsonPrimitive) ?: JsonNull)
+                        put("updatedAt", row.updatedAt.toEpochMilliseconds()); put("size", row.size)
+                        put("isDir", row.isDir); put("childCount", row.childCount); put("mediaId", row.mediaId)
+                    }) }
+                }
+            }
             "fileTaskScan" -> scanFileTaskPaths(paths.filterNot { isPrivate(getCanonicalPath(it)) })
             "fileTaskMediaSnapshot" -> {
                 require(paths.size <= 128)

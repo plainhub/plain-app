@@ -12,9 +12,8 @@ import com.ismartcoding.plain.enums.PathKind
 import com.ismartcoding.plain.platform.Permission
 import com.ismartcoding.plain.platform.checkEnabledAsync
 import com.ismartcoding.plain.features.file.FileSortBy
-import com.ismartcoding.plain.platform.searchFilesInDir
+import com.ismartcoding.plain.features.file.RustFileHelper
 import com.ismartcoding.plain.platform.getRecentFiles
-import com.ismartcoding.plain.platform.statFile
 import com.ismartcoding.plain.httpserver.loaders.MountsLoader
 import com.ismartcoding.plain.httpserver.models.FavoriteFolder
 import com.ismartcoding.plain.httpserver.models.File
@@ -42,20 +41,20 @@ suspend fun recentFiles(): List<File> {
 @GraphQLQuery
 suspend fun files(root: String, offset: Int, limit: Int, query: String, sortBy: FileSortBy): List<File> {
     Permission.WRITE_EXTERNAL_STORAGE.checkEnabledAsync()
-    return searchFilesInDir(query, root, sortBy).drop(offset).take(limit).map { it.toModel() }
+    return RustFileHelper.search(query, root, sortBy, offset, limit).map { it.toModel() }
 }
 
 @GraphQLQuery
 suspend fun fileCount(root: String, query: String): Int {
     Permission.WRITE_EXTERNAL_STORAGE.checkEnabledAsync()
-    return searchFilesInDir(query, root, FileSortBy.DATE_ASC).size
+    return RustFileHelper.count(query, root)
 }
 
 @GraphQLQuery(description = "Detailed info for one file. `fileName` is optional — when omitted it is derived from `path`; it selects the media-info probe (image/video/audio).")
 suspend fun fileInfo(path: String, fileName: String? = null): FileInfo {
     Permission.WRITE_EXTERNAL_STORAGE.checkEnabledAsync()
     val finalPath = path.getFinalPath()
-    val stat = statFile(finalPath)
+    val stat = RustFileHelper.stat(finalPath)
     val updatedAt = stat?.updatedAt ?: kotlin.time.Instant.fromEpochMilliseconds(0)
     val size = stat?.size ?: 0L
     val name = fileName ?: finalPath.getFilenameFromPath()
@@ -72,14 +71,14 @@ suspend fun fileInfo(path: String, fileName: String? = null): FileInfo {
 suspend fun pathExists(path: String): Boolean {
     val finalPath = path.getFinalPath()
     if (finalPath.isBlank() || finalPath == ".") return false
-    return statFile(finalPath) != null
+    return RustFileHelper.stat(finalPath) != null
 }
 
 @GraphQLQuery(description = "Kind of the path: FILE or DIR; null when the path does not exist (same total-predicate semantics as pathExists).")
 suspend fun pathKind(path: String): PathKind? {
     val finalPath = path.getFinalPath()
     if (finalPath.isBlank() || finalPath == ".") return null
-    val stat = statFile(finalPath) ?: return null
+    val stat = RustFileHelper.stat(finalPath) ?: return null
     return if (stat.isDir) PathKind.DIR else PathKind.FILE
 }
 

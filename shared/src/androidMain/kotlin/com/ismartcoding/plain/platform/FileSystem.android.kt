@@ -26,15 +26,6 @@ actual fun getSDCardPath(): String = FileSystemHelper.getSDCardPath(appContext)
 
 actual fun getUsbDiskPaths(): List<String> = FileSystemHelper.getUsbDiskPaths()
 
-actual fun listFilesInDir(dir: String, showHidden: Boolean, sortBy: FileSortBy): List<DFile> =
-    FileSystemHelper.getFilesList(dir, showHidden, sortBy)
-
-actual suspend fun searchFilesInDir(query: String, root: String, sortBy: FileSortBy): List<DFile> =
-    FileSystemHelper.search(query, root, sortBy)
-
-actual fun searchFilesByName(query: String, dir: String, showHidden: Boolean, sortBy: FileSortBy): List<DFile> =
-    FileSystemHelper.search(query, dir, showHidden).sorted(sortBy)
-
 actual suspend fun searchFiles(query: String, limit: Int, offset: Int, sortBy: FileSortBy): List<DFile> =
     FileMediaStoreHelper.searchAsync(appContext, query, limit, offset, sortBy)
 

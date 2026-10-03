@@ -29,19 +29,19 @@ expect fun getUsbDiskPaths(): List<String>
 /**
  * List files in [dir], optionally including hidden files, sorted by [sortBy].
  */
-expect fun listFilesInDir(dir: String, showHidden: Boolean, sortBy: FileSortBy): List<DFile>
+suspend fun listFilesInDir(dir: String, showHidden: Boolean, sortBy: FileSortBy): List<DFile> = RustFileHelper.list(dir, showHidden, sortBy)
 
 /**
  * Search files recursively under [root] matching [query], optionally including hidden files.
- * Delegates query parsing (text, parent, file_size, show_hidden) to the platform implementation.
+ * Rust owns query parsing, traversal, filtering and sorting.
  */
-expect suspend fun searchFilesInDir(query: String, root: String, sortBy: FileSortBy): List<DFile>
+suspend fun searchFilesInDir(query: String, root: String, sortBy: FileSortBy): List<DFile> = RustFileHelper.search(query, root, sortBy)
 
 /**
  * Recursively search files under [dir] whose name contains [query] (case-insensitive).
  * When [showHidden] is false, hidden files are skipped. Results are sorted by [sortBy].
  */
-expect fun searchFilesByName(query: String, dir: String, showHidden: Boolean, sortBy: FileSortBy): List<DFile>
+suspend fun searchFilesByName(query: String, dir: String, showHidden: Boolean, sortBy: FileSortBy): List<DFile> = RustFileHelper.searchName(query, dir, showHidden, sortBy)
 
 /**
  * Search files by name across the primary external volume via MediaStore

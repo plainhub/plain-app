@@ -31,39 +31,6 @@ actual fun getSDCardPath(): String = ""
 
 actual fun getUsbDiskPaths(): List<String> = emptyList()
 
-actual fun listFilesInDir(dir: String, showHidden: Boolean, sortBy: FileSortBy): List<DFile> {
-    val mgr = NSFileManager.defaultManager
-    if (!mgr.fileExistsAtPath(dir)) return emptyList()
-    val names = mgr.contentsOfDirectoryAtPath(dir, null)?.filterIsInstance<String>() ?: return emptyList()
-    val files = ArrayList<DFile>()
-    for (name in names) {
-        if (!showHidden && name.startsWith(".")) continue
-        val fullPath = joinPath(dir, name)
-        val dfile = buildDFile(fullPath, name, showHidden, computeChildren = true) ?: continue
-        files.add(dfile)
-    }
-    return files.sorted(sortBy)
-}
-
-actual suspend fun searchFilesInDir(query: String, root: String, sortBy: FileSortBy): List<DFile> = withIO {
-    val filterFields = QueryHelper.parseAsync(query)
-    val showHidden = filterFields.find { it.name == "show_hidden" }?.value?.toBoolean() ?: false
-    val text = filterFields.find { it.name == "text" }?.value ?: ""
-    val parent = filterFields.find { it.name == "parent" }?.value ?: ""
-    val fileSizeFields = filterFields.filter { it.name == "file_size" }
-    val dir = parent.ifEmpty { root }
-    val items = if (text.isNotEmpty() || fileSizeFields.isNotEmpty()) {
-        searchRecursive(text, dir, showHidden).sorted(sortBy)
-    } else {
-        listFilesInDir(dir, showHidden, sortBy)
-    }
-    if (fileSizeFields.isEmpty()) return@withIO items
-    return@withIO items.filter { !it.isDir && matchFileSizeFilters(it.size, fileSizeFields) }
-}
-
-actual fun searchFilesByName(query: String, dir: String, showHidden: Boolean, sortBy: FileSortBy): List<DFile> =
-    listFilesInDir(dir, showHidden, sortBy).filter { it.name.contains(query, ignoreCase = true) }
-
 actual suspend fun searchFiles(query: String, limit: Int, offset: Int, sortBy: FileSortBy): List<DFile> = emptyList()
 
 actual suspend fun countFiles(query: String): Int = 0
