@@ -148,22 +148,6 @@ actual suspend fun copyPickedFileToAppStorage(uriStr: String, destRelativePath: 
     }
 }
 
-@OptIn(BetaInteropApi::class, ExperimentalForeignApi::class)
-actual fun writeFileText(path: String, content: String, overwrite: Boolean): DFile {
-    if (!overwrite && NSFileManager.defaultManager.fileExistsAtPath(path)) {
-        throw com.ismartcoding.plain.lib.kgraphql.GraphQLError("File already exists")
-    }
-    val parent = path.substringBeforeLast('/', "")
-    if (parent.isNotEmpty()) {
-        NSFileManager.defaultManager.createDirectoryAtPath(
-            parent, withIntermediateDirectories = true, attributes = null, error = null,
-        )
-    }
-    NSString.create(string = content)?.writeToFile(path, atomically = true, encoding = NSUTF8StringEncoding, error = null)
-    val size = NSFileManager.defaultManager.contentsAtPath(path)?.length?.toInt()?.toLong() ?: 0L
-    return buildTextFile(path, size, TimeHelper.nowMillis())
-}
-
 actual fun getUploadTmpDirPath(): String =
     appDir() + "/upload_tmp"
 

@@ -1,5 +1,6 @@
 package com.ismartcoding.plain.platform
 
+import com.ismartcoding.plain.features.file.RustFileHelper
 import com.ismartcoding.plain.features.file.DFile
 import com.ismartcoding.plain.features.file.DStorageStatsItem
 import com.ismartcoding.plain.features.file.FileSortBy
@@ -63,12 +64,12 @@ expect suspend fun getRecentFiles(): List<DFile>
 /**
  * Create a directory at [path] (including parents). Returns the resulting DFile.
  */
-expect fun createDirectory(path: String): DFile
+suspend fun createDirectory(path: String): DFile = RustFileHelper.createDirectory(path)
 
 /**
  * Create an empty file at [path]. Returns the resulting DFile.
  */
-expect fun createFile(path: String): DFile
+suspend fun createFile(path: String): DFile = RustFileHelper.createFile(path)
 
 /**
  * Notify the media scanner that files at [paths] were added/removed.

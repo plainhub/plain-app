@@ -61,10 +61,6 @@ actual suspend fun getRecentFiles(): List<DFile> = withIO {
     }
 }
 
-actual fun createDirectory(path: String): DFile = FileSystemHelper.createDirectory(path)
-
-actual fun createFile(path: String): DFile = FileSystemHelper.createFile(path)
-
 actual fun scanFiles(paths: Array<String>) {
     appContext.scanFileByConnection(paths)
 }

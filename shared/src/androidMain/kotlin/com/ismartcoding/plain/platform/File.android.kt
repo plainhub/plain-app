@@ -162,17 +162,6 @@ actual suspend fun copyPickedFileToAppStorage(uriStr: String, destRelativePath: 
     file.displayName
 }
 
-actual fun writeFileText(path: String, content: String, overwrite: Boolean): DFile {
-    val filePath = if (path.startsWith("file://")) Uri.parse(path).path else path
-    val file = File(filePath ?: path)
-    if (!overwrite && file.exists()) {
-        throw com.ismartcoding.plain.lib.kgraphql.GraphQLError("File already exists")
-    }
-    file.writeText(content)
-    appContext.scanFileByConnection(file.absolutePath)
-    return buildTextFile(file.absolutePath, file.length(), file.lastModified())
-}
-
 actual fun getUploadTmpDirPath(): String =
     File(appContext.filesDir, "upload_tmp").absolutePath
 

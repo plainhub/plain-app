@@ -70,36 +70,6 @@ actual suspend fun countFiles(query: String): Int = 0
 
 actual suspend fun getRecentFiles(): List<DFile> = emptyList()
 
-actual fun createDirectory(path: String): DFile {
-    NSFileManager.defaultManager.createDirectoryAtPath(
-        path, withIntermediateDirectories = true, attributes = null, error = null,
-    )
-    return DFile(
-        name = path.substringAfterLast('/'),
-        path = path,
-        permission = "",
-        createdAt = null,
-        updatedAt = Instant.fromEpochMilliseconds(0),
-        size = 0,
-        isDir = true,
-        childCount = 0,
-    )
-}
-
-actual fun createFile(path: String): DFile {
-    NSFileManager.defaultManager.createFileAtPath(path, null, null)
-    return DFile(
-        name = path.substringAfterLast('/'),
-        path = path,
-        permission = "",
-        createdAt = null,
-        updatedAt = Instant.fromEpochMilliseconds(0),
-        size = 0,
-        isDir = false,
-        childCount = 0,
-    )
-}
-
 actual fun scanFiles(paths: Array<String>) {}
 
 actual suspend fun renameAndScanFile(path: String, newName: String): String? = withIO {

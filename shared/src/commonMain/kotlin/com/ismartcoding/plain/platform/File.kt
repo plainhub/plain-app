@@ -6,6 +6,7 @@ import com.ismartcoding.plain.db.DMessageFile
 import com.ismartcoding.plain.db.DMessageFiles
 import com.ismartcoding.plain.db.MessageType
 import com.ismartcoding.plain.extensions.resolveAppFileRealPath
+import com.ismartcoding.plain.features.file.RustFileHelper
 import com.ismartcoding.plain.features.file.DFile
 import com.ismartcoding.plain.helpers.AppFileStore
 import com.ismartcoding.plain.lib.TimeHelper
@@ -117,10 +118,10 @@ expect suspend fun copyPickedFileToAppStorage(uriStr: String, destRelativePath: 
 
 /**
  * Write [content] to a text file at [path]. When [overwrite] is false and the file
- * already exists, throws [com.ismartcoding.plain.lib.kgraphql.GraphQLError].
+ * already exists, the Rust request fails.
  * Returns the resulting DFile.
  */
-expect fun writeFileText(path: String, content: String, overwrite: Boolean): DFile
+suspend fun writeFileText(path: String, content: String, overwrite: Boolean): DFile = RustFileHelper.writeText(path, content, overwrite)
 
 /**
  * Returns the directory used to store chunked-upload temp files (one sub-directory

@@ -51,6 +51,16 @@ object RustContentApi {
         }
     }
 
+    suspend fun postJson(path: String, body: JsonObject): JsonObject {
+        start()
+        val target = checkNotNull(localSession)
+        return client.postText("${target.baseUrl}/$path", body.toString(), "application/json", target.headers()).use {
+            val result = Json.parseToJsonElement(it.bodyAsText()).jsonObject
+            check(it.isOk()) { result["error"]?.jsonPrimitive?.content ?: "Rust API returned HTTP ${it.status}" }
+            result
+        }
+    }
+
     suspend fun sync(feedId: String) {
         val key = feedId.ifEmpty { "all" }
         mutate("syncFeeds(id: ${if (feedId.isEmpty()) "null" else gql(feedId)})")
