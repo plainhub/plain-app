@@ -24,6 +24,7 @@ object RustHostApi {
                     client.webSocket(session.baseUrl.replace("http://", "ws://") + "/host", session.headers()) { socket ->
                         retryMs = 500L
                         coroutineScope {
+                            val exchangeScope = this
                             val capacity = Semaphore(4)
                             val sending = kotlinx.coroutines.sync.Mutex()
                             try {
@@ -38,6 +39,7 @@ object RustHostApi {
                                         try {
                                             val reply = try {
                                                 val result = when {
+                                                    method == "httpExchange" -> { com.ismartcoding.plain.httpserver.RustHttpHost.start(exchangeScope, session, params.getValue("id").jsonPrimitive.content); JsonNull }
                                                     method == "audioEngineCommand" -> AudioEngineHost.handle(method, params)
                                                     method.startsWith("fileTask") -> com.ismartcoding.plain.features.file.FileTaskHost.handle(method,params)
                                                     method == "mediaAction" -> handleMediaActionHost(params)

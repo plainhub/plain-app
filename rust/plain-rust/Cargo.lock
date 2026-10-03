@@ -1728,7 +1728,7 @@ checksum = "f6b464fbc74e149a392436b17d523f769e057cb6877f6a5c4618bc6f11800548"
 [[package]]
 name = "plain-rs"
 version = "0.1.0"
-source = "git+https://github.com/plainhub/plain-desktop.git?rev=768b63777e9041e60326c1a0fbe5a5463fb49222#768b63777e9041e60326c1a0fbe5a5463fb49222"
+source = "git+https://github.com/plainhub/plain-desktop.git?rev=315019d28f5525c3649d6f1a98d87b987b8e4f4a#315019d28f5525c3649d6f1a98d87b987b8e4f4a"
 dependencies = [
  "anyhow",
  "async-graphql",
@@ -1771,6 +1771,7 @@ version = "0.1.0"
 dependencies = [
  "jni",
  "plain-rs",
+ "rustls-pemfile",
  "serde_json",
  "tokio",
 ]

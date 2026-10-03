@@ -8,8 +8,9 @@ name = "plain_rust"
 crate-type = ["cdylib", "staticlib"]
 
 [dependencies]
-plain-rs = { git = "https://github.com/plainhub/plain-desktop.git", rev = "768b63777e9041e60326c1a0fbe5a5463fb49222", features = ["content_api", "http_transport"] }
+plain-rs = { git = "https://github.com/plainhub/plain-desktop.git", rev = "315019d28f5525c3649d6f1a98d87b987b8e4f4a", features = ["content_api", "http_transport"] }
 serde_json = "1"
+rustls-pemfile = "2"
 tokio = { version = "1", features = ["rt-multi-thread", "sync"] }
 
 [target.'cfg(target_os = "android")'.dependencies]

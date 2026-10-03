@@ -1,4 +1,5 @@
 mod core;
+mod tls;
 use plain_rs::prefs::Prefs;
 use serde_json::{Map, Value};
 use std::ffi::{CStr, CString, c_char};

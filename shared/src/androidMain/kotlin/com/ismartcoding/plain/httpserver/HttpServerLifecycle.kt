@@ -6,7 +6,6 @@ import android.content.Context
 import com.ismartcoding.plain.Constants
 import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.appContext
-import com.ismartcoding.plain.lib.apk.cert.x509.X509SelfSignedGenerator
 import com.ismartcoding.plain.lib.coIO
 import com.ismartcoding.plain.lib.withIO
 import com.ismartcoding.plain.lib.logcat.LogCat
@@ -41,28 +40,8 @@ var httpServer: EmbeddedServer<*, *>? = null
 
 private val SSL_KEY_ALIAS = Constants.SSL_NAME
 
-/**
- * Preload at app launch everything the first real server start would otherwise
- * pay for on the tap: the shared route registry + GraphQL schemas (process-wide
- * singletons reused by the real server), the HTTPS keystore and its crypto
- * classes, and an HTTP client. The empty Netty engine start only covers Netty
- * itself — without this the first start cost >2s on a mid-range phone.
- */
 fun warmUpHttpServer() {
     coIO {
-        try {
-            // Always parse the keystore once per process: the result is cached
-            // and the cold parse costs seconds, so whichever start comes first
-            // (auto-restore or user tap) must not pay it on the critical path.
-            getSslKeyStore(appContext, SystemPrefs.keyStorePassword.value)
-            LogCat.d("SSL keystore warm-up complete")
-        } catch (ex: Exception) {
-            LogCat.e("SSL keystore warm-up failed: ${ex.message}")
-        }
-        // When the service is enabled it auto-starts within ~100ms of launch;
-        // warming the route registry / Netty in parallel would just fight the
-        // start for JIT-cold classes (measured: racing the warmup nearly
-        // doubled the engine-create phase).
         if (UserPrefs.service.value) return@coIO
         try {
             HttpRouteRegistry.mainGraphQL
@@ -77,34 +56,7 @@ fun warmUpHttpServer() {
             createHttpClient().close()
         } catch (_: Exception) {
         }
-        try {
-            val s = embeddedServer(Netty, port = 0) {}
-            s.start(wait = false)
-            s.stop(0, 0)
-            LogCat.d("Netty warm-up complete")
-        } catch (_: Exception) {
-        }
-    }
-}
 
-/**
- * Generate a fresh PKCS#12 keystore file and atomically replace [file].
- */
-fun generateSslKeyStoreFile(file: File, password: String) {
-    cachedKeyStore = null
-    val keyStore = X509SelfSignedGenerator.newSelfSignedKeyStore(SSL_KEY_ALIAS, password, Constants.SSL_NAME)
-    // Write to a temp file first, then atomically rename to the target.
-    // This prevents a partially-written (corrupted) keystore if the process
-    // is killed mid-write (OOM, force-stop, reboot, etc.).
-    val tmp = File(file.parent, "${file.name}.tmp")
-    try {
-        FileOutputStream(tmp).use {
-            keyStore.store(it, password.toCharArray())
-        }
-        tmp.renameTo(file)
-    } catch (ex: Exception) {
-        tmp.delete()
-        throw ex
     }
 }
 
@@ -197,50 +149,14 @@ private fun parsePemPrivateKey(pem: String): PrivateKey {
 @Volatile
 private var cachedKeyStore: Pair<String, KeyStore>? = null
 
-/**
- * Load (or regenerate on corruption) the platform PKCS#12 keystore used by the
- * HTTPS connector. Results are cached per password: the Android PKCS#12
- * implementation costs ~0.5s (cold: seconds) to parse + verify the MAC, and the
- * file is only ever replaced by [generateSslKeyStoreFile] /
- * [storeSslKeyStore] below, which drop the cache.
- */
 @Synchronized
-private fun getSslKeyStore(context: Context, password: String): KeyStore {
-    cachedKeyStore?.let { (cachedPassword, keyStore) ->
-        if (cachedPassword == password) return keyStore
+internal fun getSslKeyStore(context: Context, password: String): KeyStore {
+    cachedKeyStore?.let { (cachedPassword, keyStore) -> if (cachedPassword == password) return keyStore }
+    val store = KeyStore.getInstance("PKCS12").apply {
+        File(context.filesDir, Constants.KEY_STORE_FILE_NAME).inputStream().use { load(it, password.toCharArray()) }
     }
-    val file = File(context.filesDir, Constants.KEY_STORE_FILE_NAME)
-    if (!file.exists()) {
-        generateSslKeyStoreFile(file, password)
-    }
-
-    val keyStore = KeyStore.getInstance("PKCS12").apply {
-        try {
-            file.inputStream().use {
-                load(it, password.toCharArray())
-            }
-        } catch (ex: Exception) {
-            LogCat.e("Failed to load keystore: ${ex.message}, regenerating...")
-            ex.printStackTrace()
-            // Delete corrupted file and regenerate
-            if (file.exists()) {
-                file.delete()
-            }
-            try {
-                generateSslKeyStoreFile(file, password)
-                // Reload the newly generated keystore
-                file.inputStream().use {
-                    load(it, password.toCharArray())
-                }
-            } catch (ex2: Exception) {
-                LogCat.e("Failed to regenerate keystore: ${ex2.message}")
-                ex2.printStackTrace()
-                throw ex2
-            }
-        }
-    }
-    cachedKeyStore = password to keyStore
-    return keyStore
+    cachedKeyStore = password to store
+    return store
 }
 
 /**

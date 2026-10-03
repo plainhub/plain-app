@@ -159,6 +159,7 @@ sealed class PlainHttpClientSpec {
     data object Unsafe : PlainHttpClientSpec()
     data object Download : PlainHttpClientSpec()
     data object PeerStatus : PlainHttpClientSpec()
+    data object HttpHost : PlainHttpClientSpec()
     data class Crypto(
         val keyBytes: ByteArray,
         val timeoutSeconds: Int = 10,

@@ -28,11 +28,10 @@ import platform.Foundation.create
  * commonMain's [startHttpServerAsync] / [stopHttpServerCoreAsync].
  */
 
-actual fun getSSLSignature(password: String): ByteArray =
-    IosPlatformRegistry.sslCertProvider()?.getCertSignatureBytes() ?: ByteArray(0)
+actual fun getSSLSignature(password: String): ByteArray = RustTlsCertificate.signature()
 
 actual fun generateSSLKeyStore(password: String) {
-    IosPlatformRegistry.sslCertProvider()?.regenerateCert()
+    RustTlsCertificate.regenerate()
 }
 
 actual suspend fun replaceSSLKeyStoreAsync(
@@ -47,11 +46,12 @@ actual suspend fun replaceSSLKeyStoreAsync(
         SslCertImportMode.PKCS12 -> {
             val data = readFileBytes(firstUri)
             provider.replaceCertWithPkcs12(data, password)
+            RustTlsCertificate.importPem(provider.certificatePem(), provider.privateKeyPem())
         }
         SslCertImportMode.PEM -> {
             val certPem = readFileText(firstUri)
             val keyPem = readFileText(secondUri)
-            provider.replaceCertWithPem(certPem, keyPem)
+            RustTlsCertificate.importPem(certPem, keyPem)
         }
     }
 }
@@ -72,40 +72,12 @@ private fun readFileText(uriStr: String): String {
         ?: throw IllegalStateException("Failed to read the selected file")
 }
 
-/**
- * iOS engine start: drive the Swift `PlainHttpServer` via [IosHttpServerBridge].
- * Returns `true` when the SwiftNIO bootstrap bound the configured ports.
- * Failure reason is recorded in [HttpServerManager.httpServerError] for the
- * common orchestrator to surface.
- */
-actual suspend fun startHttpEngineAsync(): Boolean = withIO {
-    val bridge = IosPlatformRegistry.httpServerBridge()
-    if (bridge == null) {
-        HttpServerManager.httpServerError.value = "iOS HTTP server bridge not registered — Swift PlainHttpServer missing"
-        LogCat.e(HttpServerManager.httpServerError.value)
-        return@withIO false
-    }
-    val httpPort = UserPrefs.httpPort.value
-    val httpsPort = UserPrefs.httpsPort.value
-    val ok = try {
-        bridge.start(httpPort, httpsPort)
-    } catch (ex: Exception) {
-        HttpServerManager.httpServerError.value = ex.message ?: "Failed to start HTTP server"
-        LogCat.e("startHttpEngineAsync failed: ${ex.message}")
-        false
-    }
-    if (ok) {
-        HttpServerManager.httpServerError.value = ""
-    } else if (HttpServerManager.httpServerError.value.isEmpty()) {
-        HttpServerManager.httpServerError.value = "Failed to start HTTP server"
-    }
-    ok
+actual suspend fun startHttpEngineAsync(): Boolean {
+    IosPlatformRegistry.httpServerBridge()?.stop()
+    return com.ismartcoding.plain.httpserver.RustHttpEngine.start()
 }
 
-/** iOS engine stop: stop the SwiftNIO bridge. */
-actual suspend fun stopHttpEngineAsync(): Unit = withIO {
-    IosPlatformRegistry.httpServerBridge()?.stop()
-}
+actual suspend fun stopHttpEngineAsync() = com.ismartcoding.plain.httpserver.RustHttpEngine.stop()
 
 /** No platform side effects on iOS once the server is healthy. */
 actual suspend fun onHttpServerStarted() {
@@ -147,7 +119,7 @@ actual suspend fun stopHttpServiceAsync(): Unit = withIO {
 
 
 actual fun isHttpServerRunning(): Boolean =
-    IosPlatformRegistry.httpServerBridge()?.isRunning() == true
+    com.ismartcoding.plain.httpserver.RustHttpEngine.isRunning
 
 actual fun isMdnsRunning(): Boolean = MdnsHostResponder.isRunning
 

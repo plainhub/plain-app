@@ -9,6 +9,8 @@ import io.ktor.utils.io.writeFully
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.channels.trySendBlocking
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
@@ -41,6 +43,7 @@ import kotlin.coroutines.resumeWithException
 internal class OkHttpPlainClient(
     private val client: OkHttpClient,
     override val cryptoKey: ByteArray? = null,
+    private val boundedWs: Boolean = false,
 ) : PlainHttpClient {
     override suspend fun request(req: PlainRequest): PlainResponse {
         val call = client.newCall(req.toOkHttpRequest())
@@ -64,7 +67,7 @@ internal class OkHttpPlainClient(
     ): T {
         val requestBuilder = Request.Builder().url(url)
         headers.forEach { (k, v) -> requestBuilder.header(k, v) }
-        val session = OkHttpWsSession(client, requestBuilder.build())
+        val session = OkHttpWsSession(client, requestBuilder.build(), boundedWs)
         try {
             return block(session)
         } finally {
@@ -121,37 +124,49 @@ private fun InputStream.toByteReadChannel(onClose: () -> Unit): ByteReadChannel 
 internal class OkHttpWsSession(
     client: OkHttpClient,
     request: Request,
+    private val bounded: Boolean = false,
 ) : WebSocketListener(), PlainWebSocketSession {
-    private val channel = Channel<PlainWsFrame>(Channel.UNLIMITED)
+    private val channel = Channel<PlainWsFrame>(if (bounded) 4 else Channel.UNLIMITED)
+    @Volatile private var closed = false
     private val ws: WebSocket = client.newWebSocket(request, this)
 
     override val incoming = channel
 
     override fun onMessage(webSocket: WebSocket, text: String) {
-        channel.trySend(PlainWsFrame(text, null))
+        if (bounded) channel.trySendBlocking(PlainWsFrame(text, null)) else channel.trySend(PlainWsFrame(text, null))
     }
 
     override fun onMessage(webSocket: WebSocket, bytes: ByteString) {
-        channel.trySend(PlainWsFrame(null, bytes.toByteArray()))
+        if (bounded) channel.trySendBlocking(PlainWsFrame(null, bytes.toByteArray())) else channel.trySend(PlainWsFrame(null, bytes.toByteArray()))
     }
 
     override fun onClosed(webSocket: WebSocket, code: Int, reason: String) {
+        closed = true
         channel.close()
     }
 
     override fun onFailure(webSocket: WebSocket, t: Throwable, response: Response?) {
+        closed = true
         channel.close(t)
     }
 
     override suspend fun sendBinary(data: ByteArray) {
-        ws.send(data.toByteString())
+        if (bounded) awaitCapacity()
+        check(ws.send(data.toByteString())) { "WebSocket send failed" }
     }
 
     override suspend fun sendText(text: String) {
-        ws.send(text)
+        if (bounded) awaitCapacity()
+        check(ws.send(text)) { "WebSocket send failed" }
+    }
+
+    private suspend fun awaitCapacity() {
+        while (!closed && ws.queueSize() > 256 * 1024) delay(5)
+        check(!closed) { "WebSocket closed" }
     }
 
     override fun close() {
+        closed = true
         ws.close(1000, null)
         channel.close()
     }
@@ -222,6 +237,7 @@ internal fun createOkHttpPlainClient(spec: PlainHttpClientSpec): PlainHttpClient
         PlainHttpClientSpec.Unsafe -> OkHttpPlainClient(SharedOkHttpClients.unsafe)
         PlainHttpClientSpec.Download -> OkHttpPlainClient(SharedOkHttpClients.download)
         PlainHttpClientSpec.PeerStatus -> OkHttpPlainClient(SharedOkHttpClients.peerStatus)
+        PlainHttpClientSpec.HttpHost -> OkHttpPlainClient(SharedOkHttpClients.peerStatus, boundedWs = true)
 
         is PlainHttpClientSpec.Crypto -> OkHttpPlainClient(
             SharedOkHttpClients.unsafe.newBuilder()

@@ -20,16 +20,8 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 
-/**
- * SSL certificate signature bytes for the current HTTPS keystore.
- * @param password keystore password
- */
 expect fun getSSLSignature(password: String): ByteArray
 
-/**
- * Regenerate the SSL keystore file used by the embedded HTTPS server.
- * @param password keystore password
- */
 expect fun generateSSLKeyStore(password: String)
 
 /**

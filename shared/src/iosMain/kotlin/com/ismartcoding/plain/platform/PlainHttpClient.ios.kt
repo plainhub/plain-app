@@ -204,7 +204,7 @@ internal class IosPlainClient(
         )
         val task = session.webSocketTaskWithRequest(request)
         task.resume()
-        val wsSession = IosWebSocketSession(task)
+        val wsSession = IosWebSocketSession(task, spec == PlainHttpClientSpec.HttpHost)
         wsSession.startReading()
         try {
             return block(wsSession)
@@ -221,8 +221,9 @@ internal class IosPlainClient(
 
 private class IosWebSocketSession(
     private val task: NSURLSessionWebSocketTask,
+    private val bounded: Boolean = false,
 ) : PlainWebSocketSession {
-    override val incoming = Channel<PlainWsFrame>(Channel.UNLIMITED)
+    override val incoming = Channel<PlainWsFrame>(if (bounded) 4 else Channel.UNLIMITED)
     private val scope = CoroutineScope(IODispatcher + SupervisorJob())
 
     fun startReading() {
@@ -235,7 +236,7 @@ private class IosWebSocketSession(
                     } else {
                         PlainWsFrame(message.string, null)
                     }
-                    incoming.trySend(frame)
+                    if (bounded) incoming.send(frame) else incoming.trySend(frame)
                 }
                 incoming.close()
             } catch (e: Exception) {
@@ -365,7 +366,7 @@ private fun configurationFor(spec: PlainHttpClientSpec): NSURLSessionConfigurati
             config.setTimeoutIntervalForResource(3600.0)
         }
 
-        PlainHttpClientSpec.PeerStatus -> {
+        PlainHttpClientSpec.PeerStatus, PlainHttpClientSpec.HttpHost -> {
             // Long-lived WebSocket: no request timeout, keep-alive handled by ping.
             config.setTimeoutIntervalForRequest(3600.0)
             config.setTimeoutIntervalForResource(3600.0 * 24)

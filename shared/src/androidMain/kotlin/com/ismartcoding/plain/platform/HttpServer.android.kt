@@ -21,9 +21,6 @@ import com.ismartcoding.plain.mdns.NsdHelper
 import com.ismartcoding.plain.services.HttpServerService
 import com.ismartcoding.plain.services.PNotificationListenerService
 import com.ismartcoding.plain.httpserver.HttpServerManager
-import com.ismartcoding.plain.httpserver.createHttpServerAsync
-import com.ismartcoding.plain.httpserver.generateSslKeyStoreFile
-import com.ismartcoding.plain.httpserver.getSslSignatureBytes
 import com.ismartcoding.plain.httpserver.httpServer
 import com.ismartcoding.plain.httpserver.replaceSslKeyStoreBytes
 import com.ismartcoding.plain.httpserver.replaceSslKeyStoreFromPem
@@ -34,11 +31,10 @@ import kotlinx.coroutines.withContext
 import java.io.File
 import kotlin.time.Duration.Companion.milliseconds
 
-actual fun getSSLSignature(password: String): ByteArray =
-    getSslSignatureBytes(appContext, password)
+actual fun getSSLSignature(password: String): ByteArray = RustTlsCertificate.signature()
 
 actual fun generateSSLKeyStore(password: String) {
-    generateSslKeyStoreFile(File(appContext.filesDir, Constants.KEY_STORE_FILE_NAME), password)
+    RustTlsCertificate.regenerate()
 }
 
 actual suspend fun replaceSSLKeyStoreAsync(
@@ -47,19 +43,11 @@ actual suspend fun replaceSSLKeyStoreAsync(
     secondUri: String,
     password: String,
 ): ByteArray = withIO {
-    val file = File(appContext.filesDir, Constants.KEY_STORE_FILE_NAME)
-    val keystorePassword = SystemPrefs.keyStorePassword.value
-    when (mode) {
-        SslCertImportMode.PKCS12 -> {
-            val bytes = readUriBytes(firstUri)
-            replaceSslKeyStoreBytes(file, bytes, password, keystorePassword)
-        }
-        SslCertImportMode.PEM -> {
-            val certPem = readUriText(firstUri)
-            val keyPem = readUriText(secondUri)
-            replaceSslKeyStoreFromPem(file, certPem, keyPem, keystorePassword)
-        }
+    val (cert, key) = when (mode) {
+        SslCertImportMode.PKCS12 -> decodeRustTlsPkcs12(readUriBytes(firstUri), password)
+        SslCertImportMode.PEM -> readUriText(firstUri) to readUriText(secondUri)
     }
+    RustTlsCertificate.importPem(cert, key)
 }
 
 private fun readUriBytes(uriStr: String): ByteArray {
@@ -70,36 +58,15 @@ private fun readUriBytes(uriStr: String): ByteArray {
 
 private fun readUriText(uriStr: String): String = readUriBytes(uriStr).toString(Charsets.UTF_8)
 
-/**
- * Android engine start: create the Ktor/Netty embedded server, bind the
- * configured HTTP+HTTPS connectors, and store the running instance. On failure
- * the partially-started engine is stopped and the error reason is recorded in
- * [HttpServerManager.httpServerError] for the common orchestrator to surface.
- */
-actual suspend fun startHttpEngineAsync(): Boolean = withIO {
-    val tCreate = System.currentTimeMillis()
-    val newServer = createHttpServerAsync(appContext)
-    val tCreated = System.currentTimeMillis()
-    try {
-        newServer.start(wait = false)
-        httpServer = newServer
-        HttpServerManager.httpServerError.value = ""
-        LogCat.d("engine create=${tCreated - tCreate}ms start=${System.currentTimeMillis() - tCreated}ms")
-        true
-    } catch (ex: Exception) {
-        // The engine may have partially started (thread pools created) before
-        // throwing — always stop it to prevent thread/memory leaks.
-        try { newServer.stop(0, 0) } catch (_: Exception) {}
-        HttpServerManager.httpServerError.value = ex.message ?: ""
-        LogCat.e("startHttpEngineAsync failed: ${ex.message}")
-        false
-    }
+actual suspend fun startHttpEngineAsync(): Boolean {
+    try { httpServer?.stop(0, 1_000) } finally { httpServer = null }
+    return com.ismartcoding.plain.httpserver.RustHttpEngine.start()
 }
 
-/** Android engine stop: stop the Ktor/Netty instance if running and clear the reference. */
-actual suspend fun stopHttpEngineAsync() = withIO {
-    try { httpServer?.stop(0, 1_000) } catch (_: Exception) {}
-    httpServer = null
+actual suspend fun stopHttpEngineAsync(): Unit = withIO {
+    com.ismartcoding.plain.httpserver.RustHttpEngine.stop()
+    try { httpServer?.stop(0, 1_000) } finally { httpServer = null }
+    Unit
 }
 
 // The SMS/MMS hooks below serve the web desktop bridge, whose only clients are
