@@ -39,6 +39,7 @@ object RustHostApi {
                                             val reply = try {
                                                 val result = when {
                                                     method == "audioEngineCommand" -> AudioEngineHost.handle(method, params)
+                                                    method.startsWith("fileTask") -> com.ismartcoding.plain.features.file.FileTaskHost.handle(method,params)
                                                     method == "mediaAction" -> handleMediaActionHost(params)
                                                     method.startsWith("imageIndex") -> ImageIndexHost.handle(method, params)
                                                     else -> AudioLibraryHost.handle(method, params)

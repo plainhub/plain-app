@@ -6,14 +6,15 @@ import com.ismartcoding.plain.lib.kgraphql.schema.dsl.SchemaBuilder
 import com.ismartcoding.plain.extensions.getFinalPath
 import com.ismartcoding.plain.platform.Permission
 import com.ismartcoding.plain.platform.checkEnabledAsync
-import com.ismartcoding.plain.platform.copyFileOrDir
 import com.ismartcoding.plain.platform.createDirectory
 import com.ismartcoding.plain.platform.deleteFileOrDir
-import com.ismartcoding.plain.platform.getNewPath
-import com.ismartcoding.plain.platform.moveFileOrDir
 import com.ismartcoding.plain.platform.renameAndScanFile
 import com.ismartcoding.plain.platform.scanFiles
 import com.ismartcoding.plain.platform.writeFileText
+import com.ismartcoding.plain.features.file.FileTaskHelper
+import com.ismartcoding.plain.features.file.FileTaskOp
+import com.ismartcoding.plain.features.file.FileTaskStatus
+import com.ismartcoding.plain.features.file.FileTaskType
 import com.ismartcoding.plain.helpers.FilePathValidator
 import com.ismartcoding.plain.httpserver.models.FavoriteFolder
 import com.ismartcoding.plain.httpserver.models.ActionResult
@@ -53,20 +54,16 @@ suspend fun writeTextFile(path: String, content: String, overwrite: Boolean): Fi
 @GraphQLMutation
 suspend fun copyFile(src: String, dst: String, overwrite: Boolean): Boolean {
     Permission.WRITE_EXTERNAL_STORAGE.checkEnabledAsync()
-    FilePathValidator.requireAllSafe(listOf(src, dst))
-    val finalDst = if (overwrite) dst else getNewPath(dst)
-    copyFileOrDir(src, finalDst)
-    scanFiles(arrayOf(finalDst))
+    val task = FileTaskHelper.execute(FileTaskType.COPY,listOf(FileTaskOp(src,dst,overwrite)))
+    check(task.status == FileTaskStatus.DONE) { task.error }
     return true
 }
 
 @GraphQLMutation
 suspend fun moveFile(src: String, dst: String, overwrite: Boolean): Boolean {
     Permission.WRITE_EXTERNAL_STORAGE.checkEnabledAsync()
-    FilePathValidator.requireAllSafe(listOf(src, dst))
-    val finalDst = if (overwrite) dst else getNewPath(dst)
-    moveFileOrDir(src, finalDst)
-    scanFiles(arrayOf(src, finalDst))
+    val task = FileTaskHelper.execute(FileTaskType.MOVE,listOf(FileTaskOp(src,dst,overwrite)))
+    check(task.status == FileTaskStatus.DONE) { task.error }
     return true
 }
 
