@@ -1,10 +1,11 @@
 package com.ismartcoding.plain.features
 
+import com.ismartcoding.plain.chat.peer.RustPeerStore
+
 import com.ismartcoding.plain.api.*
 import com.ismartcoding.plain.db.DClipboard
 import com.ismartcoding.plain.helpers.ContentWhere
 import com.ismartcoding.plain.helpers.FilterField
-import com.ismartcoding.plain.platform.AppDatabase
 import kotlinx.serialization.json.*
 
 object ClipboardHelper {
@@ -36,7 +37,7 @@ object ClipboardHelper {
     suspend fun clear() { delete("all:true") }
 
     suspend fun getSourceName(source: String): String =
-        if (source.isBlank()) "" else AppDatabase.instance.peerDao().getById(source)?.name ?: source
+        if (source.isBlank()) "" else RustPeerStore.getById(source)?.name ?: source
 
     internal fun applyClipboardSearch(where: ContentWhere, query: String) = LegacyClipboardHelper.applyClipboardSearch(where, query)
     internal fun applyClipboardFilterFields(where: ContentWhere, fields: List<FilterField>) = LegacyClipboardHelper.applyClipboardFilterFields(where, fields)

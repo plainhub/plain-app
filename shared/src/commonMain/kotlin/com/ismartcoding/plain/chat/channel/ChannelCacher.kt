@@ -2,13 +2,13 @@ package com.ismartcoding.plain.chat.channel
 
 import com.ismartcoding.plain.lib.extensions.toSortName
 import com.ismartcoding.plain.lib.withIO
-import com.ismartcoding.plain.platform.AppDatabase
 import com.ismartcoding.plain.db.DChatChannel
 import com.ismartcoding.plain.db.DChat
 import kotlin.time.Instant
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -49,14 +49,16 @@ object ChannelCacher {
      *
      * @return 修改后的新 channel 实例；若 channelId 不存在则返回 null。
      */
+    @OptIn(ExperimentalEncodingApi::class)
     suspend fun mutateChannel(channelId: String, block: (DChatChannel) -> Unit): DChatChannel? = withIO {
         val current = channelsMap.value
         val runtime = current[channelId] ?: return@withIO null
         val newChannel = runtime.channel.copy()
         block(newChannel)
-        AppDatabase.instance.chatChannelDao().update(newChannel)
-        channelsMap.value = current + (channelId to runtime.copy(channel = newChannel))
-        newChannel
+        val saved = RustChannelStore.patch(runtime.channel, newChannel)
+        val keyBytes = if (saved.key.isNotEmpty()) Base64Lenient.decode(saved.key) else ByteArray(0)
+        channelsMap.update { it + (channelId to ChannelRuntime(saved, keyBytes)) }
+        saved
     }
 
     fun removeChannel(channelId: String) {
@@ -66,7 +68,7 @@ object ChannelCacher {
     }
 
     suspend fun load() = withIO {
-        val channels = AppDatabase.instance.chatChannelDao().getAll()
+        val channels = RustChannelStore.getAll()
         val runtimeMap = channels.associate { channel ->
             val keyBytes = if (channel.key.isNotEmpty()) Base64Lenient.decode(channel.key) else ByteArray(0)
             channel.id to ChannelRuntime(channel, keyBytes)

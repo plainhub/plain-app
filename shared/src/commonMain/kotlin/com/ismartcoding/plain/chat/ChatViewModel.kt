@@ -1,5 +1,9 @@
 package com.ismartcoding.plain.chat
 
+import com.ismartcoding.plain.chat.channel.RustChannelStore
+
+import com.ismartcoding.plain.chat.peer.RustPeerStore
+
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import com.ismartcoding.plain.lib.withIO
@@ -8,7 +12,6 @@ import com.ismartcoding.plain.platform.textMessageContent
 import com.ismartcoding.plain.chat.data.ChatTarget
 import com.ismartcoding.plain.chat.data.ChatTargetType
 import com.ismartcoding.plain.chat.peer.PeerCacher
-import com.ismartcoding.plain.platform.AppDatabase
 import com.ismartcoding.plain.db.DChat
 import com.ismartcoding.plain.db.DMessageContent
 import com.ismartcoding.plain.db.DMessageFile
@@ -77,12 +80,12 @@ object ChatViewModel : ISelectableViewModel<VChat> {
 
     suspend fun fetchAsync(toId: String) = withIO {
         val current = _target.value
-        val dao = AppDatabase.instance.chatDao()
+        val dao = RustChatStore
         val isChannel = current.type == ChatTargetType.CHANNEL
         val list = if (isChannel) dao.getByChannelId(current.toId) else dao.getByPeerId(toId)
         _itemsFlow.value = list.sortedByDescending { it.createdAt }.map { chat ->
             val fromName = if (isChannel && chat.fromId != "me") {
-                AppDatabase.instance.peerDao().getById(chat.fromId)?.name ?: ""
+                RustPeerStore.getById(chat.fromId)?.name ?: ""
             } else ""
             VChat.from(chat, fromName)
         }
@@ -136,7 +139,7 @@ object ChatViewModel : ISelectableViewModel<VChat> {
     fun resendToMembers(messageId: String, peerIds: List<String>) {
         launchSafe {
             val target = target.value
-            val channel = AppDatabase.instance.chatChannelDao().getById(target.toId) ?: return@launchSafe
+            val channel = RustChannelStore.getById(target.toId) ?: return@launchSafe
             val item = ChatManager.getChatItem(messageId) ?: return@launchSafe
             ChatManager.updateStatus(item, ChatStatus.PENDING)
             update(item)

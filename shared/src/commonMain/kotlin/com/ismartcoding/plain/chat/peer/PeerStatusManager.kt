@@ -8,7 +8,6 @@ import com.ismartcoding.plain.lib.JsonHelper
 import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.platform.isWifiAwareSupported
-import com.ismartcoding.plain.platform.AppDatabase
 import com.ismartcoding.plain.db.DPeer
 import com.ismartcoding.plain.enums.PeerStatus
 import com.ismartcoding.plain.db.getStatusWsUrl
@@ -66,7 +65,7 @@ object PeerStatusManager {
     }
 
     private suspend fun notifyAwareOfPairedPeers() {
-        val peers = AppDatabase.instance.peerDao().getAllPaired()
+        val peers = RustPeerStore.getAllPaired()
         LogCat.d("peer status: feeding ${peers.size} paired peers to Aware")
         peers.forEach { subscribeAwareForPeer(it) }
     }
@@ -112,7 +111,7 @@ object PeerStatusManager {
             LogCat.d("peer status: reconnect skipped peer=$peerId reason=$reason active_socket=true")
             return@withIO
         }
-        val peer = AppDatabase.instance.peerDao().getById(peerId) ?: return@withIO
+        val peer = RustPeerStore.getById(peerId) ?: return@withIO
         if (!shouldConnect(peer)) return@withIO
         val key = PeerCacher.getKeyBytes(peer.id) ?: return@withIO
 
@@ -126,7 +125,7 @@ object PeerStatusManager {
         MdnsDiscoverManager.browse()
         delay(DISCOVER_REPLY_WAIT_MS)
 
-        val refreshedPeer = AppDatabase.instance.peerDao().getById(peer.id) ?: peer
+        val refreshedPeer = RustPeerStore.getById(peer.id) ?: peer
         if (refreshedPeer.updatedAt == updatedAtBefore) {
             LogCat.d("peer status: no discover reply peer=$peerId — rescheduling")
             scheduleReconnect(peer.id)
@@ -232,7 +231,7 @@ object PeerStatusManager {
     }
 
     private suspend fun loadConnectablePeers(): List<DPeer> = withIO {
-        val peers = AppDatabase.instance.peerDao().getAllPaired()
+        val peers = RustPeerStore.getAllPaired()
         val connectable = peers.filter { shouldConnect(it) }
         LogCat.d("peer status: peers total=${peers.size} connectable=${connectable.size}")
         connectable

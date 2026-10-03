@@ -1,4 +1,8 @@
 package com.ismartcoding.plain.chat
+
+import com.ismartcoding.plain.chat.channel.RustChannelStore
+
+import com.ismartcoding.plain.chat.peer.RustPeerStore
 import com.ismartcoding.plain.platform.canShowNotifications
 
 import com.ismartcoding.plain.lib.withIO
@@ -6,7 +10,6 @@ import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.chat.data.ChatTarget
 import com.ismartcoding.plain.chat.data.ChatTargetType
 import com.ismartcoding.plain.chat.download.DownloadQueue
-import com.ismartcoding.plain.platform.AppDatabase
 import com.ismartcoding.plain.db.DChat
 import com.ismartcoding.plain.db.DChatChannel
 import com.ismartcoding.plain.db.DMessageContent
@@ -50,11 +53,11 @@ object ChatMessageReceiver {
             }
         }
 
-        val fromPeer = AppDatabase.instance.peerDao().getById(fromPeerId)
+        val fromPeer = RustPeerStore.getById(fromPeerId)
             ?: throw Exception("invalid peer")
 
         val fromChannel: DChatChannel? = if (fromChannelId.isNotEmpty()) {
-            val ch = AppDatabase.instance.chatChannelDao().getById(fromChannelId)
+            val ch = RustChannelStore.getById(fromChannelId)
                 ?: throw IllegalStateException("Unknown channel")
             if (ch.status != ChatChannelStatus.JOINED) {
                 throw IllegalStateException("Channel not joined")

@@ -1,7 +1,8 @@
 package com.ismartcoding.plain.discover
 
+import com.ismartcoding.plain.chat.peer.RustPeerStore
+
 import com.ismartcoding.plain.chat.peer.PeerManager
-import com.ismartcoding.plain.platform.AppDatabase
 import com.ismartcoding.plain.db.DPeer
 import com.ismartcoding.plain.enums.DeviceType
 import com.ismartcoding.plain.enums.PeerStatus
@@ -21,7 +22,7 @@ object PairingPeerStore {
     ) = withIO {
         try {
             val now = TimeHelper.now()
-            val peer = (AppDatabase.instance.peerDao().getById(deviceId) ?: DPeer(deviceId).apply {
+            val peer = (RustPeerStore.getById(deviceId) ?: DPeer(deviceId).apply {
                 createdAt = now
             }).apply {
                 name = deviceName
@@ -39,7 +40,7 @@ object PairingPeerStore {
             // also not persisted; the in-memory PeerCacher.awareSupportedMap
             // (refreshed from BLE scan flags + GATT DISCOVER reply) is the
             // source of truth.
-            AppDatabase.instance.peerDao().upsert(peer)
+            RustPeerStore.upsert(peer)
             PeerManager.load()
             LogCat.d("Upserted peer: $deviceId")
         } catch (e: Exception) {

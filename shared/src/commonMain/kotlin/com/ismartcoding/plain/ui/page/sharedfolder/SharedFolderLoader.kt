@@ -1,5 +1,7 @@
 package com.ismartcoding.plain.ui.page.sharedfolder
 
+import com.ismartcoding.plain.chat.RustChatStore
+
 import com.ismartcoding.plain.preferences.*
 
 import com.ismartcoding.plain.TempData
@@ -16,7 +18,6 @@ import com.ismartcoding.plain.features.share.SharedLinkClient
 import com.ismartcoding.plain.lib.mdns.MdnsServiceBrowser
 import com.ismartcoding.plain.lib.mdns.MdnsServiceSnapshot
 import com.ismartcoding.plain.lib.withIO
-import com.ismartcoding.plain.platform.AppDatabase
 import com.ismartcoding.plain.platform.getDeviceIP4sWithPrefixLength
 import kotlinx.coroutines.delay
 
@@ -101,7 +102,7 @@ internal suspend fun syncCardBack(messageId: String, old: DMessageShare, result:
     withIO {
         val chat = ChatManager.getChatItem(messageId) ?: return@withIO
         chat.content.value = fresh
-        AppDatabase.instance.chatDao().updateData(ChatItemDataUpdate(messageId, chat.content))
+        RustChatStore.updateData(ChatItemDataUpdate(messageId, chat.content))
     }
     ChatViewModel.onMessageUpdated(messageId)
 }

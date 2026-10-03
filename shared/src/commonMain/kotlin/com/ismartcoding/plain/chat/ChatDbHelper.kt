@@ -1,12 +1,9 @@
 package com.ismartcoding.plain.chat
 
-import com.ismartcoding.plain.platform.AppDatabase
 import com.ismartcoding.plain.db.ChatItemDataUpdate
 import com.ismartcoding.plain.db.DChat
 import com.ismartcoding.plain.db.DMessageContent
-import com.ismartcoding.plain.db.rawQuery
 import com.ismartcoding.plain.enums.ChatStatus
-import com.ismartcoding.plain.helpers.ContentWhere
 import com.ismartcoding.plain.db.DMessageDeliveryResult
 import com.ismartcoding.plain.db.DMessageFiles
 import com.ismartcoding.plain.db.DMessageImages
@@ -14,7 +11,6 @@ import com.ismartcoding.plain.db.DMessageStatusData
 import com.ismartcoding.plain.db.MessageType
 import com.ismartcoding.plain.db.DPeer
 import com.ismartcoding.plain.lib.JsonHelper.jsonEncode
-import com.ismartcoding.plain.helpers.SearchHelper
 import com.ismartcoding.plain.platform.releaseAppFile
 import com.ismartcoding.plain.lib.withIO
 
@@ -26,33 +22,27 @@ object ChatDbHelper {
         item.channelId = channelId
         item.content = message
         item.status = if (isRemote) ChatStatus.PENDING else ChatStatus.SENT
-        AppDatabase.instance.chatDao().insert(item)
+        RustChatStore.insert(item)
         item
     }
 
     suspend fun getChatItem(id: String): DChat? = withIO {
-        AppDatabase.instance.chatDao().getById(id)
+        RustChatStore.getById(id)
     }
 
     suspend fun searchAsync(query: String, limit: Int, offset: Int): List<DChat> = withIO {
         if (query.isEmpty()) return@withIO emptyList()
-        val where = ContentWhere()
-        where.addLike("content", query)
-        val sql = "SELECT * FROM chats WHERE ${where.toSelection()} ORDER BY created_at DESC LIMIT $limit OFFSET $offset"
-        AppDatabase.instance.chatDao().search(rawQuery(sql, where.args.toTypedArray()))
+        RustChatStore.search(query, limit, offset)
     }
 
     suspend fun countAsync(query: String): Int = withIO {
         if (query.isEmpty()) return@withIO 0
-        val where = ContentWhere()
-        where.addLike("content", query)
-        val sql = "SELECT COUNT(*) FROM chats WHERE ${where.toSelection()}"
-        AppDatabase.instance.chatDao().count(rawQuery(sql, where.args.toTypedArray()))
+        RustChatStore.count(query)
     }
 
     suspend fun updateChatItemStatus(item: DChat, status: ChatStatus) = withIO {
         item.status = status
-        AppDatabase.instance.chatDao().updateStatus(item.id, status)
+        RustChatStore.updateStatus(item.id, status)
     }
 
     suspend fun updateChatItemStatus(item: DChat, peer: DPeer, error: String?) = withIO {
@@ -63,18 +53,18 @@ object ChatDbHelper {
         }
         item.status = statusData.aggregateStatus()
         item.statusData = if (statusData.total > 0) jsonEncode(statusData) else ""
-        AppDatabase.instance.chatDao().updateStatusAndData(item.id, item.status, item.statusData)
+        RustChatStore.updateStatusAndData(item.id, item.status, item.statusData)
     }
 
     suspend fun updateChannelChatItemStatus(item: DChat, statusData: DMessageStatusData?) = withIO {
         item.status = statusData?.aggregateStatus() ?: ChatStatus.FAILED
         item.statusData = if (statusData != null && statusData.total > 0) jsonEncode(statusData) else ""
-        AppDatabase.instance.chatDao().updateStatusAndData(item.id, item.status, item.statusData)
+        RustChatStore.updateStatusAndData(item.id, item.status, item.statusData)
     }
 
     suspend fun updateChatItemContent(item: DChat, content: DMessageContent) = withIO {
         item.content = content
-        AppDatabase.instance.chatDao().updateData(ChatItemDataUpdate(id = item.id, content = content))
+        RustChatStore.updateData(ChatItemDataUpdate(id = item.id, content = content))
     }
 
     suspend fun updateChatItemFilesContent(item: DChat, files: List<com.ismartcoding.plain.db.DMessageFile>) = withIO {
@@ -89,36 +79,21 @@ object ChatDbHelper {
     suspend fun deleteAsync(
         id: String,
     ) = withIO {
-        val chat = AppDatabase.instance.chatDao().getById(id) ?: return@withIO
+        val chat = RustChatStore.getById(id) ?: return@withIO
         releaseFidFiles(chat.content.value)
-        AppDatabase.instance.chatDao().delete(id)
+        RustChatStore.delete(id)
         ChatManager.refreshLatestChats()
     }
 
     suspend fun getIdsAsync(query: String): Set<String> = withIO {
         if (query.isEmpty()) return@withIO emptySet()
-        val fields = SearchHelper.parse(query)
-        val idsField = fields.firstOrNull { it.name == "ids" }
-        if (idsField != null) {
-            return@withIO idsField.value.split(",").filter { it.isNotBlank() }.toSet()
-        }
-        val dao = AppDatabase.instance.chatDao()
-        val channelField = fields.firstOrNull { it.name == "channel" }
-        if (channelField != null) {
-            return@withIO dao.getByChannelId(channelField.value).map { it.id }.toSet()
-        }
-        val peerField = fields.firstOrNull { it.name == "peer" }
-        if (peerField != null) {
-            val peerId = if (peerField.value == "local") "local" else peerField.value
-            return@withIO dao.getByPeerId(peerId).map { it.id }.toSet()
-        }
-        emptySet()
+        RustChatStore.getIds(query)
     }
 
     suspend fun deleteByIdsAsync(ids: Set<String>) = withIO {
-        val dao = AppDatabase.instance.chatDao()
+        val dao = RustChatStore
         ids.chunked(500).forEach { chunk ->
-            val chats = ids.mapNotNull { dao.getById(it) }
+            val chats = chunk.mapNotNull { dao.getById(it) }
             releaseChatsFiles( chats)
             dao.deleteByIds(chats.map { it.id })
         }
@@ -126,14 +101,14 @@ object ChatDbHelper {
     }
 
     suspend fun deleteAllChatsAsync(peerId: String) = withIO {
-        val chatDao = AppDatabase.instance.chatDao()
+        val chatDao = RustChatStore
         releaseChatsFiles(chatDao.getByPeerId(peerId))
         chatDao.deleteByPeerId(peerId)
         ChatManager.refreshLatestChats()
     }
 
     suspend fun deleteAllChannelChatsAsync(channelId: String) = withIO {
-        val chatDao = AppDatabase.instance.chatDao()
+        val chatDao = RustChatStore
         releaseChatsFiles(chatDao.getByChannelId(channelId))
         chatDao.deleteByChannelId(channelId)
         ChatManager.refreshLatestChats()

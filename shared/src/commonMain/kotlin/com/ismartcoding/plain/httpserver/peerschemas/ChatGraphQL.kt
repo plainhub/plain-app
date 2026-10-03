@@ -1,5 +1,7 @@
 package com.ismartcoding.plain.httpserver.peerschemas
 
+import com.ismartcoding.plain.chat.peer.RustPeerStore
+
 import com.ismartcoding.plain.chat.ChatMessageReceiver
 import com.ismartcoding.plain.chat.ReplayedMessageException
 import com.ismartcoding.plain.chat.channel.ChannelSystemMessageReceiver
@@ -10,7 +12,6 @@ import com.ismartcoding.plain.lib.kgraphql.Context
 import com.ismartcoding.plain.lib.kgraphql.annotations.GraphQLMutation
 import com.ismartcoding.plain.lib.kgraphql.annotations.GraphQLSchemaTarget
 import com.ismartcoding.plain.lib.logcat.LogCat
-import com.ismartcoding.plain.platform.AppDatabase
 import com.ismartcoding.plain.platform.startAwareIfNeeded
 import com.ismartcoding.plain.platform.subscribeAwareForPeer
 import com.ismartcoding.plain.httpserver.PeerGraphQLService
@@ -67,7 +68,7 @@ suspend fun startAware(context: Context): Boolean {
     val started = startAwareIfNeeded()
     if (started) {
         withIO {
-            val peer = AppDatabase.instance.peerDao().getById(fromPeerId)
+            val peer = RustPeerStore.getById(fromPeerId)
             if (peer != null) {
                 subscribeAwareForPeer(peer)
             }

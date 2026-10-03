@@ -1,12 +1,15 @@
 package com.ismartcoding.plain.chat
 
+import com.ismartcoding.plain.chat.channel.RustChannelStore
+
+import com.ismartcoding.plain.chat.peer.RustPeerStore
+
 import com.ismartcoding.plain.lib.withIO
 import com.ismartcoding.plain.chat.channel.ChannelChatSender
 import com.ismartcoding.plain.chat.data.ChatTarget
 import com.ismartcoding.plain.chat.data.ChatTargetType
 import com.ismartcoding.plain.discover.MdnsDiscoverManager
 import com.ismartcoding.plain.chat.peer.PeerChatSender
-import com.ismartcoding.plain.platform.AppDatabase
 import com.ismartcoding.plain.db.DChat
 import com.ismartcoding.plain.db.DChatChannel
 import com.ismartcoding.plain.db.DMessageStatusData
@@ -37,7 +40,7 @@ object ChatSender {
 
         when (target.type) {
             ChatTargetType.PEER -> {
-                val peer = AppDatabase.instance.peerDao().getById(target.toId) ?: return@withIO
+                val peer = RustPeerStore.getById(target.toId) ?: return@withIO
                 val finished = withTimeoutOrNull(PEER_SEND_TIMEOUT_MS) {
                     sendToPeer(item, peer)
                     true
@@ -50,7 +53,7 @@ object ChatSender {
             }
 
             ChatTargetType.CHANNEL -> {
-                val channel = AppDatabase.instance.chatChannelDao().getById(target.toId) ?: return@withIO
+                val channel = RustChannelStore.getById(target.toId) ?: return@withIO
                 sendToChannel(item, channel, onlinePeerIds)
             }
         }

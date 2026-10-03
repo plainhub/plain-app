@@ -1,9 +1,10 @@
 package com.ismartcoding.plain.chat.channel
 
+import com.ismartcoding.plain.chat.peer.RustPeerStore
+
 import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.chat.peer.PeerCacher
-import com.ismartcoding.plain.platform.AppDatabase
 import com.ismartcoding.plain.enums.ChannelSystemMessageAction
 import com.ismartcoding.plain.enums.ChannelSystemMessageType
 import com.ismartcoding.plain.enums.DeviceType
@@ -53,7 +54,7 @@ object ChannelSystemMessageReceiver {
         logTag: String = "member",
     ): Boolean {
         if (PeerCacher.getPeer(id) != null) return false
-        AppDatabase.instance.peerDao().insert(
+        RustPeerStore.insert(
             DPeer(
                 id = id,
                 name = name,
@@ -133,7 +134,7 @@ object ChannelSystemMessageReceiver {
             channel.ownerId = fromId
             channel.members = msg.members
             channel.version = msg.version
-            AppDatabase.instance.chatChannelDao().insert(channel)
+            RustChannelStore.insert(channel)
         }
 
         PeerCacher.load()

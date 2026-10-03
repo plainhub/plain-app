@@ -1,4 +1,6 @@
 package com.ismartcoding.plain.chat.download
+
+import com.ismartcoding.plain.chat.RustChatStore
 import com.ismartcoding.plain.platform.resolveAppFilePath
 import com.ismartcoding.plain.platform.importDownloadedFile
 import com.ismartcoding.plain.platform.getMimeTypeFromExtension
@@ -8,7 +10,6 @@ import com.ismartcoding.plain.lib.extensions.getFilenameExtension
 import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.chat.peer.transport.PeerTransportRouter
 import com.ismartcoding.plain.features.download.DownloadStatus
-import com.ismartcoding.plain.platform.AppDatabase
 import com.ismartcoding.plain.db.ChatItemDataUpdate
 import com.ismartcoding.plain.db.DMessageFiles
 import com.ismartcoding.plain.db.DMessageImages
@@ -102,7 +103,7 @@ object PeerFileDownloader {
     }
 
     private suspend fun updateMessageFileUri(messageId: String, originalUri: String, newUri: String) {
-        val message = AppDatabase.instance.chatDao().getById(messageId) ?: return
+        val message = RustChatStore.getById(messageId) ?: return
         val content = message.content
 
         when (content.value) {
@@ -123,7 +124,7 @@ object PeerFileDownloader {
             }
         }
 
-        AppDatabase.instance.chatDao().updateData(ChatItemDataUpdate(messageId, content))
+        RustChatStore.updateData(ChatItemDataUpdate(messageId, content))
         LogCat.d("PeerFileDownloader: updated URI $originalUri -> $newUri")
     }
 }

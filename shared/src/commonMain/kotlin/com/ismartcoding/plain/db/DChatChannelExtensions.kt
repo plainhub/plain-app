@@ -1,7 +1,8 @@
 package com.ismartcoding.plain.db
 
+import com.ismartcoding.plain.chat.peer.RustPeerStore
+
 import com.ismartcoding.plain.preferences.*
-import com.ismartcoding.plain.platform.AppDatabase
 
 import kotlin.io.encoding.ExperimentalEncodingApi
 import com.ismartcoding.plain.helpers.Base64Lenient
@@ -34,7 +35,7 @@ fun DChatChannel.getRecipientIds(): List<String> {
 
 suspend fun DChatChannel.getPeersAsync(): List<DPeer> = withIO {
     val ids = memberIds()
-    val dbPeers = AppDatabase.instance.peerDao().getByIds(ids).associateBy { it.id }
+    val dbPeers = RustPeerStore.getByIds(ids).associateBy { it.id }
     ids.mapNotNull { peerId ->
         if (peerId == TempData.clientId) {
             DPeer(

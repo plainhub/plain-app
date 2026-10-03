@@ -1,10 +1,11 @@
 package com.ismartcoding.plain.chat.peer
 
+import com.ismartcoding.plain.chat.channel.RustChannelStore
+
 import com.ismartcoding.plain.lib.withIO
 import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.chat.ChatCacher
 import com.ismartcoding.plain.chat.ChatDbHelper
-import com.ismartcoding.plain.platform.AppDatabase
 import com.ismartcoding.plain.db.DPeer
 import com.ismartcoding.plain.enums.DeviceType
 import com.ismartcoding.plain.enums.PeerStatus
@@ -12,11 +13,11 @@ import com.ismartcoding.plain.lib.TimeHelper
 
 object PeerManager {
     suspend fun deletePeer(peerId: String): Boolean = withIO {
-        val peerDao = AppDatabase.instance.peerDao()
+        val peerDao = RustPeerStore
         val peer = peerDao.getById(peerId) ?: return@withIO false
 
         ChatDbHelper.deleteAllChatsAsync(peerId)
-        val isChannelMember = AppDatabase.instance.chatChannelDao().getAll().any { it.hasMember(peerId) }
+        val isChannelMember = RustChannelStore.getAll().any { it.hasMember(peerId) }
         if (isChannelMember) {
             peer.key = ""
             peer.status = PeerStatus.CHANNEL
@@ -31,7 +32,7 @@ object PeerManager {
     }
 
     suspend fun markUnpaired(peerId: String): Boolean = withIO {
-        val peerDao = AppDatabase.instance.peerDao()
+        val peerDao = RustPeerStore
         val peer = peerDao.getById(peerId) ?: return@withIO false
         peer.status = PeerStatus.UNPAIRED
         peer.updatedAt = TimeHelper.now()

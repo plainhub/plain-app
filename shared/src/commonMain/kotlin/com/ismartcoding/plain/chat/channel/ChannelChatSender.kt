@@ -1,10 +1,11 @@
 package com.ismartcoding.plain.chat.channel
 
+import com.ismartcoding.plain.chat.peer.RustPeerStore
+
 import com.ismartcoding.plain.lib.withIO
 import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.chat.peer.PeerGraphQLClient
-import com.ismartcoding.plain.platform.AppDatabase
 import com.ismartcoding.plain.db.DChatChannel
 import com.ismartcoding.plain.db.DMessageContent
 import com.ismartcoding.plain.db.DMessageDeliveryResult
@@ -51,7 +52,7 @@ object ChannelChatSender {
             LogCat.d("Channel ${channel.id}: no recipients to send to")
             DMessageStatusData()
         } else {
-            val peerDao = AppDatabase.instance.peerDao()
+            val peerDao = RustPeerStore
             val results = mutableListOf<DMessageDeliveryResult>()
             for (memberId in recipientIds) {
                 val memberPeer = peerDao.getById(memberId)
@@ -71,7 +72,7 @@ object ChannelChatSender {
         leaderId: String,
         content: DMessageContent,
     ): Result {
-        val peerDao = AppDatabase.instance.peerDao()
+        val peerDao = RustPeerStore
         val leaderPeer = peerDao.getById(leaderId)
         if (leaderPeer == null) {
             LogCat.e("Channel ${channel.id}: leader peer $leaderId not found in DB")

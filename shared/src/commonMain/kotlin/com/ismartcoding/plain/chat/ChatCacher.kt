@@ -1,6 +1,9 @@
 package com.ismartcoding.plain.chat
 
-import com.ismartcoding.plain.platform.AppDatabase
+import com.ismartcoding.plain.chat.channel.RustChannelStore
+
+import com.ismartcoding.plain.chat.peer.RustPeerStore
+
 import com.ismartcoding.plain.db.DChat
 import com.ismartcoding.plain.lib.withIO
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -11,9 +14,9 @@ object ChatCacher {
     fun getLatestChat(chatId: String): DChat? = latestChatMap.value[chatId]
 
     suspend fun load() = withIO {
-        val allPeers = AppDatabase.instance.peerDao().getAll()
-        val allChannels = AppDatabase.instance.chatChannelDao().getAll()
-        val chatDao = AppDatabase.instance.chatDao()
+        val allPeers = RustPeerStore.getAll()
+        val allChannels = RustChannelStore.getAll()
+        val chatDao = RustChatStore
         val chatCache = mutableMapOf<String, DChat>()
         val latestChats = chatDao.getAllLatestChats()
         val peerIds = allPeers.map { it.id }.toSet()

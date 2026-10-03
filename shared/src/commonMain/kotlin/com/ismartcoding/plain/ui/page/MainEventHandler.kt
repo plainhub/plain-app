@@ -1,11 +1,12 @@
 package com.ismartcoding.plain.ui.page
 
+import com.ismartcoding.plain.chat.RustChatStore
+
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import com.ismartcoding.plain.lib.Channel
 import com.ismartcoding.plain.lib.coIO
 import com.ismartcoding.plain.lib.JsonHelper
-import com.ismartcoding.plain.platform.AppDatabase
 import com.ismartcoding.plain.platform.updateChatMessageTextAsync
 import com.ismartcoding.plain.db.DMessageText
 import com.ismartcoding.plain.enums.AudioAction
@@ -93,7 +94,7 @@ fun MainEventCollector(
 
                 is HDownloadTaskDoneEvent -> {
                     scope.launch(Dispatchers.Default) {
-                        val chat = AppDatabase.instance.chatDao().getById(event.downloadTask.messageId)
+                        val chat = RustChatStore.getById(event.downloadTask.messageId)
                         if (chat != null) {
                             chatVM.update(chat)
                             val m = chat.toModel()

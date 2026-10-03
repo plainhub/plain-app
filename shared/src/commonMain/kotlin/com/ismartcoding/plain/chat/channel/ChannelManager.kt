@@ -1,11 +1,12 @@
 package com.ismartcoding.plain.chat.channel
 
+import com.ismartcoding.plain.chat.peer.RustPeerStore
+
 import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.chat.ChatDbHelper
 import com.ismartcoding.plain.chat.ChatManager
 import com.ismartcoding.plain.chat.peer.GraphQLResponse
 import com.ismartcoding.plain.chat.peer.PeerCacher
-import com.ismartcoding.plain.platform.AppDatabase
 import com.ismartcoding.plain.db.ChannelMember
 import com.ismartcoding.plain.db.DChatChannel
 import com.ismartcoding.plain.db.DPeer
@@ -53,7 +54,7 @@ object ChannelManager {
             channel.version = 1
             channel.members = listOf(ChannelMember(peerId = TempData.clientId))
 
-            AppDatabase.instance.chatChannelDao().insert(channel)
+            RustChannelStore.insert(channel)
             ChannelCacher.load()
             channel
         }
@@ -77,7 +78,7 @@ object ChannelManager {
         withIO {
             val channel = ensureChannel(channelId)
             ChatDbHelper.deleteAllChannelChatsAsync(channelId)
-            AppDatabase.instance.chatChannelDao().delete(channelId)
+            RustChannelStore.delete(channelId)
             ChannelCacher.removeChannel(channelId)
             if (channel.isOwnedByMe()) {
                 ChannelSystemMessageSender.broadcastKick(channel)
@@ -90,7 +91,7 @@ object ChannelManager {
             val existing = ensureChannel(channelId)
             if (existing.isOwnedByMe()) throw Exception("Owner cannot leave; delete the channel instead")
 
-            val ownerPeer = AppDatabase.instance.peerDao().getById(existing.ownerId)
+            val ownerPeer = RustPeerStore.getById(existing.ownerId)
             val channel = ChannelCacher.mutateChannel(channelId) { ch ->
                 ch.status = ChatChannelStatus.LEFT
                 ch.members = ch.members.filter { it.peerId != TempData.clientId }
@@ -103,7 +104,7 @@ object ChannelManager {
 
     suspend fun inviteMember(channelId: String, peerId: String): DChatChannel {
         return withIO {
-            val peer = AppDatabase.instance.peerDao().getById(peerId)
+            val peer = RustPeerStore.getById(peerId)
             val channel = ChannelCacher.mutateChannel(channelId) { ch ->
                 if (!ch.isOwnedByMe()) throw Exception("Only owner can add members")
                 if (ch.hasMember(peerId)) throw Exception("Already a member")
@@ -136,7 +137,7 @@ object ChannelManager {
 
     suspend fun kickMember(channelId: String, peerId: String): DChatChannel {
         return withIO {
-            val peer = AppDatabase.instance.peerDao().getById(peerId)
+            val peer = RustPeerStore.getById(peerId)
             val channel = ChannelCacher.mutateChannel(channelId) { ch ->
                 if (!ch.isOwnedByMe()) throw Exception("Only owner can remove members")
                 if (!ch.hasMember(peerId)) throw Exception("Not a member")
@@ -170,7 +171,7 @@ object ChannelManager {
             val ownerPeer = ensureOwner(channel)
             ChannelSystemMessageSender.sendInviteDecline(channel.id, ownerPeer)
             ChatDbHelper.deleteAllChannelChatsAsync(channelId)
-            AppDatabase.instance.chatChannelDao().delete(channelId)
+            RustChannelStore.delete(channelId)
             ChannelCacher.removeChannel(channelId)
         }
     }

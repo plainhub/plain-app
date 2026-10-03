@@ -4,7 +4,6 @@ import com.ismartcoding.plain.helpers.Base64Lenient
 import com.ismartcoding.plain.lib.withIO
 import com.ismartcoding.plain.chat.ChatCacher
 import com.ismartcoding.plain.chat.peer.transport.PeerTransportType
-import com.ismartcoding.plain.platform.AppDatabase
 import com.ismartcoding.plain.db.DChat
 import com.ismartcoding.plain.db.DPeer
 import com.ismartcoding.plain.enums.PeerStatus
@@ -15,6 +14,7 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
@@ -105,14 +105,17 @@ object PeerCacher {
      *
      * @return 修改后的新 peer 实例；若 peerId 不存在则返回 null。
      */
+    @OptIn(ExperimentalEncodingApi::class)
     suspend fun mutatePeer(peerId: String, block: (DPeer) -> Unit): DPeer? = withIO {
         val current = peersMap.value
         val runtime = current[peerId] ?: return@withIO null
         val newPeer = runtime.peer.copy()
         block(newPeer)
-        AppDatabase.instance.peerDao().update(newPeer)
-        peersMap.value = current + (peerId to runtime.copy(peer = newPeer))
-        newPeer
+        val saved = RustPeerStore.patch(runtime.peer, newPeer) ?: return@withIO null
+        val keyBytes = if (saved.key.isNotEmpty()) Base64Lenient.decode(saved.key) else ByteArray(0)
+        val publicKeyBytes = if (saved.publicKey.isNotEmpty()) Base64Lenient.decode(saved.publicKey) else ByteArray(0)
+        peersMap.update { it + (peerId to PeerRuntime(saved, keyBytes, publicKeyBytes)) }
+        saved
     }
 
     /** Returns whether the peer's Wi-Fi Aware service is currently running (from DISCOVER reply). */
@@ -147,7 +150,7 @@ object PeerCacher {
 
     @OptIn(ExperimentalEncodingApi::class)
     suspend fun load() = withIO {
-        val peers = AppDatabase.instance.peerDao().getAll()
+        val peers = RustPeerStore.getAll()
         val runtimeMap = peers.associate { peer ->
             val keyBytes = if (peer.key.isNotEmpty()) Base64Lenient.decode(peer.key) else ByteArray(0)
             val publicKeyBytes = if (peer.publicKey.isNotEmpty()) Base64Lenient.decode(peer.publicKey) else ByteArray(0)
