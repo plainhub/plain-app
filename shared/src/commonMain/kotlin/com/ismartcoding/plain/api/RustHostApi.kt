@@ -1,5 +1,6 @@
 package com.ismartcoding.plain.api
 
+import com.ismartcoding.plain.features.imageindex.ImageIndexHost
 import com.ismartcoding.plain.features.audio.AudioLibraryHost
 import com.ismartcoding.plain.features.audio.AudioEngineHost
 import com.ismartcoding.plain.lib.logcat.LogCat
@@ -35,7 +36,11 @@ object RustHostApi {
                                     launch {
                                         try {
                                             val reply = try {
-                                                val result = if (method == "audioEngineCommand") AudioEngineHost.handle(method, params) else AudioLibraryHost.handle(method, params)
+                                                val result = when {
+                                                    method == "audioEngineCommand" -> AudioEngineHost.handle(method, params)
+                                                    method.startsWith("imageIndex") -> ImageIndexHost.handle(method, params)
+                                                    else -> AudioLibraryHost.handle(method, params)
+                                                }
                                                 buildJsonObject { put("id", id); put("result", result) }
                                             } catch (cancelled: CancellationException) { throw cancelled }
                                             catch (e: Exception) { buildJsonObject { put("id", id); put("error", e.message ?: "Host operation failed") } }
@@ -49,6 +54,7 @@ object RustHostApi {
                     }
                 } catch (cancelled: CancellationException) { throw cancelled }
                 catch (e: Exception) { LogCat.e("Rust host: ${e.message}") }
+                finally { withContext(NonCancellable) { try { ImageIndexHost.disconnect() } catch (error: Exception) { LogCat.e("Image index cleanup",error) } } }
                 delay(retryMs)
                 retryMs = (retryMs * 2).coerceAtMost(5_000)
             }

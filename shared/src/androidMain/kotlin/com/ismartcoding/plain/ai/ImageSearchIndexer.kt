@@ -1,158 +1,38 @@
 package com.ismartcoding.plain.ai
-import com.ismartcoding.plain.appContext
 
-import android.graphics.Bitmap
-import com.ismartcoding.plain.lib.withIO
+import com.ismartcoding.plain.api.string
+import com.ismartcoding.plain.data.DImage
+import com.ismartcoding.plain.features.imageindex.ImageIndexHelper
+import com.ismartcoding.plain.lib.coIO
 import com.ismartcoding.plain.lib.logcat.LogCat
-import com.ismartcoding.plain.features.ImageEmbeddingHelper
-import com.ismartcoding.plain.db.DImageEmbedding
-import com.ismartcoding.plain.platform.Permission
-import com.ismartcoding.plain.platform.isGranted
-import com.ismartcoding.plain.features.file.FileSortBy
-import com.ismartcoding.plain.features.media.ImageMediaStoreHelper
 import com.ismartcoding.plain.lib.sendEvent
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.joinAll
-import kotlinx.coroutines.launch
-import java.io.File
-import java.util.concurrent.atomic.AtomicInteger
+import kotlinx.coroutines.CancellationException
+import kotlinx.serialization.json.*
 
 object ImageSearchIndexer {
-    private const val BATCH_SIZE = 20
-    private const val PRELOAD_BUFFER = 16
-    private const val NUM_WORKERS = 4
-    private const val NUM_LOADERS = 3
-
     @Volatile var isRunning = false; private set
-    @Volatile private var cancelled = false
-    var totalImages = 0; private set
-    var indexedImages = 0; private set
+    @Volatile var totalImages = 0; private set
+    @Volatile var indexedImages = 0; private set
+    private var version = -1L
 
-    /** Index specific images incrementally (single worker, no progress UI). */
-    suspend fun indexImages(images: List<com.ismartcoding.plain.data.DImage>) = withIO {
-        if (images.isEmpty()) return@withIO
-        val dao = ImageEmbeddingHelper
-        val modelFile = File(ImageSearchManager.getModelDir(), "mobileclip_s2_image.tflite")
-        val worker = ImageEmbedWorker(modelFile)
-        try {
-            val batch = mutableListOf<DImageEmbedding>()
-            for (image in images) {
-                val bmp = ImageEmbedWorker.loadBitmap(image.path) ?: continue
-                val embedding = worker.embedBitmap(bmp) ?: continue
-                batch.add(DImageEmbedding(image.id, image.path, floatsToBytes(embedding)))
-                if (batch.size >= BATCH_SIZE) {
-                    ImageEmbeddingHelper.insertAll(batch)
-                    batch.clear()
-                }
-            }
-            if (batch.isNotEmpty()) dao.insertAll(batch)
-        } finally {
-            worker.close()
+    suspend fun start(forceReindex: Boolean = false) { applyStatus(ImageIndexHelper.start(forceReindex)) }
+    suspend fun indexImages(images: List<DImage>) { applyStatus(ImageIndexHelper.selected(images.map { it.id })) }
+    fun cancel() {
+        coIO {
+            try { applyStatus(ImageIndexHelper.cancel()) }
+            catch (cancelled: CancellationException) { throw cancelled }
+            catch (error: Exception) { ImageSearchManager.setIndexError(error.message ?: "Image index cancellation failed");LogCat.e("Image index",error) }
         }
     }
-
-    /** Full scan with progress tracking (parallel workers). */
-    suspend fun start(forceReindex: Boolean = false) = withIO {
-        if (isRunning) return@withIO
-        if (ImageSearchManager.status.value != ImageSearchStatusType.READY) return@withIO
-        isRunning = true
-        cancelled = false
-        try {
-            val context = appContext
-            if (!Permission.WRITE_EXTERNAL_STORAGE.isGranted()) return@withIO
-            val allImages = ImageMediaStoreHelper.searchAsync(
-                context, "", Int.MAX_VALUE, 0, FileSortBy.DATE_DESC,
-            )
-            totalImages = allImages.size
-            val dao = ImageEmbeddingHelper
-            if (forceReindex) dao.deleteAll()
-            val existingIds = dao.getAllIds().toSet()
-
-            val currentIds = allImages.map { it.id }.toSet()
-            val staleIds = existingIds - currentIds
-            if (staleIds.isNotEmpty()) dao.deleteByIds(staleIds.toList())
-
-            val toIndex = allImages.filter { it.id !in existingIds }
-            indexedImages = totalImages - toIndex.size
-            emitProgress()
-
-            indexWithParallelWorkers(toIndex)
-        } catch (e: Exception) {
-            LogCat.e("Image indexing failed", e)
-        } finally {
-            isRunning = false
-            emitProgress()
-        }
-    }
-
-    private suspend fun indexWithParallelWorkers(
-        toIndex: List<com.ismartcoding.plain.data.DImage>,
-    ) = coroutineScope {
-        val modelFile = File(ImageSearchManager.getModelDir(), "mobileclip_s2_image.tflite")
-        val imageCh = Channel<com.ismartcoding.plain.data.DImage>(PRELOAD_BUFFER)
-        val bitmapCh = Channel<Triple<String, String, Bitmap>>(PRELOAD_BUFFER)
-        val resultCh = Channel<DImageEmbedding>(BATCH_SIZE * 2)
-        val indexed = AtomicInteger(indexedImages)
-
-        // Dispatcher: feed images into work queue
-        launch(Dispatchers.IO) {
-            for (image in toIndex) {
-                if (cancelled) break
-                imageCh.send(image)
-            }
-            imageCh.close()
-        }
-
-        // Parallel bitmap loaders
-        val loaderJobs = (0 until NUM_LOADERS).map {
-            launch(Dispatchers.IO) {
-                for (image in imageCh) {
-                    if (cancelled) break
-                    val bmp = ImageEmbedWorker.loadBitmap(image.path) ?: continue
-                    bitmapCh.send(Triple(image.id, image.path, bmp))
-                }
-            }
-        }
-        launch { loaderJobs.joinAll(); bitmapCh.close() }
-
-        // Parallel inference workers, each with own model + buffers
-        val workers = (0 until NUM_WORKERS).map { ImageEmbedWorker(modelFile) }
-        val workerJobs = workers.map { worker ->
-            launch(Dispatchers.Default) {
-                for ((id, path, bmp) in bitmapCh) {
-                    if (cancelled) { bmp.recycle(); break }
-                    val embedding = worker.embedBitmap(bmp) ?: continue
-                    resultCh.send(DImageEmbedding(id, path, floatsToBytes(embedding)))
-                }
-            }
-        }
-        launch { workerJobs.joinAll(); resultCh.close() }
-
-        // Batch writer
-        val batch = mutableListOf<DImageEmbedding>()
-        for (item in resultCh) {
-            batch.add(item)
-            indexedImages = indexed.incrementAndGet()
-            if (batch.size >= BATCH_SIZE) {
-                ImageEmbeddingHelper.insertAll(batch)
-                batch.clear()
-                emitProgress()
-            }
-        }
-        if (batch.isNotEmpty()) {
-            ImageEmbeddingHelper.insertAll(batch)
-            batch.clear()
-        }
-        emitProgress()
-
-        workers.forEach { it.close() }
-    }
-
-    fun cancel() { cancelled = true }
-
-    private fun emitProgress() {
-        sendEvent(ImageIndexProgressEvent(totalImages, indexedImages, isRunning))
+    @Synchronized
+    fun applyStatus(status: JsonObject) {
+        val next = status.getValue("version").jsonPrimitive.long
+        if (next < version) return
+        version = next
+        isRunning = status.getValue("isRunning").jsonPrimitive.boolean
+        totalImages = status.getValue("totalImages").jsonPrimitive.int
+        indexedImages = status.getValue("indexedImages").jsonPrimitive.int
+        ImageSearchManager.setIndexError(status.string("errorMessage"))
+        sendEvent(ImageIndexProgressEvent(totalImages,indexedImages,isRunning))
     }
 }

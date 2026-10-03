@@ -1,169 +1,81 @@
 package com.ismartcoding.plain.ai
-import com.ismartcoding.plain.appContext
 
+import android.provider.MediaStore
+import com.ismartcoding.plain.appContext
+import com.ismartcoding.plain.features.ImageEmbeddingHelper
+import com.ismartcoding.plain.features.imageindex.ImageIndexHelper
 import com.ismartcoding.plain.platform.isQPlus
 import com.ismartcoding.plain.lib.logcat.LogCat
-import com.ismartcoding.plain.features.ImageEmbeddingHelper
-import com.ismartcoding.plain.platform.Permission
-import com.ismartcoding.plain.platform.isGranted
-import com.ismartcoding.plain.features.file.FileSortBy
-import com.ismartcoding.plain.features.media.ImageMediaStoreHelper
-import android.provider.MediaStore
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.ensureActive
-import kotlinx.coroutines.launch
-import kotlin.coroutines.coroutineContext
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
+import kotlinx.serialization.json.boolean
+import kotlinx.serialization.json.jsonPrimitive
 
-/**
- * Central coordinator for AI image search indexing.
- * All index operations are queued and processed serially to prevent race conditions.
- *
- * Entry points:
- *  - [enqueueAdd]    – after upload, restore from trash
- *  - [enqueueRemove] – after delete, move to trash
- *  - [enqueueSync]   – ContentObserver change, app startup
- *  - [fullScan]      – user-triggered full rescan
- */
 object ImageIndexManager {
-    private const val SYNC_THRESHOLD = 50
-
-    private sealed class Op {
-        data class Add(val ids: Set<String>) : Op()
-        data class Remove(val ids: Set<String>) : Op()
-        data object Sync : Op()
-        data class FullScan(val force: Boolean) : Op()
+    private sealed class Action {
+        data class Add(val ids: Set<String>) : Action()
+        data class Remove(val ids: Set<String>) : Action()
+        data class Scan(val force: Boolean) : Action()
     }
-
-    private val opChannel = Channel<Op>(Channel.UNLIMITED)
+    private val requests = Channel<Action>(32)
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
-    private var processorJob: Job? = null
+    private val sending = Mutex()
     private var observer: ImageMediaObserver? = null
-
-    /** Start the processor and ContentObserver. Call when model becomes READY. */
-    fun startup() {
-        if (processorJob?.isActive == true) return
-        processorJob = scope.launch { processOps() }
-        registerObserver()
-        enqueueSync()
-    }
-
-    /** Stop the processor and ContentObserver. Call when model is disabled. */
-    fun shutdown() {
-        unregisterObserver()
-        processorJob?.cancel()
-        processorJob = null
-    }
-
-    fun enqueueAdd(ids: Set<String>) {
-        if (ids.isEmpty() || !ImageSearchManager.isModelReady()) return
-        opChannel.trySend(Op.Add(ids))
-    }
-
-    fun enqueueRemove(ids: Set<String>) {
-        if (ids.isEmpty()) return
-        opChannel.trySend(Op.Remove(ids))
-    }
-
-    fun enqueueSync() {
-        ensureProcessorRunning()
-        opChannel.trySend(Op.Sync)
-    }
-
-    fun fullScan(force: Boolean = false) {
-        ensureProcessorRunning()
-        LogCat.d("ImageIndexManager: fullScan enqueued (force=$force)")
-        opChannel.trySend(Op.FullScan(force))
-    }
-
-    private fun ensureProcessorRunning() {
-        if (ImageSearchManager.isModelReady() && processorJob?.isActive != true) {
-            processorJob = scope.launch { processOps() }
-        }
-    }
-
-    private suspend fun processOps() {
-        for (op in opChannel) {
-            if (!ImageSearchManager.isModelReady()) continue
-            try {
-                LogCat.d("ImageIndexManager: processing $op")
-                when (op) {
-                    is Op.FullScan -> ImageSearchIndexer.start(op.force)
-                    is Op.Add -> doAdd(op.ids)
-                    is Op.Remove -> doRemove(op.ids)
-                    is Op.Sync -> doSync()
+    @Volatile private var active = false
+    init {
+        scope.launch {
+            for (request in requests) {
+                sending.withLock {
+                    try {
+                        when (request) {
+                            is Action.Add -> if (active) ImageSearchIndexer.applyStatus(ImageIndexHelper.selected(request.ids))
+                            is Action.Remove -> ImageEmbeddingHelper.deleteByIds(request.ids.toList())
+                            is Action.Scan -> if (active) ImageSearchIndexer.start(request.force)
+                        }
+                    } catch (cancelled: CancellationException) { throw cancelled }
+                    catch (error: Exception) { ImageSearchManager.setIndexError(error.message ?: "Image index request failed");LogCat.e("Image index",error) }
                 }
-            } catch (e: Exception) {
-                // Check if our own processor job was cancelled (by shutdown())
-                coroutineContext.ensureActive()
-                LogCat.e("ImageIndexManager op failed", e)
             }
         }
     }
-
-    private suspend fun doAdd(ids: Set<String>) {
-        val dao = ImageEmbeddingHelper
-        val existingIds = dao.getAllIds().toSet()
-        val newIds = ids - existingIds
-        if (newIds.isEmpty()) return
-
-        val context = appContext
-        val idsQuery = "ids:${newIds.joinToString(",")}"
-        val images = ImageMediaStoreHelper.searchAsync(
-            context, idsQuery, newIds.size, 0, FileSortBy.DATE_DESC,
-        )
-        if (images.isNotEmpty()) {
-            ImageSearchIndexer.indexImages(images)
-        }
+    @Synchronized
+    fun startup() {
+        if (active) return
+        active = true
+        val uri = if (isQPlus()) MediaStore.Images.Media.getContentUri(MediaStore.VOLUME_EXTERNAL) else MediaStore.Images.Media.EXTERNAL_CONTENT_URI
+        val next = ImageMediaObserver { enqueueSync() }
+        appContext.contentResolver.registerContentObserver(uri,true,next)
+        observer = next
+        enqueueSync()
     }
-
-    private suspend fun doRemove(ids: Set<String>) {
-        ImageEmbeddingHelper.deleteByIds(ids.toList())
-    }
-
-    private suspend fun doSync() {
-        val context = appContext
-        if (!Permission.WRITE_EXTERNAL_STORAGE.isGranted()) return
-        val allImages = ImageMediaStoreHelper.searchAsync(
-            context, "", Int.MAX_VALUE, 0, FileSortBy.DATE_DESC,
-        )
-        val currentIds = allImages.map { it.id }.toSet()
-        val dao = ImageEmbeddingHelper
-        val existingIds = dao.getAllIds().toSet()
-
-        // Remove stale embeddings
-        val staleIds = existingIds - currentIds
-        if (staleIds.isNotEmpty()) dao.deleteByIds(staleIds.toList())
-
-        // Index new images – delegate to FullScan for large batches
-        val newImages = allImages.filter { it.id !in existingIds }
-        if (newImages.size > SYNC_THRESHOLD) {
-            LogCat.d("ImageIndexManager: doSync: ${newImages.size} new images, delegating to FullScan")
-            opChannel.trySend(Op.FullScan(false))
-        } else if (newImages.isNotEmpty()) {
-            ImageSearchIndexer.indexImages(newImages)
-        }
-    }
-
-    private fun registerObserver() {
-        if (observer != null) return
-        val obs = ImageMediaObserver { enqueueSync() }
-        val uri = if (isQPlus()) {
-            MediaStore.Images.Media.getContentUri(MediaStore.VOLUME_EXTERNAL)
-        } else {
-            MediaStore.Images.Media.EXTERNAL_CONTENT_URI
-        }
-        appContext.contentResolver.registerContentObserver(uri, true, obs)
-        observer = obs
-    }
-
-    private fun unregisterObserver() {
-        observer?.let {
-            appContext.contentResolver.unregisterContentObserver(it)
-        }
+    suspend fun shutdown() {
+        active = false
+        observer?.let { appContext.contentResolver.unregisterContentObserver(it) }
         observer = null
+        sending.withLock {
+            while (requests.tryReceive().isSuccess) { }
+            ImageSearchIndexer.applyStatus(ImageIndexHelper.cancel())
+        }
+        withTimeout(45_000) {
+            while (true) {
+                val status = ImageIndexHelper.status()
+                ImageSearchIndexer.applyStatus(status)
+                if (!status.getValue("isRunning").jsonPrimitive.boolean) break
+                delay(50)
+            }
+        }
+        ImageIndexInference.disconnect()
+    }
+    fun enqueueAdd(ids: Set<String>) { if (ids.isNotEmpty() && active) send(Action.Add(ids)) }
+    fun enqueueRemove(ids: Set<String>) { if (ids.isNotEmpty()) send(Action.Remove(ids)) }
+    fun enqueueSync() { if (active) send(Action.Scan(false)) }
+    fun fullScan(force: Boolean = false) {
+        if (!active) { ImageSearchManager.setIndexError("Image search models are unavailable");return }
+        send(Action.Scan(force))
+    }
+    private fun send(action: Action) {
+        if (requests.trySend(action).isFailure) ImageSearchManager.setIndexError("Image index request capacity exceeded")
     }
 }

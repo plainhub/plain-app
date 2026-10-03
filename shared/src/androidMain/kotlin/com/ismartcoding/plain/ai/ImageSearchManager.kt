@@ -156,6 +156,12 @@ object ImageSearchManager {
         }
     }
 
+    fun setIndexError(message: String) {
+        if (_errorMessage.value == message) return
+        _errorMessage.value = message
+        emitStatus()
+    }
+
     private fun emitStatus() {
         sendEvent(ImageSearchStatusChangedEvent(_status.value, _downloadProgress.value, _errorMessage.value))
     }

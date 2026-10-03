@@ -13,14 +13,14 @@ import java.io.File
  * Independent inference worker with its own model instance and buffers.
  * Multiple workers can run in parallel for high-throughput indexing.
  */
-class ImageEmbedWorker(modelFile: File, private val inputSize: Int = 256) : AutoCloseable {
+class ImageEmbedWorker(modelFile: File, private val inputSize: Int = 256) : ImageIndexWorker {
     private val model: CompiledModel = DelegateHelper.createModel(modelFile)
     private val inputBuffers: List<TensorBuffer> = model.createInputBuffers()
     private val outputBuffers: List<TensorBuffer> = model.createOutputBuffers()
     private val pixelsBuf = IntArray(inputSize * inputSize)
     private val chwBuf = FloatArray(3 * inputSize * inputSize)
 
-    fun embedBitmap(bitmap: Bitmap): FloatArray? {
+    override fun embedBitmap(bitmap: Bitmap): FloatArray? {
         return try {
             bitmapToNCHW(bitmap, pixelsBuf, chwBuf)
             inputBuffers[0].writeFloat(chwBuf)

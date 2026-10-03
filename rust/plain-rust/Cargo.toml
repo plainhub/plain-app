@@ -8,7 +8,7 @@ name = "plain_rust"
 crate-type = ["cdylib", "staticlib"]
 
 [dependencies]
-plain-rs = { git = "https://github.com/plainhub/plain-desktop.git", rev = "acfdac75e499dc2ea623aff4deeb30f3047b6790", features = ["content_api"] }
+plain-rs = { git = "https://github.com/plainhub/plain-desktop.git", rev = "526a319f046e0e6a3f1d1a7fa3fa68886d3f19b0", features = ["content_api"] }
 serde_json = "1"
 tokio = { version = "1", features = ["rt-multi-thread", "sync"] }
 
