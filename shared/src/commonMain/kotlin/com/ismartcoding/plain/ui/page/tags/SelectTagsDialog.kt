@@ -28,9 +28,8 @@ import com.ismartcoding.plain.ui.base.PSelectionChip
 import com.ismartcoding.plain.ui.components.NewTagButton
 import com.ismartcoding.plain.ui.components.TagNameDialog
 import com.ismartcoding.plain.ui.models.TagsViewModel
-import com.ismartcoding.plain.platform.IODispatcher
 import com.ismartcoding.plain.ui.theme.dialogSheetBackground
-import kotlinx.coroutines.launch
+import com.ismartcoding.plain.ui.models.launchSafe
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
@@ -74,7 +73,7 @@ fun SelectTagsDialog(
                     PSelectionChip(
                         selected = tagIds.contains(tag.id),
                         onClick = {
-                            scope.launch(IODispatcher) {
+                            scope.launchSafe {
                                 tagsVM.toggleTagAsync(data, tag.id)
                                 if (tagIds.contains(tag.id)) {
                                     tagIds.remove(tag.id)

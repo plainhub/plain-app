@@ -4,7 +4,6 @@ import com.ismartcoding.plain.lib.kgraphql.GraphQLError
 import com.ismartcoding.plain.lib.kgraphql.annotations.GraphQLMutation
 import com.ismartcoding.plain.lib.kgraphql.annotations.GraphQLQuery
 import com.ismartcoding.plain.lib.kgraphql.schema.dsl.SchemaBuilder
-import com.ismartcoding.plain.lib.withIO
 import com.ismartcoding.plain.data.TagRelationStub
 import com.ismartcoding.plain.enums.DataType
 import com.ismartcoding.plain.features.NoteHelper
@@ -19,11 +18,7 @@ import com.ismartcoding.plain.httpserver.models.toModel
 
 @GraphQLQuery
 suspend fun tags(type: DataType): List<Tag> {
-    val tagCountMap = TagHelper.count(type).associate { it.id to it.count }
-    return TagHelper.getAll(type).map {
-        it.count = tagCountMap[it.id] ?: 0
-        it.toModel()
-    }
+    return TagHelper.getAll(type).map { it.toModel() }
 }
 
 @GraphQLQuery
@@ -51,7 +46,6 @@ suspend fun updateTag(id: ID, name: String): Tag {
 
 @GraphQLMutation
 suspend fun deleteTag(id: ID): Boolean {
-    TagHelper.deleteTagRelationsByTagId(id.value)
     TagHelper.delete(id.value)
     return true
 }
@@ -68,35 +62,16 @@ suspend fun addToTags(type: DataType, tagIds: List<ID>, query: String): Boolean 
 
         DataType.FEED_ENTRY -> FeedEntryHelper.getIdsAsync(query).map { TagRelationStub(it) }
 
-        else -> emptyList()
+        else -> throw GraphQLError("Unsupported tag query type: ${type.name}")
     }
 
-    tagIds.forEach { tagId ->
-        val existingKeys = withIO { TagHelper.getKeysByTagId(tagId.value) }
-        val newItems = items.filter { !existingKeys.contains(it.key) }
-        if (newItems.isNotEmpty()) {
-            TagHelper.addTagRelations(
-                newItems.map {
-                    it.toTagRelation(tagId.value, type)
-                },
-            )
-        }
-    }
+    TagHelper.addTagRelations(items.flatMap { item -> tagIds.map { item.toTagRelation(it.value, type) } })
     return true
 }
 
 @GraphQLMutation
 suspend fun updateTagRelations(type: DataType, item: TagRelationStub, addTagIds: List<ID>, removeTagIds: List<ID>): Boolean {
-    addTagIds.forEach { tagId ->
-        TagHelper.addTagRelations(
-            arrayOf(item).map {
-                it.toTagRelation(tagId.value, type)
-            },
-        )
-    }
-    if (removeTagIds.isNotEmpty()) {
-        TagHelper.deleteTagRelationByKeysTagIds(setOf(item.key), removeTagIds.map { it.value }.toSet())
-    }
+    TagHelper.editTagRelations(type, item, addTagIds.map { it.value }, removeTagIds.map { it.value })
     return true
 }
 
@@ -109,7 +84,7 @@ suspend fun removeFromTags(type: DataType, tagIds: List<ID>, query: String): Boo
 
         DataType.NOTE -> NoteHelper.getIdsAsync(query)
         DataType.FEED_ENTRY -> FeedEntryHelper.getIdsAsync(query)
-        else -> emptySet()
+        else -> throw GraphQLError("Unsupported tag query type: ${type.name}")
     }
 
     TagHelper.deleteTagRelationByKeysTagIds(ids, tagIds.map { it.value }.toSet())
