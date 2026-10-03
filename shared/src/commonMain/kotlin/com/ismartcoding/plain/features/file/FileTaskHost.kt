@@ -15,6 +15,16 @@ object FileTaskHost {
                 if (canonical.any { !isPrivate(it) }) check(Permission.WRITE_EXTERNAL_STORAGE.isGranted()) { "File access permission denied" }
             }
             "fileTaskScan" -> scanFileTaskPaths(paths.filterNot { isPrivate(getCanonicalPath(it)) })
+            "fileTaskMediaSnapshot" -> {
+                require(paths.size <= 128)
+                val external = paths.filterNot { isPrivate(getCanonicalPath(it)) }
+                FilePathValidator.requireAllSafe(external.map(::getCanonicalPath))
+                return@withIO buildJsonArray {
+                    queryFileTaskMedia(external).forEach { row -> add(buildJsonObject {
+                        put("mediaType", row.type.value); put("mediaId", row.id); put("path", row.path)
+                    }) }
+                }
+            }
             else -> error("Unknown file host method")
         }
         JsonPrimitive(true)
