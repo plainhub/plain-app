@@ -21,13 +21,20 @@ actual suspend fun searchMedia(
 
 actual suspend fun countMedia(dataType: DataType, query: String): Int = 0
 
-actual suspend fun trashMedia(dataType: DataType, ids: Set<String>) {}
+actual suspend fun trashMedia(dataType: DataType, ids: Set<String>) {
+    com.ismartcoding.plain.features.mediaactions.MediaActionHelper.run(dataType,com.ismartcoding.plain.features.mediaactions.MediaAction.TRASH,ids)
+}
 
-actual suspend fun restoreMedia(dataType: DataType, ids: Set<String>) {}
+actual suspend fun restoreMedia(dataType: DataType, ids: Set<String>) {
+    com.ismartcoding.plain.features.mediaactions.MediaActionHelper.run(dataType,com.ismartcoding.plain.features.mediaactions.MediaAction.RESTORE,ids)
+}
 
-actual suspend fun deleteMedia(dataType: DataType, ids: Set<String>, fromTrash: Boolean) {}
+actual suspend fun deleteMedia(dataType: DataType, ids: Set<String>, fromTrash: Boolean) {
+    com.ismartcoding.plain.features.mediaactions.MediaActionHelper.run(dataType,com.ismartcoding.plain.features.mediaactions.MediaAction.DELETE,ids,fromTrash)
+}
 
-actual suspend fun moveMedia(dataType: DataType, ids: Set<String>, destDir: String): Boolean = false
+actual suspend fun moveMedia(dataType: DataType, ids: Set<String>, destDir: String): Boolean =
+    com.ismartcoding.plain.features.mediaactions.MediaActionHelper.run(dataType,com.ismartcoding.plain.features.mediaactions.MediaAction.MOVE,ids,destDir=destDir) == ids.size
 
 actual suspend fun getDocExtGroups(query: String): List<Pair<String, Int>> = emptyList()
 

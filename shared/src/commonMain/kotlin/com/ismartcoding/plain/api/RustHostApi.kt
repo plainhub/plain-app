@@ -5,6 +5,7 @@ import com.ismartcoding.plain.features.audio.AudioLibraryHost
 import com.ismartcoding.plain.features.audio.AudioEngineHost
 import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.platform.createPeerStatusHttpClient
+import com.ismartcoding.plain.platform.handleMediaActionHost
 import kotlinx.coroutines.*
 import kotlinx.coroutines.sync.Semaphore
 import kotlinx.serialization.json.*
@@ -38,6 +39,7 @@ object RustHostApi {
                                             val reply = try {
                                                 val result = when {
                                                     method == "audioEngineCommand" -> AudioEngineHost.handle(method, params)
+                                                    method == "mediaAction" -> handleMediaActionHost(params)
                                                     method.startsWith("imageIndex") -> ImageIndexHost.handle(method, params)
                                                     else -> AudioLibraryHost.handle(method, params)
                                                 }

@@ -38,6 +38,8 @@ object DocMediaStoreHelper : BaseMediaContentHelper() {
         "application/javascript"
     )
 
+    fun isDocumentMimeType(value: String?): Boolean = value != null && (value.startsWith("text/") || value in extraDocumentMimeTypes)
+
     override fun getProjection(): Array<String> {
         val cols = mutableListOf(
             MediaStore.Files.FileColumns._ID,

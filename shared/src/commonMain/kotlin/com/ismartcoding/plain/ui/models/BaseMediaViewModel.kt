@@ -14,7 +14,6 @@ import com.ismartcoding.plain.features.TagHelper
 import com.ismartcoding.plain.features.file.FileSortBy
 import com.ismartcoding.plain.platform.countMedia
 import com.ismartcoding.plain.platform.deleteMedia
-import com.ismartcoding.plain.platform.getMediaPathsByIds
 import com.ismartcoding.plain.platform.restoreMedia
 import com.ismartcoding.plain.platform.searchMedia
 import com.ismartcoding.plain.platform.trashMedia
@@ -103,50 +102,31 @@ abstract class BaseMediaViewModel<T : IData> : ISearchableViewModel<T>, ViewMode
         trashItems(tagsVM, ids)
     }
 
-    /** Type-specific cascade after trashing; [paths] are resolved before the trash flag hides them. */
-    internal open suspend fun onTrashed(paths: Set<String>) {}
-
     fun restore(tagsVM: TagsViewModel, ids: Set<String>) {
         restoreItems(tagsVM, ids)
     }
 
     open fun delete(tagsVM: TagsViewModel, ids: Set<String>) {
-        viewModelScope.launchSafe {
-            DialogHelper.showLoading()
-            TagHelper.deleteTagRelationByKeys(ids, dataType)
-            deleteMedia(dataType, ids, trash.value)
-            loadAsync(tagsVM)
-            DialogHelper.hideLoading()
-            sendEvent(MediaStoreChangedEvent(dataType))
-        }
+        viewModelScope.launchSafe { applyMediaAction(tagsVM) { deleteMedia(dataType, ids, trash.value) } }
     }
 
-    fun trashItems(
-        tagsVM: TagsViewModel, ids: Set<String>,
-    ) {
-        viewModelScope.launchSafe {
-            DialogHelper.showLoading()
-            val paths = getMediaPathsByIds(dataType, ids)
-            TagHelper.deleteTagRelationByKeys(ids, dataType)
-            trashMedia(dataType, ids)
-            onTrashed(paths)
-            loadAsync(tagsVM)
-            DialogHelper.hideLoading()
-            sendEvent(MediaStoreChangedEvent(dataType))
-            _itemsFlow.update { it.filterNot { i -> ids.contains(i.id) } }
-        }
+    fun trashItems(tagsVM: TagsViewModel, ids: Set<String>) {
+        viewModelScope.launchSafe { applyMediaAction(tagsVM) { trashMedia(dataType, ids) } }
     }
 
-    fun restoreItems(
-        tagsVM: TagsViewModel, ids: Set<String>,
-    ) {
-        viewModelScope.launchSafe {
-            DialogHelper.showLoading()
-            restoreMedia(dataType, ids)
-            loadAsync(tagsVM)
-            DialogHelper.hideLoading()
-            sendEvent(MediaStoreChangedEvent(dataType))
-            _itemsFlow.update { it.filterNot { i -> ids.contains(i.id) } }
+    fun restoreItems(tagsVM: TagsViewModel, ids: Set<String>) {
+        viewModelScope.launchSafe { applyMediaAction(tagsVM) { restoreMedia(dataType, ids) } }
+    }
+
+    private suspend fun applyMediaAction(tagsVM: TagsViewModel, action: suspend () -> Unit) {
+        DialogHelper.showLoading()
+        try { action() }
+        finally {
+            try { loadAsync(tagsVM) }
+            finally {
+                DialogHelper.hideLoading()
+                sendEvent(MediaStoreChangedEvent(dataType))
+            }
         }
     }
 

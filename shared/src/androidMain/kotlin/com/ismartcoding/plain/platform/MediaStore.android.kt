@@ -131,43 +131,19 @@ actual suspend fun countMedia(dataType: DataType, query: String): Int {
 }
 
 actual suspend fun trashMedia(dataType: DataType, ids: Set<String>) {
-    when (dataType) {
-        DataType.AUDIO -> AudioMediaStoreHelper.trashByIdsAsync(appContext, ids)
-        DataType.DOC -> DocMediaStoreHelper.trashByIdsAsync(appContext, ids)
-        DataType.IMAGE -> ImageMediaStoreHelper.trashByIdsAsync(appContext, ids)
-        DataType.VIDEO -> VideoMediaStoreHelper.trashByIdsAsync(appContext, ids)
-        else -> {}
-    }
+    com.ismartcoding.plain.features.mediaactions.MediaActionHelper.run(dataType,com.ismartcoding.plain.features.mediaactions.MediaAction.TRASH,ids)
 }
 
 actual suspend fun restoreMedia(dataType: DataType, ids: Set<String>) {
-    when (dataType) {
-        DataType.AUDIO -> AudioMediaStoreHelper.restoreByIdsAsync(appContext, ids)
-        DataType.DOC -> DocMediaStoreHelper.restoreByIdsAsync(appContext, ids)
-        DataType.IMAGE -> ImageMediaStoreHelper.restoreByIdsAsync(appContext, ids)
-        DataType.VIDEO -> VideoMediaStoreHelper.restoreByIdsAsync(appContext, ids)
-        else -> {}
-    }
+    com.ismartcoding.plain.features.mediaactions.MediaActionHelper.run(dataType,com.ismartcoding.plain.features.mediaactions.MediaAction.RESTORE,ids)
 }
 
 actual suspend fun deleteMedia(dataType: DataType, ids: Set<String>, fromTrash: Boolean) {
-    when (dataType) {
-        DataType.AUDIO -> AudioMediaStoreHelper.deleteRecordsAndFilesByIdsAsync(appContext, ids, fromTrash)
-        DataType.DOC -> DocMediaStoreHelper.deleteRecordsAndFilesByIdsAsync(appContext, ids, fromTrash)
-        DataType.IMAGE -> ImageMediaStoreHelper.deleteRecordsAndFilesByIdsAsync(appContext, ids, fromTrash)
-        DataType.VIDEO -> VideoMediaStoreHelper.deleteRecordsAndFilesByIdsAsync(appContext, ids, fromTrash)
-        else -> {}
-    }
+    com.ismartcoding.plain.features.mediaactions.MediaActionHelper.run(dataType,com.ismartcoding.plain.features.mediaactions.MediaAction.DELETE,ids,fromTrash)
 }
 
 actual suspend fun moveMedia(dataType: DataType, ids: Set<String>, destDir: String): Boolean {
-    return when (dataType) {
-        DataType.AUDIO -> AudioMediaStoreHelper.moveByIdsAsync(appContext, ids, destDir)
-        DataType.DOC -> DocMediaStoreHelper.moveByIdsAsync(appContext, ids, destDir)
-        DataType.IMAGE -> ImageMediaStoreHelper.moveByIdsAsync(appContext, ids, destDir)
-        DataType.VIDEO -> VideoMediaStoreHelper.moveByIdsAsync(appContext, ids, destDir)
-        else -> false
-    }
+    return com.ismartcoding.plain.features.mediaactions.MediaActionHelper.run(dataType,com.ismartcoding.plain.features.mediaactions.MediaAction.MOVE,ids,destDir=destDir) == ids.size
 }
 
 private suspend fun getTrashedMessageIds(): Set<String> =

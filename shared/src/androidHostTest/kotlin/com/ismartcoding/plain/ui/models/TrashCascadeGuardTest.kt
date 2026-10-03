@@ -5,14 +5,6 @@ import kotlin.test.Test
 import kotlin.test.assertTrue
 import kotlin.test.fail
 
-/**
- * Locks the trash-cascade contract (2026-09-23). App-UI trash (trashItems) used
- * to skip the path cleanup that the server flow (MediaGraphQL.trashMediaItems)
- * performs, so audios trashed in-app kept their playlist rows and still showed
- * on the playlist detail page. Paths must be resolved BEFORE trashMedia — once
- * IS_TRASHED is set, default MediaStore queries hide the rows and the paths are
- * unrecoverable.
- */
 class TrashCascadeGuardTest {
 
     private fun source(relativePath: String): String {
@@ -43,24 +35,23 @@ class TrashCascadeGuardTest {
     }
 
     @Test
-    fun `trashItems resolves paths before trashing and calls the cascade hook`() {
+    fun `media UI delegates actions without preemptive reference cleanup`() {
         val body = functionBody(source(baseMediaVmPath), "trashItems")
-        val resolve = body.indexOf("getMediaPathsByIds(dataType, ids)")
-        val trash = body.indexOf("trashMedia(dataType, ids)")
-        assertTrue(resolve >= 0, "trashItems must resolve paths via getMediaPathsByIds before trashing")
-        assertTrue(trash > resolve, "paths must be resolved BEFORE trashMedia (trashed rows hide from default queries)")
-        assertTrue(body.contains("onTrashed(paths)"), "trashItems must hand the paths to the onTrashed cascade hook")
+        assertTrue(body.contains("trashMedia(dataType, ids)"))
+        assertTrue(!body.contains("deleteTagRelationByKeys"))
+        assertTrue(!body.contains("onTrashed"))
+        assertTrue(!source(audioVmPath).contains("override suspend fun onTrashed"))
     }
 
     @Test
-    fun `audio trash cascades to queue, history and playlists like the server flow`() {
-        val override = functionBody(source(audioVmPath), "onTrashed")
-        assertTrue(
-            override.contains("AudioQueueManager.removePaths(paths)"),
-            "AudioViewModel.onTrashed must cascade via AudioQueueManager.removePaths",
-        )
-        val cascade = functionBody(source(queueManagerPath), "removePaths")
-        assertTrue(cascade.contains("audioHostRemovePaths"), "AudioQueueManager.removePaths must call the atomic Rust cascade")
+    fun `native media actions call the shared Rust coordinator`() {
+        val bridge = source("shared/src/androidMain/kotlin/com/ismartcoding/plain/platform/MediaStore.android.kt")
+        for (name in listOf("trashMedia","restoreMedia","deleteMedia","moveMedia")) {
+            assertTrue(functionBody(bridge,name).contains("MediaActionHelper.run"), "$name must route through Rust")
+        }
+        val helper = source("shared/src/commonMain/kotlin/com/ismartcoding/plain/features/mediaactions/MediaActionHelper.kt")
+        assertTrue(helper.contains("mediaHostAction"))
+        assertTrue(helper.contains("failedIds"))
     }
 
     @Test
