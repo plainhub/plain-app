@@ -42,7 +42,6 @@ actual fun fileLength(path: String): Long {
     return runCatching { File(path).takeIf { it.exists() }?.length() ?: 0L }.getOrDefault(0L)
 }
 
-actual suspend fun renameMediaFile(path: String, newName: String): String? = renameAndScanFile(path, newName)
 
 actual fun getMediaDurationMs(path: String): Long {
     val durationMs = File(path).getDurationMs(appContext)

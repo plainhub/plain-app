@@ -9,7 +9,6 @@ import com.ismartcoding.plain.platform.checkEnabledAsync
 import com.ismartcoding.plain.platform.createDirectory
 import com.ismartcoding.plain.platform.deleteFileOrDir
 import com.ismartcoding.plain.platform.renameAndScanFile
-import com.ismartcoding.plain.platform.scanFiles
 import com.ismartcoding.plain.platform.writeFileText
 import com.ismartcoding.plain.features.file.FileTaskHelper
 import com.ismartcoding.plain.features.file.FileTaskOp
@@ -26,7 +25,6 @@ suspend fun deleteFiles(paths: List<String>): ActionResult {
     Permission.WRITE_EXTERNAL_STORAGE.checkEnabledAsync()
     FilePathValidator.requireAllSafe(paths)
     val deleted = paths.count { deleteFileOrDir(it) }
-    scanFiles(paths.toTypedArray())
     return ActionResult(deleted)
 }
 

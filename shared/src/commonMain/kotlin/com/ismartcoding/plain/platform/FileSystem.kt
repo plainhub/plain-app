@@ -81,7 +81,7 @@ expect fun scanFiles(paths: Array<String>)
  * Rename a file from [path] to [newName] and notify the media scanner.
  * Returns the new absolute path on success, null on failure.
  */
-expect suspend fun renameAndScanFile(path: String, newName: String): String?
+suspend fun renameAndScanFile(path: String, newName: String): String? = RustFileHelper.rename(path, newName)
 
 /**
  * Storage stats for internal storage.
@@ -113,7 +113,7 @@ expect fun extractZipEntryToCache(zipVirtualPath: String): String?
 /**
  * Delete a file or directory (recursively) at [path]. Returns true on success.
  */
-expect fun deleteFileOrDir(path: String): Boolean
+suspend fun deleteFileOrDir(path: String): Boolean = RustFileHelper.delete(path)
 
 /**
  * Given an existing [path], returns a sibling path with a "(1)", "(2)"... suffix

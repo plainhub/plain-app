@@ -16,6 +16,12 @@ object RustFileHelper {
     suspend fun search(query: String, root: String, sortBy: FileSortBy, offset: Int = 0, limit: Int? = null): List<DFile> = read(root, query, null, null, sortBy, offset, limit)["items"]!!.jsonArray.map { decode(it.jsonObject) }
     suspend fun count(query: String, root: String): Int = read(root, query, null, null, FileSortBy.NAME_ASC, countOnly = true).getValue("count").jsonPrimitive.int
 
+    suspend fun rename(path: String, name: String): String? {
+        val value = RustContentApi.postJson("files/mutate", buildJsonObject { put("action", "rename"); put("path", path); put("name", name) }, longRunning = true).getValue("path")
+        return if (value is JsonNull) null else value.jsonPrimitive.content
+    }
+    suspend fun delete(path: String): Boolean = RustContentApi.postJson("files/mutate", buildJsonObject { put("action", "delete"); put("path", path) }, longRunning = true).getValue("removed").jsonPrimitive.boolean
+
     suspend fun stat(path: String): DFile? {
         val row = RustContentApi.postJson("files/stat", buildJsonObject { put("path", path) }).getValue("file")
         return if (row is JsonNull) null else decode(row.jsonObject)

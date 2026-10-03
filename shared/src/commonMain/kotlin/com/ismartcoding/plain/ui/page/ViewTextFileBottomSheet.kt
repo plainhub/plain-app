@@ -18,7 +18,6 @@ import com.ismartcoding.plain.lib.extensions.formatBytes
 import com.ismartcoding.plain.lib.extensions.getMimeType
 import com.ismartcoding.plain.platform.deleteFileOrDir
 import com.ismartcoding.plain.platform.formatDateTime
-import com.ismartcoding.plain.platform.scanFiles
 import com.ismartcoding.plain.platform.shareFiles
 import com.ismartcoding.plain.features.file.DFile
 import com.ismartcoding.plain.ui.base.BottomSpace
@@ -87,13 +86,13 @@ fun ViewTextFileBottomSheet(
                         Res.string.confirm_to_delete,
                         callback = {
                             scope.launch(Dispatchers.Default) {
-                                val paths = mutableListOf(path)
-                                paths.forEach {
-                                    deleteFileOrDir(it)
-                                }
-                                scanFiles(paths.toTypedArray())
-                                onDismiss()
-                                onDeleted()
+                                try {
+                                    if (deleteFileOrDir(path)) {
+                                        onDismiss()
+                                        onDeleted()
+                                    }
+                                } catch (cancelled: kotlinx.coroutines.CancellationException) { throw cancelled }
+                                catch (error: Exception) { com.ismartcoding.plain.ui.helpers.DialogHelper.showMessage(error) }
                             }
                         },
                         danger = true

@@ -32,7 +32,7 @@ expect fun fileLength(path: String): Long
  * Returns the new absolute path on success, or null on failure.
  * On Android this also triggers a MediaScanner scan so the gallery stays in sync.
  */
-expect suspend fun renameMediaFile(path: String, newName: String): String?
+suspend fun renameMediaFile(path: String, newName: String): String? = renameAndScanFile(path, newName)
 
 /** Returns the media duration in seconds for the file at [path], or 0L on failure. */
 expect fun getMediaDurationMs(path: String): Long

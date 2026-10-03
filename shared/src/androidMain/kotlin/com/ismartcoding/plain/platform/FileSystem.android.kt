@@ -56,15 +56,6 @@ actual fun scanFiles(paths: Array<String>) {
     appContext.scanFileByConnection(paths)
 }
 
-actual suspend fun renameAndScanFile(path: String, newName: String): String? {
-    val newFile = FileHelper.rename(path, newName)
-    appContext.scanFileByConnection(path)
-    if (newFile != null) {
-        appContext.scanFileByConnection(newFile.absolutePath)
-    }
-    return newFile?.absolutePath
-}
-
 actual fun getInternalStorageStats(): DStorageStatsItem = FileSystemHelper.getInternalStorageStats()
 
 actual fun getSDCardStorageStats(): DStorageStatsItem = FileSystemHelper.getSDCardStorageStats(appContext)
@@ -176,8 +167,6 @@ actual fun extractZipEntryToCache(zipVirtualPath: String): String? {
     }
     return null
 }
-
-actual fun deleteFileOrDir(path: String): Boolean = File(path).deleteRecursively()
 
 actual fun getNewPath(path: String): String = File(path).newPath()
 

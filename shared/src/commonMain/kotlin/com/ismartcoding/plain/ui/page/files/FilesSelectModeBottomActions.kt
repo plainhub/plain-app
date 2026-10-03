@@ -89,14 +89,18 @@ fun FilesSelectModeBottomActions(
                             scope.launch {
                                 val paths = filesVM.selectedIds.toSet()
                                 DialogHelper.showLoading()
-                                withIO {
-                                    FilePathValidator.requireAllSafe(paths.toList())
-                                    paths.forEach { deleteFileOrDir(it) }
-                                    scanFiles(paths.toTypedArray())
+                                try {
+                                    withIO {
+                                        FilePathValidator.requireAllSafe(paths.toList())
+                                        paths.forEach { deleteFileOrDir(it) }
+                                    }
+                                } catch (cancelled: kotlinx.coroutines.CancellationException) { throw cancelled }
+                                catch (error: Exception) { DialogHelper.showMessage(error) }
+                                finally {
+                                    DialogHelper.hideLoading()
                                     filesVM.loadAsync()
+                                    filesVM.exitSelectMode()
                                 }
-                                DialogHelper.hideLoading()
-                                filesVM.exitSelectMode()
                             }
                         },
                         danger = true

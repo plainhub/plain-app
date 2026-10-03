@@ -39,17 +39,6 @@ actual suspend fun getRecentFiles(): List<DFile> = emptyList()
 
 actual fun scanFiles(paths: Array<String>) {}
 
-actual suspend fun renameAndScanFile(path: String, newName: String): String? = withIO {
-    val parent = path.substringBeforeLast('/')
-    val newPath = joinPath(parent, newName)
-    try {
-        if (NSFileManager.defaultManager.moveItemAtPath(path, newPath, error = null)) newPath else null
-    } catch (e: Exception) {
-        LogCat.e("renameAndScanFile: ${e.message}")
-        null
-    }
-}
-
 actual fun getInternalStorageStats(): DStorageStatsItem {
     val path = appDir()
     return try {
@@ -70,14 +59,6 @@ actual fun getUSBStorageStats(): List<DStorageStatsItem> = emptyList()
 actual fun listZipEntries(zipVirtualPath: String, sortBy: FileSortBy): List<DFile> = emptyList()
 
 actual fun extractZipEntryToCache(zipVirtualPath: String): String? = null
-
-actual fun deleteFileOrDir(path: String): Boolean {
-    return try {
-        NSFileManager.defaultManager.removeItemAtPath(path, null)
-    } catch (e: Exception) {
-        false
-    }
-}
 
 actual fun getNewPath(path: String): String {
     val dotIndex = path.lastIndexOf('.')

@@ -120,17 +120,6 @@ actual fun fileLength(path: String): Long = try {
     0L
 }
 
-actual suspend fun renameMediaFile(path: String, newName: String): String? = try {
-    val parent = path.substringBeforeLast('/', "")
-    if (parent.isEmpty()) return null
-    val newPath = "$parent/$newName"
-    NSFileManager.defaultManager.moveItemAtPath(path, newPath, null)
-    newPath
-} catch (e: Exception) {
-    LogCat.e("renameMediaFile: ${e.message}")
-    null
-}
-
 actual fun getMediaDurationMs(path: String): Long = readAssetDurationMs(path)
 
 actual fun getAudioDurationMs(path: String): Long = readAssetDurationMs(path)

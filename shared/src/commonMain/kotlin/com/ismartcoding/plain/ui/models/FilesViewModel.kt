@@ -29,7 +29,6 @@ import com.ismartcoding.plain.platform.getSDCardPath
 import com.ismartcoding.plain.platform.getUsbDiskPaths
 import com.ismartcoding.plain.platform.listFilesInDir
 import com.ismartcoding.plain.platform.listZipEntries
-import com.ismartcoding.plain.platform.scanFiles
 import com.ismartcoding.plain.platform.searchFilesByName
 import com.ismartcoding.plain.ui.helpers.DialogHelper
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -238,13 +237,17 @@ class FilesViewModel : ISearchableViewModel<DFile>, ISelectableViewModel<DFile>,
     fun deleteFiles(paths: Set<String>) {
         viewModelScope.launch {
             DialogHelper.showLoading()
-            withIO {
-                FilePathValidator.requireAllSafe(paths.toList())
-                paths.forEach { deleteFileOrDir(it) }
-                scanFiles(paths.toTypedArray())
+            try {
+                withIO {
+                    FilePathValidator.requireAllSafe(paths.toList())
+                    paths.forEach { deleteFileOrDir(it) }
+                }
+            } catch (cancelled: kotlinx.coroutines.CancellationException) { throw cancelled }
+            catch (error: Exception) { DialogHelper.showMessage(error) }
+            finally {
+                DialogHelper.hideLoading()
+                loadAsync()
             }
-            DialogHelper.hideLoading()
-            _itemsFlow.update { it.filterNot { i -> paths.contains(i.path) } }
         }
     }
 
