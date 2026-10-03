@@ -79,4 +79,35 @@ class ChatStorageRustHttpTest {
             ChatCacher.load()
         }
     }
+    @Test
+    fun chatDeletionReleasesOwnedAttachmentsThroughRust() = runBlocking {
+        val prefix = "synthetic-chat-attachment-${UUID.randomUUID()}"
+        val bytes = prefix.toByteArray()
+        val store = com.ismartcoding.plain.helpers.AppFileStore
+        val file = store.importBytes(bytes, "text/plain")
+        val suffix = file.realPath.substringAfterLast('/')
+        val content = DChat.parseContent("""{"type":"FILES","value":{"items":[{"uri":"fid:$suffix","fileName":"fixture.txt","size":${bytes.size}}]}}""")
+        val direct = DChat(id = "$prefix-direct", fromId = "me", toId = prefix, content = content)
+        val group = DChat(id = "$prefix-group", fromId = prefix, toId = "me", channelId = prefix, content = content)
+        val path = java.io.File(store.realPathFromId(suffix))
+        try {
+            store.importBytes(bytes, "text/plain")
+            RustChatStore.insert(direct, group)
+            assertEquals(2, store.getById(file.id)!!.refCount)
+            ChatDbHelper.deleteAllChatsAsync(prefix)
+            assertNull(RustChatStore.getById(direct.id))
+            assertNotNull(RustChatStore.getById(group.id))
+            assertEquals(1, store.getById(file.id)!!.refCount)
+            assertArrayEquals(bytes, path.readBytes())
+            ChatDbHelper.deleteAllChannelChatsAsync(prefix)
+            assertNull(RustChatStore.getById(group.id))
+            assertNull(store.getById(file.id))
+            assertFalse(path.exists())
+            RustChatStore.deleteByIds(listOf(direct.id, direct.id, group.id))
+        } finally {
+            RustChatStore.deleteByIds(listOf(direct.id, group.id))
+            while (store.getById(file.id) != null) store.release(file.id)
+        }
+    }
+
 }

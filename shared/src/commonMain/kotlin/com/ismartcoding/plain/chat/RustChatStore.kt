@@ -32,8 +32,8 @@ object RustChatStore {
     suspend fun updateData(item: ChatItemDataUpdate) { check(callChatStore("chatContent") { put("id", item.id); put("content", item.content.toJSONString()) }.jsonPrimitive.boolean) { "Chat unavailable" } }
     suspend fun delete(id: String) { deleteByIds(listOf(id)) }
     suspend fun deleteByIds(ids: List<String>) { callChatStore("deleteChats") { put("ids", JsonArray(ids.map(::JsonPrimitive))) } }
-    suspend fun deleteByPeerId(id: String) { deleteByIds(getByPeerId(id).map { it.id }) }
-    suspend fun deleteByChannelId(id: String) { deleteByIds(getByChannelId(id).map { it.id }) }
+    suspend fun deleteByPeerId(id: String) { callChatStore("deletePeerChats") { put("id", id) } }
+    suspend fun deleteByChannelId(id: String) { callChatStore("deleteChannelChats") { put("id", id) } }
     private fun encode(row: DChat): JsonObject = buildJsonObject {
         put("id", row.id); put("from_id", row.fromId); put("to_id", row.toId); put("channel_id", row.channelId); put("content", row.content.toJSONString())
         put("status", row.status.name); put("status_data", row.statusData); put("created_at", row.createdAt.toString()); put("updated_at", row.updatedAt.toString())

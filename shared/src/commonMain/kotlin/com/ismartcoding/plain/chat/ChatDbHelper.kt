@@ -11,7 +11,6 @@ import com.ismartcoding.plain.db.DMessageStatusData
 import com.ismartcoding.plain.db.MessageType
 import com.ismartcoding.plain.db.DPeer
 import com.ismartcoding.plain.lib.JsonHelper.jsonEncode
-import com.ismartcoding.plain.platform.releaseAppFile
 import com.ismartcoding.plain.lib.withIO
 
 object ChatDbHelper {
@@ -79,8 +78,6 @@ object ChatDbHelper {
     suspend fun deleteAsync(
         id: String,
     ) = withIO {
-        val chat = RustChatStore.getById(id) ?: return@withIO
-        releaseFidFiles(chat.content.value)
         RustChatStore.delete(id)
         ChatManager.refreshLatestChats()
     }
@@ -91,37 +88,18 @@ object ChatDbHelper {
     }
 
     suspend fun deleteByIdsAsync(ids: Set<String>) = withIO {
-        val dao = RustChatStore
-        ids.chunked(500).forEach { chunk ->
-            val chats = chunk.mapNotNull { dao.getById(it) }
-            releaseChatsFiles( chats)
-            dao.deleteByIds(chats.map { it.id })
-        }
+        RustChatStore.deleteByIds(ids.toList())
         ChatManager.refreshLatestChats()
     }
 
     suspend fun deleteAllChatsAsync(peerId: String) = withIO {
-        val chatDao = RustChatStore
-        releaseChatsFiles(chatDao.getByPeerId(peerId))
-        chatDao.deleteByPeerId(peerId)
+        RustChatStore.deleteByPeerId(peerId)
         ChatManager.refreshLatestChats()
     }
 
     suspend fun deleteAllChannelChatsAsync(channelId: String) = withIO {
-        val chatDao = RustChatStore
-        releaseChatsFiles(chatDao.getByChannelId(channelId))
-        chatDao.deleteByChannelId(channelId)
+        RustChatStore.deleteByChannelId(channelId)
         ChatManager.refreshLatestChats()
     }
 
-    private suspend fun releaseFidFiles(value: Any?) {
-        when (value) {
-            is DMessageFiles -> value.items.forEach { if (it.isFidFile()) releaseAppFile(it.localFileId()) }
-            is DMessageImages -> value.items.forEach { if (it.isFidFile()) releaseAppFile(it.localFileId()) }
-        }
-    }
-
-    private suspend fun releaseChatsFiles(chats: List<DChat>) {
-        for (chat in chats) releaseFidFiles(chat.content.value)
-    }
 }
