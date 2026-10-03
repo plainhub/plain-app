@@ -4,7 +4,7 @@ import com.ismartcoding.plain.appContext
 import android.graphics.Bitmap
 import com.ismartcoding.plain.lib.withIO
 import com.ismartcoding.plain.lib.logcat.LogCat
-import com.ismartcoding.plain.features.ImageEmbeddingHelper
+import com.ismartcoding.plain.platform.AppDatabase
 import com.ismartcoding.plain.db.DImageEmbedding
 import com.ismartcoding.plain.platform.Permission
 import com.ismartcoding.plain.platform.isGranted
@@ -19,7 +19,7 @@ import kotlinx.coroutines.launch
 import java.io.File
 import java.util.concurrent.atomic.AtomicInteger
 
-object ImageSearchIndexer {
+object LegacyImageSearchIndexer {
     private const val BATCH_SIZE = 20
     private const val PRELOAD_BUFFER = 16
     private const val NUM_WORKERS = 4
@@ -33,8 +33,8 @@ object ImageSearchIndexer {
     /** Index specific images incrementally (single worker, no progress UI). */
     suspend fun indexImages(images: List<com.ismartcoding.plain.data.DImage>) = withIO {
         if (images.isEmpty()) return@withIO
-        val dao = ImageEmbeddingHelper
-        val modelFile = File(ImageSearchManager.getModelDir(), "mobileclip_s2_image.tflite")
+        val dao = AppDatabase.instance.imageEmbeddingDao()
+        val modelFile = File(LegacyImageSearchManager.getModelDir(), "mobileclip_s2_image.tflite")
         val worker = ImageEmbedWorker(modelFile)
         try {
             val batch = mutableListOf<DImageEmbedding>()
@@ -43,7 +43,7 @@ object ImageSearchIndexer {
                 val embedding = worker.embedBitmap(bmp) ?: continue
                 batch.add(DImageEmbedding(image.id, image.path, floatsToBytes(embedding)))
                 if (batch.size >= BATCH_SIZE) {
-                    ImageEmbeddingHelper.insertAll(batch)
+                    dao.insertAll(batch)
                     batch.clear()
                 }
             }
@@ -56,7 +56,7 @@ object ImageSearchIndexer {
     /** Full scan with progress tracking (parallel workers). */
     suspend fun start(forceReindex: Boolean = false) = withIO {
         if (isRunning) return@withIO
-        if (ImageSearchManager.status.value != ImageSearchStatusType.READY) return@withIO
+        if (LegacyImageSearchManager.status.value != ImageSearchStatusType.READY) return@withIO
         isRunning = true
         cancelled = false
         try {
@@ -66,7 +66,7 @@ object ImageSearchIndexer {
                 context, "", Int.MAX_VALUE, 0, FileSortBy.DATE_DESC,
             )
             totalImages = allImages.size
-            val dao = ImageEmbeddingHelper
+            val dao = AppDatabase.instance.imageEmbeddingDao()
             if (forceReindex) dao.deleteAll()
             val existingIds = dao.getAllIds().toSet()
 
@@ -78,7 +78,7 @@ object ImageSearchIndexer {
             indexedImages = totalImages - toIndex.size
             emitProgress()
 
-            indexWithParallelWorkers(toIndex)
+            indexWithParallelWorkers(toIndex, dao)
         } catch (e: Exception) {
             LogCat.e("Image indexing failed", e)
         } finally {
@@ -89,8 +89,9 @@ object ImageSearchIndexer {
 
     private suspend fun indexWithParallelWorkers(
         toIndex: List<com.ismartcoding.plain.data.DImage>,
+        dao: com.ismartcoding.plain.db.ImageEmbeddingDao,
     ) = coroutineScope {
-        val modelFile = File(ImageSearchManager.getModelDir(), "mobileclip_s2_image.tflite")
+        val modelFile = File(LegacyImageSearchManager.getModelDir(), "mobileclip_s2_image.tflite")
         val imageCh = Channel<com.ismartcoding.plain.data.DImage>(PRELOAD_BUFFER)
         val bitmapCh = Channel<Triple<String, String, Bitmap>>(PRELOAD_BUFFER)
         val resultCh = Channel<DImageEmbedding>(BATCH_SIZE * 2)
@@ -136,13 +137,13 @@ object ImageSearchIndexer {
             batch.add(item)
             indexedImages = indexed.incrementAndGet()
             if (batch.size >= BATCH_SIZE) {
-                ImageEmbeddingHelper.insertAll(batch)
+                dao.insertAll(batch)
                 batch.clear()
                 emitProgress()
             }
         }
         if (batch.isNotEmpty()) {
-            ImageEmbeddingHelper.insertAll(batch)
+            dao.insertAll(batch)
             batch.clear()
         }
         emitProgress()

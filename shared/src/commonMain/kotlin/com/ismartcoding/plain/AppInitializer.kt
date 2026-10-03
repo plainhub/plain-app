@@ -23,6 +23,7 @@ import com.ismartcoding.plain.httpserver.HttpServerManager
  */
 suspend fun initCommonPreferences() {
     SystemPrefs.ensureSignatureKeyPair()
+    com.ismartcoding.plain.features.MediaDurationHelper.restore()
     com.ismartcoding.plain.features.VideoProgressHost.restore()
     com.ismartcoding.plain.features.audio.AudioEngineHost.start()
     SystemPrefs.ensureClientId()

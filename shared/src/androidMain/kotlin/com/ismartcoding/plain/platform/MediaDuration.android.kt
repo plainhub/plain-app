@@ -1,14 +1,14 @@
 package com.ismartcoding.plain.platform
 
 import com.ismartcoding.plain.TempData
-import com.ismartcoding.plain.db.DMediaItem
+import com.ismartcoding.plain.features.MediaDurationHelper
 import com.ismartcoding.plain.events.MediaDurationZeroItem
 import com.ismartcoding.plain.helpers.Mp4Helper
 import com.ismartcoding.plain.lib.logcat.LogCat
 
 /**
  * Calculate actual duration for a single zero-duration media item and persist
- * it to the app's [mediaItemDao] + in-memory [TempData.mediaDurationMap].
+ * it through [MediaDurationHelper] + in-memory [TempData.mediaDurationMap].
  *
  * MediaStore.DURATION is read-only on Android 10+ (contentResolver.update
  * silently returns 0 rows), so we cannot write back to MediaStore. Instead we
@@ -23,14 +23,7 @@ actual suspend fun processSingleDurationZero(
     try {
         val durationMs = Mp4Helper.getMp4DurationMs(item.path)
         if (durationMs <= 0) return
-        AppDatabase.instance.mediaItemDao().upsert(
-            DMediaItem(
-                mediaType = mediaType,
-                mediaId = item.id,
-                durationMs = durationMs,
-            )
-        )
-        TempData.mediaDurationMap["$mediaType:${item.id}"] = durationMs
+        MediaDurationHelper.save(mediaType, item.id, durationMs)
         LogCat.d("Cached duration for $mediaType ${item.id}: ${durationMs}ms")
     } catch (e: Exception) {
         LogCat.e("Failed to cache duration for ${item.path}: ${e.message}")

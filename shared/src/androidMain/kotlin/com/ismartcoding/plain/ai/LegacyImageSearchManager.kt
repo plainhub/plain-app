@@ -8,17 +8,18 @@ import com.ismartcoding.plain.enums.AppChannelType
 import com.ismartcoding.plain.lib.withIO
 import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.lib.sendEvent
-import com.ismartcoding.plain.features.ImageEmbeddingHelper
+import com.ismartcoding.plain.platform.AppDatabase
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import java.io.File
 
 
-object ImageSearchManager {
+object LegacyImageSearchManager {
     private const val MODEL_DIR_NAME = "ai_models"
     private const val IMAGE_MODEL = "mobileclip_s2_image.tflite"
     private const val TEXT_MODEL = "mobileclip_s2_text.tflite"
     private const val TOKENIZER = "tokenizer.json"
+    private const val MIN_SCORE = 0.15f
 
     private const val HF_BASE =
         "https://huggingface.co/plainhub/mobileclip-s2-tflite/resolve/main"
@@ -57,7 +58,7 @@ object ImageSearchManager {
         val enabled = UserPrefs.aiImageSearchEnabled.value
         if (enabled && isModelAvailable()) {
             loadModels()
-            ImageIndexManager.startup()
+            LegacyImageIndexManager.startup()
         }
     }
 
@@ -74,16 +75,16 @@ object ImageSearchManager {
         }
         loadModels()
         UserPrefs.aiImageSearchEnabled.value = true
-        ImageIndexManager.startup()
+        LegacyImageIndexManager.startup()
     }
 
     suspend fun disableAsync() = withIO {
-        ImageIndexManager.shutdown()
+        LegacyImageIndexManager.shutdown()
         ImageEmbedHelper.close()
         TextEmbedHelper.close()
         DelegateHelper.closeAll()
         modelsDir.deleteRecursively()
-        ImageEmbeddingHelper.deleteAll()
+        AppDatabase.instance.imageEmbeddingDao().deleteAll()
         _status.value = ImageSearchStatusType.UNAVAILABLE
         UserPrefs.aiImageSearchEnabled.value = false
         emitStatus()
@@ -96,7 +97,7 @@ object ImageSearchManager {
      */
     fun releaseModels() {
         if (_status.value != ImageSearchStatusType.READY) return
-        if (ImageSearchIndexer.isRunning) return
+        if (LegacyImageSearchIndexer.isRunning) return
         ImageEmbedHelper.release()
         TextEmbedHelper.release()
         LogCat.d("AI models released under memory pressure")
@@ -111,8 +112,15 @@ object ImageSearchManager {
 
     suspend fun search(query: String, limit: Int = 50): List<SemanticSearchResult> =
         withIO {
-            val textEmb = TextEmbedHelper.embed(query) ?: error("Image search query inference failed")
-            ImageEmbeddingHelper.search(floatsToBytes(textEmb), limit)
+            val textEmb = TextEmbedHelper.embed(query) ?: return@withIO emptyList()
+            val dao = AppDatabase.instance.imageEmbeddingDao()
+            val all = dao.getAll()
+            all.mapNotNull { vec ->
+                val imgEmb = bytesToFloats(vec.embedding)
+                if (hasInvalidValues(imgEmb)) return@mapNotNull null
+                val score = dotProduct(textEmb, imgEmb)
+                if (score >= MIN_SCORE) SemanticSearchResult(vec.id, score) else null
+            }.sortedByDescending { it.score }.take(limit)
         }
 
     private suspend fun downloadModels() {
