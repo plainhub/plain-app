@@ -39,6 +39,11 @@ object AudioQueueManager {
         RustContentApi.mutate("audioHostOnPlaying(path: ${gql(path)}, title: ${gql(title)}, artist: ${gql(artist)}, durationMs: $durationMs)")
     }
 
+    suspend fun onStarted(audio: DPlaylistAudio, revision: Long) {
+        val track = listOf(audio).audioInput().removePrefix("[").removeSuffix("]")
+        RustContentApi.mutate("audioReportStarted(track: $track, revision: $revision)")
+    }
+
     suspend fun setCurrent(path: String) { RustContentApi.mutate("audioHostSetCurrent(path: ${gql(path)})") }
     suspend fun queueTotal(): Int = RustContentApi.query("audioHostQueueCount").getValue("audioHostQueueCount").jsonPrimitive.int
     suspend fun queuePage(offset: Int, limit: Int): List<DPlaylistAudio> = queuePageFiltered("",offset,limit)

@@ -6,5 +6,6 @@ import com.ismartcoding.plain.features.file.FileSortBy
 interface AudioLibraryProvider {
     suspend fun count(): Int
     suspend fun page(offset: Int, limit: Int, sort: FileSortBy): List<DPlaylistAudio>
+    suspend fun metadata(path: String): DPlaylistAudio = com.ismartcoding.plain.platform.audioLibraryMetadata(path)
     suspend fun contains(path: String): Boolean
 }

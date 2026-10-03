@@ -5,6 +5,7 @@ import com.ismartcoding.plain.appContext
 
 import android.content.ComponentName
 import android.content.Context
+import androidx.media3.common.PlaybackException
 import androidx.media3.common.Player
 import androidx.media3.session.MediaController
 import androidx.media3.session.SessionToken
@@ -14,7 +15,9 @@ import com.ismartcoding.plain.lib.coIO
 import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.enums.AudioAction
-import com.ismartcoding.plain.enums.MediaPlayMode
+import com.ismartcoding.plain.features.audio.AudioCommands
+import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.withTimeout
 import com.ismartcoding.plain.events.AudioActionEvent
 import com.ismartcoding.plain.features.audio.AudioQueueManager
 import com.ismartcoding.plain.lib.sendEvent
@@ -44,9 +47,24 @@ object AudioPlayer {
     }
 
     private val playerListener = object : Player.Listener {
+        override fun onPlayerError(error: PlaybackException) {
+            pendingStart = null
+            player?.pause()
+            refreshPlayingState()
+            LogCat.e("Audio playback: ${error.message}")
+            setChangedNotify(AudioAction.NOT_FOUND)
+        }
+
         override fun onIsPlayingChanged(isPlaying: Boolean) {
             LogCat.d("Player.isPlaying changed to: $isPlaying")
             refreshPlayingState()
+            if (isPlaying) {
+                val audio = pendingStart?.takeIf { it.first.path == currentPath }
+                if (audio != null) {
+                    pendingStart = null
+                    coIO { AudioQueueManager.onStarted(audio.first, audio.second) }
+                }
+            }
             if (!isPlaying && player != null) {
                 TempData.audioPlayPosition = player?.currentPosition ?: 0
             }
@@ -61,7 +79,10 @@ object AudioPlayer {
         }
     }
 
+    private var controller: MediaController? = null
     private var player: Player? = null
+    private var pendingStart: Pair<DPlaylistAudio, Long>? = null
+    val currentPath: String get() = player?.currentMediaItem?.mediaId.orEmpty()
     var playerProgress: Long = 0 // player progress in milliseconds
         get() {
             val currentPlayer = player
@@ -87,7 +108,8 @@ object AudioPlayer {
         val sessionToken = SessionToken(context, ComponentName(context, AudioPlayerService::class.java))
         val mediaControllerFuture = MediaController.Builder(context, sessionToken).buildAsync()
         mediaControllerFuture.addListener({
-            player = mediaControllerFuture.get().also {
+            controller = mediaControllerFuture.get()
+            player = checkNotNull(AudioPlayerService.nativePlayer).also {
                 it.addListener(playerListener)
                 refreshPlayingState()
                 it.setPlaybackSpeed(UserPrefs.audioPlaybackSpeed.value)
@@ -98,63 +120,19 @@ object AudioPlayer {
         }, MoreExecutors.directExecutor())
     }
 
-    fun play(
-        context: Context,
-        playlistAudio: DPlaylistAudio
-    ) {
-        coMain {
-            TempData.audioPlayPosition = 0
-            AudioQueueManager.enqueue(listOf(playlistAudio))
-            ensurePlayer(context) {
-                doPlay(playlistAudio)
-            }
+    suspend fun load(context: Context, audio: DPlaylistAudio, positionMs: Long, speed: Float, revision: Long) {
+        val ready = CompletableDeferred<Unit>()
+        ensurePlayer(context) {
+            try {
+                TempData.audioPlayPosition = positionMs
+                doPlay(audio, speed, revision)
+                ready.complete(Unit)
+            } catch (e: Exception) { ready.completeExceptionally(e) }
         }
+        withTimeout(15_000) { ready.await() }
     }
 
-    fun justPlay(
-        context: Context,
-        playlistAudio: DPlaylistAudio
-    ) {
-        coMain {
-            TempData.audioPlayPosition = 0
-            ensurePlayer(context) {
-                doPlay(playlistAudio)
-            }
-        }
-    }
-
-    fun play() {
-        coMain {
-            val current = player?.currentMediaItem
-            if (current != null) {
-                player?.seekTo(TempData.audioPlayPosition)
-                player?.play()
-                return@coMain
-            }
-
-            val context = appContext
-            val path = AudioQueueManager.source().currentPath
-            if (path.isEmpty()) {
-                return@coMain
-            }
-            val playlistAudio = try {
-                DPlaylistAudio.fromPath(context, path)
-            } catch (e: Exception) {
-                LogCat.e(e.toString())
-                null
-            }
-            if (playlistAudio != null) {
-                try {
-                    ensurePlayer(context) {
-                        doPlay(playlistAudio)
-                    }
-                } catch (e: Exception) {
-                    LogCat.e(e.toString())
-                    setChangedNotify(AudioAction.NOT_FOUND)
-                }
-            }
-        }
-    }
+    fun play() { coMain { player?.play() } }
 
     fun seekTo(positionMs: Long) {
         coMain {
@@ -165,7 +143,6 @@ object AudioPlayer {
                 currentPlayer.seekTo(seekPosition)
                 return@coMain
             }
-            play()
         }
     }
 
@@ -178,27 +155,7 @@ object AudioPlayer {
     }
 
     private fun skipTo(isNext: Boolean) {
-        val context = appContext
-        coIO {
-            val audio = AudioQueueManager.resolveNext(
-                isNext = isNext,
-                shuffle = UserPrefs.audioPlayMode.value == MediaPlayMode.SHUFFLE,
-            )
-            if (audio == null) {
-                LogCat.d("skipTo: nothing to play, queue is empty")
-                // Stop so playWhenReady (and the flow) turns off instead of
-                // pretending to play a finished queue.
-                coMain { player?.pause() }
-                return@coIO
-            }
-            LogCat.d("skipTo: ${audio.path}")
-            coMain {
-                ensurePlayer(context) {
-                    TempData.audioPlayPosition = 0
-                    doPlay(audio)
-                }
-            }
-        }
+        AudioCommands.submit(if (isNext) "NEXT" else "PREVIOUS")
     }
 
     fun pause() {
@@ -213,6 +170,7 @@ object AudioPlayer {
             if (player?.isPlaying == true) {
                 player?.pause()
             }
+            pendingStart = null
             player?.clearMediaItems()
             TempData.audioPlayPosition = 0
         }
@@ -227,20 +185,25 @@ object AudioPlayer {
 
     fun release() {
         player?.removeListener(playerListener)
+        pendingStart = null
         player = null
+        controller?.release()
+        controller = null
         _isPlayingFlow.value = false
         TempData.audioPlayPosition = 0
     }
 
     private fun doPlay(
         audio: DPlaylistAudio,
+        speed: Float,
+        revision: Long,
     ) {
+        pendingStart = audio to revision
         player?.setMediaItem(audio.toMediaItem())
         player?.prepare()
         player?.seekTo(TempData.audioPlayPosition)
-        player?.setPlaybackSpeed(UserPrefs.audioPlaybackSpeed.value)
+        player?.setPlaybackSpeed(speed)
         player?.play()
-        coIO { AudioQueueManager.onPlaying(audio.path, audio.title, audio.artist, audio.durationMs) }
     }
 
     fun setChangedNotify(action: AudioAction) {

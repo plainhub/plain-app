@@ -1,5 +1,6 @@
 package com.ismartcoding.plain.platform
 
+import com.ismartcoding.plain.features.audio.AudioCommands
 import com.ismartcoding.plain.audio.DPlaylistAudio
 import com.ismartcoding.plain.i18n.Res
 import com.ismartcoding.plain.i18n.audio_notification_prompt
@@ -9,22 +10,20 @@ import kotlinx.coroutines.withContext
 
 interface AudioPlayer {
     val isPlayingFlow: StateFlow<Boolean>
+    val currentPath: String
+    suspend fun load(audio: DPlaylistAudio, positionMs: Long, speed: Float, revision: Long)
     val progress: Long
     fun seekTo(positionMs: Long)
     fun pause()
     fun play()
     fun restartIfPlaying()
-    fun playFromPath(path: String)
-    fun justPlay(audio: DPlaylistAudio)
     fun clear()
-    fun skipToPrevious()
-    fun skipToNext()
     fun setPlaybackSpeed(speed: Float)
 }
 
 expect fun createAudioPlayer(): AudioPlayer
 
-private val audioPlayer: AudioPlayer by lazy { createAudioPlayer() }
+internal val audioPlayer: AudioPlayer by lazy { createAudioPlayer() }
 
 fun audioIsPlayingFlow(): StateFlow<Boolean> = audioPlayer.isPlayingFlow
 
@@ -33,34 +32,34 @@ fun audioPlayerProgress(): Long = audioPlayer.progress
 /** Suspending read for non-main threads (e.g. the HTTP server): the Android player is a Media3 MediaController which only allows calls on the app thread. */
 suspend fun audioPlayerProgressAsync(): Long = withContext(Dispatchers.Main) { audioPlayer.progress }
 
-fun audioSeekTo(positionMs: Long) = audioPlayer.seekTo(positionMs)
+fun audioSeekTo(positionMs: Long) = AudioCommands.submit("SEEK", positionMs = positionMs)
 
-fun audioPause() = audioPlayer.pause()
+fun audioPause() = AudioCommands.submit("PAUSE")
 
-fun audioPlay() = audioPlayer.play()
+fun audioPlay() = AudioCommands.submit("PLAY")
 
-fun restartAudioIfPlaying() = audioPlayer.restartIfPlaying()
+fun restartAudioIfPlaying() = AudioCommands.submit("RESTART")
 
-fun playAudioFromPath(path: String) = audioPlayer.playFromPath(path)
+fun playAudioFromPath(path: String) = AudioCommands.playPath(path)
 
 fun playAudioWithNotificationCheck(path: String) {
     checkNotificationPermission(Res.string.audio_notification_prompt) {
-        audioPlayer.playFromPath(path)
+        AudioCommands.playPath(path)
     }
 }
 
-fun audioJustPlay(audio: DPlaylistAudio) = audioPlayer.justPlay(audio)
+fun audioJustPlay(audio: DPlaylistAudio) = AudioCommands.playTrack(audio)
 
 fun audioJustPlayWithNotificationCheck(audio: DPlaylistAudio) {
     checkNotificationPermission(Res.string.audio_notification_prompt) {
-        audioPlayer.justPlay(audio)
+        AudioCommands.playTrack(audio)
     }
 }
 
-fun audioClear() = audioPlayer.clear()
+fun audioClear() = AudioCommands.submit("CLEAR")
 
-fun audioSkipToPrevious() = audioPlayer.skipToPrevious()
+fun audioSkipToPrevious() = AudioCommands.submit("PREVIOUS")
 
-fun audioSkipToNext() = audioPlayer.skipToNext()
+fun audioSkipToNext() = AudioCommands.submit("NEXT")
 
-fun audioSetPlaybackSpeed(speed: Float) = audioPlayer.setPlaybackSpeed(speed)
+fun audioSetPlaybackSpeed(speed: Float) = AudioCommands.submit("SET_SPEED", speed = speed)

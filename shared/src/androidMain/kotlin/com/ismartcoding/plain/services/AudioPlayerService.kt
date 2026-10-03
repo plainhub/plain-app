@@ -25,10 +25,13 @@ import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.enums.AudioAction
 import com.ismartcoding.plain.audio.AudioPlayer
 import com.ismartcoding.plain.enums.AudioServiceAction
-import com.ismartcoding.plain.enums.MediaPlayMode
 
 @OptIn(UnstableApi::class)
 class AudioPlayerService : MediaLibraryService() {
+    companion object {
+        var nativePlayer: Player? = null
+            private set
+    }
     private lateinit var player: Player
     private lateinit var session: MediaLibrarySession
 
@@ -58,11 +61,7 @@ class AudioPlayerService : MediaLibraryService() {
 
         override fun onPlaybackStateChanged(playbackState: Int) {
             if (playbackState == Player.STATE_ENDED) {
-                if (UserPrefs.audioPlayMode.value == MediaPlayMode.REPEAT_ONE) {
-                    AudioPlayer.seekTo(0L)
-                } else {
-                    AudioPlayer.skipToNext()
-                }
+                com.ismartcoding.plain.features.audio.AudioCommands.submit("COMPLETED")
             }
         }
 
@@ -94,8 +93,14 @@ class AudioPlayerService : MediaLibraryService() {
             return
         }
         player = createPlayer()
+        nativePlayer = player
         player.addListener(listener)
         val forwardingPlayer = object : ForwardingPlayer(player) {
+            override fun play() = com.ismartcoding.plain.platform.audioPlay()
+            override fun pause() = com.ismartcoding.plain.platform.audioPause()
+            override fun seekTo(positionMs: Long) = com.ismartcoding.plain.platform.audioSeekTo(positionMs)
+            override fun setPlaybackSpeed(speed: Float) = com.ismartcoding.plain.platform.audioSetPlaybackSpeed(speed)
+            override fun stop() = com.ismartcoding.plain.platform.audioPause()
             override fun seekToPrevious() {
                 AudioPlayer.skipToPrevious()
             }
@@ -139,7 +144,7 @@ class AudioPlayerService : MediaLibraryService() {
         }
         when (intent?.action) {
             AudioServiceAction.QUIT.name -> {
-                AudioPlayer.pause()
+                com.ismartcoding.plain.platform.audioPause()
             }
 
         }
@@ -164,6 +169,7 @@ class AudioPlayerService : MediaLibraryService() {
         session.run {
             release()
             player.stop()
+            nativePlayer = null
             player.release()
             AudioPlayer.release()
         }

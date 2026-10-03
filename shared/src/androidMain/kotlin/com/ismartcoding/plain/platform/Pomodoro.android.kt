@@ -21,7 +21,6 @@ import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.Constants
 import com.ismartcoding.plain.audio.DPlaylistAudio
 import com.ismartcoding.plain.data.DPomodoroSettings
-import com.ismartcoding.plain.audio.AudioPlayer
 import com.ismartcoding.plain.audio.fromPath
 import com.ismartcoding.plain.helpers.NotificationHelper
 import com.ismartcoding.plain.MainActivity
@@ -122,7 +121,7 @@ private suspend fun playCustomSong(context: android.content.Context, songPath: S
     try {
         val audio = DPlaylistAudio.fromPath(context, songPath)
         coIO {
-            AudioPlayer.justPlay(context, audio)
+            audioJustPlay(audio)
         }
     } catch (e: Exception) {
         LogCat.e("Failed to play custom song: ${e.message}")

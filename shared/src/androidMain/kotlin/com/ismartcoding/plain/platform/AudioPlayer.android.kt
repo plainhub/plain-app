@@ -3,13 +3,16 @@ package com.ismartcoding.plain.platform
 import com.ismartcoding.plain.appContext
 import com.ismartcoding.plain.audio.AudioPlayer as AndroidAudioPlayer
 import com.ismartcoding.plain.audio.DPlaylistAudio
-import com.ismartcoding.plain.audio.fromPath
 import kotlinx.coroutines.flow.StateFlow
 
 actual fun createAudioPlayer(): AudioPlayer = ExoPlayerAudioPlayer
 
 private object ExoPlayerAudioPlayer : AudioPlayer {
     override val isPlayingFlow: StateFlow<Boolean> = AndroidAudioPlayer.isPlayingFlow
+
+    override val currentPath: String get() = AndroidAudioPlayer.currentPath
+
+    override suspend fun load(audio: DPlaylistAudio, positionMs: Long, speed: Float, revision: Long) = AndroidAudioPlayer.load(appContext, audio, positionMs, speed, revision)
 
     override val progress: Long
         get() = AndroidAudioPlayer.playerProgress
@@ -27,19 +30,7 @@ private object ExoPlayerAudioPlayer : AudioPlayer {
         }
     }
 
-    override fun playFromPath(path: String) {
-        AndroidAudioPlayer.play(appContext, DPlaylistAudio.fromPath(appContext, path))
-    }
-
-    override fun justPlay(audio: DPlaylistAudio) {
-        AndroidAudioPlayer.justPlay(appContext, audio)
-    }
-
     override fun clear() = AndroidAudioPlayer.clear()
-
-    override fun skipToPrevious() = AndroidAudioPlayer.skipToPrevious()
-
-    override fun skipToNext() = AndroidAudioPlayer.skipToNext()
 
     override fun setPlaybackSpeed(speed: Float) = AndroidAudioPlayer.setPlaybackSpeed(speed)
 }

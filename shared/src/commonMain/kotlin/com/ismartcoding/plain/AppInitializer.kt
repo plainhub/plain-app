@@ -24,6 +24,7 @@ import com.ismartcoding.plain.httpserver.HttpServerManager
 suspend fun initCommonPreferences() {
     SystemPrefs.ensureSignatureKeyPair()
     com.ismartcoding.plain.features.VideoProgressHost.restore()
+    com.ismartcoding.plain.features.audio.AudioEngineHost.start()
     SystemPrefs.ensureClientId()
     TempData.deviceName.value = UserPrefs.deviceName.value.ifEmpty { getDeviceName() }
     SystemPrefs.ensureKeyStorePassword()

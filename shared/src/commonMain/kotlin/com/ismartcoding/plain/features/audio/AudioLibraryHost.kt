@@ -17,6 +17,9 @@ object AudioLibraryHost {
     suspend fun handle(method: String, params: JsonObject): JsonElement {
         val provider = lock.withLock { currentProvider }
         return when (method) {
+            "audioMetadata" -> provider.metadata(params.string("path")).let { row ->
+                buildJsonObject { put("path",row.path);put("title",row.title);put("artist",row.artist);put("albumId",row.albumId);put("durationMs",row.durationMs) }
+            }
             "audioLibraryCount" -> JsonPrimitive(provider.count())
             "audioLibraryPath" -> provider.page(params.getValue("offset").jsonPrimitive.int, 1, sort(params)).firstOrNull()?.path?.let(::JsonPrimitive) ?: JsonNull
             "audioLibraryPage" -> JsonArray(provider.page(params.getValue("offset").jsonPrimitive.int, params.getValue("limit").jsonPrimitive.int, sort(params)).map { row ->

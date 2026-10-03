@@ -1,6 +1,7 @@
 package com.ismartcoding.plain.api
 
 import com.ismartcoding.plain.features.audio.AudioLibraryHost
+import com.ismartcoding.plain.features.audio.AudioEngineHost
 import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.platform.createPeerStatusHttpClient
 import kotlinx.coroutines.*
@@ -34,7 +35,7 @@ object RustHostApi {
                                     launch {
                                         try {
                                             val reply = try {
-                                                val result = AudioLibraryHost.handle(method, params)
+                                                val result = if (method == "audioEngineCommand") AudioEngineHost.handle(method, params) else AudioLibraryHost.handle(method, params)
                                                 buildJsonObject { put("id", id); put("result", result) }
                                             } catch (cancelled: CancellationException) { throw cancelled }
                                             catch (e: Exception) { buildJsonObject { put("id", id); put("error", e.message ?: "Host operation failed") } }

@@ -6,7 +6,8 @@ import com.ismartcoding.plain.preferences.*
 
 import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.audio.DPlaylistAudio
-import com.ismartcoding.plain.enums.MediaPlayMode
+import com.ismartcoding.plain.features.audio.AudioCommands
+import kotlinx.coroutines.withContext
 import com.ismartcoding.plain.features.audio.AudioQueueManager
 import com.ismartcoding.plain.lib.logcat.LogCat
 import kotlinx.cinterop.ExperimentalForeignApi
@@ -23,7 +24,10 @@ import platform.AVFAudio.AVAudioSession
 import platform.AVFAudio.AVAudioSessionCategoryPlayback
 import platform.AVFoundation.AVPlayer
 import platform.AVFoundation.AVPlayerItem
+import platform.AVFoundation.AVPlayerTimeControlStatusPlaying
+import platform.AVFoundation.AVPlayerTimeControlStatusPaused
 import platform.Foundation.NSURL
+import platform.Foundation.valueForKey
 import platform.darwin.NSObject
 
 actual fun createAudioPlayer(): AudioPlayer = AVPlayerAudioPlayer
@@ -34,6 +38,14 @@ private object AVPlayerAudioPlayer : AudioPlayer {
 
     private var player: AVPlayer? = null
     private var currentAudio: DPlaylistAudio? = null
+    private var pendingStart: Pair<DPlaylistAudio, Long>? = null
+    override val currentPath: String get() = if (player == null) "" else currentAudio?.path.orEmpty()
+
+    override suspend fun load(audio: DPlaylistAudio, positionMs: Long, speed: Float, revision: Long) = withContext(Dispatchers.Main) {
+        currentAudio = audio
+        TempData.audioPlayPosition = positionMs
+        playInternal(audio, speed, revision)
+    }
 
     /** Playback intent: true from play() until pause()/clear(); the flow
      *  mirrors it so play buttons stay steady across track switches. */
@@ -73,14 +85,12 @@ private object AVPlayerAudioPlayer : AudioPlayer {
             val p = player
             if (p != null) {
                 avPlayerPerform(p as NSObject, "play")
+                avPlayerSetRate(p as NSObject, UserPrefs.audioPlaybackSpeed.value)
                 _isPlayingFlow.value = true
                 startPolling()
                 return@launch
             }
-            val audio = currentAudio ?: AudioQueueManager.source().currentPath
-                .takeIf { it.isNotEmpty() }?.let { playlistAudioFromPath(it) } ?: return@launch
-            currentAudio = audio
-            playInternal(audio)
+
         }
     }
 
@@ -94,24 +104,6 @@ private object AVPlayerAudioPlayer : AudioPlayer {
         }
     }
 
-    override fun playFromPath(path: String) {
-        scope.launch {
-            val audio = playlistAudioFromPath(path)
-            AudioQueueManager.enqueue(listOf(audio))
-            currentAudio = audio
-            TempData.audioPlayPosition = 0
-            playInternal(audio)
-        }
-    }
-
-    override fun justPlay(audio: DPlaylistAudio) {
-        scope.launch {
-            currentAudio = audio
-            TempData.audioPlayPosition = 0
-            playInternal(audio)
-        }
-    }
-
     override fun clear() {
         scope.launch {
             playWhenReady = false
@@ -122,33 +114,10 @@ private object AVPlayerAudioPlayer : AudioPlayer {
             }
             player = null
             currentAudio = null
+            pendingStart = null
             _isPlayingFlow.value = false
             TempData.audioPlayPosition = 0
             stopPolling()
-        }
-    }
-
-    override fun skipToPrevious() = skipTo(isNext = false)
-
-    override fun skipToNext() = skipTo(isNext = true)
-
-    private fun skipTo(isNext: Boolean) {
-        scope.launch {
-            val audio = AudioQueueManager.resolveNext(
-                isNext = isNext,
-                shuffle = UserPrefs.audioPlayMode.value == MediaPlayMode.SHUFFLE,
-            )
-            if (audio == null) {
-                LogCat.d("skipTo: nothing to play, queue is empty")
-                playWhenReady = false
-                _isPlayingFlow.value = false
-                val p = player
-                if (p != null) avPlayerPerform(p as NSObject, "pause")
-                return@launch
-            }
-            currentAudio = audio
-            TempData.audioPlayPosition = 0
-            playInternal(audio)
         }
     }
 
@@ -156,48 +125,44 @@ private object AVPlayerAudioPlayer : AudioPlayer {
         UserPrefs.audioPlaybackSpeed.value = speed
         scope.launch {
             val p = player ?: return@launch
-            avPlayerSetRate(p as NSObject, speed)
+            if (playWhenReady) avPlayerSetRate(p as NSObject, speed)
         }
     }
 
-    private fun playInternal(audio: DPlaylistAudio) {
+    private fun playInternal(audio: DPlaylistAudio, speed: Float, revision: Long) {
         try {
             configureSession()
             val url = NSURL.fileURLWithPath(audio.path)
             val item = AVPlayerItem(uRL = url)
             val seekMs = TempData.audioPlayPosition
-            val speed = UserPrefs.audioPlaybackSpeed.value
+            pendingStart = audio to revision
             val existing = player
             if (existing != null) {
                 avPlayerPerformWithArg(existing as NSObject, "replaceCurrentItemWithPlayerItem:", item)
                 avPlayerSeekToMs(existing as NSObject, seekMs)
-                avPlayerSetRate(existing as NSObject, speed)
                 avPlayerPerform(existing as NSObject, "play")
+                avPlayerSetRate(existing as NSObject, speed)
             } else {
                 val newPlayer = AVPlayer(uRL = url)
                 seekPlayerIfNeeded(newPlayer as NSObject, seekMs)
-                avPlayerSetRate(newPlayer as NSObject, speed)
                 avPlayerPerform(newPlayer as NSObject, "play")
+                avPlayerSetRate(newPlayer as NSObject, speed)
                 player = newPlayer
             }
             playWhenReady = true
             _isPlayingFlow.value = true
             startPolling()
-            scope.launch {
-                AudioQueueManager.onPlaying(audio.path, audio.title, audio.artist, audio.durationMs)
-            }
+
         } catch (e: Exception) {
-            LogCat.e("playInternal: ${e.message}")
+            pendingStart = null
+            playWhenReady = false
+            _isPlayingFlow.value = false
+            throw e
         }
     }
 
     private fun configureSession() {
-        try {
-            val session = AVAudioSession.sharedInstance()
-            session.setCategory(AVAudioSessionCategoryPlayback, null)
-        } catch (e: Exception) {
-            LogCat.e("configureSession: ${e.message}")
-        }
+        check(AVAudioSession.sharedInstance().setCategory(AVAudioSessionCategoryPlayback, null)) { "Audio session configuration failed" }
     }
 
     private fun startPolling() {
@@ -206,12 +171,21 @@ private object AVPlayerAudioPlayer : AudioPlayer {
             while (isActive) {
                 delay(200)
                 val p = player ?: break
-                if (avPlayerRate(p as NSObject) == 0f) {
-                    TempData.audioPlayPosition = 0
+                val position = avPlayerTimeMs(p as NSObject, "currentTime")
+                TempData.audioPlayPosition = position
+                val status = (p.valueForKey("timeControlStatus") as? platform.Foundation.NSNumber)?.intValue()
+                if (status?.toLong() == AVPlayerTimeControlStatusPlaying) {
+                    pendingStart?.let { audio ->
+                        pendingStart = null
+                        scope.launch { AudioQueueManager.onStarted(audio.first, audio.second) }
+                    }
+                }
+                val item = avPlayerCurrentItem(p as NSObject)
+                val duration = item?.let { avPlayerTimeMs(it, "duration") } ?: 0L
+                if (playWhenReady && status?.toLong() == AVPlayerTimeControlStatusPaused && duration > 0 && position >= duration - 50) {
                     onCompleted()
                     break
                 }
-                TempData.audioPlayPosition = avPlayerTimeMs(p as NSObject, "currentTime")
             }
         }
     }
@@ -221,18 +195,8 @@ private object AVPlayerAudioPlayer : AudioPlayer {
         pollJob = null
     }
 
-    private fun onCompleted() {
-        when (UserPrefs.audioPlayMode.value) {
-            MediaPlayMode.REPEAT_ONE -> {
-                val audio = currentAudio
-                if (audio != null) {
-                    TempData.audioPlayPosition = 0
-                    playInternal(audio)
-                }
-            }
-            else -> skipTo(isNext = true)
-        }
-    }
+    private fun onCompleted() { AudioCommands.submit("COMPLETED") }
+
 }
 
 private fun seekPlayerIfNeeded(target: NSObject, ms: Long) {
