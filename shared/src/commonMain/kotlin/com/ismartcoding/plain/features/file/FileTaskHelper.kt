@@ -22,7 +22,14 @@ object FileTaskHelper {
             delay(100)
         }
     }
-    suspend fun execute(type: FileTaskType, ops: List<FileTaskOp>): DFileTask = wait(create(type,ops).id)
+    suspend fun recover(id: String): DFileTask {
+        RustContentApi.postJson("files/mutate", buildJsonObject { put("action", "recover"); put("clientId", clientId); put("id", id) }, longRunning = true)
+        return wait(id)
+    }
+    suspend fun execute(type: FileTaskType, ops: List<FileTaskOp>): DFileTask {
+        val task = wait(create(type,ops).id)
+        return if (task.status == FileTaskStatus.ERROR) recover(task.id) else task
+    }
     suspend fun remove(id: String): Boolean = RustContentApi.mutate("removeFileHostTask(clientId: ${gql(clientId)}, id: ${gql(id)})").getValue("removeFileHostTask").jsonPrimitive.boolean
     suspend fun list(offset: Int, limit: Int, query: String): List<DFileTask> = RustContentApi.query("fileHostTasks(clientId: ${gql(clientId)}, offset: $offset, limit: $limit, query: ${gql(query)}) { $fields }").getValue("fileHostTasks").jsonArray.map(::parse)
     private fun parse(value: JsonElement): DFileTask = value.jsonObject.let { row ->
