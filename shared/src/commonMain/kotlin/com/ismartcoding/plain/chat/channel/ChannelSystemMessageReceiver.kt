@@ -1,341 +1,47 @@
 package com.ismartcoding.plain.chat.channel
 
-import com.ismartcoding.plain.chat.peer.RustPeerStore
-
-import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.TempData
+import com.ismartcoding.plain.chat.callChatStore
 import com.ismartcoding.plain.chat.peer.PeerCacher
-import com.ismartcoding.plain.enums.ChannelSystemMessageAction
 import com.ismartcoding.plain.enums.ChannelSystemMessageType
-import com.ismartcoding.plain.enums.DeviceType
-import com.ismartcoding.plain.enums.ChannelMemberStatus
-import com.ismartcoding.plain.enums.ChatChannelStatus
-import com.ismartcoding.plain.enums.PeerStatus
-import com.ismartcoding.plain.db.DChatChannel
-import com.ismartcoding.plain.db.DPeer
-import com.ismartcoding.plain.db.verifyEd25519Signature
-import com.ismartcoding.plain.events.ChannelInviteCanceledEvent
 import com.ismartcoding.plain.events.ChannelInviteReceivedEvent
-import com.ismartcoding.plain.lib.JsonHelper.jsonDecode
-import com.ismartcoding.plain.lib.TimeHelper
+import com.ismartcoding.plain.events.ChannelInviteCanceledEvent
+import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.lib.sendEvent
-import com.ismartcoding.plain.chat.channel.ChannelSystemMessages.ChannelInvite
-import com.ismartcoding.plain.chat.channel.ChannelSystemMessages.ChannelInviteAccept
-import com.ismartcoding.plain.chat.channel.ChannelSystemMessages.ChannelInviteDecline
-import com.ismartcoding.plain.chat.channel.ChannelSystemMessages.ChannelKick
-import com.ismartcoding.plain.chat.channel.ChannelSystemMessages.ChannelLeave
-import com.ismartcoding.plain.chat.channel.ChannelSystemMessages.ChannelUpdate
-import com.ismartcoding.plain.db.isOwnedByMe
+import kotlinx.serialization.json.*
 
 object ChannelSystemMessageReceiver {
-
-    suspend fun handle(fromId: String, type: ChannelSystemMessageType, payload: String) {
-        try {
-            when (type) {
-                ChannelSystemMessageType.INVITE -> handleInvite(fromId, jsonDecode(payload))
-                ChannelSystemMessageType.INVITE_ACCEPT -> handleInviteAccept(fromId, jsonDecode(payload))
-                ChannelSystemMessageType.INVITE_DECLINE -> handleInviteDecline(fromId, jsonDecode(payload))
-                ChannelSystemMessageType.UPDATE -> handleUpdate(fromId, jsonDecode(payload))
-                ChannelSystemMessageType.KICK -> handleKick(fromId, jsonDecode(payload))
-                ChannelSystemMessageType.LEAVE -> handleLeave(fromId, jsonDecode(payload))
-            }
-        } catch (e: Exception) {
-            LogCat.e("Error handling channel system message [${type.name}] from $fromId: ${e.message}")
+    suspend fun handle(fromId: String, type: ChannelSystemMessageType, payload: String): Boolean = try {
+        val result = callChatStore("receiveChannel") {
+            put("actor", TempData.clientId)
+            put("from_id", fromId)
+            put("message_type", type.name)
+            put("payload", payload)
+        }.jsonObject
+        if (result.getValue("changed").jsonPrimitive.boolean) {
+            PeerCacher.load()
+            ChannelCacher.load()
         }
-    }
-
-    private suspend fun ensureChannelPeer(
-        id: String,
-        name: String,
-        publicKey: String,
-        deviceType: DeviceType,
-        ip: String = "",
-        port: Int = 0,
-        logTag: String = "member",
-    ): Boolean {
-        if (PeerCacher.getPeer(id) != null) return false
-        RustPeerStore.insert(
-            DPeer(
-                id = id,
-                name = name,
-                publicKey = publicKey,
-                status = PeerStatus.CHANNEL,
-                deviceType = deviceType,
-                ip = ip,
-                port = port,
-            ),
-        )
-        LogCat.d("Created channel peer record for $logTag $id")
-        return true
-    }
-
-    private suspend fun handleInvite(fromId: String, msg: ChannelInvite) {
-        val existingChannel = ChannelCacher.getChannel(msg.channelId)
-        val isReinvite = existingChannel != null &&
-                (existingChannel.status == ChatChannelStatus.LEFT || existingChannel.status == ChatChannelStatus.KICKED)
-
-        if (msg.owner != fromId) {
-            LogCat.e("Invite from $fromId but payload claims owner=${msg.owner} — rejected")
-            return
+        result["invite"]?.takeUnless { it is JsonNull }?.jsonObject?.let { invite ->
+            sendEvent(ChannelInviteReceivedEvent(
+                invite.getValue("channelId").jsonPrimitive.content,
+                invite.getValue("channelName").jsonPrimitive.content,
+                invite.getValue("ownerPeerId").jsonPrimitive.content,
+                invite.getValue("ownerPeerName").jsonPrimitive.content,
+            ))
         }
-
-        val ownerMemberInfo = msg.memberPeers.find { it.id == msg.owner }
-        if (ownerMemberInfo == null) {
-            LogCat.e("Invite for channel ${msg.channelId} has no owner memberPeerInfo — rejected")
-            return
+        result["cancel"]?.takeUnless { it is JsonNull }?.jsonObject?.let { cancel ->
+            sendEvent(ChannelInviteCanceledEvent(
+                cancel.getValue("channelId").jsonPrimitive.content,
+                cancel.getValue("ownerPeerId").jsonPrimitive.content,
+            ))
         }
-        val invitePayload = channelMessagePayload(
-            channelId = msg.channelId,
-            version = msg.version,
-            action = ChannelSystemMessageAction.INVITE,
-            target = TempData.clientId,
-        )
-        if (!verifyEd25519Signature(ownerMemberInfo.publicKey, invitePayload, msg.signature)) {
-            LogCat.e("Invite signature failed for channel ${msg.channelId} from $fromId — rejected")
-            return
+        if (result.getValue("broadcast").jsonPrimitive.boolean) {
+            ChannelSystemMessageSender.broadcastUpdate(RustChannelStore.decode(result.getValue("channel")))
         }
-
-        if (existingChannel != null && !isReinvite) {
-            LogCat.d("Channel ${msg.channelId} already exists locally, ignoring invite")
-            return
-        }
-
-        val peer = PeerCacher.getPeer(fromId) ?: run {
-            LogCat.e("Invite from unknown peer $fromId — ignored")
-            return
-        }
-
-        for (memberInfo in msg.memberPeers) {
-            ensureChannelPeer(
-                id = memberInfo.id,
-                name = memberInfo.name,
-                publicKey = memberInfo.publicKey,
-                deviceType = memberInfo.deviceType,
-                ip = memberInfo.ip,
-                port = memberInfo.port,
-            )
-        }
-
-        if (isReinvite) {
-            ChannelCacher.mutateChannel(msg.channelId) { ch ->
-                ch.name = msg.channelName
-                ch.key = msg.key
-                ch.ownerId = fromId
-                ch.members = msg.members
-                ch.version = msg.version
-                ch.status = ChatChannelStatus.JOINED
-            }
-            LogCat.d("Re-invite for channel ${msg.channelId} (was ${existingChannel.status}), restored to joined")
-        } else {
-            val channel = DChatChannel()
-            channel.id = msg.channelId
-            channel.name = msg.channelName
-            channel.key = msg.key
-            channel.ownerId = fromId
-            channel.members = msg.members
-            channel.version = msg.version
-            RustChannelStore.insert(channel)
-        }
-
-        PeerCacher.load()
-        ChannelCacher.load()
-
-        val peerName = peer.name.ifEmpty { fromId }
-        sendEvent(
-            ChannelInviteReceivedEvent(
-                channelId = msg.channelId,
-                channelName = msg.channelName,
-                ownerPeerId = fromId,
-                ownerPeerName = peerName,
-            )
-        )
-
-        LogCat.d("Channel invite received: ${msg.channelName} from $fromId")
-    }
-
-    private suspend fun handleInviteAccept(fromId: String, msg: ChannelInviteAccept) {
-        val channel = ChannelCacher.getChannel(msg.channelId) ?: run {
-            LogCat.e("InviteAccept for unknown channel ${msg.channelId}")
-            return
-        }
-
-        if (!channel.isOwnedByMe()) {
-            LogCat.e("InviteAccept received but we are not the owner of ${msg.channelId}")
-            return
-        }
-
-        val existingPeer = PeerCacher.getPeer(fromId)
-        if (existingPeer == null) {
-            ensureChannelPeer(
-                id = fromId,
-                name = msg.name,
-                publicKey = msg.publicKey,
-                deviceType = msg.deviceType,
-                logTag = "accepting member",
-            )
-        } else if (existingPeer.publicKey.isEmpty() && msg.publicKey.isNotEmpty()) {
-            PeerCacher.mutatePeer(fromId) { p ->
-                p.publicKey = msg.publicKey
-                if (msg.name.isNotEmpty() && p.name.isEmpty()) {
-                    p.name = msg.name
-                }
-            }
-        }
-
-        val member = channel.findMember(fromId)
-        if (member == null) {
-            LogCat.e("InviteAccept from $fromId for channel ${msg.channelId} but peer is not in members list — rejected")
-            return
-        }
-        if (!member.isPending()) {
-            LogCat.d("InviteAccept from $fromId but member is not pending (status=${member.status}), ignoring")
-            return
-        }
-
-        val updatedChannel = ChannelCacher.mutateChannel(msg.channelId) { ch ->
-            ch.members = ch.members.map {
-                if (it.peerId == fromId) it.copy(status = ChannelMemberStatus.JOINED) else it
-            }
-            ch.version++
-            ch.updatedAt = TimeHelper.now()
-        } ?: return
-
-        ChannelSystemMessageSender.broadcastUpdate(updatedChannel)
-
-        LogCat.d("Peer $fromId accepted invite for channel ${msg.channelId}")
-    }
-
-    private suspend fun handleInviteDecline(fromId: String, msg: ChannelInviteDecline) {
-        val channel = ChannelCacher.getChannel(msg.channelId) ?: return
-
-        if (!channel.isOwnedByMe()) return
-
-        if (channel.hasMember(fromId)) {
-            ChannelCacher.mutateChannel(msg.channelId) { ch ->
-                ch.members = ch.members.filter { it.peerId != fromId }
-                ch.version++
-                ch.updatedAt = TimeHelper.now()
-            }
-        }
-
-        LogCat.d("Peer $fromId declined invite for channel ${msg.channelId}")
-    }
-
-    private suspend fun handleUpdate(fromId: String, msg: ChannelUpdate) {
-        val channel = ChannelCacher.getChannel(msg.channelId)
-
-        if (channel == null) {
-            LogCat.e("ChannelUpdate for unknown channel ${msg.channelId}")
-            return
-        }
-
-        if (channel.ownerId != fromId) {
-            LogCat.e("ChannelUpdate from non-owner $fromId (owner=${channel.ownerId}) — rejected")
-            return
-        }
-
-        val ownerPeer = PeerCacher.getPeer(channel.ownerId)
-        if (ownerPeer == null) {
-            LogCat.e("ChannelUpdate: owner peer ${channel.ownerId} not found locally — rejected")
-            return
-        }
-        val updatePayload = channelMessagePayload(
-            channelId = msg.channelId,
-            version = msg.version,
-            action = ChannelSystemMessageAction.UPDATE,
-            target = "",
-        )
-        if (!verifyEd25519Signature(ownerPeer.publicKey, updatePayload, msg.signature)) {
-            LogCat.e("ChannelUpdate signature failed for channel ${msg.channelId} from $fromId — rejected")
-            return
-        }
-
-        if (msg.version <= channel.version) {
-            LogCat.d("Ignoring stale ChannelUpdate (local=${channel.version}, remote=${msg.version})")
-            return
-        }
-
-        for (memberInfo in msg.memberPeers) {
-            ensureChannelPeer(
-                id = memberInfo.id,
-                name = memberInfo.name,
-                publicKey = memberInfo.publicKey,
-                deviceType = memberInfo.deviceType,
-                ip = memberInfo.ip,
-                port = memberInfo.port,
-                logTag = "member via update",
-            )
-        }
-
-        ChannelCacher.mutateChannel(msg.channelId) { ch ->
-            ch.name = msg.channelName
-            ch.members = msg.members
-            ch.version = msg.version
-            ch.updatedAt = TimeHelper.now()
-        }
-
-        PeerCacher.load()
-
-        LogCat.d("Channel ${msg.channelId} updated to version ${msg.version}")
-    }
-
-    private suspend fun handleKick(fromId: String, msg: ChannelKick) {
-        val channel = ChannelCacher.getChannel(msg.channelId)
-        if (channel == null) {
-            // inviting, cancel the dialog
-            sendEvent(ChannelInviteCanceledEvent(channelId = msg.channelId, ownerPeerId = fromId))
-            return
-        }
-
-        if (channel.ownerId != fromId) {
-            LogCat.e("ChannelKick from non-owner $fromId (owner=${channel.ownerId}) — rejected")
-            return
-        }
-
-        val ownerPeer = PeerCacher.getPeer(channel.ownerId)
-        if (ownerPeer == null) {
-            LogCat.e("ChannelKick: owner peer ${channel.ownerId} not found locally — rejected")
-            return
-        }
-        val kickPayload = channelMessagePayload(
-            channelId = msg.channelId,
-            version = msg.version,
-            action = ChannelSystemMessageAction.KICK,
-            target = TempData.clientId,
-        )
-        if (!verifyEd25519Signature(ownerPeer.publicKey, kickPayload, msg.signature)) {
-            LogCat.e("ChannelKick signature failed for channel ${msg.channelId} from $fromId — rejected")
-            return
-        }
-
-        val wasPending = channel.findMember(TempData.clientId)?.isPending() == true
-        ChannelCacher.mutateChannel(msg.channelId) { ch ->
-            ch.status = ChatChannelStatus.KICKED
-            ch.members = ch.members.filter { it.peerId != TempData.clientId }
-        }
-
-        if (wasPending) {
-            sendEvent(ChannelInviteCanceledEvent(channelId = msg.channelId, ownerPeerId = fromId))
-        }
-        LogCat.d("Kicked from channel ${msg.channelId} by $fromId")
-    }
-
-    private suspend fun handleLeave(fromId: String, msg: ChannelLeave) {
-        val channel = ChannelCacher.getChannel(msg.channelId) ?: return
-
-        if (!channel.isOwnedByMe()) {
-            LogCat.e("ChannelLeave received but we are not the owner of ${msg.channelId}")
-            return
-        }
-
-        val updatedChannel = ChannelCacher.mutateChannel(msg.channelId) { ch ->
-            ch.members = ch.members.filter { it.peerId != fromId }
-            ch.version++
-            ch.updatedAt = TimeHelper.now()
-        } ?: return
-
-        ChannelSystemMessageSender.broadcastUpdate(updatedChannel)
-
-        LogCat.d("Peer $fromId left channel ${msg.channelId}")
+        result.getValue("accepted").jsonPrimitive.boolean
+    } catch (error: Exception) {
+        LogCat.e("Channel message rejected [${type.name}] from $fromId: ${error.message}")
+        false
     }
 }

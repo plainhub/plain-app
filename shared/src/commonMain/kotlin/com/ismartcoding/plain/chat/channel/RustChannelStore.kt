@@ -28,7 +28,7 @@ object RustChannelStore {
         put("id", row.id); put("name", row.name); put("key", row.key); put("owner_id", row.ownerId); put("members", JsonHelper.jsonEncode(row.members))
         put("version", row.version); put("status", row.status.name); put("created_at", row.createdAt.toString()); put("updated_at", row.updatedAt.toString())
     }
-    private fun decode(value: JsonElement): DChatChannel = value.jsonObject.let { row ->
+    internal fun decode(value: JsonElement): DChatChannel = value.jsonObject.let { row ->
         fun string(key: String) = row.getValue(key).jsonPrimitive.content
         DChatChannel(string("id"), string("name"), string("key"), string("owner_id"), JsonHelper.jsonDecode<List<ChannelMember>>(string("members")), row.getValue("version").jsonPrimitive.long, ChatChannelStatus.valueOf(string("status")), Instant.parse(string("created_at")), Instant.parse(string("updated_at")))
     }

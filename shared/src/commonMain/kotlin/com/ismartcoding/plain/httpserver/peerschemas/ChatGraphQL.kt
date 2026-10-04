@@ -27,8 +27,7 @@ import com.ismartcoding.plain.httpserver.models.toModel
 suspend fun channelSystemMessage(type: ChannelSystemMessageType, payload: String, context: Context): Boolean {
     val ctx = context.get<GraphqlRequestContext>()!!
     val fromId = ctx.header("c-id") ?: ""
-    ChannelSystemMessageReceiver.handle(fromId, type, payload)
-    return true
+    return ChannelSystemMessageReceiver.handle(fromId, type, payload)
 }
 
 @GraphQLMutation(
