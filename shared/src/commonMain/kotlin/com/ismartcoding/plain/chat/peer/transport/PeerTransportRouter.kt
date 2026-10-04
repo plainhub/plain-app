@@ -1,90 +1,78 @@
 package com.ismartcoding.plain.chat.peer.transport
-import com.ismartcoding.plain.platform.createWifiAwareTransport
 
+import com.ismartcoding.plain.api.RustContentApi
 import com.ismartcoding.plain.chat.peer.GraphQLResponse
-import com.ismartcoding.plain.chat.peer.PeerCacher
+import com.ismartcoding.plain.chat.peer.RustPeerStore
 import com.ismartcoding.plain.db.DPeer
-import com.ismartcoding.plain.lib.logcat.LogCat
-import kotlinx.coroutines.withTimeoutOrNull
+import com.ismartcoding.plain.platform.createWifiAwareTransport
+import kotlinx.coroutines.NonCancellable
+import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.ensureActive
+import kotlinx.coroutines.withContext
+import kotlinx.serialization.json.*
+import kotlin.io.encoding.Base64
 
 object PeerTransportRouter {
-    /**
-     * Cap on a single transport attempt for a small signed request. BLE can
-     * legitimately need ~10s scan + connect + RPC for a slow peer; past 15s
-     * the endpoint is dead and the fallback chain should move on instead of
-     * wedging the caller.
-     */
-    private const val SEND_ATTEMPT_TIMEOUT_MS = 15_000L
-
-    private val transports: List<PeerTransport> = buildList {
+    private val transports = buildList {
         add(LanTransport)
         createWifiAwareTransport()?.let { add(it) }
-        // BLE is the last-resort fallback for both chat and file download: it
-        // works whenever the peer is paired (the peer's clientId is broadcast
-        // in the BLE scan response serviceData, so a clientId-based BLE scan
-        // finds the peer even when LAN and Wi-Fi Aware are both unavailable).
-        // File downloads over BLE use chunked byte-range requests to stay
-        // within the GATT response limits — slow but functional for
-        // cross-subnet peers where no other transport is reachable.
         add(BleTransport)
-    }
+    }.associateBy { it.type }
+
+    internal fun capabilities(): JsonArray = JsonArray(transports.keys.map { JsonPrimitive(it.name) })
+    internal fun adapter(type: PeerTransportType): PeerTransport = transports[type]
+        ?: throw TransportUnavailable(type, "", IllegalStateException("Platform transport unavailable"))
 
     suspend fun send(peer: DPeer, request: SignedRequest, keyBytes: ByteArray): GraphQLResponse {
-        val errors = mutableListOf<String>()
-        try {
-            for (t in transports) {
-                if (t is LanTransport && peer.ip.isEmpty()) {
-                    continue
-                }
-                if (PeerCircuitBreaker.isOpen(peer.id, t.type)) {
-                    LogCat.d("transport ${t.type} skipped for peer ${peer.id} (breaker open)")
-                    continue
-                }
-                PeerCacher.setCurrentTransport(peer.id, t.type)
-                try {
-                    val resp = withTimeoutOrNull(SEND_ATTEMPT_TIMEOUT_MS) { t.send(peer, request, keyBytes) }
-                    if (resp == null) {
-                        PeerCircuitBreaker.recordFailure(peer.id, t.type)
-                        errors.add("${t.type.name} timeout after ${SEND_ATTEMPT_TIMEOUT_MS / 1000}s")
-                        LogCat.d("${t.type.name} timeout for peer ${peer.id}")
-                        continue
-                    }
-                    PeerCircuitBreaker.recordSuccess(peer.id, t.type)
-                    return resp
-                } catch (e: TransportUnavailable) {
-                    PeerCircuitBreaker.recordFailure(peer.id, t.type)
-                    val causeMsg = e.cause?.message ?: e.message
-                    errors.add("${t.type.name} error: $causeMsg")
-                    LogCat.d("${t.type.name} error: ${peer.id} $causeMsg")
-                }
-            }
-            throw Exception(errors.joinToString("\n"))
-        } finally {
-            PeerCacher.setCurrentTransport(peer.id, null)
-        }
+        val response = call(buildJsonObject {
+            put("action", "send"); put("id", peer.id); put("channel_id", request.channelId)
+            put("body", request.body); put("key", Base64.encode(keyBytes))
+        })
+        return GraphQLResponseParser.parse(response.toString())
     }
 
-    suspend fun downloadFile(
-        peer: DPeer,
-        fileId: String,
-    ): DownloadedResponse {
-        var lastError: Throwable? = null
-        for (t in transports) {
-            if (PeerCircuitBreaker.isOpen(peer.id, t.type)) {
-                LogCat.d("transport ${t.type} skipped for peer ${peer.id} (breaker open)")
-                continue
+    suspend fun downloadFile(peer: DPeer, fileId: String): DownloadedResponse {
+        var ticket: JsonElement? = null
+        try {
+            val begin = withContext(NonCancellable) {
+                val value = call(buildJsonObject { put("action", "beginDownload"); put("id", peer.id); put("available", capabilities()) }).jsonObject
+                ticket = value["ticket"]?.takeUnless { it is JsonNull }
+                value
             }
-            try {
-                val resp = t.downloadFile(peer, fileId)
-                PeerCircuitBreaker.recordSuccess(peer.id, t.type)
-                return resp
-            } catch (e: TransportUnavailable) {
-                PeerCircuitBreaker.recordFailure(peer.id, t.type)
-                val causeMsg = e.cause?.message ?: e.message
-                LogCat.d("transport ${t.type} unavailable for peer ${peer.id}: $causeMsg")
-                lastError = e
+            val currentPeer = RustPeerStore.decode(begin.getValue("peer"))
+            var error = begin["error"]?.jsonPrimitive?.contentOrNull
+            while (ticket != null) {
+                currentCoroutineContext().ensureActive()
+                val active = checkNotNull(ticket)
+                val type = PeerTransportType.valueOf(active.jsonObject.getValue("transport").jsonPrimitive.content)
+                val downloaded = try {
+                    adapter(type).downloadFile(currentPeer, fileId)
+                } catch (unavailable: TransportUnavailable) {
+                    withContext(NonCancellable) {
+                        val step = finish(active, buildJsonObject {
+                            put("kind", "unavailable"); put("error", unavailable.cause?.message ?: unavailable.message ?: "Transport unavailable")
+                        })
+                        ticket = step["ticket"]?.takeUnless { it is JsonNull }
+                        error = step["error"]?.jsonPrimitive?.contentOrNull
+                    }
+                    continue
+                }
+                try {
+                    withContext(NonCancellable) { finish(active, buildJsonObject { put("kind", "connected") }) }
+                    ticket = null
+                    currentCoroutineContext().ensureActive()
+                    return downloaded
+                } catch (failure: Throwable) { downloaded.close(); throw failure }
             }
+            throw IllegalStateException(error ?: "Peer transport unavailable")
+        } finally {
+            ticket?.let { active -> withContext(NonCancellable) {
+                runCatching { call(buildJsonObject { put("action", "abort"); put("ticket", active) }) }
+            } }
         }
-        throw Exception("all transports exhausted for file download peer=${peer.id}", lastError)
     }
+    private suspend fun finish(ticket: JsonElement, outcome: JsonObject): JsonObject = call(buildJsonObject {
+        put("action", "finishDownload"); put("ticket", ticket); put("outcome", outcome)
+    }).jsonObject
+    private suspend fun call(body: JsonObject): JsonElement = RustContentApi.postJson("chat/transport", body, longRunning = true).getValue("result")
 }

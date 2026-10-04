@@ -28,7 +28,7 @@ object PeerCacher {
     val onlineMap = MutableStateFlow<Map<String, Boolean>>(emptyMap())
 
     // Transport currently being attempted for a peer, or absent when idle. Set
-    // by PeerTransportRouter.send() right before each transport attempt and
+    // by PeerTransportHost right before each transport attempt and
     // cleared in finally. Observed by ChatPage to show the transport badge
     // only while a send is in flight.
     val currentTransportMap = MutableStateFlow<Map<String, PeerTransportType>>(emptyMap())
