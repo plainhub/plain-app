@@ -1,6 +1,7 @@
 package com.ismartcoding.plain.api
 
 import com.ismartcoding.plain.events.*
+import com.ismartcoding.plain.httpserver.models.toModel
 import com.ismartcoding.plain.features.feed.FeedWorkerState
 import com.ismartcoding.plain.features.feed.FeedWorkerStatus
 import com.ismartcoding.plain.lib.sendEvent
@@ -110,6 +111,15 @@ object RustContentApi {
                         val type = message.getValue("type").jsonPrimitive.int
                         val payload = message.getValue("payload").jsonPrimitive.content
                         when (type) {
+                            EventType.MESSAGE_UPDATED.value -> {
+                                val items = Json.parseToJsonElement(payload).jsonArray.mapNotNull { value ->
+                                    com.ismartcoding.plain.chat.RustChatStore.getById(value.jsonObject.getValue("id").jsonPrimitive.content)
+                                }
+                                items.forEach { com.ismartcoding.plain.chat.ChatViewModel.update(it) }
+                                com.ismartcoding.plain.chat.ChatCacher.load()
+                                if (items.isNotEmpty()) sendEvent(WebSocketEvent(EventType.MESSAGE_UPDATED,
+                                    com.ismartcoding.plain.lib.JsonHelper.jsonEncode(items.map { it.toModel() })))
+                            }
                             EventType.DOWNLOAD_PROGRESS.value -> {
                                 com.ismartcoding.plain.chat.download.DownloadQueue.refresh()
                                 sendEvent(WebSocketEvent(EventType.DOWNLOAD_PROGRESS, payload))

@@ -12,7 +12,6 @@ import com.ismartcoding.plain.db.DMessageImages
 import com.ismartcoding.plain.db.MessageType
 import com.ismartcoding.plain.enums.ChatStatus
 import com.ismartcoding.plain.events.EventType
-import com.ismartcoding.plain.events.FetchLinkPreviewsEvent
 import com.ismartcoding.plain.events.WebSocketEvent
 import com.ismartcoding.plain.lib.JsonHelper
 import com.ismartcoding.plain.httpserver.models.toModel
@@ -38,9 +37,6 @@ object ChatManager {
             toId = if (target.type == ChatTargetType.PEER) target.toId else "",
             channelId = if (target.type == ChatTargetType.CHANNEL) target.toId else "",
         )
-        if (item.content.type == MessageType.TEXT) {
-            sendEvent(FetchLinkPreviewsEvent(item))
-        }
         refreshLatestChats()
         item
     }

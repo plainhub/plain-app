@@ -16,7 +16,6 @@ import com.ismartcoding.plain.db.MessageType
 import com.ismartcoding.plain.db.DPeer
 import com.ismartcoding.plain.db.getMessagePreview
 import com.ismartcoding.plain.events.EventType
-import com.ismartcoding.plain.events.FetchLinkPreviewsEvent
 import com.ismartcoding.plain.events.ChatMessageNotificationEvent
 import com.ismartcoding.plain.events.WebSocketEvent
 import com.ismartcoding.plain.platform.LocaleHelper
@@ -41,9 +40,6 @@ object ChatMessageReceiver {
         val fromPeer = received.peer
         val fromChannel = received.channel
 
-        if (item.content.type == MessageType.TEXT) {
-            sendEvent(FetchLinkPreviewsEvent(item))
-        }
 
         if (item.content.type == MessageType.FILES ||
             item.content.type == MessageType.IMAGES

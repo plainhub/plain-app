@@ -12,6 +12,10 @@ import com.ismartcoding.plain.lib.html2md.MDConverter
 import com.ismartcoding.plain.lib.rss.model.RssChannel
 import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.lib.readability4j.Readability4J
+import com.ismartcoding.plain.helpers.AppFileStore
+
+private suspend fun importImageBytesToFid(data: ByteArray, mimeType: String): String? =
+    AppFileStore.toFidUri(AppFileStore.importBytes(data, mimeType))
 
 suspend fun DFeedEntry.legacyFetchContentAsync(): ApiResult = withIO {
     try {

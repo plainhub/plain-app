@@ -7,8 +7,6 @@ import androidx.compose.runtime.LaunchedEffect
 import com.ismartcoding.plain.lib.Channel
 import com.ismartcoding.plain.lib.coIO
 import com.ismartcoding.plain.lib.JsonHelper
-import com.ismartcoding.plain.platform.updateChatMessageTextAsync
-import com.ismartcoding.plain.db.DMessageText
 import com.ismartcoding.plain.enums.AudioAction
 import androidx.navigation.NavHostController
 import androidx.navigation.NavDestination.Companion.hasRoute
@@ -16,14 +14,12 @@ import com.ismartcoding.plain.events.AudioActionEvent
 import com.ismartcoding.plain.events.ConfirmDialogEvent
 import com.ismartcoding.plain.events.ConfirmToAcceptLoginEvent
 import com.ismartcoding.plain.events.EventType
-import com.ismartcoding.plain.events.FetchLinkPreviewsEvent
 import com.ismartcoding.plain.events.LoadingDialogEvent
 import com.ismartcoding.plain.events.WebSocketEvent
 import com.ismartcoding.plain.events.HDownloadTaskDoneEvent
 import com.ismartcoding.plain.events.HPomodoroPauseEvent
 import com.ismartcoding.plain.events.HPomodoroStartEvent
 import com.ismartcoding.plain.events.HPomodoroStopEvent
-import com.ismartcoding.plain.features.LinkPreviewHelper
 import com.ismartcoding.plain.lib.sendEvent
 import com.ismartcoding.plain.ui.base.ToastEvent
 import com.ismartcoding.plain.ui.models.AudioQueueViewModel
@@ -70,16 +66,6 @@ fun MainEventCollector(
                 is AudioActionEvent -> {
                     if (event.action == AudioAction.MEDIA_ITEM_TRANSITION) {
                         scope.launch(Dispatchers.Default) { audioQueueVM.loadAsync() }
-                    }
-                }
-
-                is FetchLinkPreviewsEvent -> {
-                    scope.launch(Dispatchers.Default) {
-                        val data = event.chat.content.value as? DMessageText ?: return@launch
-                        val urls = LinkPreviewHelper.extractUrls(data.text)
-                        if (urls.isEmpty()) return@launch
-                        updateChatMessageTextAsync(event.chat, data.text)
-                        chatVM.update(event.chat)
                     }
                 }
 

@@ -1,82 +1,26 @@
 package com.ismartcoding.plain.features
 
-import com.ismartcoding.plain.lib.withIO
-import com.ismartcoding.plain.lib.JsonHelper
-import com.ismartcoding.plain.chat.ChatDbHelper
+import com.ismartcoding.plain.api.RustContentApi
+import com.ismartcoding.plain.chat.RustChatStore
+import com.ismartcoding.plain.chat.ChatCacher
 import com.ismartcoding.plain.db.DChat
-import com.ismartcoding.plain.db.DLinkPreview
-import com.ismartcoding.plain.db.DMessageContent
-import com.ismartcoding.plain.db.DMessageText
-import com.ismartcoding.plain.db.MessageType
-import com.ismartcoding.plain.events.EventType
-import com.ismartcoding.plain.events.WebSocketEvent
-import com.ismartcoding.plain.lib.sendEvent
-import com.ismartcoding.plain.platform.deletePreviewImage
-import com.ismartcoding.plain.platform.fetchLinkPreviewsAsync
-import com.ismartcoding.plain.httpserver.models.toModel
+import kotlinx.serialization.json.*
 
-/**
- * Edits a text chat message and reconciles its link previews:
- * diffs URLs, cleans up images for removed URLs, fetches previews for added
- * URLs, persists via [ChatDbHelper], then emits one `MESSAGE_UPDATED` event.
- */
 object ChatMessageEditor {
-
-    /**
-     * Returns the same [item] reference (mutated in place) so callers can
-     * immediately update their UI lists. Returns true if a change was
-     * persisted (and a `MESSAGE_UPDATED` event emitted), false if the text
-     * and resolved previews are identical to the existing content.
-     */
-    suspend fun updateTextAsync(
-        item: DChat,
-        newText: String,
-    ): Boolean = withIO {
-        val originalText = item.content.value as? DMessageText
-        val originalPreviews = originalText?.linkPreviews ?: emptyList()
-        val originalUrls = originalPreviews.map { it.url }
-        val newUrls = LinkPreviewHelper.extractUrls(newText)
-        val linksChanged = newUrls.toSet() != originalUrls.toSet()
-
-        val resolvedPreviews: List<DLinkPreview> = if (!linksChanged) {
-            originalPreviews
-        } else {
-            val removed = originalUrls - newUrls.toSet()
-            originalPreviews
-                .filter { it.url in newUrls }
-                .also { survivors ->
-                    removed.forEach { url ->
-                        originalPreviews.firstOrNull { it.url == url }?.imageLocalPath?.let { path ->
-                            deletePreviewImage(path)
-                        }
-                    }
-                }
-                .toMutableList()
-                .apply {
-                    val added = newUrls - originalUrls.toSet()
-                    if (added.isNotEmpty()) {
-                        addAll(fetchLinkPreviewsAsync(added).filter { !it.hasError })
-                    }
-                }
-        }
-
-        if (originalText?.text == newText && originalPreviews == resolvedPreviews) {
-            return@withIO false
-        }
-
-        val content = DMessageContent(
-            type = MessageType.TEXT,
-            value = DMessageText(text = newText, linkPreviews = resolvedPreviews),
-        )
-        ChatDbHelper.updateChatItemContent(item, content)
-
-        val model = item.toModel()
-        sendEvent(
-            WebSocketEvent(
-                EventType.MESSAGE_UPDATED,
-                JsonHelper.jsonEncode(listOf(model)),
-            ),
-        )
-        return@withIO true
+    suspend fun updateTextAsync(item: DChat, newText: String): Boolean {
+        val result = RustContentApi.postJson("chat/link-preview", buildJsonObject {
+            put("action", "edit"); put("id", item.id); put("text", newText)
+        }).getValue("result").jsonObject
+        val current = RustChatStore.decode(result.getValue("chat"))
+        item.fromId = current.fromId
+        item.toId = current.toId
+        item.channelId = current.channelId
+        item.createdAt = current.createdAt
+        item.status = current.status
+        item.statusData = current.statusData
+        item.content = current.content
+        item.updatedAt = current.updatedAt
+        ChatCacher.load()
+        return result.getValue("changed").jsonPrimitive.boolean
     }
 }
