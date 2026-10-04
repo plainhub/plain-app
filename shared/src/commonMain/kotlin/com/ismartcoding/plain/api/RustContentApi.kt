@@ -98,6 +98,7 @@ object RustContentApi {
                     com.ismartcoding.plain.chat.download.DownloadQueue.refresh()
                     com.ismartcoding.plain.discover.PairingProjection.reconcile()
                     com.ismartcoding.plain.discover.RustNearbyDevices.refresh()
+                    com.ismartcoding.plain.discover.RustMdnsRuntime.refresh()
                     com.ismartcoding.plain.chat.peer.PeerCacher.load()
                     com.ismartcoding.plain.chat.channel.ChannelCacher.load()
                     com.ismartcoding.plain.chat.ChatCacher.load()
@@ -116,6 +117,7 @@ object RustContentApi {
                         val type = message.getValue("type").jsonPrimitive.int
                         val payload = message.getValue("payload").jsonPrimitive.content
                         when (type) {
+                            com.ismartcoding.plain.discover.RustMdnsRuntime.EVENT_UPDATED, EventType.NEARBY_DISCOVERY_STARTED.value, EventType.NEARBY_DISCOVERY_STOPPED.value -> com.ismartcoding.plain.discover.RustMdnsRuntime.refresh(if (type == com.ismartcoding.plain.discover.RustMdnsRuntime.EVENT_UPDATED) payload else null)
                             EventType.NEARBY_DEVICE_FOUND.value -> com.ismartcoding.plain.discover.RustNearbyDevices.refresh(payload)
                             EventType.PAIRING_REQUEST_RECEIVED.value -> com.ismartcoding.plain.discover.PairingProjection.request(payload)
                             EventType.PAIRING_STARTED.value -> com.ismartcoding.plain.discover.PairingProjection.started(payload)

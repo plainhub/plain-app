@@ -15,7 +15,7 @@ import com.ismartcoding.plain.discover.MdnsDiscoverManager
 import com.ismartcoding.plain.features.share.SharedInfoDto
 import com.ismartcoding.plain.features.share.SharedLink
 import com.ismartcoding.plain.features.share.SharedLinkClient
-import com.ismartcoding.plain.lib.mdns.MdnsServiceBrowser
+import com.ismartcoding.plain.discover.RustMdnsRuntime
 import com.ismartcoding.plain.lib.mdns.MdnsServiceSnapshot
 import com.ismartcoding.plain.lib.withIO
 import com.ismartcoding.plain.platform.getDeviceIP4sWithPrefixLength
@@ -69,7 +69,7 @@ internal suspend fun fetchSharedInfoWithFallback(
     repeat(12) { round ->
         if (round % 4 == 0) MdnsDiscoverManager.browse()
         delay(700)
-        val discovered = MdnsServiceBrowser.snapshot()
+        val discovered = RustMdnsRuntime.services(RustMdnsRuntime.snapshot())
             .filter { it.complete && snapshotDeviceId(it) == msg.peerInfo.id }
             .flatMap { snapshot -> snapshot.ips.map { SharedLinkClient.linkOf(msg.shareId, msg.urlToken, it, snapshot.port) } }
         if (discovered.isNotEmpty()) {

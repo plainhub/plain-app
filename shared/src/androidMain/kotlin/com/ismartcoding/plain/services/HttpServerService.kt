@@ -45,13 +45,7 @@ class HttpServerService : LifecycleService() {
         NotificationHelper.ensureDefaultChannel()
 
         lockManager = HttpServerLockManager(this).also { it.start() }
-        mdnsRegister = MdnsRegister(
-            context = this,
-            isActive = { HttpServerManager.serverState.value == HttpServerState.ON },
-            hostnameProvider = { TempData.mdnsHostname },
-            httpPortProvider = { UserPrefs.httpPort.value },
-            httpsPortProvider = { UserPrefs.httpsPort.value },
-        ).also { it.start() }
+        mdnsRegister = MdnsRegister(this).also { it.start() }
     }
 
     @SuppressLint("InlinedApi")

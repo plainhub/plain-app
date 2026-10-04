@@ -21,7 +21,7 @@ object RustNearbyDevices {
 
     suspend fun scanning() = mutex.withLock {
         apply(call(buildJsonObject {
-            put("action", "scanning"); put("lan", NearbyViewModel.isDiscovering.value); put("ble", NearbyViewModel.isBleScanning.value)
+            put("action", "bleScanning"); put("ble", NearbyViewModel.isBleScanning.value)
         }))
     }
 

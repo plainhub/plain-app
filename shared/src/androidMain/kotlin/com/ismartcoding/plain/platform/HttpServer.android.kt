@@ -24,7 +24,7 @@ import com.ismartcoding.plain.httpserver.HttpServerManager
 import com.ismartcoding.plain.httpserver.httpServer
 import com.ismartcoding.plain.httpserver.replaceSslKeyStoreBytes
 import com.ismartcoding.plain.httpserver.replaceSslKeyStoreFromPem
-import com.ismartcoding.plain.lib.mdns.MdnsHostResponder
+import com.ismartcoding.plain.discover.RustMdnsRuntime
 import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
@@ -93,7 +93,7 @@ actual suspend fun onWebSocketSessionStarted() {
 }
 
 actual suspend fun onHttpServerStopped() {
-    NsdHelper.unregisterService()
+    RustMdnsRuntime.control("unpublish")
     PeerStatusManager.stop()
     SmsProviderObserver.stop()
     ClipboardWatcher.stop()
@@ -151,7 +151,7 @@ actual suspend fun stopHttpServiceAsync(): Unit = withIO {
 
 actual fun isHttpServerRunning(): Boolean = HttpServerService.isRunning()
 
-actual fun isMdnsRunning(): Boolean = MdnsHostResponder.isRunning
+actual fun isMdnsRunning(): Boolean = RustMdnsRuntime.running
 
 actual fun getAwareAttachStatus(): String =
     if (WifiAwareTransport.awareSession != null) "attached" else "not attached"

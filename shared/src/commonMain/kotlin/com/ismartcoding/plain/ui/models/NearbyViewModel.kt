@@ -29,15 +29,11 @@ object NearbyViewModel {
     private var blePermissionJob: Job? = null
 
     fun startDiscovering() {
-        isDiscovering.value = true
-        scope.launchSafe { com.ismartcoding.plain.discover.RustNearbyDevices.scanning() }
         MdnsDiscoverManager.startPeriodicDiscovery()
     }
 
     fun stopDiscovering() {
-        isDiscovering.value = false
         MdnsDiscoverManager.stopPeriodicDiscovery()
-        scope.launchSafe { com.ismartcoding.plain.discover.RustNearbyDevices.scanning() }
     }
 
     fun requestBlePermission() {

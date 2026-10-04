@@ -23,7 +23,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
-import com.ismartcoding.plain.discover.MdnsDiscoverManager
 import com.ismartcoding.plain.i18n.Res
 import com.ismartcoding.plain.i18n.mdns_debug
 import com.ismartcoding.plain.i18n.mdns_hostname
@@ -34,11 +33,10 @@ import com.ismartcoding.plain.i18n.mdns_port
 import com.ismartcoding.plain.i18n.mdns_service_type
 import com.ismartcoding.plain.i18n.mdns_txt
 import com.ismartcoding.plain.i18n.not_available
-import com.ismartcoding.plain.lib.mdns.MdnsPacketCapture
+import com.ismartcoding.plain.discover.RustMdnsRuntime
 import com.ismartcoding.plain.lib.mdns.MdnsPacketDirection
 import com.ismartcoding.plain.lib.mdns.MdnsPacketLog
 import com.ismartcoding.plain.lib.mdns.MdnsServiceSnapshot
-import com.ismartcoding.plain.lib.mdns.MdnsServiceBrowser
 import com.ismartcoding.plain.ui.base.BottomSpace
 import com.ismartcoding.plain.ui.base.PCard
 import com.ismartcoding.plain.ui.base.PListItem
@@ -57,14 +55,14 @@ import org.jetbrains.compose.resources.stringResource
  * mDNS protocol debug page. Shows the raw wire data parsed from the
  * `_plainapp._tcp.local` responses (service type, instance, hostname, port,
  * TXT records, IPs) for every device currently known to
- * [MdnsServiceBrowser], plus a live stream of the last 100 received and 100
+ * Rust mDNS, plus a live stream of the last 50 received and 50
  * sent mDNS packets. Click a packet row to expand its decoded records.
  *
  * While the page is open it keeps periodic discovery running, enables packet
  * capture, and refreshes every two seconds. Leaving the page disables capture
  * so production overhead stays zero.
  */
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, kotlin.uuid.ExperimentalUuidApi::class)
 @Composable
 fun MdnsDebugPage(navController: NavHostController) {
     var snapshots by remember { mutableStateOf(emptyList<MdnsServiceSnapshot>()) }
@@ -74,28 +72,30 @@ fun MdnsDebugPage(navController: NavHostController) {
     var paused by remember { mutableStateOf(false) }
     var selectedTab by remember { mutableStateOf(0) }
 
-    // Discovery may already be running (e.g. the Nearby page); only stop it on
-    // exit when this page started it.
-    var startedByPage by remember { mutableStateOf(false) }
+    val debugToken = remember { kotlin.uuid.Uuid.random().toString() }
 
     LaunchedEffect(Unit) {
-        MdnsPacketCapture.setEnabled(true)
-        startedByPage = !MdnsDiscoverManager.isDiscovering()
-        MdnsDiscoverManager.startPeriodicDiscovery()
-        while (true) {
-            if (!paused) {
-                snapshots = MdnsServiceBrowser.snapshot()
-                packetsIn = MdnsPacketCapture.snapshotIn()
-                packetsOut = MdnsPacketCapture.snapshotOut()
+        try {
+            RustMdnsRuntime.debugStart(debugToken)
+            while (true) {
+                if (!paused) {
+                    val current = RustMdnsRuntime.snapshot()
+                    snapshots = RustMdnsRuntime.services(current)
+                    packetsIn = RustMdnsRuntime.packets(current, true)
+                    packetsOut = RustMdnsRuntime.packets(current, false)
+                }
+                delay(2000)
             }
-            delay(2000)
+        } catch (cancelled: kotlinx.coroutines.CancellationException) {
+            throw cancelled
+        } catch (error: Exception) {
+            com.ismartcoding.plain.lib.logcat.LogCat.e("mDNS debug snapshot", error)
         }
     }
 
     DisposableEffect(Unit) {
         onDispose {
-            MdnsPacketCapture.setEnabled(false)
-            if (startedByPage) MdnsDiscoverManager.stopPeriodicDiscovery()
+            RustMdnsRuntime.debugStop(debugToken)
         }
     }
 

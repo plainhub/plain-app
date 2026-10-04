@@ -2,13 +2,11 @@ package com.ismartcoding.plain.platform
 
 import com.ismartcoding.plain.preferences.*
 
-import com.ismartcoding.plain.discover.ensureMdnsInterfacesInstalled
 import com.ismartcoding.plain.lib.coIO
 import com.ismartcoding.plain.lib.withIO
 import com.ismartcoding.plain.lib.logcat.LogCat
-import com.ismartcoding.plain.lib.mdns.MdnsHostResponder
+import com.ismartcoding.plain.discover.RustMdnsRuntime
 import com.ismartcoding.plain.lib.toByteArray
-import com.ismartcoding.plain.discover.RustDiscoveryAdvertisement
 import com.ismartcoding.plain.httpserver.HttpServerManager
 import platform.Foundation.NSFileManager
 import platform.Foundation.NSString
@@ -71,9 +69,7 @@ actual suspend fun stopHttpEngineAsync() = com.ismartcoding.plain.httpserver.Rus
 
 /** No platform side effects on iOS once the server is healthy. */
 actual suspend fun onHttpServerStarted() {
-    ensureMdnsInterfacesInstalled()
-    val service = RustDiscoveryAdvertisement.mdns()
-    MdnsHostResponder.start(service.targetHostname, service)
+    RustMdnsRuntime.control("publish")
 }
 
 /** iOS has no Android SMS send-result state to replay. */
@@ -81,7 +77,7 @@ actual suspend fun onWebSocketSessionStarted() = Unit
 
 /** No platform side effects on iOS when the server stops. */
 actual suspend fun onHttpServerStopped() {
-    MdnsHostResponder.clearService()
+    RustMdnsRuntime.control("unpublish")
 }
 
 /**
@@ -105,7 +101,7 @@ actual suspend fun stopHttpServiceAsync(): Unit = withIO {
 actual fun isHttpServerRunning(): Boolean =
     com.ismartcoding.plain.httpserver.RustHttpEngine.isRunning
 
-actual fun isMdnsRunning(): Boolean = MdnsHostResponder.isRunning
+actual fun isMdnsRunning(): Boolean = RustMdnsRuntime.running
 
 actual fun getAwareAttachStatus(): String = "not available"
 actual fun getAwareDiscoveredPeerCount(): Int = 0
