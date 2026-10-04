@@ -15,6 +15,7 @@ object RustChannelStore {
     suspend fun update(vararg item: DChatChannel) { save(item.toList(), "UPDATE") }
     private suspend fun save(items: List<DChatChannel>, mode: String) { callChatStore("saveChannels") { put("mode", mode); put("items", JsonArray(items.map(::encode))) } }
     suspend fun patch(before: DChatChannel, after: DChatChannel): DChatChannel = decode(callChatStore("patchChannel") { put("before", encode(before)); put("after", encode(after)) })
+    suspend fun remove(id: String): DChatChannel? = callChatStore("removeChannel") { put("id", id) }.takeUnless { it is JsonNull }?.let(::decode)
     suspend fun delete(id: String) { deleteByIds(listOf(id)) }
     suspend fun deleteByIds(ids: List<String>) { callChatStore("deleteChannels") { put("ids", JsonArray(ids.map(::JsonPrimitive))) } }
     private fun encode(row: DChatChannel): JsonObject = buildJsonObject {

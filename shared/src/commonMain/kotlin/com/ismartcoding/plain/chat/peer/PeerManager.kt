@@ -1,30 +1,15 @@
 package com.ismartcoding.plain.chat.peer
 
-import com.ismartcoding.plain.chat.channel.RustChannelStore
 
 import com.ismartcoding.plain.lib.withIO
 import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.chat.ChatCacher
-import com.ismartcoding.plain.chat.ChatDbHelper
 import com.ismartcoding.plain.db.DPeer
 import com.ismartcoding.plain.enums.DeviceType
-import com.ismartcoding.plain.enums.PeerStatus
-import com.ismartcoding.plain.lib.TimeHelper
 
 object PeerManager {
     suspend fun deletePeer(peerId: String): Boolean = withIO {
-        val peerDao = RustPeerStore
-        val peer = peerDao.getById(peerId) ?: return@withIO false
-
-        ChatDbHelper.deleteAllChatsAsync(peerId)
-        val isChannelMember = RustChannelStore.getAll().any { it.hasMember(peerId) }
-        if (isChannelMember) {
-            peer.key = ""
-            peer.status = PeerStatus.CHANNEL
-            peerDao.update(peer)
-        } else {
-            peerDao.delete(peerId)
-        }
+        if (!RustPeerStore.remove(peerId)) return@withIO false
         PeerCacher.removePeer(peerId)
         PeerCacher.load()
         ChatCacher.load()
@@ -32,11 +17,7 @@ object PeerManager {
     }
 
     suspend fun markUnpaired(peerId: String): Boolean = withIO {
-        val peerDao = RustPeerStore
-        val peer = peerDao.getById(peerId) ?: return@withIO false
-        peer.status = PeerStatus.UNPAIRED
-        peer.updatedAt = TimeHelper.now()
-        peerDao.update(peer)
+        if (!RustPeerStore.unpair(peerId)) return@withIO false
         PeerCacher.load()
         LogCat.d("Device unpaired: $peerId")
         true
@@ -49,28 +30,9 @@ object PeerManager {
         name: String,
         deviceType: DeviceType,
     ): DPeer? {
-        val existing = PeerCacher.getPeer(deviceId) ?: return null
-        if (existing.status != PeerStatus.PAIRED) return null
-
-        val newIpString = ips.joinToString(",")
-        // mDNS announcements repeat every few seconds — skip the DB write when
-        // nothing changed so the peers table isn't hammered by updates.
-        if (existing.ip == newIpString && existing.port == port &&
-            existing.name == name && existing.deviceType == deviceType
-        ) return existing
-        val newDeviceType = deviceType
-        return PeerCacher.mutatePeer(deviceId) { p ->
-            if (p.ip != newIpString) p.ip = newIpString
-            if (p.port != port) p.port = port
-            if (p.name != name) p.name = name
-            if (p.deviceType != newDeviceType) p.deviceType = newDeviceType
-            // Always refresh updatedAt to signal we heard from this peer.
-            // PeerStatusManager.reconnectPeer compares updatedAt before and after
-            // a directed DISCOVER to detect whether the reply arrived within the
-            // wait window. Without this, a stale IP in the DB would be reused
-            // forever (observed: 370+ failed reconnect attempts to a dead IP).
-            p.updatedAt = TimeHelper.now()
-        }
+        val peer = RustPeerStore.discovered(deviceId, ips, port, name, deviceType) ?: return null
+        PeerCacher.load()
+        return peer
     }
 
     fun setOnlineStatus(peerId: String, online: Boolean) {

@@ -19,6 +19,11 @@ object RustPeerStore {
     suspend fun upsert(vararg item: DPeer) { save(item.toList(), "UPSERT") }
     private suspend fun save(items: List<DPeer>, mode: String) { callChatStore("savePeers") { put("mode", mode); put("items", JsonArray(items.map(::encode))) } }
     suspend fun patch(before: DPeer, after: DPeer): DPeer? = callChatStore("patchPeer") { put("before", encode(before)); put("after", encode(after)) }.takeUnless { it is JsonNull }?.let(::decode)
+    suspend fun remove(id: String): Boolean = callChatStore("removePeer") { put("id", id) }.jsonPrimitive.boolean
+    suspend fun unpair(id: String): Boolean = callChatStore("unpairPeer") { put("id", id) }.jsonPrimitive.boolean
+    suspend fun discovered(id: String, ips: List<String>, port: Int, name: String, type: DeviceType): DPeer? = callChatStore("discoverPeer") {
+        put("id", id); put("ips", JsonArray(ips.map(::JsonPrimitive))); put("port", port); put("name", name); put("device_type", type.name)
+    }.takeUnless { it is JsonNull }?.let(::decode)
     suspend fun delete(id: String) { deleteByIds(listOf(id)) }
     suspend fun deleteByIds(ids: List<String>) { callChatStore("deletePeers") { put("ids", JsonArray(ids.map(::JsonPrimitive))) } }
     private fun encode(row: DPeer): JsonObject = buildJsonObject {

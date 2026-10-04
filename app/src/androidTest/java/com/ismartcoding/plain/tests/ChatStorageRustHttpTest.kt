@@ -110,4 +110,46 @@ class ChatStorageRustHttpTest {
         }
     }
 
+    @Test
+    fun peerAndChannelBusinessRemovalIsRustOwnedAndPreservesSharedAttachments() = runBlocking {
+        val prefix = "synthetic-chat-entity-${UUID.randomUUID()}"
+        val peer = DPeer(id = prefix, name = prefix, status = PeerStatus.PAIRED, key = "", ip = "old", port = 1)
+        val channel = DChatChannel(id = "$prefix-channel", name = prefix, ownerId = "$prefix-owner", members = listOf(ChannelMember(peer.id)))
+        val store = com.ismartcoding.plain.helpers.AppFileStore
+        val file = store.importBytes(prefix.toByteArray(), "text/plain")
+        val suffix = file.realPath.substringAfterLast('/')
+        val content = DChat.parseContent("""{"type":"FILES","value":{"items":[{"uri":"fid:$suffix","fileName":"fixture.txt","size":${prefix.toByteArray().size}}]}}""")
+        val direct = DChat(id = "$prefix-direct", fromId = "me", toId = peer.id, content = content)
+        val group = DChat(id = "$prefix-group", fromId = peer.id, toId = "me", channelId = channel.id, content = content)
+        try {
+            RustPeerStore.insert(peer)
+            PeerCacher.load()
+            val discovered = com.ismartcoding.plain.chat.peer.PeerManager.applyDeviceDiscovered(peer.id, listOf("127.0.0.1", "::1"), 443, "discovered", DeviceType.PHONE)!!
+            assertEquals("127.0.0.1,::1", discovered.ip)
+            assertEquals("discovered", RustPeerStore.getById(peer.id)!!.name)
+            assertTrue(com.ismartcoding.plain.chat.peer.PeerManager.markUnpaired(peer.id))
+            assertNull(com.ismartcoding.plain.chat.peer.PeerManager.applyDeviceDiscovered(peer.id, emptyList(), 1, "stale", DeviceType.PHONE))
+            RustChannelStore.insert(channel)
+            store.importBytes(prefix.toByteArray(), "text/plain")
+            RustChatStore.insert(direct, group)
+            assertTrue(com.ismartcoding.plain.chat.peer.PeerManager.deletePeer(peer.id))
+            assertEquals(PeerStatus.CHANNEL, RustPeerStore.getById(peer.id)!!.status)
+            assertNull(RustChatStore.getById(direct.id))
+            assertNotNull(RustChatStore.getById(group.id))
+            assertEquals(1, store.getById(file.id)!!.refCount)
+            com.ismartcoding.plain.chat.channel.ChannelManager.deleteChannel(channel.id)
+            assertNull(RustChannelStore.getById(channel.id))
+            assertNull(RustChatStore.getById(group.id))
+            assertNull(store.getById(file.id))
+            assertTrue(com.ismartcoding.plain.chat.peer.PeerManager.deletePeer(peer.id))
+            assertFalse(com.ismartcoding.plain.chat.peer.PeerManager.deletePeer(peer.id))
+        } finally {
+            RustChatStore.deleteByIds(listOf(direct.id, group.id))
+            RustChannelStore.delete(channel.id)
+            RustPeerStore.delete(peer.id)
+            while (store.getById(file.id) != null) store.release(file.id)
+            ChannelCacher.load(); PeerCacher.load(); ChatCacher.load()
+        }
+    }
+
 }

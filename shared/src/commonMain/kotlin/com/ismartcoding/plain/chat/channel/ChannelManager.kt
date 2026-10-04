@@ -3,7 +3,6 @@ package com.ismartcoding.plain.chat.channel
 import com.ismartcoding.plain.chat.peer.RustPeerStore
 
 import com.ismartcoding.plain.TempData
-import com.ismartcoding.plain.chat.ChatDbHelper
 import com.ismartcoding.plain.chat.ChatManager
 import com.ismartcoding.plain.chat.peer.GraphQLResponse
 import com.ismartcoding.plain.chat.peer.PeerCacher
@@ -76,9 +75,8 @@ object ChannelManager {
 
     suspend fun deleteChannel(channelId: String) {
         withIO {
-            val channel = ensureChannel(channelId)
-            ChatDbHelper.deleteAllChannelChatsAsync(channelId)
-            RustChannelStore.delete(channelId)
+            val channel = RustChannelStore.remove(channelId) ?: throw Exception("Channel not found")
+            com.ismartcoding.plain.chat.ChatManager.refreshLatestChats()
             ChannelCacher.removeChannel(channelId)
             if (channel.isOwnedByMe()) {
                 ChannelSystemMessageSender.broadcastKick(channel)
@@ -170,8 +168,8 @@ object ChannelManager {
             val channel = ensureChannel(channelId)
             val ownerPeer = ensureOwner(channel)
             ChannelSystemMessageSender.sendInviteDecline(channel.id, ownerPeer)
-            ChatDbHelper.deleteAllChannelChatsAsync(channelId)
-            RustChannelStore.delete(channelId)
+            RustChannelStore.remove(channelId)
+            com.ismartcoding.plain.chat.ChatManager.refreshLatestChats()
             ChannelCacher.removeChannel(channelId)
         }
     }
