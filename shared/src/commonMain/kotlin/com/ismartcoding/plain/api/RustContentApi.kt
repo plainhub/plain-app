@@ -94,6 +94,7 @@ object RustContentApi {
             try {
                 eventClient.webSocket(localSession!!.baseUrl.replace("http://", "ws://") + "/events", localSession!!.headers()) { socket ->
                     retryMs = 500L
+                    com.ismartcoding.plain.chat.download.DownloadQueue.refresh()
                     for (frame in socket.incoming) {
                         frame.binary?.let { bytes ->
                             if (bytes.size >= 4) {
@@ -109,6 +110,10 @@ object RustContentApi {
                         val type = message.getValue("type").jsonPrimitive.int
                         val payload = message.getValue("payload").jsonPrimitive.content
                         when (type) {
+                            EventType.DOWNLOAD_PROGRESS.value -> {
+                                com.ismartcoding.plain.chat.download.DownloadQueue.refresh()
+                                sendEvent(WebSocketEvent(EventType.DOWNLOAD_PROGRESS, payload))
+                            }
                             EventType.CONTENT_CHANGED.value -> {
                                 try { com.ismartcoding.plain.features.FavoriteFolderHelper.refresh() }
                                 catch (cancelled: CancellationException) { throw cancelled }

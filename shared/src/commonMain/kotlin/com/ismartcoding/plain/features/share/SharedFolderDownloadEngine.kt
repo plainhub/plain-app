@@ -172,7 +172,7 @@ object SharedFolderDownloadEngine : DownloadEngine {
         DownloadCenter.requeue(taskId)
     }
 
-    override suspend fun execute(taskHandle: DownloadTaskHandle) {
+    override suspend fun execute(taskHandle: DownloadTaskHandle) = com.ismartcoding.plain.features.download.DownloadIo.run {
         val task = taskHandle as SharedFolderBatchTask
         task.status = DownloadStatus.DOWNLOADING
         task.error = ""

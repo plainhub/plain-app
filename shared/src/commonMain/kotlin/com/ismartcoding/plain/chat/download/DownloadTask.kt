@@ -15,8 +15,6 @@ data class DownloadTask(
     override var error: String = "",
     var downloadedSize: Long = 0,
     var downloadSpeed: Long = 0,
-    var lastDownloadedSize: Long = 0,
-    var lastUpdateTime: Long? = null,
     override var job: Job? = null,
     override var aborted: Boolean = false,
 ) : DownloadTaskHandle {

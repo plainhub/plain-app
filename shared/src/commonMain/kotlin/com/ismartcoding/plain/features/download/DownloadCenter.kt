@@ -23,6 +23,7 @@ object DownloadCenter {
     private val downloadChannel = Channel<DownloadTaskHandle>(Channel.BUFFERED)
     private val tasks = mutableMapOf<String, DownloadTaskHandle>()
     private val tasksLock = PlatformLock()
+    private val externalTasks = mutableMapOf<String, DownloadTaskHandle>()
     private val engines = mutableMapOf<String, DownloadEngine>()
 
     /**
@@ -49,9 +50,17 @@ object DownloadCenter {
         tasksLock.withLock { engines[kind] = engine }
     }
 
-    fun get(taskId: String): DownloadTaskHandle? = tasksLock.withLock { tasks[taskId] }
+    fun replaceExternal(kind: String, items: List<DownloadTaskHandle>) {
+        tasksLock.withLock {
+            externalTasks.entries.removeAll { it.value.kind == kind }
+            items.forEach { externalTasks[it.id] = it.flowSnapshot() }
+        }
+        scope.launch { updateProgressFlow() }
+    }
 
-    fun all(): List<DownloadTaskHandle> = tasksLock.withLock { tasks.values.map { it.flowSnapshot() } }
+    fun get(taskId: String): DownloadTaskHandle? = tasksLock.withLock { tasks[taskId] ?: externalTasks[taskId] }
+
+    fun all(): List<DownloadTaskHandle> = tasksLock.withLock { (tasks.values + externalTasks.values).map { it.flowSnapshot() } }
 
     /** Enqueues a task; false when an active or finished task with the same id exists. */
     fun add(task: DownloadTaskHandle): Boolean = tasksLock.withLock {
@@ -285,10 +294,10 @@ object DownloadCenter {
     }
 
     private suspend fun updateProgressFlow() {
-        val snapshot = tasksLock.withLock {
-            tasks.mapValues { it.value.flowSnapshot() }.toMap()
+        tasksLock.withLock {
+            val snapshot = (tasks + externalTasks).mapValues { it.value.flowSnapshot() }.toMap()
+            progress.value = snapshot
+            updates.tryEmit(snapshot)
         }
-        progress.value = snapshot
-        updates.tryEmit(snapshot)
     }
 }
