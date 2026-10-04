@@ -327,7 +327,7 @@ class AndroidBleGattClient(
         uuid: UUID? = null,
         timeoutMs: Long = 5_000L,
     ): ActionResult? {
-        val tag = "[BLE] waitForResult ${type} ${mac}"
+        val tag = "[BLE] waitForResult $type $mac"
         val result = withTimeoutOrNull(timeoutMs.milliseconds) {
             val channel = getChannel(type)
             var result = channel.receive()

@@ -3,7 +3,10 @@
 package com.ismartcoding.plain.platform
 
 import com.ismartcoding.plain.lib.crypto.ECDHKeyPair
+import com.ismartcoding.plain.lib.crypto.fillSecureRandom
 import com.ismartcoding.plain.lib.crypto.sha256
+import com.ismartcoding.plain.lib.crypto.xChaCha20Poly1305Decrypt
+import com.ismartcoding.plain.lib.crypto.xChaCha20Poly1305Encrypt
 import com.ismartcoding.plain.lib.logcat.LogCat
 import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.cinterop.IntVar
@@ -39,12 +42,12 @@ import kotlin.io.encoding.Base64
 import kotlin.io.encoding.ExperimentalEncodingApi
 
 actual fun chaCha20Decrypt(key: ByteArray, content: ByteArray): ByteArray? =
-    com.ismartcoding.plain.crypto.xChaCha20Poly1305Decrypt(key, content)
+    xChaCha20Poly1305Decrypt(key, content)
 
 actual fun chaCha20Encrypt(key: ByteArray, content: ByteArray): ByteArray {
     val nonce = ByteArray(24)
     fillSecureRandom(nonce)
-    return com.ismartcoding.plain.crypto.xChaCha20Poly1305Encrypt(key, nonce, content)
+    return xChaCha20Poly1305Encrypt(key, nonce, content)
 }
 
 actual fun chaCha20Encrypt(key: ByteArray, content: String): ByteArray =
@@ -252,18 +255,4 @@ private fun cfStringToString(cfString: CFStringRef?): String? {
         }
     }
     return null
-}
-
-/**
- * Fill [buffer] with cryptographically secure random bytes via `SecRandomCopyBytes`.
- * Returns false if the call fails (e.g. invalid parameters).
- */
-private fun fillSecureRandom(buffer: ByteArray): Boolean {
-    if (buffer.isEmpty()) return true
-    // SecRandomCopyBytes returns errSecSuccess (0) on success.
-    // count parameter is ULong in Kotlin/Native Security bindings.
-    val status = buffer.usePinned { pinned ->
-        SecRandomCopyBytes(kSecRandomDefault, buffer.size.toULong(), pinned.addressOf(0))
-    }
-    return status == 0
 }

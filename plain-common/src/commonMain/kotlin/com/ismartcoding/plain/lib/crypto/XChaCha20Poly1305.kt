@@ -1,4 +1,4 @@
-package com.ismartcoding.plain.crypto
+package com.ismartcoding.plain.lib.crypto
 
 import kotlin.experimental.xor
 
@@ -192,7 +192,14 @@ private fun poly1305KeyGen(key: ByteArray, nonce12: ByteArray): ByteArray {
     return block.copyOfRange(0, 32)
 }
 
-internal fun xChaCha20Poly1305Encrypt(key: ByteArray, nonce24: ByteArray, plaintext: ByteArray, aad: ByteArray = ByteArray(0)): ByteArray {
+/**
+ * XChaCha20-Poly1305 (RFC draft-irtf-cfrg-xchacha) AEAD seal.
+ *
+ * [key] is 32 bytes, [nonce24] is 24 bytes. Returns
+ * `nonce24 || ciphertext || tag(16)`, the wire format used by Tink subtle,
+ * libsodium and plain-web.
+ */
+fun xChaCha20Poly1305Encrypt(key: ByteArray, nonce24: ByteArray, plaintext: ByteArray, aad: ByteArray = ByteArray(0)): ByteArray {
     val subKey = hChaCha20(key, nonce24.copyOfRange(0, 16))
     val nonce12 = ByteArray(12)
     nonce24.copyOfRange(16, 24).copyInto(nonce12, 4)
@@ -216,7 +223,14 @@ internal fun xChaCha20Poly1305Encrypt(key: ByteArray, nonce24: ByteArray, plaint
     return nonce24 + ciphertext + tag
 }
 
-internal fun xChaCha20Poly1305Decrypt(key: ByteArray, data: ByteArray, aad: ByteArray = ByteArray(0)): ByteArray? {
+/**
+ * XChaCha20-Poly1305 (RFC draft-irtf-cfrg-xchacha) AEAD open.
+ *
+ * [data] is `nonce24 || ciphertext || tag(16)` as produced by
+ * [xChaCha20Poly1305Encrypt]. Returns null when the input is malformed or the
+ * tag does not authenticate.
+ */
+fun xChaCha20Poly1305Decrypt(key: ByteArray, data: ByteArray, aad: ByteArray = ByteArray(0)): ByteArray? {
     if (data.size < 24 + 16) return null
     val nonce24 = data.copyOfRange(0, 24)
     val ciphertext = data.copyOfRange(24, data.size - 16)
