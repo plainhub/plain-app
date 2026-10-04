@@ -18,4 +18,10 @@ object RustPeerWireStore {
     suspend fun decrypt(key: ByteArray, body: ByteArray): String? = callChatStore("decryptPeer") {
         put("key", Base64.encode(key)); put("body", Base64.encode(body))
     }.takeUnless { it is JsonNull }?.jsonPrimitive?.content
+    suspend fun authenticatePeer(fromId: String, channelId: String, body: ByteArray): JsonObject = callChatStore("authenticatePeer") {
+        put("from_id", fromId); put("channel_id", channelId); put("body", Base64.encode(body))
+    }.jsonObject
+    suspend fun authenticateEnvelope(key: ByteArray, publicKey: ByteArray, body: ByteArray): JsonObject = callChatStore("authenticateEnvelope") {
+        put("key", Base64.encode(key)); put("public_key", Base64.encode(publicKey)); put("body", Base64.encode(body))
+    }.jsonObject
 }

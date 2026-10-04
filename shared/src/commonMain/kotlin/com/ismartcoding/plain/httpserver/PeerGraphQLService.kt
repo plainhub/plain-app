@@ -2,10 +2,8 @@ package com.ismartcoding.plain.httpserver
 
 import com.ismartcoding.plain.preferences.*
 
-import com.ismartcoding.plain.TempData
-import com.ismartcoding.plain.chat.channel.ChannelCacher
-import com.ismartcoding.plain.chat.peer.PeerCacher
-import com.ismartcoding.plain.chat.peer.PeerChatParser
+import com.ismartcoding.plain.chat.peer.RustPeerWireStore
+import com.ismartcoding.plain.helpers.Base64Lenient
 import com.ismartcoding.plain.lib.kgraphql.GraphqlRequest
 import com.ismartcoding.plain.lib.kgraphql.KGraphQL
 import com.ismartcoding.plain.lib.kgraphql.context
@@ -15,14 +13,13 @@ import com.ismartcoding.plain.lib.kgraphql.schema.Schema
 import com.ismartcoding.plain.lib.kgraphql.schema.dsl.SchemaBuilder
 import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.lib.withIO
-import com.ismartcoding.plain.platform.chaCha20Encrypt
 import com.ismartcoding.plain.httpserver.http.GraphqlRequestContext
 import com.ismartcoding.plain.httpserver.http.HttpCall
 import com.ismartcoding.plain.httpserver.http.HttpStatus
 import com.ismartcoding.plain.httpserver.models.ChatItem
 import com.ismartcoding.plain.httpserver.models.ID
 import com.ismartcoding.plain.httpserver.mainschemas.addPeerSchemaTypes
-import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.*
 import kotlin.reflect.typeOf
 
 /**
@@ -40,7 +37,7 @@ class PeerGraphQLService private constructor(
     /**
      * Decrypt the peer-encrypted request body using either the channel key
      * (when `c-cid` is present) or the peer's shared key, validate the
-     * signature/timestamp via [PeerChatParser], then execute the GraphQL
+     * signature/timestamp in shared Rust, then execute the GraphQL
      * operation and re-encrypt the response with the same key.
      */
     suspend fun handle(call: HttpCall) {
@@ -54,49 +51,23 @@ class PeerGraphQLService private constructor(
         val channelId = call.header("c-cid") ?: ""
         LogCat.d("[PeerGraphQL] from=$clientId channelId=$channelId")
 
-        // Determine the decryption key:
-        // 1. If c-cid is present, always use the channel key (supports non-paired members).
-        // 2. Otherwise, use the peer's shared key (paired peer-to-peer chat).
-        val token = if (channelId.isNotEmpty()) {
-            ChannelCacher.getKeyBytes(channelId)
-        } else {
-            // Direct peer-to-peer message: require the peer to be paired.
-            // An unpaired peer must not be able to deliver messages to us.
-            val peer = PeerCacher.getPeer(clientId)
-            if (peer == null || !peer.isPaired()) {
-                LogCat.w("[PeerGraphQL] reject non-paired direct message from=$clientId status=${peer?.status}")
-                call.respondNoBody(HttpStatus.FORBIDDEN)
-                return
-            }
-            PeerCacher.getKeyBytes(clientId)
-        }
-        val publicKey = PeerCacher.getPublicKeyBytes(clientId)
-        if (token == null || publicKey == null) {
-            LogCat.w("[PeerGraphQL] unauthorized from=$clientId token=${token != null} pub=${publicKey != null}")
-            call.respondNoBody(HttpStatus.UNAUTHORIZED)
+        val authenticated = RustPeerWireStore.authenticatePeer(clientId, channelId, call.receiveBody())
+        val status = authenticated.getValue("status").jsonPrimitive.int
+        if (status != HttpStatus.OK) {
+            call.respondNoBody(status)
             return
         }
-
-        val decryptResult = PeerChatParser.decrypt(token, clientId, publicKey, call.receiveBody())
-        if (decryptResult.content == null) {
-            LogCat.w("[PeerGraphQL] decrypt fail from=$clientId code=${decryptResult.code}")
-            call.respondNoBody(decryptResult.code.value)
-            return
-        }
-
-        // Carry the verified signature and timestamp to the resolvers via the
-        // shared request context. The resolvers read them back through
-        // GraphqlRequestContext.attribute(...).
+        val token = Base64Lenient.decode(authenticated.getValue("key").jsonPrimitive.content)
+        val content = authenticated.getValue("content").jsonPrimitive.content
         val ctxHolder = GraphqlRequestContext(call).apply {
-            setAttribute(ATTR_SIGNATURE, decryptResult.signature)
-            setAttribute(ATTR_TIMESTAMP, decryptResult.timestamp)
+            setAttribute(ATTR_SIGNATURE, authenticated.getValue("signature").jsonPrimitive.content)
+            setAttribute(ATTR_TIMESTAMP, authenticated.getValue("timestamp").jsonPrimitive.long)
         }
-
-        val request = Json.decodeFromString(GraphqlRequest.serializer(), decryptResult.content)
+        val request = Json.decodeFromString(GraphqlRequest.serializer(), content)
         val ctx = context { +ctxHolder }
         val result = withIO { schema.execute(request.query, request.variables?.toString(), ctx) }
         call.respond(
-            chaCha20Encrypt(token, result),
+            RustPeerWireStore.encrypt(token, result),
             contentType = "application/octet-stream",
         )
         LogCat.d("[PeerGraphQL] done from=$clientId")
