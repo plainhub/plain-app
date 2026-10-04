@@ -4,6 +4,8 @@ import com.ismartcoding.plain.api.clientHeadersMap
 
 import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.data.DNearbyDevice
+import com.ismartcoding.plain.data.DPairingTicket
+import com.ismartcoding.plain.discover.PairingInitiator
 import com.ismartcoding.plain.data.DPairingResponse
 import com.ismartcoding.plain.chat.peer.PeerCacher
 import com.ismartcoding.plain.discover.DDiscoverReply
@@ -138,6 +140,7 @@ object PairingTransport {
         val scanner = bleTransport().createScanner()
 
         var notificationEnabled = false
+        var ticket: DPairingTicket? = null
         return try {
             scanner.pauseScan()
             val api = BleDeviceApi(bleDevice)
@@ -148,44 +151,29 @@ object PairingTransport {
                 return false
             }
 
-            val request = PairingCore.startPairingSession(device, deviceIp = "")
+            val (request, started) = PairingCore.startPairingSession(device, deviceIp = "")
+            ticket = started
+            PairingInitiator.awaitPairResponse(started)
             val body = PairingCore.formatMessage(NearbyMessageType.PAIR_REQUEST, JsonHelper.jsonEncode(request))
             LogCat.d("BLE pairViaBle: sending request to ${device.name}")
 
             if (!api.sendRequest(BleServices.nearby, BleRequestData.create(clientHeadersMap()).copy(body = body))) {
                 LogCat.e("BLE pairViaBle: failed to send pairing request")
-                PairingCore.notifyFailed(device.id, device.name, "Failed to send pairing request")
+                PairingInitiator.fail(started, "Failed to send pairing request")
                 return false
             }
             NearbyViewModel.onPairingRequestSent(device.id)
             notificationEnabled = true
             LogCat.d("BLE pairViaBle: request sent, waiting for PAIR_RESPONSE notification")
 
-            val responseJson = waitForPairResponseNotification(bleDevice)
-
-            bleDevice.setNotification(BleServices.nearby, false)
-            notificationEnabled = false
-
-            if (responseJson != null) {
-                val response = JsonHelper.jsonDecode<DPairingResponse>(responseJson)
-                // The responder is identified by its full clientId, which is
-                // on DPairingResponse.fromId (sent via the GATT notification,
-                // NOT parsed from the BLE scan response — only the shortId
-                // hash is broadcast). No BLE MAC needs to be cached.
-                PairingCore.handlePairResponse(
-                    response = response,
-                    senderIp = "",
-                )
-            } else {
-                LogCat.e("BLE pairViaBle: response timeout after ${PAIR_RESPONSE_TIMEOUT_MS}ms")
-                PairingCore.notifyFailed(device.id, device.name, "Pairing timed out")
-            }
-            true
+            awaitPairingResult(bleDevice, started.delayMs)
         } catch (e: CancellationException) {
+            ticket?.let { withContext(NonCancellable) { PairingInitiator.fail(it, "Pairing cancelled") } }
             throw e
         } catch (e: Exception) {
             LogCat.e("BLE pairViaBle error: ${e.message}")
-            PairingCore.notifyFailed(device.id, device.name, "Pairing failed: ${e.message}")
+            ticket?.let { PairingInitiator.fail(it, "Pairing failed: ${e.message}") }
+                ?: PairingCore.notifyFailed(device.id, device.name, "Pairing failed: ${e.message}")
             false
         } finally {
             withContext(NonCancellable) {
@@ -198,10 +186,22 @@ object PairingTransport {
         }
     }
 
-    private suspend fun waitForPairResponseNotification(bleDevice: BleGattClient): String? {
+    private suspend fun awaitPairingResult(bleDevice: BleGattClient, timeoutMs: Long): Boolean {
+        val deadline = TimeHelper.nowMillis() + timeoutMs
+        while (true) {
+            val remaining = deadline - TimeHelper.nowMillis()
+            if (remaining <= 0) return false
+            val responseJson = waitForPairResponseNotification(bleDevice, remaining) ?: return false
+            val response = runCatching { JsonHelper.jsonDecode<DPairingResponse>(responseJson) }.getOrNull() ?: continue
+            val paired = PairingCore.handlePairResponse(response, senderIp = "")
+            if (paired != null) return paired
+        }
+    }
+
+    private suspend fun waitForPairResponseNotification(bleDevice: BleGattClient, timeoutMs: Long): String? {
         val startTime = TimeHelper.nowMillis()
         while (true) {
-            val remaining = PAIR_RESPONSE_TIMEOUT_MS - (TimeHelper.nowMillis() - startTime)
+            val remaining = timeoutMs - (TimeHelper.nowMillis() - startTime)
             if (remaining <= 0) return null
             val notification = bleDevice.waitForNotification(BleServices.nearby, remaining) ?: return null
             if (notification.startsWith(NearbyMessageType.PAIR_RESPONSE.toPrefix())) {
@@ -213,4 +213,3 @@ object PairingTransport {
 }
 
 private const val BLE_REFRESH_INTERVAL_MS = 5_000L
-private const val PAIR_RESPONSE_TIMEOUT_MS = 90_000L

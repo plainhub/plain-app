@@ -51,8 +51,6 @@ object PairingResponder {
             LogCat.e("Error responding to pairing: ${e.message}")
             PairingCore.notifyFailed(request.fromId, request.fromName, "Failed to respond to pairing request")
             if (isBle) BlePairingSessionStore.remove(request.fromId)
-        } finally {
-            PairingSessionStore.remove(request.fromId)
         }
     }
 
@@ -74,7 +72,7 @@ object PairingResponder {
         }
     }
 
-    fun onCancel(cancel: DPairingCancel) {
+    suspend fun onCancel(cancel: DPairingCancel) {
         LogCat.d("Pairing cancelled by remote device: ${cancel.fromId}")
         PairingCore.handlePairCancel(cancel)
     }

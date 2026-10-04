@@ -9,7 +9,6 @@ import com.ismartcoding.plain.data.DPairingCancel
 import com.ismartcoding.plain.data.DPairingRequest
 import com.ismartcoding.plain.data.DPairingResponse
 import com.ismartcoding.plain.data.DPairingResult
-import com.ismartcoding.plain.data.DPairingSession
 import com.ismartcoding.plain.enums.NearbyMessageType
 import com.ismartcoding.plain.enums.DiscoveryMethod
 import com.ismartcoding.plain.events.EventType
@@ -17,11 +16,8 @@ import com.ismartcoding.plain.events.PairingCanceledEvent
 import com.ismartcoding.plain.events.PairingRequestReceivedEvent
 import com.ismartcoding.plain.events.PairingSuccessEvent
 import com.ismartcoding.plain.events.WebSocketEvent
-import com.ismartcoding.plain.helpers.Base64Lenient
 import com.ismartcoding.plain.lib.JsonHelper
 import com.ismartcoding.plain.lib.TimeHelper
-import com.ismartcoding.plain.lib.crypto.ECDHKeyPair
-import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.lib.sendEvent
 import com.ismartcoding.plain.platform.getAppVersion
 import com.ismartcoding.plain.platform.getDeviceIP4s
@@ -30,9 +26,7 @@ import com.ismartcoding.plain.platform.getDeviceType
 import com.ismartcoding.plain.platform.getPlatformName
 import com.ismartcoding.plain.platform.isWifiAwareSupported
 import com.ismartcoding.plain.ui.models.NearbyViewModel
-import kotlin.io.encoding.ExperimentalEncodingApi
 
-@OptIn(ExperimentalEncodingApi::class)
 object PairingCore {
 
     // ---- Discovery ----------------------------------------------------------
@@ -72,155 +66,49 @@ object PairingCore {
 
     // ---- Initiator (send request / receive response) -----------------------
 
-    suspend fun startPairingSession(device: DNearbyDevice, deviceIp: String): DPairingRequest {
-        val (request, keyPair) = buildPairingRequest()
-        PairingSessionStore.put(
-            DPairingSession(
-                deviceId = device.id,
-                deviceName = device.name,
-                deviceIp = deviceIp,
-                devicePort = device.port,
-                keyPair = keyPair,
-            )
-        )
-        return request
+    suspend fun startPairingSession(device: DNearbyDevice, deviceIp: String): Pair<DPairingRequest, com.ismartcoding.plain.data.DPairingTicket> =
+        RustPairingStore.start(device.id, device.name, deviceIp, device.port)
+
+    suspend fun handlePairResponse(response: DPairingResponse, senderIp: String): Boolean? {
+        val outcome = RustPairingStore.complete(response, senderIp) ?: return null
+        val peer = outcome.peer
+        if (peer == null) {
+            notifyFailed(outcome.ticket.deviceId, outcome.ticket.deviceName, outcome.error)
+            return false
+        }
+        publishSuccess(peer.id, peer.name, senderIp, peer.key)
+        return true
     }
 
-    suspend fun handlePairResponse(response: DPairingResponse, senderIp: String) {
-        val session = PairingSessionStore.get(response.fromId)
-        if (session == null) {
-            LogCat.e("No active pairing session for ${response.fromId}")
-            return
-        }
-        if (!RustPairingStore.validateResponse(response, session.deviceId)) {
-            LogCat.w("Invalid pairing response ignored for ${response.fromId}")
-            return
-        }
-        try {
-            processPairingResponse(response, session, senderIp)
-        } catch (e: Exception) {
-            LogCat.e("Error processing pairing response: ${e.message}")
-            notifyFailed(response.fromId, session.deviceName, "Failed to process pairing response")
-        } finally {
-            PairingSessionStore.remove(response.fromId)
-        }
-    }
-
-    // ---- Responder (receive request / send response) -----------------------
-
-    fun handlePairRequest(request: DPairingRequest, senderAddress: String, isBle: Boolean) {
-        if (isBle) {
-            // senderAddress on BLE is the MAC of the connected central. We
-            // don't store it on the request anymore (peers are identified by
-            // clientId, not MAC), but the GATT server still needs it for
-            // routing notifications back to the connected device.
-            BlePairingSessionStore.put(request.fromId, senderAddress)
-        } else {
-            request.fromIp = senderAddress
-        }
+    suspend fun handlePairRequest(request: DPairingRequest, senderAddress: String, isBle: Boolean) {
+        if (!isBle) request.fromIp = senderAddress
+        val new = RustPairingStore.receiveRequest(request) ?: return
+        if (isBle) BlePairingSessionStore.put(request.fromId, senderAddress)
+        if (!new) return
         sendEvent(PairingRequestReceivedEvent(request))
         sendEvent(WebSocketEvent(EventType.PAIRING_REQUEST_RECEIVED, JsonHelper.jsonEncode(request)))
     }
 
-    suspend fun buildRejectionResponse(request: DPairingRequest): DPairingResponse? = RustPairingStore.response(request, false)?.first
+    suspend fun buildRejectionResponse(request: DPairingRequest): DPairingResponse? = RustPairingStore.respond(request, false)?.first
 
-    fun handlePairCancel(cancel: DPairingCancel) {
-        val session = PairingSessionStore.get(cancel.fromId)
-        sendEvent(PairingCanceledEvent(cancel.fromId))
-        sendEvent(
-            WebSocketEvent(
-                EventType.PAIRING_CANCELED,
-                JsonHelper.jsonEncode(
-                    DPairingResult(
-                        deviceId = cancel.fromId,
-                        deviceName = session?.deviceName ?: "",
-                    )
-                )
-            )
-        )
-        PairingSessionStore.remove(cancel.fromId)
+    suspend fun handlePairCancel(cancel: DPairingCancel) {
+        val ticket = RustPairingStore.receiveCancel(cancel) ?: return
+        sendEvent(PairingCanceledEvent(ticket.deviceId))
+        sendEvent(WebSocketEvent(EventType.PAIRING_CANCELED, JsonHelper.jsonEncode(DPairingResult(deviceId = ticket.deviceId, deviceName = ticket.deviceName))))
     }
-
-    // ---- Core pairing logic (existing) -------------------------------------
-
-    suspend fun buildPairingRequest(): Pair<DPairingRequest, ECDHKeyPair> = RustPairingStore.request()
 
     suspend fun acceptPairingRequest(request: DPairingRequest): DPairingResponse? {
-        val built = RustPairingStore.response(request, true) ?: return null
-        val response = built.first
-        val keyPair = requireNotNull(built.second)
-        PairingSessionStore.put(DPairingSession(deviceId = request.fromId, deviceName = request.fromName, deviceIp = request.fromIp, devicePort = request.port, keyPair = keyPair))
-
-        val requestEcdhPublicKey = Base64Lenient.decode(request.ecdhPublicKey)
-        val encryptKey = RustPairingStore.derive(keyPair.privateKeyEncoded, requestEcdhPublicKey)
-        if (encryptKey == null) {
-            PairingSessionStore.remove(request.fromId)
-            return null
-        }
-
-        val peerIps = (listOf(request.fromIp) + request.ips).filter { it.isNotEmpty() }.distinct()
-        PairingPeerStore.save(
-            deviceId = request.fromId,
-            deviceName = request.fromName,
-            deviceIps = peerIps,
-            port = request.port,
-            deviceType = request.deviceType,
-            key = encryptKey,
-            signaturePublicKey = request.signaturePublicKey,
-        )
-        NearbyViewModel.handlePairingSuccess(request.fromId)
-        sendEvent(PairingSuccessEvent(request.fromId, request.fromName, request.fromIp, encryptKey))
-        sendEvent(
-            WebSocketEvent(
-                EventType.PAIRING_SUCCESS,
-                JsonHelper.jsonEncode(DPairingResult(deviceId = request.fromId, deviceName = request.fromName)),
-            )
-        )
-        return response
+        val built = RustPairingStore.respond(request, true) ?: return null
+        val peer = requireNotNull(built.second)
+        publishSuccess(peer.id, peer.name, request.fromIp, peer.key)
+        return built.first
     }
 
-    suspend fun processPairingResponse(
-        response: DPairingResponse,
-        session: DPairingSession,
-        senderIp: String,
-    ): Boolean {
-        if (!RustPairingStore.validateResponse(response, session.deviceId)) {
-            notifyFailed(response.fromId, session.deviceName, "Invalid pairing response")
-            return false
-        }
-
-        if (response.accepted) {
-            val responseEcdhPublicKey = Base64Lenient.decode(response.ecdhPublicKey)
-            val encryptKey = RustPairingStore.derive(session.keyPair.privateKeyEncoded, responseEcdhPublicKey)
-            if (encryptKey == null) {
-                notifyFailed(response.fromId, session.deviceName, "Failed to compute shared key")
-                return false
-            }
-            val peerIps = (listOf(senderIp) + response.ips).filter { it.isNotEmpty() }.distinct()
-            PairingPeerStore.save(
-                deviceId = response.fromId,
-                deviceName = session.deviceName,
-                deviceIps = peerIps,
-                port = response.port,
-                deviceType = response.deviceType,
-                key = encryptKey,
-                signaturePublicKey = response.signaturePublicKey,
-            )
-            NearbyViewModel.handlePairingSuccess(response.fromId)
-            sendEvent(PairingSuccessEvent(response.fromId, session.deviceName, senderIp, encryptKey))
-            sendEvent(
-                WebSocketEvent(
-                    EventType.PAIRING_SUCCESS,
-                    JsonHelper.jsonEncode(DPairingResult(deviceId = response.fromId, deviceName = session.deviceName)),
-                )
-            )
-            LogCat.d("Pairing completed successfully with ${session.deviceName}")
-            return true
-        } else {
-            notifyFailed(response.fromId, session.deviceName, "Pairing request was rejected")
-            LogCat.d("Verified pairing rejection from ${session.deviceName}")
-            return false
-        }
+    private suspend fun publishSuccess(id: String, name: String, ip: String, key: String) {
+        com.ismartcoding.plain.chat.peer.PeerManager.load()
+        NearbyViewModel.handlePairingSuccess(id)
+        sendEvent(PairingSuccessEvent(id, name, ip, key))
+        sendEvent(WebSocketEvent(EventType.PAIRING_SUCCESS, JsonHelper.jsonEncode(DPairingResult(deviceId = id, deviceName = name))))
     }
 
     fun notifyFailed(deviceId: String, deviceName: String, reason: String) {
