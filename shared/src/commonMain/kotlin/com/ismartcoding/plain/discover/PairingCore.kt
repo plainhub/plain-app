@@ -1,12 +1,9 @@
 package com.ismartcoding.plain.discover
 
-import com.ismartcoding.plain.preferences.*
-
+import com.ismartcoding.plain.preferences.UserPrefs
 import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.ble.client.BleGattClient
 import com.ismartcoding.plain.ble.server.BlePairingSessionStore
-import com.ismartcoding.plain.platform.computeECDHSharedKey
-import com.ismartcoding.plain.platform.generateECDHKeyPair
 import com.ismartcoding.plain.data.DNearbyDevice
 import com.ismartcoding.plain.data.DPairingCancel
 import com.ismartcoding.plain.data.DPairingRequest
@@ -22,7 +19,6 @@ import com.ismartcoding.plain.events.PairingSuccessEvent
 import com.ismartcoding.plain.events.WebSocketEvent
 import com.ismartcoding.plain.helpers.Base64Lenient
 import com.ismartcoding.plain.lib.JsonHelper
-import com.ismartcoding.plain.helpers.SignatureHelper
 import com.ismartcoding.plain.lib.TimeHelper
 import com.ismartcoding.plain.lib.crypto.ECDHKeyPair
 import com.ismartcoding.plain.lib.logcat.LogCat
@@ -34,7 +30,6 @@ import com.ismartcoding.plain.platform.getDeviceType
 import com.ismartcoding.plain.platform.getPlatformName
 import com.ismartcoding.plain.platform.isWifiAwareSupported
 import com.ismartcoding.plain.ui.models.NearbyViewModel
-import kotlin.io.encoding.Base64
 import kotlin.io.encoding.ExperimentalEncodingApi
 
 @OptIn(ExperimentalEncodingApi::class)
@@ -97,6 +92,10 @@ object PairingCore {
             LogCat.e("No active pairing session for ${response.fromId}")
             return
         }
+        if (!RustPairingStore.validateResponse(response, session.deviceId)) {
+            LogCat.w("Invalid pairing response ignored for ${response.fromId}")
+            return
+        }
         try {
             processPairingResponse(response, session, senderIp)
         } catch (e: Exception) {
@@ -123,23 +122,7 @@ object PairingCore {
         sendEvent(WebSocketEvent(EventType.PAIRING_REQUEST_RECEIVED, JsonHelper.jsonEncode(request)))
     }
 
-    suspend fun buildRejectionResponse(request: DPairingRequest): DPairingResponse? {
-        if (!validatePairingRequest(request)) return null
-        val response = DPairingResponse(
-            fromId = TempData.clientId,
-            toId = request.fromId,
-            port = UserPrefs.httpsPort.value,
-            deviceType = request.deviceType,
-            ecdhPublicKey = "",
-            signaturePublicKey = SignatureHelper.getRawPublicKeyBase64Async(),
-            accepted = false,
-            timestamp = TimeHelper.nowMillis(),
-            ips = getDeviceIP4s(),
-            awareSupported = isWifiAwareSupported,
-        )
-        response.signature = SignatureHelper.signTextAsync(response.toSignatureData())
-        return response
-    }
+    suspend fun buildRejectionResponse(request: DPairingRequest): DPairingResponse? = RustPairingStore.response(request, false)?.first
 
     fun handlePairCancel(cancel: DPairingCancel) {
         val session = PairingSessionStore.get(cancel.fromId)
@@ -160,54 +143,16 @@ object PairingCore {
 
     // ---- Core pairing logic (existing) -------------------------------------
 
-    suspend fun buildPairingRequest(): Pair<DPairingRequest, ECDHKeyPair> {
-        val keyPair = generateECDHKeyPair()
-        val ecdhPublicKey = Base64.encode(keyPair.publicKeyEncoded)
-        val request = DPairingRequest(
-            fromId = TempData.clientId,
-            fromName = TempData.deviceName.value,
-            port = UserPrefs.httpsPort.value,
-            deviceType = getDeviceType(),
-            ecdhPublicKey = ecdhPublicKey,
-            signaturePublicKey = SignatureHelper.getRawPublicKeyBase64Async(),
-            timestamp = TimeHelper.nowMillis(),
-            ips = getDeviceIP4s(),
-            awareSupported = isWifiAwareSupported,
-        )
-        request.signature = SignatureHelper.signTextAsync(request.toSignatureData())
-        return request to keyPair
-    }
+    suspend fun buildPairingRequest(): Pair<DPairingRequest, ECDHKeyPair> = RustPairingStore.request()
 
     suspend fun acceptPairingRequest(request: DPairingRequest): DPairingResponse? {
-        if (!validatePairingRequest(request)) return null
-
-        val keyPair = generateECDHKeyPair()
-        PairingSessionStore.put(
-            DPairingSession(
-                deviceId = request.fromId,
-                deviceName = request.fromName,
-                deviceIp = request.fromIp,
-                devicePort = request.port,
-                keyPair = keyPair,
-            )
-        )
-
-        val response = DPairingResponse(
-            fromId = TempData.clientId,
-            toId = request.fromId,
-            port = UserPrefs.httpsPort.value,
-            deviceType = getDeviceType(),
-            ecdhPublicKey = Base64.encode(keyPair.publicKeyEncoded),
-            signaturePublicKey = SignatureHelper.getRawPublicKeyBase64Async(),
-            accepted = true,
-            timestamp = TimeHelper.nowMillis(),
-            ips = getDeviceIP4s(),
-            awareSupported = isWifiAwareSupported,
-        )
-        response.signature = SignatureHelper.signTextAsync(response.toSignatureData())
+        val built = RustPairingStore.response(request, true) ?: return null
+        val response = built.first
+        val keyPair = requireNotNull(built.second)
+        PairingSessionStore.put(DPairingSession(deviceId = request.fromId, deviceName = request.fromName, deviceIp = request.fromIp, devicePort = request.port, keyPair = keyPair))
 
         val requestEcdhPublicKey = Base64Lenient.decode(request.ecdhPublicKey)
-        val encryptKey = computeECDHSharedKey(keyPair.privateKeyEncoded, requestEcdhPublicKey)
+        val encryptKey = RustPairingStore.derive(keyPair.privateKeyEncoded, requestEcdhPublicKey)
         if (encryptKey == null) {
             PairingSessionStore.remove(request.fromId)
             return null
@@ -239,21 +184,14 @@ object PairingCore {
         session: DPairingSession,
         senderIp: String,
     ): Boolean {
-        if (!PairingSecurity.validateTimestamp(response.timestamp)) {
-            LogCat.e("Pairing response timestamp is too old or in the future")
-            notifyFailed(response.fromId, session.deviceName, "Invalid timestamp")
+        if (!RustPairingStore.validateResponse(response, session.deviceId)) {
+            notifyFailed(response.fromId, session.deviceName, "Invalid pairing response")
             return false
         }
-        if (!PairingSecurity.verify(response)) {
-            LogCat.e("Pairing response signature verification failed")
-            notifyFailed(response.fromId, session.deviceName, "Signature verification failed")
-            return false
-        }
-        LogCat.d("Pairing response signature verified successfully")
 
         if (response.accepted) {
             val responseEcdhPublicKey = Base64Lenient.decode(response.ecdhPublicKey)
-            val encryptKey = computeECDHSharedKey(session.keyPair.privateKeyEncoded, responseEcdhPublicKey)
+            val encryptKey = RustPairingStore.derive(session.keyPair.privateKeyEncoded, responseEcdhPublicKey)
             if (encryptKey == null) {
                 notifyFailed(response.fromId, session.deviceName, "Failed to compute shared key")
                 return false
@@ -295,16 +233,4 @@ object PairingCore {
         )
     }
 
-    private fun validatePairingRequest(request: DPairingRequest): Boolean {
-        if (!PairingSecurity.validateTimestamp(request.timestamp)) {
-            LogCat.e("Pairing request timestamp is too old or in the future")
-            return false
-        }
-        if (!PairingSecurity.verify(request)) {
-            LogCat.e("Pairing request signature verification failed")
-            return false
-        }
-        LogCat.d("Pairing request signature verified successfully")
-        return true
-    }
 }
