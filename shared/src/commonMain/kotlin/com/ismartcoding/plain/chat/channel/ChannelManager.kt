@@ -2,23 +2,16 @@ package com.ismartcoding.plain.chat.channel
 
 import com.ismartcoding.plain.chat.peer.RustPeerStore
 
-import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.chat.ChatManager
 import com.ismartcoding.plain.chat.peer.GraphQLResponse
-import com.ismartcoding.plain.chat.peer.PeerCacher
-import com.ismartcoding.plain.db.ChannelMember
 import com.ismartcoding.plain.db.DChatChannel
 import com.ismartcoding.plain.db.DPeer
 import com.ismartcoding.plain.db.getOwner
 import com.ismartcoding.plain.db.isOwnedByMe
-import com.ismartcoding.plain.enums.ChannelMemberStatus
-import com.ismartcoding.plain.enums.ChatChannelStatus
 import com.ismartcoding.plain.events.EventType
 import com.ismartcoding.plain.events.WebSocketEvent
 import com.ismartcoding.plain.lib.JsonHelper
-import com.ismartcoding.plain.lib.TimeHelper
 import com.ismartcoding.plain.lib.coIO
-import com.ismartcoding.plain.platform.generateChaCha20Key
 import com.ismartcoding.plain.lib.withIO
 import com.ismartcoding.plain.lib.sendEvent
 import com.ismartcoding.plain.httpserver.models.toModel
@@ -44,33 +37,17 @@ object ChannelManager {
         }
     }
 
-    suspend fun createChannel(name: String): DChatChannel {
-        return withIO {
-            val channel = DChatChannel()
-            channel.name = name.trim()
-            channel.ownerId = TempData.clientId
-            channel.key = generateChaCha20Key()
-            channel.version = 1
-            channel.members = listOf(ChannelMember(peerId = TempData.clientId))
-
-            RustChannelStore.insert(channel)
-            ChannelCacher.load()
-            channel
-        }
+    suspend fun createChannel(name: String): DChatChannel = withIO {
+        val channel = RustChannelStore.create(name)
+        ChannelCacher.load()
+        channel
     }
 
-    suspend fun renameChannel(channelId: String, newName: String): DChatChannel {
-        return withIO {
-            val channel = ChannelCacher.mutateChannel(channelId) { ch ->
-                ch.name = newName.trim()
-                ch.version++
-                ch.updatedAt = TimeHelper.now()
-            } ?: throw Exception("Channel not found")
-            if (channel.isOwnedByMe()) {
-                ChannelSystemMessageSender.broadcastUpdate(channel)
-            }
-            channel
-        }
+    suspend fun renameChannel(channelId: String, newName: String): DChatChannel = withIO {
+        val channel = RustChannelStore.action(channelId, "rename", name = newName)
+        ChannelCacher.load()
+        if (channel.isOwnedByMe()) ChannelSystemMessageSender.broadcastUpdate(channel)
+        channel
     }
 
     suspend fun deleteChannel(channelId: String) {
@@ -84,83 +61,40 @@ object ChannelManager {
         }
     }
 
-    suspend fun leaveChannel(channelId: String) {
-        withIO {
-            val existing = ensureChannel(channelId)
-            if (existing.isOwnedByMe()) throw Exception("Owner cannot leave; delete the channel instead")
-
-            val ownerPeer = RustPeerStore.getById(existing.ownerId)
-            val channel = ChannelCacher.mutateChannel(channelId) { ch ->
-                ch.status = ChatChannelStatus.LEFT
-                ch.members = ch.members.filter { it.peerId != TempData.clientId }
-            } ?: throw Exception("Channel not found")
-            if (ownerPeer != null) {
-                ChannelSystemMessageSender.sendLeave(channel.id, ownerPeer)
-            }
-        }
+    suspend fun leaveChannel(channelId: String): Unit = withIO {
+        val channel = RustChannelStore.action(channelId, "leave")
+        ChannelCacher.load()
+        RustPeerStore.getById(channel.ownerId)?.let { ChannelSystemMessageSender.sendLeave(channel.id, it) }
+        Unit
     }
 
-    suspend fun inviteMember(channelId: String, peerId: String): DChatChannel {
-        return withIO {
-            val peer = RustPeerStore.getById(peerId)
-            val channel = ChannelCacher.mutateChannel(channelId) { ch ->
-                if (!ch.isOwnedByMe()) throw Exception("Only owner can add members")
-                if (ch.hasMember(peerId)) throw Exception("Already a member")
-                ch.members += ChannelMember(
-                    peerId = peerId,
-                    status = ChannelMemberStatus.PENDING,
-                )
-                ch.version++
-                ch.updatedAt = TimeHelper.now()
-            } ?: throw Exception("Channel not found")
-
-            if (peer != null) {
-                ChannelSystemMessageSender.sendInvite(channel, peer)
-            }
-            channel
-        }
+    suspend fun inviteMember(channelId: String, peerId: String): DChatChannel = withIO {
+        val channel = RustChannelStore.action(channelId, "invite", peer = peerId)
+        ChannelCacher.load()
+        RustPeerStore.getById(peerId)?.let { ChannelSystemMessageSender.sendInvite(channel, it) }
+        channel
     }
 
-    suspend fun resendInvite(channelId: String, peerId: String) {
-        withIO {
-            val channel = ensureChannel(channelId)
-            if (!channel.isOwnedByMe()) throw Exception("Only owner can resend invites")
-            val member = channel.findMember(peerId) ?: throw Exception("Not a member")
-            if (!member.isPending()) throw Exception("Member is not pending")
-            val peer = PeerCacher.getPeer(peerId)
-                ?: throw Exception("Peer not found")
-            ChannelSystemMessageSender.sendInvite(channel, peer)
-        }
+    suspend fun resendInvite(channelId: String, peerId: String): Unit = withIO {
+        val channel = RustChannelStore.action(channelId, "resend", peer = peerId)
+        ChannelCacher.load()
+        val peer = RustPeerStore.getById(peerId) ?: throw Exception("Peer not found")
+        ChannelSystemMessageSender.sendInvite(channel, peer)
+        Unit
     }
 
-    suspend fun kickMember(channelId: String, peerId: String): DChatChannel {
-        return withIO {
-            val peer = RustPeerStore.getById(peerId)
-            val channel = ChannelCacher.mutateChannel(channelId) { ch ->
-                if (!ch.isOwnedByMe()) throw Exception("Only owner can remove members")
-                if (!ch.hasMember(peerId)) throw Exception("Not a member")
-                ch.members = ch.members.filter { it.peerId != peerId }
-                ch.version++
-                ch.updatedAt = TimeHelper.now()
-            } ?: throw Exception("Channel not found")
-
-            if (peer != null) {
-                ChannelSystemMessageSender.sendKick(channel, peer)
-            }
-            ChannelSystemMessageSender.broadcastUpdate(channel)
-            channel
-        }
+    suspend fun kickMember(channelId: String, peerId: String): DChatChannel = withIO {
+        val channel = RustChannelStore.action(channelId, "kick", peer = peerId)
+        ChannelCacher.load()
+        RustPeerStore.getById(peerId)?.let { ChannelSystemMessageSender.sendKick(channel, it) }
+        ChannelSystemMessageSender.broadcastUpdate(channel)
+        channel
     }
 
-    suspend fun acceptInvite(channelId: String): GraphQLResponse {
-        return withIO {
-            val channel = ensureChannel(channelId)
-            val member = channel.findMember(TempData.clientId)
-                ?: throw Exception("Invite no longer valid")
-            if (!member.isPending()) throw Exception("Invite no longer valid")
-            val ownerPeer = ensureOwner(channel)
-            ChannelSystemMessageSender.sendInviteAccept(channel.id, ownerPeer)
-        }
+    suspend fun acceptInvite(channelId: String): GraphQLResponse = withIO {
+        val channel = RustChannelStore.action(channelId, "accept")
+        ChannelCacher.load()
+        ChannelSystemMessageSender.sendInviteAccept(channel.id, ensureOwner(channel))
     }
 
     suspend fun declineInvite(channelId: String) {

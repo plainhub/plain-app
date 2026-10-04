@@ -152,4 +152,49 @@ class ChatStorageRustHttpTest {
         }
     }
 
+    @Test
+    fun channelCommandsUseRustKeysMembershipAndOwnerRules() = runBlocking {
+        val prefix = "synthetic-channel-state-${UUID.randomUUID()}"
+        val actor = com.ismartcoding.plain.TempData.clientId
+        var created: DChatChannel? = null
+        val peer = DPeer(id = "$prefix-peer", name = prefix, ip = "127.0.0.1", port = 1)
+        val foreign = DChatChannel(id = "$prefix-foreign", name = prefix, ownerId = peer.id, members = listOf(ChannelMember(actor, ChannelMemberStatus.PENDING)))
+        try {
+            val manager = com.ismartcoding.plain.chat.channel.ChannelManager
+            val channel = manager.createChannel("  $prefix  ")
+            created = channel
+            assertEquals(prefix, channel.name)
+            assertEquals(actor, channel.ownerId)
+            assertEquals(32, android.util.Base64.decode(channel.key, android.util.Base64.DEFAULT).size)
+            assertEquals(actor, channel.members.single().peerId)
+            val renamed = manager.renameChannel(channel.id, "  $prefix renamed  ")
+            assertEquals(2L, renamed.version)
+            assertEquals(channel.key, renamed.key)
+            val invited = manager.inviteMember(channel.id, peer.id)
+            assertEquals(3L, invited.version)
+            assertEquals(ChannelMemberStatus.PENDING, invited.members.single { it.peerId == peer.id }.status)
+            try { manager.inviteMember(channel.id, peer.id); fail("Duplicate invitation accepted") } catch (_: Exception) { }
+            try { manager.leaveChannel(channel.id); fail("Owner was allowed to leave") } catch (_: Exception) { }
+            RustPeerStore.insert(peer)
+            assertEquals(3L, RustChannelStore.action(channel.id, "resend", peer = peer.id).version)
+            RustPeerStore.delete(peer.id)
+            val kicked = manager.kickMember(channel.id, peer.id)
+            assertEquals(4L, kicked.version)
+            assertFalse(kicked.members.any { it.peerId == peer.id })
+            RustPeerStore.insert(peer)
+            RustChannelStore.insert(foreign)
+            assertEquals(foreign.id, RustChannelStore.action(foreign.id, "accept").id)
+            RustPeerStore.delete(peer.id)
+            manager.leaveChannel(foreign.id)
+            val left = RustChannelStore.getById(foreign.id)!!
+            assertEquals(ChatChannelStatus.LEFT, left.status)
+            assertFalse(left.members.any { it.peerId == actor })
+        } finally {
+            created?.let { RustChannelStore.remove(it.id) }
+            RustChannelStore.remove(foreign.id)
+            RustPeerStore.delete(peer.id)
+            ChannelCacher.load(); PeerCacher.load(); ChatCacher.load()
+        }
+    }
+
 }

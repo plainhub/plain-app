@@ -9,6 +9,12 @@ import kotlinx.serialization.json.*
 import kotlin.time.Instant
 
 object RustChannelStore {
+    suspend fun create(name: String): DChatChannel = decode(callChatStore("createChannel") { put("actor", com.ismartcoding.plain.TempData.clientId); put("name", name) })
+    suspend fun action(id: String, kind: String, name: String? = null, peer: String? = null): DChatChannel = decode(callChatStore("channelAction") {
+        put("actor", com.ismartcoding.plain.TempData.clientId); put("id", id); put("operation", buildJsonObject {
+            put("kind", kind); name?.let { put("name", it) }; peer?.let { put("peer", it) }
+        })
+    })
     suspend fun getAll(): List<DChatChannel> = callChatStore("channels").jsonArray.map(::decode)
     suspend fun getById(id: String): DChatChannel? = callChatStore("channel") { put("id", id) }.takeUnless { it is JsonNull }?.let(::decode)
     suspend fun insert(vararg item: DChatChannel) { save(item.toList(), "INSERT") }
