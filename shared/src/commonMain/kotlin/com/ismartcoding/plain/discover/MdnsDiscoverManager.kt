@@ -1,7 +1,6 @@
 package com.ismartcoding.plain.discover
 
 import com.ismartcoding.plain.TempData
-import com.ismartcoding.plain.chat.peer.PeerManager
 import com.ismartcoding.plain.chat.peer.PeerStatusManager
 import com.ismartcoding.plain.data.DNearbyDevice
 import com.ismartcoding.plain.enums.DeviceType
@@ -17,7 +16,6 @@ import com.ismartcoding.plain.lib.mdns.MdnsServiceBrowser
 import com.ismartcoding.plain.lib.mdns.MdnsServiceInfo
 import com.ismartcoding.plain.lib.mdns.PLAINAPP_SERVICE_TYPE
 import com.ismartcoding.plain.lib.sendEvent
-import com.ismartcoding.plain.ui.models.NearbyViewModel
 
 /** Installs platform-supplied data the shared-lib mDNS stack needs (iOS interfaces). */
 internal expect fun ensureMdnsInterfacesInstalled()
@@ -72,7 +70,7 @@ object MdnsDiscoverManager {
     /**
      * Triggers an immediate one-shot mDNS PTR browse. Responses for a paired
      * peer refresh its IP/port via
-     * [PeerManager.applyDeviceDiscovered]
+     * [RustNearbyDevices.seen]
      * (which also bumps `updatedAt`), letting
      * [PeerStatusManager.reconnectPeer] detect
      * whether the reply arrived within its wait window.
@@ -104,10 +102,6 @@ object MdnsDiscoverManager {
     }
 
     private fun handleFoundDevice(device: MdnsFoundDevice) {
-        // Skip our own looped-back announcements (multicast loop is enabled on
-        // purpose so multiple same-device sockets keep working) instead of
-        // emitting this device into the nearby list / peer tables.
-        if (device.id == TempData.clientId) return
         val deviceType = runCatching { DeviceType.valueOf(device.deviceType) }
             .getOrDefault(DeviceType.OTHER)
         val d = DNearbyDevice(
@@ -122,22 +116,9 @@ object MdnsDiscoverManager {
             discoveryMethods = setOf(DiscoveryMethod.LAN),
         )
         coIO {
-            // History cache: every sighting is persisted regardless of page
-            // state, so the nearby page can render instantly from history.
-            NearbyDeviceCache.upsertAsync(d)
-            // Resident-listener path: always refresh a paired peer's address so a
-            // changed IP is picked up by the next reconnect attempt even while
-            // the nearby scan loop is off.
-            PeerManager.applyDeviceDiscovered(
-                deviceId = d.id,
-                ips = d.ips,
-                port = d.port,
-                name = d.name,
-                deviceType = d.deviceType,
-            )
-            // Scan-gated path: nearby-list events only fire while discovery runs.
+            if (!RustNearbyDevices.seen(d, visible = MdnsServiceBrowser.isRunning, resident = true)) return@coIO
+            com.ismartcoding.plain.chat.peer.PeerCacher.load()
             if (!MdnsServiceBrowser.isRunning) return@coIO
-            NearbyViewModel.handleNewDevice(d)
             PeerStatusManager.setOnline(d.id, true)
         }
     }
