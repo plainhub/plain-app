@@ -45,9 +45,7 @@ object PairingCore {
         )
     }
 
-    fun formatMessage(type: NearbyMessageType, json: String): String {
-        return "${type.toPrefix()}$json"
-    }
+    suspend fun formatMessage(type: NearbyMessageType, json: String): String = RustNearbyWire.encode(type, json)
 
     fun replyToDevice(reply: DDiscoverReply, bleClient: BleGattClient? = null): DNearbyDevice {
         return DNearbyDevice(

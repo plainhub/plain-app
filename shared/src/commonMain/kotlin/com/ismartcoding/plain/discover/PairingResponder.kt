@@ -54,7 +54,7 @@ object PairingResponder {
         }
     }
 
-    private fun sendResponseViaBle(fromId: String, fromName: String, response: DPairingResponse) {
+    private suspend fun sendResponseViaBle(fromId: String, fromName: String, response: DPairingResponse) {
         val mac = BlePairingSessionStore.get(fromId)
         if (mac == null) {
             LogCat.e("sendResponseViaBle: no stored MAC for $fromId")

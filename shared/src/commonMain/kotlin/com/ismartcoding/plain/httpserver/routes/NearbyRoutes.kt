@@ -1,5 +1,6 @@
 package com.ismartcoding.plain.httpserver.routes
 
+import com.ismartcoding.plain.discover.RustNearbyWire
 import com.ismartcoding.plain.discover.PairingCore
 import com.ismartcoding.plain.enums.NearbyMessageType
 import com.ismartcoding.plain.lib.JsonHelper
@@ -15,12 +16,11 @@ import com.ismartcoding.plain.lib.logcat.LogCat
 fun HttpRouter.addNearbyRoutes() {
     post("/nearby") { call ->
         val body = call.receiveText()
-        val type = NearbyMessageType.entries.firstOrNull { body.startsWith(it.toPrefix()) } ?: run {
-            LogCat.e("NearbyRoutes: unknown message type, body=${body.take(50)}")
+        val message = RustNearbyWire.parse(body) ?: run {
             call.respondText("unknown message type", status = HttpStatus.BAD_REQUEST)
             return@post
         }
-        val payload = body.removePrefix(type.toPrefix())
+        val (type, payload) = message
         LogCat.d("NearbyRoutes: type=$type from=${call.remoteHost}")
 
         when (type) {

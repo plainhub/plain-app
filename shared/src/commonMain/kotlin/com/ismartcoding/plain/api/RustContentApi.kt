@@ -96,6 +96,7 @@ object RustContentApi {
                 eventClient.webSocket(localSession!!.baseUrl.replace("http://", "ws://") + "/events", localSession!!.headers()) { socket ->
                     retryMs = 500L
                     com.ismartcoding.plain.chat.download.DownloadQueue.refresh()
+                    com.ismartcoding.plain.discover.PairingProjection.reconcile()
                     for (frame in socket.incoming) {
                         frame.binary?.let { bytes ->
                             if (bytes.size >= 4) {
@@ -111,6 +112,7 @@ object RustContentApi {
                         val type = message.getValue("type").jsonPrimitive.int
                         val payload = message.getValue("payload").jsonPrimitive.content
                         when (type) {
+                            EventType.PAIRING_FAILED.value -> com.ismartcoding.plain.discover.PairingProjection.timeout(payload)
                             EventType.MESSAGE_UPDATED.value -> {
                                 val items = Json.parseToJsonElement(payload).jsonArray.mapNotNull { value ->
                                     com.ismartcoding.plain.chat.RustChatStore.getById(value.jsonObject.getValue("id").jsonPrimitive.content)

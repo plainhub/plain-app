@@ -2,6 +2,7 @@ package com.ismartcoding.plain.ble.server
 
 import com.ismartcoding.plain.ble.BleRequestData
 import com.ismartcoding.plain.ble.BleUuids
+import com.ismartcoding.plain.discover.RustNearbyWire
 import com.ismartcoding.plain.discover.PairingCore
 import com.ismartcoding.plain.enums.NearbyMessageType
 import com.ismartcoding.plain.lib.JsonHelper
@@ -12,11 +13,10 @@ class NearbyServiceHandler : BleServiceHandler {
 
     override suspend fun handleRequest(requestData: BleRequestData, clientMac: String): String? {
         val body = requestData.body
-        val type = NearbyMessageType.entries.firstOrNull { body.startsWith(it.toPrefix()) } ?: run {
-            LogCat.e("NearbyServiceHandler: unknown message type, body=${body.take(50)}")
+        val message = RustNearbyWire.parse(body) ?: run {
             return null
         }
-        val payload = body.removePrefix(type.toPrefix())
+        val (type, payload) = message
         LogCat.d("NearbyServiceHandler: type=$type from=$clientMac")
 
         return when (type) {

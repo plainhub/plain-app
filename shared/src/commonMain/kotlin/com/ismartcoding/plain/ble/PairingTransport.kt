@@ -10,6 +10,7 @@ import com.ismartcoding.plain.data.DPairingResponse
 import com.ismartcoding.plain.chat.peer.PeerCacher
 import com.ismartcoding.plain.discover.DDiscoverReply
 import com.ismartcoding.plain.discover.PairingCore
+import com.ismartcoding.plain.discover.RustNearbyWire
 import com.ismartcoding.plain.enums.NearbyMessageType
 import com.ismartcoding.plain.lib.JsonHelper
 import com.ismartcoding.plain.lib.TimeHelper
@@ -122,7 +123,7 @@ object PairingTransport {
             }
             val json = result.value as? String ?: return null
             if (json.isEmpty()) return null
-            JsonHelper.jsonDecode<DDiscoverReply>(json)
+            RustNearbyWire.discoverReply(json, device.id)
         } catch (e: Exception) {
             LogCat.e("[BLE] readDiscoverReply error: ${e.message}")
             null
@@ -153,7 +154,6 @@ object PairingTransport {
 
             val (request, started) = PairingCore.startPairingSession(device, deviceIp = "")
             ticket = started
-            PairingInitiator.awaitPairResponse(started)
             val body = PairingCore.formatMessage(NearbyMessageType.PAIR_REQUEST, JsonHelper.jsonEncode(request))
             LogCat.d("BLE pairViaBle: sending request to ${device.name}")
 
@@ -204,8 +204,9 @@ object PairingTransport {
             val remaining = timeoutMs - (TimeHelper.nowMillis() - startTime)
             if (remaining <= 0) return null
             val notification = bleDevice.waitForNotification(BleServices.nearby, remaining) ?: return null
-            if (notification.startsWith(NearbyMessageType.PAIR_RESPONSE.toPrefix())) {
-                return notification.removePrefix(NearbyMessageType.PAIR_RESPONSE.toPrefix())
+            val message = RustNearbyWire.parse(notification)
+            if (message?.first == NearbyMessageType.PAIR_RESPONSE) {
+                return message.second
             }
             LogCat.d("BLE pairViaBle: ignoring non-PAIR_RESPONSE notification: ${notification.take(20)}")
         }

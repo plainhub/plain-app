@@ -12,6 +12,7 @@ import com.ismartcoding.plain.preferences.UserPrefs
 import kotlinx.serialization.json.*
 
 object RustPairingStore {
+    suspend fun tickets(): List<DPairingTicket> = callChatStore("pairingTickets") {}.jsonArray.map(::ticket)
     private fun device() = buildJsonObject {
         put("name", TempData.deviceName.value)
         put("port", UserPrefs.httpsPort.value)

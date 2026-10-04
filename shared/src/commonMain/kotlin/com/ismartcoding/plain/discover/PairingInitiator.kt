@@ -15,14 +15,12 @@ import com.ismartcoding.plain.ui.models.NearbyViewModel
 import kotlinx.coroutines.*
 
 object PairingInitiator {
-    private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
 
     suspend fun start(device: DNearbyDevice) = withIO {
         var ticket: DPairingTicket? = null
         try {
             val (request, started) = PairingCore.startPairingSession(device, getBestIp(device.ips))
             ticket = started
-            awaitPairResponse(started)
             if (PairingMessenger.sendRequest(request, started.deviceIp, started.devicePort)) {
                 NearbyViewModel.onPairingRequestSent(device.id)
                 sendEvent(WebSocketEvent(EventType.PAIRING_STARTED, JsonHelper.jsonEncode(DPairingResult(deviceId = device.id, deviceName = device.name))))
@@ -37,15 +35,6 @@ object PairingInitiator {
             val started = ticket
             if (started == null) PairingCore.notifyFailed(device.id, device.name, "Failed to send pairing request")
             else fail(started, "Failed to send pairing request")
-        }
-    }
-
-    fun awaitPairResponse(ticket: DPairingTicket) {
-        scope.launch {
-            delay(ticket.delayMs)
-            try {
-                RustPairingStore.expire(ticket)?.let { PairingCore.notifyFailed(it.deviceId, it.deviceName, "Pairing timed out") }
-            } catch (e: Exception) { LogCat.e("Pairing timeout check failed: ${e.message}") }
         }
     }
 
