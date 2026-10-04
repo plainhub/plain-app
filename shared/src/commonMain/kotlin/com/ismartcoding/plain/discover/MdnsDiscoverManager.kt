@@ -13,8 +13,6 @@ import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.lib.mdns.MdnsFoundDevice
 import com.ismartcoding.plain.lib.mdns.MdnsHostResponder
 import com.ismartcoding.plain.lib.mdns.MdnsServiceBrowser
-import com.ismartcoding.plain.lib.mdns.MdnsServiceInfo
-import com.ismartcoding.plain.lib.mdns.PLAINAPP_SERVICE_TYPE
 import com.ismartcoding.plain.lib.sendEvent
 
 /** Installs platform-supplied data the shared-lib mDNS stack needs (iOS interfaces). */
@@ -62,7 +60,7 @@ object MdnsDiscoverManager {
     fun updateAdvertisedService() {
         coIO {
             MdnsHostResponder.updateService(
-                buildMdnsServiceInfo(PairingCore.buildDiscoverReply(), TempData.mdnsHostname)
+                RustDiscoveryAdvertisement.mdns()
             )
         }
     }
@@ -123,24 +121,3 @@ object MdnsDiscoverManager {
         }
     }
 }
-
-/**
- * Builds the advertised mDNS service for this device from a discovery reply.
- * TXT keys mirror [DDiscoverReply] fields (see design doc §4.1).
- */
-internal fun buildMdnsServiceInfo(reply: DDiscoverReply, hostname: String): MdnsServiceInfo =
-    MdnsServiceInfo(
-        instanceName = reply.name,
-        serviceType = PLAINAPP_SERVICE_TYPE,
-        targetHostname = hostname,
-        port = reply.port,
-        txtRecords = listOf(
-            "id=${reply.id}",
-            "dv=${reply.deviceType.name}",
-            "ver=${reply.version}",
-            "pf=${reply.platform}",
-            "aw=${if (reply.awareSupported) "1" else "0"}",
-            "ar=${if (reply.awareRunning) "1" else "0"}",
-        ),
-        ips = reply.ips,
-    )

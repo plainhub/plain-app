@@ -79,7 +79,7 @@ actual suspend fun stopHttpEngineAsync(): Unit = withIO {
 //   on reconnect (see onWebSocketSessionStarted).
 actual suspend fun onHttpServerStarted() {
     val service = HttpServerService.instance ?: return
-    NsdHelper.registerServices(UserPrefs.httpPort.value, UserPrefs.httpsPort.value)
+    NsdHelper.registerServices()
     PNotificationListenerService.toggle(service, Permission.NOTIFICATION_LISTENER.isEnabledAsync())
     SmsProviderObserver.start(service)
     ClipboardWatcher.start()

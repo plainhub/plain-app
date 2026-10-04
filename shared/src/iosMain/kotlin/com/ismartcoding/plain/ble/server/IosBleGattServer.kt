@@ -2,21 +2,22 @@
 
 package com.ismartcoding.plain.ble.server
 
-import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.ble.BleSegmentData
-import com.ismartcoding.plain.ble.BleServiceData
+import com.ismartcoding.plain.discover.RustDiscoveryAdvertisement
 import com.ismartcoding.plain.ble.BleUuids
 import com.ismartcoding.plain.lib.JsonHelper
 import com.ismartcoding.plain.lib.toByteArray
 import com.ismartcoding.plain.lib.toNSData
 import com.ismartcoding.plain.lib.logcat.LogCat
-import com.ismartcoding.plain.platform.isWifiAwareSupported
 import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.isActive
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withTimeoutOrNull
 import platform.CoreBluetooth.CBATTErrorSuccess
@@ -48,6 +49,7 @@ class IosBleGattServer : BleGattServer {
     private val characteristics = mutableMapOf<String, CBMutableCharacteristic>()
     private var serviceAdded = false
     private var advertising = false
+    private var advertisingJob: Job? = null
 
     /**
      * Notification chunk size for response delivery. Matches the request
@@ -58,33 +60,35 @@ class IosBleGattServer : BleGattServer {
     private val notifyAckTimeoutMs = 10_000L
 
     override fun start() {
-        if (peripheralManager != null) return
-        val del = PeripheralManagerDelegate(this)
-        delegate = del
-        peripheralManager = CBPeripheralManager(del, null)
+        scope.launch(Dispatchers.Main.immediate) {
+            if (peripheralManager != null) return@launch
+            val del = PeripheralManagerDelegate(this@IosBleGattServer)
+            delegate = del
+            peripheralManager = CBPeripheralManager(del, null)
+        }
     }
 
     override fun stop() {
-        val manager = peripheralManager ?: return
-        if (advertising) {
+        scope.launch(Dispatchers.Main.immediate) {
+            advertisingJob?.cancel()
+            advertisingJob = null
+            val manager = peripheralManager ?: return@launch
             manager.stopAdvertising()
             advertising = false
+            if (serviceAdded) { manager.removeAllServices(); serviceAdded = false }
+            peripheralManager = null
+            delegate = null
+            characteristics.clear()
         }
-        if (serviceAdded) {
-            manager.removeAllServices()
-            serviceAdded = false
-        }
-        peripheralManager = null
-        delegate = null
-        characteristics.clear()
     }
 
     override fun refreshAdvertising() {
-        val manager = peripheralManager ?: return
-        if (advertising) {
+        scope.launch(Dispatchers.Main.immediate) {
+            val manager = peripheralManager ?: return@launch
             manager.stopAdvertising()
+            advertising = false
+            startAdvertising(manager)
         }
-        startAdvertising(manager)
     }
 
     override fun sendNotification(mac: String, charUuid: String, value: String): Boolean {
@@ -164,22 +168,21 @@ class IosBleGattServer : BleGattServer {
     }
 
     private fun startAdvertising(manager: CBPeripheralManager) {
-        val payload = BleServiceData.encode(
-            awareSupported = isWifiAwareSupported,
-            awareRunning = TempData.awareRunning.value,
-            clientId = TempData.clientId,
-        )
-        val serviceDataMap: Map<Any?, Any?> = mapOf(
-            CBUUID.UUIDWithString(BleUuids.SERVICE_UUID) to payload.toNSData(),
-        )
-        val advertisingData = mapOf<Any?, Any?>(
-            platform.CoreBluetooth.CBAdvertisementDataServiceUUIDsKey to
-                listOf(CBUUID.UUIDWithString(BleUuids.SERVICE_UUID)),
-            platform.CoreBluetooth.CBAdvertisementDataServiceDataKey to serviceDataMap,
-        )
-        manager.startAdvertising(advertisingData)
-        advertising = true
-        LogCat.d("BLE GATT server advertising started (clientId=${TempData.clientId})")
+        advertisingJob?.cancel()
+        advertisingJob = scope.launch(Dispatchers.Main.immediate) {
+            try {
+                val payload = RustDiscoveryAdvertisement.ble()
+                if (!isActive || peripheralManager !== manager) return@launch
+                val uuid = CBUUID.UUIDWithString(BleUuids.SERVICE_UUID)
+                val serviceDataMap: Map<Any?, Any?> = mapOf(uuid to payload.toNSData())
+                manager.startAdvertising(mapOf<Any?, Any?>(
+                    platform.CoreBluetooth.CBAdvertisementDataServiceUUIDsKey to listOf(uuid),
+                    platform.CoreBluetooth.CBAdvertisementDataServiceDataKey to serviceDataMap,
+                ))
+                advertising = true
+            } catch (cancelled: CancellationException) { throw cancelled }
+            catch (error: Exception) { LogCat.e("BLE advertise error: ${error.message}") }
+        }
     }
 
     internal fun onManagerReady() {

@@ -1,7 +1,5 @@
 package com.ismartcoding.plain.discover
 
-import com.ismartcoding.plain.preferences.UserPrefs
-import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.ble.client.BleGattClient
 import com.ismartcoding.plain.data.DNearbyDevice
 import com.ismartcoding.plain.data.DPairingCancel
@@ -16,32 +14,12 @@ import com.ismartcoding.plain.events.WebSocketEvent
 import com.ismartcoding.plain.lib.JsonHelper
 import com.ismartcoding.plain.lib.TimeHelper
 import com.ismartcoding.plain.lib.sendEvent
-import com.ismartcoding.plain.platform.getAppVersion
-import com.ismartcoding.plain.platform.getDeviceIP4s
-import com.ismartcoding.plain.platform.getDeviceName
-import com.ismartcoding.plain.platform.getDeviceType
-import com.ismartcoding.plain.platform.getPlatformName
-import com.ismartcoding.plain.platform.isWifiAwareSupported
 import com.ismartcoding.plain.ui.models.NearbyViewModel
 import kotlinx.serialization.json.jsonObject
 
 object PairingCore {
 
     // ---- Discovery ----------------------------------------------------------
-
-    fun buildDiscoverReply(): DDiscoverReply {
-        return DDiscoverReply(
-            id = TempData.clientId,
-            name = TempData.deviceName.value.ifEmpty { getDeviceName() },
-            deviceType = getDeviceType(),
-            port = UserPrefs.httpsPort.value,
-            version = getAppVersion(),
-            platform = getPlatformName(),
-            ips = getDeviceIP4s(),
-            awareSupported = isWifiAwareSupported,
-            awareRunning = TempData.awareRunning.value,
-        )
-    }
 
     suspend fun formatMessage(type: NearbyMessageType, json: String): String = RustNearbyWire.encode(type, json)
 

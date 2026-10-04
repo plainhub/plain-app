@@ -1,43 +1,38 @@
 package com.ismartcoding.plain.mdns
 
 import com.ismartcoding.plain.lib.logcat.LogCat
-import com.ismartcoding.plain.TempData
-import com.ismartcoding.plain.discover.PairingCore
-import com.ismartcoding.plain.discover.buildMdnsServiceInfo
+import com.ismartcoding.plain.discover.RustDiscoveryAdvertisement
 import com.ismartcoding.plain.lib.mdns.MdnsHostResponder
 import java.util.concurrent.atomic.AtomicBoolean
 
 object NsdHelper {
     // Prevents concurrent starts from racing multicast lock/socket lifecycle.
     private val registering = AtomicBoolean(false)
+    private val serviceLock = Any()
+    private var generation = 0L
 
     /**
      * Start mDNS hostname responder for the active web service.
      */
-    fun registerServices(httpPort: Int?, httpsPort: Int?): Boolean {
+    suspend fun registerServices(): Boolean {
         if (!registering.compareAndSet(false, true)) {
             LogCat.d("registerServices already in progress, skipping")
             return false
         }
         try {
-            return registerServicesInternal(httpPort, httpsPort)
+            return registerServicesInternal()
         } finally {
             registering.set(false)
         }
     }
 
-    private fun registerServicesInternal(httpPort: Int?, httpsPort: Int?): Boolean {
-        unregisterService()
-
-        val hasAnyPort = (httpPort != null && httpPort > 0) || (httpsPort != null && httpsPort > 0)
-        if (!hasAnyPort) {
-            LogCat.e("No active web service port, skip mDNS responder start")
-            return false
+    private suspend fun registerServicesInternal(): Boolean {
+        val expected = synchronized(serviceLock) { unregisterService(); generation }
+        val service = RustDiscoveryAdvertisement.mdns()
+        val hostname = service.targetHostname
+        return synchronized(serviceLock) {
+            if (generation != expected) false else MdnsHostResponder.start(hostname, service)
         }
-
-        val hostname = TempData.mdnsHostname
-        val service = buildMdnsServiceInfo(PairingCore.buildDiscoverReply(), hostname)
-        return MdnsHostResponder.start(hostname, service)
     }
 
     /**
@@ -46,6 +41,9 @@ object NsdHelper {
      * NOT a full stop — see [MdnsHostResponder.clearService].
      */
     fun unregisterService() {
-        MdnsHostResponder.clearService()
+        synchronized(serviceLock) {
+            generation++
+            MdnsHostResponder.clearService()
+        }
     }
 }

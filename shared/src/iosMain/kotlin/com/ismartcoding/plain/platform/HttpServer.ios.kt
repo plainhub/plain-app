@@ -2,15 +2,13 @@ package com.ismartcoding.plain.platform
 
 import com.ismartcoding.plain.preferences.*
 
-import com.ismartcoding.plain.TempData
-import com.ismartcoding.plain.discover.PairingCore
 import com.ismartcoding.plain.discover.ensureMdnsInterfacesInstalled
 import com.ismartcoding.plain.lib.coIO
 import com.ismartcoding.plain.lib.withIO
 import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.lib.mdns.MdnsHostResponder
 import com.ismartcoding.plain.lib.toByteArray
-import com.ismartcoding.plain.discover.buildMdnsServiceInfo
+import com.ismartcoding.plain.discover.RustDiscoveryAdvertisement
 import com.ismartcoding.plain.httpserver.HttpServerManager
 import platform.Foundation.NSFileManager
 import platform.Foundation.NSString
@@ -18,15 +16,7 @@ import platform.Foundation.NSURL
 import platform.Foundation.NSUTF8StringEncoding
 import platform.Foundation.create
 
-/**
- * iOS implementation of the HTTP server platform contract, backed by the
- * SwiftNIO server living in the iosApp Swift target.
- *
- * Only the lowest-level engine lifecycle (start/stop the SwiftNIO bridge) and
- * the SSL cert provider live here; all business logic (state transitions,
- * retry, health probing, error formatting, event emission) is shared in
- * commonMain's [startHttpServerAsync] / [stopHttpServerCoreAsync].
- */
+// OS hooks for the Rust HTTP server and user certificate import.
 
 actual fun getSSLSignature(password: String): ByteArray = RustTlsCertificate.signature()
 
@@ -82,14 +72,8 @@ actual suspend fun stopHttpEngineAsync() = com.ismartcoding.plain.httpserver.Rus
 /** No platform side effects on iOS once the server is healthy. */
 actual suspend fun onHttpServerStarted() {
     ensureMdnsInterfacesInstalled()
-    // Start mDNS hostname responder so peers can discover this device via its .local name.
-    val httpPort = UserPrefs.httpPort.value
-    val httpsPort = UserPrefs.httpsPort.value
-    if (httpPort > 0 || httpsPort > 0) {
-        val hostname = TempData.mdnsHostname
-        val service = buildMdnsServiceInfo(PairingCore.buildDiscoverReply(), hostname)
-        MdnsHostResponder.start(hostname, service)
-    }
+    val service = RustDiscoveryAdvertisement.mdns()
+    MdnsHostResponder.start(service.targetHostname, service)
 }
 
 /** iOS has no Android SMS send-result state to replay. */

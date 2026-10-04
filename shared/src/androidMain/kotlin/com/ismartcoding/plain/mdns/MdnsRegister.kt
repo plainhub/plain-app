@@ -82,10 +82,7 @@ class MdnsRegister(
 
             LogCat.d("mDNS re-register ($reason): $freshIfaces")
             runCatching {
-                NsdHelper.registerServices(
-                    httpPort = if (httpOk) httpPort else null,
-                    httpsPort = if (httpsOk) httpsPort else null,
-                )
+                NsdHelper.registerServices()
             }
                 .onSuccess { ok ->
                     if (ok) {

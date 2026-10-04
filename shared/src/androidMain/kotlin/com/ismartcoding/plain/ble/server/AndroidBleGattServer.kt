@@ -14,18 +14,19 @@ import android.bluetooth.le.AdvertiseSettings
 import android.bluetooth.le.BluetoothLeAdvertiser
 import android.content.Context
 import android.os.ParcelUuid
-import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.appContext
 import com.ismartcoding.plain.ble.BleSegmentData
-import com.ismartcoding.plain.ble.BleServiceData
+import com.ismartcoding.plain.discover.RustDiscoveryAdvertisement
 import com.ismartcoding.plain.ble.BleUuids
 import com.ismartcoding.plain.lib.JsonHelper
 import com.ismartcoding.plain.lib.logcat.LogCat
-import com.ismartcoding.plain.platform.isWifiAwareSupported
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.isActive
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withTimeoutOrNull
 import java.util.UUID
@@ -39,6 +40,8 @@ class AndroidBleGattServer : BleGattServer {
     private val bluetoothManager get() =
         appContext.getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
 
+    private val advertisingLock = Any()
+    private var advertisingJob: Job? = null
     private var advertiser: BluetoothLeAdvertiser? = null
     private var gattServer: BluetoothGattServer? = null
     private val connectedDevices = ConcurrentHashMap<String, android.bluetooth.BluetoothDevice>()
@@ -59,14 +62,20 @@ class AndroidBleGattServer : BleGattServer {
 
     override fun start() {
         val adapter = bluetoothManager.adapter ?: return
-        advertiser = adapter.bluetoothLeAdvertiser ?: return
-        startAdvertising()
+        synchronized(advertisingLock) {
+            advertiser = adapter.bluetoothLeAdvertiser ?: return
+            startAdvertising()
+        }
         openGattServer()
     }
 
     override fun stop() {
-        advertiser?.stopAdvertising(advertiseCallback)
-        advertiser = null
+        synchronized(advertisingLock) {
+            advertisingJob?.cancel()
+            advertisingJob = null
+            advertiser?.stopAdvertising(advertiseCallback)
+            advertiser = null
+        }
         try {
             gattServer?.close()
         } catch (_: Exception) {
@@ -75,8 +84,10 @@ class AndroidBleGattServer : BleGattServer {
     }
 
     override fun refreshAdvertising() {
-        advertiser?.stopAdvertising(advertiseCallback)
-        startAdvertising()
+        synchronized(advertisingLock) {
+            advertiser?.stopAdvertising(advertiseCallback)
+            startAdvertising()
+        }
     }
 
     @Suppress("DEPRECATION")
@@ -101,47 +112,25 @@ class AndroidBleGattServer : BleGattServer {
     }
 
     private fun startAdvertising() {
-        val settings = AdvertiseSettings.Builder()
-            .setAdvertiseMode(AdvertiseSettings.ADVERTISE_MODE_LOW_LATENCY)
-            .setConnectable(true)
-            .setTimeout(0)
-            .build()
-        // Do NOT include the device name in the advertising packet — on some
-        // devices (e.g. Pixel 9 / Android 17) the system adds extra bytes
-        // (TX power, flags) that push the total past the 31-byte limit,
-        // causing ADVERTISE_FAILED_DATA_TOO_LARGE (error code 1). The peer's
-        // display name is fetched later via the GATT DISCOVER reply, so it
-        // is not needed here. Keeping only the service UUID keeps the
-        // advertising packet minimal and compatible with the ScanFilter.
-        val data = AdvertiseData.Builder()
-            .setIncludeDeviceName(false)
-            .addServiceUuid(ParcelUuid(UUID.fromString(BleUuids.SERVICE_UUID)))
-            .build()
-        val scanResponse = AdvertiseData.Builder()
-            .addServiceData(
-                ParcelUuid(UUID.fromString(BleUuids.SERVICE_UUID)),
-                buildServiceData(),
-            )
-            .build()
-        try {
-            advertiser?.startAdvertising(settings, data, scanResponse, advertiseCallback)
-        } catch (e: Exception) {
-            LogCat.e("GATT advertise error: ${e.message}")
+        val target = advertiser ?: return
+        advertisingJob?.cancel()
+        advertisingJob = scope.launch {
+            try {
+                val payload = RustDiscoveryAdvertisement.ble()
+                synchronized(advertisingLock) {
+                    if (!isActive || advertiser !== target) return@launch
+                    val settings = AdvertiseSettings.Builder()
+                        .setAdvertiseMode(AdvertiseSettings.ADVERTISE_MODE_LOW_LATENCY)
+                        .setConnectable(true).setTimeout(0).build()
+                    val uuid = ParcelUuid(UUID.fromString(BleUuids.SERVICE_UUID))
+                    val data = AdvertiseData.Builder().setIncludeDeviceName(false).addServiceUuid(uuid).build()
+                    val scanResponse = AdvertiseData.Builder().addServiceData(uuid, payload).build()
+                    target.startAdvertising(settings, data, scanResponse, advertiseCallback)
+                }
+            } catch (cancelled: CancellationException) { throw cancelled }
+            catch (error: Exception) { LogCat.e("GATT advertise error: ${error.message}") }
         }
     }
-
-    /**
-     * Builds the scan response serviceData payload: byte[0] = aware flags,
-     * byte[1..8] = SHA256(clientId)[0:8]. Total 9 bytes — well within the
-     * 31-byte BLE limit (full entry = 1 len + 1 type + 16 UUID + 9 = 27 bytes).
-     * See [BleServiceData] for the wire format.
-     */
-    private fun buildServiceData(): ByteArray =
-        BleServiceData.encode(
-            awareSupported = isWifiAwareSupported,
-            awareRunning = TempData.awareRunning.value,
-            clientId = TempData.clientId,
-        )
 
     private fun openGattServer() {
         val server = try {

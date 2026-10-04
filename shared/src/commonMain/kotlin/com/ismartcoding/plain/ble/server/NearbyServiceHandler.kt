@@ -21,7 +21,7 @@ class NearbyServiceHandler : BleServiceHandler {
 
         return when (type) {
             NearbyMessageType.DISCOVER ->
-                JsonHelper.jsonEncode(PairingCore.buildDiscoverReply())
+                com.ismartcoding.plain.discover.RustDiscoveryAdvertisement.replyJson().toString()
 
             NearbyMessageType.DISCOVER_REPLY -> null
 
