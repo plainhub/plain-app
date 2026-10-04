@@ -1,8 +1,6 @@
 package com.ismartcoding.plain.chat
 
-import com.ismartcoding.plain.chat.channel.RustChannelStore
 
-import com.ismartcoding.plain.chat.peer.RustPeerStore
 import com.ismartcoding.plain.platform.canShowNotifications
 
 import com.ismartcoding.plain.lib.withIO
@@ -12,7 +10,6 @@ import com.ismartcoding.plain.chat.data.ChatTargetType
 import com.ismartcoding.plain.chat.download.DownloadQueue
 import com.ismartcoding.plain.db.DChat
 import com.ismartcoding.plain.db.DChatChannel
-import com.ismartcoding.plain.db.DMessageContent
 import com.ismartcoding.plain.db.DMessageFiles
 import com.ismartcoding.plain.db.DMessageImages
 import com.ismartcoding.plain.db.MessageType
@@ -22,7 +19,6 @@ import com.ismartcoding.plain.events.EventType
 import com.ismartcoding.plain.events.FetchLinkPreviewsEvent
 import com.ismartcoding.plain.events.ChatMessageNotificationEvent
 import com.ismartcoding.plain.events.WebSocketEvent
-import com.ismartcoding.plain.enums.ChatChannelStatus
 import com.ismartcoding.plain.platform.LocaleHelper
 import com.ismartcoding.plain.lib.JsonHelper
 import com.ismartcoding.plain.i18n.Res
@@ -30,48 +26,20 @@ import com.ismartcoding.plain.i18n.peer_chat
 import com.ismartcoding.plain.lib.sendEvent
 import com.ismartcoding.plain.httpserver.models.ChatItem
 import com.ismartcoding.plain.httpserver.models.dchatToModel
-import kotlinx.coroutines.sync.Mutex
-import kotlinx.coroutines.sync.withLock
 
 object ChatMessageReceiver {
 
-    private val seenSignaturesMutex = Mutex()
-    private val seenSignatures = mutableSetOf<String>()
-
     suspend fun receive(
         fromPeerId: String,
-        content: DMessageContent,
+        content: String,
         fromChannelId: String = "",
-        signature: String = "",
-        timestamp: Long = 0L,
-    ): DChat = withIO {
-        if (signature.isNotEmpty() && timestamp > 0L) {
-            val key = "$fromPeerId|$signature|$timestamp"
-            val isReplay = seenSignaturesMutex.withLock { !seenSignatures.add(key) }
-            if (isReplay) {
-                throw ReplayedMessageException(fromPeerId, timestamp)
-            }
-        }
-
-        val fromPeer = RustPeerStore.getById(fromPeerId)
-            ?: throw Exception("invalid peer")
-
-        val fromChannel: DChatChannel? = if (fromChannelId.isNotEmpty()) {
-            val ch = RustChannelStore.getById(fromChannelId)
-                ?: throw IllegalStateException("Unknown channel")
-            if (ch.status != ChatChannelStatus.JOINED) {
-                throw IllegalStateException("Channel not joined")
-            }
-            ch
-        } else null
-
-        val item = ChatDbHelper.insertChatItem(
-            message = content,
-            fromId = fromPeerId,
-            toId = if (fromChannelId.isEmpty()) "me" else "",
-            channelId = fromChannelId,
-            isRemote = false,
-        )
+        signature: String,
+        timestamp: Long,
+    ): DChat? = withIO {
+        val received = RustChatStore.receive(fromPeerId, fromChannelId, content, signature, timestamp) ?: return@withIO null
+        val item = received.chat
+        val fromPeer = received.peer
+        val fromChannel = received.channel
 
         if (item.content.type == MessageType.TEXT) {
             sendEvent(FetchLinkPreviewsEvent(item))
@@ -149,6 +117,3 @@ private data class NotificationPayload(
     val targetName: String,
     val messageText: String,
 )
-
-class ReplayedMessageException(val fromPeerId: String, val timestamp: Long) :
-    Exception("Replayed message from $fromPeerId at $timestamp")

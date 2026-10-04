@@ -3,10 +3,8 @@ package com.ismartcoding.plain.httpserver.peerschemas
 import com.ismartcoding.plain.chat.peer.RustPeerStore
 
 import com.ismartcoding.plain.chat.ChatMessageReceiver
-import com.ismartcoding.plain.chat.ReplayedMessageException
 import com.ismartcoding.plain.chat.channel.ChannelSystemMessageReceiver
 import com.ismartcoding.plain.enums.ChannelSystemMessageType
-import com.ismartcoding.plain.db.DChat
 import com.ismartcoding.plain.lib.withIO
 import com.ismartcoding.plain.lib.kgraphql.Context
 import com.ismartcoding.plain.lib.kgraphql.annotations.GraphQLMutation
@@ -41,18 +39,13 @@ suspend fun createChatItem(content: String, context: Context): List<ChatItem> {
     val signature: String = ctx.attribute(PeerGraphQLService.ATTR_SIGNATURE) ?: ""
     val timestamp: Long = ctx.attribute(PeerGraphQLService.ATTR_TIMESTAMP) ?: 0L
 
-    val item = try {
-        ChatMessageReceiver.receive(
-            fromPeerId = fromPeerId,
-            content = DChat.parseContent(content),
-            fromChannelId = fromChannelId,
-            signature = signature,
-            timestamp = timestamp,
-        )
-    } catch (e: ReplayedMessageException) {
-        LogCat.d("Dropped replayed message from $fromPeerId")
-        return emptyList()
-    }
+    val item = ChatMessageReceiver.receive(
+        fromPeerId = fromPeerId,
+        content = content,
+        fromChannelId = fromChannelId,
+        signature = signature,
+        timestamp = timestamp,
+    ) ?: return emptyList()
     return listOf(item.toModel())
 }
 

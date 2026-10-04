@@ -6,6 +6,21 @@ import kotlinx.serialization.json.*
 import kotlin.time.Instant
 
 object RustChatStore {
+    suspend fun create(toId: String, channelId: String, content: DMessageContent): DChat = decode(callChatStore("createChat") {
+        put("to_id", toId); put("channel_id", channelId); put("content", content.toJSONString())
+    })
+    suspend fun receive(fromId: String, channelId: String, content: String, signature: String, timestamp: Long): DReceivedChat? {
+        val result = callChatStore("receiveChat") {
+            put("from_id", fromId); put("channel_id", channelId); put("content", content); put("signature", signature); put("timestamp", timestamp)
+        }.takeUnless { it is JsonNull }?.jsonObject ?: return null
+        return DReceivedChat(decode(result.getValue("chat")), com.ismartcoding.plain.chat.peer.RustPeerStore.decode(result.getValue("peer")), result.getValue("channel").takeUnless { it is JsonNull }?.let(com.ismartcoding.plain.chat.channel.RustChannelStore::decode))
+    }
+    suspend fun delivery(id: String, results: List<DMessageDeliveryResult>?, retry: Boolean = false): DChat? = callChatStore("chatDelivery") {
+        put("id", id); put("retry", retry)
+        put("results", results?.let { JsonArray(it.map { result -> buildJsonObject {
+            put("peerId", result.peerId); put("peerName", result.peerName); put("error", result.error?.let(::JsonPrimitive) ?: JsonNull)
+        } }) } ?: JsonNull)
+    }.takeUnless { it is JsonNull }?.let(::decode)
     suspend fun getAll(): List<DChat> = page()
     suspend fun getByPeerId(id: String): List<DChat> = page(peer = id)
     suspend fun getByChannelId(id: String): List<DChat> = page(channel = id)

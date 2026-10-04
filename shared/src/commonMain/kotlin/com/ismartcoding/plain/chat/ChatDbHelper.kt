@@ -10,19 +10,11 @@ import com.ismartcoding.plain.db.DMessageImages
 import com.ismartcoding.plain.db.DMessageStatusData
 import com.ismartcoding.plain.db.MessageType
 import com.ismartcoding.plain.db.DPeer
-import com.ismartcoding.plain.lib.JsonHelper.jsonEncode
 import com.ismartcoding.plain.lib.withIO
 
 object ChatDbHelper {
-    suspend fun insertChatItem(message: DMessageContent, fromId: String = "me", toId: String = "local", channelId: String = "", isRemote: Boolean): DChat = withIO {
-        val item = DChat()
-        item.fromId = fromId
-        item.toId = toId
-        item.channelId = channelId
-        item.content = message
-        item.status = if (isRemote) ChatStatus.PENDING else ChatStatus.SENT
-        RustChatStore.insert(item)
-        item
+    suspend fun insertChatItem(message: DMessageContent, toId: String = "local", channelId: String = ""): DChat = withIO {
+        RustChatStore.create(toId, channelId, message)
     }
 
     suspend fun getChatItem(id: String): DChat? = withIO {
@@ -40,30 +32,29 @@ object ChatDbHelper {
     }
 
     suspend fun updateChatItemStatus(item: DChat, status: ChatStatus) = withIO {
-        item.status = status
         RustChatStore.updateStatus(item.id, status)
+        item.status = status
     }
 
     suspend fun updateChatItemStatus(item: DChat, peer: DPeer, error: String?) = withIO {
-        val statusData = if (error == null) {
-            DMessageStatusData()
-        } else {
-            DMessageStatusData(listOf(DMessageDeliveryResult(peerId = peer.id, peerName = peer.name, error = error)))
-        }
-        item.status = statusData.aggregateStatus()
-        item.statusData = if (statusData.total > 0) jsonEncode(statusData) else ""
-        RustChatStore.updateStatusAndData(item.id, item.status, item.statusData)
+        val results = if (error == null) emptyList() else listOf(DMessageDeliveryResult(peerId = peer.id, peerName = peer.name, error = error))
+        applyDelivery(item, results)
     }
 
-    suspend fun updateChannelChatItemStatus(item: DChat, statusData: DMessageStatusData?) = withIO {
-        item.status = statusData?.aggregateStatus() ?: ChatStatus.FAILED
-        item.statusData = if (statusData != null && statusData.total > 0) jsonEncode(statusData) else ""
-        RustChatStore.updateStatusAndData(item.id, item.status, item.statusData)
+    suspend fun updateChannelChatItemStatus(item: DChat, statusData: DMessageStatusData?, retry: Boolean = false) = withIO {
+        applyDelivery(item, statusData?.results, retry)
+    }
+
+    private suspend fun applyDelivery(item: DChat, results: List<DMessageDeliveryResult>?, retry: Boolean = false) {
+        val saved = checkNotNull(RustChatStore.delivery(item.id, results, retry)) { "Chat unavailable" }
+        item.status = saved.status
+        item.statusData = saved.statusData
+        item.updatedAt = saved.updatedAt
     }
 
     suspend fun updateChatItemContent(item: DChat, content: DMessageContent) = withIO {
-        item.content = content
         RustChatStore.updateData(ChatItemDataUpdate(id = item.id, content = content))
+        item.content = content
     }
 
     suspend fun updateChatItemFilesContent(item: DChat, files: List<com.ismartcoding.plain.db.DMessageFile>) = withIO {

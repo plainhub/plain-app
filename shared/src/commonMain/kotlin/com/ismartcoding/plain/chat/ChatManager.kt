@@ -36,10 +36,8 @@ object ChatManager {
     suspend fun createChatItem(target: ChatTarget, content: DMessageContent): DChat = withIO {
         val item = ChatDbHelper.insertChatItem(
             message = content,
-            fromId = "me",
             toId = if (target.type == ChatTargetType.PEER) target.toId else "",
             channelId = if (target.type == ChatTargetType.CHANNEL) target.toId else "",
-            isRemote = !target.isLocal(),
         )
         if (item.content.type == MessageType.TEXT) {
             sendEvent(FetchLinkPreviewsEvent(item))
@@ -70,10 +68,8 @@ object ChatManager {
         }
         val item = ChatDbHelper.insertChatItem(
             message = content,
-            fromId = "me",
             toId = if (target.type == ChatTargetType.PEER) target.toId else "",
             channelId = if (target.type == ChatTargetType.CHANNEL) target.toId else "",
-            isRemote = !target.isLocal(),
         )
         refreshLatestChats()
         item

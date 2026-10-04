@@ -40,7 +40,10 @@ object ChatSender {
 
         when (target.type) {
             ChatTargetType.PEER -> {
-                val peer = RustPeerStore.getById(target.toId) ?: return@withIO
+                val peer = RustPeerStore.getById(target.toId) ?: run {
+                    ChatDbHelper.updateChannelChatItemStatus(item, null)
+                    return@withIO
+                }
                 val finished = withTimeoutOrNull(PEER_SEND_TIMEOUT_MS) {
                     sendToPeer(item, peer)
                     true
@@ -53,7 +56,10 @@ object ChatSender {
             }
 
             ChatTargetType.CHANNEL -> {
-                val channel = RustChannelStore.getById(target.toId) ?: return@withIO
+                val channel = RustChannelStore.getById(target.toId) ?: run {
+                    ChatDbHelper.updateChannelChatItemStatus(item, null)
+                    return@withIO
+                }
                 sendToChannel(item, channel, onlinePeerIds)
             }
         }
@@ -100,11 +106,6 @@ object ChatSender {
 
     suspend fun sendToChannelMembers(item: DChat, channel: DChatChannel, peerIds: List<String>) = withIO {
         val newResults = ChannelChatSender.sendToRecipients(channel, peerIds, item.content)
-        val existing = item.parseStatusData()?.results ?: emptyList()
-        val retriedIds = peerIds.toSet()
-        val merged = existing.filter { it.peerId !in retriedIds } + newResults.results
-        val mergedStatusData = DMessageStatusData(merged)
-
-        ChatDbHelper.updateChannelChatItemStatus(item, mergedStatusData)
+        ChatDbHelper.updateChannelChatItemStatus(item, newResults, retry = true)
     }
 }
