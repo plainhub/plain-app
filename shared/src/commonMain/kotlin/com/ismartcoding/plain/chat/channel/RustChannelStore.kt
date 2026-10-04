@@ -24,7 +24,7 @@ object RustChannelStore {
     suspend fun remove(id: String): DChatChannel? = callChatStore("removeChannel") { put("id", id) }.takeUnless { it is JsonNull }?.let(::decode)
     suspend fun delete(id: String) { deleteByIds(listOf(id)) }
     suspend fun deleteByIds(ids: List<String>) { callChatStore("deleteChannels") { put("ids", JsonArray(ids.map(::JsonPrimitive))) } }
-    private fun encode(row: DChatChannel): JsonObject = buildJsonObject {
+    internal fun encode(row: DChatChannel): JsonObject = buildJsonObject {
         put("id", row.id); put("name", row.name); put("key", row.key); put("owner_id", row.ownerId); put("members", JsonHelper.jsonEncode(row.members))
         put("version", row.version); put("status", row.status.name); put("created_at", row.createdAt.toString()); put("updated_at", row.updatedAt.toString())
     }

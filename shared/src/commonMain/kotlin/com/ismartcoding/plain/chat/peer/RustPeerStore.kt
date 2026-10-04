@@ -31,7 +31,7 @@ object RustPeerStore {
         put("status", row.status.name); put("port", row.port); put("device_type", row.deviceType.name); put("token", "")
         put("created_at", row.createdAt.toString()); put("updated_at", row.updatedAt.toString())
     }
-    private fun decode(value: JsonElement): DPeer = value.jsonObject.let { row ->
+    internal fun decode(value: JsonElement): DPeer = value.jsonObject.let { row ->
         fun string(key: String) = row.getValue(key).jsonPrimitive.content
         DPeer(string("id"), string("name"), string("ip"), string("key"), string("public_key"), PeerStatus.valueOf(string("status")), row.getValue("port").jsonPrimitive.int, DeviceType.valueOf(string("device_type")), Instant.parse(string("created_at")), Instant.parse(string("updated_at")))
     }

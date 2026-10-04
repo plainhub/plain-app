@@ -15,6 +15,7 @@ import com.ismartcoding.plain.enums.*
 import com.ismartcoding.plain.lib.JsonHelper.jsonEncode
 import com.ismartcoding.plain.platform.generateEd25519KeyPair
 import com.ismartcoding.plain.platform.signEd25519
+import kotlinx.serialization.json.*
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.*
 import org.junit.Test
@@ -68,4 +69,44 @@ class ChannelReceiveRustHttpTest {
             PeerCacher.load()
         }
     }
+    @Test
+    fun outboundPreparationUsesRustSignaturesAndLatestTransportKeys() = runBlocking {
+        val prefix = "synthetic-channel-send-${UUID.randomUUID()}"
+        val actor = TempData.clientId
+        val paired = DPeer(id = "$prefix-paired", name = prefix, key = Base64.encode(ByteArray(32) { 8 }), status = PeerStatus.PAIRED, ip = "127.0.0.1", port = 1)
+        val group = DPeer(id = "$prefix-group", name = prefix, status = PeerStatus.CHANNEL, ip = "127.0.0.1", port = 1)
+        val publicKey = Base64.decode(com.ismartcoding.plain.helpers.SignatureHelper.getRawPublicKeyBase64Async())
+        val channel = RustChannelStore.create("中文 $prefix")
+        try {
+            ChannelSystemMessageSender.broadcastUpdate(channel)
+            RustPeerStore.insert(paired, group)
+            RustChannelStore.action(channel.id, "invite", peer = paired.id)
+            val current = RustChannelStore.action(channel.id, "invite", peer = group.id)
+            val prepared = RustChannelOutgoingStore.prepare(current, ChannelSystemMessageType.INVITE, paired.id)
+            val pieces = RustChannelOutgoingStore.wire(prepared).split('|', limit = 3)
+            assertTrue(com.ismartcoding.plain.platform.verifyEd25519(publicKey, (pieces[1] + pieces[2]).encodeToByteArray(), Base64.decode(pieces[0])))
+            val wire = Json.parseToJsonElement(pieces[2]).jsonObject
+            val payload = Json.parseToJsonElement(wire.getValue("variables").jsonObject.getValue("payload").jsonPrimitive.content).jsonObject
+            assertEquals(actor, payload.getValue("owner").jsonPrimitive.content)
+            assertTrue(com.ismartcoding.plain.platform.verifyEd25519(publicKey, channelMessagePayload(current.id, current.version, ChannelSystemMessageAction.INVITE, paired.id).encodeToByteArray(), Base64.decode(payload.getValue("signature").jsonPrimitive.content)))
+            val target = prepared.getValue("targets").jsonArray.single().jsonObject
+            assertEquals(paired.key, target.getValue("key").jsonPrimitive.content)
+            assertEquals("", target.getValue("channelId").jsonPrimitive.content)
+            paired.key = Base64.encode(ByteArray(32) { 9 })
+            RustPeerStore.update(paired)
+            val broadcast = RustChannelOutgoingStore.prepare(current, ChannelSystemMessageType.UPDATE)
+            val targets = broadcast.getValue("targets").jsonArray.map { it.jsonObject }.associateBy { it.getValue("peer").jsonObject.getValue("id").jsonPrimitive.content }
+            assertEquals(paired.key, targets.getValue(paired.id).getValue("key").jsonPrimitive.content)
+            assertEquals(current.key, targets.getValue(group.id).getValue("key").jsonPrimitive.content)
+            assertEquals(current.id, targets.getValue(group.id).getValue("channelId").jsonPrimitive.content)
+            val removed = RustChannelStore.remove(current.id)!!
+            assertEquals(2, RustChannelOutgoingStore.prepare(removed, ChannelSystemMessageType.KICK).getValue("targets").jsonArray.size)
+        } finally {
+            RustChannelStore.remove(channel.id)
+            RustPeerStore.deleteByIds(listOf(paired.id, group.id))
+            ChannelCacher.load()
+            PeerCacher.load()
+        }
+    }
+
 }

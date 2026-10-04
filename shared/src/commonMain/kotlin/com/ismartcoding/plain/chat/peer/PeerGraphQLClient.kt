@@ -3,7 +3,6 @@ package com.ismartcoding.plain.chat.peer
 import com.ismartcoding.plain.helpers.SignatureHelper
 import com.ismartcoding.plain.lib.TimeHelper
 import com.ismartcoding.plain.chat.channel.ChannelCacher
-import com.ismartcoding.plain.enums.ChannelSystemMessageType
 import com.ismartcoding.plain.chat.peer.transport.PeerTransportRouter
 import com.ismartcoding.plain.chat.peer.transport.SignedRequest
 import com.ismartcoding.plain.db.DMessageContent
@@ -37,41 +36,6 @@ object PeerGraphQLClient {
         val keyBytes = requireNotNull(PeerCacher.getKeyBytes(peer.id)) {
             "PeerCacher has no key bytes for peer ${peer.id}"
         }
-        return PeerTransportRouter.send(peer, request, keyBytes)
-    }
-
-    suspend fun sendChannelSystemMessage(
-        peer: DPeer,
-        type: ChannelSystemMessageType,
-        payload: String,
-        channelId: String = "",
-    ): GraphQLResponse {
-        val mutation = $$"""
-                mutation ChannelSystemMessage($type: ChannelSystemMessageType!, $payload: String!) {
-                    channelSystemMessage(type: $type, payload: $payload)
-                }
-            """.trimIndent()
-
-        val variables = mapOf(
-            "type" to type.name,
-            "payload" to payload,
-        )
-
-        val keyBytes = if (peer.key.isNotEmpty()) {
-            requireNotNull(PeerCacher.getKeyBytes(peer.id)) {
-                "PeerCacher has no key bytes for peer ${peer.id}"
-            }
-        } else {
-            requireNotNull(ChannelCacher.getKeyBytes(channelId)) {
-                "ChannelCacher has no key bytes for channel $channelId"
-            }
-        }
-
-        val request = buildSignedRequest(
-            query = mutation,
-            variables = variables,
-            channelId = if (peer.key.isNotEmpty()) "" else channelId,
-        )
         return PeerTransportRouter.send(peer, request, keyBytes)
     }
 
