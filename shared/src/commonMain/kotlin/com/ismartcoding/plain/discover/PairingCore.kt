@@ -62,9 +62,6 @@ object PairingCore {
 
     // ---- Initiator (send request / receive response) -----------------------
 
-    suspend fun startPairingSession(device: DNearbyDevice, deviceIp: String): Pair<DPairingRequest, com.ismartcoding.plain.data.DPairingTicket> =
-        RustPairingStore.start(device.id, device.name, deviceIp, device.port)
-
     suspend fun handlePairResponse(response: DPairingResponse, senderIp: String): Boolean? {
         val result = RustPairingRuntime.complete(response, senderIp)
         if (result is kotlinx.serialization.json.JsonNull) return null

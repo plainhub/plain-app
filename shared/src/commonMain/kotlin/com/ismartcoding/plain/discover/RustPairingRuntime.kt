@@ -7,6 +7,24 @@ import com.ismartcoding.plain.platform.getDeviceIP4sWithPrefixLength
 import kotlinx.serialization.json.*
 
 object RustPairingRuntime {
+    suspend fun states(): JsonArray = call(buildJsonObject { put("action", "states") }).jsonArray
+
+    suspend fun start(device: DNearbyDevice): JsonElement {
+        val result = call(buildJsonObject {
+        put("action", "start"); put("device", RustPairingStore.deviceFacts()); put("target", target(device))
+        put("ips", JsonArray(device.ips.map(::JsonPrimitive))); put("interfaces", interfaces())
+        put("methods", JsonArray(device.discoveryMethods.map { JsonPrimitive(it.name) })); put("ble", device.bleClient != null)
+        })
+        PairingProjection.reconcile()
+        return result
+    }
+    suspend fun startBle(device: DNearbyDevice) = call(buildJsonObject {
+        put("action", "startBle"); put("device", RustPairingStore.deviceFacts()); put("target", target(device))
+    })
+    private fun target(device: DNearbyDevice) = buildJsonObject {
+        put("deviceId", device.id); put("deviceName", device.name); put("deviceIp", ""); put("devicePort", device.port)
+    }
+    private fun interfaces() = JsonArray(getDeviceIP4sWithPrefixLength().map { (ip, prefix) -> buildJsonObject { put("ip", ip); put("prefixLength", prefix.toInt()) } })
     suspend fun startLan(device: DNearbyDevice) = call(buildJsonObject {
         put("action", "startLan"); put("device", RustPairingStore.deviceFacts())
         put("target", buildJsonObject {

@@ -6,9 +6,13 @@ import kotlinx.serialization.json.*
 
 object PairingProjection {
     suspend fun reconcile() {
-        val active = RustPairingStore.tickets().map { it.deviceId }.toSet()
+        val states = RustPairingRuntime.states().map { it.jsonObject }
+        val active = states.map { it.getValue("deviceId").jsonPrimitive.content }.toSet()
         NearbyViewModel.itemStatus.toMap().forEach { (id, status) ->
-            if (status == NearbyItemStatus.PAIRING && id !in active) NearbyViewModel.itemStatus.remove(id)
+            if (status in setOf(NearbyItemStatus.STARTING, NearbyItemStatus.PAIRING) && id !in active) NearbyViewModel.itemStatus.remove(id)
+        }
+        states.forEach {
+            NearbyViewModel.itemStatus[it.getValue("deviceId").jsonPrimitive.content] = NearbyItemStatus.valueOf(it.getValue("phase").jsonPrimitive.content)
         }
     }
 
@@ -16,7 +20,7 @@ object PairingProjection {
         val value = Json.parseToJsonElement(payload).jsonObject
         val id = value.getValue("deviceId").jsonPrimitive.content
         if (RustPairingStore.tickets().none { it.deviceId == id && it.generation == value.getValue("generation").jsonPrimitive.content }) return
-        NearbyViewModel.onPairingRequestSent(id)
+        NearbyViewModel.itemStatus[id] = NearbyItemStatus.PAIRING
         com.ismartcoding.plain.lib.sendEvent(com.ismartcoding.plain.events.WebSocketEvent(
             com.ismartcoding.plain.events.EventType.PAIRING_STARTED, com.ismartcoding.plain.lib.JsonHelper.jsonEncode(
                 com.ismartcoding.plain.data.DPairingResult(id, value.getValue("deviceName").jsonPrimitive.content))))

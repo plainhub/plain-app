@@ -17,6 +17,8 @@ object RustNearbyDevices {
     private val clients = mutableMapOf<String, BleGattClient>()
     private var revision = -1L
 
+    internal suspend fun client(id: String): BleGattClient? = mutex.withLock { clients[id] }
+
     suspend fun scanning() = mutex.withLock {
         apply(call(buildJsonObject {
             put("action", "scanning"); put("lan", NearbyViewModel.isDiscovering.value); put("ble", NearbyViewModel.isBleScanning.value)

@@ -7,7 +7,6 @@ import com.ismartcoding.plain.chat.peer.PeerManager
 import com.ismartcoding.plain.data.DNearbyDevice
 import com.ismartcoding.plain.discover.MdnsDiscoverManager
 import com.ismartcoding.plain.discover.PairingInitiator
-import com.ismartcoding.plain.enums.DiscoveryMethod
 import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.platform.ensureBlePermissionAsync
 import com.ismartcoding.plain.platform.isBluetoothReadyToUse
@@ -28,7 +27,6 @@ object NearbyViewModel {
 
     private var bleJob: Job? = null
     private var blePermissionJob: Job? = null
-    private val blePairingJobs = mutableStateMapOf<String, Job>()
 
     fun startDiscovering() {
         isDiscovering.value = true
@@ -89,19 +87,7 @@ object NearbyViewModel {
         if (itemStatus[device.id] != null) return
         itemStatus[device.id] = NearbyItemStatus.STARTING
 
-        if (DiscoveryMethod.LAN in device.discoveryMethods && device.ips.isNotEmpty()) {
-            scope.launchSafe {
-                PairingInitiator.start(device)
-            }
-        } else if (DiscoveryMethod.BLE in device.discoveryMethods && device.bleClient != null) {
-            blePairingJobs[device.id] = scope.launchSafe(onDone = {
-                blePairingJobs.remove(device.id)
-            }) {
-                PairingTransport.pairViaBle(device)
-            }
-        } else {
-            itemStatus.remove(device.id)
-        }
+        scope.launchSafe { PairingInitiator.start(device) }
     }
 
     fun unpairDevice(deviceId: String) {
@@ -117,22 +103,7 @@ object NearbyViewModel {
 
     fun cancelPairing(deviceId: String) {
         itemStatus.remove(deviceId)
-        blePairingJobs.remove(deviceId)?.let {
-            it.cancel()
-            return
-        }
         PairingInitiator.cancel(deviceId)
-    }
-
-    /**
-     * The pairing request has been sent successfully. Transition from the
-     * STARTING (loading) state to PAIRING (pending) so the user knows the
-     * request reached the peer and we are waiting for its response.
-     */
-    fun onPairingRequestSent(deviceId: String) {
-        if (itemStatus[deviceId] == NearbyItemStatus.STARTING) {
-            itemStatus[deviceId] = NearbyItemStatus.PAIRING
-        }
     }
 
     fun getStatus(deviceId: String, isPaired: Boolean): NearbyItemStatus {
