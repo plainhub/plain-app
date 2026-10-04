@@ -3,37 +3,43 @@ package com.ismartcoding.plain.platform
 import com.ismartcoding.plain.lib.TimeHelper
 import com.ismartcoding.plain.lib.withIO
 import com.ismartcoding.plain.lib.logcat.LogCat
-import com.ismartcoding.plain.lib.toNSData
 import kotlinx.cinterop.ExperimentalForeignApi
+import kotlinx.cinterop.addressOf
+import kotlinx.cinterop.convert
+import kotlinx.cinterop.usePinned
+import platform.posix.fopen
+import platform.posix.fwrite
+import platform.posix.fclose
 import platform.Foundation.NSFileManager
 import platform.Foundation.NSTemporaryDirectory
-import platform.Foundation.writeToFile
 import platform.UniformTypeIdentifiers.UTType
 
 @OptIn(ExperimentalForeignApi::class)
 private class IosDownloadTempFileHandle(
     override val filePath: String,
 ) : DownloadTempFileHandle {
-    private val chunks = mutableListOf<ByteArray>()
+    private val stream = checkNotNull(fopen(filePath, "wb")) { "Unable to open download file" }
+    private var closed = false
 
     override fun write(buffer: ByteArray, offset: Int, length: Int) {
-        if (length <= 0) return
-        chunks.add(buffer.copyOfRange(offset, offset + length))
+        check(!closed) { "Download file closed" }
+        require(offset >= 0 && length >= 0 && offset <= buffer.size - length)
+        if (length == 0) return
+        buffer.usePinned { pinned ->
+            check(fwrite(pinned.addressOf(offset), 1.convert(), length.convert(), stream) == length.toULong()) {
+                "Unable to write download file"
+            }
+        }
     }
 
     override fun close() {
-        val size = chunks.sumOf { it.size }
-        val merged = ByteArray(size)
-        var pos = 0
-        for (chunk in chunks) {
-            chunk.copyInto(merged, pos)
-            pos += chunk.size
-        }
-        merged.toNSData().writeToFile(filePath, atomically = true)
+        if (closed) return
+        closed = true
+        check(fclose(stream) == 0) { "Unable to close download file" }
     }
 
     override fun delete() {
-        NSFileManager.defaultManager.removeItemAtPath(filePath, null)
+        try { close() } finally { NSFileManager.defaultManager.removeItemAtPath(filePath, null) }
     }
 }
 

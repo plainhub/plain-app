@@ -1,130 +1,88 @@
 package com.ismartcoding.plain.chat.download
 
-import com.ismartcoding.plain.chat.RustChatStore
-import com.ismartcoding.plain.platform.resolveAppFilePath
-import com.ismartcoding.plain.platform.importDownloadedFile
-import com.ismartcoding.plain.platform.getMimeTypeFromExtension
-import com.ismartcoding.plain.platform.createDownloadTempFile
-
-import com.ismartcoding.plain.lib.extensions.getFilenameExtension
-import com.ismartcoding.plain.lib.logcat.LogCat
+import com.ismartcoding.plain.api.RustContentApi
 import com.ismartcoding.plain.chat.peer.transport.PeerTransportRouter
 import com.ismartcoding.plain.features.download.DownloadStatus
-import com.ismartcoding.plain.db.ChatItemDataUpdate
-import com.ismartcoding.plain.db.DMessageFiles
-import com.ismartcoding.plain.db.DMessageImages
 import com.ismartcoding.plain.lib.TimeHelper
+import com.ismartcoding.plain.lib.logcat.LogCat
+import com.ismartcoding.plain.platform.DownloadTempFileHandle
+import com.ismartcoding.plain.platform.createFileWriteHandle
 import io.ktor.utils.io.readAvailable
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.NonCancellable
+import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.ensureActive
+import kotlinx.coroutines.withContext
 import kotlinx.coroutines.yield
+import kotlinx.serialization.json.*
 
 object PeerFileDownloader {
-    suspend fun downloadAsync(
-        task: DownloadTask,
-    ): String? {
-        val messageFile = task.messageFile
-        val fileName = messageFile.fileName
-        val fileId = messageFile.parseFileId()
-
-        val tempFile = createDownloadTempFile(task.messageFile.id)
-
+    suspend fun downloadAsync(task: DownloadTask): String? {
+        var token: String? = null
+        var handle: DownloadTempFileHandle? = null
+        var closed = false
         try {
+            val ticket = withContext(NonCancellable) {
+                call(buildJsonObject {
+                    put("action", "begin"); put("message_id", task.messageId)
+                    put("id", task.messageFile.id); put("uri", task.messageFile.uri)
+                }).jsonObject.also { token = it.getValue("token").jsonPrimitive.content }
+            }
+            currentCoroutineContext().ensureActive()
+            val temp = createFileWriteHandle(ticket.getValue("path").jsonPrimitive.content)
+            handle = temp
             task.status = DownloadStatus.DOWNLOADING
             task.downloadedSize = 0
-
-            var downloadedBytes = 0L
-            val downloaded = PeerTransportRouter.downloadFile(task.peer, fileId)
-
-            downloaded.use { d ->
-                if (d.status !in 200..299) {
-                    val error = "HTTP ${d.status}"
-                    LogCat.e("Download failed: $error")
-                    task.status = DownloadStatus.FAILED
-                    task.error = error
-                    return null
-                }
-
-                val channel = d.channel
+            task.downloadSpeed = 0
+            PeerTransportRouter.downloadFile(task.peer, task.messageFile.parseFileId()).use { response ->
+                check(response.status in 200..299) { "HTTP ${response.status}" }
                 val buffer = ByteArray(8192)
-                var lastProgressUpdate = TimeHelper.nowMillis()
-                var lastDownloadedSize = 0L
-
-                while (task.status == DownloadStatus.DOWNLOADING) {
-                    val bytesRead = channel.readAvailable(buffer)
-                    if (bytesRead == -1) break
-
-                    tempFile.write(buffer, 0, bytesRead)
-                    downloadedBytes += bytesRead
+                var lastProgress = TimeHelper.nowMillis()
+                var lastBytes = 0L
+                while (true) {
+                    currentCoroutineContext().ensureActive()
+                    val read = response.channel.readAvailable(buffer)
+                    if (read == -1) break
+                    temp.write(buffer, 0, read)
+                    task.downloadedSize += read
                     val now = TimeHelper.nowMillis()
-
-                    task.downloadedSize = downloadedBytes
-                    if (now - lastProgressUpdate > 1000) {
-                        val downloadedSinceLast = downloadedBytes - lastDownloadedSize
-                        val timeElapsed = (now - lastProgressUpdate) / 1000.0
-                        task.downloadSpeed = (downloadedSinceLast / timeElapsed).toLong()
-                        task.lastDownloadedSize = downloadedBytes
-                        task.lastUpdateTime = now
-                        lastProgressUpdate = now
-                        lastDownloadedSize = downloadedBytes
+                    if (now - lastProgress >= 1000) {
+                        task.downloadSpeed = (task.downloadedSize - lastBytes) * 1000 / (now - lastProgress)
+                        lastBytes = task.downloadedSize
+                        lastProgress = now
                         DownloadQueue.notifyProgressUpdate()
                     }
                     yield()
                 }
             }
-
-            tempFile.close()
-
-            if (downloadedBytes == messageFile.size) {
-                task.status = DownloadStatus.COMPLETED
-                task.downloadedSize = downloadedBytes
+            temp.close()
+            closed = true
+            currentCoroutineContext().ensureActive()
+            val receipt = withContext(NonCancellable) {
+                call(buildJsonObject { put("action", "finish"); put("token", checkNotNull(token)) }).jsonObject
+            }
+            token = null
+            currentCoroutineContext().ensureActive()
+            task.status = DownloadStatus.COMPLETED
+            task.downloadSpeed = 0
+            return receipt.getValue("path").jsonPrimitive.content
+        } catch (cancelled: CancellationException) {
+            throw cancelled
+        } catch (failure: Exception) {
+            LogCat.e("Download failed: ${failure.message}")
+            if (!task.aborted) {
+                task.status = DownloadStatus.FAILED
+                task.error = failure.message ?: "Download failed"
                 task.downloadSpeed = 0
-
-                val mimeType = getMimeTypeFromExtension(fileName.getFilenameExtension())
-
-                val fidUri = importDownloadedFile(tempFile, fileName, mimeType)
-                val realPath = resolveAppFilePath(fidUri)
-
-                updateMessageFileUri(task.messageId, messageFile.uri, fidUri)
-                return realPath
-            } else {
-                if (!task.aborted) {
-                    task.status = DownloadStatus.FAILED
-                    task.error = "Incomplete download"
-                }
-                tempFile.delete()
-                return null
             }
-        } catch (ex: Exception) {
-            LogCat.e("Download failed: ${ex.message}")
-            task.status = DownloadStatus.FAILED
-            task.error = ex.message ?: "Download failed"
-            tempFile.delete()
             return null
-        }
-    }
-
-    private suspend fun updateMessageFileUri(messageId: String, originalUri: String, newUri: String) {
-        val message = RustChatStore.getById(messageId) ?: return
-        val content = message.content
-
-        when (content.value) {
-            is DMessageFiles -> {
-                val files = content.value as DMessageFiles
-                val updatedFiles = files.items.map { file ->
-                    if (file.uri == originalUri) file.copy(uri = newUri) else file
-                }
-                content.value = DMessageFiles(updatedFiles)
-            }
-
-            is DMessageImages -> {
-                val images = content.value as DMessageImages
-                val updatedImages = images.items.map { image ->
-                    if (image.uri == originalUri) image.copy(uri = newUri) else image
-                }
-                content.value = DMessageImages(updatedImages)
+        } finally {
+            if (!closed) runCatching { handle?.close() }
+            withContext(NonCancellable) {
+                token?.let { value -> runCatching { call(buildJsonObject { put("action", "abort"); put("token", value) }) } }
             }
         }
-
-        RustChatStore.updateData(ChatItemDataUpdate(messageId, content))
-        LogCat.d("PeerFileDownloader: updated URI $originalUri -> $newUri")
     }
+    private suspend fun call(body: JsonObject): JsonElement =
+        RustContentApi.postJson("chat/attachment", body, longRunning = true).getValue("result")
 }
