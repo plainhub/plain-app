@@ -97,6 +97,9 @@ object RustContentApi {
                     retryMs = 500L
                     com.ismartcoding.plain.chat.download.DownloadQueue.refresh()
                     com.ismartcoding.plain.discover.PairingProjection.reconcile()
+                    com.ismartcoding.plain.chat.peer.PeerCacher.load()
+                    com.ismartcoding.plain.chat.channel.ChannelCacher.load()
+                    com.ismartcoding.plain.chat.ChatCacher.load()
                     for (frame in socket.incoming) {
                         frame.binary?.let { bytes ->
                             if (bytes.size >= 4) {
@@ -113,6 +116,20 @@ object RustContentApi {
                         val payload = message.getValue("payload").jsonPrimitive.content
                         when (type) {
                             EventType.PAIRING_FAILED.value -> com.ismartcoding.plain.discover.PairingProjection.timeout(payload)
+                            EventType.MESSAGE_CREATED.value -> {
+                                Json.parseToJsonElement(payload).jsonArray.forEach { value ->
+                                    com.ismartcoding.plain.chat.RustChatStore.getById(value.jsonObject.getValue("id").jsonPrimitive.content)?.let { item ->
+                                        com.ismartcoding.plain.chat.peer.RustPeerStore.getById(item.fromId)?.let { peer ->
+                                            val channel = item.channelId.takeIf { it.isNotEmpty() }?.let { com.ismartcoding.plain.chat.channel.RustChannelStore.getById(it) }
+                                            com.ismartcoding.plain.chat.ChatMessageReceiver.applyCommitted(item, peer, channel)
+                                        }
+                                    }
+                                }
+                            }
+                            EventType.CHANNELS_UPDATED.value -> {
+                                com.ismartcoding.plain.chat.channel.ChannelSystemMessageReceiver.applyCommitted(Json.parseToJsonElement(payload).jsonObject)
+                                sendEvent(WebSocketEvent(EventType.CHANNELS_UPDATED, ""))
+                            }
                             EventType.MESSAGE_UPDATED.value -> {
                                 val items = Json.parseToJsonElement(payload).jsonArray.mapNotNull { value ->
                                     com.ismartcoding.plain.chat.RustChatStore.getById(value.jsonObject.getValue("id").jsonPrimitive.content)

@@ -7,12 +7,8 @@ import com.ismartcoding.plain.lib.withIO
 import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.chat.data.ChatTarget
 import com.ismartcoding.plain.chat.data.ChatTargetType
-import com.ismartcoding.plain.chat.download.DownloadQueue
 import com.ismartcoding.plain.db.DChat
 import com.ismartcoding.plain.db.DChatChannel
-import com.ismartcoding.plain.db.DMessageFiles
-import com.ismartcoding.plain.db.DMessageImages
-import com.ismartcoding.plain.db.MessageType
 import com.ismartcoding.plain.db.DPeer
 import com.ismartcoding.plain.db.getMessagePreview
 import com.ismartcoding.plain.events.EventType
@@ -28,36 +24,9 @@ import com.ismartcoding.plain.httpserver.models.dchatToModel
 
 object ChatMessageReceiver {
 
-    suspend fun receive(
-        fromPeerId: String,
-        content: String,
-        fromChannelId: String = "",
-        signature: String,
-        timestamp: Long,
-    ): DChat? = withIO {
-        val received = RustChatStore.receive(fromPeerId, fromChannelId, content, signature, timestamp) ?: return@withIO null
-        val item = received.chat
-        val fromPeer = received.peer
-        val fromChannel = received.channel
-
-
-        if (item.content.type == MessageType.FILES ||
-            item.content.type == MessageType.IMAGES
-        ) {
-            val files = when (item.content.value) {
-                is DMessageFiles -> (item.content.value as DMessageFiles).items
-                is DMessageImages -> (item.content.value as DMessageImages).items
-                else -> emptyList()
-            }
-            files.forEach { file ->
-                DownloadQueue.addDownloadTask(
-                    messageFile = file,
-                    peer = fromPeer,
-                    messageId = item.id,
-                )
-            }
-        }
-
+    suspend fun applyCommitted(item: DChat, fromPeer: DPeer, fromChannel: DChatChannel?) = withIO {
+        val fromChannelId = item.channelId
+        val fromPeerId = item.fromId
         ChatViewModel.onMessagesCreated(
             target = if (fromChannelId.isNotEmpty()) {
                 ChatTarget(fromChannelId, ChatTargetType.CHANNEL)
@@ -76,7 +45,6 @@ object ChatMessageReceiver {
         )
 
         emitNotificationIfNeeded(item, fromPeer, fromChannel)
-        item
     }
 
     private fun emitNotificationIfNeeded(

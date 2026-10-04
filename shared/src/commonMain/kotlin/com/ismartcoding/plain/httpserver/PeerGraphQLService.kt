@@ -1,102 +1,46 @@
 package com.ismartcoding.plain.httpserver
 
-import com.ismartcoding.plain.preferences.*
-
-import com.ismartcoding.plain.chat.peer.RustPeerWireStore
-import com.ismartcoding.plain.helpers.Base64Lenient
-import com.ismartcoding.plain.lib.kgraphql.GraphqlRequest
 import com.ismartcoding.plain.lib.kgraphql.KGraphQL
-import com.ismartcoding.plain.lib.kgraphql.context
 import com.ismartcoding.plain.lib.kgraphql.generated.registerGeneratedPeerResolvers
 import com.ismartcoding.plain.lib.kgraphql.generated.registerGeneratedSchema
 import com.ismartcoding.plain.lib.kgraphql.schema.Schema
 import com.ismartcoding.plain.lib.kgraphql.schema.dsl.SchemaBuilder
-import com.ismartcoding.plain.lib.logcat.LogCat
-import com.ismartcoding.plain.lib.withIO
-import com.ismartcoding.plain.httpserver.http.GraphqlRequestContext
 import com.ismartcoding.plain.httpserver.http.HttpCall
-import com.ismartcoding.plain.httpserver.http.HttpStatus
 import com.ismartcoding.plain.httpserver.models.ChatItem
 import com.ismartcoding.plain.httpserver.models.ID
 import com.ismartcoding.plain.httpserver.mainschemas.addPeerSchemaTypes
 import kotlinx.serialization.json.*
 import kotlin.reflect.typeOf
 
-/**
- * Holds the peer-chat GraphQL [Schema] and dispatches `/peer_graphql`
- * requests.
- *
- * The schema extends the main schema with two mutations used for peer-to-peer
- * chat and channel system messages. The resolvers read request headers from
- * the shared [GraphqlRequestContext] (instead of Ktor's `ApplicationCall`),
- * keeping them commonMain-compatible.
- */
+// Native BLE/route adapter; schema is built only for contract export.
 class PeerGraphQLService private constructor(
-    val schema: Schema,
+    private val contractSchema: () -> Schema,
 ) {
-    /**
-     * Decrypt the peer-encrypted request body using either the channel key
-     * (when `c-cid` is present) or the peer's shared key, validate the
-     * signature/timestamp in shared Rust, then execute the GraphQL
-     * operation and re-encrypt the response with the same key.
-     */
+    val schema: Schema by lazy(contractSchema)
+
     suspend fun handle(call: HttpCall) {
-        if (!UserPrefs.service.value) {
-            LogCat.w("[PeerGraphQL] reject webDisabled")
-            call.respondNoBody(HttpStatus.FORBIDDEN)
-            return
-        }
-
-        val clientId = call.header("c-id") ?: ""
-        val channelId = call.header("c-cid") ?: ""
-        LogCat.d("[PeerGraphQL] from=$clientId channelId=$channelId")
-
-        val authenticated = RustPeerWireStore.authenticatePeer(clientId, channelId, call.receiveBody())
-        val status = authenticated.getValue("status").jsonPrimitive.int
-        if (status != HttpStatus.OK) {
-            call.respondNoBody(status)
-            return
-        }
-        val token = Base64Lenient.decode(authenticated.getValue("key").jsonPrimitive.content)
-        val content = authenticated.getValue("content").jsonPrimitive.content
-        val ctxHolder = GraphqlRequestContext(call).apply {
-            setAttribute(ATTR_SIGNATURE, authenticated.getValue("signature").jsonPrimitive.content)
-            setAttribute(ATTR_TIMESTAMP, authenticated.getValue("timestamp").jsonPrimitive.long)
-        }
-        val request = Json.decodeFromString(GraphqlRequest.serializer(), content)
-        val ctx = context { +ctxHolder }
-        val result = withIO { schema.execute(request.query, request.variables?.toString(), ctx) }
-        call.respond(
-            RustPeerWireStore.encrypt(token, result),
-            contentType = "application/octet-stream",
-        )
-        LogCat.d("[PeerGraphQL] done from=$clientId")
+        val result = com.ismartcoding.plain.api.RustContentApi.postJson("chat/peer-graphql", buildJsonObject {
+            put("clientId", call.header("c-id") ?: "")
+            put("channelId", call.header("c-cid") ?: "")
+            put("body", kotlin.io.encoding.Base64.encode(call.receiveBody()))
+        }, longRunning = true).getValue("result").jsonObject
+        val status = result.getValue("status").jsonPrimitive.int
+        if (status == 200) call.respond(kotlin.io.encoding.Base64.decode(result.getValue("body").jsonPrimitive.content),
+            contentType = "application/octet-stream")
+        else call.respondNoBody(status)
     }
 
     companion object {
-        const val ATTR_SIGNATURE = "peerGraphql.signature"
-        const val ATTR_TIMESTAMP = "peerGraphql.timestamp"
-
-        /**
-         * Build the [PeerGraphQLService] with a schema that combines the
-         * shared scalar/enum types (so peer mutations can return [ChatItem]
-         * results with [com.ismartcoding.plain.httpserver.models.ID] and
-         * [kotlin.time.Instant] fields) with the peer-specific mutations.
-         */
         fun create(): PeerGraphQLService {
-            val schema = KGraphQL.schema {
-                registerGeneratedSchema()
-                addPeerSchemaTypes()
-                applyPeerSchema()
+            return PeerGraphQLService {
+                KGraphQL.schema {
+                    registerGeneratedSchema()
+                    addPeerSchemaTypes()
+                    applyPeerSchema()
+                }
             }
-            return PeerGraphQLService(schema)
         }
 
-        /**
-         * Schema block that adds the peer-chat mutations on top of the main
-         * schema. The resolvers reach the request headers via the
-         * [GraphqlRequestContext] injected into the KGraphQL Context.
-         */
         fun SchemaBuilder.applyPeerSchema() {
             registerGeneratedPeerResolvers()
             type<ChatItem> {

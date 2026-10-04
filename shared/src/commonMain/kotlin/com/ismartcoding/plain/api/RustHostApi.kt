@@ -41,6 +41,7 @@ object RustHostApi {
                                                 val result = when {
                                                     method == "httpExchange" -> { com.ismartcoding.plain.httpserver.RustHttpHost.start(exchangeScope, session, params.getValue("id").jsonPrimitive.content); JsonNull }
                                                     method.startsWith("attachmentTransfer") -> com.ismartcoding.plain.chat.download.AttachmentTransferHost.handle(exchangeScope, method, params)
+                                                    method == "peerStartAware" || method == "peerDeviceInfo" -> com.ismartcoding.plain.chat.peer.PeerGraphQLHost.handle(method, params)
                                                     method.startsWith("peerTransport") -> com.ismartcoding.plain.chat.peer.transport.PeerTransportHost.handle(method, params)
                                                     method == "audioEngineCommand" -> AudioEngineHost.handle(method, params)
                                                     method.startsWith("fileTask") -> com.ismartcoding.plain.features.file.FileTaskHost.handle(method,params)
