@@ -1,36 +1,11 @@
 package com.ismartcoding.plain.db
 
 import com.ismartcoding.plain.extensions.getFinalPath
-import com.ismartcoding.plain.helpers.getFileId
 
 fun DMessageFile.getPreviewPath(peer: DPeer?): String {
     return if (isRemoteFile()) {
         peer?.getFileUrl(parseFileId()) + "&w=200&h=200"
     } else {
         uri.getFinalPath()
-    }
-}
-
-fun DMessageContent.toPeerMessageContent(): DMessageContent {
-    return when (type) {
-        MessageType.FILES -> {
-            val files = value as DMessageFiles
-            val modified = files.items.map { file ->
-                val fileId = getFileId(file.uri)
-                file.copy(uri = "fsid:$fileId")
-            }
-            DMessageContent(type, DMessageFiles(modified))
-        }
-
-        MessageType.IMAGES -> {
-            val images = value as DMessageImages
-            val modified = images.items.map { image ->
-                val fileId = getFileId(image.uri)
-                image.copy(uri = "fsid:$fileId")
-            }
-            DMessageContent(type, DMessageImages(modified))
-        }
-
-        else -> this
     }
 }

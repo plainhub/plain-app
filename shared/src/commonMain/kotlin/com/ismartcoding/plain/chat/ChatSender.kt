@@ -1,111 +1,35 @@
 package com.ismartcoding.plain.chat
 
-import com.ismartcoding.plain.chat.channel.RustChannelStore
-
-import com.ismartcoding.plain.chat.peer.RustPeerStore
-
-import com.ismartcoding.plain.lib.withIO
-import com.ismartcoding.plain.chat.channel.ChannelChatSender
-import com.ismartcoding.plain.chat.data.ChatTarget
-import com.ismartcoding.plain.chat.data.ChatTargetType
-import com.ismartcoding.plain.discover.MdnsDiscoverManager
-import com.ismartcoding.plain.chat.peer.PeerChatSender
+import com.ismartcoding.plain.api.RustContentApi
 import com.ismartcoding.plain.db.DChat
-import com.ismartcoding.plain.db.DChatChannel
-import com.ismartcoding.plain.db.DMessageStatusData
-import com.ismartcoding.plain.db.DPeer
-import com.ismartcoding.plain.db.getRecipientIds
-import com.ismartcoding.plain.enums.ChatStatus
-import com.ismartcoding.plain.lib.logcat.LogCat
-import kotlinx.coroutines.withTimeoutOrNull
+import com.ismartcoding.plain.discover.MdnsDiscoverManager
+import com.ismartcoding.plain.lib.withIO
+import kotlinx.serialization.json.*
 
 object ChatSender {
-    /**
-     * Overall cap on one peer send, covering the full transport fallback
-     * chain. A dead peer surfaces as FAILED quickly instead of wedging the
-     * caller (share sheet / forward dialog) for minutes. Channel sends are
-     * not capped here: a leader broadcast fans out to every member, which
-     * can legitimately exceed the cap.
-     */
-    private const val PEER_SEND_TIMEOUT_MS = 20_000L
-
-    suspend fun send(
-        item: DChat,
-        target: ChatTarget,
-        onlinePeerIds: Set<String>,
-    ) = withIO {
-        if (target.isLocal()) {
-            return@withIO
-        }
-
-        when (target.type) {
-            ChatTargetType.PEER -> {
-                val peer = RustPeerStore.getById(target.toId) ?: run {
-                    ChatDbHelper.updateChannelChatItemStatus(item, null)
-                    return@withIO
-                }
-                val finished = withTimeoutOrNull(PEER_SEND_TIMEOUT_MS) {
-                    sendToPeer(item, peer)
-                    true
-                }
-                if (finished == null) {
-                    LogCat.w("Send to peer ${peer.id} timed out after ${PEER_SEND_TIMEOUT_MS / 1000}s")
-                    ChatDbHelper.updateChatItemStatus(item, ChatStatus.FAILED)
-                    triggerPeerRediscovery(peer.id)
-                }
-            }
-
-            ChatTargetType.CHANNEL -> {
-                val channel = RustChannelStore.getById(target.toId) ?: run {
-                    ChatDbHelper.updateChannelChatItemStatus(item, null)
-                    return@withIO
-                }
-                sendToChannel(item, channel, onlinePeerIds)
-            }
-        }
+    suspend fun send(item: DChat) = withIO {
+        deliver(item, null)
     }
 
-    fun triggerPeerRediscovery(peerId: String) {
-        LogCat.d("triggerPeerRediscovery: $peerId")
-        MdnsDiscoverManager.browse()
+    suspend fun sendToChannelMembers(item: DChat, peerIds: List<String>) = withIO {
+        deliver(item, peerIds)
     }
 
-    suspend fun sendToPeer(item: DChat, peer: DPeer) = withIO {
-        if (!peer.isPaired()) {
-            LogCat.w("Skip send to unpaired peer ${peer.id}")
-            ChatDbHelper.updateChatItemStatus(item, peer, "peer unpaired")
-            return@withIO
-        }
-        val error = PeerChatSender.send(peer, item.content)
-        if (error != null) {
-            triggerPeerRediscovery(peer.id)
-        }
-        ChatDbHelper.updateChatItemStatus(item, peer, error)
-    }
-
-    suspend fun sendToChannel(item: DChat, channel: DChatChannel, onlinePeerIds: Set<String> = emptySet()) = withIO {
-        when (val result = ChannelChatSender.send(channel, item.content)) {
-            is ChannelChatSender.Result.Status -> {
-                ChatDbHelper.updateChannelChatItemStatus(item, result.data)
-            }
-
-            ChannelChatSender.Result.NoLeader -> {
-                channel.getRecipientIds().forEach { triggerPeerRediscovery(it) }
-                ChatDbHelper.updateChannelChatItemStatus(item, null)
-            }
-
-            is ChannelChatSender.Result.LeaderPeerMissing -> {
-                triggerPeerRediscovery(result.leaderId)
-                channel.getRecipientIds()
-                    .filter { it != result.leaderId }
-                    .forEach { triggerPeerRediscovery(it) }
-                ChatDbHelper.updateChannelChatItemStatus(item, null)
-            }
-        }
-    }
-
-    suspend fun sendToChannelMembers(item: DChat, channel: DChatChannel, peerIds: List<String>) = withIO {
-        val newResults = ChannelChatSender.sendToRecipients(channel, peerIds, item.content)
-        ChatDbHelper.updateChannelChatItemStatus(item, newResults, retry = true)
+    private suspend fun deliver(item: DChat, peerIds: List<String>?) {
+        val result = RustContentApi.postJson("chat/send", buildJsonObject {
+            put("id", item.id)
+            put("recipients", peerIds?.let { JsonArray(it.map(::JsonPrimitive)) } ?: JsonNull)
+        }, longRunning = true).getValue("result").jsonObject
+        if (result.getValue("rediscover").jsonPrimitive.boolean) MdnsDiscoverManager.browse()
+        val saved = result.getValue("chat").takeUnless { it is JsonNull }?.let(RustChatStore::decode)
+            ?: error("Chat unavailable")
+        item.fromId = saved.fromId
+        item.toId = saved.toId
+        item.channelId = saved.channelId
+        item.content = saved.content
+        item.createdAt = saved.createdAt
+        item.status = saved.status
+        item.statusData = saved.statusData
+        item.updatedAt = saved.updatedAt
     }
 }

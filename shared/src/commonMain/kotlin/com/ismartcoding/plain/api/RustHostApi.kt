@@ -40,6 +40,7 @@ object RustHostApi {
                                             val reply = try {
                                                 val result = when {
                                                     method == "httpExchange" -> { com.ismartcoding.plain.httpserver.RustHttpHost.start(exchangeScope, session, params.getValue("id").jsonPrimitive.content); JsonNull }
+                                                    method == "chatTransport" -> com.ismartcoding.plain.chat.ChatTransportHost.handle(params)
                                                     method == "audioEngineCommand" -> AudioEngineHost.handle(method, params)
                                                     method.startsWith("fileTask") -> com.ismartcoding.plain.features.file.FileTaskHost.handle(method,params)
                                                     method == "mediaAction" -> handleMediaActionHost(params)

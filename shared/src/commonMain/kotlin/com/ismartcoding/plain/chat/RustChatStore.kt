@@ -53,7 +53,7 @@ object RustChatStore {
         put("id", row.id); put("from_id", row.fromId); put("to_id", row.toId); put("channel_id", row.channelId); put("content", row.content.toJSONString())
         put("status", row.status.name); put("status_data", row.statusData); put("created_at", row.createdAt.toString()); put("updated_at", row.updatedAt.toString())
     }
-    private fun decode(value: JsonElement): DChat = value.jsonObject.let { row ->
+    internal fun decode(value: JsonElement): DChat = value.jsonObject.let { row ->
         fun string(key: String) = row.getValue(key).jsonPrimitive.content
         DChat(id = string("id"), fromId = string("from_id"), toId = string("to_id"), channelId = string("channel_id"), status = ChatStatus.valueOf(string("status")), statusData = string("status_data"), content = DChat.parseContent(string("content")), createdAt = Instant.parse(string("created_at")), updatedAt = Instant.parse(string("updated_at")))
     }

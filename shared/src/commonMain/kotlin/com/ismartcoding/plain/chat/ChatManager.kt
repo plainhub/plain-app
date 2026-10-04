@@ -3,7 +3,6 @@ package com.ismartcoding.plain.chat
 import com.ismartcoding.plain.lib.withIO
 import com.ismartcoding.plain.chat.data.ChatTarget
 import com.ismartcoding.plain.chat.data.ChatTargetType
-import com.ismartcoding.plain.chat.peer.PeerCacher
 import com.ismartcoding.plain.db.DChat
 import com.ismartcoding.plain.db.DChatChannel
 import com.ismartcoding.plain.db.DMessageContent
@@ -47,17 +46,17 @@ object ChatManager {
     }
 
     suspend fun sendMessage(item: DChat, target: ChatTarget, onlinePeerIds: Set<String>) = withIO {
-        ChatSender.send(item, target, onlinePeerIds)
+        ChatSender.send(item)
     }
 
     suspend fun resendMessage(item: DChat) = withIO {
-        ChatSender.send(item, item.target(), PeerCacher.getOnlinePeerIds())
+        ChatSender.send(item)
         ChatViewModel.onMessageUpdated(item.id)
         sendEvent(WebSocketEvent(EventType.MESSAGE_UPDATED, JsonHelper.jsonEncode(listOf(item.toModel()))))
     }
 
     suspend fun sendToChannelMembers(item: DChat, channel: DChatChannel, peerIds: List<String>) = withIO {
-        ChatSender.sendToChannelMembers(item, channel, peerIds)
+        ChatSender.sendToChannelMembers(item, peerIds)
     }
 
     suspend fun insertFilesImmediate(target: ChatTarget, files: List<DMessageFile>, isImageVideo: Boolean): DChat = withIO {
@@ -87,7 +86,7 @@ object ChatManager {
             ChatDbHelper.updateChatItemStatus(item, ChatStatus.SENT)
         } else {
             ChatDbHelper.updateChatItemStatus(item, ChatStatus.PENDING)
-            ChatSender.send(item, target, onlinePeerIds)
+            ChatSender.send(item)
         }
         refreshLatestChats()
         item
@@ -109,9 +108,4 @@ object ChatManager {
         }
     }
 
-    private fun DChat.target(): ChatTarget = when {
-        channelId.isNotEmpty() -> ChatTarget(channelId, ChatTargetType.CHANNEL)
-        toId.isEmpty() || toId == "local" -> ChatTarget("local", ChatTargetType.PEER)
-        else -> ChatTarget(toId, ChatTargetType.PEER)
-    }
 }

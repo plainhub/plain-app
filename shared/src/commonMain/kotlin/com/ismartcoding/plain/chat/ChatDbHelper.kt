@@ -4,12 +4,9 @@ import com.ismartcoding.plain.db.ChatItemDataUpdate
 import com.ismartcoding.plain.db.DChat
 import com.ismartcoding.plain.db.DMessageContent
 import com.ismartcoding.plain.enums.ChatStatus
-import com.ismartcoding.plain.db.DMessageDeliveryResult
 import com.ismartcoding.plain.db.DMessageFiles
 import com.ismartcoding.plain.db.DMessageImages
-import com.ismartcoding.plain.db.DMessageStatusData
 import com.ismartcoding.plain.db.MessageType
-import com.ismartcoding.plain.db.DPeer
 import com.ismartcoding.plain.lib.withIO
 
 object ChatDbHelper {
@@ -34,22 +31,6 @@ object ChatDbHelper {
     suspend fun updateChatItemStatus(item: DChat, status: ChatStatus) = withIO {
         RustChatStore.updateStatus(item.id, status)
         item.status = status
-    }
-
-    suspend fun updateChatItemStatus(item: DChat, peer: DPeer, error: String?) = withIO {
-        val results = if (error == null) emptyList() else listOf(DMessageDeliveryResult(peerId = peer.id, peerName = peer.name, error = error))
-        applyDelivery(item, results)
-    }
-
-    suspend fun updateChannelChatItemStatus(item: DChat, statusData: DMessageStatusData?, retry: Boolean = false) = withIO {
-        applyDelivery(item, statusData?.results, retry)
-    }
-
-    private suspend fun applyDelivery(item: DChat, results: List<DMessageDeliveryResult>?, retry: Boolean = false) {
-        val saved = checkNotNull(RustChatStore.delivery(item.id, results, retry)) { "Chat unavailable" }
-        item.status = saved.status
-        item.statusData = saved.statusData
-        item.updatedAt = saved.updatedAt
     }
 
     suspend fun updateChatItemContent(item: DChat, content: DMessageContent) = withIO {
