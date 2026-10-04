@@ -115,6 +115,10 @@ object RustContentApi {
                         val type = message.getValue("type").jsonPrimitive.int
                         val payload = message.getValue("payload").jsonPrimitive.content
                         when (type) {
+                            EventType.PAIRING_REQUEST_RECEIVED.value -> com.ismartcoding.plain.discover.PairingProjection.request(payload)
+                            EventType.PAIRING_STARTED.value -> com.ismartcoding.plain.discover.PairingProjection.started(payload)
+                            EventType.PAIRING_CANCELED.value -> com.ismartcoding.plain.discover.PairingProjection.canceled(payload)
+                            EventType.PAIRING_SUCCESS.value -> com.ismartcoding.plain.discover.PairingProjection.success(payload)
                             EventType.PAIRING_FAILED.value -> com.ismartcoding.plain.discover.PairingProjection.timeout(payload)
                             EventType.MESSAGE_CREATED.value -> {
                                 Json.parseToJsonElement(payload).jsonArray.forEach { value ->

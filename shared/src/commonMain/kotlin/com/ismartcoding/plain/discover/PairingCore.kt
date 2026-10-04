@@ -3,7 +3,6 @@ package com.ismartcoding.plain.discover
 import com.ismartcoding.plain.preferences.UserPrefs
 import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.ble.client.BleGattClient
-import com.ismartcoding.plain.ble.server.BlePairingSessionStore
 import com.ismartcoding.plain.data.DNearbyDevice
 import com.ismartcoding.plain.data.DPairingCancel
 import com.ismartcoding.plain.data.DPairingRequest
@@ -12,8 +11,6 @@ import com.ismartcoding.plain.data.DPairingResult
 import com.ismartcoding.plain.enums.NearbyMessageType
 import com.ismartcoding.plain.enums.DiscoveryMethod
 import com.ismartcoding.plain.events.EventType
-import com.ismartcoding.plain.events.PairingCanceledEvent
-import com.ismartcoding.plain.events.PairingRequestReceivedEvent
 import com.ismartcoding.plain.events.PairingSuccessEvent
 import com.ismartcoding.plain.events.WebSocketEvent
 import com.ismartcoding.plain.lib.JsonHelper
@@ -26,6 +23,7 @@ import com.ismartcoding.plain.platform.getDeviceType
 import com.ismartcoding.plain.platform.getPlatformName
 import com.ismartcoding.plain.platform.isWifiAwareSupported
 import com.ismartcoding.plain.ui.models.NearbyViewModel
+import kotlinx.serialization.json.jsonObject
 
 object PairingCore {
 
@@ -68,41 +66,18 @@ object PairingCore {
         RustPairingStore.start(device.id, device.name, deviceIp, device.port)
 
     suspend fun handlePairResponse(response: DPairingResponse, senderIp: String): Boolean? {
-        val outcome = RustPairingStore.complete(response, senderIp) ?: return null
-        val peer = outcome.peer
-        if (peer == null) {
-            notifyFailed(outcome.ticket.deviceId, outcome.ticket.deviceName, outcome.error)
-            return false
-        }
-        publishSuccess(peer.id, peer.name, senderIp, peer.key)
-        return true
+        val result = RustPairingRuntime.complete(response, senderIp)
+        if (result is kotlinx.serialization.json.JsonNull) return null
+        return result.jsonObject.getValue("peer") !is kotlinx.serialization.json.JsonNull
     }
 
     suspend fun handlePairRequest(request: DPairingRequest, senderAddress: String, isBle: Boolean) {
-        if (!isBle) request.fromIp = senderAddress
-        val new = RustPairingStore.receiveRequest(request) ?: return
-        if (isBle) BlePairingSessionStore.put(request.fromId, senderAddress)
-        if (!new) return
-        sendEvent(PairingRequestReceivedEvent(request))
-        sendEvent(WebSocketEvent(EventType.PAIRING_REQUEST_RECEIVED, JsonHelper.jsonEncode(request)))
+        RustPairingRuntime.receiveRequest(request, senderAddress, isBle)
     }
 
-    suspend fun buildRejectionResponse(request: DPairingRequest): DPairingResponse? = RustPairingStore.respond(request, false)?.first
+    suspend fun handlePairCancel(cancel: DPairingCancel) { RustPairingRuntime.receiveCancel(cancel) }
 
-    suspend fun handlePairCancel(cancel: DPairingCancel) {
-        val ticket = RustPairingStore.receiveCancel(cancel) ?: return
-        sendEvent(PairingCanceledEvent(ticket.deviceId))
-        sendEvent(WebSocketEvent(EventType.PAIRING_CANCELED, JsonHelper.jsonEncode(DPairingResult(deviceId = ticket.deviceId, deviceName = ticket.deviceName))))
-    }
-
-    suspend fun acceptPairingRequest(request: DPairingRequest): DPairingResponse? {
-        val built = RustPairingStore.respond(request, true) ?: return null
-        val peer = requireNotNull(built.second)
-        publishSuccess(peer.id, peer.name, request.fromIp, peer.key)
-        return built.first
-    }
-
-    private suspend fun publishSuccess(id: String, name: String, ip: String, key: String) {
+    internal suspend fun publishSuccess(id: String, name: String, ip: String, key: String) {
         com.ismartcoding.plain.chat.peer.PeerManager.load()
         NearbyViewModel.handlePairingSuccess(id)
         sendEvent(PairingSuccessEvent(id, name, ip, key))

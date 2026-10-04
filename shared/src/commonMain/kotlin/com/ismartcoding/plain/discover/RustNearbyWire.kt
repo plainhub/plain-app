@@ -25,5 +25,14 @@ object RustNearbyWire {
         put("action", "discoverReply"); put("payload", payload); put("short_id", shortId)
     }).toString())
 
+    suspend fun beginScan(): String = call(buildJsonObject { put("action", "scanBegin") }).jsonPrimitive.content
+    suspend fun endScan(id: String) { call(buildJsonObject { put("action", "scanEnd"); put("id", id) }) }
+    suspend fun scanSeen(id: String, shortId: String): JsonObject = call(buildJsonObject { put("action", "scanSeen"); put("id", id); put("short_id", shortId) }).jsonObject
+    suspend fun scanReply(id: String, shortId: String, generation: String, payload: String?): DDiscoverReply? = try { call(buildJsonObject {
+        put("action", "scanReply"); put("id", id); put("short_id", shortId); put("generation", generation); put("payload", payload?.let(::JsonPrimitive) ?: JsonNull)
+    }).takeUnless { it is JsonNull }?.let { JsonHelper.jsonDecode<DDiscoverReply>(it.toString()) }
+    } catch (cancelled: CancellationException) { throw cancelled }
+    catch (_: Exception) { null }
+
     private suspend fun call(body: JsonObject) = RustContentApi.postJson("chat/nearby", body).getValue("result")
 }

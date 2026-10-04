@@ -2,6 +2,7 @@ package com.ismartcoding.plain.ble
 import com.ismartcoding.plain.platform.bleTransport
 import com.ismartcoding.plain.api.clientHeadersMap
 
+import kotlinx.serialization.json.*
 import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.data.DNearbyDevice
 import com.ismartcoding.plain.data.DPairingTicket
@@ -72,36 +73,25 @@ object PairingTransport {
     }
 
     fun scanAndDiscover(): Flow<DNearbyDevice> = flow {
-        val replyCache = mutableMapOf<String, DDiscoverReply>()
-        val lastEmit = mutableMapOf<String, Long>()
-        bleTransport().createScanner().scan(BleUuids.SERVICE_UUID).collect { device ->
-            // device.id is the peer's shortId (SHA256(clientId)[0:8] hex,
-            // parsed from scan response serviceData) — the stable per-scan
-            // match key. The full clientId is NOT available from the scan;
-            // it is recovered below via the GATT DISCOVER reply. The BLE MAC
-            // is not used because Android randomizes it every ~15 min.
-            val shortId = device.id
-            val cached = replyCache[shortId]
-            if (cached == null) {
-                val reply = readDiscoverReply(device)
+        val scan = RustNearbyWire.beginScan()
+        try {
+            bleTransport().createScanner().scan(BleUuids.SERVICE_UUID).collect { device ->
+                val step = RustNearbyWire.scanSeen(scan, device.id)
+                val reply = when (step.getValue("kind").jsonPrimitive.content) {
+                    "read" -> RustNearbyWire.scanReply(scan, device.id, step.getValue("generation").jsonPrimitive.content, readDiscoverReply(device))
+                    "emit" -> JsonHelper.jsonDecode<DDiscoverReply>(step.getValue("reply").toString())
+                    else -> null
+                }
                 if (reply != null) {
-                    replyCache[shortId] = reply
                     PeerCacher.setAwareSupported(reply.id, reply.awareSupported)
                     PeerCacher.setAwareRunning(reply.id, reply.awareRunning)
                     emit(PairingCore.replyToDevice(reply, device))
-                    lastEmit[shortId] = TimeHelper.nowMillis()
-                }
-            } else {
-                val now = TimeHelper.nowMillis()
-                if (now - (lastEmit[shortId] ?: 0) > BLE_REFRESH_INTERVAL_MS) {
-                    emit(PairingCore.replyToDevice(cached, device))
-                    lastEmit[shortId] = now
                 }
             }
-        }
+        } finally { withContext(NonCancellable) { RustNearbyWire.endScan(scan) } }
     }
 
-    private suspend fun readDiscoverReply(device: BleGattClient): DDiscoverReply? {
+    private suspend fun readDiscoverReply(device: BleGattClient): String? {
         val scanner = bleTransport().createScanner()
         return try {
             // GATT operations (connect, CCCD writes, chunked reads) share the
@@ -123,8 +113,9 @@ object PairingTransport {
             }
             val json = result.value as? String ?: return null
             if (json.isEmpty()) return null
-            RustNearbyWire.discoverReply(json, device.id)
-        } catch (e: Exception) {
+            json
+        } catch (cancelled: CancellationException) { throw cancelled }
+        catch (e: Exception) {
             LogCat.e("[BLE] readDiscoverReply error: ${e.message}")
             null
         } finally {
@@ -212,5 +203,3 @@ object PairingTransport {
         }
     }
 }
-
-private const val BLE_REFRESH_INTERVAL_MS = 5_000L

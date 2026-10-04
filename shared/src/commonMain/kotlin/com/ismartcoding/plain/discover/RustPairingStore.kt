@@ -13,7 +13,7 @@ import kotlinx.serialization.json.*
 
 object RustPairingStore {
     suspend fun tickets(): List<DPairingTicket> = callChatStore("pairingTickets") {}.jsonArray.map(::ticket)
-    private fun device() = buildJsonObject {
+    internal fun deviceFacts() = buildJsonObject {
         put("name", TempData.deviceName.value)
         put("port", UserPrefs.httpsPort.value)
         put("device_type", getDeviceType().name)
@@ -22,7 +22,7 @@ object RustPairingStore {
     }
     suspend fun start(id: String, name: String, ip: String, port: Int): Pair<DPairingRequest, DPairingTicket> {
         val result = callChatStore("startPairing") {
-            put("device", device())
+            put("device", deviceFacts())
             put("target", buildJsonObject {
                 put("deviceId", id); put("deviceName", name); put("deviceIp", ip); put("devicePort", port)
             })
@@ -40,7 +40,7 @@ object RustPairingStore {
         val result = callChatStore("respondPairing") {
             put("request", Json.parseToJsonElement(JsonHelper.jsonEncode(request)))
             put("accepted", accepted)
-            put("device", device())
+            put("device", deviceFacts())
         }.takeUnless { it is JsonNull }?.jsonObject ?: return null
         return JsonHelper.jsonDecode<DPairingResponse>(result.getValue("response").toString()) to result.getValue("peer").takeUnless { it is JsonNull }?.let(RustPeerStore::decode)
     }
