@@ -7,8 +7,7 @@ import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.platform.PlainHttpClient
 import com.ismartcoding.plain.platform.get
 import com.ismartcoding.plain.platform.post
-import com.ismartcoding.plain.platform.chaCha20Decrypt
-import com.ismartcoding.plain.platform.chaCha20Encrypt
+import com.ismartcoding.plain.chat.peer.RustPeerWireStore
 import io.ktor.utils.io.ByteReadChannel
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
@@ -63,7 +62,7 @@ internal suspend fun executeGraphQLRequest(
         if (cryptoKey != null) {
             client.post(
                 url,
-                body = chaCha20Encrypt(cryptoKey, body),
+                body = RustPeerWireStore.encrypt(cryptoKey, body),
                 contentType = "application/octet-stream",
                 headers = clientHeadersWith("c-cid" to channelId),
             )
@@ -84,8 +83,8 @@ internal suspend fun executeGraphQLRequest(
     response.use {
         val responseBody = if (cryptoKey != null) {
             val encryptedBytes = it.bodyAsBytes()
-            val decrypted = chaCha20Decrypt(cryptoKey, encryptedBytes)
-            decrypted?.decodeToString() ?: encryptedBytes.decodeToString()
+            val decrypted = RustPeerWireStore.decrypt(cryptoKey, encryptedBytes)
+            requireNotNull(decrypted) { "Failed to authenticate peer response" }
         } else {
             it.bodyAsText()
         }

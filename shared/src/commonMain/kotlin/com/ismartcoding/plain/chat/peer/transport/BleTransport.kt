@@ -13,8 +13,7 @@ import com.ismartcoding.plain.lib.JsonHelper
 import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.platform.PlatformLock
 import com.ismartcoding.plain.platform.bleTransport
-import com.ismartcoding.plain.platform.chaCha20Decrypt
-import com.ismartcoding.plain.platform.chaCha20Encrypt
+import com.ismartcoding.plain.chat.peer.RustPeerWireStore
 import com.ismartcoding.plain.platform.isBleReady
 import io.ktor.utils.io.ByteChannel
 import io.ktor.utils.io.close
@@ -135,7 +134,7 @@ object BleTransport : PeerTransport {
         // Encrypt the signed request body with the peer's shared key, the
         // same way the OkHttp crypto client would for LanTransport. The
         // server's PeerGraphQLService decrypts with the same key.
-        val encryptedBody = chaCha20Encrypt(keyBytes, request.body)
+        val encryptedBody = RustPeerWireStore.encrypt(keyBytes, request.body)
 
         val rpcRequest = BleHttpRequest(
             method = "POST",
@@ -203,14 +202,14 @@ object BleTransport : PeerTransport {
             }
 
             val encryptedResponse = Base64Lenient.decode(rpcResponse.body)
-            val decrypted = chaCha20Decrypt(keyBytes, encryptedResponse)
+            val decrypted = RustPeerWireStore.decrypt(keyBytes, encryptedResponse)
                 ?: return@withLock GraphQLResponse(
                     null,
                     null,
                     IllegalStateException("failed to decrypt response from peer"),
                 )
 
-            GraphQLResponseParser.parse(decrypted.decodeToString())
+            GraphQLResponseParser.parse(decrypted)
         }
     }
 
