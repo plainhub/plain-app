@@ -24,6 +24,6 @@ object PairingMessenger {
         send(NearbyMessageType.PAIR_CANCEL, JsonHelper.jsonEncode(cancel), targetIp, targetPort)
 
     private suspend fun send(type: NearbyMessageType, json: String, targetIp: String, targetPort: Int): Boolean {
-        return NearbyHttpClient.post(PairingCore.formatMessage(type, json), targetIp, targetPort)
+        return NearbyHttpClient.send(type, json, targetIp, targetPort)
     }
 }

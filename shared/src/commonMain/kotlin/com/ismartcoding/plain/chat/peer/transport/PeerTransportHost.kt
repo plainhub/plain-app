@@ -8,6 +8,7 @@ import kotlinx.serialization.json.*
 
 object PeerTransportHost {
     suspend fun handle(method: String, params: JsonObject): JsonElement {
+        if (method.startsWith("peerTransportPrewarm")) return PeerTransportPrewarmHost.handle(method, params)
         if (method == "peerTransportCapabilities") return PeerTransportRouter.capabilities()
         check(method == "peerTransportAttempt") { "Unknown peer transport operation" }
         val peer = RustPeerStore.decode(params.getValue("peer"))
