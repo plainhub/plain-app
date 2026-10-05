@@ -4,6 +4,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.ble.BleServiceData
 import com.ismartcoding.plain.discover.RustDiscoveryAdvertisement
+import com.ismartcoding.plain.discover.RustBleServiceData
 import com.ismartcoding.plain.platform.*
 import com.ismartcoding.plain.preferences.UserPrefs
 import org.junit.Assert.*
@@ -30,9 +31,21 @@ class DiscoveryAdvertisementRustHttpTest {
         assertEquals(listOf("id=${reply.id}", "dv=${reply.deviceType.name}", "ver=${reply.version}", "pf=${reply.platform}", "aw=${if (reply.awareSupported) 1 else 0}", "ar=${if (reply.awareRunning) 1 else 0}"), mdns.txtRecords)
         val payload = RustDiscoveryAdvertisement.ble()
         assertEquals(9, payload.size)
-        val parts = BleServiceData.decode(payload)!!
-        assertEquals(BleServiceData.shortIdOf(reply.id), parts.shortId)
+        val parts = RustBleServiceData.decode(payload)!!
+        assertEquals(RustBleServiceData.shortIdOf(reply.id), parts.shortId)
         assertEquals(reply.awareSupported, parts.awareSupported)
         assertEquals(reply.awareRunning, parts.awareRunning)
+    }
+    @Test
+    fun rawBleScanHeaderUsesRustForDecodeAndPeerMatching() = runBlocking {
+        val bytes = byteArrayOf(0xf3.toByte(), 0, 1, 2, 3, 4, 0x80.toByte(), 0xfe.toByte(), 0xff.toByte())
+        val parts = RustBleServiceData.decode(bytes)!!
+        assertEquals("000102030480feff", parts.shortId)
+        assertTrue(parts.awareSupported)
+        assertTrue(parts.awareRunning)
+        assertEquals(parts, RustBleServiceData.decode(bytes + byteArrayOf(42)))
+        assertNull(RustBleServiceData.decode(null))
+        for (size in 0 until 9) assertNull(RustBleServiceData.decode(bytes.copyOf(size)))
+        assertEquals(BleServiceData.shortIdOf("fixture"), RustBleServiceData.shortIdOf("fixture"))
     }
 }

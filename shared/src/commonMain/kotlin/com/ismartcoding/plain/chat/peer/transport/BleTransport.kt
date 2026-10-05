@@ -122,7 +122,7 @@ object BleTransport : PeerTransport {
 
         val clientId = peer.id
         val scanner = bleTransport().createScanner()
-        val client = scanner.createClient(clientId)
+        val client = scanner.createClient(com.ismartcoding.plain.discover.RustBleServiceData.shortIdOf(clientId))
             ?: withTimeoutOrNull(SCAN_TIMEOUT_MS) { scanner.findOne(clientId) }
         if (client == null) {
             throw TransportUnavailable(type, peer.id, IllegalStateException("BLE device not found"))
@@ -220,7 +220,7 @@ object BleTransport : PeerTransport {
 
         val clientId = peer.id
         val scanner = bleTransport().createScanner()
-        val client = scanner.createClient(clientId)
+        val client = scanner.createClient(com.ismartcoding.plain.discover.RustBleServiceData.shortIdOf(clientId))
             ?: withTimeoutOrNull(SCAN_TIMEOUT_MS) { scanner.findOne(clientId) }
         if (client == null) {
             throw TransportUnavailable(type, peer.id, IllegalStateException("BLE device not found"))

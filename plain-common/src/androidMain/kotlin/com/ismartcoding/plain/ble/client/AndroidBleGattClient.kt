@@ -25,8 +25,8 @@ class AndroidBleGattClient(
     private val onDisconnected: (AndroidBleGattClient) -> Unit = {},
     override var rssi: Int = 0,
     shortId: String = "",
-    override val awareSupported: Boolean = false,
-    override val awareRunning: Boolean = false,
+    override var awareSupported: Boolean = false,
+    override var awareRunning: Boolean = false,
 ) : BleGattClient {
 
     /**

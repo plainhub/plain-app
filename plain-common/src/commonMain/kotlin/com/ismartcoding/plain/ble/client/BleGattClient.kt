@@ -66,24 +66,24 @@ interface BleScanner {
 
     /**
      * Finds a discovered BLE device whose shortId matches [clientId]. The
-     * shortId is computed via [com.ismartcoding.plain.ble.BleServiceData.shortIdOf]
-     * (8-byte truncated SHA256 of the full clientId), so callers pass the
+     * shortId is obtained from Rust (8-byte truncated SHA256 of the full
+     * clientId), so callers pass the
      * peer's full clientId (TempData.clientId / DPeer.id) and the scanner
      * matches it against the shortId broadcast in the scan response.
      */
     suspend fun findOne(clientId: String): BleGattClient?
 
     /**
-     * Returns an already-discovered [BleGattClient] for [clientId], or null if
-     * no matching device has been seen in the current scan session. Matching
-     * is done by shortId (see [findOne]).
+     * Returns an already-discovered [BleGattClient] for [shortId], or null if
+     * no matching device has been seen in the current scan session. The caller supplies
+     * the shortId obtained from the Rust discovery API.
      *
      * On Android, BLE MACs can't be constructed from a clientId alone — the
      * underlying [android.bluetooth.BluetoothDevice] must come from a scan
      * result. Callers that need a client for a known clientId should use
      * [findOne] (which scans) or check the result of a prior [scan] flow.
      */
-    fun createClient(clientId: String): BleGattClient?
+    fun createClient(shortId: String): BleGattClient?
 
     fun isReadyToUse(): Boolean
 

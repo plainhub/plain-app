@@ -25,8 +25,8 @@ class IosBleGattClient(
     val peripheral: CBPeripheral,
     override var rssi: Int = 0,
     shortId: String = "",
-    override val awareSupported: Boolean = false,
-    override val awareRunning: Boolean = false,
+    override var awareSupported: Boolean = false,
+    override var awareRunning: Boolean = false,
 ) : BleGattClient {
 
     /**

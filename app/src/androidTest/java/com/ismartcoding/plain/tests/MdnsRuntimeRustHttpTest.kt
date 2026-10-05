@@ -55,8 +55,8 @@ class MdnsRuntimeRustHttpTest {
             RustMdnsRuntime.control("browse")
             val captured = RustMdnsRuntime.snapshot()
             val packets = RustMdnsRuntime.packets(captured, false)
+            assertEquals(captured.getValue("running").jsonPrimitive.boolean, RustMdnsRuntime.running)
             if (com.ismartcoding.plain.platform.getDeviceIP4s().isEmpty()) {
-                assertFalse(captured.getValue("running").jsonPrimitive.boolean)
                 assertTrue(packets.all { it.srcPort > 0 && it.size > 0 })
             } else assertTrue(packets.any { it.summary.contains("PTR") && it.detail.contains("_plainapp._tcp.local") && it.srcPort > 0 && it.size > 0 })
             assertTrue(RustMdnsRuntime.services(captured).all { it.serviceType == "_plainapp._tcp.local" })

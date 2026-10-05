@@ -14,6 +14,10 @@ import androidx.compose.runtime.mutableStateListOf
 import com.ismartcoding.plain.appContext
 import com.ismartcoding.plain.ble.BleServiceData
 import com.ismartcoding.plain.ble.BleUuids
+import com.ismartcoding.plain.discover.RustBleServiceData
+import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.ensureActive
+import kotlinx.coroutines.flow.map
 import com.ismartcoding.plain.lib.extensions.hasPermission
 import com.ismartcoding.plain.platform.isSPlus
 import com.ismartcoding.plain.lib.logcat.LogCat
@@ -79,16 +83,20 @@ object AndroidBleScanner : BleScanner {
 
     @SuppressLint("MissingPermission")
     override fun scan(serviceUuid: String): Flow<BleGattClient> {
-        return callbackFlow {
+        return callbackFlow<ScanResult> {
             LogCat.d("Scan bluetooth devices for $serviceUuid")
             beginScan(serviceUuid) { result ->
-                val parts = parseServiceData(result, serviceUuid)
-                trySend(addDevice(result.device, result.rssi, parts))
+                trySend(result)
             }
 
             awaitClose {
                 endScan()
             }
+        }.map { result ->
+            val data = result.scanRecord?.serviceData?.get(ParcelUuid.fromString(serviceUuid))
+            val parts = RustBleServiceData.decode(data)
+            currentCoroutineContext().ensureActive()
+            addDevice(result.device, result.rssi, parts)
         }
     }
 
@@ -146,21 +154,11 @@ object AndroidBleScanner : BleScanner {
     @Synchronized
     override fun isScanPaused(): Boolean = pauseCount > 0
 
-    /**
-     * Parses the scan response serviceData via [BleServiceData.decode].
-     * Returns null when the serviceData is absent (peer is not advertising
-     * yet) — in that case the device falls back to being identified by MAC.
-     */
-    private fun parseServiceData(result: ScanResult, serviceUuid: String): BleServiceData.Parts? {
-        val data = result.scanRecord?.serviceData?.get(ParcelUuid.fromString(serviceUuid)) ?: return null
-        return BleServiceData.decode(data)
-    }
-
     override suspend fun findOne(clientId: String): BleGattClient? {
         if (!isReadyToUse()) return null
         // Match by shortId (SHA256(clientId)[0:8] hex) — the scan-exposed
         // stable identifier. The full clientId is never broadcast.
-        val shortId = BleServiceData.shortIdOf(clientId)
+        val shortId = RustBleServiceData.shortIdOf(clientId)
         allDevices.find { it.id.equals(shortId, ignoreCase = true) }?.let { return it }
         return scan(serviceUuid = BleUuids.SERVICE_UUID).firstOrNull { device ->
             shortId.equals(device.id, ignoreCase = true)
@@ -168,12 +166,11 @@ object AndroidBleScanner : BleScanner {
     }
 
     @SuppressLint("MissingPermission")
-    override fun createClient(clientId: String): BleGattClient? {
+    override fun createClient(shortId: String): BleGattClient? {
         // On Android we can't construct a BleGattClient from a clientId alone —
         // the underlying BluetoothDevice (with its current MAC) must come from
         // a scan result. Return an already-discovered client if we have one;
         // otherwise the caller must scan via [findOne]. Match by shortId.
-        val shortId = BleServiceData.shortIdOf(clientId)
         return allDevices.find { it.id.equals(shortId, ignoreCase = true) }
     }
 
@@ -209,6 +206,7 @@ object AndroidBleScanner : BleScanner {
             allDevices.add(d)
         } else {
             d.rssi = rssi
+            parts?.let { d.awareSupported = it.awareSupported; d.awareRunning = it.awareRunning }
         }
         return d
     }
