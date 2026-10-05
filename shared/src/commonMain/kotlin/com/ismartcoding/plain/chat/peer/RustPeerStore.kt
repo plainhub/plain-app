@@ -2,6 +2,7 @@ package com.ismartcoding.plain.chat.peer
 
 import com.ismartcoding.plain.chat.callChatStore
 import com.ismartcoding.plain.db.DPeer
+import com.ismartcoding.plain.db.PeerAddress
 import com.ismartcoding.plain.enums.DeviceType
 import com.ismartcoding.plain.enums.PeerStatus
 import kotlinx.serialization.json.*
@@ -26,6 +27,16 @@ object RustPeerStore {
     }.takeUnless { it is JsonNull }?.let(::decode)
     suspend fun delete(id: String) { deleteByIds(listOf(id)) }
     suspend fun deleteByIds(ids: List<String>) { callChatStore("deletePeers") { put("ids", JsonArray(ids.map(::JsonPrimitive))) } }
+    suspend fun address(peer: DPeer): PeerAddress = decodeAddress(callChatStore("peerAddress") {
+        put("id", peer.id); put("expected", encode(peer))
+    })
+    suspend fun fileUrl(peer: DPeer, fileId: String): String = callChatStore("peerFileUrl") {
+        put("id", peer.id); put("expected", encode(peer)); put("file_id", fileId)
+    }.jsonPrimitive.content
+    private fun decodeAddress(value: JsonElement): PeerAddress = value.jsonObject.let { row ->
+        fun string(key: String) = row.getValue(key).jsonPrimitive.content
+        PeerAddress(string("bestIp"), string("name"), string("baseUrl"), string("apiUrl"), string("statusWsUrl"))
+    }
     private fun encode(row: DPeer): JsonObject = buildJsonObject {
         put("id", row.id); put("name", row.name); put("ip", row.ip); put("key", row.key); put("public_key", row.publicKey)
         put("status", row.status.name); put("port", row.port); put("device_type", row.deviceType.name); put("token", "")
@@ -33,6 +44,6 @@ object RustPeerStore {
     }
     internal fun decode(value: JsonElement): DPeer = value.jsonObject.let { row ->
         fun string(key: String) = row.getValue(key).jsonPrimitive.content
-        DPeer(string("id"), string("name"), string("ip"), string("key"), string("public_key"), PeerStatus.valueOf(string("status")), row.getValue("port").jsonPrimitive.int, DeviceType.valueOf(string("device_type")), Instant.parse(string("created_at")), Instant.parse(string("updated_at")))
+        DPeer(string("id"), string("name"), string("ip"), string("key"), string("public_key"), PeerStatus.valueOf(string("status")), row.getValue("port").jsonPrimitive.int, DeviceType.valueOf(string("device_type")), Instant.parse(string("created_at")), Instant.parse(string("updated_at"))).also { peer -> row["address"]?.let { peer.address = decodeAddress(it) } }
     }
 }

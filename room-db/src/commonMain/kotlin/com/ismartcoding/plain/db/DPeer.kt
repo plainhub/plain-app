@@ -6,6 +6,7 @@ import androidx.room3.Dao
 import com.ismartcoding.plain.lib.TimeHelper
 import kotlin.time.Instant
 import androidx.room3.Entity
+import androidx.room3.Ignore
 import androidx.room3.Insert
 import androidx.room3.PrimaryKey
 import androidx.room3.Query
@@ -27,6 +28,7 @@ data class DPeer(
 
     @ColumnInfo(name = "created_at") var createdAt: Instant = TimeHelper.now(),
     @ColumnInfo(name = "updated_at") var updatedAt: Instant = TimeHelper.now(),
+    @Ignore var address: PeerAddress? = null,
 ) {
     fun isPaired(): Boolean = status == PeerStatus.PAIRED
     fun getIpList(): List<String> {

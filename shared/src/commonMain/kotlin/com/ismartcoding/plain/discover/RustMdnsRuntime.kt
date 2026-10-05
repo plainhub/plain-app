@@ -33,6 +33,10 @@ object RustMdnsRuntime {
                 try {
                     val row = call(command.body)
                     apply(row)
+                    if (command.body["action"]?.jsonPrimitive?.content == "restart") {
+                        PeerCacher.load()
+                        RustNearbyDevices.refresh()
+                    }
                     command.reply.complete(row)
                 } catch (cancelled: CancellationException) {
                     command.reply.cancel(cancelled)

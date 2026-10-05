@@ -4,19 +4,20 @@ import com.ismartcoding.plain.platform.createCryptoClient
 import com.ismartcoding.plain.platform.createDownloadClient
 import com.ismartcoding.plain.chat.peer.GraphQLResponse
 import com.ismartcoding.plain.db.DPeer
-import com.ismartcoding.plain.db.getApiUrl
+import com.ismartcoding.plain.chat.peer.RustPeerStore
 import com.ismartcoding.plain.db.getFileUrl
 
 object LanTransport : PeerTransport {
     override val type = PeerTransportType.LAN
 
     override suspend fun send(peer: DPeer, request: SignedRequest, keyBytes: ByteArray): GraphQLResponse {
+        val address = RustPeerStore.address(peer)
         val client = createCryptoClient(keyBytes, 10)
         return executeGraphQLRequest(
             transportType = type,
             peerId = peer.id,
             client = client,
-            url = peer.getApiUrl(),
+            url = address.apiUrl,
             body = request.body,
             channelId = request.channelId,
         )

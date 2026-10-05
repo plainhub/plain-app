@@ -173,7 +173,7 @@ internal fun LazyListScope.nearbyDeviceListItems(
         NearbyDeviceItem(
             item = item,
             status = status,
-            bestIp = getBestIp(item.ips),
+            bestIp = item.bestIp,
         )
         VerticalSpace(8.dp)
     }

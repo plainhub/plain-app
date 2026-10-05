@@ -18,6 +18,6 @@ object NearbyDeviceCache {
     suspend fun removeAsync(id: String) { callChatStore("deleteNearby") { put("id", id) } }
     suspend fun getAllAsync(): List<DNearbyDevice> = callChatStore("nearby").jsonArray.map { value -> value.jsonObject.let { row ->
         fun string(key: String) = row.getValue(key).jsonPrimitive.content
-        DNearbyDevice(id = string("id"), name = string("name"), ips = row.getValue("ips").jsonArray.map { it.jsonPrimitive.content }, port = row.getValue("port").jsonPrimitive.int, deviceType = DeviceType.valueOf(string("device_type")), version = string("version"), platform = string("platform"), lastSeen = Instant.parse(string("last_seen")), discoveryMethods = setOf(DiscoveryMethod.LAN))
+        DNearbyDevice(id = string("id"), name = string("name"), ips = row.getValue("ips").jsonArray.map { it.jsonPrimitive.content }, port = row.getValue("port").jsonPrimitive.int, deviceType = DeviceType.valueOf(string("device_type")), version = string("version"), platform = string("platform"), lastSeen = Instant.parse(string("last_seen")), discoveryMethods = setOf(DiscoveryMethod.LAN), bestIp = string("bestIp"))
     } }
 }

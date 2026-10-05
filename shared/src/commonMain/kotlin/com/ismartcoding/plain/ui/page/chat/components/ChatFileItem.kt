@@ -2,6 +2,8 @@ package com.ismartcoding.plain.ui.page.chat.components
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.produceState
+import kotlinx.coroutines.CancellationException
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -46,7 +48,11 @@ fun ChatFileItem(
     onShowAudioPlayer: () -> Unit,
 ) {
     val itemState = rememberTransformItemState()
-    val previewPath = item.getPreviewPath(peer)
+    val previewPath by produceState("", item.uri, peer?.id, peer?.address, peer?.ip, peer?.port, peer?.key, peer?.publicKey, peer?.status) {
+        value = try { item.getPreviewPath(peer) }
+        catch (cancelled: CancellationException) { throw cancelled }
+        catch (_: Exception) { "" }
+    }
     val path = item.uri.getFinalPath()
     val fileName = item.fileName.ifEmpty { path.getFilenameFromPath() }
     val isAudio = fileName.isAudioFast()

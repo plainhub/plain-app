@@ -21,5 +21,7 @@ data class DNearbyDevice(
     val status: NearbyItemStatus = NearbyItemStatus.UNPAIRED,
     val discoveryMethods: Set<DiscoveryMethod> = setOf(),
     @Transient
+    val bestIp: String = "",
+    @Transient
     val bleClient: BleGattClient? = null,
 )

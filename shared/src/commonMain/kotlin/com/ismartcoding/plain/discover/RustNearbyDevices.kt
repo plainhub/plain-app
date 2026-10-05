@@ -51,7 +51,7 @@ object RustNearbyDevices {
         revision = next
         val devices = snapshot.getValue("devices").jsonArray.map {
             val device = JsonHelper.jsonDecode<DNearbyDevice>(it.toString())
-            device.copy(bleClient = clients[device.id], status = NearbyViewModel.getStatus(device.id, device.status == com.ismartcoding.plain.ui.models.NearbyItemStatus.PAIRED))
+            device.copy(bestIp = it.jsonObject.getValue("bestIp").jsonPrimitive.content, bleClient = clients[device.id], status = NearbyViewModel.getStatus(device.id, device.status == com.ismartcoding.plain.ui.models.NearbyItemStatus.PAIRED))
         }
         clients.keys.retainAll(devices.map { it.id }.toSet())
         NearbyViewModel.nearbyDevices.value = devices

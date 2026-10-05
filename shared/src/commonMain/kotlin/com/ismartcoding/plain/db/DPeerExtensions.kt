@@ -1,24 +1,10 @@
 package com.ismartcoding.plain.db
 
-import com.ismartcoding.plain.platform.bestLanIp
-import com.ismartcoding.plain.platform.getDeviceIP4sWithPrefixLength
-import com.ismartcoding.plain.helpers.UrlHelper
-import com.ismartcoding.plain.lib.extensions.urlEncode
+import com.ismartcoding.plain.chat.peer.RustPeerStore
 
-fun DPeer.getBestIp(): String {
-    val ips = getIpList()
-    if (ips.isEmpty()) return ip
-    return bestLanIp(ips, getDeviceIP4sWithPrefixLength())
-}
-
-fun DPeer.getBaseUrl(): String = UrlHelper.buildUrl("https", getBestIp(), port)
-
-fun DPeer.getApiUrl(): String = "${getBaseUrl()}/peer_graphql"
-
-fun DPeer.getStatusWsUrl(): String = UrlHelper.buildUrl("wss", getBestIp(), port, "/status")
-
-fun DPeer.getFileUrl(fileId: String): String = "${getBaseUrl()}/fs?id=${fileId.urlEncode()}"
-
-fun DPeer.getName(): String {
-    return name.ifBlank { getBestIp() }
-}
+fun DPeer.getBestIp(): String = address?.bestIp.orEmpty()
+fun DPeer.getBaseUrl(): String = address?.baseUrl.orEmpty()
+fun DPeer.getApiUrl(): String = address?.apiUrl.orEmpty()
+fun DPeer.getStatusWsUrl(): String = address?.statusWsUrl.orEmpty()
+suspend fun DPeer.getFileUrl(fileId: String): String = RustPeerStore.fileUrl(this, fileId)
+fun DPeer.getName(): String = address?.name ?: name

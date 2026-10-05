@@ -3,7 +3,6 @@ package com.ismartcoding.plain.discover
 import com.ismartcoding.plain.api.RustContentApi
 import com.ismartcoding.plain.data.*
 import com.ismartcoding.plain.lib.JsonHelper
-import com.ismartcoding.plain.platform.getDeviceIP4sWithPrefixLength
 import kotlinx.serialization.json.*
 
 object RustPairingRuntime {
@@ -12,7 +11,7 @@ object RustPairingRuntime {
     suspend fun start(device: DNearbyDevice): JsonElement {
         val result = call(buildJsonObject {
         put("action", "start"); put("device", RustPairingStore.deviceFacts()); put("target", target(device))
-        put("ips", JsonArray(device.ips.map(::JsonPrimitive))); put("interfaces", interfaces())
+        put("ips", JsonArray(device.ips.map(::JsonPrimitive)))
         put("methods", JsonArray(device.discoveryMethods.map { JsonPrimitive(it.name) })); put("ble", device.bleClient != null)
         })
         PairingProjection.reconcile()
@@ -24,14 +23,12 @@ object RustPairingRuntime {
     private fun target(device: DNearbyDevice) = buildJsonObject {
         put("deviceId", device.id); put("deviceName", device.name); put("deviceIp", ""); put("devicePort", device.port)
     }
-    private fun interfaces() = JsonArray(getDeviceIP4sWithPrefixLength().map { (ip, prefix) -> buildJsonObject { put("ip", ip); put("prefixLength", prefix.toInt()) } })
     suspend fun startLan(device: DNearbyDevice) = call(buildJsonObject {
         put("action", "startLan"); put("device", RustPairingStore.deviceFacts())
         put("target", buildJsonObject {
             put("deviceId", device.id); put("deviceName", device.name); put("deviceIp", ""); put("devicePort", device.port)
         })
         put("ips", JsonArray(device.ips.map(::JsonPrimitive)))
-        put("interfaces", JsonArray(getDeviceIP4sWithPrefixLength().map { (ip, prefix) -> buildJsonObject { put("ip", ip); put("prefixLength", prefix.toInt()) } }))
     })
     suspend fun cancel(id: String) = call(buildJsonObject { put("action", "cancel"); put("id", id); put("generation", JsonNull) })
     suspend fun receiveRequest(request: DPairingRequest, address: String, ble: Boolean) = call(buildJsonObject {

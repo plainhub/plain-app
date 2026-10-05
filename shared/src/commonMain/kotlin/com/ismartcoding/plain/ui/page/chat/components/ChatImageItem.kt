@@ -9,6 +9,9 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.produceState
+import kotlinx.coroutines.CancellationException
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
@@ -54,6 +57,11 @@ internal fun ChatImageItem(
     val downloadProgress = downloadTask?.let {
         if (it.messageFile.size > 0) it.downloadedSize.toFloat() / it.messageFile.size.toFloat() else 0f
     } ?: 0f
+    val previewPath by produceState("", item.uri, peer?.id, peer?.address, peer?.ip, peer?.port, peer?.key, peer?.publicKey, peer?.status) {
+        value = try { item.getPreviewPath(peer) }
+        catch (cancelled: CancellationException) { throw cancelled }
+        catch (_: Exception) { "" }
+    }
     val scope = rememberCoroutineScope()
 
     LaunchedEffect(item.uri) {
@@ -82,7 +90,7 @@ internal fun ChatImageItem(
     ) {
         TransformImageView(
             modifier = Modifier.size(imageWidthDp).clip(RoundedCornerShape(6.dp)),
-            path = item.getPreviewPath(peer),
+            path = previewPath,
             fileName = item.fileName,
             key = item.id,
             itemState = itemState,
