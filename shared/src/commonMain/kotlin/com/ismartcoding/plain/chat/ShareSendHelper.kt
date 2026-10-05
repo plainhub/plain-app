@@ -10,16 +10,11 @@ import com.ismartcoding.plain.db.DSharePeerInfo
 import com.ismartcoding.plain.db.DShare
 import com.ismartcoding.plain.db.MessageType
 import com.ismartcoding.plain.enums.ChatStatus
-import com.ismartcoding.plain.events.EventType
-import com.ismartcoding.plain.events.WebSocketEvent
 import com.ismartcoding.plain.features.file.FileSortBy
 import com.ismartcoding.plain.features.share.ShareCrypto
 import com.ismartcoding.plain.features.share.ShareManager
-import com.ismartcoding.plain.httpserver.models.toModel
-import com.ismartcoding.plain.lib.JsonHelper
 import com.ismartcoding.plain.lib.extensions.isImageFast
 import com.ismartcoding.plain.lib.extensions.isVideoFast
-import com.ismartcoding.plain.lib.sendEvent
 import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.platform.getDeviceIP4
 import com.ismartcoding.plain.lib.withIO
@@ -61,18 +56,19 @@ object ShareSendHelper {
         // Placeholder message per target so remote UIs see the files immediately.
         val messageIds = targets.map { target ->
             val item = ChatManager.insertFilesImmediate(target, placeholders.map { it.first }, isImageVideo)
-            sendEvent(WebSocketEvent(EventType.MESSAGE_CREATED, JsonHelper.jsonEncode(listOf(item.toModel()))))
             ChatViewModel.onMessagesCreated(target, listOf(item), scroll = true)
             item.id
         }
         val finalItems = importPickedFiles(placeholders)
+        val updatedItems = RustChatService.replaceMany(messageIds, finalItems)
+        ChatManager.refreshLatestChats()
         coroutineScope {
             targets.mapIndexed { index, target ->
                 async {
-                    val updated = ChatManager.updateFilesMessage(messageIds[index], finalItems, target, PeerCacher.getOnlinePeerIds())
+                    val updated = updatedItems[index]
                     if (updated != null) ChatViewModel.onMessageUpdated(updated.id)
                     val captionOk = caption.isNullOrBlank() || sendText(target, caption)
-                    captionOk && updated?.status != ChatStatus.FAILED
+                    captionOk && updated?.status == ChatStatus.SENT
                 }
             }.all { it.await() }
         }
@@ -156,7 +152,6 @@ object ShareSendHelper {
         if (!target.isLocal()) {
             ChatManager.sendMessage(item, target, PeerCacher.getOnlinePeerIds())
         }
-        sendEvent(WebSocketEvent(EventType.MESSAGE_CREATED, JsonHelper.jsonEncode(listOf(item.toModel()))))
         ChatViewModel.onMessagesCreated(target, listOf(item), scroll = true)
         item.status == ChatStatus.SENT
     }

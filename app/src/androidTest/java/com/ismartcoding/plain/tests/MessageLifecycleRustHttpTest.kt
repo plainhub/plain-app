@@ -54,4 +54,40 @@ class MessageLifecycleRustHttpTest {
             com.ismartcoding.plain.chat.ChatCacher.load()
         }
     }
+    @Test
+    fun rustFileCommandsBindSharedOwnershipAndIgnoreTheCurrentUiTarget() = runBlocking {
+        val manager = com.ismartcoding.plain.chat.ChatManager
+        val local = com.ismartcoding.plain.chat.data.ChatTarget.parseId("peer:local")
+        val wrongTarget = com.ismartcoding.plain.chat.data.ChatTarget.parseId("peer:synthetic-other")
+        val bytes = "synthetic-${UUID.randomUUID()}".toByteArray()
+        val owned = com.ismartcoding.plain.helpers.AppFileStore.importBytes(bytes, "text/plain")
+        val file = DMessageFile(id = owned.id, uri = "content://synthetic", fileName = "fixture.txt", size = 0)
+        val chats = mutableListOf<String>()
+        try {
+            val first = manager.insertFilesImmediate(local, listOf(file), false).also { chats += it.id }
+            val second = manager.insertFilesImmediate(local, listOf(file), false).also { chats += it.id }
+            val imported = file.copy(uri = com.ismartcoding.plain.helpers.AppFileStore.toFidUri(owned))
+            val json = kotlinx.serialization.json.Json { encodeDefaults = true }
+            val response = com.ismartcoding.plain.api.RustContentApi.postJson("chat/service", kotlinx.serialization.json.buildJsonObject {
+                put("action", kotlinx.serialization.json.JsonPrimitive("replaceFilesMany"))
+                put("ids", kotlinx.serialization.json.JsonArray(chats.map { kotlinx.serialization.json.JsonPrimitive(it) }))
+                put("items", json.parseToJsonElement(json.encodeToString(kotlinx.serialization.builtins.ListSerializer(DMessageFile.serializer()), listOf(imported))))
+            })
+            assertTrue(response.containsKey("result"))
+            assertEquals(2, com.ismartcoding.plain.helpers.AppFileStore.getById(owned.id)!!.refCount)
+            val saved = manager.updateFilesMessage(first.id, listOf(imported), wrongTarget, emptySet())!!
+            assertEquals(ChatStatus.SENT, saved.status)
+            assertEquals(bytes.size.toLong(), (saved.content.value as DMessageFiles).items.single().size)
+            RustChatStore.delete(first.id)
+            assertEquals(1, com.ismartcoding.plain.helpers.AppFileStore.getById(owned.id)!!.refCount)
+            assertTrue(java.io.File(com.ismartcoding.plain.helpers.AppFileStore.resolveUri(imported.uri)).exists())
+            RustChatStore.delete(second.id)
+            assertNull(com.ismartcoding.plain.helpers.AppFileStore.getById(owned.id))
+        } finally {
+            RustChatStore.deleteByIds(chats)
+            while (com.ismartcoding.plain.helpers.AppFileStore.getById(owned.id) != null) com.ismartcoding.plain.helpers.AppFileStore.release(owned.id)
+            com.ismartcoding.plain.chat.ChatCacher.load()
+        }
+    }
+
 }

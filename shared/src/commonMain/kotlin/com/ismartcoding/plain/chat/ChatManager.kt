@@ -2,20 +2,11 @@ package com.ismartcoding.plain.chat
 
 import com.ismartcoding.plain.lib.withIO
 import com.ismartcoding.plain.chat.data.ChatTarget
-import com.ismartcoding.plain.chat.data.ChatTargetType
 import com.ismartcoding.plain.db.DChat
 import com.ismartcoding.plain.db.DChatChannel
 import com.ismartcoding.plain.db.DMessageContent
 import com.ismartcoding.plain.db.DMessageFile
-import com.ismartcoding.plain.db.DMessageFiles
-import com.ismartcoding.plain.db.DMessageImages
-import com.ismartcoding.plain.db.MessageType
 import com.ismartcoding.plain.enums.ChatStatus
-import com.ismartcoding.plain.events.EventType
-import com.ismartcoding.plain.events.WebSocketEvent
-import com.ismartcoding.plain.lib.JsonHelper
-import com.ismartcoding.plain.httpserver.models.toModel
-import com.ismartcoding.plain.lib.sendEvent
 
 object ChatManager {
 
@@ -32,11 +23,7 @@ object ChatManager {
     }
 
     suspend fun createChatItem(target: ChatTarget, content: DMessageContent): DChat = withIO {
-        val item = ChatDbHelper.insertChatItem(
-            message = content,
-            toId = if (target.type == ChatTargetType.PEER) target.toId else "",
-            channelId = if (target.type == ChatTargetType.CHANNEL) target.toId else "",
-        )
+        val item = RustChatService.create(target, content)
         refreshLatestChats()
         item
     }
@@ -48,7 +35,6 @@ object ChatManager {
     suspend fun resendMessage(item: DChat) = withIO {
         ChatSender.send(item)
         ChatViewModel.onMessageUpdated(item.id)
-        sendEvent(WebSocketEvent(EventType.MESSAGE_UPDATED, JsonHelper.jsonEncode(listOf(item.toModel()))))
     }
 
     suspend fun sendToChannelMembers(item: DChat, channel: DChatChannel, peerIds: List<String>) = withIO {
@@ -56,16 +42,7 @@ object ChatManager {
     }
 
     suspend fun insertFilesImmediate(target: ChatTarget, files: List<DMessageFile>, isImageVideo: Boolean): DChat = withIO {
-        val content = if (isImageVideo) {
-            DMessageContent(MessageType.IMAGES, DMessageImages(files))
-        } else {
-            DMessageContent(MessageType.FILES, DMessageFiles(files))
-        }
-        val item = ChatDbHelper.insertChatItem(
-            message = content,
-            toId = if (target.type == ChatTargetType.PEER) target.toId else "",
-            channelId = if (target.type == ChatTargetType.CHANNEL) target.toId else "",
-        )
+        val item = RustChatService.createFiles(target, files, isImageVideo)
         refreshLatestChats()
         item
     }
@@ -76,14 +53,7 @@ object ChatManager {
         target: ChatTarget,
         onlinePeerIds: Set<String>,
     ): DChat? = withIO {
-        val item = ChatDbHelper.getChatItem(messageId) ?: return@withIO null
-        ChatDbHelper.updateChatItemFilesContent(item, files)
-        if (target.isLocal()) {
-            ChatDbHelper.updateChatItemStatus(item, ChatStatus.SENT)
-        } else {
-            ChatDbHelper.updateChatItemStatus(item, ChatStatus.PENDING)
-            ChatSender.send(item)
-        }
+        val item = RustChatService.replaceFiles(messageId, files)
         refreshLatestChats()
         item
     }
@@ -97,11 +67,7 @@ object ChatManager {
     }
 
     suspend fun clearAllMessages(target: ChatTarget) = withIO {
-        if (target.type == ChatTargetType.CHANNEL) {
-            ChatDbHelper.deleteAllChannelChatsAsync(target.toId)
-        } else {
-            ChatDbHelper.deleteAllChatsAsync(target.toId)
-        }
+        RustChatService.clear(target)
     }
 
 }

@@ -2,7 +2,6 @@ package com.ismartcoding.plain.chat
 
 import com.ismartcoding.plain.api.RustContentApi
 import com.ismartcoding.plain.db.DChat
-import com.ismartcoding.plain.discover.MdnsDiscoverManager
 import com.ismartcoding.plain.lib.withIO
 import kotlinx.serialization.json.*
 
@@ -20,7 +19,6 @@ object ChatSender {
             put("id", item.id)
             put("recipients", peerIds?.let { JsonArray(it.map(::JsonPrimitive)) } ?: JsonNull)
         }, longRunning = true).getValue("result").jsonObject
-        if (result.getValue("rediscover").jsonPrimitive.boolean) MdnsDiscoverManager.browse()
         val saved = result.getValue("chat").takeUnless { it is JsonNull }?.let(RustChatStore::decode)
             ?: error("Chat unavailable")
         item.fromId = saved.fromId

@@ -139,12 +139,22 @@ object RustContentApi {
                             EventType.MESSAGE_CREATED.value -> {
                                 Json.parseToJsonElement(payload).jsonArray.forEach { value ->
                                     com.ismartcoding.plain.chat.RustChatStore.getById(value.jsonObject.getValue("id").jsonPrimitive.content)?.let { item ->
-                                        com.ismartcoding.plain.chat.peer.RustPeerStore.getById(item.fromId)?.let { peer ->
+                                        if (item.fromId == "me") {
+                                            com.ismartcoding.plain.chat.ChatCacher.load()
+                                            sendEvent(WebSocketEvent(EventType.MESSAGE_CREATED,
+                                                com.ismartcoding.plain.lib.JsonHelper.jsonEncode(listOf(item.toModel()))))
+                                        } else com.ismartcoding.plain.chat.peer.RustPeerStore.getById(item.fromId)?.let { peer ->
                                             val channel = item.channelId.takeIf { it.isNotEmpty() }?.let { com.ismartcoding.plain.chat.channel.RustChannelStore.getById(it) }
                                             com.ismartcoding.plain.chat.ChatMessageReceiver.applyCommitted(item, peer, channel)
                                         }
                                     }
                                 }
+                            }
+                            EventType.MESSAGE_DELETED.value -> {
+                                val target = Json.parseToJsonElement(payload).jsonPrimitive.content
+                                com.ismartcoding.plain.chat.ChatViewModel.onConversationCleared(target)
+                                com.ismartcoding.plain.chat.ChatCacher.load()
+                                sendEvent(WebSocketEvent(EventType.MESSAGE_DELETED, payload))
                             }
                             EventType.CHANNELS_UPDATED.value -> {
                                 com.ismartcoding.plain.chat.channel.ChannelSystemMessageReceiver.applyCommitted(Json.parseToJsonElement(payload).jsonObject)

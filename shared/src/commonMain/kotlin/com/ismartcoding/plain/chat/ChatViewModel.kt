@@ -22,7 +22,6 @@ import com.ismartcoding.plain.i18n.Res
 import com.ismartcoding.plain.i18n.sent
 import com.ismartcoding.plain.lib.sendEvent
 import com.ismartcoding.plain.ui.helpers.DialogHelper
-import com.ismartcoding.plain.httpserver.models.toModel
 import com.ismartcoding.plain.ui.models.ISelectableViewModel
 import com.ismartcoding.plain.ui.models.VChat
 import kotlinx.coroutines.CoroutineScope
@@ -123,7 +122,6 @@ object ChatViewModel : ISelectableViewModel<VChat> {
             val target = target.value
             ChatManager.clearAllMessages(target)
             _itemsFlow.value = emptyList()
-            sendEvent(WebSocketEvent(EventType.MESSAGE_DELETED, JsonHelper.jsonEncode(target.encodedToId)))
         }
     }
 
@@ -155,7 +153,6 @@ object ChatViewModel : ISelectableViewModel<VChat> {
             if (!target.isLocal()) {
                 ChatManager.sendMessage(item2, target, onlinePeerIds)
             }
-            sendEvent(WebSocketEvent(EventType.MESSAGE_CREATED, JsonHelper.jsonEncode(listOf(item2.toModel()))))
             publishCreated(target, listOf(item2))
             if (item2.status == ChatStatus.SENT) {
                 DialogHelper.showSuccess(Res.string.sent)
@@ -179,7 +176,6 @@ object ChatViewModel : ISelectableViewModel<VChat> {
             ChatManager.sendMessage(item, target, onlinePeerIds)
             publishUpdated(item)
         }
-        sendEvent(WebSocketEvent(EventType.MESSAGE_CREATED, JsonHelper.jsonEncode(listOf(item.toModel()))))
         item.status == ChatStatus.SENT
     }
 
@@ -198,7 +194,6 @@ object ChatViewModel : ISelectableViewModel<VChat> {
     suspend fun sendFilesImmediate(files: List<DMessageFile>, isImageVideo: Boolean): String = withIO {
         val item = ChatManager.insertFilesImmediate(target.value, files, isImageVideo)
         publishCreated(target.value, listOf(item), scroll = true)
-        sendEvent(WebSocketEvent(EventType.MESSAGE_CREATED, JsonHelper.jsonEncode(listOf(item.toModel()))))
         item.id
     }
 
@@ -213,8 +208,8 @@ object ChatViewModel : ISelectableViewModel<VChat> {
     /**
      * Entry point for non-UI writers delivering already-persisted messages
      * (share-to-chat, incoming WebSocket, GraphQL-created messages). Updates
-     * the open conversation when the target matches; WebSocket broadcast to
-     * desktop clients stays the caller's responsibility.
+     * the open conversation when the target matches. Root message events
+     * are forwarded to desktop clients by RustContentApi.
      */
     suspend fun onMessagesCreated(target: ChatTarget, items: List<DChat>, scroll: Boolean = false) = mutex.withLock {
         if (_target.value == target) {
@@ -233,6 +228,10 @@ object ChatViewModel : ISelectableViewModel<VChat> {
         mutex.withLock {
             update(chat)
         }
+    }
+
+    suspend fun onConversationCleared(encodedTarget: String) = mutex.withLock {
+        if (_target.value.encodedToId == encodedTarget) _itemsFlow.value = emptyList()
     }
 
     suspend fun onMessagesDeleted(ids: Set<String>) = mutex.withLock {
