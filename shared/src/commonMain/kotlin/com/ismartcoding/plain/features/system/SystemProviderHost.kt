@@ -5,6 +5,7 @@ import com.ismartcoding.plain.lib.JsonHelper
 import com.ismartcoding.plain.lib.pinyin.Pinyin
 import com.ismartcoding.plain.platform.installedPackageFacts
 import com.ismartcoding.plain.platform.notificationFacts
+import com.ismartcoding.plain.platform.isGranted
 import kotlinx.serialization.json.*
 
 object SystemProviderHost {
@@ -22,6 +23,15 @@ object SystemProviderHost {
                 val text = value.jsonPrimitive.content
                 put(text, text.parseEpochMillis()?.let(::JsonPrimitive) ?: JsonNull)
             }
+        }
+        "systemPermissionFacts" -> buildJsonObject {
+            val granted = buildJsonObject {
+                params.getValue("permissions").jsonArray.forEach { item ->
+                    val name = item.jsonPrimitive.content
+                    put(name, com.ismartcoding.plain.platform.Permission.valueOf(name).isGranted())
+                }
+            }
+            put("granted", granted)
         }
         "systemDeleteRecords" -> JsonArray(com.ismartcoding.plain.platform.deleteSystemProviderFacts(
             com.ismartcoding.plain.enums.DataType.valueOf(params.getValue("provider").jsonPrimitive.content),

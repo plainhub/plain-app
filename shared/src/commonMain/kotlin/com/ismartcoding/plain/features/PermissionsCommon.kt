@@ -18,17 +18,8 @@ import com.ismartcoding.plain.ui.resources.phone_call as ui_drawable_phone_call
 import com.ismartcoding.plain.i18n.folder
 
 suspend fun checkEnabledAsync(permissions: Set<Permission>) {
-    val apiPermissions = SystemPrefs.apiPermissions.value.toMutableSet()
-    if (apiPermissions.contains(Permission.WRITE_CONTACTS.toString())) {
-        apiPermissions.add(Permission.READ_CONTACTS.toString())
-    }
-    if (apiPermissions.contains(Permission.WRITE_CALL_LOG.toString())) {
-        apiPermissions.add(Permission.READ_CALL_LOG.toString())
-    }
-    for (item in permissions.map { it.toString() }) {
-        if (!apiPermissions.contains(item)) {
-            throw Exception("no_permission")
-        }
+    if (!com.ismartcoding.plain.features.system.RustSystemProviders.permissionsAllowed(permissions.map { it.name })) {
+        throw Exception("no_permission")
     }
 }
 

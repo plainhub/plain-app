@@ -119,15 +119,15 @@ fun Permission.grant(): Boolean {
 }
 
 suspend fun Permission.isEnabledAsync(): Boolean {
-    return SystemPrefs.apiPermissions.value.contains(name)
+    return com.ismartcoding.plain.features.system.RustSystemProviders.permissionsAllowed(listOf(name))
 }
 
 suspend fun Permission.enabledAndIsGrantedAsync(): Boolean {
-    return isGranted() && isEnabledAsync()
+    return com.ismartcoding.plain.features.system.RustSystemProviders.permissionsAllowed(listOf(name), requireGranted = true)
 }
 
 suspend fun Permission.checkEnabledAsync() {
-    if (!isEnabledAsync()) {
+    if (!com.ismartcoding.plain.features.system.RustSystemProviders.permissionsAllowed(listOf(name))) {
         throw Exception("no_permission")
     }
 }
