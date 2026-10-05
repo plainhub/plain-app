@@ -1,261 +1,50 @@
 package com.ismartcoding.plain.chat.peer
-import com.ismartcoding.plain.platform.subscribeAwareForPeer
-import com.ismartcoding.plain.platform.startAwareIfNeeded
 
-import com.ismartcoding.plain.lib.withIO
-import com.ismartcoding.plain.platform.chaCha20Encrypt
-import com.ismartcoding.plain.lib.JsonHelper
-import com.ismartcoding.plain.lib.logcat.LogCat
-import com.ismartcoding.plain.TempData
-import com.ismartcoding.plain.platform.isWifiAwareSupported
-import com.ismartcoding.plain.db.DPeer
-import com.ismartcoding.plain.enums.PeerStatus
-import com.ismartcoding.plain.db.getStatusWsUrl
-import com.ismartcoding.plain.discover.MdnsDiscoverManager
+import com.ismartcoding.plain.api.RustContentApi
 import com.ismartcoding.plain.events.EventType
 import com.ismartcoding.plain.events.PeerStatusData
 import com.ismartcoding.plain.events.WebSocketEvent
-import com.ismartcoding.plain.helpers.SignatureHelper
-import com.ismartcoding.plain.lib.TimeHelper
+import com.ismartcoding.plain.lib.JsonHelper
+import com.ismartcoding.plain.lib.coIO
+import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.lib.sendEvent
-import com.ismartcoding.plain.platform.PlainHttpClient
-import com.ismartcoding.plain.platform.createPeerStatusHttpClient
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.launch
-import kotlin.math.min
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.channels.Channel
+import kotlinx.serialization.json.*
+import kotlin.concurrent.Volatile
 
 object PeerStatusManager {
-    private const val INITIAL_RECONNECT_DELAY_MS = 1000L
-    private const val MAX_RECONNECT_DELAY_MS = 60000L
-    private const val DISCOVER_REPLY_WAIT_MS = 2000L
-
-    private data class PeerState(
-        val socketJob: Job? = null,
-        val reconnectJob: Job? = null,
-        val reconnectAttempts: Int = 0,
-        val online: Boolean = false,
-    )
-
-    private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
-    private val client: PlainHttpClient by lazy { createPeerStatusHttpClient() }
-    private val statesFlow = MutableStateFlow<Map<String, PeerState>>(emptyMap())
-
-    private val startedFlow = MutableStateFlow(false)
-
-    fun start() {
-        if (startedFlow.value) return
-        startedFlow.value = true
-        LogCat.d("peer status: start")
-        scope.launch { reconnectAll() }
-        if (isWifiAwareSupported) {
-            ensureAwareStarted()
-        }
-    }
-
-    fun ensureAwareStarted() {
-        if (startAwareIfNeeded()) {
-            scope.launch { notifyAwareOfPairedPeers() }
-        }
-    }
-
-    private suspend fun notifyAwareOfPairedPeers() {
-        val peers = RustPeerStore.getAllPaired()
-        LogCat.d("peer status: feeding ${peers.size} paired peers to Aware")
-        peers.forEach { subscribeAwareForPeer(it) }
-    }
-
-    fun stop() {
-        LogCat.d("peer status: stop")
-        startedFlow.value = false
-        statesFlow.value.keys.toList().forEach { peerId ->
-            val state = state(peerId)
-            state.reconnectJob?.cancel()
-            state.socketJob?.cancel()
-            updateState(peerId) { it.copy(reconnectJob = null, socketJob = null, reconnectAttempts = 0) }
-            setOnline(peerId, false)
-        }
-    }
-
-    fun disconnected(peerId: String) {
-        LogCat.d("peer status: incoming disconnected peer=$peerId")
-        setOnline(peerId, false)
-    }
-
-    fun isOnline(peerId: String): Boolean = statesFlow.value[peerId]?.online == true
-
-    fun onlinePeers(): Set<String> = statesFlow.value.entries.filter { it.value.online }.map { it.key }.toSet()
-
-    fun reconnectNow(reason: String) {
-        scope.launch {
-            LogCat.d("peer status: reconnect triggered reason=$reason")
-            reconnectAll()
-        }
-    }
-
-    private suspend fun reconnectAll() = withIO {
-        if (!startedFlow.value) return@withIO
-        loadConnectablePeers().forEach { forceReconnectPeer(it, reason = "reconnect_all") }
-    }
-
-    private suspend fun reconnectPeer(peerId: String, reason: String) = withIO {
-        if (!startedFlow.value) return@withIO
-        updateState(peerId) { it.copy(reconnectJob = null) }
-        val state = state(peerId)
-        if (state.socketJob != null) {
-            LogCat.d("peer status: reconnect skipped peer=$peerId reason=$reason active_socket=true")
-            return@withIO
-        }
-        val peer = RustPeerStore.getById(peerId) ?: return@withIO
-        if (!shouldConnect(peer)) return@withIO
-        val key = PeerCacher.getKeyBytes(peer.id) ?: return@withIO
-
-        LogCat.d("peer status: reconnect peer=$peerId reason=$reason")
-        // Record updatedAt before the directed DISCOVER so we can detect
-        // whether the reply actually arrived. Without this check, a stale IP
-        // in the DB would be reused forever — the socket would fail against
-        // the dead address and schedule another reconnect, never giving the
-        // discover reply a chance to refresh the IP.
-        val updatedAtBefore = peer.updatedAt
-        MdnsDiscoverManager.browse()
-        delay(DISCOVER_REPLY_WAIT_MS)
-
-        val refreshedPeer = RustPeerStore.getById(peer.id) ?: peer
-        if (refreshedPeer.updatedAt == updatedAtBefore) {
-            LogCat.d("peer status: no discover reply peer=$peerId — rescheduling")
-            scheduleReconnect(peer.id)
-            return@withIO
-        }
-        if (refreshedPeer.ip.isEmpty() || refreshedPeer.port <= 0) {
-            scheduleReconnect(peer.id)
-            return@withIO
-        }
-        openSocket(refreshedPeer, key)
-    }
-
-    private suspend fun forceReconnectPeer(peer: DPeer, reason: String) = withIO {
-        if (!startedFlow.value) return@withIO
-        val state = state(peer.id)
-        state.reconnectJob?.cancel()
-        updateState(peer.id) { it.copy(reconnectJob = null) }
-        if (peer.ip.isEmpty()) {
-            return@withIO
-        }
-        if (state.socketJob != null) {
-            LogCat.d("peer status: reconnect skipped peer=${peer.id} reason=$reason active_socket=true")
-            return@withIO
-        }
-        val key = PeerCacher.getKeyBytes(peer.id) ?: return@withIO
-        LogCat.d("peer status: reconnect peer=${peer.id} reason=$reason")
-        openSocket(peer, key)
-    }
-
-    private suspend fun openSocket(peer: DPeer, key: ByteArray) = withIO {
-        val peerId = peer.id
-        val wsUrl = peer.getStatusWsUrl()
-        LogCat.d("peer status: open socket peer=$peerId url=$wsUrl")
-
-        val timestamp = TimeHelper.nowMillis().toString()
-        val signature = SignatureHelper.signTextAsync("$timestamp${TempData.clientId}")
-        val payload = chaCha20Encrypt(key, "$signature|$timestamp|${TempData.clientId}")
-
-        val job = scope.launch {
-            val currentJob = coroutineContext[Job]!!
-            try {
-                client.webSocket("$wsUrl?cid=${TempData.clientId}") { session ->
-                    session.sendBinary(payload)
-                    for (frame in session.incoming) {
-                        val text = frame.text ?: continue
-                        if (text != "ok") continue
-                        updateState(peerId) {
-                            it.copy(reconnectJob = null, reconnectAttempts = 0)
-                        }
-                        setOnline(peerId, true)
-                        LogCat.d("peer status: outgoing online peer=$peerId")
-                    }
-                }
-            } catch (e: Exception) {
-                LogCat.e("peer status: outgoing failed peer=$peerId message=${e.message}")
-            } finally {
-                handleClosed(peerId, currentJob)
+    @Volatile private var online = emptySet<String>()
+    private val commands = Channel<String>(64)
+    init {
+        coIO {
+            for (action in commands) {
+                try {
+                    RustContentApi.postJson("chat/peer-status", buildJsonObject { put("action", action) })
+                    PeerStatusProjection.refresh()
+                } catch (cancelled: CancellationException) { throw cancelled }
+                catch (error: Exception) { LogCat.e("Rust peer status control", error) }
             }
         }
-
-        val state = state(peerId)
-        if (state.reconnectJob == null) {
-            updateState(peerId) { it.copy(socketJob = job) }
-        } else {
-            job.cancel()
-        }
     }
-
-    private fun handleClosed(peerId: String, job: Job) {
-        val s = state(peerId)
-        val tracked = s.socketJob == null || s.socketJob == job
-        if (!tracked) {
-            LogCat.d("peer status: close ignored peer=$peerId tracked=false")
-            return
-        }
-        updateState(peerId) { it.copy(socketJob = null) }
-        setOnline(peerId, false)
-        scheduleReconnect(peerId)
+    private fun request(action: String) {
+        if (!commands.trySend(action).isSuccess) LogCat.e("Peer status control queue is full")
     }
-
-    private fun scheduleReconnect(peerId: String) {
-        if (!startedFlow.value) {
-            LogCat.d("peer status: schedule reconnect skipped peer=$peerId stopped=true")
-            return
-        }
-        val state = state(peerId)
-        if (state.socketJob != null) {
-            LogCat.d("peer status: schedule reconnect skipped peer=$peerId active_socket=true")
-            return
-        }
-        if (state.reconnectJob != null) {
-            LogCat.d("peer status: schedule reconnect skipped peer=$peerId pending_backoff=true")
-            return
-        }
-        val newAttempts = state.reconnectAttempts + 1
-        val delayMs = min(MAX_RECONNECT_DELAY_MS, INITIAL_RECONNECT_DELAY_MS * (1L shl min(newAttempts - 1, 6)))
-        LogCat.d("peer status: schedule reconnect peer=$peerId attempt=$newAttempts delay=${delayMs}ms")
-        val reconnectJob = scope.launch {
-            delay(delayMs)
-            reconnectPeer(peerId, reason = "backoff")
-        }
-        updateState(peerId) { it.copy(reconnectJob = reconnectJob, reconnectAttempts = newAttempts) }
-    }
-
-    private suspend fun loadConnectablePeers(): List<DPeer> = withIO {
-        val peers = RustPeerStore.getAllPaired()
-        val connectable = peers.filter { shouldConnect(it) }
-        LogCat.d("peer status: peers total=${peers.size} connectable=${connectable.size}")
-        connectable
-    }
-
-    private fun shouldConnect(peer: DPeer): Boolean {
-        return peer.status == PeerStatus.PAIRED && peer.key.isNotEmpty() && TempData.clientId < peer.id
-    }
-
-    fun setOnline(peerId: String, online: Boolean) {
-        val current = state(peerId)
-        if (current.online == online) return
-        updateState(peerId) { it.copy(online = online) }
-        LogCat.d("peer status: online peer=$peerId value=$online")
-        PeerManager.setOnlineStatus(peerId, online)
-        sendEvent(WebSocketEvent(EventType.PEER_STATUS_UPDATED, JsonHelper.jsonEncode(PeerStatusData(peerId, online))))
-    }
-
-    private fun state(peerId: String): PeerState = statesFlow.value[peerId] ?: PeerState()
-
-    private fun updateState(peerId: String, update: (PeerState) -> PeerState) {
-        statesFlow.update { map ->
-            val current = map[peerId] ?: PeerState()
-            map + (peerId to update(current))
+    fun start() { request("start"); ensureAwareStarted() }
+    fun stop() = request("stop")
+    fun reconnectNow(reason: String) { LogCat.d("Peer status reconnect: $reason"); request("reconnect") }
+    fun ensureAwareStarted() = request("ensureAware")
+    fun isOnline(peerId: String): Boolean = peerId in online
+    fun onlinePeers(): Set<String> = online
+    internal fun applySnapshot(current: Set<String>) {
+        val previous = online
+        online = current
+        (previous + current).forEach { id ->
+            val active = id in current
+            if ((id in previous) != active) {
+                PeerManager.setOnlineStatus(id, active)
+                sendEvent(WebSocketEvent(EventType.PEER_STATUS_UPDATED, JsonHelper.jsonEncode(PeerStatusData(id, active))))
+            }
         }
     }
 }

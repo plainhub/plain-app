@@ -2,7 +2,6 @@ package com.ismartcoding.plain.discover
 
 import com.ismartcoding.plain.api.RustContentApi
 import com.ismartcoding.plain.chat.peer.PeerCacher
-import com.ismartcoding.plain.chat.peer.PeerStatusManager
 import com.ismartcoding.plain.events.EventType
 import com.ismartcoding.plain.events.WebSocketEvent
 import com.ismartcoding.plain.lib.coIO
@@ -87,7 +86,7 @@ object RustMdnsRuntime {
         if (row.getValue("revision").jsonPrimitive.long != revision) return
         val latest = snapshot()
         if (latest["runtimeId"] == event["runtimeId"] && latest.getValue("revision").jsonPrimitive.long == revision && latest.getValue("scanning").jsonPrimitive.boolean) {
-            PeerStatusManager.setOnline(peer, true)
+            com.ismartcoding.plain.chat.peer.PeerStatusProjection.refresh()
         }
     }
     fun services(row: JsonObject): List<MdnsServiceSnapshot> = row.getValue("services").jsonArray.map {
