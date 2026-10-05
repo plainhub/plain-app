@@ -89,13 +89,7 @@ private fun scheduleCancelledMmsAttachmentCleanup(attachmentPaths: List<String>)
 }
 
 actual suspend fun getMediaBuckets(dataType: DataType): List<DMediaBucket> {
-    return when (dataType) {
-        DataType.IMAGE -> ImageMediaStoreHelper.getBucketsAsync(appContext)
-        DataType.VIDEO -> VideoMediaStoreHelper.getBucketsAsync(appContext)
-        DataType.AUDIO -> if (isQPlus()) AudioMediaStoreHelper.getBucketsAsync(appContext) else emptyList()
-        DataType.DOC -> DocMediaStoreHelper.getDocBucketsAsync(appContext)
-        else -> emptyList()
-    }
+    return com.ismartcoding.plain.features.system.RustSystemProviders.mediaBuckets(dataType)
 }
 
 actual suspend fun searchMedia(

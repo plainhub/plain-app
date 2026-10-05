@@ -23,7 +23,7 @@ import com.ismartcoding.plain.lib.withIO
 import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.platform.getNewPath
 import com.ismartcoding.plain.platform.moveFileOrDir
-import com.ismartcoding.plain.data.DMediaBucket
+import com.ismartcoding.plain.data.DMediaBucketItemFact
 import com.ismartcoding.plain.enums.MediaType
 import com.ismartcoding.plain.enums.DataType
 import com.ismartcoding.plain.features.system.RustSystemProviders
@@ -230,46 +230,42 @@ abstract class BaseMediaContentHelper {
         }
     }
 
-    fun getBucketsAsync(context: Context): List<DMediaBucket> {
-        val bucketMap = mutableMapOf<String, DMediaBucket>()
+    fun getBucketItemFactsAsync(context: Context): List<DMediaBucketItemFact> = queryBucketItemFacts(
+        context,
+        if (mediaType == MediaType.AUDIO) {
+            "${MediaStore.Audio.Media.DURATION} > 0 AND ${MediaStore.MediaColumns.BUCKET_DISPLAY_NAME} != ''"
+        } else {
+            "${MediaStore.MediaColumns.BUCKET_DISPLAY_NAME} != ''"
+        },
+        null,
+    )
 
-        // Columns to retrieve from the MediaStore query
-        val projection =
-            arrayOf(
-                MediaStore.MediaColumns.BUCKET_ID,
-                MediaStore.MediaColumns.BUCKET_DISPLAY_NAME,
-                MediaStore.MediaColumns.SIZE,
-                MediaStore.MediaColumns.DATA,
-            )
-
-        // Querying the MediaStore for images
-        context.contentResolver.query(
+    protected fun queryBucketItemFacts(
+        context: Context,
+        selection: String,
+        selectionArgs: Array<String>?,
+    ): List<DMediaBucketItemFact> {
+        val projection = arrayOf(
+            MediaStore.MediaColumns.BUCKET_ID,
+            MediaStore.MediaColumns.BUCKET_DISPLAY_NAME,
+            MediaStore.MediaColumns.SIZE,
+            MediaStore.MediaColumns.DATA,
+        )
+        return context.contentResolver.query(
             uriExternal,
             projection,
-            if (mediaType == MediaType.AUDIO) {
-                "${MediaStore.Audio.Media.DURATION} > 0 AND ${MediaStore.MediaColumns.BUCKET_DISPLAY_NAME} != ''"
-            } else {
-                "${MediaStore.MediaColumns.BUCKET_DISPLAY_NAME} != ''"
-            },
-            null,
+            selection,
+            selectionArgs,
             "${MediaStore.MediaColumns.DATE_MODIFIED} DESC",
-        )?.forEach { cursor, cache ->
-            val bucketId = cursor.getStringValue(MediaStore.MediaColumns.BUCKET_ID, cache)
-            val bucketName = cursor.getStringValue(MediaStore.MediaColumns.BUCKET_DISPLAY_NAME, cache)
-            val size = cursor.getLongValue(MediaStore.MediaColumns.SIZE, cache)
-            val path = cursor.getStringValue(MediaStore.MediaColumns.DATA, cache)
-            val bucket = bucketMap[bucketId]
-            if (bucket != null) {
-                if (bucket.topItems.size < 4) {
-                    bucket.topItems.add(path)
-                }
-                bucket.size += size
-                bucket.itemCount++
-            } else {
-                bucketMap[bucketId] = DMediaBucket(bucketId, bucketName, 1, size, mutableListOf(path))
-            }
-        }
-
-        return bucketMap.values.sortedBy { it.name.toSortName() }
+        )?.map { cursor, cache ->
+            val name = cursor.getStringValue(MediaStore.MediaColumns.BUCKET_DISPLAY_NAME, cache)
+            DMediaBucketItemFact(
+                id = cursor.getStringValue(MediaStore.MediaColumns.BUCKET_ID, cache),
+                name = name,
+                size = cursor.getLongValue(MediaStore.MediaColumns.SIZE, cache),
+                path = cursor.getStringValue(MediaStore.MediaColumns.DATA, cache),
+                sortName = name.toSortName(),
+            )
+        }.orEmpty()
     }
 }

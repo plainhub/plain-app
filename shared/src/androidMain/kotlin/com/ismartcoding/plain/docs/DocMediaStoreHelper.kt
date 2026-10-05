@@ -11,10 +11,9 @@ import com.ismartcoding.plain.lib.extensions.getStringValue
 import com.ismartcoding.plain.lib.extensions.getTimeSecondsValue
 import com.ismartcoding.plain.lib.extensions.map
 import com.ismartcoding.plain.lib.extensions.queryCursor
-import com.ismartcoding.plain.lib.extensions.toSortName
 import com.ismartcoding.plain.lib.withIO
 import com.ismartcoding.plain.platform.isQPlus
-import com.ismartcoding.plain.data.DMediaBucket
+import com.ismartcoding.plain.data.DMediaBucketItemFact
 import com.ismartcoding.plain.data.TagRelationStub
 import com.ismartcoding.plain.enums.MediaType
 import com.ismartcoding.plain.enums.DataType
@@ -107,34 +106,11 @@ object DocMediaStoreHelper : BaseMediaContentHelper() {
         return extCounts.map { Pair(it.key.uppercase(), it.value) }.sortedBy { it.first }
     }
 
-    fun getDocBucketsAsync(context: Context): List<DMediaBucket> {
+    fun getDocBucketItemFactsAsync(context: Context): List<DMediaBucketItemFact> {
         if (!isQPlus()) return emptyList()
-        val bucketMap = mutableMapOf<String, DMediaBucket>()
-        val projection = arrayOf(
-            MediaStore.MediaColumns.BUCKET_ID,
-            MediaStore.MediaColumns.BUCKET_DISPLAY_NAME,
-            MediaStore.MediaColumns.SIZE,
-            MediaStore.MediaColumns.DATA,
-        )
         val mimeTypePlaceholders = extraDocumentMimeTypes.joinToString(",") { "?" }
         val selection = "(${MediaStore.Files.FileColumns.MIME_TYPE} LIKE ? OR ${MediaStore.Files.FileColumns.MIME_TYPE} IN ($mimeTypePlaceholders)) AND ${MediaStore.Files.FileColumns.SIZE} > 0 AND ${MediaStore.MediaColumns.BUCKET_DISPLAY_NAME} != ''"
         val selectionArgs = (listOf("text/%") + extraDocumentMimeTypes).toTypedArray()
-        context.contentResolver.query(uriExternal, projection, selection, selectionArgs, "${MediaStore.MediaColumns.DATE_MODIFIED} DESC")?.forEach { cursor, cache ->
-            val bucketId = cursor.getStringValue(MediaStore.MediaColumns.BUCKET_ID, cache)
-            val bucketName = cursor.getStringValue(MediaStore.MediaColumns.BUCKET_DISPLAY_NAME, cache)
-            val size = cursor.getLongValue(MediaStore.MediaColumns.SIZE, cache)
-            val path = cursor.getStringValue(MediaStore.MediaColumns.DATA, cache)
-            val bucket = bucketMap[bucketId]
-            if (bucket != null) {
-                if (bucket.topItems.size < 4) {
-                    bucket.topItems.add(path)
-                }
-                bucket.size += size
-                bucket.itemCount++
-            } else {
-                bucketMap[bucketId] = DMediaBucket(bucketId, bucketName, 1, size, mutableListOf(path))
-            }
-        }
-        return bucketMap.values.sortedBy {  it.name.toSortName() }
+        return queryBucketItemFacts(context, selection, selectionArgs)
     }
 }

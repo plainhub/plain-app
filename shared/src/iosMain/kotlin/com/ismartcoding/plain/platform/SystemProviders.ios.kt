@@ -14,3 +14,5 @@ actual suspend fun systemSmsFacts(method: String, params: kotlinx.serialization.
         "systemSmsThreadFacts" -> kotlinx.serialization.json.JsonArray(emptyList())
         else -> error("Unsupported SMS facts")
     }
+
+actual suspend fun mediaBucketItemFacts(dataType: DataType): List<com.ismartcoding.plain.data.DMediaBucketItemFact> = emptyList()

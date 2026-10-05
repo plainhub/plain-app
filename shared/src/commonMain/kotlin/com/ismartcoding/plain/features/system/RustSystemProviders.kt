@@ -2,6 +2,8 @@ package com.ismartcoding.plain.features.system
 
 import com.ismartcoding.plain.api.RustContentApi
 import com.ismartcoding.plain.data.DNotification
+import com.ismartcoding.plain.data.DMediaBucket
+import com.ismartcoding.plain.enums.DataType
 import com.ismartcoding.plain.features.file.FileSortBy
 import com.ismartcoding.plain.lib.JsonHelper
 import com.ismartcoding.plain.platform.DPackageInfo
@@ -60,4 +62,22 @@ object RustSystemProviders {
         put("action", "reply"); put("id", id); put("actionIndex", actionIndex); put("text", text)
     }).getValue("ok").jsonPrimitive.boolean
     suspend fun notificationCount(query: String): Int = call("notificationCount", query).getValue("count").jsonPrimitive.int
+
+    suspend fun mediaBuckets(dataType: DataType): List<DMediaBucket> {
+        val facts = com.ismartcoding.plain.platform.mediaBucketItemFacts(dataType)
+        val response = RustContentApi.postJson("system/media-buckets", buildJsonObject {
+            put("dataType", dataType.name)
+            put("items", Json.parseToJsonElement(JsonHelper.jsonEncode(facts)))
+        })
+        return response.getValue("items").jsonArray.map { value ->
+            val item = value.jsonObject
+            DMediaBucket(
+                id = item.getValue("id").jsonPrimitive.content,
+                name = item.getValue("name").jsonPrimitive.content,
+                itemCount = item.getValue("itemCount").jsonPrimitive.int,
+                size = item.getValue("size").jsonPrimitive.long,
+                topItems = item.getValue("topItems").jsonArray.map { it.jsonPrimitive.content }.toMutableList(),
+            )
+        }
+    }
 }

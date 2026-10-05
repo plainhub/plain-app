@@ -25,3 +25,11 @@ actual suspend fun deleteSystemProviderFacts(provider: DataType, ids: Set<String
 
 actual suspend fun systemSmsFacts(method: String, params: kotlinx.serialization.json.JsonObject): kotlinx.serialization.json.JsonElement =
     com.ismartcoding.plain.features.sms.SmsHelper.facts(appContext, method, params)
+
+actual suspend fun mediaBucketItemFacts(dataType: DataType): List<com.ismartcoding.plain.data.DMediaBucketItemFact> = when (dataType) {
+    DataType.IMAGE -> com.ismartcoding.plain.features.media.ImageMediaStoreHelper.getBucketItemFactsAsync(appContext)
+    DataType.VIDEO -> com.ismartcoding.plain.features.media.VideoMediaStoreHelper.getBucketItemFactsAsync(appContext)
+    DataType.AUDIO -> if (com.ismartcoding.plain.platform.isQPlus()) com.ismartcoding.plain.audio.AudioMediaStoreHelper.getBucketItemFactsAsync(appContext) else emptyList()
+    DataType.DOC -> com.ismartcoding.plain.docs.DocMediaStoreHelper.getDocBucketItemFactsAsync(appContext)
+    else -> emptyList()
+}
