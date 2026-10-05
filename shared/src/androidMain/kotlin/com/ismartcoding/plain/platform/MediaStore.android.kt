@@ -105,6 +105,8 @@ actual suspend fun searchMedia(
     offset: Int,
     sortBy: FileSortBy,
 ): List<IData> {
+    if (dataType == DataType.CALL && !Permission.READ_CALL_LOG.isGranted()) return emptyList()
+    if (dataType == DataType.CONTACT && !Permission.READ_CONTACTS.isGranted()) return emptyList()
     return when (dataType) {
         DataType.AUDIO -> AudioMediaStoreHelper.searchAsync(appContext, query, limit, offset, sortBy)
         DataType.DOC -> DocMediaStoreHelper.searchAsync(appContext, query, limit, offset, sortBy)
@@ -118,6 +120,8 @@ actual suspend fun searchMedia(
 }
 
 actual suspend fun countMedia(dataType: DataType, query: String): Int {
+    if (dataType == DataType.CALL && !Permission.READ_CALL_LOG.isGranted()) return 0
+    if (dataType == DataType.CONTACT && !Permission.READ_CONTACTS.isGranted()) return 0
     return when (dataType) {
         DataType.AUDIO -> AudioMediaStoreHelper.countAsync(appContext, query)
         DataType.DOC -> DocMediaStoreHelper.countAsync(appContext, query)
@@ -260,15 +264,19 @@ actual fun getMediaItemUriString(dataType: DataType, id: String): String = when 
     else -> ""
 }
 
-actual suspend fun getMediaIds(dataType: DataType, query: String): Set<String> = when (dataType) {
-    DataType.AUDIO -> AudioMediaStoreHelper.getIdsAsync(appContext, query)
-    DataType.VIDEO -> VideoMediaStoreHelper.getIdsAsync(appContext, query)
-    DataType.IMAGE -> ImageMediaStoreHelper.getIdsAsync(appContext, query)
-    DataType.DOC -> DocMediaStoreHelper.getIdsAsync(appContext, query)
-    DataType.CALL -> CallMediaStoreHelper.getIdsAsync(appContext, query)
-    DataType.CONTACT -> ContactMediaStoreHelper.getIdsAsync(appContext, query)
-    DataType.SMS -> SmsHelper.getIdsAsync(appContext, query)
-    else -> emptySet()
+actual suspend fun getMediaIds(dataType: DataType, query: String): Set<String> {
+    if (dataType == DataType.CALL && !Permission.READ_CALL_LOG.isGranted()) return emptySet()
+    if (dataType == DataType.CONTACT && !Permission.READ_CONTACTS.isGranted()) return emptySet()
+    return when (dataType) {
+        DataType.AUDIO -> AudioMediaStoreHelper.getIdsAsync(appContext, query)
+        DataType.VIDEO -> VideoMediaStoreHelper.getIdsAsync(appContext, query)
+        DataType.IMAGE -> ImageMediaStoreHelper.getIdsAsync(appContext, query)
+        DataType.DOC -> DocMediaStoreHelper.getIdsAsync(appContext, query)
+        DataType.CALL -> CallMediaStoreHelper.getIdsAsync(appContext, query)
+        DataType.CONTACT -> ContactMediaStoreHelper.getIdsAsync(appContext, query)
+        DataType.SMS -> SmsHelper.getIdsAsync(appContext, query)
+        else -> emptySet()
+    }
 }
 
 actual suspend fun getTrashedMediaIds(dataType: DataType, query: String): Set<String> = when (dataType) {
