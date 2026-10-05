@@ -1,6 +1,8 @@
 package com.ismartcoding.plain.features.sms
 
+import android.Manifest
 import android.app.PendingIntent
+import android.content.pm.PackageManager
 import android.content.Context
 import android.content.Intent
 import android.database.Cursor
@@ -413,6 +415,9 @@ object SmsHelper {
         args.addAll(jsonObject.getValue("args").jsonArray.map { it.jsonPrimitive.content })
     }
     suspend fun facts(context: Context, method: String, params: JsonObject): JsonElement = withIO {
+        if (context.checkSelfPermission(Manifest.permission.READ_SMS) != PackageManager.PERMISSION_GRANTED) {
+            throw SecurityException("READ_SMS permission revoked")
+        }
         if (method == "systemMmsTextFacts") return@withIO Json.parseToJsonElement(JsonHelper.jsonEncode(mmsTextFacts(context)))
         if (method == "systemSmsConversationFacts") return@withIO SmsConversationHelper.facts(context, params)
         val plans = if (method == "systemSmsRowsFacts" || method == "systemSmsThreadFacts") params.getValue("plans").jsonObject else params
