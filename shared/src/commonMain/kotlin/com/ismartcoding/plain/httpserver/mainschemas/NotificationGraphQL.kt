@@ -36,6 +36,7 @@ suspend fun deleteNotifications(ids: List<ID>): ActionResult {
 
 @GraphQLMutation(description = "Reply to a notification. actionIndex indexes Notification.replyActions (the reply-capable subset only), NOT the plain actions list.")
 suspend fun replyNotification(id: ID, actionIndex: Int, text: String): Boolean {
+    Permission.NOTIFICATION_LISTENER.checkEnabledAsync()
     val ok = com.ismartcoding.plain.features.system.RustSystemProviders.replyNotification(id.value, actionIndex, text)
     if (!ok) {
         throw GraphQLError("action_not_found")
