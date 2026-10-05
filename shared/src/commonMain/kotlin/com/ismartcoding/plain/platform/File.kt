@@ -351,7 +351,7 @@ expect fun isAnimatedImageOrSvg(path: String, fileName: String): Boolean
  * When [centerCrop] is true the thumbnail is cropped to fit the aspect ratio.
  * Returns null when the platform cannot produce a thumbnail.
  */
-expect suspend fun getThumbnailBytes(
+expect suspend fun decodeThumbnailBytes(
     path: String,
     width: Int,
     height: Int,

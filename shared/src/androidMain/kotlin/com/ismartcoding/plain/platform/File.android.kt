@@ -36,7 +36,6 @@ import com.ismartcoding.plain.features.media.VideoMediaStoreHelper
 import com.ismartcoding.plain.lib.extensions.compress
 import com.ismartcoding.plain.thumbnail.DecodeLimiter
 import com.ismartcoding.plain.thumbnail.DecodePolicy
-import com.ismartcoding.plain.thumbnail.ThumbnailProvider
 import kotlinx.coroutines.runBlocking
 import java.io.ByteArrayOutputStream
 import java.io.File
@@ -326,7 +325,7 @@ actual fun isAnimatedImageOrSvg(path: String, fileName: String): Boolean {
     }
 }
 
-actual suspend fun getThumbnailBytes(
+actual suspend fun decodeThumbnailBytes(
     path: String,
     width: Int,
     height: Int,
@@ -336,7 +335,7 @@ actual suspend fun getThumbnailBytes(
 ): ByteArray? = withIO {
     val file = File(path)
     if (!file.exists()) return@withIO null
-    ThumbnailProvider.instance?.toThumbBytesAsync(appContext, file, width, height, centerCrop, mediaId, fileName)
+    com.ismartcoding.plain.thumbnail.ThumbnailGenerator.decodeBytesAsync(appContext, file, width, height, centerCrop, mediaId, fileName)
 }
 
 actual suspend fun streamZipToSink(items: List<ZipStreamEntry>, sink: StreamSink, recursive: Boolean): Boolean = withIO {

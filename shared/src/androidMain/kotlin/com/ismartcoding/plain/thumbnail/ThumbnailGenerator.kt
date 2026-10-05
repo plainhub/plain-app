@@ -40,7 +40,7 @@ import java.io.File
  *  JPEG at quality 85 — ~4-8× faster to encode than WebP, sufficient for thumbnails.
  *
  * Caching:
- *  Disk cache in [ThumbnailCache] keyed by path + mtime + dimensions + mode.
+ *  Root manages thumbnail requests and the disk cache.
  *  mediaId-based (MediaStore) thumbnails are excluded from disk cache since
  *  they are already served from MediaStore's own cache layer.
  */
@@ -141,7 +141,7 @@ object ThumbnailGenerator : ThumbnailProvider {
                     .allowHardware(false)
                     // One-shot decode-and-compress: the shared loader's memory cache
                     // (up to 75% of the heap) would retain bitmaps that are never
-                    // reused — the disk cache in toThumbBytesAsync covers repeats.
+                    // reused — Root caches encoded thumbnails for repeat requests.
                     .memoryCachePolicy(CachePolicy.DISABLED)
                     .build()
                 bitmap = (imageLoader.execute(request).image as? BitmapImage)?.bitmap
@@ -167,40 +167,28 @@ object ThumbnailGenerator : ThumbnailProvider {
         mediaId: String,
         fileName: String,
     ): ByteArray? {
-        // System thumbnails (mediaId + ≤512 px) bypass our disk cache; every
-        // other request reads it first — a hit is a cheap file read that needs
-        // no decode permit and stays instant on all devices.
-        if (mediaId.isEmpty() || width > 512) {
-            // ~20 ms read vs ~200 ms decode
-            ThumbnailCache.get(context, file.absolutePath, width, height, centerCrop)?.let { return it }
-        }
+        return com.ismartcoding.plain.platform.getThumbnailBytes(file.absolutePath, width, height, centerCrop, mediaId, fileName)
+    }
 
-        // All decode work is gated by DecodeLimiter: rapid scrolling queues
-        // here instead of stacking parallel decodes into an OOM.
-        return DecodeLimiter.withPermit {
-            // Priority 1: Android system thumbnail (MediaStore already manages its own cache layer).
-            if (mediaId.isNotEmpty() && width <= 512) {
-                getBitmapAsync(context, file, width, height, centerCrop, mediaId, fileName)
-                    ?.let { return@withPermit compressToJpeg(it) }
-            }
-
-            // Priority 2: our disk cache — reached when the system thumbnail failed
-            ThumbnailCache.get(context, file.absolutePath, width, height, centerCrop)?.let { return@withPermit it }
-
-            // Priority 3: self-generate, then cache the result
-            val bitmap = getBitmapAsync(context, file, width, height, centerCrop, fileName = fileName)
-                ?: return@withPermit null
-            val bytes = compressToJpeg(bitmap)
-            ThumbnailCache.put(context, file.absolutePath, width, height, centerCrop, bytes)
-            bytes
-        }
+    suspend fun decodeBytesAsync(
+        context: Context,
+        file: File,
+        width: Int,
+        height: Int,
+        centerCrop: Boolean,
+        mediaId: String,
+        fileName: String,
+    ): ByteArray? = DecodeLimiter.withPermit {
+        val bitmap = getBitmapAsync(context, file, width, height, centerCrop, mediaId, fileName) ?: return@withPermit null
+        compressToJpeg(bitmap)
     }
 
     /** Compress to JPEG (quality 85 — ~4-8× faster to encode than WebP) and recycle the bitmap. */
     private fun compressToJpeg(bitmap: Bitmap): ByteArray {
         val stream = ByteArrayOutputStream()
-        bitmap.compress(Bitmap.CompressFormat.JPEG, 85, stream)
-        bitmap.recycle()
-        return stream.toByteArray()
+        return try {
+            check(bitmap.compress(Bitmap.CompressFormat.JPEG, 85, stream)) { "Thumbnail JPEG encoding failed" }
+            stream.toByteArray()
+        } finally { bitmap.recycle() }
     }
 }

@@ -352,7 +352,7 @@ actual fun isAnimatedImageOrSvg(path: String, fileName: String): Boolean {
 }
 
 @OptIn(ExperimentalForeignApi::class, BetaInteropApi::class)
-actual suspend fun getThumbnailBytes(
+actual suspend fun decodeThumbnailBytes(
     path: String,
     width: Int,
     height: Int,

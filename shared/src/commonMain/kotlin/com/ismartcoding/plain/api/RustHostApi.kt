@@ -40,6 +40,7 @@ object RustHostApi {
                                             val reply = try {
                                                 val result = when {
                                                     method == "httpExchange" -> { com.ismartcoding.plain.httpserver.RustHttpHost.start(exchangeScope, session, params.getValue("id").jsonPrimitive.content); JsonNull }
+                                                    method.startsWith("thumbnail") -> com.ismartcoding.plain.thumbnail.ThumbnailHost.handle(session, method, params)
                                                     method.startsWith("chatPicked") -> com.ismartcoding.plain.chat.ChatPickedHost.handle(method, params)
                                                     method.startsWith("sharedTransfer") -> com.ismartcoding.plain.features.share.SharedTransferHost.handle(exchangeScope, method, params)
                                                     method.startsWith("blePair") -> com.ismartcoding.plain.discover.BlePairingHost.handle(method, params)

@@ -8,7 +8,7 @@ import com.ismartcoding.plain.platform.extractZipEntryToCache
 import com.ismartcoding.plain.platform.fileExists
 import com.ismartcoding.plain.platform.getContentTypeForPath
 import com.ismartcoding.plain.platform.getPackageIconBytes
-import com.ismartcoding.plain.platform.getThumbnailBytes
+import com.ismartcoding.plain.platform.getThumbnailResponse
 import com.ismartcoding.plain.platform.isAnimatedImageOrSvg
 import com.ismartcoding.plain.platform.isContentUri
 import com.ismartcoding.plain.platform.probeVideoCodec
@@ -227,25 +227,12 @@ object FileServer {
 
         // Thumbnail request: ?w=...&h=...[&cc=false]
         if (widthParam != null && heightParam != null) {
-            val thumbBytes = getThumbnailBytes(
-                path = path,
-                width = widthParam,
-                height = heightParam,
-                centerCrop = centerCrop,
-                mediaId = mediaId,
-                fileName = fileName,
-            )
-            if (thumbBytes != null) {
-                call.responseHeader("Cache-Control", "private, max-age=86400")
-                // The encrypted /fs id is regenerated per GraphQL response, so
-                // max-age only covers same-URL remounts; the ETag lets the
-                // ConditionalHeaders plugin answer revalidations with 304
-                // once the browser has stored a response under any id.
-                call.responseHeader(
-                    "ETag",
-                    "\"thumb-${stat.size}-${stat.updatedAt.toEpochMilliseconds()}-$widthParam-$heightParam-${path.hashCode()}\"",
-                )
-                call.respond(thumbBytes)
+            getThumbnailResponse(path, widthParam, heightParam, centerCrop, mediaId, fileName, call.header("If-None-Match")).use { response ->
+                if (response.status.value == 204) return
+                listOf("Cache-Control", "ETag").forEach { name -> response.header(name)?.let { call.responseHeader(name, it) } }
+                if (response.status.value == 304) { call.respondNoBody(response.status.value); return }
+                check(response.isSuccess()) { "Thumbnail generation failed: ${response.bodyAsText()}" }
+                call.respond(response.bodyAsBytes(), contentType = response.header("Content-Type") ?: "image/jpeg")
             }
             return
         }
