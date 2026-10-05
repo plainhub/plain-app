@@ -3,9 +3,6 @@ package com.ismartcoding.plain.httpserver.routes
 import com.ismartcoding.plain.preferences.*
 
 import com.ismartcoding.plain.TempData
-import com.ismartcoding.plain.chat.peer.PeerCacher
-import com.ismartcoding.plain.chat.peer.PeerChatParser
-import com.ismartcoding.plain.chat.peer.PeerStatusManager
 import com.ismartcoding.plain.events.ConfirmToAcceptLoginEvent
 import com.ismartcoding.plain.data.ScreenMirrorControlInput
 import com.ismartcoding.plain.enums.ScreenMirrorControlAction
@@ -53,49 +50,13 @@ private class WsSessionAsHandle(
 }
 
 /**
- * Registers `/status` and `/` WebSocket routes.
+ * Registers the Main UI `/` WebSocket route.
  *
  * All authentication, decryption, session tracking, and event dispatch
  * lives here so the platform layer (Ktor `webSocket {}` / SwiftNIO upgrade
  * handler) only needs to expose a [WsSession] and dispatch incoming frames.
  */
 fun HttpRouter.addWebSocketRoutes() {
-    webSocket("/status") { ws, call ->
-        val peerId = call.queryParam("cid") ?: ""
-        if (peerId.isEmpty()) {
-            ws.close(WsCloseCode.POLICY_VIOLATION, "`cid` is missing")
-            return@webSocket
-        }
-        var authenticated = false
-        try {
-            while (true) {
-                val frame = ws.receiveBinary() ?: break
-                if (authenticated) continue
-
-                val token = PeerCacher.getKeyBytes(peerId)
-                val publicKey = PeerCacher.getPublicKeyBytes(peerId)
-                if (token == null || publicKey == null) {
-                    ws.close(WsCloseCode.POLICY_VIOLATION, "unknown_peer")
-                    return@webSocket
-                }
-                val decryptResult = PeerChatParser.decrypt(token, peerId, publicKey, frame)
-                if (decryptResult.content == null) {
-                    ws.close(WsCloseCode.POLICY_VIOLATION, "invalid_request: $peerId")
-                    return@webSocket
-                }
-                authenticated = true
-                PeerStatusManager.setOnline(peerId, true)
-                ws.sendText("ok")
-            }
-        } catch (ex: Exception) {
-            LogCat.e("status ws: $ex")
-        } finally {
-            if (authenticated) {
-                PeerStatusManager.disconnected(peerId)
-            }
-        }
-    }
-
     webSocket("/") { ws, call ->
         // WS `/` is the Main-UI login + event-push channel — it requires
         // `canDesktopAccess()`. WS `/status` (peer heartbeat) is separate and
