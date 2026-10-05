@@ -37,7 +37,7 @@ object RustPeerStore {
         fun string(key: String) = row.getValue(key).jsonPrimitive.content
         PeerAddress(string("bestIp"), string("name"), string("baseUrl"), string("apiUrl"), string("statusWsUrl"))
     }
-    private fun encode(row: DPeer): JsonObject = buildJsonObject {
+    internal fun encode(row: DPeer): JsonObject = buildJsonObject {
         put("id", row.id); put("name", row.name); put("ip", row.ip); put("key", row.key); put("public_key", row.publicKey)
         put("status", row.status.name); put("port", row.port); put("device_type", row.deviceType.name); put("token", "")
         put("created_at", row.createdAt.toString()); put("updated_at", row.updatedAt.toString())

@@ -1,30 +1,27 @@
 package com.ismartcoding.plain.chat.peer.transport
 
-import com.ismartcoding.plain.platform.createCryptoClient
-import com.ismartcoding.plain.platform.createDownloadClient
+import com.ismartcoding.plain.api.RustContentApi
 import com.ismartcoding.plain.chat.peer.GraphQLResponse
-import com.ismartcoding.plain.db.DPeer
 import com.ismartcoding.plain.chat.peer.RustPeerStore
-import com.ismartcoding.plain.db.getFileUrl
+import com.ismartcoding.plain.db.DPeer
+import kotlinx.coroutines.CancellationException
+import kotlinx.serialization.json.*
 
 object LanTransport : PeerTransport {
     override val type = PeerTransportType.LAN
-
-    override suspend fun send(peer: DPeer, request: SignedRequest, keyBytes: ByteArray): GraphQLResponse {
-        val address = RustPeerStore.address(peer)
-        val client = createCryptoClient(keyBytes, 10)
-        return executeGraphQLRequest(
-            transportType = type,
-            peerId = peer.id,
-            client = client,
-            url = address.apiUrl,
-            body = request.body,
-            channelId = request.channelId,
-        )
-    }
-
+    override suspend fun send(peer: DPeer, request: SignedRequest, keyBytes: ByteArray): GraphQLResponse =
+        error("LAN sending is owned by Rust")
     override suspend fun downloadFile(peer: DPeer, fileId: String): DownloadedResponse {
-        val client = createDownloadClient()
-        return executeDownloadRequest(type, peer.id, client, peer.getFileUrl(fileId))
+        val response = try {
+            RustContentApi.postStream("chat/lan/file", buildJsonObject {
+                put("id", peer.id); put("expected", RustPeerStore.encode(peer)); put("file_id", fileId)
+            })
+        } catch (cancelled: CancellationException) { throw cancelled }
+        catch (failure: Exception) { throw TransportUnavailable(type, peer.id, failure) }
+        if (!response.isSuccess()) {
+            response.close()
+            throw TransportUnavailable(type, peer.id)
+        }
+        return DownloadedResponse(response.status.value, response.channel) { response.close() }
     }
 }

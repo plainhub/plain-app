@@ -19,7 +19,7 @@ object PeerTransportRouter {
         add(BleTransport)
     }.associateBy { it.type }
 
-    internal fun capabilities(): JsonArray = JsonArray(transports.keys.map { JsonPrimitive(it.name) })
+    internal fun capabilities(): JsonArray = JsonArray(transports.keys.filter { it != PeerTransportType.LAN }.map { JsonPrimitive(it.name) })
     internal fun adapter(type: PeerTransportType): PeerTransport = transports[type]
         ?: throw TransportUnavailable(type, "", IllegalStateException("Platform transport unavailable"))
 

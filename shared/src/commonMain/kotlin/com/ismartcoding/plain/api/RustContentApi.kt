@@ -62,6 +62,12 @@ object RustContentApi {
         }
     }
 
+    suspend fun postStream(path: String, body: JsonObject): PlainResponse {
+        start()
+        val target = checkNotNull(localSession)
+        return transferClient.postText("${target.baseUrl}/$path", body.toString(), "application/json", target.headers())
+    }
+
     suspend fun sync(feedId: String) {
         val key = feedId.ifEmpty { "all" }
         mutate("syncFeeds(id: ${if (feedId.isEmpty()) "null" else gql(feedId)})")
@@ -99,6 +105,7 @@ object RustContentApi {
                     com.ismartcoding.plain.discover.PairingProjection.reconcile()
                     com.ismartcoding.plain.discover.RustNearbyDevices.refresh()
                     com.ismartcoding.plain.discover.RustMdnsRuntime.refresh()
+                    com.ismartcoding.plain.chat.peer.PeerTransportProjection.refresh()
                     com.ismartcoding.plain.chat.peer.PeerStatusProjection.refresh()
                     com.ismartcoding.plain.chat.peer.PeerCacher.load()
                     com.ismartcoding.plain.chat.channel.ChannelCacher.load()
@@ -119,6 +126,7 @@ object RustContentApi {
                         val payload = message.getValue("payload").jsonPrimitive.content
                         when (type) {
                             EventType.PEER_STATUS_UPDATED.value -> { com.ismartcoding.plain.chat.peer.PeerStatusProjection.refresh(); com.ismartcoding.plain.chat.peer.PeerCacher.load() }
+                            com.ismartcoding.plain.chat.peer.PeerTransportProjection.EVENT_UPDATED -> com.ismartcoding.plain.chat.peer.PeerTransportProjection.refresh()
                             com.ismartcoding.plain.chat.peer.PeerStatusProjection.EVENT_UPDATED -> com.ismartcoding.plain.chat.peer.PeerStatusProjection.refresh(payload)
                             com.ismartcoding.plain.discover.RustMdnsRuntime.EVENT_UPDATED, EventType.NEARBY_DISCOVERY_STARTED.value, EventType.NEARBY_DISCOVERY_STOPPED.value -> com.ismartcoding.plain.discover.RustMdnsRuntime.refresh(if (type == com.ismartcoding.plain.discover.RustMdnsRuntime.EVENT_UPDATED) payload else null)
                             EventType.NEARBY_DEVICE_FOUND.value -> com.ismartcoding.plain.discover.RustNearbyDevices.refresh(payload)

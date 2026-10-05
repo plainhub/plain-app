@@ -1,6 +1,5 @@
 package com.ismartcoding.plain.chat.peer.transport
 
-import com.ismartcoding.plain.chat.peer.PeerCacher
 import com.ismartcoding.plain.chat.peer.RustPeerStore
 import com.ismartcoding.plain.helpers.Base64Lenient
 import kotlinx.coroutines.withTimeoutOrNull
@@ -13,7 +12,7 @@ object PeerTransportHost {
         check(method == "peerTransportAttempt") { "Unknown peer transport operation" }
         val peer = RustPeerStore.decode(params.getValue("peer"))
         val type = PeerTransportType.valueOf(params.getValue("transport").jsonPrimitive.content)
-        PeerCacher.setCurrentTransport(peer.id, type)
+        check(type != PeerTransportType.LAN) { "LAN attempts are owned by Rust" }
         try {
             val response = withTimeoutOrNull(params.getValue("timeoutMs").jsonPrimitive.long) {
                 PeerTransportRouter.adapter(type).send(peer,
@@ -30,7 +29,7 @@ object PeerTransportHost {
             }
         } catch (failure: TransportUnavailable) {
             return unavailable(failure.cause?.message ?: failure.message ?: "Transport unavailable")
-        } finally { PeerCacher.setCurrentTransport(peer.id, null) }
+        }
     }
     private fun unavailable(error: String): JsonObject = buildJsonObject { put("kind", "unavailable"); put("error", error) }
 }

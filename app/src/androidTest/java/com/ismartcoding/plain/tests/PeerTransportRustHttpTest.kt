@@ -32,7 +32,8 @@ class PeerTransportRustHttpTest {
         try {
             RustPeerStore.insert(peer)
             val capabilities = PeerTransportHost.handle("peerTransportCapabilities", buildJsonObject {}).jsonArray.map { it.jsonPrimitive.content }
-            assertTrue(capabilities.containsAll(listOf("LAN", "BLE")))
+            assertTrue(capabilities.contains("BLE"))
+            assertFalse(capabilities.contains("LAN"))
             for (type in capabilities.filter { it != "LAN" }) {
                 repeat(2) {
                     val ticket = begin(listOf(type)).getValue("ticket")
@@ -47,9 +48,13 @@ class PeerTransportRustHttpTest {
             assertTrue(blocked)
             peer.ip = "127.0.0.1"
             RustPeerStore.update(peer)
-            val ticket = begin(listOf("LAN")).getValue("ticket")
+            val ticket = begin(emptyList()).getValue("ticket")
             assertEquals("LAN", ticket.jsonObject.getValue("transport").jsonPrimitive.content)
+            com.ismartcoding.plain.chat.peer.PeerTransportProjection.refresh()
+            assertEquals(com.ismartcoding.plain.chat.peer.transport.PeerTransportType.LAN, com.ismartcoding.plain.chat.peer.PeerCacher.currentTransportMap.value[id])
             finish(ticket, "connected")
+            com.ismartcoding.plain.chat.peer.PeerTransportProjection.refresh()
+            assertNull(com.ismartcoding.plain.chat.peer.PeerCacher.currentTransportMap.value[id])
             var duplicateRejected = false
             try { finish(ticket, "connected") } catch (_: IllegalStateException) { duplicateRejected = true }
             assertTrue(duplicateRejected)
