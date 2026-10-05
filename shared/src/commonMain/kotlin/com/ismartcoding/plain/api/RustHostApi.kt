@@ -44,6 +44,7 @@ object RustHostApi {
                                                     method.startsWith("chatPicked") -> com.ismartcoding.plain.chat.ChatPickedHost.handle(method, params)
                                                     method.startsWith("sharedTransfer") -> com.ismartcoding.plain.features.share.SharedTransferHost.handle(exchangeScope, method, params)
                                                     method.startsWith("blePair") -> com.ismartcoding.plain.discover.BlePairingHost.handle(method, params)
+                                                    method.startsWith("mainGraphql") -> com.ismartcoding.plain.httpserver.MainGraphQLHost.handle(method, params)
                                                     method == "mdnsMulticast" -> com.ismartcoding.plain.discover.MdnsMulticastHost.handle(params)
                                                     method == "discoveryFacts" -> com.ismartcoding.plain.discover.DiscoveryAdvertisementHost.facts()
                                                     method == "nearbyScanFacts" -> com.ismartcoding.plain.discover.NearbyScanHost.facts()

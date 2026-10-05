@@ -50,6 +50,14 @@ class MainGraphQLService private constructor(
         )
     }
 
+    suspend fun executeForRust(query: String, clientId: String): String = withIO {
+        val request = Json.decodeFromString(GraphqlRequest.serializer(), query)
+        val ctx = context {
+            +GraphqlRequestContext(mapOf("c-id" to clientId))
+        }
+        schema.execute(request.query, request.variables?.toString(), ctx)
+    }
+
     /**
      * Handle a `/graphql` POST request. Supports two auth modes:
      *

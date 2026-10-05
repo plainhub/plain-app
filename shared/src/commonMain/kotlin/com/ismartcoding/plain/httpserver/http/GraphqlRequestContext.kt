@@ -12,14 +12,17 @@ package com.ismartcoding.plain.httpserver.http
  * it via `context.get<GraphqlRequestContext>()` (which uses the reified
  * class as the lookup key, matching how KGraphQL stores components).
  */
-class GraphqlRequestContext(
-    val call: HttpCall,
+class GraphqlRequestContext private constructor(
+    val call: HttpCall?,
+    private val requestHeaders: Map<String, String>,
 ) {
+    constructor(call: HttpCall) : this(call, emptyMap())
+    constructor(requestHeaders: Map<String, String>) : this(null, requestHeaders.mapKeys { it.key.lowercase() })
     /** Mutable per-request attributes, used by the peer-graphql route to
      *  carry the verified signature and timestamp to the resolver. */
     val attributes: MutableMap<String, Any?> = mutableMapOf()
 
-    fun header(name: String): String? = call.header(name)
+    fun header(name: String): String? = requestHeaders[name.lowercase()] ?: call?.header(name)
 
     fun setAttribute(name: String, value: Any?) {
         attributes[name] = value

@@ -52,6 +52,24 @@ class PublicRustHttpTest {
                 client.post("http://127.0.0.1:$port/init", ByteArray(0)).use { assertEquals(400, it.status.value) }
                 client.get("http://127.0.0.1:$port/").use { assertEquals(200, it.status.value); assertTrue(it.bodyAsText().contains("window.__SERVER_TIME__=")) }
                 HttpServerManager.tokenCache.put(clientId, key)
+                val initBody = chaCha20Encrypt(key, "authenticated-init".encodeToByteArray())
+                client.post("http://127.0.0.1:$port/init", initBody, "application/octet-stream", mapOf("c-id" to clientId)).use {
+                    val responseText = it.bodyAsText()
+                    assertEquals(responseText, 200, it.status.value)
+                    val response = Json.parseToJsonElement(responseText).jsonObject
+                    assertTrue(response.getValue("signaturePublicKey").jsonPrimitive.content.isNotEmpty())
+                    assertEquals("", response.getValue("password").jsonPrimitive.content)
+                }
+                val graphqlRequest = """{"query":"{ noteCount(query: \"all\") }","variables":{}}"""
+                val replayBody = "${System.currentTimeMillis()}|${UUID.randomUUID()}|$graphqlRequest"
+                val encryptedGraphqlRequest = chaCha20Encrypt(key, replayBody)
+                client.post("http://127.0.0.1:$port/graphql", encryptedGraphqlRequest, "application/octet-stream", mapOf("c-id" to clientId)).use {
+                    assertEquals(200, it.status.value)
+                    val decryptedResponse = chaCha20Decrypt(key, it.bodyAsBytes())
+                        ?: throw AssertionError("GraphQL response decryption failed")
+                    val result = Json.parseToJsonElement(decryptedResponse.decodeToString()).jsonObject
+                    assertNotNull(result.toString(), result["data"]?.jsonObject?.get("noteCount"))
+                }
                 val info = buildJsonObject { put("dir", root.absolutePath); put("replace", false); put("size", payload.size) }.toString()
                 val encrypted = chaCha20Encrypt(key, info.encodeToByteArray())
                 val prefix = "--fixture\r\nContent-Disposition: form-data; name=\"info\"\r\n\r\n".encodeToByteArray()
@@ -79,6 +97,7 @@ class PublicRustHttpTest {
         } finally {
             stopHttpEngineAsync()
             HttpServerManager.tokenCache.invalidate(clientId)
+            HttpServerManager.clientIpCache.invalidate(clientId)
             root.deleteRecursively()
             UserPrefs.service.value = oldService
             UserPrefs.desktopAccess.value = oldDesktop
