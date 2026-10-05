@@ -3,9 +3,7 @@ package com.ismartcoding.plain.events
 import com.ismartcoding.plain.ai.ImageIndexProgressEvent
 import com.ismartcoding.plain.ai.ImageSearchStatusChangedEvent
 import com.ismartcoding.plain.ble.PairingTransport
-import com.ismartcoding.plain.chat.ChatManager
 import com.ismartcoding.plain.data.DPairingRequest
-import com.ismartcoding.plain.db.DChat
 import com.ismartcoding.plain.discover.MdnsDiscoverManager
 import com.ismartcoding.plain.enums.ActionSourceType
 import com.ismartcoding.plain.enums.ActionType
@@ -40,7 +38,6 @@ import com.ismartcoding.plain.platform.startMmsPolling
 import com.ismartcoding.plain.ui.models.FolderOption
 import com.ismartcoding.plain.httpserver.AuthRequest
 import com.ismartcoding.plain.httpserver.WsSessionHandle
-import com.ismartcoding.plain.httpserver.models.toModel
 import com.ismartcoding.plain.httpserver.websocket.WebSocketHelper
 import com.ismartcoding.plain.platform.MediaDurationFixQueue
 import kotlinx.coroutines.Job
@@ -276,12 +273,6 @@ object AppEvents {
 
                     is CancelUpdateDownloadEvent -> {
                         cancelUpdateDownloadAsync()
-                    }
-
-                    is HRetryChatItemEvent -> {
-                        coIO {
-                            ChatManager.resendMessage(event.item)
-                        }
                     }
 
                     is ChatMessageNotificationEvent -> {

@@ -7,8 +7,6 @@ import com.ismartcoding.plain.chat.peer.RustPeerStore
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import com.ismartcoding.plain.lib.withIO
-import com.ismartcoding.plain.lib.JsonHelper
-import com.ismartcoding.plain.platform.textMessageContent
 import com.ismartcoding.plain.chat.data.ChatTarget
 import com.ismartcoding.plain.chat.data.ChatTargetType
 import com.ismartcoding.plain.chat.peer.PeerCacher
@@ -16,11 +14,8 @@ import com.ismartcoding.plain.db.DChat
 import com.ismartcoding.plain.db.DMessageContent
 import com.ismartcoding.plain.db.DMessageFile
 import com.ismartcoding.plain.enums.ChatStatus
-import com.ismartcoding.plain.events.EventType
-import com.ismartcoding.plain.events.WebSocketEvent
 import com.ismartcoding.plain.i18n.Res
 import com.ismartcoding.plain.i18n.sent
-import com.ismartcoding.plain.lib.sendEvent
 import com.ismartcoding.plain.ui.helpers.DialogHelper
 import com.ismartcoding.plain.ui.models.ISelectableViewModel
 import com.ismartcoding.plain.ui.models.VChat
@@ -91,7 +86,7 @@ object ChatViewModel : ISelectableViewModel<VChat> {
     }
 
     fun addAll(items: List<DChat>) {
-        _itemsFlow.update { items.map { VChat.from(it) } + it }
+        _itemsFlow.update { items.map { VChat.from(it) } + it.filterNot { existing -> items.any { incoming -> incoming.id == existing.id } } }
     }
 
     fun addAllAndScroll(items: List<DChat>) {
@@ -128,8 +123,6 @@ object ChatViewModel : ISelectableViewModel<VChat> {
     fun resendMessage(messageId: String) {
         launchSafe {
             val item = ChatManager.getChatItem(messageId) ?: return@launchSafe
-            ChatManager.updateStatus(item, ChatStatus.PENDING)
-            update(item)
             ChatManager.resendMessage(item)
         }
     }
@@ -139,8 +132,6 @@ object ChatViewModel : ISelectableViewModel<VChat> {
             val target = target.value
             val channel = RustChannelStore.getById(target.toId) ?: return@launchSafe
             val item = ChatManager.getChatItem(messageId) ?: return@launchSafe
-            ChatManager.updateStatus(item, ChatStatus.PENDING)
-            update(item)
             ChatManager.sendToChannelMembers(item, channel, peerIds)
             update(item)
         }
@@ -148,11 +139,7 @@ object ChatViewModel : ISelectableViewModel<VChat> {
 
     fun forwardMessage(messageId: String, target: ChatTarget, onlinePeerIds: Set<String>) {
         launchSafe {
-            val item = ChatManager.getChatItem(messageId) ?: return@launchSafe
-            val item2 = ChatManager.createChatItem(target, item.content)
-            if (!target.isLocal()) {
-                ChatManager.sendMessage(item2, target, onlinePeerIds)
-            }
+            val item2 = ChatManager.forward(messageId, target)
             publishCreated(target, listOf(item2))
             if (item2.status == ChatStatus.SENT) {
                 DialogHelper.showSuccess(Res.string.sent)
@@ -164,18 +151,12 @@ object ChatViewModel : ISelectableViewModel<VChat> {
         launchSafe {
             ChatManager.deleteByIds(ids)
             _itemsFlow.update { it.filterNot { m -> ids.contains(m.id) } }
-            sendEvent(WebSocketEvent(EventType.MESSAGE_DELETED, JsonHelper.jsonEncode("ids=${ids.joinToString(",")}")))
         }
     }
 
     private suspend fun doSendMessage(target: ChatTarget, content: DMessageContent, onlinePeerIds: Set<String>): Boolean = withIO {
-        val item = ChatManager.createChatItem(target, content)
+        val item = ChatManager.sendContent(target, content)
         publishCreated(target, listOf(item), scroll = true)
-
-        if (!target.isLocal()) {
-            ChatManager.sendMessage(item, target, onlinePeerIds)
-            publishUpdated(item)
-        }
         item.status == ChatStatus.SENT
     }
 
@@ -187,7 +168,7 @@ object ChatViewModel : ISelectableViewModel<VChat> {
 
     fun sendTextMessage(text: String, onlinePeerIds: Set<String>, onResult: (Boolean) -> Unit = {}) {
         launchSafe {
-            onResult(doSendMessage(target.value, textMessageContent(text), onlinePeerIds))
+            onResult(ChatManager.sendText(target.value, text).status == ChatStatus.SENT)
         }
     }
 
@@ -215,10 +196,10 @@ object ChatViewModel : ISelectableViewModel<VChat> {
         if (_target.value == target) {
             if (scroll) {
                 val previousTopId = _itemsFlow.value.firstOrNull()?.id
-                _itemsFlow.update { items.map { VChat.from(it) } + it }
+                _itemsFlow.update { items.map { VChat.from(it) } + it.filterNot { existing -> items.any { incoming -> incoming.id == existing.id } } }
                 _scrollToLatest.trySend(previousTopId)
             } else {
-                _itemsFlow.update { items.map { VChat.from(it) } + it }
+                _itemsFlow.update { items.map { VChat.from(it) } + it.filterNot { existing -> items.any { incoming -> incoming.id == existing.id } } }
             }
         }
     }

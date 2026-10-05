@@ -1,5 +1,6 @@
 package com.ismartcoding.plain.chat.peer.transport.aware
 
+import kotlinx.serialization.json.jsonObject
 import android.Manifest
 import android.net.ConnectivityManager
 import android.net.wifi.aware.PeerHandle
@@ -23,7 +24,6 @@ import kotlin.time.Duration.Companion.milliseconds
 internal class AwareLinkPool(
     private val session: AwareSession,
     private val connectivityManager: ConnectivityManager,
-    private val httpFactory: AwareHttpClientFactory,
 ) {
     private val links = ConcurrentHashMap<String, AwarePeerLink>()
     private val subscribedPeers = ConcurrentHashMap<String, DPeer>()
@@ -123,14 +123,21 @@ internal class AwareLinkPool(
     @RequiresPermission(allOf = [Manifest.permission.ACCESS_NETWORK_STATE, Manifest.permission.CHANGE_NETWORK_STATE])
     suspend fun linkFor(peer: DPeer): AwarePeerLink {
         session.start()
+        val config = com.ismartcoding.plain.api.RustContentApi.postJson("chat/transport", kotlinx.serialization.json.buildJsonObject {
+            put("action", kotlinx.serialization.json.JsonPrimitive("awareConfig"))
+            put("id", kotlinx.serialization.json.JsonPrimitive(peer.id))
+        }).getValue("result").jsonObject
+        links[peer.id]?.takeUnless { it.matches(config) }?.let { old ->
+            if (links.remove(peer.id, old)) old.close(reason = "configuration changed")
+        }
         return links.computeIfAbsent(peer.id) {
             AwarePeerLink.create(
                 peer = peer,
+                config = config,
                 session = session,
                 connectivityManager = connectivityManager,
-                httpFactory = httpFactory,
-                onClose = { peerId: String, reason: String ->
-                    links.remove(peerId)
+                onClose = { link: AwarePeerLink, _: String ->
+                    links.remove(link.peerId, link)
                 },
             )
         }

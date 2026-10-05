@@ -6,7 +6,6 @@ import com.ismartcoding.plain.db.DChat
 import com.ismartcoding.plain.db.DChatChannel
 import com.ismartcoding.plain.db.DMessageContent
 import com.ismartcoding.plain.db.DMessageFile
-import com.ismartcoding.plain.enums.ChatStatus
 
 object ChatManager {
 
@@ -18,9 +17,13 @@ object ChatManager {
 
     suspend fun getIdsAsync(query: String): Set<String> = ChatDbHelper.getIdsAsync(query)
 
-    suspend fun updateStatus(item: DChat, status: ChatStatus) {
-        ChatDbHelper.updateChatItemStatus(item, status)
-    }
+    suspend fun sendContent(target: ChatTarget, content: DMessageContent): DChat = RustChatService.send(target, content)
+    suspend fun sendText(target: ChatTarget, text: String): DChat = RustChatService.sendText(listOf(target), text).single()
+    suspend fun forward(id: String, target: ChatTarget): DChat = RustChatService.forward(id, target)
+    suspend fun retry(id: String): DChat = RustChatService.retry(id)
+    suspend fun deleteQuery(query: String): Int = RustChatService.deleteQuery(query)
+    suspend fun sharePicked(target: ChatTarget, uris: List<String>, images: Boolean, normalize: Boolean): Boolean =
+        RustChatService.share(listOf(target), uris, null, null, images, normalize)
 
     suspend fun createChatItem(target: ChatTarget, content: DMessageContent): DChat = withIO {
         val item = RustChatService.create(target, content)
@@ -59,11 +62,11 @@ object ChatManager {
     }
 
     suspend fun deleteOne(id: String) {
-        ChatDbHelper.deleteAsync(id)
+        RustChatService.delete(setOf(id))
     }
 
     suspend fun deleteByIds(ids: Set<String>) {
-        ChatDbHelper.deleteByIdsAsync(ids)
+        RustChatService.delete(ids)
     }
 
     suspend fun clearAllMessages(target: ChatTarget) = withIO {

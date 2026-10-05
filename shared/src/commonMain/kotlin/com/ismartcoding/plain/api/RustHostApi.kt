@@ -35,13 +35,13 @@ object RustHostApi {
                                     val method = request.string("method")
                                     val params = request.getValue("params").jsonObject
                                     capacity.acquire()
-                                    launch {
+                                    launch(start = kotlinx.coroutines.CoroutineStart.UNDISPATCHED) {
                                         try {
                                             val reply = try {
                                                 val result = when {
                                                     method == "httpExchange" -> { com.ismartcoding.plain.httpserver.RustHttpHost.start(exchangeScope, session, params.getValue("id").jsonPrimitive.content); JsonNull }
+                                                    method.startsWith("chatPicked") -> com.ismartcoding.plain.chat.ChatPickedHost.handle(method, params)
                                                     method.startsWith("sharedTransfer") -> com.ismartcoding.plain.features.share.SharedTransferHost.handle(exchangeScope, method, params)
-                                                    method.startsWith("attachmentTransfer") -> com.ismartcoding.plain.chat.download.AttachmentTransferHost.handle(exchangeScope, method, params)
                                                     method.startsWith("blePair") -> com.ismartcoding.plain.discover.BlePairingHost.handle(method, params)
                                                     method == "mdnsMulticast" -> com.ismartcoding.plain.discover.MdnsMulticastHost.handle(params)
                                                     method == "discoveryFacts" -> com.ismartcoding.plain.discover.DiscoveryAdvertisementHost.facts()
@@ -68,7 +68,7 @@ object RustHostApi {
                     }
                 } catch (cancelled: CancellationException) { throw cancelled }
                 catch (e: Exception) { LogCat.e("Rust host: ${e.message}") }
-                finally { withContext(NonCancellable) { try { com.ismartcoding.plain.features.share.SharedTransferHost.disconnect() } catch (error: Exception) { LogCat.e("Shared OS adapter cleanup", error) }; try { com.ismartcoding.plain.discover.MdnsMulticastHost.disconnect() } catch (error: Exception) { LogCat.e("Multicast permission cleanup", error) }; try { com.ismartcoding.plain.discover.BlePairingHost.disconnect() } catch (error: Exception) { LogCat.e("BLE handle cleanup", error) }; try { ImageIndexHost.disconnect() } catch (error: Exception) { LogCat.e("Image index cleanup",error) } } }
+                finally { withContext(NonCancellable) { try { com.ismartcoding.plain.chat.peer.transport.PeerSocketHost.disconnect() } catch (error: Exception) { LogCat.e("Peer socket cleanup", error) }; try { com.ismartcoding.plain.chat.ChatPickedHost.disconnect() } catch (error: Exception) { LogCat.e("Selected file cleanup", error) }; try { com.ismartcoding.plain.features.share.SharedTransferHost.disconnect() } catch (error: Exception) { LogCat.e("Shared OS adapter cleanup", error) }; try { com.ismartcoding.plain.discover.MdnsMulticastHost.disconnect() } catch (error: Exception) { LogCat.e("Multicast permission cleanup", error) }; try { com.ismartcoding.plain.discover.BlePairingHost.disconnect() } catch (error: Exception) { LogCat.e("BLE handle cleanup", error) }; try { ImageIndexHost.disconnect() } catch (error: Exception) { LogCat.e("Image index cleanup",error) } } }
                 delay(retryMs)
                 retryMs = (retryMs * 2).coerceAtMost(5_000)
             }

@@ -1,17 +1,10 @@
 package com.ismartcoding.plain.platform
 
-import com.ismartcoding.plain.Constants
-import com.ismartcoding.plain.db.DMessageContent
-import com.ismartcoding.plain.db.DMessageFile
-import com.ismartcoding.plain.db.DMessageFiles
-import com.ismartcoding.plain.db.MessageType
-import com.ismartcoding.plain.extensions.resolveAppFileRealPath
 import com.ismartcoding.plain.features.file.RustFileHelper
 import com.ismartcoding.plain.features.file.DFile
 import com.ismartcoding.plain.helpers.AppFileStore
 import com.ismartcoding.plain.lib.TimeHelper
 import com.ismartcoding.plain.lib.withIO
-import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.httpserver.http.StreamSink
 import com.ismartcoding.plain.lib.kgraphql.GraphQLError
 import kotlin.time.Instant
@@ -19,16 +12,6 @@ import kotlin.time.Instant
 // ── Shared construction / detection helpers ────────────────────────────────
 // These hold the platform-independent business logic so each actual only keeps
 // the lowest-level file I/O. Android is the reference implementation.
-
-/**
- * Build the [DMessageContent] for a long-text file written at [path].
- * Used by [createLongTextFile].
- */
-fun buildLongTextMessage(path: String, fileName: String, text: String, size: Long): DMessageContent {
-    val summary = text.substring(0, minOf(text.length, Constants.TEXT_FILE_SUMMARY_LENGTH))
-    val messageFile = DMessageFile(uri = path, size = size, summary = summary, fileName = fileName)
-    return DMessageContent(MessageType.FILES, DMessageFiles(listOf(messageFile)))
-}
 
 /**
  * Build the [DFile] record for a text file at [path] with [size] bytes and the
@@ -75,7 +58,6 @@ expect suspend fun sha256FileEdges(path: String, size: Long): String
  */
 expect fun writeBytesToPath(path: String, bytes: ByteArray): Boolean
 
-expect fun createLongTextFile(text: String): DMessageContent
 
 /**
  * Copy a file into the system Downloads folder.

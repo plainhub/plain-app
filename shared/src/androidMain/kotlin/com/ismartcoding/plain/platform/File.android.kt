@@ -3,14 +3,12 @@ package com.ismartcoding.plain.platform
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import com.ismartcoding.plain.appContext
-import com.ismartcoding.plain.db.DMessageContent
 import com.ismartcoding.plain.extensions.resolveAppFileRealPath
 import com.ismartcoding.plain.features.file.DFile
 import com.ismartcoding.plain.helpers.AppHelper
 import com.ismartcoding.plain.helpers.AppFileStore
 import com.ismartcoding.plain.helpers.ChatFileSaveHelper
 import com.ismartcoding.plain.helpers.FileHelper
-import com.ismartcoding.plain.lib.TimeHelper
 import com.ismartcoding.plain.lib.withIO
 import com.ismartcoding.plain.helpers.FileHashEdgeBytes
 import com.ismartcoding.plain.lib.extensions.isAnimatedImageOrSvgHeader
@@ -19,7 +17,6 @@ import com.ismartcoding.plain.lib.extensions.isHeifHeader
 import com.ismartcoding.plain.lib.extensions.toHexString
 import com.ismartcoding.plain.lib.extensions.queryOpenableFile
 import com.ismartcoding.plain.lib.extensions.queryOpenableFileName
-import com.ismartcoding.plain.lib.extensions.scanFileByConnection
 import com.ismartcoding.plain.httpserver.http.StreamSink
 import android.net.Uri
 import androidx.core.net.toUri
@@ -40,7 +37,6 @@ import com.ismartcoding.plain.lib.extensions.compress
 import com.ismartcoding.plain.thumbnail.DecodeLimiter
 import com.ismartcoding.plain.thumbnail.DecodePolicy
 import com.ismartcoding.plain.thumbnail.ThumbnailProvider
-import com.ismartcoding.plain.ui.page.appfiles.AppFileDisplayNameHelper
 import kotlinx.coroutines.runBlocking
 import java.io.ByteArrayOutputStream
 import java.io.File
@@ -129,16 +125,6 @@ actual fun writeBytesToPath(path: String, bytes: ByteArray): Boolean {
     } catch (_: Exception) {
         false
     }
-}
-
-actual fun createLongTextFile(text: String): DMessageContent {
-    val timestamp = TimeHelper.now().toEpochMilliseconds()
-    val fileName = "message-$timestamp.txt"
-    val dir = appContext.getExternalFilesDir(android.os.Environment.DIRECTORY_DOCUMENTS)
-    if (!dir!!.exists()) dir.mkdirs()
-    val file = java.io.File(dir, fileName)
-    file.writeText(text)
-    return buildLongTextMessage(file.absolutePath, fileName, text, file.length())
 }
 
 actual fun saveFileToDownloads(path: String, fileName: String): String {

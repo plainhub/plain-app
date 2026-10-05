@@ -1,7 +1,6 @@
 package com.ismartcoding.plain.events
 
 import com.ismartcoding.plain.chat.download.DownloadTask
-import com.ismartcoding.plain.db.DChat
 import com.ismartcoding.plain.enums.WebSettingsFeature
 import com.ismartcoding.plain.lib.ChannelEvent
 
@@ -20,7 +19,6 @@ class HOpenAccessibilitySettingsEvent : ChannelEvent()
 
 class HOpenWebSettingsEvent(val feature: WebSettingsFeature? = null) : ChannelEvent()
 
-class HRetryChatItemEvent(val item: DChat) : ChannelEvent()
 /**
  * Fired after the default SMS app is launched for an MMS send.
  * AppEvents polls content://mms for the correlated row and always clears

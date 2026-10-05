@@ -140,6 +140,9 @@ object RustContentApi {
                                 Json.parseToJsonElement(payload).jsonArray.forEach { value ->
                                     com.ismartcoding.plain.chat.RustChatStore.getById(value.jsonObject.getValue("id").jsonPrimitive.content)?.let { item ->
                                         if (item.fromId == "me") {
+                                            val target = if (item.channelId.isEmpty()) com.ismartcoding.plain.chat.data.ChatTarget.parseId("peer:" + item.toId)
+                                                else com.ismartcoding.plain.chat.data.ChatTarget.parseId("channel:" + item.channelId)
+                                            com.ismartcoding.plain.chat.ChatViewModel.onMessagesCreated(target, listOf(item), scroll = true)
                                             com.ismartcoding.plain.chat.ChatCacher.load()
                                             sendEvent(WebSocketEvent(EventType.MESSAGE_CREATED,
                                                 com.ismartcoding.plain.lib.JsonHelper.jsonEncode(listOf(item.toModel()))))
@@ -152,7 +155,8 @@ object RustContentApi {
                             }
                             EventType.MESSAGE_DELETED.value -> {
                                 val target = Json.parseToJsonElement(payload).jsonPrimitive.content
-                                com.ismartcoding.plain.chat.ChatViewModel.onConversationCleared(target)
+                                if (target.startsWith("ids=")) com.ismartcoding.plain.chat.ChatViewModel.onMessagesDeleted(target.removePrefix("ids=").split(',').filter { it.isNotEmpty() }.toSet())
+                                else com.ismartcoding.plain.chat.ChatViewModel.onConversationCleared(target)
                                 com.ismartcoding.plain.chat.ChatCacher.load()
                                 sendEvent(WebSocketEvent(EventType.MESSAGE_DELETED, payload))
                             }

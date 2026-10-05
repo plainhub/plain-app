@@ -1,7 +1,7 @@
 package com.ismartcoding.plain.chat.peer.transport.aware
 
-import com.ismartcoding.plain.preferences.*
 
+import kotlinx.serialization.json.*
 import android.Manifest
 import android.annotation.SuppressLint
 import android.net.ConnectivityManager
@@ -14,8 +14,6 @@ import android.net.wifi.aware.WifiAwareNetworkSpecifier
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.annotation.RequiresPermission
-import com.ismartcoding.plain.TempData
-import com.ismartcoding.plain.chat.peer.PeerCacher
 import com.ismartcoding.plain.db.DPeer
 import com.ismartcoding.plain.lib.logcat.LogCat
 import kotlinx.coroutines.CompletableDeferred
@@ -27,7 +25,6 @@ import java.net.Inet6Address
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicLong
 import java.util.concurrent.atomic.AtomicReference
-import kotlin.math.min
 import kotlin.time.Duration.Companion.milliseconds
 
 @RequiresApi(Build.VERSION_CODES.S)
@@ -36,12 +33,14 @@ class AwarePeerLink(
     val peerId: String,
     private val session: AwareSession,
     private val connectivityManager: ConnectivityManager,
-    private val httpFactory: AwareHttpClientFactory,
     private val isClient: Boolean,
-    private val onClose: (peerId: String, reason: String) -> Unit,
+    private val pmk: ByteArray?,
+    private val localPort: Int,
+    private val onClose: (link: AwarePeerLink, reason: String) -> Unit,
 ) {
     enum class LinkState { IDLE, CONNECTING, CONNECTED, CLOSED }
 
+    private val networkCallback = AtomicReference<ConnectivityManager.NetworkCallback?>(null)
     private val connection = AtomicReference<PeerConnection?>(null)
     private val closed = AtomicBoolean(false)
     private val buildMutex = Mutex()
@@ -49,6 +48,11 @@ class AwarePeerLink(
     @Volatile private var peerHandle: PeerHandle? = null
 
     val lastActiveAt = AtomicLong(System.currentTimeMillis())
+
+    fun matches(config: JsonObject): Boolean =
+        isClient == config.getValue("isClient").jsonPrimitive.boolean &&
+            localPort == config.getValue("localPort").jsonPrimitive.int &&
+            pmk.contentEquals(config.getValue("pmk").takeUnless { it is JsonNull }?.let { kotlin.io.encoding.Base64.decode(it.jsonPrimitive.content) })
 
     fun updatePeerHandle(handle: PeerHandle) {
         peerHandle = handle
@@ -117,6 +121,7 @@ class AwarePeerLink(
                     }
                     LogCat.d("[AWARE] build handle ok peer=${d.id} attempt=${attempt + 1}/$maxAttempts hasPeerHandle=${peerHandle != null}")
                     val conn = openNetwork(handle, d.port)
+                    check(!closed.get()) { "Aware link closed" }
                     state = LinkState.CONNECTED
                     connection.set(conn)
                     LogCat.d("[AWARE] build ok peer=${d.id} ip=${conn.peerIpv6} port=${conn.peerPort}")
@@ -188,7 +193,6 @@ class AwarePeerLink(
                         network = n,
                         peerIpv6 = ip,
                         peerPort = port,
-                        httpClient = httpFactory.build(peerId, n, ip),
                     ),
                 )
             }
@@ -205,6 +209,8 @@ class AwarePeerLink(
                 REQUEST_TIMEOUT_MS,
             )
             registered = true
+            networkCallback.set(callback)
+            check(!closed.get()) { "Aware link closed" }
             LogCat.d("[AWARE] requestNetwork registered peer=$peerId")
             // publisher requestNetwork 注册后发 ready 回执给 subscriber。
             // 这是非阻塞信号 —— subscriber 不等 ready 就已 requestNetwork，但收到 ready 时
@@ -230,7 +236,6 @@ class AwarePeerLink(
     }
 
     private fun buildSpecifier(handle: PeerHandle): WifiAwareNetworkSpecifier {
-        val pmk = derivePmk()
         val builder = if (isClient) {
             val sub = session.subscribe ?: error("subscribe session not ready")
             WifiAwareNetworkSpecifier.Builder(sub, handle)
@@ -240,22 +245,10 @@ class AwarePeerLink(
         }
         pmk?.let { builder.setPmk(it) }
         if (!isClient) {
-            builder.setPort(UserPrefs.httpsPort.value)
+            builder.setPort(localPort)
         }
-        LogCat.d("[AWARE] buildSpecifier peer=$peerId role=${if (isClient) "client" else "server"} pmk=${pmk != null}")
+        LogCat.d("[AWARE] buildSpecifier peer=$peerId role=${if (isClient) "client" else "server"} pmk=true")
         return builder.build()
-    }
-
-    private fun derivePmk(): ByteArray? = try {
-        val raw = PeerCacher.getKeyBytes(peerId)
-        when {
-            raw == null || raw.isEmpty() -> null
-            raw.size == 32 -> raw
-            else -> ByteArray(32).also { System.arraycopy(raw, 0, it, 0, min(raw.size, 32)) }
-        }
-    } catch (e: Exception) {
-        LogCat.e("Wi-Fi Aware derive PMK failed: ${e.message}")
-        null
     }
 
     private fun onNetworkLost() {
@@ -263,7 +256,7 @@ class AwarePeerLink(
         try {
             if (state == LinkState.CLOSED) return
             state = LinkState.IDLE
-            connection.getAndSet(null)?.httpClient?.let { runCatching { it.close() } }
+            connection.set(null)
             LogCat.w("Aware onLost peer=$peerId state=IDLE")
         } finally {
             buildMutex.unlock()
@@ -273,8 +266,9 @@ class AwarePeerLink(
     fun close(reason: String) {
         if (!closed.compareAndSet(false, true)) return
         state = LinkState.CLOSED
-        connection.getAndSet(null)?.httpClient?.let { runCatching { it.close() } }
-        onClose(peerId, reason)
+        networkCallback.getAndSet(null)?.let { callback -> runCatching { connectivityManager.unregisterNetworkCallback(callback) } }
+        connection.set(null)
+        onClose(this, reason)
     }
 
     companion object {
@@ -291,16 +285,17 @@ class AwarePeerLink(
         @RequiresPermission(allOf = [Manifest.permission.ACCESS_NETWORK_STATE, Manifest.permission.CHANGE_NETWORK_STATE])
         fun create(
             peer: DPeer,
+            config: kotlinx.serialization.json.JsonObject,
             session: AwareSession,
             connectivityManager: ConnectivityManager,
-            httpFactory: AwareHttpClientFactory,
-            onClose: (peerId: String, reason: String) -> Unit,
+            onClose: (link: AwarePeerLink, reason: String) -> Unit,
         ): AwarePeerLink = AwarePeerLink(
             peerId = peer.id,
             session = session,
             connectivityManager = connectivityManager,
-            httpFactory = httpFactory,
-            isClient = TempData.clientId < peer.id,
+            isClient = config.getValue("isClient").jsonPrimitive.boolean,
+            pmk = config.getValue("pmk").takeUnless { it is JsonNull }?.let { kotlin.io.encoding.Base64.decode(it.jsonPrimitive.content) },
+            localPort = config.getValue("localPort").jsonPrimitive.int,
             onClose = onClose,
         )
     }

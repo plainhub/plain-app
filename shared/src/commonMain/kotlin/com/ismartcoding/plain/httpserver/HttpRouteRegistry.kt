@@ -151,7 +151,7 @@ object HttpRouteRegistry {
     /**
      * Find the [RouteEntry] matching [method] + [path] and invoke its handler
      * against [call]. Path parameters (`{name}`) are resolved into
-     * [call.pathParam] via the [BleHttpCall] adapter — for platform
+     * [call.pathParam] via the HTTP adapter — for platform
      * [HttpCall] implementations the params are already populated by the
      * platform router, so this function only does the lookup.
      *
@@ -171,7 +171,7 @@ object HttpRouteRegistry {
      * Locate the [RouteEntry] for [method] + [path], returning the matched
      * path parameters (possibly empty) or `null` when no route matches.
      * Exposed so callers that need to populate path params on the [HttpCall]
-     * adapter (e.g. [BleHttpCall]) can do so before dispatch.
+     * adapter can do so before dispatch.
      */
     fun matchRoute(method: HttpMethod, path: String): RouteEntry? {
         return router.entries().firstOrNull { entry ->

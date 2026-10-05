@@ -2,7 +2,6 @@
 
 package com.ismartcoding.plain.platform
 
-import com.ismartcoding.plain.db.DMessageContent
 import com.ismartcoding.plain.features.file.DFile
 import com.ismartcoding.plain.helpers.AppFileStore
 import com.ismartcoding.plain.helpers.FileHashHelper
@@ -81,20 +80,6 @@ actual fun writeBytesToPath(path: String, bytes: ByteArray): Boolean {
 }
 
 @OptIn(BetaInteropApi::class, ExperimentalForeignApi::class)
-actual fun createLongTextFile(text: String): DMessageContent {
-    val timestamp = TimeHelper.now().toEpochMilliseconds()
-    val fileName = "message-$timestamp.txt"
-    val dir = appDir() + "/Documents"
-    NSFileManager.defaultManager.createDirectoryAtPath(
-        dir, withIntermediateDirectories = true, attributes = null, error = null,
-    )
-    val file = "$dir/$fileName"
-    NSString.create(string = text)?.writeToFile(file, atomically = true, encoding = NSUTF8StringEncoding, error = null)
-    val size = NSFileManager.defaultManager.contentsAtPath(file)?.length?.toInt()?.toLong() ?: 0L
-    return buildLongTextMessage(file, fileName, text, size)
-}
-
-@OptIn(ExperimentalForeignApi::class)
 actual fun saveFileToDownloads(path: String, fileName: String): String {
     val destDir = appDir() + "/Downloads"
     NSFileManager.defaultManager.createDirectoryAtPath(
