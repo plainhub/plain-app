@@ -3,9 +3,6 @@ package com.ismartcoding.plain.features.share
 import com.ismartcoding.plain.api.*
 import com.ismartcoding.plain.db.DShare
 import com.ismartcoding.plain.db.ShareRoot
-import com.ismartcoding.plain.helpers.UrlHelper
-import com.ismartcoding.plain.platform.getDeviceIP4
-import com.ismartcoding.plain.preferences.UserPrefs
 import kotlinx.serialization.json.*
 import kotlin.io.encoding.Base64
 import kotlin.time.Instant
@@ -26,8 +23,7 @@ object ShareManager {
     suspend fun getShare(id: String): DShare? = RustContentApi.query("shareRecord(id: ${gql(id)}) { $FIELDS }")["shareRecord"]?.takeUnless { it is JsonNull }?.share()
     suspend fun sharedToken(id: String): String = RustContentApi.query("shareToken(id: ${gql(id)})").string("shareToken")
 
-    suspend fun buildLink(share: DShare, host: String = getDeviceIP4()): String =
-        UrlHelper.buildUrl("https", host, UserPrefs.httpsPort.value, "/s/${share.id}#${sharedToken(share.id)}")
+    suspend fun buildLink(share: DShare, host: String? = null): String = SharedLinkClient.pageUrl(SharedLinkClient.ownLink(share.id, host))
 
     suspend fun loadAuth(id: String): SharedAuth? {
         val auth = RustContentApi.query("shareAuth(id: ${gql(id)}) { token share { $FIELDS } }")["shareAuth"]?.takeUnless { it is JsonNull }?.jsonObject ?: return null

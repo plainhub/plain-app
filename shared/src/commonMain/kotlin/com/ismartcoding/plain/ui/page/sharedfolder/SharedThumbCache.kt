@@ -8,6 +8,7 @@ import com.ismartcoding.plain.lib.extensions.isVideoFast
 import com.ismartcoding.plain.platform.cacheDirPath
 import com.ismartcoding.plain.platform.createFileWriteHandle
 import com.ismartcoding.plain.platform.fileExists
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 
@@ -43,6 +44,9 @@ internal object SharedThumbCache {
                 )
                 handle.close()
                 path
+            } catch (cancelled: CancellationException) {
+                handle.delete()
+                throw cancelled
             } catch (_: Exception) {
                 handle.delete()
                 null

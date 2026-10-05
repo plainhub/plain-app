@@ -4,6 +4,7 @@ import com.ismartcoding.plain.features.share.SharedFileDto
 import com.ismartcoding.plain.features.share.SharedLink
 import com.ismartcoding.plain.features.share.SharedLinkClient
 import com.ismartcoding.plain.lib.withIO
+import kotlinx.coroutines.CancellationException
 import com.ismartcoding.plain.platform.DownloadTempFileHandle
 import com.ismartcoding.plain.platform.ZipStreamEntry
 import com.ismartcoding.plain.platform.createDownloadTempFile
@@ -90,6 +91,8 @@ internal object SharedFolderTransfer {
             val handle = createDownloadTempFile("preview_${entry.name}")
             withIO { downloadToHandle(SharedLinkClient.fileUrl(link, urlToken, entry.virtualPath), handle) }
             handle
+        } catch (cancelled: CancellationException) {
+            throw cancelled
         } catch (_: Exception) {
             null
         }

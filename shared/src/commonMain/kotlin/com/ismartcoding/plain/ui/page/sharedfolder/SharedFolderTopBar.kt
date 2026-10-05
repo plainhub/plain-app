@@ -57,11 +57,11 @@ internal fun SharedFolderTopBar(
                 ) { dismiss ->
                     PSheetActionRow(UiRes.drawable.ui_drawable_chrome, stringResource(Res.string.open_in_browser)) {
                         dismiss()
-                        state.browserUrl()?.let { launchUrl(it) }
+                        state.withBrowserUrl { launchUrl(it) }
                     }
                     PSheetActionRow(UiRes.drawable.ui_drawable_copy, stringResource(Res.string.copy_link)) {
                         dismiss()
-                        state.browserUrl()?.let {
+                        state.withBrowserUrl {
                             setClipboardText("", it)
                             DialogHelper.showSuccess(Res.string.copied)
                         }

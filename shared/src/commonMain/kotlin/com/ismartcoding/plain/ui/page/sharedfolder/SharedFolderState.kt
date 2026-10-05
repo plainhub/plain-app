@@ -29,6 +29,7 @@ import com.ismartcoding.plain.ui.components.mediaviewer.previewer.MediaPreviewer
 import com.ismartcoding.plain.ui.helpers.DialogHelper
 import com.ismartcoding.plain.ui.models.MediaPreviewData
 import com.ismartcoding.plain.ui.page.files.components.openLocalFileByType
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
@@ -97,7 +98,7 @@ internal class SharedFolderState(
         scope.launch {
             loadingPath = path
             errorPath = null
-            val result = fetchSharedInfoWithFallback(msg, path.takeIf { it.isNotEmpty() })
+            val result = fetchSharedInfoWithFallback(messageId, msg, path.takeIf { it.isNotEmpty() })
             // User navigated elsewhere meanwhile: drop the stale result.
             if (loadingPath != path) return@launch
             loadingPath = null
@@ -108,7 +109,7 @@ internal class SharedFolderState(
             dirCache[path] = result.info
             activeLink = result.link
             if (path.isEmpty()) rootInfo = result.info
-            syncCardBack(messageId, msg, result)
+            shareMsg = result.card
         }
     }
 
@@ -160,10 +161,15 @@ internal class SharedFolderState(
             it.entries.any { e -> e.virtualPath == entry.virtualPath }
     }
 
-    fun browserUrl(): String? {
-        val msg = shareMsg ?: return null
-        val link = activeLink ?: addressCandidates(msg).firstOrNull() ?: return null
-        return SharedLinkClient.pageUrl(link)
+    fun withBrowserUrl(action: (String) -> Unit) {
+        val msg = shareMsg ?: return
+        scope.launch {
+            try {
+                val link = activeLink ?: SharedLinkClient.initialLink(messageId, msg)
+                action(SharedLinkClient.pageUrl(link))
+            } catch (cancelled: CancellationException) { throw cancelled }
+            catch (_: Exception) { DialogHelper.showErrorDialog(LocaleHelper.getString(Res.string.cannot_load_share)) }
+        }
     }
 
     /**
