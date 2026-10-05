@@ -12,12 +12,12 @@ import com.ismartcoding.plain.lib.extensions.map
 import com.ismartcoding.plain.lib.extensions.queryCursor
 import com.ismartcoding.plain.lib.withIO
 import com.ismartcoding.plain.appContext
-import com.ismartcoding.plain.extensions.normalizeComparison
-import com.ismartcoding.plain.extensions.parseSizeToBytes
 import com.ismartcoding.plain.extensions.toFile
 import com.ismartcoding.plain.features.file.DFile
 import com.ismartcoding.plain.features.file.FileSortBy
 import com.ismartcoding.plain.features.file.toFileSortBy
+import com.ismartcoding.plain.features.system.RustSystemProviders
+import com.ismartcoding.plain.enums.DataType
 import com.ismartcoding.plain.helpers.QueryHelper
 
 object FileMediaStoreHelper : BaseContentHelper() {
@@ -37,43 +37,9 @@ object FileMediaStoreHelper : BaseContentHelper() {
     }
 
     override suspend fun buildWhereAsync(query: String): ContentWhere {
-        val where = ContentWhere()
-        if (query.isNotEmpty()) {
-            var showHidden = false
-            QueryHelper.parseAsync(query).forEach {
-                when (it.name) {
-                    "text" -> {
-                        where.addLike("${MediaStore.Files.FileColumns.DISPLAY_NAME}", it.value)
-                    }
-                    "parent" -> {
-                        where.add("${MediaStore.Files.FileColumns.PARENT} = ?", getIdByPathAsync(appContext, it.value) ?: "-1")
-                    }
-                    "type" -> {
-                        where.add("${MediaStore.Files.FileColumns.MIME_TYPE} = ?", it.value)
-                    }
-                    "show_hidden" -> {
-                        showHidden = it.value.toBoolean()
-                    }
-                    "file_size" -> {
-                        val (rawOp, rawValue) = it.normalizeComparison(defaultOp = "=")
-                        val bytes = rawValue.parseSizeToBytes() ?: return@forEach
-                        val op = when (rawOp) {
-                            ">", ">=", "<", "<=", "!=", "=" -> rawOp
-                            else -> "="
-                        }
-                        where.add("${MediaStore.Files.FileColumns.SIZE} $op ?", bytes.toString())
-                    }
-                    "ids" -> {
-                        where.addIn(MediaStore.Files.FileColumns._ID, it.value.split(","))
-                    }
-                }
-            }
-
-            if (!showHidden) {
-                where.addNotStartsWith(MediaStore.Files.FileColumns.DISPLAY_NAME, ".")
-            }
-        }
-        return where
+        val parentPath = QueryHelper.parseAsync(query).firstOrNull { it.name == "parent" }?.value
+        val parentId = parentPath?.let { getIdByPathAsync(appContext, it) ?: "-1" }
+        return RustSystemProviders.providerWhere(DataType.FILE, query, parentId)
     }
 
     suspend fun searchAsync(

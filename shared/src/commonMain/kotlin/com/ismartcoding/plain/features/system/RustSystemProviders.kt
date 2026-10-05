@@ -18,8 +18,11 @@ object RustSystemProviders {
         RustContentApi.postJson("system/providers", buildJsonObject {
             put("action", action); put("query", query); put("offset", offset); put("limit", limit); put("sortBy", sortBy.name)
         })
-    suspend fun providerWhere(provider: com.ismartcoding.plain.enums.DataType, query: String): com.ismartcoding.plain.helpers.ContentWhere {
-        val result = RustContentApi.postJson("system/provider-plan", buildJsonObject { put("provider", provider.name); put("query", query) })
+    suspend fun providerWhere(provider: com.ismartcoding.plain.enums.DataType, query: String, resolvedParentId: String? = null): com.ismartcoding.plain.helpers.ContentWhere {
+        val result = RustContentApi.postJson("system/provider-plan", buildJsonObject {
+            put("provider", provider.name); put("query", query)
+            resolvedParentId?.let { put("resolvedParentId", it) }
+        })
         return com.ismartcoding.plain.helpers.ContentWhere().apply {
             result.getValue("clauses").jsonArray.forEach { add(it.jsonPrimitive.content) }
             args.addAll(result.getValue("args").jsonArray.map { it.jsonPrimitive.content })
