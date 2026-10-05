@@ -40,6 +40,12 @@ class SharedFolderBatchLogicTest {
     }
 
     @Test
+    fun enumerationOrPackingFailureCannotBecomeCompletedWithZeroFileFailures() {
+        assertEquals(DownloadStatus.FAILED, deriveShareBatchStatus(false, false, 0, 0, "enumeration failed"))
+        assertEquals(DownloadStatus.PARTIAL, deriveShareBatchStatus(false, false, 2, 0, "packing failed"))
+    }
+
+    @Test
     fun fractionIsZeroWhileEnumeratingAndClampedDuringTransfer() {
         val task = SharedFolderBatchTask(
             id = "t", messageId = "m", type = ShareBatchType.SYNC, title = "t",

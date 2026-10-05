@@ -2,15 +2,15 @@ package com.ismartcoding.plain.ui.page.sharedfolder
 
 import com.ismartcoding.plain.features.share.SharedFileDto
 import com.ismartcoding.plain.features.share.SharedLink
+import com.ismartcoding.plain.features.share.ShareBatchType
 import com.ismartcoding.plain.features.share.SharedLinkClient
 import com.ismartcoding.plain.lib.withIO
 import kotlinx.coroutines.CancellationException
 import com.ismartcoding.plain.platform.DownloadTempFileHandle
 import com.ismartcoding.plain.platform.ZipStreamEntry
 import com.ismartcoding.plain.platform.createDownloadTempFile
-import com.ismartcoding.plain.platform.createFileSink
+import com.ismartcoding.plain.platform.getDownloadsDirPath
 import com.ismartcoding.plain.platform.createFileWriteHandle
-import com.ismartcoding.plain.platform.streamZipToSink
 import com.ismartcoding.plain.platform.saveTempFileToDownloads
 
 /**
@@ -32,7 +32,8 @@ internal object SharedFolderTransfer {
             SharedLinkClient.downloadTo(url, { buffer, length -> handle.write(buffer, 0, length) }, onProgress)
             handle.close()
         } catch (e: Exception) {
-            handle.delete()
+            runCatching { handle.close() }
+            runCatching { handle.delete() }
             throw e
         }
     }
@@ -53,7 +54,8 @@ internal object SharedFolderTransfer {
             }
             saveTempFileToDownloads(handle, entry.name)
         } catch (e: Exception) {
-            handle.delete()
+            runCatching { handle.close() }
+            runCatching { handle.delete() }
             throw e
         }
         if (saved.isNullOrEmpty()) handle.delete()
@@ -76,7 +78,8 @@ internal object SharedFolderTransfer {
                 }
             }
         } catch (e: Exception) {
-            handle.delete()
+            runCatching { handle.close() }
+            runCatching { handle.delete() }
             throw e
         }
     }
@@ -112,27 +115,17 @@ internal object SharedFolderTransfer {
         onFileProgress: (entry: SharedFileDto, fraction: Float) -> Unit = { _, _ -> },
         onPacking: () -> Unit = {},
     ): Boolean {
-        // Expand selected directories into their file trees so one zip holds
-        // everything: files keep their name, dir files nest under dirName/.
-        val items = mutableListOf<Pair<SharedFileDto, String>>() // entry to entry name
-        suspend fun walk(entry: SharedFileDto, base: String) {
-            if (!entry.isDir) {
-                items.add(entry to base)
-                return
-            }
-            val info = SharedLinkClient.fetchSharedInfo(link, entry.virtualPath.takeIf { it.isNotEmpty() })
-            info.entries.forEach { child ->
-                walk(child, if (base.isEmpty()) child.name else "$base/${child.name}")
-            }
-        }
-        entries.forEach { walk(it, it.name) }
-        onEnumerated(items.size, items.sumOf { it.first.size })
+        val plan = SharedLinkClient.plan(ShareBatchType.ZIP, link, entries, "", "${getDownloadsDirPath().trimEnd('/')}/PlainApp")
+        onEnumerated(plan.totalFiles, plan.totalSize)
 
         val tempFiles = mutableListOf<Pair<DownloadTempFileHandle, String>>() // handle to entry name
         try {
-            items.forEach { (entry, entryName) ->
+            plan.targets.forEach { target ->
+                val entry = target.entry
+                val entryName = target.entryName
                 onFileStart(entry)
-                val handle = createDownloadTempFile("zipitem_${entryName}")
+                val handle = createDownloadTempFile("zipitem_${com.ismartcoding.plain.helpers.StringHelper.shortUUID()}")
+                tempFiles.add(handle to entryName)
                 withIO {
                     downloadToHandle(
                         SharedLinkClient.fileUrl(link, urlToken, entry.virtualPath),
@@ -141,17 +134,23 @@ internal object SharedFolderTransfer {
                         if (total > 0) onFileProgress(entry, done.toFloat() / total)
                     }
                 }
-                tempFiles.add(handle to entryName)
             }
             if (tempFiles.isEmpty()) return false
             onPacking()
-            val sink = createFileSink(destZipPath)
-            val ok = streamZipToSink(
-                tempFiles.map { (handle, name) -> ZipStreamEntry(sourcePath = handle.filePath, entryName = name) },
-                sink,
-            )
-            sink.close()
-            return ok
+            val destination = createFileWriteHandle(destZipPath)
+            try {
+                withIO {
+                    SharedLinkClient.packZip(tempFiles.map { (handle, name) -> ZipStreamEntry(handle.filePath, name) }) { bytes, length ->
+                        destination.write(bytes, 0, length)
+                    }
+                }
+                destination.close()
+                return true
+            } catch (error: Exception) {
+                runCatching { destination.close() }
+                destination.delete()
+                throw error
+            }
         } finally {
             tempFiles.forEach { (handle, _) -> handle.delete() }
         }

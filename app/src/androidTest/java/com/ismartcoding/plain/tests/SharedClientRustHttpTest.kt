@@ -67,6 +67,35 @@ class SharedClientRustHttpTest {
             assertEquals(file.length(), finalBytes)
             val direct = SharedLinkClient.fetchSharedInfo(result.link, folder.name)
             assertEquals(entry.virtualPath, direct.entries.single().virtualPath)
+            val nested = File(folder, "子目录").apply { mkdirs() }
+            val nestedFile = File(nested, "nested.txt").apply { writeText("synthetic nested") }
+            val roots = SharedLinkClient.fetchSharedInfo(result.link, null).entries
+            val rootEntry = roots.single { it.name == marker }
+            val syncPlan = SharedLinkClient.plan(ShareBatchType.SYNC, result.link, listOf(rootEntry), "${folder.absolutePath}/output", "/downloads/PlainApp")
+            assertEquals(2, syncPlan.totalFiles)
+            assertEquals(file.length() + nestedFile.length(), syncPlan.totalSize)
+            val nestedTarget = syncPlan.targets.single { it.entry.name == nestedFile.name }
+            assertEquals("${folder.absolutePath}/output/$marker/子目录", nestedTarget.writeDir)
+            assertEquals("$marker/子目录/nested.txt", nestedTarget.entryName)
+            assertFalse(nestedTarget.storeToDownloads)
+            val publicPlan = SharedLinkClient.plan(ShareBatchType.MULTI, result.link, listOf(entry), "", "/downloads/PlainApp")
+            assertTrue(publicPlan.targets.single().storeToDownloads)
+            val zipPlan = SharedLinkClient.plan(ShareBatchType.ZIP, result.link, listOf(rootEntry), "", "/downloads/PlainApp")
+            assertEquals(syncPlan.targets.map { it.entryName }, zipPlan.targets.map { it.entryName })
+            val archive = ByteArrayOutputStream()
+            SharedLinkClient.packZip(listOf(
+                com.ismartcoding.plain.platform.ZipStreamEntry(file.absolutePath, "$marker/${file.name}"),
+                com.ismartcoding.plain.platform.ZipStreamEntry(nestedFile.absolutePath, nestedTarget.entryName),
+            )) { bytes, length -> archive.write(bytes, 0, length) }
+            val extracted = mutableMapOf<String, String>()
+            java.util.zip.ZipInputStream(archive.toByteArray().inputStream()).use { zip ->
+                while (true) {
+                    val item = zip.nextEntry ?: break
+                    extracted[item.name] = zip.readBytes().toString(Charsets.UTF_8)
+                }
+            }
+            assertEquals("synthetic download", extracted["$marker/${file.name}"])
+            assertEquals("synthetic nested", extracted[nestedTarget.entryName])
             val own = ShareManager.buildLink(share, "::1")
             assertTrue(own.startsWith("https://[::1]:${initial.port}/s/"))
             var rejected = false

@@ -3,111 +3,14 @@ package com.ismartcoding.plain.features.share
 import com.ismartcoding.plain.features.download.DOWNLOAD_KIND_SHARE
 import com.ismartcoding.plain.features.download.DownloadCenter
 import com.ismartcoding.plain.features.download.DownloadEngine
-import com.ismartcoding.plain.features.download.DownloadFailure
 import com.ismartcoding.plain.features.download.DownloadStatus
+import com.ismartcoding.plain.features.download.DownloadFailure
 import com.ismartcoding.plain.features.download.DownloadTaskHandle
 import com.ismartcoding.plain.features.download.isTerminalDownloadStatus
 import com.ismartcoding.plain.lib.TimeHelper
 import com.ismartcoding.plain.platform.getDownloadsDirPath
 import com.ismartcoding.plain.ui.page.sharedfolder.SharedFolderTransfer
 import kotlinx.coroutines.CancellationException
-
-/** How a batch was created; drives enumeration and destination rules. */
-enum class ShareBatchType { FILE, ZIP, SYNC, MULTI }
-
-/** One resolved file destination inside a batch. */
-data class ShareFileTarget(
-    val entry: SharedFileDto,
-    /** Write dir for plain writes; ignored when [storeToDownloads] is true. */
-    val writeDir: String,
-    /** MediaStore public Downloads (flat, top-level files only). */
-    val storeToDownloads: Boolean,
-)
-
-/**
- * Aggregated download task for a shared folder: one user action (single file,
- * dir zip, dir sync or multi-selection save) is ONE task with file counters,
- * so a 1000-file sync renders as one card and occupies one queue slot.
- * [completedPaths] survives [DownloadCenter.requeue] retries, letting the
- * engine re-run only failed files.
- */
-class SharedFolderBatchTask(
-    override val id: String,
-    val messageId: String,
-    val type: ShareBatchType,
-    val title: String,
-    /** "" = public Downloads target; otherwise an absolute directory path. */
-    val targetDir: String,
-    /** Working endpoint; refreshed from a fresh enqueue before a re-run (see [refreshFrom]). */
-    var link: SharedLink,
-    var urlToken: String,
-    val entries: List<SharedFileDto>,
-    val zipName: String = "",
-) : DownloadTaskHandle {
-    override val kind: String = DOWNLOAD_KIND_SHARE
-    override var status: DownloadStatus = DownloadStatus.PENDING
-    override var error: String = ""
-    var downloadedSize: Long = 0
-    var totalSize: Long = 0
-    var downloadSpeed: Long = 0
-    var totalFiles: Int = 0
-    var doneFiles: Int = 0
-    var failedFiles: Int = 0
-    var currentFile: String = ""
-    var packing: Boolean = false
-    var failures = mutableListOf<DownloadFailure>()
-    override var aborted: Boolean = false
-    override var job: kotlinx.coroutines.Job? = null
-
-    val completedPaths = mutableSetOf<String>()
-    /** Files resolved by the walker; null until the first run enumerates them. */
-    var enumerated: List<ShareFileTarget>? = null
-
-    override fun flowSnapshot(): DownloadTaskHandle {
-        val s = SharedFolderBatchTask(
-            id, messageId, type, title, targetDir, link, urlToken, entries, zipName,
-        )
-        s.status = status
-        s.error = error
-        s.downloadedSize = downloadedSize
-        s.totalSize = totalSize
-        s.downloadSpeed = downloadSpeed
-        s.totalFiles = totalFiles
-        s.doneFiles = doneFiles
-        s.failedFiles = failedFiles
-        s.currentFile = currentFile
-        s.packing = packing
-        s.failures = failures.toList().toMutableList()
-        return s
-    }
-
-    /** Takes over the fresh enqueue's endpoint, so re-runs survive address changes. */
-    override fun refreshFrom(fresh: DownloadTaskHandle) {
-        if (fresh !is SharedFolderBatchTask) return
-        link = fresh.link
-        urlToken = fresh.urlToken
-    }
-
-    /** Overall fraction 0..1; 0 while the walker is still counting. */
-    fun fraction(): Float = if (totalSize > 0) (downloadedSize.toFloat() / totalSize).coerceIn(0f, 1f) else 0f
-}
-
-/**
- * Terminal batch status from counters. Active states outrank error so a huge
- * batch keeps running (and keeps its progress bar) while a few files failed.
- */
-internal fun deriveShareBatchStatus(
-    running: Boolean,
-    canceled: Boolean,
-    doneFiles: Int,
-    failedFiles: Int,
-): DownloadStatus = when {
-    running -> DownloadStatus.DOWNLOADING
-    canceled -> DownloadStatus.CANCELED
-    failedFiles == 0 -> DownloadStatus.COMPLETED
-    doneFiles > 0 -> DownloadStatus.PARTIAL
-    else -> DownloadStatus.FAILED
-}
 
 /**
  * Engine for shared-folder batch downloads. Enqueue APIs build a
@@ -190,15 +93,18 @@ object SharedFolderDownloadEngine : DownloadEngine {
             throw e
         } catch (e: Exception) {
             task.error = e.message ?: "error"
+            if (task.type == ShareBatchType.ZIP) task.doneFiles = 0
         }
         if (task.status != DownloadStatus.CANCELED) {
             task.currentFile = ""
+            task.packing = false
             task.downloadSpeed = 0
             task.status = deriveShareBatchStatus(
                 running = false,
                 canceled = false,
                 doneFiles = task.doneFiles,
                 failedFiles = task.failedFiles,
+                error = task.error,
             )
             if (task.status == DownloadStatus.FAILED && task.error.isEmpty()) {
                 task.error = "download failed"
@@ -216,13 +122,12 @@ object SharedFolderDownloadEngine : DownloadEngine {
     /** File-based batches (FILE / SYNC / MULTI): enumerate once, stream serially. */
     private suspend fun executeFiles(task: SharedFolderBatchTask, notify: ThrottledNotifier) {
         if (task.enumerated == null) {
-            task.enumerated = enumerate(task)
-            task.totalFiles = task.enumerated!!.size
-            task.totalSize = task.enumerated!!.sumOf { it.entry.size }
+            task.enumerated = SharedLinkClient.plan(task.type, task.link, task.entries, task.targetDir, downloadsBase())
+            task.totalFiles = task.enumerated!!.totalFiles
+            task.totalSize = task.enumerated!!.totalSize
             notify.force()
         }
-        val targets = task.enumerated!!
-        val store = task.targetDir.isEmpty()
+        val targets = task.enumerated!!.targets
         task.doneFiles = targets.count { it.entry.virtualPath in task.completedPaths }
         var baseBytes = targets.filter { it.entry.virtualPath in task.completedPaths }.sumOf { it.entry.size }
         task.downloadedSize = baseBytes
@@ -237,10 +142,11 @@ object SharedFolderDownloadEngine : DownloadEngine {
             val size = entry.size.coerceAtLeast(1)
             try {
                 if (target.storeToDownloads) {
-                    SharedFolderTransfer.downloadFileToDownloads(task.link, task.urlToken, entry) { f ->
+                    val saved = SharedFolderTransfer.downloadFileToDownloads(task.link, task.urlToken, entry) { f ->
                         task.downloadedSize = baseBytes + (size * f).toLong()
                         notify.tick()
                     }
+                    check(saved.isNotEmpty()) { "Platform declined saving shared file" }
                 } else {
                     SharedFolderTransfer.downloadFileToDir(task.link, task.urlToken, entry, target.writeDir) { f ->
                         task.downloadedSize = baseBytes + (size * f).toLong()
@@ -257,7 +163,7 @@ object SharedFolderDownloadEngine : DownloadEngine {
             } catch (e: Exception) {
                 task.failures.add(DownloadFailure(entry.virtualPath, e.message ?: ""))
                 task.failedFiles = task.failures.size
-                baseBytes += entry.size
+                task.downloadedSize = baseBytes
                 notify.force()
             }
         }
@@ -301,53 +207,6 @@ object SharedFolderDownloadEngine : DownloadEngine {
             task.downloadedSize = task.totalSize
         } else {
             task.error = "zip failed"
-        }
-    }
-
-    /**
-     * Resolves the batch file list once. Top-level files of FILE/MULTI going
-     * to the Downloads target use the MediaStore store; everything else is a
-     * plain write mirroring the remote tree under the target base dir.
-     */
-    private suspend fun enumerate(task: SharedFolderBatchTask): List<ShareFileTarget> {
-        val out = mutableListOf<ShareFileTarget>()
-        val plainBase = task.targetDir.ifEmpty { downloadsBase() }
-        val toDownloads = task.targetDir.isEmpty()
-        when (task.type) {
-            ShareBatchType.FILE -> {
-                val entry = task.entries.first()
-                if (toDownloads) out.add(ShareFileTarget(entry, "", true))
-                else out.add(ShareFileTarget(entry, plainBase, false))
-            }
-            ShareBatchType.SYNC -> {
-                val root = task.entries.first()
-                walk(task.link, root, "${plainBase.trimEnd('/')}/${root.name}", out)
-            }
-            ShareBatchType.MULTI -> task.entries.forEach { entry ->
-                if (entry.isDir) walk(task.link, entry, "${plainBase.trimEnd('/')}/${entry.name}", out)
-                else if (toDownloads) out.add(ShareFileTarget(entry, "", true))
-                else out.add(ShareFileTarget(entry, plainBase, false))
-            }
-            ShareBatchType.ZIP -> {}
-        }
-        return out
-    }
-
-    private suspend fun walk(
-        link: SharedLink,
-        entry: SharedFileDto,
-        writeDir: String,
-        out: MutableList<ShareFileTarget>,
-    ) {
-        if (!entry.isDir) {
-            out.add(ShareFileTarget(entry, writeDir, false))
-            return
-        }
-        val info = SharedLinkClient.fetchSharedInfo(link, entry.virtualPath.takeIf { it.isNotEmpty() })
-        info.entries.sortedWith(
-            compareBy<SharedFileDto> { !it.isDir }.thenBy { it.name.lowercase() },
-        ).forEach { child ->
-            walk(link, child, "$writeDir/${child.name}", out)
         }
     }
 

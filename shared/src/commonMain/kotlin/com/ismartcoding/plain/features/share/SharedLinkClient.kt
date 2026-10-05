@@ -9,7 +9,7 @@ import kotlinx.coroutines.ensureActive
 import kotlinx.serialization.json.*
 
 object SharedLinkClient {
-    private val json = Json { ignoreUnknownKeys = true }
+    private val json = Json { ignoreUnknownKeys = true; encodeDefaults = true }
 
     fun pageUrl(link: SharedLink): String = link.pageUrl
 
@@ -28,6 +28,12 @@ object SharedLinkClient {
     suspend fun fetchSharedInfo(link: SharedLink, virtualPath: String?): SharedInfoDto = json.decodeFromJsonElement(call(buildJsonObject {
         put("action", "fetch"); put("link", json.encodeToJsonElement(link)); put("virtual_path", virtualPath)
     }))
+
+    suspend fun plan(kind: ShareBatchType, link: SharedLink, entries: List<SharedFileDto>, targetDir: String, downloadsBase: String): SharedBatchPlan =
+        json.decodeFromJsonElement(call(buildJsonObject {
+            put("action", "plan"); put("kind", kind.name); put("link", json.encodeToJsonElement(link))
+            put("entries", json.encodeToJsonElement(entries)); put("target_dir", targetDir); put("downloads_base", downloadsBase)
+        }))
 
     suspend fun fileUrl(link: SharedLink, urlToken: String, virtualPath: String): String = call(buildJsonObject {
         put("action", "fileUrl"); put("link", json.encodeToJsonElement(link)); put("url_token", urlToken); put("virtual_path", virtualPath); put("zip", false)
@@ -57,6 +63,23 @@ object SharedLinkClient {
             }
             currentCoroutineContext().ensureActive()
             onProgress(downloaded, total)
+        }
+    }
+
+    suspend fun packZip(items: List<com.ismartcoding.plain.platform.ZipStreamEntry>, write: (ByteArray, Int) -> Unit) {
+        val body = buildJsonObject { put("items", JsonArray(items.map { item -> buildJsonObject {
+            put("sourcePath", item.sourcePath); put("entryName", item.entryName)
+        } })) }
+        RustContentApi.postStream("shares/client/zip", body).use { response ->
+            check(response.isSuccess()) { "Shared ZIP HTTP ${response.status.value}" }
+            val buffer = ByteArray(64 * 1024)
+            while (true) {
+                currentCoroutineContext().ensureActive()
+                val read = response.channel.readAvailable(buffer)
+                if (read == -1) break
+                if (read > 0) write(buffer, read)
+            }
+            currentCoroutineContext().ensureActive()
         }
     }
 

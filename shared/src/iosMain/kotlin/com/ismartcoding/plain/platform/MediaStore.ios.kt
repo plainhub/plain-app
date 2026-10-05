@@ -130,7 +130,7 @@ actual fun getScreenSize(): Pair<Int, Int> {
     return bounds
 }
 
-actual fun getDownloadsDirPath(): String = ""
+actual fun getDownloadsDirPath(): String = appDir() + "/downloads"
 
 actual suspend fun getContactById(id: String): com.ismartcoding.plain.data.DContact? = null
 
