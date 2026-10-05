@@ -25,7 +25,7 @@ private class AndroidDownloadTempFileHandle(
     }
 
     override fun delete() {
-        if (file.exists()) file.delete()
+        check(!file.exists() || file.delete()) { "Unable to delete download file" }
     }
 }
 

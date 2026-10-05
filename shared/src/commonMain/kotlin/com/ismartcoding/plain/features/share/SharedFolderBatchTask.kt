@@ -33,10 +33,6 @@ class SharedFolderBatchTask(
     override var aborted: Boolean = false
     override var job: kotlinx.coroutines.Job? = null
 
-    internal val completedPaths = mutableSetOf<String>()
-    /** Files resolved by the walker; null until the first run enumerates them. */
-    internal var enumerated: SharedBatchPlan? = null
-
     override fun flowSnapshot(): DownloadTaskHandle {
         val s = SharedFolderBatchTask(
             id, messageId, type, title, targetDir, link, urlToken, entries, zipName,

@@ -42,7 +42,7 @@ object SharedLinkClient {
     suspend fun downloadTo(
         url: String,
         write: (buffer: ByteArray, length: Int) -> Unit,
-        onProgress: (downloaded: Long, total: Long) -> Unit = { _, _ -> },
+        onProgress: suspend (downloaded: Long, total: Long) -> Unit = { _, _ -> },
     ) {
         RustContentApi.postStream("shares/client/file", buildJsonObject { put("url", url) }).use { response ->
             check(response.isSuccess()) { "Shared download HTTP ${response.status.value}" }

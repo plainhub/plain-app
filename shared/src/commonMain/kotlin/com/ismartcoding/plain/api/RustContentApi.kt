@@ -102,6 +102,7 @@ object RustContentApi {
                 eventClient.webSocket(localSession!!.baseUrl.replace("http://", "ws://") + "/events", localSession!!.headers()) { socket ->
                     retryMs = 500L
                     com.ismartcoding.plain.chat.download.DownloadQueue.refresh()
+                    com.ismartcoding.plain.features.share.SharedFolderDownloadEngine.refresh()
                     com.ismartcoding.plain.discover.PairingProjection.reconcile()
                     com.ismartcoding.plain.discover.RustNearbyDevices.refresh()
                     com.ismartcoding.plain.discover.RustMdnsRuntime.refresh()
@@ -162,6 +163,7 @@ object RustContentApi {
                                 com.ismartcoding.plain.chat.download.DownloadQueue.refresh()
                                 sendEvent(WebSocketEvent(EventType.DOWNLOAD_PROGRESS, payload))
                             }
+                            10004 -> com.ismartcoding.plain.features.share.SharedFolderDownloadEngine.refresh()
                             EventType.CONTENT_CHANGED.value -> {
                                 try { com.ismartcoding.plain.features.FavoriteFolderHelper.refresh() }
                                 catch (cancelled: CancellationException) { throw cancelled }

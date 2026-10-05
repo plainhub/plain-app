@@ -1,49 +1,10 @@
 package com.ismartcoding.plain.features.share
 
-import com.ismartcoding.plain.features.download.DownloadStatus
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
-/**
- * Locks the terminal batch-status derivation (active outranks error) and the
- * batch progress fraction — the aggregation math behind the download cards.
- */
+/** Verifies the UI fraction for Rust-projected batch counters. */
 class SharedFolderBatchLogicTest {
-
-    @Test
-    fun runningOutranksFailures() {
-        assertEquals(
-            DownloadStatus.DOWNLOADING,
-            deriveShareBatchStatus(running = true, canceled = false, doneFiles = 3, failedFiles = 5),
-            "a running batch with failures keeps its progress bar",
-        )
-    }
-
-    @Test
-    fun allDoneNoFailuresIsCompleted() {
-        assertEquals(DownloadStatus.COMPLETED, deriveShareBatchStatus(false, false, doneFiles = 10, failedFiles = 0))
-    }
-
-    @Test
-    fun someFailedSomeDoneIsPartial() {
-        assertEquals(DownloadStatus.PARTIAL, deriveShareBatchStatus(false, false, doneFiles = 11, failedFiles = 3))
-    }
-
-    @Test
-    fun allFailedIsFailed() {
-        assertEquals(DownloadStatus.FAILED, deriveShareBatchStatus(false, false, doneFiles = 0, failedFiles = 3))
-    }
-
-    @Test
-    fun canceledWinsOverFailuresWhenNotRunning() {
-        assertEquals(DownloadStatus.CANCELED, deriveShareBatchStatus(false, true, doneFiles = 2, failedFiles = 4))
-    }
-
-    @Test
-    fun enumerationOrPackingFailureCannotBecomeCompletedWithZeroFileFailures() {
-        assertEquals(DownloadStatus.FAILED, deriveShareBatchStatus(false, false, 0, 0, "enumeration failed"))
-        assertEquals(DownloadStatus.PARTIAL, deriveShareBatchStatus(false, false, 2, 0, "packing failed"))
-    }
 
     @Test
     fun fractionIsZeroWhileEnumeratingAndClampedDuringTransfer() {

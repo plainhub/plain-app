@@ -105,6 +105,9 @@ object DownloadCenter {
     }
 
     fun pause(taskId: String): Boolean = tasksLock.withLock {
+        if (externalTasks[taskId]?.kind == DOWNLOAD_KIND_SHARE) {
+            return@withLock com.ismartcoding.plain.features.share.SharedFolderDownloadEngine.control(taskId, "pause")
+        }
         val task = tasks[taskId] ?: return@withLock false
         when (task.status) {
             DownloadStatus.DOWNLOADING -> {
@@ -124,6 +127,9 @@ object DownloadCenter {
     }
 
     fun resume(taskId: String): Boolean = tasksLock.withLock {
+        if (externalTasks[taskId]?.kind == DOWNLOAD_KIND_SHARE) {
+            return@withLock com.ismartcoding.plain.features.share.SharedFolderDownloadEngine.control(taskId, "resume")
+        }
         val task = tasks[taskId] ?: return@withLock false
         if (task.status != DownloadStatus.PAUSED) return@withLock false
         task.aborted = false
@@ -135,6 +141,9 @@ object DownloadCenter {
 
     /** Retries a failed task from scratch, resetting its counters. */
     fun retry(taskId: String): Boolean = tasksLock.withLock {
+        if (externalTasks[taskId]?.kind == DOWNLOAD_KIND_SHARE) {
+            return@withLock com.ismartcoding.plain.features.share.SharedFolderDownloadEngine.control(taskId, "retry")
+        }
         val task = tasks[taskId] ?: return@withLock false
         if (task.status != DownloadStatus.FAILED && task.status != DownloadStatus.PARTIAL) return@withLock false
         task.aborted = false
@@ -149,6 +158,9 @@ object DownloadCenter {
      * from their own bookkeeping (e.g. re-running only failed files).
      */
     fun requeue(taskId: String): Boolean = tasksLock.withLock {
+        if (externalTasks[taskId]?.kind == DOWNLOAD_KIND_SHARE) {
+            return@withLock com.ismartcoding.plain.features.share.SharedFolderDownloadEngine.control(taskId, "retry")
+        }
         val task = tasks[taskId] ?: return@withLock false
         if (!task.status.isTerminalDownloadStatus()) return@withLock false
         task.aborted = false
@@ -163,6 +175,9 @@ object DownloadCenter {
      * so it stays visible in finished lists until removed.
      */
     fun cancel(taskId: String): Boolean = tasksLock.withLock {
+        if (externalTasks[taskId]?.kind == DOWNLOAD_KIND_SHARE) {
+            return@withLock com.ismartcoding.plain.features.share.SharedFolderDownloadEngine.control(taskId, "cancel")
+        }
         val task = tasks[taskId] ?: return@withLock false
         if (task.status.isTerminalDownloadStatus()) return@withLock false
         task.aborted = true
@@ -174,6 +189,9 @@ object DownloadCenter {
 
     /** Drops a task from the registry, aborting it first when still active. */
     fun remove(taskId: String): Boolean = tasksLock.withLock {
+        if (externalTasks[taskId]?.kind == DOWNLOAD_KIND_SHARE) {
+            return@withLock com.ismartcoding.plain.features.share.SharedFolderDownloadEngine.control(taskId, "remove")
+        }
         val task = tasks[taskId] ?: return@withLock false
         if (task.status == DownloadStatus.DOWNLOADING) {
             task.aborted = true

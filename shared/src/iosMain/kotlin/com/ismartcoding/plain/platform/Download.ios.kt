@@ -39,7 +39,9 @@ private class IosDownloadTempFileHandle(
     }
 
     override fun delete() {
-        try { close() } finally { NSFileManager.defaultManager.removeItemAtPath(filePath, null) }
+        try { close() } finally {
+            check(!NSFileManager.defaultManager.fileExistsAtPath(filePath) || NSFileManager.defaultManager.removeItemAtPath(filePath, null)) { "Unable to delete download file" }
+        }
     }
 }
 
