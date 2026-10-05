@@ -10,7 +10,6 @@ import com.ismartcoding.plain.features.sms.SmsProviderContract
 import com.ismartcoding.plain.httpserver.http.GraphqlRequestContext
 import com.ismartcoding.plain.helpers.QueryHelper
 import com.ismartcoding.plain.lib.kgraphql.Context
-import kotlin.time.Instant
 import com.ismartcoding.plain.lib.kgraphql.GraphQLError
 import com.ismartcoding.plain.lib.kgraphql.annotations.GraphQLMutation
 import com.ismartcoding.plain.lib.kgraphql.annotations.GraphQLQuery
@@ -24,7 +23,6 @@ import com.ismartcoding.plain.platform.countMedia
 import com.ismartcoding.plain.platform.countSmsConversations
 import com.ismartcoding.plain.platform.enabledAndIsGrantedAsync
 import com.ismartcoding.plain.platform.fileExists
-import com.ismartcoding.plain.platform.getSmsConversationDate
 import com.ismartcoding.plain.platform.getSmsAllCounts
 import com.ismartcoding.plain.platform.trashSms as trashSmsInternal
 import com.ismartcoding.plain.platform.restoreSms as restoreSmsInternal
@@ -129,7 +127,7 @@ suspend fun archivedSmsConversations(offset: Int, limit: Int, query: String): Li
 
 @GraphQLMutation
 suspend fun archiveSmsConversation(id: ID): Boolean {
-    val date = getSmsConversationDate(id.value)?.let { Instant.fromEpochMilliseconds(it) } ?: TimeHelper.now()
+    val date = RustSmsQuery.conversationDate(id.value) ?: TimeHelper.now()
     com.ismartcoding.plain.features.sms.RustSmsState.archive(id.value, date)
     return true
 }
