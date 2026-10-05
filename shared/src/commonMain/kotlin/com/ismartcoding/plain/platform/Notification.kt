@@ -25,13 +25,17 @@ expect suspend fun getAllNotificationApps(): List<DNotificationApp>
  * Filter cached notifications using the platform notification listener state.
  * Returns an empty list on platforms without a notification listener.
  */
-expect suspend fun filterNotificationsAsync(): List<DNotification>
+suspend fun filterNotificationsAsync(): List<DNotification> = com.ismartcoding.plain.features.system.RustSystemProviders.notifications("", 0, Int.MAX_VALUE)
+
+expect suspend fun notificationFacts(): List<DNotification>
 
 /**
  * Reply to a previously posted notification action identified by [id] and
  * [actionIndex] with the given [text]. Returns true if the reply was sent,
  * false if the action was not found (e.g. notification was removed).
  */
+expect suspend fun cancelNotificationFacts(ids: Set<String>): Set<String>
+
 expect fun replyNotification(id: String, actionIndex: Int, text: String): Boolean
 
 /**

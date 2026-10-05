@@ -2,14 +2,7 @@ package com.ismartcoding.plain.platform
 
 import com.ismartcoding.plain.features.file.FileSortBy
 
-actual suspend fun searchPackages(
-    query: String,
-    limit: Int,
-    offset: Int,
-    sortBy: FileSortBy,
-): List<DPackageInfo> = emptyList()
-
-actual suspend fun countPackages(query: String): Int = 0
+actual suspend fun installedPackageFacts(): List<DPackageInfo> = emptyList()
 
 actual suspend fun getPackageInfoMap(ids: List<String>): Map<String, DPackageInfo?> =
     ids.associateWith { null }

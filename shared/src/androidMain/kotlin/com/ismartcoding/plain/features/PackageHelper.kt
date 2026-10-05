@@ -50,78 +50,15 @@ object PackageHelper {
         return !isInstalled(packageName)
     }
 
-    suspend fun searchAsync(query: String, limit: Int, offset: Int, sortBy: FileSortBy): List<DPackage> = withIO {
-        try {
-            var type = ""
-            var text = ""
-            var ids = setOf<String>()
-            if (query.isNotEmpty()) {
-                val queryGroups = QueryHelper.parseAsync(query)
-                var t = queryGroups.find { it.name == "type" }
-                if (t != null) {
-                    type = t.value
-                }
-                t = queryGroups.find { it.name == "text" }
-                if (t != null) {
-                    text = t.value
-                }
-                t = queryGroups.find { it.name == "ids" }
-                if (t != null) {
-                    ids = t.value.split(",").toSet()
-                }
-            }
-
-            val apps = mutableListOf<DPackageStub>()
-            val appInfos = packageManager.getInstalledApplications(0)
-            appInfos.forEach { appInfo ->
-                if (ids.isNotEmpty() && !ids.contains(appInfo.packageName)) {
-                    return@forEach
-                }
-
-                if (type.isNotEmpty()) {
-                    val appType = getAppType(appInfo)
-                    if (appType.name != type) {
-                        return@forEach
-                    }
-                }
-                apps.add(DPackageStub(appInfo, appInfo.packageName, getLabel(appInfo)))
-            }
-
-            if (query.isEmpty() || text.isEmpty()) {
-                return@withIO apps.map {
-                    try {
-                        getPackage(it.appInfo, packageManager.getPackageInfo(it.id, PackageManager.GET_SIGNING_CERTIFICATES))
-                    } catch (ex: Exception) {
-                        LogCat.d(ex.toString())
-                        getPackage(it.appInfo, PackageInfo().apply {
-                            this.packageName = it.id
-                        })
-                    }
-                }.sorted(sortBy).drop(offset).take(limit)
-            }
-
-            return@withIO apps.map {
-                try {
-                    getPackage(it.appInfo, packageManager.getPackageInfo(it.id, PackageManager.GET_SIGNING_CERTIFICATES))
-                } catch (ex: Exception) {
-                    LogCat.d(ex.toString())
-                    getPackage(it.appInfo, PackageInfo().apply {
-                        this.packageName = it.id
-                    })
-                }
-            }.filter {
-                text.isEmpty()
-                        || it.id.contains(text, true)
-                        || it.name.contains(text, true)
-                        || it.certs.any { c ->
-                    c.issuer.contains(text, true)
-                            || c.subject.contains(text, true)
-                }
-            }.sorted(sortBy).drop(offset).take(limit).toList()
-        } catch (ex: Exception) {
-            LogCat.d(ex.toString())
-            return@withIO emptyList()
+    suspend fun searchAsync(query: String, limit: Int, offset: Int, sortBy: FileSortBy): List<DPackage> =
+        com.ismartcoding.plain.platform.searchPackages(query, limit, offset, sortBy).mapNotNull { row ->
+            runCatching { getPackage(row.id) }.getOrNull()
         }
+
+    fun installedFacts(): List<DPackage> = packageManager.getInstalledApplications(0).map { info ->
+        val packageInfo = runCatching { packageManager.getPackageInfo(info.packageName, PackageManager.GET_SIGNING_CERTIFICATES) }
+            .getOrElse { PackageInfo().apply { packageName = info.packageName } }
+        getPackage(info, packageInfo)
     }
 
     private fun getAppType(appInfo: ApplicationInfo): PackageType {
@@ -224,23 +161,7 @@ object PackageHelper {
         }
     }
 
-    suspend fun count(query: String): Int = withIO {
-        if (query.isEmpty()) {
-            return@withIO packageManager.getInstalledApplications(0).count()
-        } else {
-            val parsed = QueryHelper.parseAsync(query)
-            if (parsed.size == 1) {
-                val t = parsed.find { it.name == "type" }
-                if (t != null) {
-                    val type = t.value
-                    return@withIO packageManager.getInstalledApplications(0).count { appInfo ->
-                        getAppType(appInfo).name == type
-                    }
-                }
-            }
-        }
-        return@withIO searchAsync(query, Int.MAX_VALUE, 0, FileSortBy.SIZE_ASC).count()
-    }
+    suspend fun count(query: String): Int = com.ismartcoding.plain.platform.countPackages(query)
 
     private fun getLabel(packageInfo: ApplicationInfo): String {
         val key = packageInfo.packageName
@@ -353,15 +274,4 @@ object PackageHelper {
         }
     }
 
-    private fun List<DPackage>.sorted(sortBy: FileSortBy): List<DPackage> {
-        return when (sortBy) {
-            FileSortBy.NAME_ASC -> this.sortedBy { Pinyin.toPinyin(it.name).lowercase() }
-            FileSortBy.NAME_DESC -> this.sortedBy { Pinyin.toPinyin(it.name).lowercase() }
-            FileSortBy.SIZE_ASC -> this.sortedBy { it.size }
-            FileSortBy.SIZE_DESC -> this.sortedByDescending { it.size }
-            FileSortBy.DATE_ASC -> this.sortedBy { it.updatedAt }
-            FileSortBy.DATE_DESC -> this.sortedByDescending { it.updatedAt }
-            else -> this.sortedBy { Pinyin.toPinyin(it.name).lowercase() }
-        }
-    }
 }

@@ -101,6 +101,7 @@ object RustContentApi {
             try {
                 eventClient.webSocket(localSession!!.baseUrl.replace("http://", "ws://") + "/events", localSession!!.headers()) { socket ->
                     retryMs = 500L
+                    runCatching { postJson("files/mutate", buildJsonObject { put("action", "recoverDeletions") }) }
                     com.ismartcoding.plain.chat.download.DownloadQueue.refresh()
                     com.ismartcoding.plain.features.share.SharedFolderDownloadEngine.refresh()
                     com.ismartcoding.plain.discover.PairingProjection.reconcile()
@@ -176,6 +177,11 @@ object RustContentApi {
                             EventType.DOWNLOAD_PROGRESS.value -> {
                                 com.ismartcoding.plain.chat.download.DownloadQueue.refresh()
                                 sendEvent(WebSocketEvent(EventType.DOWNLOAD_PROGRESS, payload))
+                            }
+                            10005 -> {
+                                val request = Json.parseToJsonElement(payload).jsonObject
+                                com.ismartcoding.plain.httpserver.HttpServerManager.clientRequestTs[request.getValue("clientId").jsonPrimitive.content] = request.getValue("time").jsonPrimitive.long
+                                sendEvent(WebRequestReceivedEvent())
                             }
                             10004 -> com.ismartcoding.plain.features.share.SharedFolderDownloadEngine.refresh()
                             EventType.CONTENT_CHANGED.value -> {

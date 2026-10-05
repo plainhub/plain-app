@@ -62,9 +62,7 @@ suspend fun deleteContacts(query: String): ActionResult {
     QueryHelper.requireExplicitBulkQuery(query)
     Permission.WRITE_CONTACTS.checkEnabledAsync()
     val newIds = getMediaIds(DataType.CONTACT, query)
-    TagHelper.deleteTagRelationByKeys(newIds, DataType.CONTACT)
-    com.ismartcoding.plain.platform.deleteContacts(newIds)
-    return ActionResult(newIds.size)
+    return ActionResult(com.ismartcoding.plain.features.system.RustSystemProviders.deleteRecords(DataType.CONTACT, newIds))
 }
 
 @GraphQLMutation

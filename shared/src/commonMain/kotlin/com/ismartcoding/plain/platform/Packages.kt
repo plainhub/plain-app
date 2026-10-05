@@ -16,6 +16,7 @@ import kotlin.time.Instant
  * [minSdkVersion], [versionCode], [hasLargeHeap]) are populated only by
  * [getPackageDetail] — search results leave them at their defaults.
  */
+@kotlinx.serialization.Serializable
 data class DPackageInfo(
     val id: String,
     val name: String,
@@ -53,17 +54,15 @@ data class PackageInstallResult(
  * and sorted by [sortBy]. Returns an empty list on platforms without a
  * package manager.
  */
-expect suspend fun searchPackages(
-    query: String,
-    limit: Int,
-    offset: Int,
-    sortBy: FileSortBy,
-): List<DPackageInfo>
+suspend fun searchPackages(query: String, limit: Int, offset: Int, sortBy: FileSortBy): List<DPackageInfo> =
+    com.ismartcoding.plain.features.system.RustSystemProviders.packages(query, limit, offset, sortBy)
+
+expect suspend fun installedPackageFacts(): List<DPackageInfo>
 
 /**
  * Count installed packages matching [query]. Returns 0 on unsupported platforms.
  */
-expect suspend fun countPackages(query: String): Int
+suspend fun countPackages(query: String): Int = com.ismartcoding.plain.features.system.RustSystemProviders.packageCount(query)
 
 /**
  * Returns a map of package id -> DPackageInfo (or null if not installed) for

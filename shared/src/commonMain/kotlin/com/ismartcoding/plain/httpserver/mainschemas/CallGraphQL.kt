@@ -50,9 +50,7 @@ suspend fun deleteCalls(query: String): ActionResult {
     QueryHelper.requireExplicitBulkQuery(query)
     Permission.WRITE_CALL_LOG.checkEnabledAsync()
     val ids = getMediaIds(DataType.CALL, query)
-    TagHelper.deleteTagRelationByKeys(ids, DataType.CALL)
-    deleteMedia(DataType.CALL, ids, true)
-    return ActionResult(ids.size)
+    return ActionResult(com.ismartcoding.plain.features.system.RustSystemProviders.deleteRecords(DataType.CALL, ids))
 }
 
 @GraphQLQuery

@@ -2,6 +2,7 @@ package com.ismartcoding.plain.data
 
 import kotlin.time.Instant
 
+@kotlinx.serialization.Serializable
 data class DNotification(
     val id: String,
     val onlyOnce: Boolean,

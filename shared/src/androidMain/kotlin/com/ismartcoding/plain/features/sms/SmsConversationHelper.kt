@@ -1,5 +1,9 @@
 package com.ismartcoding.plain.features.sms
 
+import kotlinx.serialization.json.jsonArray
+import kotlinx.serialization.json.jsonObject
+import kotlinx.serialization.json.jsonPrimitive
+import kotlinx.serialization.json.long
 import android.content.Context
 import android.provider.BaseColumns
 import android.provider.Telephony
@@ -20,6 +24,41 @@ import com.ismartcoding.plain.helpers.QueryHelper
 import kotlin.time.Instant
 
 object SmsConversationHelper {
+    suspend fun facts(context: Context, params: kotlinx.serialization.json.JsonObject): kotlinx.serialization.json.JsonElement = withIO {
+        val ids=params["ids"]?.takeUnless { it is kotlinx.serialization.json.JsonNull }?.jsonArray?.map { it.jsonPrimitive.content }
+        val beforeDates=params["beforeDates"]?.jsonObject.orEmpty()
+        val limit=params["limit"]?.takeUnless { it is kotlinx.serialization.json.JsonNull }?.jsonPrimitive?.long
+        val items=mutableListOf<DMessageConversation>()
+        val recipientIds=mutableMapOf<String,List<String>>()
+        (ids?.chunked(400) ?: listOf(emptyList())).forEach { batch ->
+            val where=ContentWhere()
+            if (ids!=null) where.addIn(BaseColumns._ID,batch)
+            context.contentResolver.queryCursor(conversationsUri,
+                arrayOf(BaseColumns._ID,Telephony.Threads.SNIPPET,Telephony.Threads.DATE,Telephony.Threads.MESSAGE_COUNT,Telephony.Threads.READ,"recipient_ids"),
+                if(ids==null)null else where.toSelection(),if(ids==null)null else where.args.toTypedArray(),"${Telephony.Threads.DATE} DESC")?.use { cursor ->
+                val cache=mutableMapOf<String,Int>()
+                while(cursor.moveToNext()) {
+                    val id=cursor.getStringValue(BaseColumns._ID,cache)
+                    items.add(DMessageConversation(id,"",cursor.getStringValue(Telephony.Threads.SNIPPET,cache),cursor.getTimeValue(Telephony.Threads.DATE,cache),cursor.getIntValue(Telephony.Threads.MESSAGE_COUNT,cache),cursor.getIntValue(Telephony.Threads.READ,cache)==1))
+                    val raw=cursor.getStringValue("recipient_ids",cache)
+                    if(raw.isNotEmpty())recipientIds[id]=SmsProviderContract.parseRecipientIds(raw)
+                }
+            }
+        }
+        val addressMap=batchGetCanonicalAddresses(context,recipientIds.values.flatten().toSet())
+        val own=getSims().map{it.number}.filter{it.isNotEmpty()}
+        val rows=items.map{item->
+            val resolved=SmsProviderContract.selectConversationAddresses(recipientIds[item.id].orEmpty().mapNotNull(addressMap::get),own.toSet())
+            item.copy(address=resolved.firstOrNull().orEmpty(),addresses=resolved)
+        }
+        kotlinx.serialization.json.buildJsonObject {
+            put("items",kotlinx.serialization.json.Json.parseToJsonElement(com.ismartcoding.plain.lib.JsonHelper.jsonEncode(rows)))
+            put("snippets",kotlinx.serialization.json.buildJsonObject {
+                beforeDates.forEach{(id,value)->getSnippetBeforeDate(context,id,value.jsonPrimitive.long)?.let{put(id,kotlinx.serialization.json.JsonPrimitive(it))}}
+            })
+        }
+    }
+
     private val conversationsUri = "content://mms-sms/conversations?simple=true".toUri()
     private val smsUri = Telephony.Sms.CONTENT_URI
     private val mmsUri = Telephony.Mms.CONTENT_URI
@@ -29,7 +68,7 @@ object SmsConversationHelper {
      * after the archive date (i.e., still effectively archived).
      */
     private suspend fun getActiveArchivedIds(context: Context): Set<String> = withIO {
-        val archivedRecords = AppDatabase.instance.archivedConversationDao().getAll()
+        val archivedRecords = com.ismartcoding.plain.features.sms.RustSmsState.archives()
         if (archivedRecords.isEmpty()) return@withIO emptySet()
         val convDates = queryConversationsByThreadIds(context, archivedRecords.map { it.conversationId })
         return@withIO archivedRecords.filter { archived ->
@@ -74,7 +113,7 @@ object SmsConversationHelper {
      * with snippet/date adjusted to reflect state at archive time.
      */
     suspend fun getArchivedConversations(context: Context): List<DMessageConversation> = withIO {
-        val archivedRecords = AppDatabase.instance.archivedConversationDao().getAll()
+        val archivedRecords = com.ismartcoding.plain.features.sms.RustSmsState.archives()
             .sortedByDescending { it.conversationDate }
         if (archivedRecords.isEmpty()) return@withIO emptyList()
         val conversations = getConversationsByIds(context, archivedRecords.map { it.conversationId })
@@ -327,7 +366,7 @@ object SmsConversationHelper {
         }
 
         // Single-pass: read conversations with full data, filter archived, paginate, resolve addresses
-        val archivedRecords = AppDatabase.instance.archivedConversationDao().getAll()
+        val archivedRecords = com.ismartcoding.plain.features.sms.RustSmsState.archives()
         val archivedMap = archivedRecords.associateBy { it.conversationId }
 
         val conversations = mutableListOf<DMessageConversation>()

@@ -66,7 +66,7 @@ suspend fun smsBoxCounts(): SmsCounts {
 
 @GraphQLMutation
 suspend fun unarchiveSmsConversation(id: ID): Boolean {
-    AppDatabase.instance.archivedConversationDao().delete(id.value)
+    com.ismartcoding.plain.features.sms.RustSmsState.unarchive(id.value)
     return true
 }
 
@@ -136,7 +136,7 @@ suspend fun archivedSmsConversations(offset: Int, limit: Int, query: String): Li
 @GraphQLMutation
 suspend fun archiveSmsConversation(id: ID): Boolean {
     val date = getSmsConversationDate(id.value)?.let { Instant.fromEpochMilliseconds(it) } ?: TimeHelper.now()
-    AppDatabase.instance.archivedConversationDao().insert(DArchivedConversation(conversationId = id.value, conversationDate = date))
+    com.ismartcoding.plain.features.sms.RustSmsState.archive(id.value, date)
     return true
 }
 

@@ -19,35 +19,24 @@ import com.ismartcoding.plain.platform.replyNotification
 @GraphQLQuery
 suspend fun notifications(offset: Int, limit: Int, query: String): List<Notification> {
     Permission.NOTIFICATION_LISTENER.checkEnabledAsync()
-    return filterNotifications(query)
-        .drop(offset.coerceAtLeast(0))
-        .take(limit.coerceAtLeast(0))
-        .map { it.toModel() }
+    return com.ismartcoding.plain.features.system.RustSystemProviders.notifications(query, offset, limit).map { it.toModel() }
 }
 
 @GraphQLQuery
 suspend fun notificationCount(query: String): Int {
     Permission.NOTIFICATION_LISTENER.checkEnabledAsync()
-    return filterNotifications(query).size
-}
-
-private suspend fun filterNotifications(query: String): List<com.ismartcoding.plain.data.DNotification> {
-    val q = QueryHelper.textOf(query).trim().lowercase()
-    return filterNotificationsAsync()
-        .filter { q.isEmpty() || it.appName.lowercase().contains(q) || it.title.lowercase().contains(q) || it.body.lowercase().contains(q) }
-        .sortedByDescending { it.time }
+    return com.ismartcoding.plain.features.system.RustSystemProviders.notificationCount(query)
 }
 
 @GraphQLMutation
 suspend fun deleteNotifications(ids: List<ID>): ActionResult {
     Permission.NOTIFICATION_LISTENER.checkEnabledAsync()
-    sendEvent(HCancelNotificationsEvent(ids.map { it.value }.toSet()))
-    return ActionResult(ids.size)
+    return ActionResult(com.ismartcoding.plain.features.system.RustSystemProviders.deleteNotifications(ids.map { it.value }))
 }
 
 @GraphQLMutation(description = "Reply to a notification. actionIndex indexes Notification.replyActions (the reply-capable subset only), NOT the plain actions list.")
 suspend fun replyNotification(id: ID, actionIndex: Int, text: String): Boolean {
-    val ok = replyNotification(id.value, actionIndex, text)
+    val ok = com.ismartcoding.plain.features.system.RustSystemProviders.replyNotification(id.value, actionIndex, text)
     if (!ok) {
         throw GraphQLError("action_not_found")
     }

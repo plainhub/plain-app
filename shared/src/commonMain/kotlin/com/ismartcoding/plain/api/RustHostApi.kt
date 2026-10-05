@@ -50,6 +50,7 @@ object RustHostApi {
                                                     method == "pairingNotification" -> com.ismartcoding.plain.discover.PairingNotificationHost.handle(params)
                                                     method == "peerStartAware" || method == "peerDeviceInfo" -> com.ismartcoding.plain.chat.peer.PeerGraphQLHost.handle(method, params)
                                                     method.startsWith("peerTransport") -> com.ismartcoding.plain.chat.peer.transport.PeerTransportHost.handle(method, params)
+                                                    method.startsWith("system") || method == "fileMetadataFacts" -> com.ismartcoding.plain.features.system.SystemProviderHost.handle(method, params)
                                                     method == "audioEngineCommand" -> AudioEngineHost.handle(method, params)
                                                     method.startsWith("fileTask") -> com.ismartcoding.plain.features.file.FileTaskHost.handle(method,params)
                                                     method == "mediaAction" -> handleMediaActionHost(params)

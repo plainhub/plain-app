@@ -1,0 +1,42 @@
+package com.ismartcoding.plain.features.system
+
+import com.ismartcoding.plain.extensions.parseEpochMillis
+import com.ismartcoding.plain.lib.JsonHelper
+import com.ismartcoding.plain.lib.pinyin.Pinyin
+import com.ismartcoding.plain.platform.installedPackageFacts
+import com.ismartcoding.plain.platform.notificationFacts
+import kotlinx.serialization.json.*
+
+object SystemProviderHost {
+    suspend fun handle(method: String, params: JsonObject): JsonElement = when (method) {
+        "systemPackageFacts" -> JsonArray(installedPackageFacts().map { item ->
+            buildJsonObject {
+                put("item", Json.parseToJsonElement(JsonHelper.jsonEncode(item)))
+                put("nameSortKey", Pinyin.toPinyin(item.name).lowercase())
+            }
+        })
+        "systemNotificationFacts" -> Json.parseToJsonElement(JsonHelper.jsonEncode(notificationFacts()))
+        "systemMmsTextFacts", "systemSmsCountFacts", "systemSmsRowsFacts", "systemSmsIdsFacts" -> com.ismartcoding.plain.platform.systemSmsFacts(method, params)
+        "systemEpochMillis" -> buildJsonObject {
+            params.getValue("values").jsonArray.forEach { value ->
+                val text = value.jsonPrimitive.content
+                put(text, text.parseEpochMillis()?.let(::JsonPrimitive) ?: JsonNull)
+            }
+        }
+        "systemDeleteRecords" -> JsonArray(com.ismartcoding.plain.platform.deleteSystemProviderFacts(
+            com.ismartcoding.plain.enums.DataType.valueOf(params.getValue("provider").jsonPrimitive.content),
+            params.getValue("ids").jsonArray.map { it.jsonPrimitive.content }.toSet()).map(::JsonPrimitive))
+        "systemCancelNotifications" -> JsonArray(com.ismartcoding.plain.platform.cancelNotificationFacts(
+            params.getValue("ids").jsonArray.map { it.jsonPrimitive.content }.toSet()).map(::JsonPrimitive))
+        "systemReplyNotification" -> JsonPrimitive(com.ismartcoding.plain.platform.replyNotification(
+            params.getValue("id").jsonPrimitive.content, params.getValue("actionIndex").jsonPrimitive.int, params.getValue("text").jsonPrimitive.content))
+        "fileMetadataFacts" -> {
+            val path = params.getValue("path").jsonPrimitive.content
+            buildJsonObject {
+                put("size", com.ismartcoding.plain.platform.statFile(path)?.size ?: 0)
+                put("mimeType", com.ismartcoding.plain.platform.getContentTypeForPath(path).orEmpty())
+            }
+        }
+        else -> error("Unsupported provider operation")
+    }
+}

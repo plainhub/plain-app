@@ -116,6 +116,7 @@ class PNotificationListenerService : NotificationListenerService() {
     override fun onListenerConnected() {
         super.onListenerConnected()
         isConnected = true
+        connectedService = this
         LogCat.d("PNotificationListenerService: onListenerConnected")
         try {
             val notifications = activeNotifications
@@ -157,35 +158,9 @@ class PNotificationListenerService : NotificationListenerService() {
         try {
 
             events.add(receiveEventHandler<HCancelNotificationsEvent> { event ->
-                if (!isConnected) {
-                    LogCat.w("PNotificationListenerService: not connected, ignoring cancel request")
-                    return@receiveEventHandler
-                }
-                if (!Permission.NOTIFICATION_LISTENER.isGranted()) {
-                    LogCat.w("PNotificationListenerService: permission not granted, ignoring cancel request")
-                    isConnected = false
-                    return@receiveEventHandler
-                }
-                
-                try {
-                    if (event.ids.size == AndroidTempData.notifications.size) {
-                        cancelAllNotifications()
-                        AndroidTempData.notifications.clear()
-                    } else {
-                        event.ids.forEach { id ->
-                            try {
-                                cancelNotification(id)
-                            } catch (ex: Exception) {
-                                LogCat.e("Failed to cancel notification $id: ${ex.message}")
-                            }
-                        }
-                    }
-                } catch (ex: SecurityException) {
-                    LogCat.e("SecurityException when canceling notifications: ${ex.message}")
-                    // Service might have lost permission, mark as disconnected
-                    isConnected = false
-                } catch (ex: Exception) {
-                    LogCat.e("Error canceling notifications: ${ex.message}")
+                com.ismartcoding.plain.lib.coIO {
+                    runCatching { com.ismartcoding.plain.features.system.RustSystemProviders.deleteNotifications(event.ids.toList()) }
+                        .onFailure { LogCat.e("Error canceling notifications: ${it.message}") }
                 }
             })
         } catch (ex: Exception) {
@@ -196,6 +171,7 @@ class PNotificationListenerService : NotificationListenerService() {
     override fun onDestroy() {
         super.onDestroy()
         isConnected = false
+        if (connectedService === this) connectedService = null
         try {
             events.forEach { it.cancel() }
             events.clear()
@@ -207,6 +183,7 @@ class PNotificationListenerService : NotificationListenerService() {
     override fun onListenerDisconnected() {
         super.onListenerDisconnected()
         isConnected = false
+        if (connectedService === this) connectedService = null
         LogCat.d("PNotificationListenerService: onListenerDisconnected")
         try {
             events.forEach { it.cancel() }
@@ -222,6 +199,9 @@ class PNotificationListenerService : NotificationListenerService() {
     }
 
     companion object {
+        @Volatile
+        internal var connectedService: PNotificationListenerService? = null
+
         fun toggle(context: Context, enable: Boolean) {
             if (!AppFeatureType.NOTIFICATIONS.has()) {
                 return

@@ -11,29 +11,10 @@ import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.packageManager
 import kotlin.time.Instant
 
-actual suspend fun searchPackages(
-    query: String,
-    limit: Int,
-    offset: Int,
-    sortBy: FileSortBy,
-): List<DPackageInfo> = withIO {
-    PackageHelper.searchAsync(query, limit, offset, sortBy).map { pkg ->
-        DPackageInfo(
-            id = pkg.id,
-            name = pkg.name,
-            type = pkg.type,
-            version = pkg.version,
-            path = pkg.path,
-            size = pkg.size,
-            installedAt = pkg.installedAt,
-            updatedAt = pkg.updatedAt,
-            certs = PackageHelper.getCerts(pkg.packageInfo),
-        )
+actual suspend fun installedPackageFacts(): List<DPackageInfo> = withIO {
+    PackageHelper.installedFacts().map { pkg ->
+            DPackageInfo(pkg.id, pkg.name, pkg.type, pkg.version, pkg.path, pkg.size, pkg.installedAt, pkg.updatedAt, pkg.certs)
     }
-}
-
-actual suspend fun countPackages(query: String): Int = withIO {
-    PackageHelper.count(query)
 }
 
 actual suspend fun getPackageInfoMap(ids: List<String>): Map<String, DPackageInfo?> = withIO {

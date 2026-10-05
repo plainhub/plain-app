@@ -48,30 +48,8 @@ object ContactMediaStoreHelper {
         )
     }
 
-    private suspend fun buildWhereAsync(query: String): ContentWhere {
-        val where = ContentWhere()
-        where.add("${ContactsContract.Data.MIMETYPE} = ?", ContactsContract.CommonDataKinds.StructuredName.CONTENT_ITEM_TYPE)
-        if (query.isNotEmpty()) {
-            QueryHelper.parseAsync(query).forEach {
-                when (it.name) {
-                    QueryHelper.BULK_ALL_FIELD -> {} // explicit whole-table sentinel — no condition
-                    "text" -> {
-                        where.addLike("${ContactsContract.CommonDataKinds.StructuredName.GIVEN_NAME}", it.value)
-                    }
-
-                    "ids" -> {
-                        where.addIn(ContactsContract.Data.RAW_CONTACT_ID, it.value.split(","))
-                    }
-
-                    "id" -> {
-                        where.addEqual(ContactsContract.Data.RAW_CONTACT_ID, it.value)
-                    }
-                }
-            }
-        }
-
-        return where
-    }
+    private suspend fun buildWhereAsync(query: String): ContentWhere =
+        com.ismartcoding.plain.features.system.RustSystemProviders.providerWhere(com.ismartcoding.plain.enums.DataType.CONTACT, query)
 
     suspend fun countAsync(context: Context, query: String): Int = withIO {
         context.contentResolver.count(uriExternal, buildWhereAsync(query))

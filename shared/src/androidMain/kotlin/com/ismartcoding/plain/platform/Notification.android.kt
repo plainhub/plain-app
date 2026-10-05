@@ -31,8 +31,24 @@ actual suspend fun getAllNotificationApps(): List<DNotificationApp> = withIO {
         .map { DNotificationApp(id = it.id, name = it.name) }
 }
 
-actual suspend fun filterNotificationsAsync(): List<DNotification> = withIO {
-    NotificationsHelper.filterNotificationsAsync(appContext)
+actual suspend fun notificationFacts(): List<DNotification> = withIO {
+    AndroidTempData.notifications.toList()
+}
+
+actual suspend fun cancelNotificationFacts(ids: Set<String>): Set<String> = withIO {
+    val service = PNotificationListenerService.connectedService ?: return@withIO emptySet()
+    if (!service.isConnected) return@withIO emptySet()
+    val active = service.activeNotifications.associateBy { it.key }
+    val submitted = ids.filter { active[it]?.isClearable == true && runCatching { service.cancelNotification(it) }.isSuccess }.toSet()
+    if (submitted.isEmpty()) return@withIO emptySet()
+    var remaining = submitted
+    repeat(20) {
+        kotlinx.coroutines.delay(25)
+        val keys = service.activeNotifications.map { it.key }.toSet()
+        remaining = submitted.intersect(keys)
+        if (remaining.isEmpty()) return@withIO submitted
+    }
+    submitted - remaining
 }
 
 actual fun replyNotification(id: String, actionIndex: Int, text: String): Boolean {

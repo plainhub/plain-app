@@ -12,7 +12,9 @@ actual suspend fun getNotificationApp(packageName: String): DNotificationApp? = 
 
 actual suspend fun getAllNotificationApps(): List<DNotificationApp> = emptyList()
 
-actual suspend fun filterNotificationsAsync(): List<DNotification> = emptyList()
+actual suspend fun notificationFacts(): List<DNotification> = emptyList()
+
+actual suspend fun cancelNotificationFacts(ids: Set<String>): Set<String> = emptySet()
 
 actual fun replyNotification(id: String, actionIndex: Int, text: String): Boolean = false
 

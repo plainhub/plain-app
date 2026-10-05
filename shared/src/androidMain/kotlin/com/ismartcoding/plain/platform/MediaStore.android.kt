@@ -146,28 +146,13 @@ actual suspend fun moveMedia(dataType: DataType, ids: Set<String>, destDir: Stri
     return com.ismartcoding.plain.features.mediaactions.MediaActionHelper.run(dataType,com.ismartcoding.plain.features.mediaactions.MediaAction.MOVE,ids,destDir=destDir) == ids.size
 }
 
-private suspend fun getTrashedMessageIds(): Set<String> =
-    AppDatabase.instance.trashedMessageDao().getAllIds().toSet()
+private suspend fun getTrashedMessageIds(): Set<String> = com.ismartcoding.plain.features.sms.RustSmsState.trashed()
 
-actual suspend fun trashSms(query: String): Int {
-    val ids = SmsHelper.getIdsAsync(appContext, query)
-    if (ids.isEmpty()) return 0
-    val dao = AppDatabase.instance.trashedMessageDao()
-    val now = Clock.System.now()
-    val newIds = ids - getTrashedMessageIds()
-    dao.insertAll(newIds.map { DTrashedMessage(messageId = it, isMms = it.startsWith("mms_"), trashedAt = now) })
-    return newIds.size
-}
+actual suspend fun trashSms(query: String): Int =
+    com.ismartcoding.plain.features.sms.RustSmsState.trash(SmsHelper.getIdsAsync(appContext, query))
 
-actual suspend fun restoreSms(query: String): Int {
-    val ids = SmsHelper.getIdsAsync(appContext, query)
-    if (ids.isEmpty()) return 0
-    val dao = AppDatabase.instance.trashedMessageDao()
-    val trashed = getTrashedMessageIds()
-    val restorable = ids.filter { it in trashed }
-    dao.deleteByMessageIds(restorable)
-    return restorable.size
-}
+actual suspend fun restoreSms(query: String): Int =
+    com.ismartcoding.plain.features.sms.RustSmsState.restore(SmsHelper.getIdsAsync(appContext, query))
 
 private const val SMS_TRASH_DIR = "sms-trash"
 private const val SMS_TRASH_RETENTION_DAYS = 30L
@@ -226,10 +211,8 @@ actual suspend fun deleteSms(query: String): Int {
     // Recovery net before touching the provider: full content archive +
     // shadow-table record (feeds the 30-day restore window).
     archiveDeletedMessages(messages)
-    val now = Clock.System.now()
-    val dao = AppDatabase.instance.trashedMessageDao()
     val known = getTrashedMessageIds()
-    dao.insertAll((ids - known).map { DTrashedMessage(messageId = it, isMms = it.startsWith("mms_"), trashedAt = now) })
+    com.ismartcoding.plain.features.sms.RustSmsState.trash(ids)
 
     var deleted = 0
     ids.forEach { id ->
@@ -239,7 +222,7 @@ actual suspend fun deleteSms(query: String): Int {
             .onFailure {
                 // Provider refused (e.g. id vanished meanwhile); drop the
                 // shadow record so it doesn't linger as a phantom entry.
-                dao.deleteByMessageIds(listOf(id))
+                if (id !in known) com.ismartcoding.plain.features.sms.RustSmsState.restore(listOf(id))
             }
     }
     return deleted
@@ -346,22 +329,17 @@ actual fun buildImageSearchStatus(): com.ismartcoding.plain.httpserver.models.Im
 actual fun lookupPhoneGeo(number: String): com.ismartcoding.plain.httpserver.models.PhoneGeo? =
     PhoneGeoCache.lookup(number)
 
-actual suspend fun searchSmsConversations(
-    query: String,
-    limit: Int,
-    offset: Int,
-): List<com.ismartcoding.plain.features.sms.DMessageConversation> =
-    com.ismartcoding.plain.features.sms.SmsConversationHelper.searchConversationsAsync(appContext, query, limit, offset)
+actual suspend fun searchSmsConversations(query: String, limit: Int, offset: Int): List<com.ismartcoding.plain.features.sms.DMessageConversation> =
+    com.ismartcoding.plain.features.sms.RustSmsQuery.conversations(query,limit,offset)
 
 actual suspend fun countSmsConversations(query: String): Int =
-    com.ismartcoding.plain.features.sms.SmsConversationHelper.conversationCountAsync(appContext, query)
+    com.ismartcoding.plain.features.sms.RustSmsQuery.conversationCount(query)
 
 actual suspend fun getArchivedSmsConversations(): List<com.ismartcoding.plain.features.sms.DMessageConversation> =
-    com.ismartcoding.plain.features.sms.SmsConversationHelper.getArchivedConversations(appContext)
+    com.ismartcoding.plain.features.sms.RustSmsQuery.archivedConversations()
 
 actual suspend fun getSmsConversationDate(threadId: String): Long? =
-    com.ismartcoding.plain.features.sms.SmsConversationHelper.getConversationsByIds(appContext, listOf(threadId))
-        .firstOrNull()?.date?.toEpochMilliseconds()
+    com.ismartcoding.plain.features.sms.RustSmsQuery.conversationDate(threadId)?.toEpochMilliseconds()
 
 actual suspend fun getSmsAllCounts(): DSmsCounts =
     com.ismartcoding.plain.features.sms.SmsHelper.countAllAsync(appContext).let {

@@ -1,7 +1,9 @@
 package com.ismartcoding.plain.features.sms
 
 import com.ismartcoding.plain.db.IData
+import kotlinx.serialization.Serializable
 
+@Serializable
 data class DMessageConversation(
     override var id: String,
     val address: String,

@@ -32,41 +32,8 @@ object CallMediaStoreHelper : BaseContentHelper() {
         )
     }
 
-    override suspend fun buildWhereAsync(query: String): ContentWhere {
-        val where = ContentWhere()
-        if (query.isNotEmpty()) {
-            QueryHelper.parseAsync(query).forEach {
-                when (it.name) {
-                    QueryHelper.BULK_ALL_FIELD -> {} // explicit whole-table sentinel — no condition
-                    "text" -> {
-                        where.addLike("${CallLog.Calls.NUMBER}", it.value)
-                    }
-
-                    "ids" -> {
-                        where.addIn(BaseColumns._ID, it.value.split(","))
-                    }
-
-                    "type" -> {
-                        where.add("${CallLog.Calls.TYPE} = ?", it.value)
-                    }
-
-                    "duration" -> {
-                        val (op, rawValue) = it.normalizeComparison(defaultOp = "=")
-                        val seconds = rawValue.trim().toLongOrNull() ?: return@forEach
-                        where.add("${CallLog.Calls.DURATION} $op ?", seconds.toString())
-                    }
-
-                    "start_time" -> {
-                        val (op, rawValue) = it.normalizeComparison(defaultOp = "=")
-                        val ts = rawValue.parseEpochMillis() ?: return@forEach
-                        where.add("${CallLog.Calls.DATE} $op ?", ts.toString())
-                    }
-                }
-            }
-        }
-
-        return where
-    }
+    override suspend fun buildWhereAsync(query: String): ContentWhere =
+        com.ismartcoding.plain.features.system.RustSystemProviders.providerWhere(com.ismartcoding.plain.enums.DataType.CALL, query)
 
     suspend fun searchAsync(
         context: Context,
