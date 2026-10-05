@@ -20,18 +20,18 @@ import com.ismartcoding.plain.lib.extensions.map
 import com.ismartcoding.plain.lib.extensions.scanFileByConnection
 import com.ismartcoding.plain.lib.extensions.toSortName
 import com.ismartcoding.plain.lib.withIO
-import com.ismartcoding.plain.helpers.FilterField
 import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.platform.getNewPath
 import com.ismartcoding.plain.platform.moveFileOrDir
 import com.ismartcoding.plain.data.DMediaBucket
 import com.ismartcoding.plain.enums.MediaType
-import com.ismartcoding.plain.helpers.QueryHelper
+import com.ismartcoding.plain.enums.DataType
+import com.ismartcoding.plain.features.system.RustSystemProviders
 import java.io.File
 
 abstract class BaseMediaContentHelper {
     protected abstract val uriExternal: Uri
-    protected abstract fun buildBaseWhere(filterFields: List<FilterField>): ContentWhere
+    protected abstract val providerType: DataType
     protected abstract fun getProjection(): Array<String>
     protected abstract val mediaType: MediaType
 
@@ -46,39 +46,11 @@ abstract class BaseMediaContentHelper {
     }
 
     private suspend fun buildWhere(query: String): ContentWhere {
-        // `all:true` is the explicit whole-table sentinel — drop it so the base where stays empty
-        val fields = QueryHelper.parseAsync(query).filterNot { it.name == QueryHelper.BULK_ALL_FIELD }
-        val where = buildBaseWhere(fields)
-        val idsField = fields.find { it.name == "ids" }
-        if (idsField != null) {
-            where.addIn(BaseColumns._ID, idsField.value.split(","))
-        }
-        return where
+        return RustSystemProviders.providerWhere(providerType, query)
     }
 
-    private suspend fun buildWheres(query: String): List<ContentWhere> {
-        // `all:true` is the explicit whole-table sentinel — drop it so the base where stays empty
-        val fields = QueryHelper.parseAsync(query).filterNot { it.name == QueryHelper.BULK_ALL_FIELD }
-        val wheres = mutableListOf<ContentWhere>()
-        val where = buildBaseWhere(fields)
-        val idsField = fields.find { it.name == "ids" }
-        if (idsField != null) {
-            val ids = idsField.value.split(",")
-            if (ids.isNotEmpty()) {
-                ids.chunked(2000).forEach { cIds ->
-                    val w = where.copy()
-                    w.addIn(BaseColumns._ID, cIds)
-                    wheres.add(w)
-                }
-            } else {
-                wheres.add(where)
-            }
-        } else {
-            wheres.add(where)
-        }
-
-        return wheres.ifEmpty { listOf(ContentWhere()) }
-    }
+    private suspend fun buildWheres(query: String): List<ContentWhere> =
+        RustSystemProviders.providerWheres(providerType, query)
 
     suspend fun getPagingCursorAsync(
         context: Context,

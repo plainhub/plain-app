@@ -3,20 +3,19 @@ package com.ismartcoding.plain.features.media
 import android.content.Context
 import android.net.Uri
 import android.provider.MediaStore
-import com.ismartcoding.plain.helpers.ContentWhere
 import com.ismartcoding.plain.lib.extensions.getIntValue
 import com.ismartcoding.plain.lib.extensions.getLongValue
 import com.ismartcoding.plain.lib.extensions.getStringValue
 import com.ismartcoding.plain.lib.extensions.getTimeSecondsValue
 import com.ismartcoding.plain.lib.extensions.map
 import com.ismartcoding.plain.lib.withIO
-import com.ismartcoding.plain.helpers.FilterField
 import com.ismartcoding.plain.platform.isQPlus
 import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.data.DVideo
 import com.ismartcoding.plain.data.TagRelationStub
 import com.ismartcoding.plain.enums.AppFeatureType
 import com.ismartcoding.plain.enums.MediaType
+import com.ismartcoding.plain.enums.DataType
 import com.ismartcoding.plain.enums.has
 import com.ismartcoding.plain.events.MediaDurationZeroEvent
 import com.ismartcoding.plain.events.MediaDurationZeroItem
@@ -26,6 +25,7 @@ import com.ismartcoding.plain.lib.sendEvent
 import kotlin.time.Instant
 
 object VideoMediaStoreHelper : BaseMediaContentHelper() {
+    override val providerType: DataType = DataType.VIDEO
     // https://stackoverflow.com/questions/63111091/java-lang-illegalargumentexception-volume-external-primary-not-found-in-android
     override val uriExternal: Uri = if (isQPlus()) MediaStore.Video.Media.getContentUri(MediaStore.VOLUME_EXTERNAL) else MediaStore.Video.Media.EXTERNAL_CONTENT_URI
     override val mediaType: MediaType = MediaType.VIDEO
@@ -52,25 +52,6 @@ object VideoMediaStoreHelper : BaseMediaContentHelper() {
         }
 
         return projection.toTypedArray()
-    }
-
-    override fun buildBaseWhere(filterFields: List<FilterField>): ContentWhere {
-        val where = ContentWhere()
-        // where.add("${MediaStore.Video.Media.DURATION}>0")
-        filterFields.forEach {
-            if (it.name == "text") {
-                where.addLike("${MediaStore.Video.Media.TITLE}", it.value)
-            } else if (it.name == "ids") {
-                where.addIn(MediaStore.Video.Media._ID, it.value.split(","))
-            } else if (it.name == "bucket_id") {
-                where.addEqual(MediaStore.Video.Media.BUCKET_ID, it.value)
-            } else if (it.name == "trash") {
-                where.trash = it.value.toBooleanStrictOrNull()
-            } else if (it.name == "excluded_dir") {
-                where.addNotStartsWith(MediaStore.Video.Media.DATA, it.value)
-            }
-        }
-        return where
     }
 
     suspend fun searchAsync(

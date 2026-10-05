@@ -4,7 +4,6 @@ import android.content.Context
 import android.net.Uri
 import android.provider.MediaStore
 import com.ismartcoding.plain.data.DDoc
-import com.ismartcoding.plain.helpers.ContentWhere
 import com.ismartcoding.plain.helpers.escapeLike
 import com.ismartcoding.plain.lib.extensions.forEach
 import com.ismartcoding.plain.lib.extensions.getLongValue
@@ -14,19 +13,19 @@ import com.ismartcoding.plain.lib.extensions.map
 import com.ismartcoding.plain.lib.extensions.queryCursor
 import com.ismartcoding.plain.lib.extensions.toSortName
 import com.ismartcoding.plain.lib.withIO
-import com.ismartcoding.plain.helpers.FilterField
 import com.ismartcoding.plain.platform.isQPlus
 import com.ismartcoding.plain.data.DMediaBucket
 import com.ismartcoding.plain.data.TagRelationStub
 import com.ismartcoding.plain.enums.MediaType
+import com.ismartcoding.plain.enums.DataType
 import com.ismartcoding.plain.extensions.normalizeComparison
 import com.ismartcoding.plain.extensions.parseSizeToBytes
 import com.ismartcoding.plain.features.file.FileSortBy
 import com.ismartcoding.plain.features.file.toSortBy
 import com.ismartcoding.plain.features.media.BaseMediaContentHelper
-import com.ismartcoding.plain.helpers.QueryHelper
 
 object DocMediaStoreHelper : BaseMediaContentHelper() {
+    override val providerType: DataType = DataType.DOC
     override val uriExternal: Uri = if (isQPlus()) MediaStore.Files.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY) else MediaStore.Files.getContentUri("external")
     override val mediaType: MediaType = MediaType.FILE
 
@@ -55,42 +54,6 @@ object DocMediaStoreHelper : BaseMediaContentHelper() {
             cols.add(MediaStore.MediaColumns.BUCKET_ID)
         }
         return cols.toTypedArray()
-    }
-
-    override fun buildBaseWhere(filterFields: List<FilterField>): ContentWhere {
-        val where = ContentWhere()
-
-        val mimeTypePlaceholders = extraDocumentMimeTypes.joinToString(",") { "?" }
-        where.add("(${MediaStore.Files.FileColumns.MIME_TYPE} LIKE ? OR ${MediaStore.Files.FileColumns.MIME_TYPE} IN ($mimeTypePlaceholders))")
-        where.args.add("text/%")
-        where.args.addAll(extraDocumentMimeTypes)
-        where.addGt(MediaStore.Files.FileColumns.SIZE, "0")
-
-        filterFields.forEach {
-            when (it.name) {
-                "text" -> where.addLike("${MediaStore.Files.FileColumns.DISPLAY_NAME}", it.value)
-                "ext" -> where.add("${MediaStore.Files.FileColumns.DISPLAY_NAME} LIKE ? ESCAPE '\\'", "%.${escapeLike(it.value)}")
-                "parent" -> where.add("${MediaStore.Files.FileColumns.DATA} LIKE ? ESCAPE '\\'", "${escapeLike(it.value)}/%")
-                "type" -> where.add("${MediaStore.Files.FileColumns.MIME_TYPE} = ?", it.value)
-                "file_size" -> {
-                    val (rawOp, rawValue) = it.normalizeComparison(defaultOp = "=")
-                    val bytes = rawValue.parseSizeToBytes() ?: return@forEach
-                    val op = when (rawOp) {
-                        ">", ">=", "<", "<=", "!=", "=" -> rawOp
-                        else -> "="
-                    }
-                    where.add("${MediaStore.Files.FileColumns.SIZE} $op ?", bytes.toString())
-                }
-                "ids" -> {
-                    where.addIn(MediaStore.Files.FileColumns._ID, it.value.split(","))
-                }
-                "bucket_id" -> if (isQPlus()) {
-                    where.addEqual(MediaStore.MediaColumns.BUCKET_ID, it.value)
-                }
-                "trash" -> where.trash = it.value.toBooleanStrictOrNull()
-            }
-        }
-        return where
     }
 
     suspend fun searchAsync(
@@ -127,7 +90,7 @@ object DocMediaStoreHelper : BaseMediaContentHelper() {
     }
 
     suspend fun getDocExtGroupsAsync(context: Context, query: String = ""): List<Pair<String, Int>> {
-        val where = buildBaseWhere(QueryHelper.parseAsync(query))
+        val where = com.ismartcoding.plain.features.system.RustSystemProviders.providerWhere(providerType, query)
         val extCounts = mutableMapOf<String, Int>()
         context.contentResolver.queryCursor(
             uriExternal,

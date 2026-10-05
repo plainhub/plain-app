@@ -3,19 +3,18 @@ package com.ismartcoding.plain.audio
 import android.content.Context
 import android.net.Uri
 import android.provider.MediaStore
-import com.ismartcoding.plain.helpers.ContentWhere
 import com.ismartcoding.plain.lib.extensions.getIntValue
 import com.ismartcoding.plain.lib.extensions.getLongValue
 import com.ismartcoding.plain.lib.extensions.getStringValue
 import com.ismartcoding.plain.lib.extensions.getTimeSecondsValue
 import com.ismartcoding.plain.lib.extensions.map
 import com.ismartcoding.plain.lib.withIO
-import com.ismartcoding.plain.helpers.FilterField
 import com.ismartcoding.plain.platform.isQPlus
 import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.data.TagRelationStub
 import com.ismartcoding.plain.enums.AppFeatureType
 import com.ismartcoding.plain.enums.MediaType
+import com.ismartcoding.plain.enums.DataType
 import com.ismartcoding.plain.enums.has
 import com.ismartcoding.plain.events.MediaDurationZeroEvent
 import com.ismartcoding.plain.events.MediaDurationZeroItem
@@ -25,6 +24,7 @@ import com.ismartcoding.plain.features.media.BaseMediaContentHelper
 import com.ismartcoding.plain.lib.sendEvent
 
 object AudioMediaStoreHelper : BaseMediaContentHelper() {
+    override val providerType: DataType = DataType.AUDIO
     override val uriExternal: Uri = if (isQPlus()) MediaStore.Audio.Media.getContentUri(MediaStore.VOLUME_EXTERNAL) else MediaStore.Audio.Media.EXTERNAL_CONTENT_URI
     override val mediaType: MediaType = MediaType.AUDIO
 
@@ -49,51 +49,6 @@ object AudioMediaStoreHelper : BaseMediaContentHelper() {
         }
 
         return projection.toTypedArray()
-    }
-
-    override fun buildBaseWhere(filterFields: List<FilterField>): ContentWhere {
-        val where = ContentWhere()
-        // NOTE: do NOT filter DURATION>0 here — zero-duration items are collected
-        // and fixed asynchronously via MediaDurationZeroEvent.
-        filterFields.forEach {
-            when (it.name) {
-                "text" -> {
-                    where.addLikes(
-                        arrayListOf(MediaStore.Audio.Media.TITLE, MediaStore.Audio.Media.ARTIST),
-                        arrayListOf(it.value, it.value),
-                    )
-                }
-
-                "path" -> {
-                    where.addEqual(MediaStore.Audio.Media.DATA, it.value)
-                }
-
-                "name" -> {
-                    where.addEqual(MediaStore.Audio.Media.TITLE, it.value)
-                }
-
-                "ids" -> {
-                    where.addIn(MediaStore.Audio.Media._ID, it.value.split(","))
-                }
-
-                "bucket_id" -> {
-                    where.addEqual(MediaStore.Audio.Media.BUCKET_ID, it.value)
-                }
-
-                "artist" -> {
-                    where.addEqual(MediaStore.Audio.Media.ARTIST, it.value)
-                }
-
-                "trash" -> {
-                    where.trash = it.value.toBooleanStrictOrNull()
-                }
-
-                "excluded_dir" -> {
-                    where.addNotStartsWith(MediaStore.Audio.Media.DATA, it.value)
-                }
-            }
-        }
-        return where
     }
 
     suspend fun searchAsync(
