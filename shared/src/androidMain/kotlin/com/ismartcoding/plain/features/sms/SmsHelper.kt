@@ -415,7 +415,7 @@ object SmsHelper {
     suspend fun facts(context: Context, method: String, params: JsonObject): JsonElement = withIO {
         if (method == "systemMmsTextFacts") return@withIO Json.parseToJsonElement(JsonHelper.jsonEncode(mmsTextFacts(context)))
         if (method == "systemSmsConversationFacts") return@withIO SmsConversationHelper.facts(context, params)
-        val plans = if (method == "systemSmsRowsFacts") params.getValue("plans").jsonObject else params
+        val plans = if (method == "systemSmsRowsFacts" || method == "systemSmsThreadFacts") params.getValue("plans").jsonObject else params
         val smsWhere = plans.getValue("sms").where()
         val mmsWhere = plans["mms"]?.takeUnless { it is JsonNull }?.where()
         when (method) {

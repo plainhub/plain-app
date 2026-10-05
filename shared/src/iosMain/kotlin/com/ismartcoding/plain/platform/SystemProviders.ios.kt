@@ -10,5 +10,7 @@ actual suspend fun systemSmsFacts(method: String, params: kotlinx.serialization.
         "systemSmsIdsFacts" -> kotlinx.serialization.json.JsonArray(emptyList())
         "systemSmsCountFacts" -> kotlinx.serialization.json.Json.parseToJsonElement("{\"sms\":0,\"mms\":0}")
         "systemSmsRowsFacts" -> kotlinx.serialization.json.Json.parseToJsonElement("{\"items\":[],\"canonicalAddress\":\"\"}")
+        "systemSmsConversationFacts" -> kotlinx.serialization.json.Json.parseToJsonElement("{\"items\":[],\"snippets\":{}}")
+        "systemSmsThreadFacts" -> kotlinx.serialization.json.JsonArray(emptyList())
         else -> error("Unsupported SMS facts")
     }

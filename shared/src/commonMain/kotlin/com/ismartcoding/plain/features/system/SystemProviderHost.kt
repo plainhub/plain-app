@@ -17,7 +17,7 @@ object SystemProviderHost {
             }
         })
         "systemNotificationFacts" -> Json.parseToJsonElement(JsonHelper.jsonEncode(notificationFacts()))
-        "systemMmsTextFacts", "systemSmsCountFacts", "systemSmsRowsFacts", "systemSmsIdsFacts" -> com.ismartcoding.plain.platform.systemSmsFacts(method, params)
+        "systemMmsTextFacts", "systemSmsCountFacts", "systemSmsRowsFacts", "systemSmsIdsFacts", "systemSmsConversationFacts", "systemSmsThreadFacts" -> com.ismartcoding.plain.platform.systemSmsFacts(method, params)
         "systemEpochMillis" -> buildJsonObject {
             params.getValue("values").jsonArray.forEach { value ->
                 val text = value.jsonPrimitive.content

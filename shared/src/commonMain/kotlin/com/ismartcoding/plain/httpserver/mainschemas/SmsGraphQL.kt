@@ -5,6 +5,7 @@ import com.ismartcoding.plain.features.file.FileSortBy
 import com.ismartcoding.plain.features.sms.DMessage
 import com.ismartcoding.plain.features.sms.DMessageAttachment
 import com.ismartcoding.plain.features.sms.DPendingMms
+import com.ismartcoding.plain.features.sms.RustSmsQuery
 import com.ismartcoding.plain.features.sms.SmsProviderContract
 import com.ismartcoding.plain.httpserver.http.GraphqlRequestContext
 import com.ismartcoding.plain.helpers.QueryHelper
@@ -58,7 +59,7 @@ private val mmsSendMutex = Mutex()
 @GraphQLQuery
 suspend fun smsBoxCounts(): SmsCounts {
     return if (Permission.READ_SMS.enabledAndIsGrantedAsync()) {
-        getSmsAllCounts().toModel()
+        RustSmsQuery.countModel().toModel()
     } else {
         SmsCounts(0, 0, 0, 0)
     }
@@ -93,21 +94,19 @@ suspend fun sendSms(
 @GraphQLQuery
 suspend fun sms(offset: Int, limit: Int, query: String): List<Sms> {
     if (!Permission.READ_SMS.enabledAndIsGrantedAsync()) return emptyList()
-    return searchMedia(DataType.SMS, query, limit, offset, FileSortBy.DATE_DESC)
-        .filterIsInstance<DMessage>()
-        .map { it.toModel() }
+    return RustSmsQuery.messages(query, offset, limit).map { it.toModel() }
 }
 
 @GraphQLQuery
 suspend fun smsConversations(offset: Int, limit: Int, query: String): List<SmsConversation> {
     if (!Permission.READ_SMS.enabledAndIsGrantedAsync()) return emptyList()
-    return searchSmsConversations(query, limit, offset).map { it.toModel() }
+    return RustSmsQuery.conversations(query, offset, limit).map { it.toModel() }
 }
 
 @GraphQLQuery
 suspend fun smsCount(query: String): Int {
     return if (Permission.READ_SMS.enabledAndIsGrantedAsync()) {
-        countMedia(DataType.SMS, query)
+        RustSmsQuery.count(query)
     } else {
         0
     }
@@ -116,7 +115,7 @@ suspend fun smsCount(query: String): Int {
 @GraphQLQuery
 suspend fun smsConversationCount(query: String): Int {
     return if (Permission.READ_SMS.enabledAndIsGrantedAsync()) {
-        countSmsConversations(query)
+        RustSmsQuery.conversationCount(query)
     } else {
         0
     }
