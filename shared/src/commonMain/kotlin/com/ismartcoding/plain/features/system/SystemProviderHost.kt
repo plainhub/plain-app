@@ -33,6 +33,16 @@ object SystemProviderHost {
             }
             put("granted", granted)
         }
+        "systemSendSms" -> {
+            com.ismartcoding.plain.platform.sendSmsText(
+                params.getValue("number").jsonPrimitive.content,
+                params.getValue("body").jsonPrimitive.content,
+                params["subscriptionId"]?.takeUnless { it is JsonNull }?.jsonPrimitive?.int,
+                params["clientId"]?.takeUnless { it is JsonNull }?.jsonPrimitive?.content,
+                params["clientRequestId"]?.takeUnless { it is JsonNull }?.jsonPrimitive?.content,
+            )
+            JsonPrimitive(true)
+        }
         "systemDeleteRecords" -> JsonArray(com.ismartcoding.plain.platform.deleteSystemProviderFacts(
             com.ismartcoding.plain.enums.DataType.valueOf(params.getValue("provider").jsonPrimitive.content),
             params.getValue("ids").jsonArray.map { it.jsonPrimitive.content }.toSet()).map(::JsonPrimitive))

@@ -18,7 +18,6 @@ import com.ismartcoding.plain.enums.DataType
 import com.ismartcoding.plain.events.HStartMmsPollingEvent
 import com.ismartcoding.plain.platform.Permission
 import com.ismartcoding.plain.platform.AppDatabase
-import com.ismartcoding.plain.platform.checkEnabledAsync
 import com.ismartcoding.plain.platform.countMedia
 import com.ismartcoding.plain.platform.countSmsConversations
 import com.ismartcoding.plain.platform.enabledAndIsGrantedAsync
@@ -33,7 +32,7 @@ import com.ismartcoding.plain.platform.mimeTypeFromExtension
 import com.ismartcoding.plain.platform.resolveAppFileUri
 import com.ismartcoding.plain.platform.searchMedia
 import com.ismartcoding.plain.platform.searchSmsConversations
-import com.ismartcoding.plain.platform.sendSmsText
+import com.ismartcoding.plain.features.sms.RustSmsSender
 import com.ismartcoding.plain.db.DArchivedConversation
 import com.ismartcoding.plain.lib.TimeHelper
 import com.ismartcoding.plain.lib.extensions.getFilenameExtension
@@ -76,11 +75,10 @@ suspend fun sendSms(
     requestId: String? = null,
     context: Context,
 ): Boolean {
-    Permission.SEND_SMS.checkEnabledAsync()
     val simId = if (subscriptionId >= 0) subscriptionId else null
     val clientId = context.get<GraphqlRequestContext>()?.header("c-id")
     try {
-        sendSmsText(number, body, simId, clientId, requestId)
+        RustSmsSender.send(number, body, simId, clientId, requestId)
     } catch (e: Exception) {
         e.printStackTrace()
         throw GraphQLError(e.message ?: "Invalid SMS input")
