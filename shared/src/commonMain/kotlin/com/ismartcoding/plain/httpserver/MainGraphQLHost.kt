@@ -15,6 +15,14 @@ import kotlinx.serialization.json.*
 object MainGraphQLHost {
     suspend fun handle(method: String, params: JsonObject): JsonElement = when (method) {
         "mainGraphqlHealth" -> JsonPrimitive(com.ismartcoding.plain.platform.getOwnPackageName())
+        "mainGraphqlShutdown" -> {
+            com.ismartcoding.plain.httpserver.closeAllWsSessions()
+            com.ismartcoding.plain.lib.coIO {
+                kotlinx.coroutines.delay(100)
+                com.ismartcoding.plain.platform.finishHttpServerStopAsync()
+            }
+            JsonNull
+        }
         "mainGraphqlInitFacts" -> buildJsonObject {
             put("desktopAccessEnabled", TempData.canDesktopAccess())
             val key = HttpServerManager.tokenCache.get(params.getValue("clientId").jsonPrimitive.content)
