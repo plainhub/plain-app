@@ -24,7 +24,6 @@ import com.ismartcoding.plain.platform.countMedia
 import com.ismartcoding.plain.platform.countSmsConversations
 import com.ismartcoding.plain.platform.enabledAndIsGrantedAsync
 import com.ismartcoding.plain.platform.fileExists
-import com.ismartcoding.plain.platform.getArchivedSmsConversations
 import com.ismartcoding.plain.platform.getSmsConversationDate
 import com.ismartcoding.plain.platform.getSmsAllCounts
 import com.ismartcoding.plain.platform.trashSms as trashSmsInternal
@@ -124,11 +123,7 @@ suspend fun smsConversationCount(query: String): Int {
 @GraphQLQuery
 suspend fun archivedSmsConversations(offset: Int, limit: Int, query: String): List<SmsConversation> {
     if (!Permission.READ_SMS.enabledAndIsGrantedAsync()) return emptyList()
-    val q = query.trim().lowercase()
-    return getArchivedSmsConversations()
-        .filter { q.isEmpty() || it.address.lowercase().contains(q) || it.snippet.lowercase().contains(q) }
-        .drop(offset.coerceAtLeast(0))
-        .take(limit.coerceAtLeast(0))
+    return RustSmsQuery.archivedConversations(query, offset, limit)
         .map { it.toModel() }
 }
 

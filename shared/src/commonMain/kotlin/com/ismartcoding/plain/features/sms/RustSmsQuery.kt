@@ -47,8 +47,16 @@ object RustSmsQuery {
     suspend fun conversationCount(query: String): Int =
         call("conversationCount") { put("query", query) }.getValue("count").jsonPrimitive.int
 
-    suspend fun archivedConversations(): List<DMessageConversation> =
-        JsonHelper.jsonDecode(call("archivedConversations").getValue("items").toString())
+    suspend fun archivedConversations(
+        query: String = "",
+        offset: Int = 0,
+        limit: Int = Int.MAX_VALUE,
+    ): List<DMessageConversation> =
+        JsonHelper.jsonDecode(call("archivedConversations") {
+            put("query", query)
+            put("offset", offset)
+            put("limit", limit)
+        }.getValue("items").toString())
 
     suspend fun conversationDate(id: String): kotlin.time.Instant? =
         call("conversationDate") {
