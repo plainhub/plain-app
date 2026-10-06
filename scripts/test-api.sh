@@ -14,7 +14,9 @@ set -uo pipefail
 source "$(dirname "${BASH_SOURCE[0]}")/test-lib.sh" "$@"
 
 MODEL="${PLAIN_DEVICE_MODEL:-Pixel_7}"
-DEV="${1:-}"
+# Only a non-flag $1 is a serial, so `--output <dir>` falls back to MODEL
+# instead of being handed to adb as a device name.
+case "${1:-}" in -*) DEV="" ;; *) DEV="${1:-}" ;; esac
 [ -z "$DEV" ] && DEV=$(serial_for_model "$MODEL")
 
 if ! have_adb; then

@@ -15,7 +15,10 @@ source "$(dirname "${BASH_SOURCE[0]}")/test-lib.sh" "$@"
 
 MODEL="${PLAIN_DEVICE_MODEL:-Pixel_7}"
 SHOTS="${PLAIN_SHOTS_DIR:-$REPO_ROOT/test-reports/shots}"
-DEV="${1:-}"
+# Only a non-flag $1 is a serial. Without this guard `--output <dir>` is taken
+# as the device, and adb blocks forever on `adb -s --output ...` instead of the
+# script falling back to MODEL.
+case "${1:-}" in -*) DEV="" ;; *) DEV="${1:-}" ;; esac
 [ -z "$DEV" ] && DEV=$(serial_for_model "$MODEL")
 
 if ! have_adb; then
@@ -106,30 +109,47 @@ else
 fi
 
 # --- files screen ------------------------------------------------------------
-# Opening Files crashed once on each device with
+# Opening Files/Docs used to crash on every open with
 #   IllegalArgumentException: Invalid token size
-# from DocMediaStoreHelper.getDocExtGroupsAsync, and did not reproduce on the
-# attempts right after. An intermittent crash that a walk happened to catch is
-# worth re-running on every gate, so this opens the screen a few times and
-# fails on any new crash record rather than only on the one that shows up.
+# from DocMediaStoreHelper.getDocExtGroupsAsync. The cause was a provider plan
+# clause MediaProvider's strict SQL grammar rejects, not a race -- it looked
+# intermittent only because the taps that "did not reproduce" had missed the
+# Docs entry entirely. So each round here checks that it really landed before
+# the round counts, otherwise a pass proves nothing.
 head1 "files screen"
 a() { adb -s "$DEV" "$@"; }
-BEFORE=$(a shell "run-as $PACKAGE cat files/crash_log.txt" 2>/dev/null | grep -c "IllegalArgumentException")
-CRASHED=""
+# Read once into a variable and hash the variable: piping into md5 hashes the
+# trailing newline, while "$(...)" strips it, so hashing the two sides
+# differently would make this case fail on every run.
+CRASH_BASE_RAW=$(a shell "run-as $PACKAGE cat files/crash_log.txt" 2>/dev/null | tr -d '\r')
+BEFORE=$(printf '%s\n' "$CRASH_BASE_RAW" | grep -c "IllegalArgumentException")
+CRASH_BASELINE=$(printf '%s' "$CRASH_BASE_RAW" | md5)
+CRASHED=""; LANDED=0
 if [ "${PLAIN_SCREEN_TAPS:-0}" = "1" ]; then
   for n in 1 2 3; do
     a shell am force-stop "$PACKAGE"; sleep 1
     a shell am start -n "$PACKAGE/com.ismartcoding.plain.MainActivity" >/dev/null 2>&1; sleep 4
-    a shell input tap 677 2211; sleep 2   # Tools
-    a shell input tap 230 1062; sleep 5   # Files
+    a shell input tap 677 2211; sleep 2.5   # Tools
+    # Confirm the Tools grid actually rendered before tapping Docs; a miss must
+    # not be counted as a round that survived the screen.
+    a shell uiautomator dump /sdcard/plain-ui.xml >/dev/null 2>&1
+    if ! a shell cat /sdcard/plain-ui.xml | grep -q 'content-desc="Docs"'; then continue; fi
+    LANDED=$((LANDED+1))
+    a shell input tap 797 840; sleep 5     # Docs
     NOW=$(a shell "run-as $PACKAGE cat files/crash_log.txt" 2>/dev/null | grep -c "IllegalArgumentException")
     if [ "$NOW" -gt "$BEFORE" ]; then CRASHED="$CRASHED attempt$n"; fi
   done
+  # A crash lands a few seconds after the screen opens, so the final round's
+  # wait can end before it does. Re-read once more so a late one still counts.
+  NOW=$(a shell "run-as $PACKAGE cat files/crash_log.txt" 2>/dev/null | grep -c "IllegalArgumentException")
+  [ "$NOW" -gt "$BEFORE" ] && [ -z "$CRASHED" ] && CRASHED=" (after the last round)"
   if [ -n "$CRASHED" ]; then
     shot "ui-files-crash"
     case_fail "files_screen" "crashed on:$CRASHED"
+  elif [ "$LANDED" -eq 0 ]; then
+    case_block "files_screen" "never reached Docs in 3 rounds -- no sample, rerun"
   else
-    case_pass "files_screen" "opened 3 times with no new crash record"
+    case_pass "files_screen" "Docs opened $LANDED time(s) with no new crash record"
   fi
 else
   case_block "files_screen" "set PLAIN_SCREEN_TAPS=1 to drive the navigation"
@@ -170,11 +190,16 @@ fi
 # old entry must not be reported as this run's result.
 head1 "crash log"
 CL=$(adb -s "$DEV" shell "run-as $PACKAGE cat files/crash_log.txt" 2>/dev/null | tr -d '\r')
+CL_NOW=$(printf '%s' "$CL" | md5)
 if [ -z "$CL" ]; then
   case_pass "no_recorded_crash" "no crash_log.txt on device"
+elif [ "$CL_NOW" = "$CRASH_BASELINE" ]; then
+  # The file outlives the process, so an entry from an earlier build is history,
+  # not this run's result. Blocking on it would keep the gate red forever after
+  # the crash is fixed -- the files_screen case above is what re-catches it.
+  case_pass "no_recorded_crash" "unchanged during this run ($(printf '%s' "$CL" | wc -l | tr -d ' ') pre-existing line(s))"
 else
-  FIRST=$(printf '%s' "$CL" | head -1)
-  case_block "no_recorded_crash" "crash_log.txt exists (first line: $FIRST) — check the run time against it"
+  case_fail "no_recorded_crash" "crash_log.txt changed during this run"
 fi
 
 report_write
