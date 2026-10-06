@@ -1,6 +1,8 @@
 package com.ismartcoding.plain.features.system
 
+import com.ismartcoding.plain.data.DContact
 import com.ismartcoding.plain.extensions.parseEpochMillis
+import com.ismartcoding.plain.features.contact.DContentItem
 import com.ismartcoding.plain.lib.JsonHelper
 import com.ismartcoding.plain.lib.pinyin.Pinyin
 import com.ismartcoding.plain.platform.installedPackageFacts
@@ -10,6 +12,62 @@ import kotlinx.serialization.json.*
 
 private fun contactInput(params: JsonObject): com.ismartcoding.plain.httpserver.models.ContactInput =
     JsonHelper.jsonDecode(params.getValue("input").toString())
+
+/**
+ * The public contact contract, field for field. The `ContactsContract`
+ * `DATA2` code stays a raw int on each detail row: Rust owns the enum, so the
+ * wire keeps the number and the mapping stays in one place.
+ */
+private fun contactFacts(contact: DContact): JsonObject {
+    fun contentItem(item: DContentItem): JsonObject = buildJsonObject {
+        put("value", JsonPrimitive(item.value))
+        put("type", JsonPrimitive(item.type))
+        put("label", JsonPrimitive(item.label))
+    }
+    fun contentItems(items: List<DContentItem>): JsonArray = JsonArray(items.map(::contentItem))
+    return buildJsonObject {
+        put("id", JsonPrimitive(contact.id))
+        put("prefix", JsonPrimitive(contact.prefix))
+        put("firstName", JsonPrimitive(contact.givenName))
+        put("middleName", JsonPrimitive(contact.middleName))
+        put("lastName", JsonPrimitive(contact.familyName))
+        put("suffix", JsonPrimitive(contact.suffix))
+        put("nickname", JsonPrimitive(contact.nickname))
+        put("photoId", JsonPrimitive(contact.photoUri))
+        put("phoneNumbers", JsonArray(contact.phoneNumbers.map { phone ->
+            buildJsonObject {
+                put("value", JsonPrimitive(phone.value))
+                put("type", JsonPrimitive(phone.type))
+                put("label", JsonPrimitive(phone.label))
+                put("normalizedNumber", JsonPrimitive(phone.normalizedNumber))
+            }
+        }))
+        put("emails", contentItems(contact.emails))
+        put("addresses", contentItems(contact.addresses))
+        put("events", contentItems(contact.events))
+        put("websites", contentItems(contact.websites))
+        put("ims", contentItems(contact.ims))
+        put("source", JsonPrimitive(contact.source))
+        put("starred", JsonPrimitive(contact.starred != 0))
+        put("contactId", JsonPrimitive(contact.contactId))
+        put("thumbnailId", JsonPrimitive(contact.thumbnailUri))
+        put("notes", JsonPrimitive(contact.notes))
+        put("groups", JsonArray(contact.groups.map { group ->
+            buildJsonObject {
+                put("id", JsonPrimitive(group.id.toString()))
+                put("name", JsonPrimitive(group.name))
+            }
+        }))
+        put("organization", contact.organization?.let { organization ->
+            buildJsonObject {
+                put("company", JsonPrimitive(organization.company))
+                put("title", JsonPrimitive(organization.title))
+            }
+        } ?: JsonNull)
+        put("ringtone", JsonPrimitive(contact.ringtone))
+        put("updatedAt", JsonPrimitive(contact.updatedAt.toString()))
+    }
+}
 
 object SystemProviderHost {
     suspend fun handle(method: String, params: JsonObject): JsonElement = when (method) {
@@ -102,6 +160,45 @@ object SystemProviderHost {
             )
             JsonPrimitive(true)
         }
+        "systemContactFacts" -> {
+            val query = params.getValue("query").jsonPrimitive.content
+            val offset = params.getValue("offset").jsonPrimitive.int
+            val limit = params.getValue("limit").jsonPrimitive.int
+            JsonArray(
+                com.ismartcoding.plain.platform.searchMedia(
+                    com.ismartcoding.plain.enums.DataType.CONTACT, query, limit, offset,
+                    com.ismartcoding.plain.features.file.FileSortBy.DATE_DESC,
+                ).filterIsInstance<DContact>().map(::contactFacts)
+            )
+        }
+        "systemContactCount" -> JsonPrimitive(
+            com.ismartcoding.plain.platform.countMedia(
+                com.ismartcoding.plain.enums.DataType.CONTACT,
+                params.getValue("query").jsonPrimitive.content,
+            )
+        )
+        "systemContactIds" -> JsonArray(
+            com.ismartcoding.plain.platform.getMediaIds(
+                com.ismartcoding.plain.enums.DataType.CONTACT,
+                params.getValue("query").jsonPrimitive.content,
+            ).map(::JsonPrimitive)
+        )
+        "systemContactGroupFacts" -> JsonArray(
+            com.ismartcoding.plain.platform.getContactGroups().map { group ->
+                buildJsonObject {
+                    put("id", JsonPrimitive(group.id.toString()))
+                    put("name", JsonPrimitive(group.name))
+                }
+            }
+        )
+        "systemContactSources" -> JsonArray(
+            com.ismartcoding.plain.platform.getContactSources().map { source ->
+                buildJsonObject {
+                    put("name", JsonPrimitive(source.name))
+                    put("type", JsonPrimitive(source.type))
+                }
+            }
+        )
         "systemDeleteRecords" -> JsonArray(com.ismartcoding.plain.platform.deleteSystemProviderFacts(
             com.ismartcoding.plain.enums.DataType.valueOf(params.getValue("provider").jsonPrimitive.content),
             params.getValue("ids").jsonArray.map { it.jsonPrimitive.content }.toSet()).map(::JsonPrimitive))
