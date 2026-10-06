@@ -66,10 +66,10 @@ emit sims '{ sims { id label number } }'
 emit sms '{ sms(offset: 0, limit: 5, query: "") { id body address read } }'
 emit sms_box_counts '{ smsBoxCounts { total inbox sent drafts } }'
 
-# --- chat, clipboard, packages, notifications -------------------------------
+# --- chat, clipboard, packages (QUERY_ALL_PACKAGES), notifications ---------
 emit chat_channels '{ chatChannels { id name ownerId version } }'
 emit_gated clipboard_items '{ clipboardItems(offset: 0, limit: 5, query: "") { id text source sensitive } }'
-emit packages '{ packages(offset: 0, limit: 5, query: "", sortBy: NAME_ASC) { id name version } }'
+emit_gated packages '{ packages(offset: 0, limit: 5, query: "", sortBy: NAME_ASC) { id name version } }'
 emit_gated notifications '{ notifications(offset: 0, limit: 5, query: "") { id appName title postedAt } }'
 
 # --- pomodoro, image editor, database, prefs, logs --------------------------
