@@ -10,7 +10,6 @@ import com.ismartcoding.plain.httpserver.routes.addFilesRoutes
 import com.ismartcoding.plain.httpserver.routes.addGraphQLRoutes
 import com.ismartcoding.plain.httpserver.routes.addNearbyRoutes
 import com.ismartcoding.plain.httpserver.routes.addSystemRoutes
-import com.ismartcoding.plain.httpserver.routes.addUploadRoutes
 import com.ismartcoding.plain.httpserver.routes.addWebSocketRoutes
 import com.ismartcoding.plain.httpserver.routes.addZipRoutes
 
@@ -139,7 +138,6 @@ object HttpRouteRegistry {
         HttpRouter().apply {
             addSystemRoutes()
             addNearbyRoutes()
-            addUploadRoutes()
             addFilesRoutes()
             addZipRoutes()
             addDlnaRoutes()

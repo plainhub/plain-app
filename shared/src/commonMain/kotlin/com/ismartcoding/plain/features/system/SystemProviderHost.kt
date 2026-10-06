@@ -46,6 +46,15 @@ object SystemProviderHost {
             )
             JsonPrimitive(true)
         }
+        "uploadTmpDirFacts" -> buildJsonObject {
+            put("path", com.ismartcoding.plain.platform.getUploadTmpDirPath())
+        }
+        "scanFilesFacts" -> {
+            com.ismartcoding.plain.platform.scanFiles(
+                params.getValue("paths").jsonArray.map { it.jsonPrimitive.content }.toTypedArray()
+            )
+            JsonPrimitive(true)
+        }
         "systemDeleteRecords" -> JsonArray(com.ismartcoding.plain.platform.deleteSystemProviderFacts(
             com.ismartcoding.plain.enums.DataType.valueOf(params.getValue("provider").jsonPrimitive.content),
             params.getValue("ids").jsonArray.map { it.jsonPrimitive.content }.toSet()).map(::JsonPrimitive))
