@@ -8,7 +8,15 @@
 set -uo pipefail
 source "$(dirname "${BASH_SOURCE[0]}")/test-lib.sh" "$@"
 
-GROUP="${1:-all}"
+# Pick the group by name, not by position. The workbench invokes this as
+# `test-unit.sh --output <dir>`, so `$1` is a flag and the argument after it
+# is a path — neither is a group, and both must be ignored.
+GROUP="all"
+for arg in "$@"; do
+  case "$arg" in
+    kotlin|rust|web|all) GROUP="$arg"; break ;;
+  esac
+done
 cd "$REPO_ROOT"
 
 # --- Kotlin ------------------------------------------------------------------
