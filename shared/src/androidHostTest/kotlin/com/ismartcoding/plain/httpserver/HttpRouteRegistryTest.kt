@@ -65,6 +65,23 @@ class HttpRouteRegistryTest {
         }
     }
 
+    /**
+     * The websocket half of the bridge table, pinned separately because it is
+     * not part of [HttpRouter.entries] — dropping it breaks every web client
+     * silently, because the app socket and the login handshake both dial the
+     * root path (`ws://host/?cid=…`). Rust's own `/events` upgrade is a
+     * different path and does not serve either of them.
+     */
+    @Test
+    fun sharedRouter_holdsExactlyTheWebSocketRoutesRustHasNotTakenOver() {
+        assertEquals(
+            listOf("/"),
+            HttpRouteRegistry.router.webSocketEntries().map { it.path },
+            "the bridge's websocket routes changed — `/` is what every web client connects to " +
+                "(app socket and login handshake), so losing it takes the whole web UI offline",
+        )
+    }
+
     @Test
     fun graphQlSchemas_stayPlatformFree() {
         HttpRouteRegistry.peerGraphQL
