@@ -80,6 +80,18 @@ abstract class BaseMediaContentHelper {
         }?.toSet() ?: emptySet()
     }
 
+    suspend fun isCurrentItemAsync(context: Context, id: String, path: String): Boolean = withIO {
+        val where = ContentWhere().apply { addIn(BaseColumns._ID, listOf(id)) }
+        context.contentResolver.getSearchCursor(
+            uriExternal,
+            arrayOf(BaseColumns._ID, MediaStore.MediaColumns.DATA),
+            where,
+        )?.map { cursor, cache ->
+            cursor.getStringValue(BaseColumns._ID, cache) == id &&
+                cursor.getStringValue(MediaStore.MediaColumns.DATA, cache) == path
+        }?.any { it } == true
+    }
+
     suspend fun getTrashedIdsAsync(
         context: Context,
         query: String,
