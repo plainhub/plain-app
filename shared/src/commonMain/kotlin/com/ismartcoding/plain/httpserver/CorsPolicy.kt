@@ -8,17 +8,15 @@ import com.ismartcoding.plain.platform.isDebugBuild
 /**
  * Shared CORS policy for the embedded HTTP server.
  *
- * Android applies it through Ktor's `CORS` plugin (see `HttpModule`); iOS
- * applies it manually in `IosRequestProcessor` because its SwiftNIO request
- * pipeline does not run through Ktor. Keeping the policy here ensures both
- * platforms enforce the same cross-origin rules — previously iOS silently
- * skipped CORS, so preflight requests were rejected by the browser.
+ * The Rust public listener serves the SPA and the GraphQL endpoints itself;
+ * [RustHttpHost] applies the same policy to the requests it bridges back, so
+ * both paths answer preflights identically — previously iOS silently skipped
+ * CORS and the browser rejected every cross-origin request.
  *
  * There is no hardcoded origin allowlist: debug builds always accept any
  * origin, and release builds only accept any origin when the user enables
  * "Allow any host" in Developer settings ([UserPrefs.allowAnyHost]).
- * Same-origin requests skip CORS processing (Ktor's
- * `allowSameOrigin` default of `true`). Custom headers prefixed with `c-`
+ * Same-origin requests skip CORS processing. Custom headers prefixed with `c-`
  * (e.g. `c-token`) are advertised as allowed in preflight responses.
  */
 object CorsPolicy {

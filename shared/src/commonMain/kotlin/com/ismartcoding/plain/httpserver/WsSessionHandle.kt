@@ -3,9 +3,9 @@ package com.ismartcoding.plain.httpserver
 /**
  * Platform-agnostic handle to a live WebSocket session.
  *
- * Android implements this with Ktor's `DefaultWebSocketServerSession`; iOS will
- * implement it with SwiftNIO. Business logic in commonMain holds instances of
- * this interface and never touches platform-specific WebSocket types directly.
+ * The bridge's [RustWsSession] implements it over the WebSocket it holds to the
+ * Rust listener. Business logic in commonMain holds instances of this interface
+ * and never touches platform-specific WebSocket types directly.
  */
 interface WsSessionHandle {
     val id: Long

@@ -10,8 +10,9 @@ import com.ismartcoding.plain.httpserver.http.HttpRouter
 import com.ismartcoding.plain.httpserver.http.HttpStatus
 
 /**
- * `/fs` — file serving endpoint shared between Android (Ktor)
- * and iOS (SwiftNIO future).
+ * `/fs` — mobile file serving, reached through the bridge: the Rust
+ * `peer_files` handler only fast-paths the desktop `fid:` payload and
+ * forwards everything else here.
  *
  * `/fs` decrypts the `id` query parameter into either a filesystem path, a
  * `content://` URI, or a `pkgicon://` URI, then streams the appropriate bytes

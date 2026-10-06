@@ -60,10 +60,8 @@ private fun readFileText(uriStr: String): String {
         ?: throw IllegalStateException("Failed to read the selected file")
 }
 
-actual suspend fun startHttpEngineAsync(): Boolean {
-    IosPlatformRegistry.httpServerBridge()?.stop()
-    return com.ismartcoding.plain.httpserver.RustHttpEngine.start()
-}
+actual suspend fun startHttpEngineAsync(): Boolean =
+    com.ismartcoding.plain.httpserver.RustHttpEngine.start()
 
 actual suspend fun stopHttpEngineAsync() = com.ismartcoding.plain.httpserver.RustHttpEngine.stop()
 
@@ -87,7 +85,7 @@ actual suspend fun onHttpServerStopped() {
  */
 actual fun startHttpServerService() {
     coIO {
-        LogCat.d("startHttpServer (iOS/SwiftNIO)")
+        LogCat.d("startHttpServer (iOS/Rust)")
         startHttpServerAsync()
     }
 }

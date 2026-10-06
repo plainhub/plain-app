@@ -7,9 +7,6 @@ import com.ismartcoding.plain.httpserver.http.HttpRouter
 import com.ismartcoding.plain.httpserver.http.RouteEntry
 import com.ismartcoding.plain.httpserver.routes.addDlnaRoutes
 import com.ismartcoding.plain.httpserver.routes.addFilesRoutes
-import com.ismartcoding.plain.httpserver.routes.addGraphQLRoutes
-import com.ismartcoding.plain.httpserver.routes.addNearbyRoutes
-import com.ismartcoding.plain.httpserver.routes.addSystemRoutes
 import com.ismartcoding.plain.httpserver.routes.addWebSocketRoutes
 
 /**
@@ -21,11 +18,10 @@ import com.ismartcoding.plain.httpserver.routes.addWebSocketRoutes
  * (MainGraphQL `/graphql`, `/init`, WS `/`, `/upload`, `/zip/dir`, `/zip/files`, `/proxyfs`)
  * are NOT listed here — they require `canDesktopAccess()`.
  *
- * Used by the Android/iOS platform intercepts as an early-reject whitelist
- * so Main-UI requests are turned away before route dispatch, while peer
- * traffic flows through to the commonMain handlers. The authoritative
- * access-control checks live inside each route handler (covers BLE RPC,
- * which has no platform intercept).
+ * Applied by [RustHttpHost] as an early-reject whitelist so Main-UI requests
+ * are turned away before dispatch, while peer traffic flows through to the
+ * commonMain handlers. The authoritative access-control checks live inside
+ * each route handler, which also covers the paths Rust serves on its own.
  */
 private val PEER_ACCESSIBLE_PATHS: Set<Pair<HttpMethod, String>> = setOf(
     HttpMethod.POST to "/peer_graphql",
@@ -119,14 +115,18 @@ fun isSharePath(method: HttpMethod, path: String): Boolean {
 }
 
 /**
- * Shared HTTP route registry built once per process and dispatch from both
- * the platform HTTP server (Ktor on Android, SwiftNIO on iOS future) and
- * the BLE [com.ismartcoding.plain.ble.server.HttpServiceHandler].
+ * Shared HTTP route registry for the routes the Rust public listener does not
+ * own yet. Everything else — `/graphql`, `/peer_graphql`, `/guest_graphql`,
+ * `/health`, `/init`, `/shutdown`, `/nearby`, `/proxyfs`, `/upload`,
+ * `/zip/dir`, `/zip/files` and the SPA assets — is served directly by the
+ * Rust listener and never reaches this table.
  *
- * All business-logic routes live in commonMain and are collected into
- * [router]. The GraphQL services ([mainGraphQL], [peerGraphQL]) are also
- * shared so the BLE RPC channel can dispatch `/graphql` and `/peer_graphql`
- * requests through the same code path as the HTTP server.
+ * `/fs` and `/media/{id}` are here because Rust forwards the formats it does
+ * not understand back through the bridge: `peer_files` only fast-paths the
+ * desktop `fid:` payload, so the mobile `id` decryption and `sid` share mode
+ * land in [addFilesRoutes].
+ *
+ * Dispatched by the bridge fallback in [RustHttpHost].
  */
 object HttpRouteRegistry {
     val mainGraphQL: MainGraphQLService by lazy { MainGraphQLService.create() }
@@ -135,11 +135,8 @@ object HttpRouteRegistry {
 
     val router: HttpRouter by lazy {
         HttpRouter().apply {
-            addSystemRoutes()
-            addNearbyRoutes()
             addFilesRoutes()
             addDlnaRoutes()
-            addGraphQLRoutes()
             addWebSocketRoutes()
         }
     }

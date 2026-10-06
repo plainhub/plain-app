@@ -1,8 +1,6 @@
 import Foundation
 import Security
 import CryptoKit
-import NIOCore
-import NIOSSL
 import PlainShared
 
 /// Native PKCS#12 import adapter.
@@ -72,22 +70,6 @@ final class SslCertManager: NSObject, IosSslCertProvider {
         // DER, so store the raw decoded key block directly (no SecKey needed).
         let keyDer = try Self.pemPrivateKeyDER(keyPem)
         return try persistCredentials(certDer: certDer, keyDer: keyDer)
-    }
-
-    func makeTLSConfiguration() throws -> TLSConfiguration {
-        let certData = loadFromKeychain(key: certKeychainKey)
-        let keyData = loadFromKeychain(key: privateKeyKeychainKey)
-        guard let certData, let keyData else {
-            throw NSError(domain: "SslCertManager", code: -1,
-                          userInfo: [NSLocalizedDescriptionKey: "Failed to load TLS credentials"])
-        }
-        let cert = try NIOSSLCertificate(bytes: Array(certData), format: .der)
-        let key = try NIOSSLPrivateKey(bytes: Array(keyData), format: .der)
-
-        return TLSConfiguration.makeServerConfiguration(
-            certificateChain: [.certificate(cert)],
-            privateKey: .privateKey(key)
-        )
     }
 
     private static func toKotlinByteArray(_ data: Data) -> KotlinByteArray {

@@ -1,8 +1,6 @@
 package com.ismartcoding.plain.httpserver
 
 import com.ismartcoding.plain.enums.HttpServerState
-import com.ismartcoding.plain.httpserver.http.HttpRouter
-import com.ismartcoding.plain.httpserver.routes.addSystemRoutes
 import com.ismartcoding.plain.lib.ktorserver.Netty
 import com.ismartcoding.plain.lib.ktorserver.NettyApplicationEngine
 import com.ismartcoding.plain.lib.ktorserver.core.engine.EmbeddedServer
@@ -16,9 +14,7 @@ import com.ismartcoding.plain.lib.ktorserver.core.routing.routing
 import com.ismartcoding.plain.platform.stopHttpServerCoreAsync
 import kotlinx.coroutines.runBlocking
 import org.slf4j.LoggerFactory
-import java.net.Inet4Address
 import java.net.InetSocketAddress
-import java.net.NetworkInterface
 import java.net.Socket
 import java.net.URI
 import java.net.http.HttpClient
@@ -40,13 +36,12 @@ import kotlin.test.assertTrue
  *
  * 1. The in-process stop orchestration must not depend on the server it stops
  *    (no self HTTP round-trip) and must finish well under the 5s timeout.
- * 2. The /shutdown route must answer immediately and complete its teardown
- *    outside the call coroutine (OFF within the deadline, not after 5s).
- * 3. The /shutdown loopback guard must key on the socket source address, not
- *    on client-controlled headers: a non-loopback peer sending a forged
- *    `Forwarded: for=127.0.0.1` header must get 403 and must NOT stop the
- *    server. (ForwardedHeaders used to be installed and rewrote remoteHost
- *    from that header, letting any LAN peer shut the server down.)
+ * 2. remoteHost must stay the literal socket peer address.
+ *
+ * The `/shutdown` route itself now lives in the Rust listener, which reaches
+ * the same teardown through the `mainGraphqlShutdown` host action; its
+ * loopback-only guard is covered by `shutdown_only_accepts_ipv4_and_ipv6_loopback_peers`
+ * in plain-rs.
  */
 class HttpServerStopLifecycleTest {
     private var engine: EmbeddedServer<NettyApplicationEngine, NettyApplicationEngine.Configuration>? = null
@@ -80,55 +75,6 @@ class HttpServerStopLifecycleTest {
     }
 
     @Test
-    fun shutdownRoute_respondsImmediately_andTeardownCompletesOffHandler() {
-        startServer { registerCommonRoutes(HttpRouter().apply { addSystemRoutes() }) }
-
-        val client = HttpClient.newHttpClient()
-        val start = System.currentTimeMillis()
-        val response = client.send(
-            HttpRequest.newBuilder(URI("http://127.0.0.1:$port/shutdown")).GET().build(),
-            HttpResponse.BodyHandlers.ofString(),
-        )
-        val responseMs = System.currentTimeMillis() - start
-
-        assertEquals(410, response.statusCode(), "loopback /shutdown must be accepted (403 means the source-address guard regressed)")
-        assertTrue(responseMs < 2000, "shutdown response took ${responseMs}ms — the response must not wait for the teardown")
-
-        // The route launches teardown in an independent coroutine; it must land
-        // OFF well before the 5s engine shutdown timeout (old self-join: ~5.1s).
-        val deadline = System.currentTimeMillis() + 3000
-        while (HttpServerManager.serverState.value != HttpServerState.OFF && System.currentTimeMillis() < deadline) {
-            Thread.sleep(50)
-        }
-        assertEquals(HttpServerState.OFF, HttpServerManager.serverState.value, "server not OFF in time — teardown stalled (old bug: in-handler engine stop self-joined for 5s)")
-        assertNull(httpServer)
-        assertTrue(isPortClosed(), "port $port still accepts connections after /shutdown")
-    }
-
-    @Test
-    fun shutdownRoute_rejectsForgedForwardedHeader_fromNonLoopbackSource() {
-        val lan = nonLoopbackIpv4() ?: return // no LAN interface in this environment: nothing to prove
-        startServer(host = "0.0.0.0") { registerCommonRoutes(HttpRouter().apply { addSystemRoutes() }) }
-
-        val client = HttpClient.newHttpClient()
-        val response = client.send(
-            HttpRequest.newBuilder(URI("http://${lan.hostAddress}:$port/shutdown"))
-                .header("Forwarded", "for=127.0.0.1")
-                .GET()
-                .build(),
-            HttpResponse.BodyHandlers.ofString(),
-        )
-
-        assertEquals(
-            403,
-            response.statusCode(),
-            "non-loopback peer passed the /shutdown guard — is a Forwarded-header plugin rewriting remoteHost from client input again?",
-        )
-        assertEquals(HttpServerState.ON, HttpServerManager.serverState.value, "a forged Forwarded header must not tear the server down")
-        assertTrue(!isPortClosed(), "port $port was closed by a forged Forwarded /shutdown request")
-    }
-
-    @Test
     fun remoteHost_isLiteralSourceAddress_neverReverseDns() {
         startServer {
             routing {
@@ -145,31 +91,8 @@ class HttpServerStopLifecycleTest {
         assertEquals(
             "127.0.0.1",
             response.body().trim(),
-            "remoteHost must be the literal peer IP. InetSocketAddress.hostName reverse-resolves and blocks /init (login-button latency) for the DNS timeout on LAN IPs with no PTR record.",
+            "remoteHost must be the literal peer IP. InetSocketAddress.hostName reverse-resolves and stalls the handler for the DNS timeout on LAN IPs with no PTR record.",
         )
-    }
-
-    @Test
-    fun shutdownRoute_acceptsIpv6LoopbackFullFormLiteral() {
-        startServer(host = "::") { registerCommonRoutes(HttpRouter().apply { addSystemRoutes() }) }
-
-        val client = HttpClient.newHttpClient()
-        val response = client.send(
-            HttpRequest.newBuilder(URI("http://[::1]:$port/shutdown")).GET().build(),
-            HttpResponse.BodyHandlers.ofString(),
-        )
-
-        assertEquals(
-            410,
-            response.statusCode(),
-            "IPv6 loopback /shutdown must be accepted. getHostString() yields the full form 0:0:0:0:0:0:0:1 (not ::1) now that remoteHost never reverse-resolves.",
-        )
-        val deadline = System.currentTimeMillis() + 3000
-        while (HttpServerManager.serverState.value != HttpServerState.OFF && System.currentTimeMillis() < deadline) {
-            Thread.sleep(50)
-        }
-        assertEquals(HttpServerState.OFF, HttpServerManager.serverState.value)
-        assertTrue(isPortClosed(), "port $port still accepts connections after /shutdown")
     }
 
     private fun startServer(
@@ -193,13 +116,6 @@ class HttpServerStopLifecycleTest {
         port = runBlocking { server.engine.resolvedConnectors().first().port }
         HttpServerManager.serverState.value = HttpServerState.ON
     }
-
-    private fun nonLoopbackIpv4(): Inet4Address? =
-        NetworkInterface.getNetworkInterfaces().asSequence()
-            .filter { it.isUp && !it.isLoopback }
-            .flatMap { it.inetAddresses.asSequence() }
-            .filterIsInstance<Inet4Address>()
-            .firstOrNull { it.isSiteLocalAddress }
 
     private fun isPortClosed(): Boolean {
         val deadline = System.currentTimeMillis() + 2000

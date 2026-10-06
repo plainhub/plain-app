@@ -9,7 +9,6 @@
 /* Begin PBXBuildFile section */
 		AA0000010000000000000001 /* iosApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000020000000000000001 /* iosApp.swift */; };
 		AA0000030000000000000001 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = AA0000040000000000000001 /* Assets.xcassets */; };
-		BB0000020000000000000001 /* PlainHttpServer.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB0000010000000000000001 /* PlainHttpServer.swift */; };
 		BB0000080000000000000001 /* NIOCore in Frameworks */ = {isa = PBXBuildFile; productRef = BB0000040000000000000001 /* NIOCore */; };
 		BB0000090000000000000001 /* NIOPosix in Frameworks */ = {isa = PBXBuildFile; productRef = BB0000050000000000000001 /* NIOPosix */; };
 		BB00000A0000000000000001 /* NIOHTTP1 in Frameworks */ = {isa = PBXBuildFile; productRef = BB0000060000000000000001 /* NIOHTTP1 */; };
@@ -29,7 +28,6 @@
 		AA0000060000000000000001 /* iosApp.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = iosApp.entitlements; sourceTree = "<group>"; };
 		AA0000100000000000000001 /* PlainShared.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = PlainShared.framework; path = "../shared/build/xcode-frameworks/PlainShared.framework"; sourceTree = "<group>"; };
 		AA0000200000000000000001 /* iosApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = iosApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		BB0000010000000000000001 /* PlainHttpServer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlainHttpServer.swift; sourceTree = "<group>"; };
 		CC0000010000000000000001 /* FilePickerController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FilePickerController.swift; sourceTree = "<group>"; };
 		DD0000010000000000000001 /* ShareController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareController.swift; sourceTree = "<group>"; };
 		EE0000010000000000000001 /* SslCertManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SslCertManager.swift; sourceTree = "<group>"; };
@@ -65,7 +63,6 @@
 			isa = PBXGroup;
 			children = (
 				AA0000020000000000000001 /* iosApp.swift */,
-				BB0000010000000000000001 /* PlainHttpServer.swift */,
 				CC0000010000000000000001 /* FilePickerController.swift */,
 				DD0000010000000000000001 /* ShareController.swift */,
 				EE0000010000000000000001 /* SslCertManager.swift */,
@@ -222,7 +219,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				AA0000010000000000000001 /* iosApp.swift in Sources */,
-				BB0000020000000000000001 /* PlainHttpServer.swift in Sources */,
 				CC0000020000000000000001 /* FilePickerController.swift in Sources */,
 				DD0000020000000000000001 /* ShareController.swift in Sources */,
 				EE0000020000000000000001 /* SslCertManager.swift in Sources */,
