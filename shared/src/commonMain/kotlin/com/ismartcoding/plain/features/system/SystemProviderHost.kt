@@ -1,6 +1,8 @@
 package com.ismartcoding.plain.features.system
 
+import com.ismartcoding.plain.data.DCall
 import com.ismartcoding.plain.data.DContact
+import com.ismartcoding.plain.data.getGeo
 import com.ismartcoding.plain.extensions.parseEpochMillis
 import com.ismartcoding.plain.features.contact.DContentItem
 import com.ismartcoding.plain.lib.JsonHelper
@@ -66,6 +68,29 @@ private fun contactFacts(contact: DContact): JsonObject {
         } ?: JsonNull)
         put("ringtone", JsonPrimitive(contact.ringtone))
         put("updatedAt", JsonPrimitive(contact.updatedAt.toString()))
+    }
+}
+
+/** The public call-log contract; the geo lookup stays on the platform. */
+private fun callFacts(call: DCall): JsonObject {
+    val geo = call.getGeo()
+    return buildJsonObject {
+        put("id", JsonPrimitive(call.id))
+        put("number", JsonPrimitive(call.number))
+        put("name", JsonPrimitive(call.name))
+        put("photoId", JsonPrimitive(com.ismartcoding.plain.helpers.getFileId(call.photoUri)))
+        put("startedAt", JsonPrimitive(call.startedAt.toString()))
+        put("durationSec", JsonPrimitive(call.durationSec))
+        put("type", JsonPrimitive(call.type))
+        put("accountId", JsonPrimitive(call.accountId))
+        put("geo", geo?.let { value ->
+            buildJsonObject {
+                put("country", JsonPrimitive(value.country))
+                put("numberType", JsonPrimitive(value.numberType))
+                put("carrier", JsonPrimitive(value.carrier))
+                put("description", JsonPrimitive(value.description))
+            }
+        } ?: JsonNull)
     }
 }
 
@@ -198,6 +223,53 @@ object SystemProviderHost {
                     put("type", JsonPrimitive(source.type))
                 }
             }
+        )
+        "systemCallFacts" -> {
+            val query = params.getValue("query").jsonPrimitive.content
+            val offset = params.getValue("offset").jsonPrimitive.int
+            val limit = params.getValue("limit").jsonPrimitive.int
+            JsonArray(
+                com.ismartcoding.plain.platform.searchMedia(
+                    com.ismartcoding.plain.enums.DataType.CALL, query, limit, offset,
+                    com.ismartcoding.plain.features.file.FileSortBy.DATE_DESC,
+                ).filterIsInstance<DCall>().map(::callFacts)
+            )
+        }
+        "systemCallCount" -> JsonPrimitive(
+            com.ismartcoding.plain.platform.countMedia(
+                com.ismartcoding.plain.enums.DataType.CALL,
+                params.getValue("query").jsonPrimitive.content,
+            )
+        )
+        "systemCallIds" -> JsonArray(
+            com.ismartcoding.plain.platform.getMediaIds(
+                com.ismartcoding.plain.enums.DataType.CALL,
+                params.getValue("query").jsonPrimitive.content,
+            ).map(::JsonPrimitive)
+        )
+        "systemMakeCall" -> {
+            com.ismartcoding.plain.platform.call(
+                params.getValue("number").jsonPrimitive.content,
+                params.getValue("showDialer").jsonPrimitive.boolean,
+            )
+            JsonPrimitive(true)
+        }
+        "systemTrashSms" -> JsonPrimitive(
+            com.ismartcoding.plain.platform.trashSms(params.getValue("query").jsonPrimitive.content)
+        )
+        "systemRestoreSms" -> JsonPrimitive(
+            com.ismartcoding.plain.platform.restoreSms(params.getValue("query").jsonPrimitive.content)
+        )
+        "systemDeleteSms" -> JsonPrimitive(
+            com.ismartcoding.plain.platform.deleteSms(params.getValue("query").jsonPrimitive.content)
+        )
+        "systemSendMms" -> JsonPrimitive(
+            com.ismartcoding.plain.httpserver.mainschemas.sendMms(
+                params.getValue("number").jsonPrimitive.content,
+                params.getValue("body").jsonPrimitive.content,
+                params.getValue("attachmentPaths").jsonArray.map { it.jsonPrimitive.content },
+                com.ismartcoding.plain.httpserver.models.ID(params.getValue("threadId").jsonPrimitive.content),
+            )
         )
         "systemDeleteRecords" -> JsonArray(com.ismartcoding.plain.platform.deleteSystemProviderFacts(
             com.ismartcoding.plain.enums.DataType.valueOf(params.getValue("provider").jsonPrimitive.content),
