@@ -3,8 +3,8 @@
   <groupId>com.ismartcoding</groupId>
   <artifactId>plain-ui-android</artifactId>
   <versioning>
-    <latest>0.4.3</latest>
-    <release>0.4.3</release>
+    <latest>0.4.4</latest>
+    <release>0.4.4</release>
     <versions>
       <version>0.1.0</version>
       <version>0.2.0</version>
@@ -14,7 +14,8 @@
       <version>0.4.1</version>
       <version>0.4.2</version>
       <version>0.4.3</version>
+      <version>0.4.4</version>
     </versions>
-    <lastUpdated>20261006102941</lastUpdated>
+    <lastUpdated>20261006113543</lastUpdated>
   </versioning>
 </metadata>
