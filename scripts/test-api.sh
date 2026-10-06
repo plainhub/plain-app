@@ -104,10 +104,18 @@ else case_block "https_listener" "https :8443 -> $T (TLS is off or the cert is n
 # instead of duplicating the query list. It needs a session token, which cannot
 # be minted without a human tapping the 2FA prompt — so without credentials this
 # is BLOCKED, never silently skipped.
+#
+# Note that a token from an ordinary browser login is NOT enough here. The
+# browser authenticates in token mode (`c-id` plus an xchacha-encrypted body);
+# this script sends `Authorization: Bearer <token>`, and main_graphql.rs only
+# honours that path for SessionType.CUSTOM sessions. A WEB session's token
+# answers 401 even when it is the very value localStorage holds as
+# `auth_token`. So the two BLOCKED reasons below are both real, and neither is
+# cleared by supplying the browser's credentials.
 head1 "graphql surface"
 GQL_SCRIPT="$REPO_ROOT/scripts/test-graphql-api.sh"
 if [ -z "${PLAIN_TOKEN:-}" ] || [ -z "${PLAIN_CLIENT_ID:-}" ]; then
-  case_block "graphql_queries" "needs PLAIN_TOKEN + PLAIN_CLIENT_ID from a real browser login (2FA prompt)"
+  case_block "graphql_queries" "no PLAIN_TOKEN + PLAIN_CLIENT_ID; and note a browser-login token alone would still 401 — see the comment above"
 elif [ ! -x "$GQL_SCRIPT" ]; then
   case_block "graphql_queries" "$GQL_SCRIPT is missing"
 else
