@@ -15,6 +15,8 @@ import com.ismartcoding.plain.lib.sendEvent
 import com.ismartcoding.plain.platform.installedPackageFacts
 import com.ismartcoding.plain.platform.notificationFacts
 import com.ismartcoding.plain.platform.isGranted
+import com.ismartcoding.plain.enums.has
+import kotlinx.coroutines.launch
 import kotlinx.serialization.json.*
 
 private fun contactInput(params: JsonObject): com.ismartcoding.plain.httpserver.models.ContactInput =
@@ -515,8 +517,124 @@ object SystemProviderHost {
         "systemDeleteDbRows" -> JsonPrimitive(com.ismartcoding.plain.platform.deleteDbTableRows(
             params.getValue("table").jsonPrimitive.content,
             params.getValue("ids").jsonArray.map { it.jsonPrimitive.content }))
+        "systemDeleteFiles" -> JsonPrimitive(params.getValue("paths").jsonArray.count { path ->
+            com.ismartcoding.plain.platform.deleteFileOrDir(path.jsonPrimitive.content)
+        })
+        "systemCreateDir" -> Json.parseToJsonElement(JsonHelper.jsonEncode(
+            com.ismartcoding.plain.platform.createDirectory(params.getValue("path").jsonPrimitive.content)))
+        "systemRenameFile" -> JsonPrimitive(com.ismartcoding.plain.platform.renameAndScanFile(
+            params.getValue("path").jsonPrimitive.content,
+            params.getValue("name").jsonPrimitive.content) != null)
+        "systemWriteTextFile" -> Json.parseToJsonElement(JsonHelper.jsonEncode(
+            com.ismartcoding.plain.platform.writeFileText(
+                params.getValue("path").jsonPrimitive.content,
+                params.getValue("content").jsonPrimitive.content,
+                params.getValue("overwrite").jsonPrimitive.boolean)))
+        "systemTransferFile" -> JsonPrimitive(com.ismartcoding.plain.features.file.FileTaskHelper.execute(
+            com.ismartcoding.plain.features.file.FileTaskType.valueOf(params.getValue("type").jsonPrimitive.content),
+            listOf(com.ismartcoding.plain.features.file.FileTaskOp(
+                params.getValue("src").jsonPrimitive.content,
+                params.getValue("dst").jsonPrimitive.content,
+                params.getValue("overwrite").jsonPrimitive.boolean),
+            )).status == com.ismartcoding.plain.features.file.FileTaskStatus.DONE)
+        "systemUploadedChunkFacts" -> buildJsonObject {
+            put("chunks", JsonArray(com.ismartcoding.plain.platform.listUploadedChunks(
+                params.getValue("fileId").jsonPrimitive.content).map(::JsonPrimitive)))
+        }
+        "systemMergeStatusFacts" -> Json.parseToJsonElement(JsonHelper.jsonEncode(
+            mergeStatusFacts(params.getValue("fileId").jsonPrimitive.content)))
+        "systemDeleteChunks" -> JsonPrimitive(com.ismartcoding.plain.platform.deleteUploadedChunks(
+            params.getValue("fileId").jsonPrimitive.content))
+        "systemMergeChunks" -> startMerge(params, isAppFile = false)
+        "systemMergeAppFileChunks" -> startMerge(params, isAppFile = true)
+        "systemMediaAction" -> runMediaAction(params)
+        "systemStopDiscovery" -> {
+            com.ismartcoding.plain.discover.RustMdnsRuntime.control("stop")
+            JsonPrimitive(true)
+        }
+        "systemStartDiscovery" -> {
+            com.ismartcoding.plain.discover.RustMdnsRuntime.control("start")
+            JsonPrimitive(true)
+        }
+        "systemDiscoveryFacts" -> Json.parseToJsonElement(
+            JsonHelper.jsonEncode(com.ismartcoding.plain.discover.RustMdnsRuntime.snapshot()))
+        "systemDeviceInfoFacts" -> Json.parseToJsonElement(
+            JsonHelper.jsonEncode(com.ismartcoding.plain.platform.getDeviceInfo()))
+        "systemDeviceStatusFacts" -> Json.parseToJsonElement(
+            JsonHelper.jsonEncode(com.ismartcoding.plain.platform.getDeviceStatus()))
+        "systemAppFacts" -> appFacts()
+        "systemAppLogFacts" -> appLogFacts(params)
+        "systemClearAppLogs" -> {
+            com.ismartcoding.plain.platform.clearLatestLogFile()
+            JsonPrimitive(true)
+        }
+        "systemSetTempValue" -> {
+            com.ismartcoding.plain.helpers.TempHelper.setValue(
+                params.getValue("key").jsonPrimitive.content, params.getValue("value").jsonPrimitive.content)
+            JsonPrimitive(true)
+        }
+        "systemRelaunchApp" -> {
+            com.ismartcoding.plain.lib.sendEvent(com.ismartcoding.plain.events.RestartAppEvent())
+            JsonPrimitive(true)
+        }
+        "systemUpdateDeviceName" -> {
+            val name = params.getValue("name").jsonPrimitive.content
+            com.ismartcoding.plain.preferences.UserPrefs.deviceName.value = name
+            com.ismartcoding.plain.TempData.deviceName.value = name
+            com.ismartcoding.plain.discover.MdnsDiscoverManager.updateAdvertisedService()
+            JsonPrimitive(true)
+        }
         else -> error("Unsupported provider operation")
     }
+}
+
+/** Log lines, newest first. A non-blank `text` filters the whole buffer
+ * before paging, so a search cannot be cut short by the page size; Rust
+ * passes `pathOnly` when it wants the log file path instead. */
+private suspend fun appLogFacts(params: JsonObject): JsonObject {
+    if (params["pathOnly"]?.jsonPrimitive?.boolean == true) {
+        return buildJsonObject {
+            put("path", JsonPrimitive(com.ismartcoding.plain.platform.getLatestLogFilePath()))
+            put("lines", JsonArray(emptyList()))
+        }
+    }
+    val offset = params.getValue("offset").jsonPrimitive.int
+    val limit = params.getValue("limit").jsonPrimitive.int
+    val text = params.getValue("query").jsonPrimitive.content.trim()
+    val lines = if (text.isEmpty()) {
+        com.ismartcoding.plain.platform.readLogLinesNewestFirst(offset, limit)
+    } else {
+        com.ismartcoding.plain.platform.readLogLinesNewestFirst(0, Int.MAX_VALUE)
+            .filter { it.contains(text, ignoreCase = true) }
+            .drop(offset.coerceAtLeast(0))
+            .take(limit.coerceAtLeast(0))
+    }
+    return buildJsonObject {
+        put("path", JsonPrimitive(com.ismartcoding.plain.platform.getLatestLogFilePath()))
+        put("lines", JsonArray(lines.map(::JsonPrimitive)))
+    }
+}
+
+/** The `App` contract row. Capabilities and permissions are named rather
+ * than encoded: both enums are the contract's own, so there is no mapping. */
+@OptIn(kotlin.io.encoding.ExperimentalEncodingApi::class)
+private suspend fun appFacts(): JsonObject = buildJsonObject {
+    put("clientId", JsonPrimitive(com.ismartcoding.plain.TempData.clientId))
+    put("urlToken", JsonPrimitive(kotlin.io.encoding.Base64.encode(com.ismartcoding.plain.TempData.urlToken)))
+    put("httpPort", JsonPrimitive(UserPrefs.httpPort.value))
+    put("httpsPort", JsonPrimitive(UserPrefs.httpsPort.value))
+    put("appDir", JsonPrimitive(com.ismartcoding.plain.platform.appDir()))
+    put("deviceName", JsonPrimitive(com.ismartcoding.plain.TempData.deviceName.value))
+    put("deviceType", JsonPrimitive(com.ismartcoding.plain.platform.getDeviceType().name))
+    put("capabilities", JsonArray(
+        com.ismartcoding.plain.platform.getDeviceCapabilities().map { JsonPrimitive(it.name) }))
+    put("buildChannel", JsonPrimitive(com.ismartcoding.plain.enums.AppChannelType
+        .fromString(com.ismartcoding.plain.buildChannel).name))
+    put("permissions", JsonArray(
+        com.ismartcoding.plain.features.getGrantedWebPermissionsAsync().map { JsonPrimitive(it.name) }))
+    put("downloadsDir", JsonPrimitive(com.ismartcoding.plain.platform.getDownloadsDirPath()))
+    put("developerMode", JsonPrimitive(UserPrefs.developerMode.value))
+    put("debug", JsonPrimitive(com.ismartcoding.plain.platform.isDebugBuild()))
 }
 
 /** The `File` contract row. `mediaId` stays an empty string for non-media
@@ -629,4 +747,99 @@ private suspend fun mediaTagFacts(params: JsonObject): JsonArray {
             }))
         }
     })
+}
+
+private suspend fun mergeStatusFacts(fileId: String): JsonObject {
+    val task = com.ismartcoding.plain.httpserver.mainschemas.MergeJobs.status(fileId)
+    return buildJsonObject {
+        put("status", JsonPrimitive(task.status.name))
+        put("value", task.value?.let(::JsonPrimitive) ?: JsonNull)
+        put("mergedSize", task.mergedSize?.let(::JsonPrimitive) ?: JsonNull)
+        put("error", task.error?.let(::JsonPrimitive) ?: JsonNull)
+    }
+}
+
+/** Starts the merge and returns immediately. The claim makes a repeated
+ * call idempotent, and the job table is what `mergeStatus` polls when the
+ * websocket result is lost. */
+private suspend fun startMerge(params: JsonObject, isAppFile: Boolean): JsonObject {
+    val fileId = params.getValue("fileId").jsonPrimitive.content
+    val totalChunks = params.getValue("totalChunks").jsonPrimitive.int
+    val totalSize = params.getValue("totalSize").jsonPrimitive.long
+    when (val claim = com.ismartcoding.plain.httpserver.mainschemas.MergeJobs.claim(fileId)) {
+        is com.ismartcoding.plain.httpserver.mainschemas.MergeClaim.AlreadyDone ->
+            return mergeStatusFacts(fileId)
+        com.ismartcoding.plain.httpserver.mainschemas.MergeClaim.InProgress ->
+            return buildJsonObject { put("status", JsonPrimitive("MERGING")) }
+        com.ismartcoding.plain.httpserver.mainschemas.MergeClaim.Claimed -> {}
+    }
+    if (com.ismartcoding.plain.platform.listUploadedChunks(fileId).isEmpty()) {
+        com.ismartcoding.plain.httpserver.mainschemas.MergeJobs.release(fileId)
+        error("No chunks found for $fileId")
+    }
+    com.ismartcoding.plain.lib.ChannelScope().launch {
+        val outcome = runCatching {
+            if (isAppFile) {
+                com.ismartcoding.plain.platform.mergeUploadedChunks(
+                    fileId, totalChunks,
+                    params.getValue("fileName").jsonPrimitive.content,
+                    replace = true, isAppFile = true, totalSize = totalSize,
+                )
+            } else {
+                com.ismartcoding.plain.platform.mergeUploadedChunks(
+                    fileId, totalChunks,
+                    params.getValue("path").jsonPrimitive.content,
+                    params.getValue("replace").jsonPrimitive.boolean,
+                    isAppFile = false, totalSize = totalSize,
+                )
+            }
+        }
+        val message = if (outcome.isSuccess) {
+            val reply = outcome.getOrThrow()
+            val idx = reply.lastIndexOf(':')
+            val value = if (idx > 0) reply.substring(0, idx) else reply
+            val size = if (idx > 0) reply.substring(idx + 1).toLongOrNull() ?: 0L else 0L
+            com.ismartcoding.plain.httpserver.mainschemas.MergeJobs.finish(fileId, value, size)
+            com.ismartcoding.plain.lib.sendEvent(com.ismartcoding.plain.events.WebSocketEvent(
+                com.ismartcoding.plain.events.EventType.UPLOAD_MERGE_RESULT,
+                JsonHelper.jsonEncode(com.ismartcoding.plain.events.UploadMergeResultData(
+                    fileId = fileId, ok = true, value = value, mergedSize = size)),
+            ))
+            null
+        } else {
+            val text = outcome.exceptionOrNull()?.message ?: "merge failed"
+            com.ismartcoding.plain.httpserver.mainschemas.MergeJobs.fail(fileId, text)
+            com.ismartcoding.plain.lib.sendEvent(com.ismartcoding.plain.events.WebSocketEvent(
+                com.ismartcoding.plain.events.EventType.UPLOAD_MERGE_RESULT,
+                JsonHelper.jsonEncode(com.ismartcoding.plain.events.UploadMergeResultData(
+                    fileId = fileId, ok = false, error = text)),
+            ))
+            text
+        }
+        if (message != null) error(message)
+    }
+    return buildJsonObject { put("status", JsonPrimitive("STARTED")) }
+}
+
+/** Each action resolves its own id source: a restore looks in the trash,
+ * a trash or a move looks in the live library, and only a delete has to
+ * ask whether the trash feature is on at all. */
+private suspend fun runMediaAction(params: JsonObject): JsonPrimitive {
+    val action = params.getValue("action").jsonPrimitive.content
+    val type = mediaDataType(params)
+    val query = params.getValue("query").jsonPrimitive.content
+    val destDir = params["destDir"]?.takeUnless { it is JsonNull }?.jsonPrimitive?.content ?: ""
+    val fromTrash = action == "delete" && com.ismartcoding.plain.enums.AppFeatureType.MEDIA_TRASH.has()
+    val ids = when {
+        action == "restore" -> com.ismartcoding.plain.platform.getTrashedMediaIds(type, query)
+        fromTrash -> com.ismartcoding.plain.platform.getTrashedMediaIds(type, query)
+        else -> com.ismartcoding.plain.platform.getMediaIds(type, query)
+    }
+    return JsonPrimitive(com.ismartcoding.plain.features.mediaactions.MediaActionHelper.run(
+        type,
+        com.ismartcoding.plain.features.mediaactions.MediaAction.valueOf(action.uppercase()),
+        ids,
+        fromTrash,
+        destDir,
+    ))
 }
