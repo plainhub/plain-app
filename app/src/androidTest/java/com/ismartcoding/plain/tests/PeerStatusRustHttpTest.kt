@@ -28,7 +28,7 @@ class PeerStatusRustHttpTest {
         val https = UserPrefs.httpsPort.value
         val client = createPeerStatusHttpClient()
         val tasks = mutableListOf<Job>()
-        suspend fun snapshot() = RustContentApi.postJson("chat/peer-status", buildJsonObject { put("action", "snapshot") }).getValue("result").jsonObject
+        suspend fun snapshot() = RustContentApi.postJsonOrThrow("chat/peer-status", buildJsonObject { put("action", "snapshot") }).getValue("result").jsonObject
         suspend fun waitState(online: Boolean, revision: Long = -1) = withTimeout(5000) {
             while (true) {
                 val row = snapshot()
@@ -78,9 +78,9 @@ class PeerStatusRustHttpTest {
             waitState(false)
             PeerStatusProjection.refresh()
             assertFalse(PeerStatusManager.isOnline(id))
-            RustContentApi.postJson("chat/peer-status", buildJsonObject { put("action", "stop") })
+            RustContentApi.postJsonOrThrow("chat/peer-status", buildJsonObject { put("action", "stop") })
             assertFalse(snapshot().getValue("outgoing").jsonObject.getValue("started").jsonPrimitive.boolean)
-            RustContentApi.postJson("chat/peer-status", buildJsonObject { put("action", "start") })
+            RustContentApi.postJsonOrThrow("chat/peer-status", buildJsonObject { put("action", "start") })
             assertTrue(snapshot().getValue("outgoing").jsonObject.getValue("started").jsonPrimitive.boolean)
             stopHttpEngineAsync()
             assertFalse(snapshot().getValue("outgoing").jsonObject.getValue("started").jsonPrimitive.boolean)

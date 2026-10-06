@@ -30,7 +30,7 @@ class MdnsRuntimeRustHttpTest {
     @OptIn(ExperimentalUuidApi::class)
     @Test
     fun rustControlsReceiverAndScannerWithActualAndroidMulticastPermission() = runBlocking {
-        suspend fun call(action: String) = RustContentApi.postJson("chat/mdns", buildJsonObject {
+        suspend fun call(action: String) = RustContentApi.postJsonOrThrow("chat/mdns", buildJsonObject {
             put("action", action)
         }).getValue("result").jsonObject
         val before = call("snapshot")

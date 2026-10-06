@@ -7,7 +7,7 @@ import kotlinx.serialization.json.*
 
 internal object RustChannelRuntime {
     suspend fun call(action: String, id: String? = null, fields: JsonObjectBuilder.() -> Unit = {}): JsonObject =
-        RustContentApi.postJson("chat/channel", buildJsonObject {
+        RustContentApi.postJsonOrThrow("chat/channel", buildJsonObject {
             put("action", action)
             id?.let { put("id", it) }
             fields()

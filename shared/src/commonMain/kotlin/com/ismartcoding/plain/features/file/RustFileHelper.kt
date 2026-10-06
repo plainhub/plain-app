@@ -17,17 +17,17 @@ object RustFileHelper {
     suspend fun count(query: String, root: String): Int = read(root, query, null, null, FileSortBy.NAME_ASC, countOnly = true).getValue("count").jsonPrimitive.int
 
     suspend fun rename(path: String, name: String): String? {
-        val value = RustContentApi.postJson("files/mutate", buildJsonObject { put("action", "rename"); put("path", path); put("name", name) }, longRunning = true).getValue("path")
+        val value = RustContentApi.postJsonOrThrow("files/mutate", buildJsonObject { put("action", "rename"); put("path", path); put("name", name) }, longRunning = true).getValue("path")
         return if (value is JsonNull) null else value.jsonPrimitive.content
     }
-    suspend fun delete(path: String): Boolean = RustContentApi.postJson("files/mutate", buildJsonObject { put("action", "delete"); put("path", path) }, longRunning = true).getValue("removed").jsonPrimitive.boolean
+    suspend fun delete(path: String): Boolean = RustContentApi.postJsonOrThrow("files/mutate", buildJsonObject { put("action", "delete"); put("path", path) }, longRunning = true).getValue("removed").jsonPrimitive.boolean
 
     suspend fun stat(path: String): DFile? {
-        val row = RustContentApi.postJson("files/stat", buildJsonObject { put("path", path) }).getValue("file")
+        val row = RustContentApi.postJsonOrThrow("files/stat", buildJsonObject { put("path", path) }).getValue("file")
         return if (row is JsonNull) null else decode(row.jsonObject)
     }
 
-    private suspend fun read(root: String, query: String, text: String?, showHidden: Boolean?, sortBy: FileSortBy, offset: Int = 0, limit: Int? = null, countOnly: Boolean = false): JsonObject = RustContentApi.postJson("files/read", buildJsonObject {
+    private suspend fun read(root: String, query: String, text: String?, showHidden: Boolean?, sortBy: FileSortBy, offset: Int = 0, limit: Int? = null, countOnly: Boolean = false): JsonObject = RustContentApi.postJsonOrThrow("files/read", buildJsonObject {
         put("root", root)
         put("query", query)
         put("text", text?.let(::JsonPrimitive) ?: JsonNull)
@@ -39,7 +39,7 @@ object RustFileHelper {
     }, longRunning = true)
 
     private suspend fun write(action: String, path: String, content: String = "", overwrite: Boolean = false): DFile {
-        val row = RustContentApi.postJson("files/write", buildJsonObject {
+        val row = RustContentApi.postJsonOrThrow("files/write", buildJsonObject {
             put("action", action)
             put("path", if (path.startsWith("file://")) Url(path).encodedPath.decodeURLPart() else path)
             if (action == "writeText") { put("content", content); put("overwrite", overwrite) }

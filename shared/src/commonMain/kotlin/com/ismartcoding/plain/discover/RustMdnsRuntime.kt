@@ -74,7 +74,7 @@ object RustMdnsRuntime {
     suspend fun debugStart(token: String) = enqueue("debugStart", token = token).await()
     fun debugStop(token: String) { enqueue("debugStop", token = token) }
     suspend fun snapshot(): JsonObject = call(buildJsonObject { put("action", "snapshot") }).also { apply(it) }
-    private suspend fun call(body: JsonObject) = RustContentApi.postJson("chat/mdns", body).getValue("result").jsonObject
+    private suspend fun call(body: JsonObject) = RustContentApi.postJsonOrThrow("chat/mdns", body).getValue("result").jsonObject
 
     private suspend fun apply(row: JsonObject) = projection.withLock {
         val revision = row.getValue("revision").jsonPrimitive.long

@@ -8,7 +8,7 @@ import kotlinx.serialization.json.*
 class HttpServiceHandler : BleServiceHandler {
     override val charUuid: String = BleUuids.HTTP_CHAR_UUID
     override suspend fun handleRequest(requestData: BleRequestData, clientMac: String): String =
-        RustContentApi.postJson("chat/ble-http", buildJsonObject {
+        RustContentApi.postJsonOrThrow("chat/ble-http", buildJsonObject {
             put("body", requestData.body)
             put("remote_host", clientMac)
             put("headers", JsonObject(requestData.headers.mapValues { JsonPrimitive(it.value) }))

@@ -83,5 +83,5 @@ object SharedLinkClient {
         }
     }
 
-    private suspend fun call(body: JsonObject): JsonElement = RustContentApi.postJson("shares/client", body, longRunning = true).getValue("result")
+    private suspend fun call(body: JsonObject): JsonElement = RustContentApi.postJsonOrThrow("shares/client", body, longRunning = true).getValue("result")
 }

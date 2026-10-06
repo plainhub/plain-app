@@ -13,7 +13,7 @@ import kotlinx.serialization.json.*
 object RustContactWriter {
     private suspend fun call(action: String, params: JsonObject): JsonObject {
         val request = JsonObject(params + ("action" to JsonPrimitive(action)))
-        return RustContentApi.postJson("system/contact-write", request)
+        return RustContentApi.postJsonOrThrow("system/contact-write", request)
     }
 
     suspend fun create(input: ContactInput): String =

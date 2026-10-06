@@ -27,7 +27,7 @@ class PeerPrewarmNearbyRustHttpTest {
         val id = "synthetic-prewarm-${UUID.randomUUID()}"
         try {
             RustPeerStore.insert(DPeer(id = id, name = id))
-            assertTrue(RustContentApi.postJson("chat/prewarm", buildJsonObject { put("id", id) }).getValue("result") is JsonNull)
+            assertTrue(RustContentApi.postJsonOrThrow("chat/prewarm", buildJsonObject { put("id", id) }).getValue("result") is JsonNull)
             val caps = PeerTransportHost.handle("peerTransportPrewarmCapabilities", buildJsonObject {}).jsonObject
             assertEquals(isBleReady(), caps.getValue("bleReady").jsonPrimitive.boolean)
             assertEquals(isWifiAwareSupported, caps.getValue("awareSupported").jsonPrimitive.boolean)

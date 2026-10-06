@@ -7,7 +7,7 @@ import kotlinx.serialization.json.*
 
 object RustSmsQuery {
     private suspend fun call(action: String, params: JsonObjectBuilder.() -> Unit = {}): JsonObject =
-        RustContentApi.postJson("system/sms", buildJsonObject {
+        RustContentApi.postJsonOrThrow("system/sms", buildJsonObject {
             put("action", action)
             params()
         })

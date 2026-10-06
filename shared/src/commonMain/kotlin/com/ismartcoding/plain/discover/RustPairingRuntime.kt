@@ -46,5 +46,5 @@ object RustPairingRuntime {
     suspend fun respond(request: DPairingRequest, accepted: Boolean) = call(buildJsonObject {
         put("action", "respond"); put("request", Json.parseToJsonElement(JsonHelper.jsonEncode(request))); put("accepted", accepted); put("device", RustPairingStore.deviceFacts())
     })
-    private suspend fun call(body: JsonObject) = RustContentApi.postJson("chat/pairing", body, longRunning = true).getValue("result")
+    private suspend fun call(body: JsonObject) = RustContentApi.postJsonOrThrow("chat/pairing", body, longRunning = true).getValue("result")
 }

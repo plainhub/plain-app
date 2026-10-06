@@ -11,7 +11,7 @@ object PeerTransportProjection {
     private val lock = Mutex()
 
     suspend fun refresh() = lock.withLock {
-        val active = RustContentApi.postJson("chat/transport", buildJsonObject { put("action", "snapshotTransfers") }).getValue("result").jsonObject
+        val active = RustContentApi.postJsonOrThrow("chat/transport", buildJsonObject { put("action", "snapshotTransfers") }).getValue("result").jsonObject
         PeerCacher.currentTransportMap.value = active.mapValues { (_, kind) -> PeerTransportType.valueOf(kind.jsonPrimitive.content) }
     }
 }

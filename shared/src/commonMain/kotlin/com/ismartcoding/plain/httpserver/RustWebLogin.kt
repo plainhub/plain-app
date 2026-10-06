@@ -26,7 +26,12 @@ object RustWebLogin {
             put("clientId", JsonPrimitive(clientId))
             put("clientIp", JsonPrimitive(clientIp))
             put("request", Json.parseToJsonElement(jsonEncode(request)))
-        })
+        }).getOrElse { error ->
+            // Rate limits, revoked sessions and ECDH failures arrive as
+            // refusals; the app must show them, not die from the exception.
+            LogCat.e("ws: Rust refused the login \"$action\": ${error.message}")
+            return JsonObject(emptyMap())
+        }
 
     /**
      * First leg. Returns the Rust-issued token when the login is complete
@@ -36,11 +41,13 @@ object RustWebLogin {
         val result = call("issue", clientId, clientIp, request)
         val status = result["status"]?.jsonPrimitive?.content ?: STATUS_PENDING
         if (status != STATUS_COMPLETED) return RustLoginResult(STATUS_PENDING, "", "")
-        return RustLoginResult(
-            STATUS_COMPLETED,
-            result.getValue("token").jsonPrimitive.content,
-            result.getValue("response").toString(),
-        )
+        val token = result["token"]?.jsonPrimitive?.content
+        val response = result["response"]
+        if (token.isNullOrEmpty() || response == null) {
+            LogCat.e("ws: Rust completed the login without a token payload")
+            return RustLoginResult(STATUS_PENDING, "", "")
+        }
+        return RustLoginResult(STATUS_COMPLETED, token, response.toString())
     }
 
     /**
@@ -55,11 +62,13 @@ object RustWebLogin {
             LogCat.e("ws: login completion refused by Rust (${result["status"]})")
             return@withIO RustLoginResult("", "", "")
         }
-        RustLoginResult(
-            STATUS_COMPLETED,
-            result.getValue("token").jsonPrimitive.content,
-            result.getValue("response").toString(),
-        )
+        val token = result["token"]?.jsonPrimitive?.content
+        val response = result["response"]
+        if (token.isNullOrEmpty() || response == null) {
+            LogCat.e("ws: Rust completed the login without a token payload")
+            return@withIO RustLoginResult("", "", "")
+        }
+        RustLoginResult(STATUS_COMPLETED, token, response.toString())
     }
 
 }

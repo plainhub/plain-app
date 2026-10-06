@@ -43,7 +43,7 @@ object RustNearbyDevices {
         }
     }
 
-    private suspend fun call(body: JsonObject) = RustContentApi.postJson("chat/nearby-devices", body).getValue("result").jsonObject
+    private suspend fun call(body: JsonObject) = RustContentApi.postJsonOrThrow("chat/nearby-devices", body).getValue("result").jsonObject
 
     private fun apply(snapshot: JsonObject) {
         val next = snapshot["revision"]?.jsonPrimitive?.long ?: return

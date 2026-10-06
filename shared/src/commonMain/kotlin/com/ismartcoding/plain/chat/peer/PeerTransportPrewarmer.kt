@@ -11,7 +11,7 @@ object PeerTransportPrewarmer {
     fun prewarm(peerId: String) {
         scope.launch {
             try {
-                RustContentApi.postJson("chat/prewarm", buildJsonObject { put("id", peerId) }, longRunning = true)
+                RustContentApi.postJsonOrThrow("chat/prewarm", buildJsonObject { put("id", peerId) }, longRunning = true)
             } catch (cancelled: CancellationException) { throw cancelled }
             catch (error: Exception) { LogCat.e("Peer prewarm", error) }
         }

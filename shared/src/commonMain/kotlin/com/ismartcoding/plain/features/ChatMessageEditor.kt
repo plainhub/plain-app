@@ -8,7 +8,7 @@ import kotlinx.serialization.json.*
 
 object ChatMessageEditor {
     suspend fun updateTextAsync(item: DChat, newText: String): Boolean {
-        val result = RustContentApi.postJson("chat/link-preview", buildJsonObject {
+        val result = RustContentApi.postJsonOrThrow("chat/link-preview", buildJsonObject {
             put("action", "edit"); put("id", item.id); put("text", newText)
         }).getValue("result").jsonObject
         val current = RustChatStore.decode(result.getValue("chat"))

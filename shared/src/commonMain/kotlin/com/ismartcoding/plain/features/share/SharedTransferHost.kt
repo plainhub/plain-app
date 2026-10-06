@@ -117,7 +117,7 @@ object SharedTransferHost {
         }
     }
     private suspend fun call(params: JsonObject, action: String, body: JsonObjectBuilder.() -> Unit): JsonElement =
-        RustContentApi.postJson("shares/batch", buildJsonObject {
+        RustContentApi.postJsonOrThrow("shares/batch", buildJsonObject {
             put("action", action); put("id", params.getValue("id")); put("generation", params.getValue("generation")); put("ticket", params.getValue("ticket")); body()
         }, longRunning = true).getValue("result")
 }

@@ -41,7 +41,7 @@ class PeerLanRustHttpTest {
             val timestamp = System.currentTimeMillis()
             val document = """{"query":"query { __typename }","variables":{}}"""
             val signature = Base64.encode(SignatureHelper.signDataAsync("$timestamp$document".encodeToByteArray()))
-            val result = RustContentApi.postJson("chat/transport", buildJsonObject {
+            val result = RustContentApi.postJsonOrThrow("chat/transport", buildJsonObject {
                 put("action", "send"); put("id", id); put("channel_id", "")
                 put("key", Base64.encode(key)); put("body", "$signature|$timestamp|$document")
             }, longRunning = true).getValue("result").jsonObject

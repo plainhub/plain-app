@@ -23,7 +23,7 @@ object FileTaskHelper {
         }
     }
     suspend fun recover(id: String): DFileTask {
-        RustContentApi.postJson("files/mutate", buildJsonObject { put("action", "recover"); put("clientId", clientId); put("id", id) }, longRunning = true)
+        RustContentApi.postJsonOrThrow("files/mutate", buildJsonObject { put("action", "recover"); put("clientId", clientId); put("id", id) }, longRunning = true)
         return wait(id)
     }
     suspend fun execute(type: FileTaskType, ops: List<FileTaskOp>): DFileTask {

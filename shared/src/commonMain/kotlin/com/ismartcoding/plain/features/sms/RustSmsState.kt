@@ -7,7 +7,7 @@ import kotlinx.serialization.json.*
 
 object RustSmsState {
     private suspend fun call(action: String, build: JsonObjectBuilder.() -> Unit = {}): JsonObject =
-        RustContentApi.postJson("system/sms-state", buildJsonObject { put("action", action); build() })
+        RustContentApi.postJsonOrThrow("system/sms-state", buildJsonObject { put("action", action); build() })
 
     suspend fun archives(): List<DArchivedConversation> = call("archives").getValue("items").jsonArray.map {
         val row = it.jsonObject

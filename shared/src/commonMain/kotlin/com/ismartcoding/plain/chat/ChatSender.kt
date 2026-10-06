@@ -15,7 +15,7 @@ object ChatSender {
     }
 
     private suspend fun deliver(item: DChat, peerIds: List<String>?) {
-        val result = RustContentApi.postJson("chat/send", buildJsonObject {
+        val result = RustContentApi.postJsonOrThrow("chat/send", buildJsonObject {
             put("id", item.id)
             put("recipients", peerIds?.let { JsonArray(it.map(::JsonPrimitive)) } ?: JsonNull)
         }, longRunning = true).getValue("result").jsonObject

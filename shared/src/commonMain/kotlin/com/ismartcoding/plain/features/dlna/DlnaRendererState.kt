@@ -49,7 +49,7 @@ object DlnaRendererState {
     private const val POSITION_PUSH_INTERVAL_MS = 2000L
 
     private suspend fun command(body: JsonObject) = RustContentApi
-        .postJson("dlna/receiver", body)
+        .postJsonOrThrow("dlna/receiver", body)
         .getValue("result")
         .jsonObject
         .let { apply(it) }

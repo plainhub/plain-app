@@ -7,7 +7,7 @@ import com.ismartcoding.plain.lib.mdns.MdnsServiceInfo
 import kotlinx.serialization.json.*
 
 object RustDiscoveryAdvertisement {
-    private suspend fun call(action: String) = RustContentApi.postJson("chat/discovery", buildJsonObject { put("action", action) }).getValue("result")
+    private suspend fun call(action: String) = RustContentApi.postJsonOrThrow("chat/discovery", buildJsonObject { put("action", action) }).getValue("result")
     suspend fun replyJson() = call("reply")
     suspend fun reply(): DDiscoverReply = JsonHelper.jsonDecode(replyJson().toString())
     suspend fun ble(): ByteArray = Base64Lenient.decode(call("ble").jsonPrimitive.content)

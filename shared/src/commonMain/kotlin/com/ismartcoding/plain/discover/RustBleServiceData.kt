@@ -5,7 +5,7 @@ import com.ismartcoding.plain.ble.BleServiceData
 import kotlinx.serialization.json.*
 
 object RustBleServiceData {
-    private suspend fun call(body: JsonObject) = RustContentApi.postJson("chat/discovery", body).getValue("result")
+    private suspend fun call(body: JsonObject) = RustContentApi.postJsonOrThrow("chat/discovery", body).getValue("result")
     suspend fun decode(data: ByteArray?): BleServiceData.Parts? {
         val row = call(buildJsonObject {
             put("action", "bleDecode")

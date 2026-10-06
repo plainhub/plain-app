@@ -68,7 +68,7 @@ class MessageLifecycleRustHttpTest {
             val second = manager.insertFilesImmediate(local, listOf(file), false).also { chats += it.id }
             val imported = file.copy(uri = com.ismartcoding.plain.helpers.AppFileStore.toFidUri(owned))
             val json = kotlinx.serialization.json.Json { encodeDefaults = true }
-            val response = com.ismartcoding.plain.api.RustContentApi.postJson("chat/service", kotlinx.serialization.json.buildJsonObject {
+            val response = com.ismartcoding.plain.api.RustContentApi.postJsonOrThrow("chat/service", kotlinx.serialization.json.buildJsonObject {
                 put("action", kotlinx.serialization.json.JsonPrimitive("replaceFilesMany"))
                 put("ids", kotlinx.serialization.json.JsonArray(chats.map { kotlinx.serialization.json.JsonPrimitive(it) }))
                 put("items", json.parseToJsonElement(json.encodeToString(kotlinx.serialization.builtins.ListSerializer(DMessageFile.serializer()), listOf(imported))))

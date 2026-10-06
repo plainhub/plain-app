@@ -34,5 +34,5 @@ object RustNearbyWire {
     } catch (cancelled: CancellationException) { throw cancelled }
     catch (_: Exception) { null }
 
-    private suspend fun call(body: JsonObject) = RustContentApi.postJson("chat/nearby", body).getValue("result")
+    private suspend fun call(body: JsonObject) = RustContentApi.postJsonOrThrow("chat/nearby", body).getValue("result")
 }

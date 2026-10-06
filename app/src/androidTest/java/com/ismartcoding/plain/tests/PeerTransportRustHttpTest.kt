@@ -20,7 +20,7 @@ class PeerTransportRustHttpTest {
     fun rustSharesCircuitStateForSendsAndDownloadsAndRejectsLateReceipts() = runBlocking {
         val id = "synthetic-peer-transport-${UUID.randomUUID()}"
         val peer = DPeer(id = id, name = id)
-        suspend fun call(body: JsonObject) = RustContentApi.postJson("chat/transport", body).getValue("result")
+        suspend fun call(body: JsonObject) = RustContentApi.postJsonOrThrow("chat/transport", body).getValue("result")
         suspend fun begin(types: List<String>) = call(buildJsonObject {
             put("action", "beginDownload"); put("id", id); put("available", JsonArray(types.map(::JsonPrimitive)))
         }).jsonObject

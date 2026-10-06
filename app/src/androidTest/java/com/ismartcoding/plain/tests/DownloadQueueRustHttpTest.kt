@@ -25,8 +25,8 @@ class DownloadQueueRustHttpTest {
         val file = DMessageFile(id = "$id-file", uri = "fsid:$id-source", fileName = "fixture.txt", size = 3)
         val peer = DPeer(id = id, name = id)
         val chat = DChat(id = id, fromId = id, toId = "me", content = DMessageContent(MessageType.FILES, DMessageFiles(listOf(file))))
-        suspend fun transport(body: JsonObject) = RustContentApi.postJson("chat/transport", body).getValue("result")
-        suspend fun queue(body: JsonObject) = RustContentApi.postJson("chat/download", body).getValue("result")
+        suspend fun transport(body: JsonObject) = RustContentApi.postJsonOrThrow("chat/transport", body).getValue("result")
+        suspend fun queue(body: JsonObject) = RustContentApi.postJsonOrThrow("chat/download", body).getValue("result")
         suspend fun snapshot() = queue(buildJsonObject { put("action", "snapshot") }).jsonObject.getValue("tasks").jsonArray.firstOrNull { it.jsonObject.getValue("id").jsonPrimitive.content == file.id }?.jsonObject
         try {
             RustPeerStore.insert(peer)
@@ -110,7 +110,7 @@ class DownloadQueueRustHttpTest {
                 while (DownloadQueue.downloadProgress.value.containsKey(fileId) || DownloadCenter.progress.value.containsKey(fileId)) delay(20)
             }
         } finally {
-            RustContentApi.postJson("chat/download", buildJsonObject { put("action", "control"); put("id", fileId); put("command", "remove") })
+            RustContentApi.postJsonOrThrow("chat/download", buildJsonObject { put("action", "control"); put("id", fileId); put("command", "remove") })
             DownloadQueue.refresh()
             RustChatStore.delete(id)
             hash?.let { value -> while (com.ismartcoding.plain.helpers.AppFileStore.getById(value) != null) com.ismartcoding.plain.helpers.AppFileStore.release(value) }

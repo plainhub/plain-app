@@ -10,7 +10,7 @@ object PeerStatusProjection {
     private val lock = Mutex()
 
     suspend fun refresh(payload: String? = null) = lock.withLock {
-        val row = RustContentApi.postJson("chat/peer-status", buildJsonObject { put("action", "snapshot") }).getValue("result").jsonObject
+        val row = RustContentApi.postJsonOrThrow("chat/peer-status", buildJsonObject { put("action", "snapshot") }).getValue("result").jsonObject
         val event = payload?.let { Json.parseToJsonElement(it).jsonObject }
         if (event != null && event["runtimeId"] != row["runtimeId"]) return@withLock
         val online = row.getValue("online").jsonArray.map { it.jsonPrimitive.content }.toSet()

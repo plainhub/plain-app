@@ -74,5 +74,5 @@ object SharedFolderDownloadEngine {
         }
         DownloadCenter.replaceExternal(DOWNLOAD_KIND_SHARE, tasks)
     }
-    private suspend fun call(body: JsonObject): JsonElement = RustContentApi.postJson("shares/batch", body, longRunning = true).getValue("result")
+    private suspend fun call(body: JsonObject): JsonElement = RustContentApi.postJsonOrThrow("shares/batch", body, longRunning = true).getValue("result")
 }

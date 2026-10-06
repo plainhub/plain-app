@@ -13,6 +13,9 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.serialization.json.*
 
+/** A refusal or transport failure from the local Rust core. */
+class RustApiException(message: String, cause: Throwable? = null) : Exception(message, cause)
+
 object RustContentApi {
     private val lock = PlatformLock()
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
@@ -52,15 +55,36 @@ object RustContentApi {
         }
     }
 
-    suspend fun postJson(path: String, body: JsonObject, longRunning: Boolean = false): JsonObject {
+    /**
+     * Posts a JSON-RPC style body to the local Rust core.
+     *
+     * Rust refusals (login rate limits, revoked sessions, failed ECDH, internal
+     * errors) are returned as [Result.failure] rather than thrown: several
+     * callers run on the UI path, where an [IllegalStateException] from `check`
+     * used to crash the app instead of surfacing the refusal. Callers that
+     * already expect a refusal should unwrap with a message.
+     */
+    suspend fun postJson(path: String, body: JsonObject, longRunning: Boolean = false): Result<JsonObject> {
         start()
         val target = checkNotNull(localSession)
         return (if (longRunning) transferClient else client).postText("${target.baseUrl}/$path", body.toString(), "application/json", target.headers()).use {
-            val result = Json.parseToJsonElement(it.bodyAsText()).jsonObject
-            check(it.isOk()) { result["error"]?.jsonPrimitive?.content ?: "Rust API returned HTTP ${it.status}" }
-            result
+            val result = runCatching { Json.parseToJsonElement(it.bodyAsText()).jsonObject }
+                .getOrElse { error -> return Result.failure(RustApiException("Rust API returned an unreadable body", error)) }
+            if (!it.isOk()) {
+                val message = result["error"]?.jsonPrimitive?.contentOrNull ?: "Rust API returned HTTP ${it.status}"
+                return Result.failure(RustApiException(message))
+            }
+            Result.success(result)
         }
     }
+
+    /**
+     * Convenience for callers that treat a Rust refusal as a programming error
+     * (background workers, tests). UI paths should use [postJson] and handle
+     * the failure, so a refusal cannot crash the app.
+     */
+    suspend fun postJsonOrThrow(path: String, body: JsonObject, longRunning: Boolean = false): JsonObject =
+        postJson(path, body, longRunning).getOrThrow()
 
     suspend fun postStream(path: String, body: JsonObject): PlainResponse {
         start()

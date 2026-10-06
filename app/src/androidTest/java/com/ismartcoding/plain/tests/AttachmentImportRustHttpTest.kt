@@ -15,7 +15,7 @@ import java.util.UUID
 
 @RunWith(AndroidJUnit4::class)
 class AttachmentImportRustHttpTest {
-    private suspend fun call(body: JsonObject) = RustContentApi.postJson("chat/attachment", body).getValue("result")
+    private suspend fun call(body: JsonObject) = RustContentApi.postJsonOrThrow("chat/attachment", body).getValue("result")
     private suspend fun begin(chat: String, file: DMessageFile) = call(buildJsonObject {
         put("action", "begin"); put("message_id", chat); put("id", file.id); put("uri", file.uri)
     }).jsonObject

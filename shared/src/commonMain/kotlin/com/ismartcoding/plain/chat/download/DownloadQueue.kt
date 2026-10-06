@@ -84,5 +84,5 @@ object DownloadQueue {
         DownloadCenter.replaceExternal(DOWNLOAD_KIND_CHAT, tasks.values.toList())
     }
     private suspend fun call(body: JsonObject): JsonElement =
-        RustContentApi.postJson("chat/download", body, longRunning = true).getValue("result")
+        RustContentApi.postJsonOrThrow("chat/download", body, longRunning = true).getValue("result")
 }

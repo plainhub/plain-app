@@ -11,17 +11,17 @@ import kotlinx.serialization.json.*
 
 object RustSystemProviders {
     suspend fun permissionsAllowed(permissions: Collection<String>, requireGranted: Boolean = false): Boolean =
-        RustContentApi.postJson("system/permissions", buildJsonObject {
+        RustContentApi.postJsonOrThrow("system/permissions", buildJsonObject {
             put("permissions", JsonArray(permissions.map(::JsonPrimitive)))
             put("requireGranted", requireGranted)
         }).getValue("allowed").jsonPrimitive.boolean
 
     private suspend fun call(action: String, query: String, offset: Int = 0, limit: Int = 0, sortBy: FileSortBy = FileSortBy.NAME_ASC): JsonObject =
-        RustContentApi.postJson("system/providers", buildJsonObject {
+        RustContentApi.postJsonOrThrow("system/providers", buildJsonObject {
             put("action", action); put("query", query); put("offset", offset); put("limit", limit); put("sortBy", sortBy.name)
         })
     suspend fun providerWhere(provider: com.ismartcoding.plain.enums.DataType, query: String, resolvedParentId: String? = null): com.ismartcoding.plain.helpers.ContentWhere {
-        val result = RustContentApi.postJson("system/provider-plan", buildJsonObject {
+        val result = RustContentApi.postJsonOrThrow("system/provider-plan", buildJsonObject {
             put("provider", provider.name); put("query", query)
             resolvedParentId?.let { put("resolvedParentId", it) }
         })
@@ -35,7 +35,7 @@ object RustSystemProviders {
         }
     }
     suspend fun providerWheres(provider: com.ismartcoding.plain.enums.DataType, query: String): List<com.ismartcoding.plain.helpers.ContentWhere> {
-        val result = RustContentApi.postJson("system/provider-plan", buildJsonObject { put("provider", provider.name); put("query", query) })
+        val result = RustContentApi.postJsonOrThrow("system/provider-plan", buildJsonObject { put("provider", provider.name); put("query", query) })
         val clauses = result.getValue("clauses").jsonArray.map { it.jsonPrimitive.content }
         val args = result.getValue("args").jsonArray.map { it.jsonPrimitive.content }
         val column = result["idsColumn"]?.jsonPrimitive?.content
@@ -49,23 +49,23 @@ object RustSystemProviders {
         } }
     }
     suspend fun deleteRecords(provider: com.ismartcoding.plain.enums.DataType, ids: Collection<String>): Int =
-        RustContentApi.postJson("system/provider-delete", buildJsonObject { put("provider", provider.name); put("ids", JsonArray(ids.map(::JsonPrimitive))) }).getValue("count").jsonPrimitive.int
+        RustContentApi.postJsonOrThrow("system/provider-delete", buildJsonObject { put("provider", provider.name); put("ids", JsonArray(ids.map(::JsonPrimitive))) }).getValue("count").jsonPrimitive.int
     suspend fun packages(query: String, limit: Int, offset: Int, sortBy: FileSortBy): List<DPackageInfo> =
         JsonHelper.jsonDecode(call("packages", query, offset, limit, sortBy).getValue("items").toString())
     suspend fun packageCount(query: String): Int = call("packageCount", query).getValue("count").jsonPrimitive.int
     suspend fun notifications(query: String, offset: Int, limit: Int): List<DNotification> =
         JsonHelper.jsonDecode(call("notifications", query, offset, limit).getValue("items").toString())
-    suspend fun deleteNotifications(ids: List<String>): Int = RustContentApi.postJson("system/notification", buildJsonObject {
+    suspend fun deleteNotifications(ids: List<String>): Int = RustContentApi.postJsonOrThrow("system/notification", buildJsonObject {
         put("action", "delete"); put("ids", JsonArray(ids.map(::JsonPrimitive)))
     }).getValue("count").jsonPrimitive.int
-    suspend fun replyNotification(id: String, actionIndex: Int, text: String): Boolean = RustContentApi.postJson("system/notification", buildJsonObject {
+    suspend fun replyNotification(id: String, actionIndex: Int, text: String): Boolean = RustContentApi.postJsonOrThrow("system/notification", buildJsonObject {
         put("action", "reply"); put("id", id); put("actionIndex", actionIndex); put("text", text)
     }).getValue("ok").jsonPrimitive.boolean
     suspend fun notificationCount(query: String): Int = call("notificationCount", query).getValue("count").jsonPrimitive.int
 
     suspend fun mediaBuckets(dataType: DataType): List<DMediaBucket> {
         val facts = com.ismartcoding.plain.platform.mediaBucketItemFacts(dataType)
-        val response = RustContentApi.postJson("system/media-buckets", buildJsonObject {
+        val response = RustContentApi.postJsonOrThrow("system/media-buckets", buildJsonObject {
             put("dataType", dataType.name)
             put("items", Json.parseToJsonElement(JsonHelper.jsonEncode(facts)))
         })

@@ -73,5 +73,5 @@ internal object RustChatService {
     suspend fun clear(target: ChatTarget) { call("clear") { put("target", target.encodedToId) } }
 
     private suspend fun call(action: String, fields: JsonObjectBuilder.() -> Unit): JsonElement =
-        RustContentApi.postJson("chat/service", buildJsonObject { put("action", action); fields() }, longRunning = true).getValue("result")
+        RustContentApi.postJsonOrThrow("chat/service", buildJsonObject { put("action", action); fields() }, longRunning = true).getValue("result")
 }

@@ -20,5 +20,5 @@ object PeerTransportRouter {
         return GraphQLResponseParser.parse(response.toString())
     }
 
-    private suspend fun call(body: JsonObject): JsonElement = RustContentApi.postJson("chat/transport", body, longRunning = true).getValue("result")
+    private suspend fun call(body: JsonObject): JsonElement = RustContentApi.postJsonOrThrow("chat/transport", body, longRunning = true).getValue("result")
 }

@@ -20,7 +20,7 @@ object PeerStatusManager {
         coIO {
             for (action in commands) {
                 try {
-                    RustContentApi.postJson("chat/peer-status", buildJsonObject { put("action", action) })
+                    RustContentApi.postJsonOrThrow("chat/peer-status", buildJsonObject { put("action", action) })
                     PeerStatusProjection.refresh()
                 } catch (cancelled: CancellationException) { throw cancelled }
                 catch (error: Exception) { LogCat.e("Rust peer status control", error) }

@@ -11,7 +11,7 @@ object RustSmsSender {
         clientId: String?,
         clientRequestId: String?,
     ) {
-        RustContentApi.postJson("system/sms-send", buildJsonObject {
+        RustContentApi.postJsonOrThrow("system/sms-send", buildJsonObject {
             put("number", number)
             put("body", body)
             put("subscriptionId", subscriptionId?.let(::JsonPrimitive) ?: JsonNull)

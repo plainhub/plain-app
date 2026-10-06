@@ -113,7 +113,7 @@ class SharedClientRustHttpTest {
                 SharedFolderDownloadEngine.refresh()
                 assertEquals(DownloadStatus.COMPLETED, DownloadCenter.get(sync.getValue("id").jsonPrimitive.content)!!.status)
                 val batchJson = Json { encodeDefaults = true }
-                RustContentApi.postJson("shares/batch", buildJsonObject {
+                RustContentApi.postJsonOrThrow("shares/batch", buildJsonObject {
                     put("action", "enqueue"); put("intent", buildJsonObject {
                         put("message_id", messageId); put("kind", "ZIP"); put("link", batchJson.encodeToJsonElement(result.link))
                         put("url_token", result.info.urlToken); put("entries", batchJson.encodeToJsonElement(listOf(rootEntry)))
@@ -140,9 +140,9 @@ class SharedClientRustHttpTest {
                 assertEquals(1, retried.getValue("doneFiles").jsonPrimitive.int)
                 assertArrayEquals(file.readBytes(), File(blocked, file.name).readBytes())
             } finally {
-                val tasks = RustContentApi.postJson("shares/batch", buildJsonObject { put("action", "snapshot") }).getValue("result").jsonObject.getValue("tasks").jsonArray
+                val tasks = RustContentApi.postJsonOrThrow("shares/batch", buildJsonObject { put("action", "snapshot") }).getValue("result").jsonObject.getValue("tasks").jsonArray
                 tasks.filter { it.jsonObject.getValue("messageId").jsonPrimitive.content == messageId }.forEach { task ->
-                    RustContentApi.postJson("shares/batch", buildJsonObject { put("action", "control"); put("id", task.jsonObject.getValue("id")); put("command", "remove") })
+                    RustContentApi.postJsonOrThrow("shares/batch", buildJsonObject { put("action", "control"); put("id", task.jsonObject.getValue("id")); put("command", "remove") })
                 }
                 batchOutput.deleteRecursively()
             }
@@ -163,7 +163,7 @@ class SharedClientRustHttpTest {
     }
     private suspend fun awaitBatch(messageId: String, kind: ShareBatchType, expected: String? = null): JsonObject = withTimeout(30_000) {
         while (true) {
-            val tasks = RustContentApi.postJson("shares/batch", buildJsonObject { put("action", "snapshot") }).getValue("result").jsonObject.getValue("tasks").jsonArray
+            val tasks = RustContentApi.postJsonOrThrow("shares/batch", buildJsonObject { put("action", "snapshot") }).getValue("result").jsonObject.getValue("tasks").jsonArray
             val row = tasks.map { it.jsonObject }.firstOrNull { it.getValue("messageId").jsonPrimitive.content == messageId && it.getValue("type").jsonPrimitive.content == kind.name }
             if (row != null) {
                 val status = row.getValue("status").jsonPrimitive.content

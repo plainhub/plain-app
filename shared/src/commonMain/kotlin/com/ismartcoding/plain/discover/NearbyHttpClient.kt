@@ -18,7 +18,7 @@ object NearbyHttpClient {
         })
 
     private suspend fun call(body: JsonObject): Boolean = try {
-        RustContentApi.postJson("chat/nearby", body).getValue("result").jsonPrimitive.boolean
+        RustContentApi.postJsonOrThrow("chat/nearby", body).getValue("result").jsonPrimitive.boolean
     } catch (cancelled: CancellationException) { throw cancelled }
     catch (_: Exception) { false }
 }
