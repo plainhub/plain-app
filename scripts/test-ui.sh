@@ -41,27 +41,24 @@ crashes() {
 }
 
 PID=$(adb -s "$DEV" shell pidof "$PACKAGE" | tr -d '\r' | awk '{print $1}')
-say "device=$DEV package=$PACKAGE pid=${PID:-none}"
+say "device=$DEV package=$PACKAGE pid-before=${PID:-none}"
 
 # The prefs file is the ground truth for what the app persisted. Reading it is
 # the only way to catch a format change that would otherwise stay invisible
 # until a remote peer fails to verify a signature.
 head1 "device identity"
 PREFS=$(adb -s "$DEV" shell "run-as $PACKAGE cat files/system_prefs.json" 2>/dev/null | tr -d '\r')
-SKP=$(printf '%s' "$PREFS" | grep -o '"signature_key_pair"[[:space:]]*:[[:space:]]*"[^"]*"' | head -1)
+SKP=$(printf '%s' "$PREFS" | grep -o '"signature_key_pair".*' | head -1)
 if [ -z "$SKP" ]; then
   case_fail "signature_key_pair_stored" "signature_key_pair missing from system_prefs.json"
+elif ! printf '%s' "$SKP" | grep -q 'publicKey'; then
+  # The value is a bare string, not the {"privateKey","publicKey"} object the
+  # pairing and login code both parse. Signatures then come out empty.
+  case_fail "signature_key_pair_stored" "not stored as a JSON keypair; readers that parse the object will fail"
+elif ! printf '%s' "$SKP" | grep -q 'privateKey'; then
+  case_fail "signature_key_pair_stored" "JSON present but privateKey is missing"
 else
-  if printf '%s' "$SKP" | grep -q '{'; then
-    PUB=$(printf '%s' "$SKP" | sed -n 's/.*\\"publicKey\\":\\"\([^\\]*\)\\".*/\1/p')
-    if [ -n "$PUB" ]; then
-      case_pass "signature_key_pair_stored" "JSON keypair form, publicKey present"
-    else
-      case_fail "signature_key_pair_stored" "JSON present but publicKey is unreadable"
-    fi
-  else
-    case_fail "signature_key_pair_stored" "stored as a bare string, not the JSON keypair the pairing code reads"
-  fi
+  case_pass "signature_key_pair_stored" "JSON keypair with both keys"
 fi
 CI=$(printf '%s' "$PREFS" | grep -o '"client_id"[[:space:]]*:[[:space:]]*"[^"]*"' | sed 's/.*: *"//;s/"$//')
 if [ -n "$CI" ]; then case_pass "client_id_present" "$CI"; else case_fail "client_id_present" "no client_id"; fi
@@ -72,13 +69,20 @@ adb -s "$DEV" logcat -c
 prepare_device "$DEV"
 sleep 3
 shot "ui-cold-start"
+# prepare_device force-stops the app on purpose, so the pid is expected to
+# change here. What must not happen is a *further* restart: read the pid after
+# launch, then again once the UI has settled.
 PID_AFTER=$(adb -s "$DEV" shell pidof "$PACKAGE" | tr -d '\r' | awk '{print $1}')
 if [ -z "$PID_AFTER" ]; then
   case_fail "cold_start" "app is not running after launch"
-elif [ -n "$PID" ] && [ "$PID_AFTER" != "$PID" ]; then
-  case_fail "cold_start" "pid changed $PID -> $PID_AFTER (process restarted during launch)"
 else
-  case_pass "cold_start" "app alive, pid ${PID_AFTER:-unknown}"
+  sleep 4
+  PID_SETTLED=$(adb -s "$DEV" shell pidof "$PACKAGE" | tr -d '\r' | awk '{print $1}')
+  if [ -z "$PID_SETTLED" ] || [ "$PID_SETTLED" != "$PID_AFTER" ]; then
+    case_fail "cold_start" "pid changed $PID_AFTER -> ${PID_SETTLED:-gone} while the UI settled"
+  else
+    case_pass "cold_start" "app alive and stable, pid $PID_AFTER"
+  fi
 fi
 OUT=$(crashes)
 if [ -z "$OUT" ]; then case_pass "cold_start_no_crash" "no FATAL EXCEPTION"
