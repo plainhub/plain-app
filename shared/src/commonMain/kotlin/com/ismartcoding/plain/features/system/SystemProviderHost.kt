@@ -427,6 +427,43 @@ object SystemProviderHost {
             JsonHelper.jsonEncode(fileInfoFacts(method, params)))
         "systemAudioFileInfo" -> Json.parseToJsonElement(
             JsonHelper.jsonEncode(fileInfoFacts(method, params)))
+        "systemMediaBucketItemFacts" -> JsonArray(
+            com.ismartcoding.plain.platform.mediaBucketItemFacts(mediaDataType(params)).map { item ->
+                buildJsonObject {
+                    put("id", JsonPrimitive(item.id)); put("name", JsonPrimitive(item.name))
+                    put("size", JsonPrimitive(item.size)); put("path", JsonPrimitive(item.path))
+                    put("sortName", JsonPrimitive(item.sortName))
+                }
+            })
+        "systemMediaRows" -> {
+            val items = com.ismartcoding.plain.platform.searchMedia(
+                mediaDataType(params),
+                params.getValue("query").jsonPrimitive.content,
+                params.getValue("limit").jsonPrimitive.int,
+                params.getValue("offset").jsonPrimitive.int,
+                fileSortBy(params),
+            )
+            JsonArray(items.map { mediaFacts(it) })
+        }
+        "systemImageRows" -> {
+            val items = com.ismartcoding.plain.platform.searchImagesCombined(
+                params.getValue("queryText").jsonPrimitive.content,
+                params.getValue("extraQuery").jsonPrimitive.content,
+                params.getValue("limit").jsonPrimitive.int,
+                params.getValue("offset").jsonPrimitive.int,
+                fileSortBy(params),
+            )
+            JsonArray(items.map { mediaFacts(it) })
+        }
+        "systemMediaCount" -> JsonPrimitive(com.ismartcoding.plain.platform.countMedia(
+            mediaDataType(params), params.getValue("query").jsonPrimitive.content))
+        "systemImageCount" -> JsonPrimitive(com.ismartcoding.plain.platform.countImagesCombined(
+            params.getValue("queryText").jsonPrimitive.content,
+            params.getValue("extraQuery").jsonPrimitive.content))
+        "systemDocExtGroups" -> JsonArray(
+            com.ismartcoding.plain.platform.getDocExtGroups("").map { (ext, count) ->
+                buildJsonObject { put("ext", JsonPrimitive(ext)); put("count", JsonPrimitive(count)) } })
+        "systemMediaTagFacts" -> mediaTagFacts(params)
         else -> error("Unsupported provider operation")
     }
 }
@@ -470,4 +507,75 @@ private fun fileInfoFacts(method: String, params: JsonObject): JsonObject {
             }
         }
     }
+}
+
+private fun mediaDataType(params: JsonObject) =
+    com.ismartcoding.plain.enums.DataType.valueOf(params.getValue("dataType").jsonPrimitive.content)
+
+private fun fileSortBy(params: JsonObject) =
+    com.ismartcoding.plain.features.file.FileSortBy.valueOf(params.getValue("sortBy").jsonPrimitive.content)
+
+/** One row of a library list. The three kinds share the `MediaItem`
+ * fields; the per-kind extras ride along so a single decoder reads all
+ * three lists, with a field a kind does not have reported as null rather
+ * than omitted — an omitted field and a null one mean the same thing to
+ * the client, but only one of them survives a round trip through a
+ * positional row. */
+private fun mediaFacts(item: com.ismartcoding.plain.db.IData): JsonObject = when (item) {
+    is com.ismartcoding.plain.data.DImage -> mediaFacts(
+        item.id, item.title, item.path, item.size, item.bucketId, item.createdAt, item.updatedAt,
+        durationMs = 0L, takenAt = item.takenAt, isFavorite = item.isFavorite)
+    is com.ismartcoding.plain.data.DVideo -> mediaFacts(
+        item.id, item.title, item.path, item.size, item.bucketId, item.createdAt, item.updatedAt,
+        durationMs = item.durationMs, takenAt = item.takenAt, isFavorite = item.isFavorite)
+    is com.ismartcoding.plain.data.DDoc -> mediaFacts(
+        item.id, item.title, item.path, item.size, item.bucketId, item.createdAt, item.updatedAt,
+        durationMs = item.durationMs, takenAt = null, isFavorite = false)
+    else -> error("Unsupported media row ${item::class.simpleName}")
+}
+
+private fun mediaFacts(
+    id: String,
+    title: String,
+    path: String,
+    size: Long,
+    bucketId: String,
+    createdAt: kotlin.time.Instant,
+    updatedAt: kotlin.time.Instant,
+    durationMs: Long,
+    takenAt: kotlin.time.Instant?,
+    isFavorite: Boolean,
+): JsonObject = buildJsonObject {
+    put("id", JsonPrimitive(id)); put("title", JsonPrimitive(title))
+    put("path", JsonPrimitive(path)); put("size", JsonPrimitive(size))
+    put("bucketId", JsonPrimitive(bucketId)); put("createdAt", JsonPrimitive(createdAt.toString()))
+    put("updatedAt", JsonPrimitive(updatedAt.toString()))
+    put("durationMs", JsonPrimitive(durationMs))
+    put("takenAt", takenAt?.let { JsonPrimitive(it.toString()) } ?: JsonNull)
+    put("isFavorite", JsonPrimitive(isFavorite))
+}
+
+/** One entry per key that actually has relations; keys with none are
+ * omitted and Rust defaults them to an empty list, so an explicit empty
+ * row would just be noise on the wire. */
+private suspend fun mediaTagFacts(params: JsonObject): JsonArray {
+    val type = mediaDataType(params)
+    val keys = params.getValue("keys").jsonArray.map { it.jsonPrimitive.content }.toSet()
+    if (keys.isEmpty()) return JsonArray(emptyList())
+    val relations = com.ismartcoding.plain.features.TagHelper
+        .getTagRelationsByKeys(keys, type).groupBy { it.key }
+    val tags = com.ismartcoding.plain.features.TagHelper.getAll(type).associateBy { it.id }
+    return JsonArray(keys.mapNotNull { key ->
+        val ids = relations[key]?.map { it.tagId } ?: return@mapNotNull null
+        if (ids.isEmpty()) return@mapNotNull null
+        buildJsonObject {
+            put("key", JsonPrimitive(key))
+            put("tags", JsonArray(ids.mapNotNull { tags[it] }.map { tag ->
+                buildJsonObject {
+                    put("id", JsonPrimitive(tag.id)); put("name", JsonPrimitive(tag.name))
+                    put("count", JsonPrimitive(tag.count))
+                }
+            }))
+        }
+    })
 }
