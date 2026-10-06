@@ -41,9 +41,9 @@ interface HttpMultipartPart {
 
 /**
  * Platform-agnostic HTTP request/response. The commonMain route handlers
- * operate exclusively against this interface, so they carry no Ktor or
- * SwiftNIO dependencies. The platform layer (e.g. `KtorHttpCall`) wraps the
- * native call and implements every member.
+ * operate exclusively against this interface, so they carry no transport
+ * dependencies. The platform layer wraps the native call and implements
+ * every member.
  */
 interface HttpCall {
     val method: HttpMethod

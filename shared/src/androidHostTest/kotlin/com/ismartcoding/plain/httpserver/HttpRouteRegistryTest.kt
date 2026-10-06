@@ -67,7 +67,6 @@ class HttpRouteRegistryTest {
 
     @Test
     fun graphQlSchemas_stayPlatformFree() {
-        HttpRouteRegistry.mainGraphQL
         HttpRouteRegistry.peerGraphQL
         HttpRouteRegistry.guestGraphQL
     }

@@ -30,8 +30,6 @@ class LikeEscapeGuardTest {
     /** Files allowed to call escapeLike (the pairing half outside ContentWhere). */
     private val escapeLikeAllowlist = setOf(
         "plain-common/src/commonMain/kotlin/com/ismartcoding/plain/helpers/ContentWhere.kt",
-        "shared/src/commonMain/kotlin/com/ismartcoding/plain/httpserver/mainschemas/ChatMessageGraphQL.kt",
-        "shared/src/commonMain/kotlin/com/ismartcoding/plain/httpserver/mainschemas/AppFileGraphQL.kt",
         "shared/src/commonMain/kotlin/com/ismartcoding/plain/features/audio/LegacyAudioPlayHistoryManager.kt",
         "shared/src/commonMain/kotlin/com/ismartcoding/plain/features/audio/LegacyAudioPlaylistManager.kt",
         "shared/src/androidMain/kotlin/com/ismartcoding/plain/docs/DocMediaStoreHelper.kt",

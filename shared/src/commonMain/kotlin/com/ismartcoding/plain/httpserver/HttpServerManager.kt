@@ -44,9 +44,9 @@ import kotlin.time.Instant
 /**
  * Pure business logic and state for the embedded HTTP/HTTPS server.
  *
- * Ktor/Netty/SSL lifecycle (start/stop the embedded server, manage the JKS
- * keystore, probe the health endpoint) lives in the platform-specific
- * `webserver` package and calls into this object for shared state.
+ * Engine lifecycle (start/stop the Rust server, manage the TLS keystore,
+ * probe the health endpoint) lives in the platform-specific `webserver`
+ * package and calls into this object for shared state.
  */
 object HttpServerManager {
     // Session caches are mutated concurrently from every in-flight HTTP/WebSocket

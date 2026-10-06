@@ -10,7 +10,6 @@ import com.ismartcoding.plain.db.*
 import com.ismartcoding.plain.enums.ChatStatus
 import com.ismartcoding.plain.features.share.ShareManager
 import com.ismartcoding.plain.helpers.AppFileStore
-import com.ismartcoding.plain.httpserver.mainschemas.chatItems
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.json.*
 import org.junit.Assert.*
@@ -65,8 +64,8 @@ class ChatServiceRustHttpTest {
             assertArrayEquals(source.readBytes(), kotlin.io.encoding.Base64.decode(compact.getValue("b").jsonPrimitive.content))
             ChatManager.deleteOne(picked.first().id)
             assertEquals(2, AppFileStore.getById(hash)!!.refCount)
-            val page = chatItems("peer:local", 0, 20, "text:$marker")
-            assertTrue(page.any { it.id.value == forward.id })
+            val page = RustContentApi.query("""chatItems(target: "peer:local", offset: 0, limit: 20, query: "text:$marker") { id }""")["data"]!!.jsonObject["chatItems"]!!.jsonArray
+            assertTrue("the sent message must appear in the contract page, got $page", page.any { it.jsonObject["id"]!!.jsonPrimitive.content == forward.id })
             val image = File(root, "$marker.png")
             val bitmap = android.graphics.Bitmap.createBitmap(7, 5, android.graphics.Bitmap.Config.ARGB_8888)
             image.outputStream().use { bitmap.compress(android.graphics.Bitmap.CompressFormat.PNG, 100, it) }

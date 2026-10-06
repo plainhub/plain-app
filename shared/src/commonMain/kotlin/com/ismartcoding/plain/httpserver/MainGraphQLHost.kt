@@ -52,18 +52,6 @@ object MainGraphQLHost {
                 put("customSessionToken", if (session?.type == SessionType.CUSTOM) session.token else null)
             }
         }
-        "mainGraphqlExecute" -> {
-            val clientId = params.getValue("clientId").jsonPrimitive.content
-            val request = params.getValue("request").jsonPrimitive.content
-            HttpServerManager.clientRequestTs[clientId] = TimeHelper.nowMillis()
-            sendEvent(WebRequestReceivedEvent())
-            val response = try {
-                HttpRouteRegistry.mainGraphQL.executeForRust(request, clientId)
-            } catch (error: GraphQLError) {
-                error.serialize()
-            }
-            JsonPrimitive(response)
-        }
         else -> error("Unsupported main GraphQL host operation")
     }
 }

@@ -17,7 +17,7 @@ typealias HttpHandler = suspend (HttpCall) -> Unit
  * iterates [entries] and registers each one with the native router so the
  * business logic can stay in shared code.
  *
- * Path parameters use the `{name}` convention — Ktor and SwiftNIO both
+ * Path parameters use the `{name}` convention — the routers that consume
  * support it natively, so no custom matcher is required.
  */
 class HttpRouter {

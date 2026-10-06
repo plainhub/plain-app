@@ -21,7 +21,6 @@ import com.ismartcoding.plain.mdns.NsdHelper
 import com.ismartcoding.plain.services.HttpServerService
 import com.ismartcoding.plain.services.PNotificationListenerService
 import com.ismartcoding.plain.httpserver.HttpServerManager
-import com.ismartcoding.plain.httpserver.httpServer
 import com.ismartcoding.plain.httpserver.replaceSslKeyStoreBytes
 import com.ismartcoding.plain.httpserver.replaceSslKeyStoreFromPem
 import com.ismartcoding.plain.discover.RustMdnsRuntime
@@ -58,15 +57,11 @@ private fun readUriBytes(uriStr: String): ByteArray {
 
 private fun readUriText(uriStr: String): String = readUriBytes(uriStr).toString(Charsets.UTF_8)
 
-actual suspend fun startHttpEngineAsync(): Boolean {
-    try { httpServer?.stop(0, 1_000) } finally { httpServer = null }
-    return com.ismartcoding.plain.httpserver.RustHttpEngine.start()
-}
+actual suspend fun startHttpEngineAsync(): Boolean =
+    com.ismartcoding.plain.httpserver.RustHttpEngine.start()
 
 actual suspend fun stopHttpEngineAsync(): Unit = withIO {
     com.ismartcoding.plain.httpserver.RustHttpEngine.stop()
-    try { httpServer?.stop(0, 1_000) } finally { httpServer = null }
-    Unit
 }
 
 // The SMS/MMS hooks below serve the web desktop bridge, whose only clients are

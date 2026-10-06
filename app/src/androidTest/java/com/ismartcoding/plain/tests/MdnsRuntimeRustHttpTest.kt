@@ -3,7 +3,6 @@ package com.ismartcoding.plain.tests
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.ismartcoding.plain.api.RustContentApi
 import com.ismartcoding.plain.discover.RustMdnsRuntime
-import com.ismartcoding.plain.httpserver.mainschemas.*
 import kotlin.uuid.Uuid
 import kotlin.uuid.ExperimentalUuidApi
 import kotlinx.coroutines.runBlocking
@@ -37,14 +36,16 @@ class MdnsRuntimeRustHttpTest {
         val before = call("snapshot")
         val debugToken = Uuid.random().toString()
         try {
-            assertTrue(startDiscovery())
-            assertTrue(isDiscovering())
+            suspend fun discovering(): Boolean =
+                RustContentApi.query("isDiscovering")["data"]!!.jsonObject["isDiscovering"]!!.jsonPrimitive.boolean
+            assertEquals(true, RustContentApi.mutate("startDiscovery")["data"]!!.jsonObject["startDiscovery"]!!.jsonPrimitive.boolean)
+            assertTrue(discovering())
             val started = call("snapshot")
             assertTrue(started.getValue("receiver").jsonPrimitive.boolean)
             assertTrue(started.getValue("scanning").jsonPrimitive.boolean)
             assertTrue(started.getValue("revision").jsonPrimitive.long > before.getValue("revision").jsonPrimitive.long)
-            assertTrue(stopDiscovery())
-            assertFalse(isDiscovering())
+            assertEquals(true, RustContentApi.mutate("stopDiscovery")["data"]!!.jsonObject["stopDiscovery"]!!.jsonPrimitive.boolean)
+            assertFalse(discovering())
             val stopped = call("snapshot")
             assertFalse(stopped.getValue("scanning").jsonPrimitive.boolean)
             assertTrue(stopped.getValue("receiver").jsonPrimitive.boolean)
@@ -60,8 +61,8 @@ class MdnsRuntimeRustHttpTest {
                 assertTrue(packets.all { it.srcPort > 0 && it.size > 0 })
             } else assertTrue(packets.any { it.summary.contains("PTR") && it.detail.contains("_plainapp._tcp.local") && it.srcPort > 0 && it.size > 0 })
             assertTrue(RustMdnsRuntime.services(captured).all { it.serviceType == "_plainapp._tcp.local" })
-            stopDiscovery()
-            assertTrue(isDiscovering())
+            RustContentApi.mutate("stopDiscovery")
+            assertTrue(discovering())
             RustMdnsRuntime.debugStop(debugToken)
             RustMdnsRuntime.control("receiver")
             val cleaned = call("snapshot")

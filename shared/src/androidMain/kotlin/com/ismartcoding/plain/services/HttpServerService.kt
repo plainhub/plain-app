@@ -25,7 +25,6 @@ import com.ismartcoding.plain.platform.cancelMmsPolling
 import com.ismartcoding.plain.platform.startHttpServerAsync
 import com.ismartcoding.plain.platform.stopHttpServerCoreAsync
 import com.ismartcoding.plain.httpserver.HttpServerManager
-import com.ismartcoding.plain.httpserver.httpServer
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 
@@ -129,17 +128,10 @@ class HttpServerService : LifecycleService() {
         super.onTaskRemoved(rootIntent)
         // User swiped away the app from recents; stop server immediately to release ports.
         NsdHelper.unregisterService()
-        try {
-            httpServer?.stop(500, 1000)
-        } catch (e: Exception) {
-            LogCat.e("Error stopping server on task removed: ${e.message}")
-        } finally {
-            PeerStatusManager.stop()
-            SmsProviderObserver.stop()
-            SmsHelper.stopSmsSendTracking()
-            cancelMmsPolling()
-            httpServer = null
-        }
+        PeerStatusManager.stop()
+        SmsProviderObserver.stop()
+        SmsHelper.stopSmsSendTracking()
+        cancelMmsPolling()
         stopSelf()
     }
 
@@ -158,11 +150,6 @@ class HttpServerService : LifecycleService() {
         SmsProviderObserver.stop()
         SmsHelper.stopSmsSendTracking()
         cancelMmsPolling()
-        try {
-            httpServer?.stop(0, 1000)
-        } catch (_: Exception) {
-        }
-        httpServer = null
         stopForeground(STOP_FOREGROUND_REMOVE)
         // Run the shared stop body (stop side-effect hooks — clipboard watcher,
         // notification listener — engine teardown again, terminal OFF) on the

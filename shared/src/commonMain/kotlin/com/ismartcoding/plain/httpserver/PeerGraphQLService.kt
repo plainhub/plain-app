@@ -8,7 +8,7 @@ import com.ismartcoding.plain.lib.kgraphql.schema.dsl.SchemaBuilder
 import com.ismartcoding.plain.httpserver.http.HttpCall
 import com.ismartcoding.plain.httpserver.models.ChatItem
 import com.ismartcoding.plain.httpserver.models.ID
-import com.ismartcoding.plain.httpserver.mainschemas.addPeerSchemaTypes
+import com.ismartcoding.plain.httpserver.peerschemas.addPeerSchemaTypes
 import kotlinx.serialization.json.*
 import kotlin.reflect.typeOf
 

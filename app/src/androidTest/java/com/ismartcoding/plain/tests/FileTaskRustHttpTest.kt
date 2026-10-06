@@ -5,7 +5,6 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.ismartcoding.plain.api.*
 import com.ismartcoding.plain.features.file.*
-import com.ismartcoding.plain.httpserver.mainschemas.copyFile
 import com.ismartcoding.plain.preferences.SystemPrefs
 import kotlinx.coroutines.*
 import kotlinx.serialization.json.*
@@ -68,10 +67,10 @@ class FileTaskRustHttpTest {
             val foreign = RustContentApi.query("fileHostTaskRecord(clientId: ${JsonPrimitive("foreign-${UUID.randomUUID()}")}, id: ${JsonPrimitive(done.id)}) { id }")
             assertEquals(JsonNull,foreign.getValue("fileHostTaskRecord"))
             SystemPrefs.apiPermissions.value = originalPermissions + "WRITE_EXTERNAL_STORAGE"
-            assertTrue(copyFile(source.path,File(root,"public-copy.txt").path,false))
+            assertEquals(true, RustContentApi.mutate("""copyFile(src: "${source.path}", dst: "${File(root,"public-copy.txt").path}", overwrite: false)""")["data"]!!.jsonObject["copyFile"]!!.jsonPrimitive.boolean)
             assertEquals("synthetic",File(root,"public-copy.txt").readText())
             var publicFailed = false
-            try { copyFile("/system/test",File(root,"public-never").path,false) }
+            try { RustContentApi.mutate("""copyFile(src: "/system/test", dst: "${File(root,"public-never").path}", overwrite: false)""") }
             catch (_: Exception) { publicFailed = true }
             assertTrue(publicFailed)
         } finally {

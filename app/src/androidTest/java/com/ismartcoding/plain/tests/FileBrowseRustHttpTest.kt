@@ -2,18 +2,15 @@ package com.ismartcoding.plain.tests
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
+import com.ismartcoding.plain.api.RustContentApi
 import com.ismartcoding.plain.features.file.FileSortBy
-import com.ismartcoding.plain.httpserver.mainschemas.files
-import com.ismartcoding.plain.httpserver.mainschemas.fileCount
-import com.ismartcoding.plain.httpserver.mainschemas.fileInfo
-import com.ismartcoding.plain.httpserver.mainschemas.pathExists
-import com.ismartcoding.plain.httpserver.mainschemas.pathKind
 import com.ismartcoding.plain.enums.PathKind
 import com.ismartcoding.plain.platform.listFilesInDir
 import com.ismartcoding.plain.platform.searchFilesInDir
 import com.ismartcoding.plain.platform.searchFilesByName
 import com.ismartcoding.plain.preferences.SystemPrefs
 import kotlinx.coroutines.runBlocking
+import kotlinx.serialization.json.*
 import org.junit.Assert.*
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -53,18 +50,20 @@ class FileBrowseRustHttpTest {
             assertEquals(listOf("large.txt"), zipped.map { it.name })
             assertEquals("folder", searchFilesInDir("", "${archive.path}!zip!/", FileSortBy.NAME_ASC).first().name)
             SystemPrefs.apiPermissions.value = permissions + "WRITE_EXTERNAL_STORAGE"
-            assertTrue(pathExists(root.path))
-            assertEquals(PathKind.DIR, pathKind(root.path))
-            assertEquals(PathKind.FILE, pathKind(File(root, "a.txt").path))
-            assertEquals(1L, fileInfo(File(root, "a.txt").path).size)
-            assertFalse(pathExists("."))
-            assertFalse(pathExists("/system"))
-            assertNull(pathKind(File(root, "missing").path))
-            assertEquals(3, fileCount(root.path, ""))
-            assertEquals(listOf("a.txt"), files(root.path, 1, 1, "", FileSortBy.NAME_ASC).map { it.name })
-            assertTrue(files(root.path, 0, 0, "", FileSortBy.NAME_ASC).isEmpty())
-            assertEquals(2, fileCount(root.path, "text:needle"))
-            assertEquals(0, fileCount(File(root, "missing").path, ""))
+            suspend fun field(selection: String): JsonElement =
+                RustContentApi.query(selection)["data"]!!.jsonObject.values.first()
+            assertEquals(true, field("""pathExists(path: "${root.path}")""").jsonPrimitive.boolean)
+            assertEquals(PathKind.DIR, field("""pathKind(path: "${root.path}")""").jsonPrimitive.content)
+            assertEquals(PathKind.FILE, field("""pathKind(path: "${File(root, "a.txt").path}")""").jsonPrimitive.content)
+            assertEquals(1L, field("""fileInfo(path: "${File(root, "a.txt").path}") { size }""").jsonObject["size"]!!.jsonPrimitive.long)
+            assertEquals(false, field("""pathExists(path: ".")""").jsonPrimitive.boolean)
+            assertEquals(false, field("""pathExists(path: "/system")""").jsonPrimitive.boolean)
+            assertNull(field("""pathKind(path: "${File(root, "missing").path}")""").jsonPrimitive.contentOrNull)
+            assertEquals(3, field("""fileCount(root: "${root.path}", query: "")""").jsonPrimitive.int)
+            assertEquals(listOf("a.txt"), field("""files(root: "${root.path}", offset: 1, limit: 1, query: "", sortBy: NAME_ASC) { name }""").jsonArray.map { it.jsonObject["name"]!!.jsonPrimitive.content })
+            assertTrue(field("""files(root: "${root.path}", offset: 0, limit: 0, query: "", sortBy: NAME_ASC) { name }""").jsonArray.isEmpty())
+            assertEquals(2, field("""fileCount(root: "${root.path}", query: "text:needle")""").jsonPrimitive.int)
+            assertEquals(0, field("""fileCount(root: "${File(root, "missing").path}", query: "")""").jsonPrimitive.int)
         } finally {
             SystemPrefs.apiPermissions.value = permissions
             root.deleteRecursively()

@@ -1,26 +1,24 @@
 package com.ismartcoding.plain
 
-import com.ismartcoding.plain.httpserver.MainGraphQLService
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.fail
 
 /**
- * Locks the wire contract of the main GraphQL schema:
+ * Locks the wire contract of the public GraphQL schema.
  *
- * 1. The committed SDL snapshot (`shared/apitest/schema.graphqls`) must match the
- *    runtime schema byte for byte — schema changes are only landed by running
- *    [PrintSchemaTest] and committing the regenerated file.
- * 2. Structural conventions from `shared/apitest/API_SPEC.md` are enforced on the
- *    SDL so new fields/operations cannot drift from the spec.
+ * The schema itself is built by Rust (`plain-rs/src/content_api/public_schema.rs`),
+ * which prints its own SDL snapshot and guards it there. This test enforces the
+ * structural conventions from `shared/apitest/API_SPEC.md` on the committed
+ * snapshot `shared/apitest/schema.graphqls`, so new fields/operations cannot
+ * drift from the spec regardless of which side implements them.
  *
- * When this test fails after an intentional schema change: run
- * `./gradlew :shared:testAndroidHostTest --tests "com.ismartcoding.plain.PrintSchemaTest"`
- * to regenerate the snapshot, and update the convention allowlists only if the
- * spec document was updated with the same decision.
+ * When this test fails after an intentional schema change, update the snapshot
+ * and the convention allowlists only if the spec document was updated with the
+ * same decision.
  */
 class ApiContractTest {
-    private val sdl: String = MainGraphQLService.create().schema.printSDL()
+    private val sdl: String = java.io.File("apitest/schema.graphqls").readText()
 
     // Fields that keep a raw String id although the naming rule says ID.
     // Each entry must be justified in API_SPEC.md ("deliberate exceptions").
@@ -60,12 +58,18 @@ class ApiContractTest {
     )
 
     @Test
-    fun sdlSnapshotMatchesCommittedFile() {
-        val committed = java.io.File("apitest/schema.graphqls").readText()
-        if (committed != sdl) {
+    fun sdlSnapshotCoversTheWholeContract() {
+        // The runtime schema is built in Rust, which prints and guards its own
+        // SDL there. This guards the App-side snapshot against being emptied or
+        // truncated, which would silently turn every check below vacuous.
+        // Counted over all operation fields, not just the ones taking arguments.
+        val queries = operationFieldNamesIn("Query")
+        val mutations = operationFieldNamesIn("Mutation")
+        if (queries.size != 93 || mutations.size != 125) {
             fail(
-                "shared/apitest/schema.graphqls is out of date with the runtime schema. " +
-                    "Regenerate with PrintSchemaTest and commit the result (see API_SPEC.md).",
+                "shared/apitest/schema.graphqls declares ${queries.size} Query / ${mutations.size} " +
+                    "Mutation operations — the contract has 93 / 125. The snapshot looks truncated or " +
+                    "drifted; every check in this class reads it, so they would pass on an empty file.",
             )
         }
     }
@@ -275,6 +279,32 @@ class ApiContractTest {
             if (line == "type $block {") inside = true
             if (inside && line == "}") inside = false
             if (inside && line.contains("(")) out.add(line.trimEnd(','))
+        }
+        return out
+    }
+
+    /**
+     * Every operation declared by one root block, by name. Unlike
+     * [operationSignaturesIn] this counts argument-less fields too, which is
+     * what a coverage check needs.
+     */
+    private fun operationFieldNamesIn(block: String): List<String> {
+        var inside = false
+        val out = mutableListOf<String>()
+        var inDescription = false
+        sdl.lineSequence().forEach { raw ->
+            val line = raw.trim()
+            if (line == "type $block {") { inside = true; return@forEach }
+            if (!inside) return@forEach
+            if (line == "}") { inside = false; return@forEach }
+            // Descriptions span triple-quoted lines and must not be parsed as fields.
+            if (inDescription) { if (line.endsWith("\"\"\"")) inDescription = false; return@forEach }
+            if (line.startsWith("\"\"\"")) {
+                if (!line.endsWith("\"\"\"") || line.length < 6) inDescription = true
+                return@forEach
+            }
+            if (line.isEmpty() || line.startsWith("#")) return@forEach
+            Regex("^(\\w+)[(:]").find(line)?.let { out.add(it.groupValues[1]) }
         }
         return out
     }

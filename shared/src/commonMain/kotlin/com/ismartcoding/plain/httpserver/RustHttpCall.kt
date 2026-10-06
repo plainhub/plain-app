@@ -115,8 +115,7 @@ internal class RustHttpCall(
     }
     override suspend fun respondFile(path: String, contentType: String?, contentDisposition: String?) {
         contentDisposition?.let { responseHeader("Content-Disposition", it) }
-        responseHeader("X-Content-Type-Options", "nosniff")
-        if (isScriptableDocument(contentType ?: "")) responseHeader("Content-Security-Policy", "sandbox")
+        securityHeadersFor(contentType).forEach { (name, value) -> responseHeader(name, value) }
         startResponse("file", contentType, buildJsonObject { put("path", path); put("contentType", contentType ?: "application/octet-stream") })
     }
     override suspend fun proxyUrl(url: String): Boolean {
@@ -140,7 +139,7 @@ internal class RustHttpCall(
         responseHeader("transferMode.dlna.org", "Streaming")
         responseHeader("Server", "DLNADOC/1.50 UPnP/1.0 Plain/1.0")
         val mime = path.getContentType().toString()
-        if (isScriptableDocument(mime)) responseHeader("Content-Security-Policy", "sandbox")
+        securityHeadersFor(mime).forEach { (name, value) -> responseHeader(name, value) }
         startResponse("file", mime, buildJsonObject { put("path", path); put("contentType", mime); put("dlna", true) })
         return true
     }
@@ -150,4 +149,18 @@ internal class RustHttpCall(
 private fun isScriptableDocument(mime: String): Boolean {
     val type = mime.substringBefore(';').trim().lowercase()
     return type == "image/svg+xml" || type == "text/html" || type == "application/xhtml+xml" || type.endsWith("+xml") || type.endsWith("/xml")
+}
+
+/**
+ * Stored-XSS mitigation for user-supplied files (the `/fs` and DLNA families).
+ * Document types a browser executes scripts in when navigated to must go out
+ * with `Content-Security-Policy: sandbox` — an opaque origin, so scripts and
+ * forms are dead while the visual preview still renders. Everything else gets
+ * `nosniff` alone, so normal media embedding is untouched.
+ *
+ * One rule for both response paths, so `/fs` and `/media/{id}` cannot drift.
+ */
+internal fun securityHeadersFor(contentType: String?): Map<String, String> = buildMap {
+    put("X-Content-Type-Options", "nosniff")
+    if (isScriptableDocument(contentType.orEmpty())) put("Content-Security-Policy", "sandbox")
 }

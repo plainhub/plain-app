@@ -1,6 +1,7 @@
 package com.ismartcoding.plain.tests
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.ismartcoding.plain.api.RustContentApi
 import com.ismartcoding.plain.chat.*
 import com.ismartcoding.plain.chat.peer.PeerCacher
 import com.ismartcoding.plain.chat.peer.RustPeerStore
@@ -10,8 +11,8 @@ import com.ismartcoding.plain.data.DNearbyDevice
 import com.ismartcoding.plain.db.*
 import com.ismartcoding.plain.discover.NearbyDeviceCache
 import com.ismartcoding.plain.enums.*
-import com.ismartcoding.plain.httpserver.mainschemas.chatItems
 import kotlinx.coroutines.runBlocking
+import kotlinx.serialization.json.*
 import org.junit.Assert.*
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -50,7 +51,8 @@ class ChatStorageRustHttpTest {
             assertEquals(two.id, RustChatStore.getByPeerIdPage(peer.id, 1, 0).single().id)
             assertEquals(1, ChatDbHelper.countAsync("$prefix literal %_"))
             assertEquals(one.id, ChatDbHelper.searchAsync("$prefix literal %_", 10, 0).single().id)
-            assertEquals(one.id, chatItems(peer.id, 0, 10, "text:\"$prefix literal %_\"").single().id.value)
+            val queried = RustContentApi.query("""chatItems(target: "${peer.id}", offset: 0, limit: 10, query: "text:\"$prefix literal %_\"") { id }""")["data"]!!.jsonObject["chatItems"]!!.jsonArray
+            assertEquals(one.id, queried.single().jsonObject["id"]!!.jsonPrimitive.content)
             assertEquals(setOf(one.id, two.id), ChatDbHelper.getIdsAsync("peer:${peer.id}"))
             assertEquals(setOf(group.id), ChatDbHelper.getIdsAsync("channel:${channel.id}"))
             RustChatStore.updateStatusAndData(two.id, ChatStatus.PARTIAL, "{\"results\":[]}")

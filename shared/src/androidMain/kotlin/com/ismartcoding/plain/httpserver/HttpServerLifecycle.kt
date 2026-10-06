@@ -10,13 +10,6 @@ import com.ismartcoding.plain.lib.coIO
 import com.ismartcoding.plain.lib.withIO
 import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.platform.createHttpClient
-import com.ismartcoding.plain.lib.ktorserver.core.engine.EmbeddedServer
-import com.ismartcoding.plain.lib.ktorserver.core.engine.applicationEnvironment
-import com.ismartcoding.plain.lib.ktorserver.core.engine.connector
-import com.ismartcoding.plain.lib.ktorserver.core.engine.embeddedServer
-import com.ismartcoding.plain.lib.ktorserver.core.engine.sslConnector
-import com.ismartcoding.plain.lib.ktorserver.Netty
-import com.ismartcoding.plain.lib.ktorserver.NettyApplicationEngine
 import org.slf4j.LoggerFactory
 import java.io.ByteArrayInputStream
 import java.io.File
@@ -30,21 +23,12 @@ import java.security.cert.X509Certificate
 import java.security.spec.PKCS8EncodedKeySpec
 import java.util.Base64
 
-/**
- * The live Ktor/Netty embedded server instance, or null when the server is stopped.
- * Platform lifecycle code below owns this reference; business state lives in
- * [HttpServerManager] (commonMain).
- */
-@Volatile
-var httpServer: EmbeddedServer<*, *>? = null
-
 private val SSL_KEY_ALIAS = Constants.SSL_NAME
 
 fun warmUpHttpServer() {
     coIO {
         if (UserPrefs.service.value) return@coIO
         try {
-            HttpRouteRegistry.mainGraphQL
             HttpRouteRegistry.peerGraphQL
             HttpRouteRegistry.guestGraphQL
             HttpRouteRegistry.router
@@ -157,50 +141,6 @@ internal fun getSslKeyStore(context: Context, password: String): KeyStore {
     }
     cachedKeyStore = password to store
     return store
-}
-
-/**
- * Create and configure the Ktor/Netty embedded server with HTTP+HTTPS connectors.
- * Does not start the server; caller is responsible for calling `start(wait = false)`.
- */
-suspend fun createHttpServerAsync(context: Context): EmbeddedServer<NettyApplicationEngine, NettyApplicationEngine.Configuration> {
-    val t0 = System.currentTimeMillis()
-    val password = SystemPrefs.keyStorePassword.value
-    return withIO {
-        val t1 = System.currentTimeMillis()
-        val passwordArray = password.toCharArray()
-        val httpPort = UserPrefs.httpPort.value
-        val httpsPort = UserPrefs.httpsPort.value
-        val keyStore = getSslKeyStore(context, password)
-        val t2 = System.currentTimeMillis()
-        val environment = applicationEnvironment {
-            log = LoggerFactory.getLogger("ktor.application")
-        }
-
-        embeddedServer(Netty, environment, configure = {
-            // Ktor's default is 32 requests per HTTP pipeline. Allowing 1,000
-            // lets a single browser connection overwhelm a memory-constrained
-            // Android compatibility container during repeated API calls.
-            runningLimit = 32
-            tcpKeepAlive = true
-
-            // Bind on all interfaces (0.0.0.0): local/loopback access (health
-            // checks, the desktop web console) arrives directly, and LAN devices
-            // reach the server through the Wi-Fi address.
-            connector {
-                port = httpPort
-            }
-            sslConnector(
-                keyStore = keyStore,
-                keyAlias = SSL_KEY_ALIAS,
-                keyStorePassword = { passwordArray },
-                privateKeyPassword = { passwordArray },
-            ) {
-                port = httpsPort
-            }
-        }, HttpModule.module)
-        .also { LogCat.d("createHttpServer: pref=${t1 - t0}ms keystore=${t2 - t1}ms server=${System.currentTimeMillis() - t2}ms") }
-    }
 }
 
 /**

@@ -5,7 +5,10 @@ import com.ismartcoding.plain.data.DContact
 import com.ismartcoding.plain.data.DScreenMirrorQuality
 import com.ismartcoding.plain.preferences.UserPrefs
 import com.ismartcoding.plain.enums.WebSettingsFeature
+import com.ismartcoding.plain.httpserver.MergeClaim
+import com.ismartcoding.plain.httpserver.MergeJobs
 import com.ismartcoding.plain.httpserver.models.toModel
+import com.ismartcoding.plain.httpserver.sendMms
 import com.ismartcoding.plain.data.getGeo
 import com.ismartcoding.plain.extensions.parseEpochMillis
 import com.ismartcoding.plain.features.contact.DContentItem
@@ -271,7 +274,7 @@ object SystemProviderHost {
             com.ismartcoding.plain.platform.deleteSms(params.getValue("query").jsonPrimitive.content)
         )
         "systemSendMms" -> JsonPrimitive(
-            com.ismartcoding.plain.httpserver.mainschemas.sendMms(
+            sendMms(
                 params.getValue("number").jsonPrimitive.content,
                 params.getValue("body").jsonPrimitive.content,
                 params.getValue("attachmentPaths").jsonArray.map { it.jsonPrimitive.content },
@@ -958,7 +961,7 @@ private suspend fun mediaTagFacts(params: JsonObject): JsonArray {
 }
 
 private suspend fun mergeStatusFacts(fileId: String): JsonObject {
-    val task = com.ismartcoding.plain.httpserver.mainschemas.MergeJobs.status(fileId)
+    val task = MergeJobs.status(fileId)
     return buildJsonObject {
         put("status", JsonPrimitive(task.status.name))
         put("value", task.value?.let(::JsonPrimitive) ?: JsonNull)
@@ -974,15 +977,15 @@ private suspend fun startMerge(params: JsonObject, isAppFile: Boolean): JsonObje
     val fileId = params.getValue("fileId").jsonPrimitive.content
     val totalChunks = params.getValue("totalChunks").jsonPrimitive.int
     val totalSize = params.getValue("totalSize").jsonPrimitive.long
-    when (val claim = com.ismartcoding.plain.httpserver.mainschemas.MergeJobs.claim(fileId)) {
-        is com.ismartcoding.plain.httpserver.mainschemas.MergeClaim.AlreadyDone ->
+    when (val claim = MergeJobs.claim(fileId)) {
+        is MergeClaim.AlreadyDone ->
             return mergeStatusFacts(fileId)
-        com.ismartcoding.plain.httpserver.mainschemas.MergeClaim.InProgress ->
+        MergeClaim.InProgress ->
             return buildJsonObject { put("status", JsonPrimitive("MERGING")) }
-        com.ismartcoding.plain.httpserver.mainschemas.MergeClaim.Claimed -> {}
+        MergeClaim.Claimed -> {}
     }
     if (com.ismartcoding.plain.platform.listUploadedChunks(fileId).isEmpty()) {
-        com.ismartcoding.plain.httpserver.mainschemas.MergeJobs.release(fileId)
+        MergeJobs.release(fileId)
         error("No chunks found for $fileId")
     }
     com.ismartcoding.plain.lib.ChannelScope().launch {
@@ -1007,7 +1010,7 @@ private suspend fun startMerge(params: JsonObject, isAppFile: Boolean): JsonObje
             val idx = reply.lastIndexOf(':')
             val value = if (idx > 0) reply.substring(0, idx) else reply
             val size = if (idx > 0) reply.substring(idx + 1).toLongOrNull() ?: 0L else 0L
-            com.ismartcoding.plain.httpserver.mainschemas.MergeJobs.finish(fileId, value, size)
+            MergeJobs.finish(fileId, value, size)
             com.ismartcoding.plain.lib.sendEvent(com.ismartcoding.plain.events.WebSocketEvent(
                 com.ismartcoding.plain.events.EventType.UPLOAD_MERGE_RESULT,
                 JsonHelper.jsonEncode(com.ismartcoding.plain.events.UploadMergeResultData(
@@ -1016,7 +1019,7 @@ private suspend fun startMerge(params: JsonObject, isAppFile: Boolean): JsonObje
             null
         } else {
             val text = outcome.exceptionOrNull()?.message ?: "merge failed"
-            com.ismartcoding.plain.httpserver.mainschemas.MergeJobs.fail(fileId, text)
+            MergeJobs.fail(fileId, text)
             com.ismartcoding.plain.lib.sendEvent(com.ismartcoding.plain.events.WebSocketEvent(
                 com.ismartcoding.plain.events.EventType.UPLOAD_MERGE_RESULT,
                 JsonHelper.jsonEncode(com.ismartcoding.plain.events.UploadMergeResultData(

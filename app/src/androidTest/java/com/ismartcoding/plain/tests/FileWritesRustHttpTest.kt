@@ -2,15 +2,15 @@ package com.ismartcoding.plain.tests
 
 import android.os.Environment
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.ismartcoding.plain.api.RustContentApi
 import androidx.test.platform.app.InstrumentationRegistry
-import com.ismartcoding.plain.httpserver.mainschemas.createDir
-import com.ismartcoding.plain.httpserver.mainschemas.writeTextFile
 import com.ismartcoding.plain.platform.createDirectory
 import com.ismartcoding.plain.platform.createFile
 import com.ismartcoding.plain.platform.writeFileText
 import com.ismartcoding.plain.platform.scanFileTaskPaths
 import com.ismartcoding.plain.preferences.SystemPrefs
 import kotlinx.coroutines.runBlocking
+import kotlinx.serialization.json.*
 import org.junit.Assert.*
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -48,12 +48,12 @@ class FileWritesRustHttpTest {
             assertTrue(runCatching { createDirectory("/system/plain-synthetic-${UUID.randomUUID()}") }.isFailure)
             SystemPrefs.apiPermissions.value = originalPermissions + "WRITE_EXTERNAL_STORAGE"
             val publicDir = File(root, "public")
-            createDir(publicDir.path)
+            RustContentApi.mutate("""createDir(path: "${publicDir.path}")""")
             assertTrue(publicDir.isDirectory)
             val publicFile = File(publicDir, "public.txt")
-            writeTextFile(publicFile.path, content, false)
+            RustContentApi.mutate("""writeTextFile(path: "${publicFile.path}", content: "$content", overwrite: false)""")
             assertEquals(content, publicFile.readText())
-            assertTrue(runCatching { writeTextFile(publicFile.path, "rejected", false) }.isFailure)
+            assertTrue(runCatching { RustContentApi.mutate("""writeTextFile(path: "${publicFile.path}", content: "rejected", overwrite: false)""") }.isFailure)
             assertEquals(content, publicFile.readText())
             createDirectory(external.path)
             val externalFile = File(external, "synthetic.txt")

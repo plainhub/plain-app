@@ -14,14 +14,12 @@ import kotlin.test.fail
  * the refetched audioQueue list. Now playAudio only marks the current track;
  * callers that need the track queued combine addAudiosToQueue/enqueue with the
  * play themselves (enqueueAndPlayAsync, or two mutations in one document from
- * the desktop). AudioQueueManager has no host-testable seam (platform
- * AppDatabase), so the wiring is locked by source scan like
- * QueueStateSyncGuardTest.
+ * the desktop). The `playAudio` half of this now lives in Rust, where the
+ * resolver is, and is guarded there; the client-side wiring below has no
+ * host-testable seam (platform AppDatabase) so it stays a source scan.
  */
 class PlayAudioQueueOrderGuardTest {
 
-    private val graphQlPath =
-        "shared/src/commonMain/kotlin/com/ismartcoding/plain/httpserver/mainschemas/AudioGraphQL.kt"
     private val vmPath =
         "shared/src/commonMain/kotlin/com/ismartcoding/plain/ui/models/AudioQueueViewModel.kt"
     private val searchPath =
@@ -53,20 +51,6 @@ class PlayAudioQueueOrderGuardTest {
             }
         }
         return null
-    }
-
-    @Test
-    fun playAudioNeverTouchesTheQueue() {
-        val body = functionBody(source(graphQlPath), "playAudio")
-            ?: fail("playAudio not found in $graphQlPath")
-        assertTrue(
-            "AudioQueueManager.setCurrent(" in body,
-            "playAudio must mark the track current via the Rust queue source",
-        )
-        assertTrue(
-            "enqueue(" !in body && "playNow(" !in body,
-            "playAudio must not enqueue: enqueue moves an already-queued track to the tail and reorders the queue; queueing is the caller's job (addAudiosToQueue alongside)",
-        )
     }
 
     @Test

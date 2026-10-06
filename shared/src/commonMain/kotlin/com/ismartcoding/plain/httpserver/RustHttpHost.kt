@@ -26,7 +26,7 @@ internal object RustHttpHost {
                     catch (error: Throwable) {
                         if (call.responded) throw error
                         if (error is GraphQLError) {
-                            if (!HttpRouteRegistry.mainGraphQL.handleError(error, call)) call.respondNoBody(HttpStatus.UNAUTHORIZED)
+                            if (!handleGraphQLError(error, call)) call.respondNoBody(HttpStatus.UNAUTHORIZED)
                         } else {
                             LogCat.e("Rust HTTP handler failed", error)
                             call.respondNoBody(HttpStatus.INTERNAL_SERVER_ERROR)

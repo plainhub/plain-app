@@ -66,7 +66,7 @@ suspend fun resetPasswordAsync(): String = HttpServerManager.resetPasswordAsync(
 //
 // Business logic (state transitions, retries, health probing, error formatting,
 // event emission) lives in the commonMain functions below; each `actual` only
-// drives the native server engine (Ktor/Netty on Android, SwiftNIO on iOS) and
+// drives the Rust server engine (plain-rs `http_transport`) and
 // the Android-only side effects (mDNS, notification-listener, foreground
 // service). iOS actuals for the side-effect hooks are no-ops.
 // ----------------------------------------------------------------------------------

@@ -1,4 +1,4 @@
-package com.ismartcoding.plain.httpserver.mainschemas
+package com.ismartcoding.plain.httpserver
 
 import com.ismartcoding.plain.httpserver.models.MergeTask
 import com.ismartcoding.plain.httpserver.models.MergeTaskStatus

@@ -9,10 +9,11 @@ import com.ismartcoding.plain.httpserver.http.HttpCall
 import com.ismartcoding.plain.httpserver.http.HttpStatus
 
 /**
- * Shared "token-mode" GraphQL request flow, used by both [MainGraphQLService]
- * (`/graphql`, session token) and [GuestGraphQLService] (`/guest_graphql`,
- * share token). Keeps decrypt → replay-guard → execute → encrypt identical
- * so the two entry points never drift.
+ * Shared "token-mode" GraphQL request flow, used by
+ * [GuestGraphQLService] (`/guest_graphql`, share token) and the peer chat
+ * entry point. Keeps decrypt → replay-guard → execute → encrypt identical
+ * so the entry points never drift. The main `/graphql` runs the same flow
+ * in Rust, against the contract schema.
  *
  * @param key the ChaCha20 key (session token for main, derived `shared_token`
  *   for guest).
