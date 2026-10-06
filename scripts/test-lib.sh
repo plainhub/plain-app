@@ -139,24 +139,27 @@ prepare_device() {
 # if something taps for it. Finds the button by its label instead of a fixed
 # coordinate, and polls because the prompt lands a beat after the request.
 approve_desktop_access() {
-  local dev="$1" i dump bounds coords cx cy
-  for i in $(seq 1 15); do
+  local dev="$1" i dump bounds coords
+  for i in $(seq 1 20); do
     adb -s "$dev" shell uiautomator dump /sdcard/plain-approve.xml >/dev/null 2>&1
     dump=$(adb -s "$dev" shell cat /sdcard/plain-approve.xml 2>/dev/null | tr -d '\r')
+    # Four separate numbers, never one joined one: stripping the brackets off
+    # "1562][601" merges two coordinates into "1562601", which then reads as
+    # three numbers instead of four and silently skips the tap.
     bounds=$(printf '%s' "$dump" | grep -o 'text="Allow"[^>]*bounds="[^"]*"' \
-      | grep -o 'bounds="[^"]*"' | head -1 | sed 's/[^0-9,]//g' | tr ',' ' ')
+      | grep -o 'bounds="[^"]*"' | head -1 | grep -oE '[0-9]+' | tr '\n' ' ')
     coords=$(printf '%s' "$bounds" | awk '{ if (NF == 4) print int(($1 + $3) / 2), int(($2 + $4) / 2) }')
     if [ -n "$coords" ]; then
       set -- $coords
-      cx="$1"
-      cy="$2"
-      adb -s "$dev" shell input tap "$cx" "$cy"
-      sleep 2
+      adb -s "$dev" shell input tap "$1" "$2"
       return 0
     fi
     sleep 2
   done
-  say "  (no 'Allow Desktop Access' prompt appeared — the login stays PENDING)"
+  # Say what was actually on screen: "no prompt" is the single most useless
+  # failure text to hand back, and it is the one this keeps hitting.
+  echo "no 'Allow Desktop Access' prompt after 40s; on screen:" >&2
+  printf '%s' "$dump" | tr '>' '\n' | grep -o 'text="[^"]\+"' | head -8 >&2
   return 1
 }
 
