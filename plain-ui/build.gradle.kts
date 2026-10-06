@@ -50,6 +50,9 @@ kotlin {
         }
         commonTest.dependencies {
             implementation(kotlin("test"))
+            // `onPreFling` 是 suspend、`Animatable.animateTo` 要 MonotonicFrameClock，
+            // commonTest 里没有可移植的 runBlocking，只能用 runTest + TestMonotonicFrameClock。
+            implementation(libs.kotlinx.coroutines.test)
         }
         androidMain.dependencies {
             api(libs.zxing.core)
@@ -72,6 +75,9 @@ compose.resources {
 dependencies {
     add("androidHostTestImplementation", kotlin("test"))
     add("androidHostTestImplementation", libs.junit)
+    // 刷新状态机的兜底测试要跑 Animatable.animateTo，只有 JVM 版 coroutines-test
+    // 带 TestMonotonicFrameClock；commonTest 编 iOS 时没有它。
+    add("androidHostTestImplementation", libs.kotlinx.coroutines.test)
 }
 
 publishing {

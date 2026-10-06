@@ -6,5 +6,9 @@
 <string name="srl_header_release">释放立即刷新</string>
 <string name="srl_header_finish">刷新完成</string>
 <string name="srl_header_failed">刷新失败</string>
+<string name="srl_header_last_refresh_just_now">上次刷新：刚刚</string>
+<string name="srl_header_last_refresh_minutes">上次刷新：%1$d 分钟前</string>
+<string name="srl_header_last_refresh_hours">上次刷新：%1$d 小时前</string>
+<string name="srl_header_last_refresh_days">上次刷新：%1$d 天前</string>
 <string name="back">后退</string>
 </resources>

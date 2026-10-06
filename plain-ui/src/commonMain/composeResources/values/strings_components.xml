@@ -6,5 +6,11 @@
 <string name="srl_header_refreshing">Refreshing…</string>
 <string name="srl_header_finish">Refreshed</string>
 <string name="srl_header_failed">Refresh failed</string>
+<!-- 上次成功刷新的相对时间。只在 values/ 与 values-zh-rCN/ 定义：
+     其余 15 个 locale 缺 key 时回落到默认（英文），不逐个机翻。 -->
+<string name="srl_header_last_refresh_just_now">Last refreshed just now</string>
+<string name="srl_header_last_refresh_minutes">Last refreshed %1$d min ago</string>
+<string name="srl_header_last_refresh_hours">Last refreshed %1$d h ago</string>
+<string name="srl_header_last_refresh_days">Last refreshed %1$d d ago</string>
 <string name="back">Back</string>
 </resources>

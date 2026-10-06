@@ -13,12 +13,31 @@ internal class RefreshLayoutNestedScrollConnection(
     private val orientationIsHorizontal: Boolean,
     private val refreshingCanScroll: Boolean = false,
 ) : NestedScrollConnection {
+
+    /**
+     * 刷新中、且调用方不要「边刷边滚」。
+     *
+     * 注意这个标志**只是「别让刷新头跟着手指动」的锁，不是滚动锁**。
+     * 之前实现反了：`onPreScroll` / `onPreFling` 在这个状态下把整个手势和整个速度
+     * 全量消费掉，子列表一个像素都收不到——刷新期间整页变成一块石头，要等刷新
+     * 结束才能滚。刷新请求经常要好几秒（超时/重试），用户就被钉在那儿干等。
+     *
+     * 正确语义：刷新中内容照常滚，刷新头**钉在 threshold 上不动**。
+     */
+    private val headerPinnedDuringRefresh: Boolean
+        get() =
+            !refreshingCanScroll &&
+                refreshLayoutState.refreshContentState.value == RefreshContentState.Refreshing
+
     //处理子组件用不完的手势,返回消费的手势
     override fun onPostScroll(
         consumed: Offset,
         available: Offset,
         source: NestedScrollSource
     ): Offset {
+        // 刷新头钉住时**不碰 offset**：一旦碰了，offset() 会把状态从 Refreshing
+        // 打回 Dragging，刷新头就被手指越拽越长。
+        if (headerPinnedDuringRefresh) return Offset.Zero
         if (source == NestedScrollSource.UserInput) {
             when (composePosition) {
                 ComposePosition.Start -> {
@@ -61,13 +80,9 @@ internal class RefreshLayoutNestedScrollConnection(
 
     //预先处理手势,返回消费的手势
     override fun onPreScroll(available: Offset, source: NestedScrollSource): Offset {
-        //如果是刷新中状态,并且刷新中不允许滚动,就拒绝对刷新区域和上下区域滚动
-        if (!refreshingCanScroll && refreshLayoutState.refreshContentState.value == RefreshContentState.Refreshing) {
-            return if (orientationIsHorizontal)
-                Offset(available.x, 0f)
-            else
-                Offset(0f, available.y)
-        }
+        // 刷新中:返回 Zero —— 子列表照常滚,刷新头保持钉在 threshold 上。
+        // 这里原来 return 整个 available,等于把整页手势吞掉。
+        if (headerPinnedDuringRefresh) return Offset.Zero
         val refreshOffset = refreshLayoutState.refreshContentOffsetState.value
         if (source == NestedScrollSource.UserInput) {
             when (composePosition) {
@@ -124,10 +139,11 @@ internal class RefreshLayoutNestedScrollConnection(
 
     //手势惯性滑动前回调,返回消费的速度,可以当做action_up
     override suspend fun onPreFling(available: Velocity): Velocity {
-        //如果是刷新中状态,并且刷新中不允许滚动,就拒绝对刷新区域和上下区域滚动
-        if (!refreshingCanScroll && refreshLayoutState.refreshContentState.value == RefreshContentState.Refreshing) {
-            return available
-        }
+        // 刷新中:Zero —— 让子列表自己飞。
+        // 这里原来 return available(整段速度都吞掉),松手后列表不会滑。
+        // 也不能走到下面的 offsetHoming():刷新头本来就停在 threshold 上,
+        // 那是刷新流程的地盘,不是手指的。
+        if (headerPinnedDuringRefresh) return Velocity.Zero
         if (refreshLayoutState.refreshContentOffsetState.value != 0f) {
             refreshLayoutState.offsetHoming()
             return available

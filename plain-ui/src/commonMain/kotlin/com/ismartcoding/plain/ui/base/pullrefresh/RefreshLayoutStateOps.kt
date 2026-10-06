@@ -23,6 +23,7 @@ fun RefreshLayoutState.setRefreshState(state: RefreshContentState) {
                 throw IllegalStateException("[RefreshLayoutState]还未初始化完成,请在[LaunchedEffect]中或composable至少组合一次后使用此方法")
             coroutineScope.launch {
                 refreshContentState.value = RefreshContentState.Finished
+                markRefreshed()
                 delay(300)
                 refreshContentOffsetState.animateTo(0f)
             }
@@ -35,11 +36,9 @@ fun RefreshLayoutState.setRefreshState(state: RefreshContentState) {
                 throw IllegalStateException("[RefreshLayoutState]还未初始化完成,请在[LaunchedEffect]中或composable至少组合一次后使用此方法")
             coroutineScope.launch {
                 refreshContentState.value = RefreshContentState.Refreshing
-                if (canCallRefreshListener)
-                    onRefreshListener()
-                else
-                    setRefreshState(RefreshContentState.Finished)
-                animateToThreshold()
+                runRefreshListener()
+                // 兜底路径已经自己收尾了，不能再把刷新头顶回去，见 parkHeaderIfStillRefreshing。
+                parkHeaderIfStillRefreshing()
             }
         }
 
