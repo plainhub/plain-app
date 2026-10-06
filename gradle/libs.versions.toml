@@ -21,7 +21,6 @@ atomicfu = "0.33.0"
 kotlinxSerializationJsonVersion="1.11.0"
 kotlinxCoroutinesVersion ="1.11.0"
 ktor = "3.6.0"
-netty = "4.2.16.Final"
 leakcanaryAndroidVersion = "2.14"
 lifecycleViewmodelKtxVersion="2.11.0"
 jetbrainsLifecycleViewmodel = "2.11.0"
@@ -138,11 +137,6 @@ ktor-io = { module = "io.ktor:ktor-io", version.ref = "ktor" }
 atomicfu = { module = "org.jetbrains.kotlinx:atomicfu", version.ref = "atomicfu" }
 
 
-# netty (runtime for vendored ktor-server-netty)
-netty-codec-http = { module = "io.netty:netty-codec-http", version.ref = "netty" }
-netty-handler = { module = "io.netty:netty-handler", version.ref = "netty" }
-netty-transport-native-epoll = { module = "io.netty:netty-transport-native-epoll", version.ref = "netty" }
-netty-transport-native-kqueue = { module = "io.netty:netty-transport-native-kqueue", version.ref = "netty" }
 
 jetbrains-markdown = { module = "org.jetbrains:markdown", version.ref = "jetbrainsMarkdown" }
 kotlinx-collections-immutable = { module = "org.jetbrains.kotlinx:kotlinx-collections-immutable", version.ref = "kotlinxCollectionsImmutable" }

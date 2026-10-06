@@ -83,8 +83,12 @@ class HttpRouteRegistryTest {
     }
 
     @Test
-    fun graphQlSchemas_stayPlatformFree() {
-        HttpRouteRegistry.peerGraphQL
-        HttpRouteRegistry.guestGraphQL
+    fun graphQlSchemas_areNotBuiltInKotlinAnymore() {
+        // Rust owns /graphql, /peer_graphql and /guest_graphql. The Kotlin
+        // services used to sit here as `lazy` warm-up handles, which pulled
+        // two whole schemas into the app for no caller.
+        val declared = HttpRouteRegistry::class.java.declaredFields.map { it.name }.toSet()
+        val back = declared.filter { it.contains("GraphQL", ignoreCase = true) }
+        assertEquals(emptyList(), back, "Kotlin GraphQL services came back")
     }
 }

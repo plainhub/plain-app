@@ -129,9 +129,6 @@ fun isSharePath(method: HttpMethod, path: String): Boolean {
  * Dispatched by the bridge fallback in [RustHttpHost].
  */
 object HttpRouteRegistry {
-    val peerGraphQL: PeerGraphQLService by lazy { PeerGraphQLService.create() }
-    val guestGraphQL: GuestGraphQLService by lazy { GuestGraphQLService.create() }
-
     val router: HttpRouter by lazy {
         HttpRouter().apply {
             addFilesRoutes()

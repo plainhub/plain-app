@@ -38,25 +38,25 @@ object RustHostApi {
                                     launch(start = kotlinx.coroutines.CoroutineStart.UNDISPATCHED) {
                                         try {
                                             val reply = try {
-                                                val result = when {
-                                                    method == "httpExchange" -> { com.ismartcoding.plain.httpserver.RustHttpHost.start(exchangeScope, session, params.getValue("id").jsonPrimitive.content); JsonNull }
-                                                    method.startsWith("thumbnail") -> com.ismartcoding.plain.thumbnail.ThumbnailHost.handle(session, method, params)
-                                                    method.startsWith("chatPicked") -> com.ismartcoding.plain.chat.ChatPickedHost.handle(method, params)
-                                                    method.startsWith("sharedTransfer") -> com.ismartcoding.plain.features.share.SharedTransferHost.handle(exchangeScope, method, params)
-                                                    method.startsWith("blePair") -> com.ismartcoding.plain.discover.BlePairingHost.handle(method, params)
-                                                    method.startsWith("mainGraphql") -> com.ismartcoding.plain.httpserver.MainGraphQLHost.handle(method, params)
-                                                    method == "mdnsMulticast" -> com.ismartcoding.plain.discover.MdnsMulticastHost.handle(params)
-                                                    method == "discoveryFacts" -> com.ismartcoding.plain.discover.DiscoveryAdvertisementHost.facts()
-                                                    method == "nearbyScanFacts" -> com.ismartcoding.plain.discover.NearbyScanHost.facts()
-                                                    method == "pairingNotification" -> com.ismartcoding.plain.discover.PairingNotificationHost.handle(params)
-                                                    method == "peerStartAware" || method == "peerDeviceInfo" -> com.ismartcoding.plain.chat.peer.PeerGraphQLHost.handle(method, params)
-                                                    method.startsWith("peerTransport") -> com.ismartcoding.plain.chat.peer.transport.PeerTransportHost.handle(method, params)
-                                                    method.startsWith("system") || method == "fileMetadataFacts" -> com.ismartcoding.plain.features.system.SystemProviderHost.handle(method, params)
-                                                    method == "audioEngineCommand" -> AudioEngineHost.handle(method, params)
-                                                    method.startsWith("fileTask") -> com.ismartcoding.plain.features.file.FileTaskHost.handle(method,params)
-                                                    method == "mediaAction" -> handleMediaActionHost(params)
-                                                    method.startsWith("imageIndex") -> ImageIndexHost.handle(method, params)
-                                                    else -> AudioLibraryHost.handle(method, params)
+                                                val result = when (routeForHostMethod(method)) {
+                                                    HostRoute.HttpExchange -> { com.ismartcoding.plain.httpserver.RustHttpHost.start(exchangeScope, session, params.getValue("id").jsonPrimitive.content); JsonNull }
+                                                    HostRoute.Thumbnail -> com.ismartcoding.plain.thumbnail.ThumbnailHost.handle(session, method, params)
+                                                    HostRoute.ChatPicked -> com.ismartcoding.plain.chat.ChatPickedHost.handle(method, params)
+                                                    HostRoute.SharedTransfer -> com.ismartcoding.plain.features.share.SharedTransferHost.handle(exchangeScope, method, params)
+                                                    HostRoute.BlePairing -> com.ismartcoding.plain.discover.BlePairingHost.handle(method, params)
+                                                    HostRoute.MainGraphql -> com.ismartcoding.plain.httpserver.MainGraphQLHost.handle(method, params)
+                                                    HostRoute.MdnsMulticast -> com.ismartcoding.plain.discover.MdnsMulticastHost.handle(params)
+                                                    HostRoute.DiscoveryAdvertisement -> com.ismartcoding.plain.discover.DiscoveryAdvertisementHost.facts()
+                                                    HostRoute.NearbyScan -> com.ismartcoding.plain.discover.NearbyScanHost.facts()
+                                                    HostRoute.PairingNotification -> com.ismartcoding.plain.discover.PairingNotificationHost.handle(params)
+                                                    HostRoute.PeerGraphql -> com.ismartcoding.plain.chat.peer.PeerGraphQLHost.handle(method, params)
+                                                    HostRoute.PeerTransport -> com.ismartcoding.plain.chat.peer.transport.PeerTransportHost.handle(method, params)
+                                                    HostRoute.SystemProvider -> com.ismartcoding.plain.features.system.SystemProviderHost.handle(method, params)
+                                                    HostRoute.AudioEngine -> AudioEngineHost.handle(method, params)
+                                                    HostRoute.FileTask -> com.ismartcoding.plain.features.file.FileTaskHost.handle(method,params)
+                                                    HostRoute.MediaAction -> handleMediaActionHost(params)
+                                                    HostRoute.ImageIndex -> ImageIndexHost.handle(method, params)
+                                                    HostRoute.AudioLibrary -> AudioLibraryHost.handle(method, params)
                                                 }
                                                 buildJsonObject { put("id", id); put("result", result) }
                                             } catch (cancelled: CancellationException) { throw cancelled }

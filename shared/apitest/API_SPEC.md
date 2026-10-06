@@ -133,7 +133,7 @@ term       := [field ":"] value op?
 | `deleteDbTableRows(ids: [String!]!)` | `[String]` | 调试 API，原生表主键 |
 | `StorageMount.diskId` | `String` | OS 磁盘 uuid，外部标识（Android 端恒空串；2026-09-20 由 diskID 改名） |
 | `PairingRequestInput.timestamp` | `Long` | 配对协议防重放字段（见 §1） |
-| guest `SharedInfo.expiresAt` | `Long` | guest schema（schema-guest.graphqls）的既有 wire 契约，已被 web guest 端消费；客户端在解析边界立即转 Instant（2026-09-24 收录，见 LONG_TERM「既有 wire 例外」） |
+| guest `SharedInfo.expiresAt` | `Long` | guest schema（Rust `/guest_graphql`）的既有 wire 契约，已被 web guest 端消费；客户端在解析边界立即转 Instant（2026-09-24 收录，见 LONG_TERM「既有 wire 例外」） |
 | `chatItems(target)` / `sendChatItem(target)` | `String` | 会话目标编址串（peer id 或带前缀的 channel target，ChatTarget.parseId 解析；2026-09-20 用户定 String，非单一实体 id） |
 | `DataType.DEFAULT` | 枚举成员 | 内部未赋值哨兵，客户端禁止发送（见 §7） |
 

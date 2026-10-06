@@ -29,8 +29,6 @@ fun warmUpHttpServer() {
     coIO {
         if (UserPrefs.service.value) return@coIO
         try {
-            HttpRouteRegistry.peerGraphQL
-            HttpRouteRegistry.guestGraphQL
             HttpRouteRegistry.router
             LogCat.d("Route registry warm-up complete")
         } catch (ex: Exception) {
