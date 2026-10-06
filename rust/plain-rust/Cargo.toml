@@ -8,7 +8,9 @@ name = "plain_rust"
 crate-type = ["cdylib", "staticlib"]
 
 [dependencies]
-plain-rs = { git = "https://github.com/plainhub/plain-desktop.git", rev = "3b1b3bc88ea6a932a48acb387dff2559cfb18182", features = ["content_api", "http_transport"] }
+# Tracks plain-desktop's main branch so the two repos never drift; Cargo.lock
+# pins the exact commit that was built.
+plain-rs = { git = "https://github.com/plainhub/plain-desktop.git", branch = "main", features = ["content_api", "http_transport"] }
 serde_json = "1"
 rustls-pemfile = "2"
 tokio = { version = "1", features = ["rt-multi-thread", "sync"] }
