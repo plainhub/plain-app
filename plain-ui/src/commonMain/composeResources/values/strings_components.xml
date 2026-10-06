@@ -13,4 +13,15 @@
 <string name="srl_header_last_refresh_hours">Last refreshed %1$d h ago</string>
 <string name="srl_header_last_refresh_days">Last refreshed %1$d d ago</string>
 <string name="back">Back</string>
+<!-- 从 plain-app 的 shared/src/commonMain/composeResources 原样搬来（17 个 locale 全套译文，
+     未重新机翻）。供 plain-ui 自带的 NoDataColumn / PTextField / PDropdownMenu / CopyIconButton 使用。
+     两边同名 key 文本必须保持一致，改动要两边同步。 -->
+<string name="no_data">No data</string>
+<string name="no_results_found">No results found</string>
+<string name="searching">Searching…</string>
+<string name="delete">Delete</string>
+<string name="paste">Paste</string>
+<string name="password">Password</string>
+<string name="clear">Clear</string>
+<string name="copy_text">Copy text</string>
 </resources>

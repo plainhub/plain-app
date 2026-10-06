@@ -7,4 +7,12 @@
 <string name="srl_header_finish">Vernieuwd</string>
 <string name="srl_header_failed">Vernieuwen mislukt</string>
 <string name="back">Terug</string>
+<string name="no_data">Geen gegevens</string>
+<string name="no_results_found">Geen resultaten gevonden</string>
+<string name="searching">Zoeken…</string>
+<string name="delete">Verwijderen</string>
+<string name="paste">Plakken</string>
+<string name="password">Wachtwoord</string>
+<string name="clear">Leegmaken</string>
+<string name="copy_text">Tekst kopiëren</string>
 </resources>

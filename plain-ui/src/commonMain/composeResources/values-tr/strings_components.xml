@@ -7,4 +7,12 @@
 <string name="srl_header_finish">Yenilendi</string>
 <string name="srl_header_failed">Yenileme başarısız</string>
 <string name="back">Geri</string>
+<string name="no_data">Veri yok</string>
+<string name="no_results_found">Sonuç bulunamadı</string>
+<string name="searching">Aranıyor…</string>
+<string name="delete">Sil</string>
+<string name="paste">Yapıştır</string>
+<string name="password">Şifre</string>
+<string name="clear">Temizle</string>
+<string name="copy_text">Metni kopyala</string>
 </resources>

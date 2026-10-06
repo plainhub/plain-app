@@ -7,4 +7,12 @@
 <string name="srl_header_finish">রিফ্রেশ হয়েছে</string>
 <string name="srl_header_failed">রিফ্রেশ ব্যর্থ হয়েছে</string>
 <string name="back">পেছনে</string>
+<string name="no_data">কোন তথ্য নেই</string>
+<string name="no_results_found">কোনো ফলাফল পাওয়া যায়নি</string>
+<string name="searching">অনুসন্ধান করা হচ্ছে...</string>
+<string name="delete">মুছে ফেলুন</string>
+<string name="paste">পেস্ট করুন</string>
+<string name="password">পাসওয়ার্ড</string>
+<string name="clear">পরিষ্কার</string>
+<string name="copy_text">মূল কাগজ অনুলিপি করুন</string>
 </resources>

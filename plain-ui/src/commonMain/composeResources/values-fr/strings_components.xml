@@ -7,4 +7,12 @@
 <string name="srl_header_finish">Actualisé</string>
 <string name="srl_header_failed">Échec de l'actualisation</string>
 <string name="back">Retour</string>
+<string name="no_data">Aucune donnée</string>
+<string name="no_results_found">Aucun résultat trouvé</string>
+<string name="searching">Recherche en cours…</string>
+<string name="delete">Supprimer</string>
+<string name="paste">Coller</string>
+<string name="password">Mot de passe</string>
+<string name="clear">Effacer</string>
+<string name="copy_text">Copier le texte</string>
 </resources>

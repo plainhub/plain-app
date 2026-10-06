@@ -7,4 +7,12 @@
 <string name="srl_header_finish">更新済み</string>
 <string name="srl_header_failed">更新に失敗しました</string>
 <string name="back">戻る</string>
+<string name="no_data">データなし</string>
+<string name="no_results_found">結果が見つかりませんでした</string>
+<string name="searching">検索中...</string>
+<string name="delete">削除</string>
+<string name="paste">貼り付け</string>
+<string name="password">パスワード</string>
+<string name="clear">クリア</string>
+<string name="copy_text">テキストをコピー</string>
 </resources>

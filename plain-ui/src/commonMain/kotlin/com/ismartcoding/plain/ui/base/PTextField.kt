@@ -1,6 +1,5 @@
 package com.ismartcoding.plain.ui.base
 
-import com.ismartcoding.plain.i18n.*
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -27,12 +26,16 @@ import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
-import com.ismartcoding.plain.platform.getClipboardText
+import androidx.compose.ui.platform.LocalClipboardManager
 import com.ismartcoding.plain.ui.resources.Res as UiRes
 import com.ismartcoding.plain.ui.resources.content_paste as ui_drawable_content_paste
 import com.ismartcoding.plain.ui.resources.eye as ui_drawable_eye
 import com.ismartcoding.plain.ui.resources.eye_off as ui_drawable_eye_off
 import com.ismartcoding.plain.ui.resources.x as ui_drawable_x
+import com.ismartcoding.plain.ui.resources.clear as ui_string_clear
+import com.ismartcoding.plain.ui.resources.password as ui_string_password
+import com.ismartcoding.plain.ui.resources.paste as ui_string_paste
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -50,6 +53,7 @@ fun PTextField(
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
     keyboardActions: KeyboardActions = KeyboardActions(),
 ) {
+    val clipboardManager = LocalClipboardManager.current
     val focusRequester = remember { FocusRequester() }
     var showPassword by remember { mutableStateOf(false) }
 
@@ -117,17 +121,17 @@ fun PTextField(
                                     UiRes.drawable.ui_drawable_x
                                 }
                             ),
-                        contentDescription = if (isPassword) stringResource(Res.string.password) else stringResource(Res.string.clear),
+                        contentDescription = if (isPassword) stringResource(UiRes.string.ui_string_password) else stringResource(UiRes.string.ui_string_clear),
                         tint = MaterialTheme.colorScheme.outline.copy(alpha = 0.5f),
                     )
                 }
             } else {
                 IconButton(onClick = {
-                    onValueChange(getClipboardText() ?: "")
+                    onValueChange(clipboardManager.getText()?.text ?: "")
                 }) {
                     Icon(
                         painter = painterResource(UiRes.drawable.ui_drawable_content_paste),
-                        contentDescription = stringResource(Res.string.paste),
+                        contentDescription = stringResource(UiRes.string.ui_string_paste),
                         tint = MaterialTheme.colorScheme.primary,
                     )
                 }

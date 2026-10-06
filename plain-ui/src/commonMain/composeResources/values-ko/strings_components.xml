@@ -7,4 +7,12 @@
 <string name="srl_header_finish">새로 고침됨</string>
 <string name="srl_header_failed">새로고침 실패</string>
 <string name="back">뒤로</string>
+<string name="no_data">데이터 없음</string>
+<string name="no_results_found">결과가 없습니다</string>
+<string name="searching">검색 중…</string>
+<string name="delete">삭제</string>
+<string name="paste">붙여넣기</string>
+<string name="password">비밀번호</string>
+<string name="clear">지우기</string>
+<string name="copy_text">텍스트 복사</string>
 </resources>

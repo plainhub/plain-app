@@ -7,4 +7,12 @@
 <string name="srl_header_finish">ताज़ा हो गया</string>
 <string name="srl_header_failed">ताज़ा करने में विफल हो गया</string>
 <string name="back">वापस</string>
+<string name="no_data">कोई डेटा नहीं</string>
+<string name="no_results_found">कोई परिणाम नहीं मिला</string>
+<string name="searching">खोज रहा है...</string>
+<string name="delete">हटाएं</string>
+<string name="paste">पेस्ट करें</string>
+<string name="password">पासवर्ड</string>
+<string name="clear">साफ़</string>
+<string name="copy_text">पाठ की प्रतिलिपि बनाएँ</string>
 </resources>

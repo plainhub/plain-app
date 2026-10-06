@@ -7,4 +7,12 @@
 <string name="srl_header_finish">Refrescado</string>
 <string name="srl_header_failed">Error al refrescar</string>
 <string name="back">Atrás</string>
+<string name="no_data">Sin datos</string>
+<string name="no_results_found">No se encontraron resultados</string>
+<string name="searching">Buscando...</string>
+<string name="delete">Eliminar</string>
+<string name="paste">Pegar</string>
+<string name="password">Contraseña</string>
+<string name="clear">Limpiar</string>
+<string name="copy_text">Copiar texto</string>
 </resources>

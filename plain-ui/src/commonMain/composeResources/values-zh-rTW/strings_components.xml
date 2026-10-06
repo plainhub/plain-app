@@ -7,4 +7,12 @@
 <string name="srl_header_finish">刷新完成</string>
 <string name="srl_header_failed">刷新失敗</string>
 <string name="back">後退</string>
+<string name="no_data">沒有數據</string>
+<string name="no_results_found">找不到結果</string>
+<string name="searching">搜索中…</string>
+<string name="delete">刪除</string>
+<string name="paste">粘貼</string>
+<string name="password">密碼</string>
+<string name="clear">清空</string>
+<string name="copy_text">複製文本</string>
 </resources>

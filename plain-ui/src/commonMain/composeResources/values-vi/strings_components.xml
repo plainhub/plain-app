@@ -7,4 +7,12 @@
 <string name="srl_header_finish">Đã làm mới</string>
 <string name="srl_header_failed">Làm mới thất bại</string>
 <string name="back">Quay lại</string>
+<string name="no_data">Không có dữ liệu</string>
+<string name="no_results_found">Không tìm thấy kết quả</string>
+<string name="searching">Đang tìm kiếm...</string>
+<string name="delete">Xóa</string>
+<string name="paste">Dán</string>
+<string name="password">Mật khẩu</string>
+<string name="clear">Xóa</string>
+<string name="copy_text">Sao chép văn bản</string>
 </resources>

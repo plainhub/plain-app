@@ -7,4 +7,12 @@
 <string name="srl_header_finish">புதுப்பிக்கப்படுகின்றது</string>
 <string name="srl_header_failed">புதுப்பிக்க தோல்வி</string>
 <string name="back">பின்</string>
+<string name="no_data">கொருக்கவில்லை</string>
+<string name="no_results_found">முடிவுகள் கண்டுபிடிக்கப்படவில்லை</string>
+<string name="searching">தேடுகிறது...</string>
+<string name="delete">நீக்கு</string>
+<string name="paste">ஒன்றினை சுழற்சி</string>
+<string name="password">கடவுச்சொல்</string>
+<string name="clear">அழி</string>
+<string name="copy_text">உரையை நகல் எடு</string>
 </resources>

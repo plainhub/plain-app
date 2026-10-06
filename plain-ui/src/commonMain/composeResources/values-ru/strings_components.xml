@@ -7,4 +7,12 @@
 <string name="srl_header_finish">Обновлено</string>
 <string name="srl_header_failed">Обновление не удалось</string>
 <string name="back">Назад</string>
+<string name="no_data">Нет данных</string>
+<string name="no_results_found">Результатов не найдено</string>
+<string name="searching">Поиск…</string>
+<string name="delete">Удалить</string>
+<string name="paste">Вставить</string>
+<string name="password">Пароль</string>
+<string name="clear">Очистить</string>
+<string name="copy_text">Копировать текст</string>
 </resources>

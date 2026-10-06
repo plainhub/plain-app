@@ -1,6 +1,5 @@
 package com.ismartcoding.plain.ui.base
 
-import com.ismartcoding.plain.i18n.*
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.PaddingValues
@@ -19,6 +18,8 @@ import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.unit.dp
 import com.ismartcoding.plain.ui.resources.Res as UiRes
 import com.ismartcoding.plain.ui.resources.trash_2 as ui_drawable_trash_2
+import com.ismartcoding.plain.ui.resources.delete as ui_string_delete
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -62,7 +63,7 @@ fun PDropdownMenuItem(
 @Composable
 fun PDropdownMenuItemDelete(onClick: () -> Unit) {
     PDropdownMenuItem(
-        text = { Text(stringResource(Res.string.delete), color = MaterialTheme.colorScheme.error) },
+        text = { Text(stringResource(UiRes.string.ui_string_delete), color = MaterialTheme.colorScheme.error) },
         leadingIcon = {
             Icon(
                 painter = painterResource(UiRes.drawable.ui_drawable_trash_2),

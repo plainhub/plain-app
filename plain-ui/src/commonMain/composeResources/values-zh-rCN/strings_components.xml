@@ -11,4 +11,12 @@
 <string name="srl_header_last_refresh_hours">上次刷新：%1$d 小时前</string>
 <string name="srl_header_last_refresh_days">上次刷新：%1$d 天前</string>
 <string name="back">后退</string>
+<string name="no_data">没有数据</string>
+<string name="no_results_found">未找到结果</string>
+<string name="searching">搜索中…</string>
+<string name="delete">删除</string>
+<string name="paste">粘贴</string>
+<string name="password">密码</string>
+<string name="clear">清空</string>
+<string name="copy_text">复制文本</string>
 </resources>
