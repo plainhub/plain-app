@@ -2,11 +2,16 @@ package com.ismartcoding.plain.features.system
 
 import com.ismartcoding.plain.data.DCall
 import com.ismartcoding.plain.data.DContact
+import com.ismartcoding.plain.data.DScreenMirrorQuality
+import com.ismartcoding.plain.preferences.UserPrefs
+import com.ismartcoding.plain.enums.WebSettingsFeature
+import com.ismartcoding.plain.httpserver.models.toModel
 import com.ismartcoding.plain.data.getGeo
 import com.ismartcoding.plain.extensions.parseEpochMillis
 import com.ismartcoding.plain.features.contact.DContentItem
 import com.ismartcoding.plain.lib.JsonHelper
 import com.ismartcoding.plain.lib.pinyin.Pinyin
+import com.ismartcoding.plain.lib.sendEvent
 import com.ismartcoding.plain.platform.installedPackageFacts
 import com.ismartcoding.plain.platform.notificationFacts
 import com.ismartcoding.plain.platform.isGranted
@@ -271,6 +276,101 @@ object SystemProviderHost {
                 com.ismartcoding.plain.httpserver.models.ID(params.getValue("threadId").jsonPrimitive.content),
             )
         )
+        "systemScreenMirrorState" -> {
+            val codec = com.ismartcoding.plain.platform.getScreenMirrorVideoCodec()
+            buildJsonObject {
+                put("running", JsonPrimitive(com.ismartcoding.plain.platform.isScreenMirrorRunning()))
+                put("controlEnabled", JsonPrimitive(com.ismartcoding.plain.platform.isScreenMirrorControlEnabled()))
+                put("codec", codec?.let { value ->
+                    buildJsonObject {
+                        put("annexB", JsonPrimitive(value.annexB))
+                        put("keyFrame", value.keyFrame?.let { JsonPrimitive(it) } ?: JsonNull)
+                    }
+                } ?: JsonNull)
+            }
+        }
+        "systemScreenMirrorQuality" -> Json.parseToJsonElement(
+            JsonHelper.jsonEncode(UserPrefs.screenMirrorQualityValue().toModel())
+        )
+        "systemStartScreenMirror" -> {
+            com.ismartcoding.plain.platform.applyScreenMirrorQualityPreference()
+            sendEvent(
+                com.ismartcoding.plain.events.HStartScreenMirrorEvent(
+                    params.getValue("audio").jsonPrimitive.boolean
+                )
+            )
+            JsonPrimitive(true)
+        }
+        "systemStopScreenMirror" -> {
+            com.ismartcoding.plain.platform.stopScreenMirror()
+            JsonPrimitive(true)
+        }
+        "systemRequestScreenMirrorAudio" -> {
+            val granted = com.ismartcoding.plain.platform.Permission.RECORD_AUDIO.isGranted()
+            if (!granted) {
+                sendEvent(
+                    com.ismartcoding.plain.events.HRequestScreenMirrorAudioEvent()
+                )
+            }
+            JsonPrimitive(granted)
+        }
+        "systemRequestScreenMirrorKeyFrame" -> {
+            com.ismartcoding.plain.platform.requestScreenMirrorKeyFrame()
+            JsonPrimitive(true)
+        }
+        "systemUpdateScreenMirrorQuality" -> {
+            val mode = when (params.getValue("mode").jsonPrimitive.content) {
+                "SMOOTH" -> com.ismartcoding.plain.enums.ScreenMirrorMode.SMOOTH
+                else -> com.ismartcoding.plain.enums.ScreenMirrorMode.HD
+            }
+            val quality = DScreenMirrorQuality(
+                mode, if (mode == com.ismartcoding.plain.enums.ScreenMirrorMode.SMOOTH) 720 else 1080
+            )
+            com.ismartcoding.plain.preferences.UserPrefs.setScreenMirrorQuality(quality)
+            com.ismartcoding.plain.platform.onScreenMirrorQualityChanged(mode)
+            JsonPrimitive(true)
+        }
+        "systemOpenAccessibilitySettings" -> {
+            sendEvent(com.ismartcoding.plain.events.HOpenAccessibilitySettingsEvent())
+            JsonPrimitive(true)
+        }
+        "systemOpenWebSettings" -> {
+            val feature = params["feature"]
+                ?.takeUnless { it is JsonNull }
+                ?.jsonPrimitive
+                ?.content
+                ?.let { name ->
+                    WebSettingsFeature.entries
+                        .firstOrNull { it.name == name }
+                }
+            sendEvent(com.ismartcoding.plain.events.HOpenWebSettingsEvent(feature))
+            JsonPrimitive(true)
+        }
+        "systemImageSearchStatus" -> Json.parseToJsonElement(
+            JsonHelper.jsonEncode(com.ismartcoding.plain.platform.buildImageSearchStatus())
+        )
+        "systemEnableImageSearch" -> {
+            sendEvent(com.ismartcoding.plain.events.HEnableImageSearchEvent())
+            JsonPrimitive(true)
+        }
+        "systemDisableImageSearch" -> {
+            sendEvent(com.ismartcoding.plain.events.HDisableImageSearchEvent())
+            JsonPrimitive(true)
+        }
+        "systemCancelImageModelDownload" -> {
+            sendEvent(com.ismartcoding.plain.events.HCancelImageModelDownloadEvent())
+            JsonPrimitive(true)
+        }
+        "systemStartImageIndex" -> {
+            com.ismartcoding.plain.platform.startImageIndexFullScan(
+                params.getValue("force").jsonPrimitive.boolean
+            )
+            JsonPrimitive(true)
+        }
+        "systemCancelImageIndex" -> {
+            com.ismartcoding.plain.platform.cancelImageIndex()
+            JsonPrimitive(true)
+        }
         "systemDeleteRecords" -> JsonArray(com.ismartcoding.plain.platform.deleteSystemProviderFacts(
             com.ismartcoding.plain.enums.DataType.valueOf(params.getValue("provider").jsonPrimitive.content),
             params.getValue("ids").jsonArray.map { it.jsonPrimitive.content }.toSet()).map(::JsonPrimitive))
