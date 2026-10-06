@@ -464,6 +464,18 @@ object SystemProviderHost {
             com.ismartcoding.plain.platform.getDocExtGroups("").map { (ext, count) ->
                 buildJsonObject { put("ext", JsonPrimitive(ext)); put("count", JsonPrimitive(count)) } })
         "systemMediaTagFacts" -> mediaTagFacts(params)
+        "systemTagQueryStubs" -> JsonArray(
+            com.ismartcoding.plain.platform.getMediaTagRelationStubs(
+                mediaDataType(params), params.getValue("query").jsonPrimitive.content).map { stub ->
+                buildJsonObject {
+                    put("key", JsonPrimitive(stub.key)); put("title", JsonPrimitive(stub.title))
+                    put("size", JsonPrimitive(stub.size))
+                }
+            })
+        "systemTagQueryKeys" -> buildJsonObject {
+            put("ids", JsonArray(com.ismartcoding.plain.platform.getMediaIds(
+                mediaDataType(params), params.getValue("query").jsonPrimitive.content).map(::JsonPrimitive)))
+        }
         else -> error("Unsupported provider operation")
     }
 }
