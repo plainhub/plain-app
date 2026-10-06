@@ -86,8 +86,7 @@ fun DlnaReceiverVideoPlayerContent(onExit: () -> Unit) {
     LaunchedEffect(Unit) {
         while (true) {
             state.updateTime()
-            DlnaRendererState.currentPositionMs.value = state.currentTime
-            DlnaRendererState.durationMs.value = state.totalTime
+            DlnaRendererState.reportPosition(state.currentTime, state.totalTime)
             delay(500)
         }
     }
@@ -114,8 +113,9 @@ fun DlnaReceiverVideoPlayerContent(onExit: () -> Unit) {
     val onPlayPause = {
         val wasPlaying = state.isPlaying
         state.togglePlay()
-        DlnaRendererState.playbackState.value =
-            if (wasPlaying) DlnaPlaybackState.PAUSED else DlnaPlaybackState.PLAYING
+        DlnaRendererState.reportPlaybackState(
+            if (wasPlaying) DlnaPlaybackState.PAUSED else DlnaPlaybackState.PLAYING,
+        )
     }
 
     val interactionSource = remember { MutableInteractionSource() }

@@ -1,16 +1,14 @@
 package com.ismartcoding.plain.features.dlna
 
-import com.ismartcoding.plain.features.dlna.receiver.DlnaReceiverEngine
+import com.ismartcoding.plain.lib.coIO
 
 /**
- * Start the DLNA renderer service (HTTP + SSDP advertiser).
- * Delegates to [DlnaReceiverEngine]; the only platform-specific piece
- * (SSDP multicast socket) is handled by [createDlnaSsdpSocket].
+ * Start the DLNA renderer service (HTTP endpoints + SSDP advertiser).
+ *
+ * The engine lives in Rust; the app only asks it to start and then follows
+ * the state it broadcasts.
  */
-fun startDlnaRenderer() = DlnaReceiverEngine.start()
+fun startDlnaRenderer() = coIO { DlnaRendererState.start() }
 
-/**
- * Stop the DLNA renderer service and release the server socket.
- * Delegates to [DlnaReceiverEngine].
- */
-fun stopDlnaRenderer() = DlnaReceiverEngine.stop()
+/** Stop the DLNA renderer service and release its resources. */
+fun stopDlnaRenderer() = coIO { DlnaRendererState.stop() }

@@ -1783,7 +1783,7 @@ checksum = "f6b464fbc74e149a392436b17d523f769e057cb6877f6a5c4618bc6f11800548"
 [[package]]
 name = "plain-rs"
 version = "0.1.0"
-source = "git+https://github.com/plainhub/plain-desktop.git?rev=71851ed7cb29cda5094cb15a71d5d28f616b7bc5#71851ed7cb29cda5094cb15a71d5d28f616b7bc5"
+source = "git+https://github.com/plainhub/plain-desktop.git?rev=4701ae9b6370fb105ccda94f5be9f1d7d51f77e5#4701ae9b6370fb105ccda94f5be9f1d7d51f77e5"
 dependencies = [
  "anyhow",
  "async-graphql",

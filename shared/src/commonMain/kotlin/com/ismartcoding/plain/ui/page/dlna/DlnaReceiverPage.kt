@@ -26,7 +26,6 @@ import androidx.navigation.NavHostController
 import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.enums.ButtonSize
 import com.ismartcoding.plain.features.dlna.DlnaRendererState
-import com.ismartcoding.plain.features.dlna.receiver.DlnaReceiverEngine
 import com.ismartcoding.plain.features.dlna.startDlnaRenderer
 import com.ismartcoding.plain.ui.base.AlertType
 import com.ismartcoding.plain.ui.base.BottomSpace
@@ -81,7 +80,7 @@ fun DlnaReceiverPage(navController: NavHostController) {
                                 stringResource(Res.string.retry),
                                 buttonSize = ButtonSize.SMALL,
                                 isLoading = isRetrying,
-                                onClick = { DlnaReceiverEngine.retry() }
+                                onClick = { DlnaRendererState.retry() }
                             )
                         },
                     )

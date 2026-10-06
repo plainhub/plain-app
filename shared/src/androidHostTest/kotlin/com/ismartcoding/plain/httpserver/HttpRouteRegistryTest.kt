@@ -32,6 +32,9 @@ class HttpRouteRegistryTest {
         HttpMethod.POST to "/upload_chunk",
         HttpMethod.GET to "/zip/dir",
         HttpMethod.GET to "/zip/files",
+        HttpMethod.GET to "/description.xml",
+        HttpMethod.POST to "/AVTransport/control",
+        HttpMethod.POST to "/RenderingControl/control",
     )
 
     @Test
@@ -43,19 +46,10 @@ class HttpRouteRegistryTest {
                 HttpMethod.GET to "/fs",
                 HttpMethod.GET to "/media/{id}",
                 HttpMethod("NOTIFY") to "/callback/cast",
-                HttpMethod.GET to "/description.xml",
-                HttpMethod.GET to "/AVTransport/scpd.xml",
-                HttpMethod.GET to "/RenderingControl/scpd.xml",
-                HttpMethod.POST to "/AVTransport/control",
-                HttpMethod.POST to "/RenderingControl/control",
-                HttpMethod("SUBSCRIBE") to "/AVTransport/event",
-                HttpMethod("SUBSCRIBE") to "/RenderingControl/event",
-                HttpMethod("UNSUBSCRIBE") to "/AVTransport/event",
-                HttpMethod("UNSUBSCRIBE") to "/RenderingControl/event",
             ),
             registered,
-            "the bridge fallback table changed — /fs (mobile id + sid), the DLNA sender routes and the " +
-                "MediaRenderer receiver routes are still Kotlin-only, so dropping one breaks that protocol",
+            "the bridge fallback table changed — /fs (mobile id + sid) and the DLNA sender routes are " +
+                "still Kotlin-only, so dropping one breaks that protocol",
         )
     }
 
