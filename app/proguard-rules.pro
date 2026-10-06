@@ -17,21 +17,11 @@
 # otherwise the stack traces are pretty useless
 
 # ===== R8 missing rules (classes not available on Android) =====
-# Netty (Ktor server engine) references many optional JVM-desktop classes
-# that don't exist on Android: tcnative SSL, JFR, log4j, JMX, BlockHound, etc.
--dontwarn io.netty.**
--dontwarn reactor.blockhound.**
+# JVM-desktop-only classes pulled in transitively. Netty's own rules went
+# away with the Ktor server engine.
 -dontwarn java.lang.management.**
 -dontwarn javax.naming.ldap.**
 -dontwarn jdk.jfr.**
--dontwarn org.apache.log4j.**
--dontwarn org.apache.logging.log4j.**
-
-# Netty 4.2 uses java.lang.invoke.VarHandle for byte[]/ByteBuffer short/int/long
-# access. R8 horizontal class merging corrupts the invoke-polymorphic call sites,
-# producing java.lang.VerifyError ("expected Reference: java.lang.Object[]") on
-# launch. Keeping the package intact disables that optimization for these classes.
--keep class io.netty.** { *; }
 
 # ===== kotlinx.serialization =====
 # Keep @Serializable companions and serializer accessors.
