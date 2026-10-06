@@ -22,8 +22,6 @@ import com.ismartcoding.plain.lib.withIO
 import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.platform.AppDatabase
 import com.ismartcoding.plain.platform.Permission
-import com.ismartcoding.plain.platform.computeECDHSharedKey
-import com.ismartcoding.plain.platform.generateECDHKeyPair
 import com.ismartcoding.plain.platform.generateNotificationId
 import com.ismartcoding.plain.platform.chaCha20Encrypt
 import com.ismartcoding.plain.platform.isAndroidOnly
@@ -283,70 +281,54 @@ object HttpServerManager {
     }
 
     /**
-     * Accept a pending web login: perform ECDH key exchange to derive a
-     * shared token (never transmitted), sign the response with Ed25519,
-     * persist the session, refresh the token cache, and send the encrypted
-     * response back to the browser via the WebSocket session handle.
+     * Deliver a Rust-issued login. The token, its signature and the
+     * `sessions` row come from Rust; this covers only the host-side work —
+     * the peer pairing record, the web login notification and sending the
+     * encrypted response back over the WebSocket.
      */
     @OptIn(ExperimentalEncodingApi::class)
-    suspend fun respondTokenAsync(
-        event: ConfirmToAcceptLoginEvent,
+    suspend fun deliverLoginResult(
+        clientId: String,
         clientIp: String,
+        request: AuthRequest,
+        result: RustLoginResult,
+        session: WsSessionHandle,
     ) = withIO {
-        val r = event.request
-        val serverKeyPair = generateECDHKeyPair()
-        val serverPublicKeyBase64 = Base64.encode(serverKeyPair.publicKeyEncoded)
+        val signedResponse = result.response()
+        if (signedResponse == null || result.token.isEmpty()) return@withIO
 
-        val clientPublicKeyBytes = Base64Lenient.decode(event.clientEcdhPublicKey)
-        val token = computeECDHSharedKey(serverKeyPair.privateKeyEncoded, clientPublicKeyBytes)
-        if (token == null) {
-            LogCat.e("ECDH shared key computation failed")
-            return@withIO
-        }
-
-        val peer = r.peer?.takeIf {
+        val peer = request.peer?.takeIf {
             it.port in 1..65535 && it.signaturePublicKey.isNotBlank() &&
                 runCatching { Base64Lenient.decode(it.signaturePublicKey).size == 32 }.getOrDefault(false)
         }
         if (peer != null) {
             PairingPeerStore.save(
-                deviceId = event.clientId,
+                deviceId = clientId,
                 deviceName = peer.deviceName,
                 deviceIps = (listOf(clientIp) + peer.ips).filter { it.isNotBlank() }.distinct(),
                 port = peer.port,
                 deviceType = peer.deviceType,
-                key = deriveLoginChatKey(token),
+                key = deriveLoginChatKey(result.token),
                 signaturePublicKey = peer.signaturePublicKey,
             )
         }
 
-        val timestamp = TimeHelper.nowMillis()
-        val response = AuthResponse(
-            clientId = TempData.clientId,
-            status = AuthStatus.COMPLETED,
-            ecdhPublicKey = serverPublicKeyBase64,
-            signature = "", // filled after signing
-            timestamp = timestamp,
-            chatPaired = peer != null,
+        // Host copy only — Rust owns issuance and the sessions row.
+        tokenCache.put(clientId, Base64Lenient.decode(result.token))
+        sendWebLoginNotification(
+            request.browserName, request.browserVersion, request.osName, request.osVersion, clientIp,
         )
-        val signature = SignatureHelper.signTextAsync(response.toSignatureData())
-        val signedResponse = response.copy(signature = signature)
+        session.send(
+            chaCha20Encrypt(passwordToToken(), JsonHelper.jsonEncode(signedResponse)),
+        )
+    }
 
-        SessionList.addOrUpdateAsync(event.clientId) {
-            it.clientIp = clientIp
-            it.osName = r.osName
-            it.osVersion = r.osVersion
-            it.browserName = r.browserName
-            it.browserVersion = r.browserVersion
-            it.token = token
-        }
-        tokenCache.put(event.clientId, Base64Lenient.decode(token))
-        sendWebLoginNotification(r.browserName, r.browserVersion, r.osName, r.osVersion, clientIp)
-        event.session.send(
-            chaCha20Encrypt(
-                passwordToToken(),
-                JsonHelper.jsonEncode(signedResponse),
-            ),
-        )
+    /** Second leg of a 2FA login, once the user accepted the prompt. */
+    suspend fun respondTokenAsync(
+        event: ConfirmToAcceptLoginEvent,
+        clientIp: String,
+    ) {
+        val result = RustWebLogin.complete(event.clientId, clientIp, event.request)
+        deliverLoginResult(event.clientId, clientIp, event.request, result, event.session)
     }
 }

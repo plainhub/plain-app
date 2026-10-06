@@ -23,6 +23,7 @@ import com.ismartcoding.plain.httpserver.AuthRequest
 import com.ismartcoding.plain.httpserver.AuthResponse
 import com.ismartcoding.plain.httpserver.AuthStatus
 import com.ismartcoding.plain.httpserver.HttpServerManager
+import com.ismartcoding.plain.httpserver.RustWebLogin
 import com.ismartcoding.plain.httpserver.requiresLoginConfirmation
 import com.ismartcoding.plain.httpserver.setOnlineClientIds
 import com.ismartcoding.plain.httpserver.http.HttpCall
@@ -136,9 +137,14 @@ private suspend fun handleLoginFrame(
     if (decryptedBytes != null) {
         r = jsonDecode<AuthRequest>(decryptedBytes.decodeToString())
     }
-    if (r?.password == hash) {
-        val event = ConfirmToAcceptLoginEvent(sessionHandle, clientId, r, r.ecdhPublicKey)
-        if (requiresLoginConfirmation(r, SystemPrefs.authTwoFactor.value)) {
+    val request = r
+    if (request != null && request.password == hash) {
+        // Rust verifies the password, decides 2FA and issues the token.
+        val issued = RustWebLogin.issue(clientId, clientIp, request)
+        if (issued.status == RustWebLogin.STATUS_COMPLETED) {
+            HttpServerManager.deliverLoginResult(clientId, clientIp, request, issued, sessionHandle)
+        } else {
+            val event = ConfirmToAcceptLoginEvent(sessionHandle, clientId, request, request.ecdhPublicKey)
             ws.sendBinary(
                 chaCha20Encrypt(
                     token,
@@ -146,10 +152,6 @@ private suspend fun handleLoginFrame(
                 ),
             )
             sendEvent(event)
-        } else {
-            coIO {
-                HttpServerManager.respondTokenAsync(event, clientIp)
-            }
         }
     } else {
         LogCat.e("ws: invalid_password")
