@@ -10,6 +10,7 @@ import com.ismartcoding.plain.lib.coIO
 import com.ismartcoding.plain.lib.withIO
 import com.ismartcoding.plain.i18n.*
 import com.ismartcoding.plain.lib.logcat.LogCat
+import kotlinx.coroutines.withTimeout
 import com.ismartcoding.plain.httpserver.HttpServerManager
 import com.ismartcoding.plain.httpserver.closeAllWsSessions
 import com.ismartcoding.plain.httpserver.httpPorts
@@ -190,11 +191,15 @@ suspend fun startHttpServerAsync() = withIO {
             startHttpServerAsyncLocked()
         } catch (ex: kotlinx.coroutines.CancellationException) {
             throw ex
-        } catch (ex: Exception) {
+        } catch (ex: Throwable) {
             // The orchestrator owns its terminal state: an unexpected failure
             // (engine create crash, keystore fatal, …) must land in ERROR,
             // never strand callers — and the UI loading spinner — in STARTING.
             // The Android service used to catch this; iOS had no backstop.
+            // Throwable rather than Exception: a native bridge whose class
+            // initializer failed raises NoClassDefFoundError, which is an
+            // Error, and that is exactly the "engine create crash" this
+            // backstop exists for.
             LogCat.e("startHttpServerAsync failed unexpectedly: ${ex.message}")
             HttpServerManager.httpServerError.value = ex.message ?: (ex::class.simpleName ?: "error")
             HttpServerManager.serverState.value = HttpServerState.ERROR
@@ -291,9 +296,18 @@ internal suspend fun finishHttpServerStopAsync() = withIO {
     withContext(NonCancellable) {
         lifecycleMutex.withLock {
             val t0 = TimeHelper.nowMillis()
-            stopHttpEngineAsync()
+            // Both steps are isolated from the terminal state below. The
+            // contract here is that a started stop always reaches OFF, so a
+            // hook that throws — or waits on a subsystem that is not answering
+            // — must not strand the state in STOPPING. The wait is bounded for
+            // the same reason: the mDNS unpublish is a side effect of stopping,
+            // not a precondition for it, and a wedged runtime used to make the
+            // server impossible to turn off.
+            runCatching { stopHttpEngineAsync() }
+                .onFailure { LogCat.e("HTTP server engine stop failed: ${it.message}") }
             val tEngine = TimeHelper.nowMillis()
-            onHttpServerStopped()
+            runCatching { withTimeout(STOP_HOOK_TIMEOUT_MS) { onHttpServerStopped() } }
+                .onFailure { LogCat.e("HTTP server stop hook failed: ${it.message}") }
             val tHooks = TimeHelper.nowMillis()
             HttpServerManager.httpServerError.value = ""
             HttpServerManager.portsInUse.value = emptySet()
@@ -302,6 +316,9 @@ internal suspend fun finishHttpServerStopAsync() = withIO {
         }
     }
 }
+
+/** Upper bound for the stop side-effect hooks, so a wedged one cannot hang teardown. */
+private const val STOP_HOOK_TIMEOUT_MS = 2_000L
 
 /**
  * Shared stop body: records STOPPING (intent marker, before the lock so the

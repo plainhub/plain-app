@@ -38,6 +38,13 @@ import kotlin.test.assertTrue
  *    (no self HTTP round-trip) and must finish well under the 5s timeout.
  * 2. remoteHost must stay the literal socket peer address.
  *
+ * (1) is also the regression lock for a stop that never finished: the stop
+ * hooks include an mDNS unpublish that waits on the Rust content API, and a
+ * runtime whose command loop had died left that wait pending forever — so
+ * `serverState` never reached OFF and the server could not be turned off. The
+ * teardown now isolates and bounds its hooks; with no Rust engine reachable
+ * here that path throws instead of hanging, which is the case this asserts.
+ *
  * The `/shutdown` route itself now lives in the Rust listener, which reaches
  * the same teardown through the `mainGraphqlShutdown` host action; its
  * loopback-only guard is covered by `shutdown_only_accepts_ipv4_and_ipv6_loopback_peers`

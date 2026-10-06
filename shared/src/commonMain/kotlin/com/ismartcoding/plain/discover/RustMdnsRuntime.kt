@@ -41,7 +41,15 @@ object RustMdnsRuntime {
                 } catch (cancelled: CancellationException) {
                     command.reply.cancel(cancelled)
                     throw cancelled
-                } catch (error: Exception) {
+                } catch (error: Throwable) {
+                    // Throwable, not Exception: this loop is the only consumer
+                    // of `commands`, so anything that escapes it — a JNI
+                    // UnsatisfiedLinkError, an OutOfMemoryError, a failure
+                    // from a Rust call that raises an Error rather than an
+                    // exception — kills the consumer for the life of the
+                    // process. Every later command then waits on a reply
+                    // nobody will ever complete, which is how a wedged
+                    // runtime turns into a hung HTTP-server stop.
                     command.reply.completeExceptionally(error)
                     LogCat.e("Rust mDNS control", error)
                 }
