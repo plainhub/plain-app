@@ -466,6 +466,53 @@ object SystemProviderHost {
             com.ismartcoding.plain.platform.getDocExtGroups("").map { (ext, count) ->
                 buildJsonObject { put("ext", JsonPrimitive(ext)); put("count", JsonPrimitive(count)) } })
         "systemMediaTagFacts" -> mediaTagFacts(params)
+        // One playlist row per path: the metadata is read off the file, which
+        // is the platform's job — Rust stores whatever this reports.
+        "systemAudioPlaylistTracks" -> JsonArray(
+            params.getValue("paths").jsonArray.map { value ->
+                val track = com.ismartcoding.plain.platform.playlistAudioFromPath(
+                    value.jsonPrimitive.content)
+                playlistTrackFacts(track)
+            })
+        "systemAudioSearchTracks" -> JsonArray(
+            com.ismartcoding.plain.platform.searchMedia(
+                com.ismartcoding.plain.enums.DataType.AUDIO,
+                params.getValue("query").jsonPrimitive.content,
+                params.getValue("limit").jsonPrimitive.int,
+                params.getValue("offset").jsonPrimitive.int,
+                com.ismartcoding.plain.features.file.FileSortBy.valueOf(
+                    params.getValue("sortBy").jsonPrimitive.content),
+            ).filterIsInstance<com.ismartcoding.plain.audio.DAudio>()
+                .map { playlistTrackFacts(com.ismartcoding.plain.audio.DPlaylistAudio(
+                    title = it.title, path = it.path, artist = it.artist,
+                    durationMs = it.durationMs)) })
+        "systemAudioLyrics" -> JsonPrimitive(
+            com.ismartcoding.plain.platform.getAudioLyrics(
+                params.getValue("path").jsonPrimitive.content))
+        "systemAudioPlaybackState" -> buildJsonObject {
+            put("isPlaying", JsonPrimitive(com.ismartcoding.plain.platform.audioIsPlayingFlow().value))
+            put("positionMs", JsonPrimitive(com.ismartcoding.plain.platform.audioPlayerProgressAsync()))
+        }
+        "systemAudioPlayMode" -> when (val mode = params["mode"]) {
+            null -> JsonPrimitive(UserPrefs.audioPlayMode.value.name)
+            else -> {
+                UserPrefs.audioPlayMode.value = com.ismartcoding.plain.enums.MediaPlayMode
+                    .valueOf(mode.jsonPrimitive.content)
+                JsonPrimitive(UserPrefs.audioPlayMode.value.name)
+            }
+        }
+        "systemAudioLibrarySort" -> JsonPrimitive(UserPrefs.audioSortByValue().name)
+        "systemAudioPlay" -> {
+            com.ismartcoding.plain.platform.audioJustPlayWithNotificationCheck(
+                playlistTrack(params.getValue("track").jsonObject))
+            JsonPrimitive(true)
+        }
+        "systemAudioClear" -> {
+            com.ismartcoding.plain.platform.audioClear()
+            com.ismartcoding.plain.lib.sendEvent(
+                com.ismartcoding.plain.events.ClearAudioQueueEvent())
+            JsonPrimitive(true)
+        }
         "systemTagQueryStubs" -> JsonArray(
             com.ismartcoding.plain.platform.getMediaTagRelationStubs(
                 mediaDataType(params), params.getValue("query").jsonPrimitive.content).map { stub ->
@@ -690,7 +737,33 @@ private fun fileSortBy(params: JsonObject) =
  * than omitted — an omitted field and a null one mean the same thing to
  * the client, but only one of them survives a round trip through a
  * positional row. */
+/** The `AudioItem` contract row — the queue and playlist shape, which is a
+ * subset of a library row: no id, no size, no bucket. */
+private fun playlistTrack(track: JsonObject) = com.ismartcoding.plain.audio.DPlaylistAudio(
+    title = track.getValue("title").jsonPrimitive.content,
+    path = track.getValue("path").jsonPrimitive.content,
+    artist = track.getValue("artist").jsonPrimitive.content,
+    durationMs = track.getValue("durationMs").jsonPrimitive.long,
+)
+
+private fun playlistTrackFacts(track: com.ismartcoding.plain.audio.DPlaylistAudio): JsonObject =
+    buildJsonObject {
+        put("title", JsonPrimitive(track.title)); put("artist", JsonPrimitive(track.artist))
+        put("path", JsonPrimitive(track.path)); put("durationMs", JsonPrimitive(track.durationMs))
+    }
+
 private fun mediaFacts(item: com.ismartcoding.plain.db.IData): JsonObject = when (item) {
+    is com.ismartcoding.plain.audio.DAudio -> buildJsonObject {
+        put("id", JsonPrimitive(item.id)); put("title", JsonPrimitive(item.title))
+        put("artist", JsonPrimitive(item.artist)); put("path", JsonPrimitive(item.path))
+        put("size", JsonPrimitive(item.size)); put("bucketId", JsonPrimitive(item.bucketId))
+        put("durationMs", JsonPrimitive(item.durationMs))
+        put("albumFileId", JsonPrimitive(
+            com.ismartcoding.plain.platform.getAudioAlbumArtFileId(item)))
+        put("createdAt", JsonPrimitive(item.createdAt.toString()))
+        put("updatedAt", JsonPrimitive(item.updatedAt.toString()))
+        put("isFavorite", JsonPrimitive(item.isFavorite))
+    }
     is com.ismartcoding.plain.data.DImage -> mediaFacts(
         item.id, item.title, item.path, item.size, item.bucketId, item.createdAt, item.updatedAt,
         durationMs = 0L, takenAt = item.takenAt, isFavorite = item.isFavorite)
