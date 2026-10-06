@@ -71,7 +71,9 @@ internal object RustHttpHost {
             val session = RustWsSession(socket, call.remoteHost)
             try { entry.handler(session, call) } finally { session.close() }
         } else if (!HttpRouteRegistry.dispatch(call.method, call.path, call)) {
-            if (call.method != HttpMethod.GET || !serveRustWebAsset(call)) call.respondNoBody(HttpStatus.NOT_FOUND)
+            // SPA assets are served by the Rust public listener before the
+            // bridge runs, so anything left here is a real 404.
+            call.respondNoBody(HttpStatus.NOT_FOUND)
         }
     }
 }

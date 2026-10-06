@@ -14,6 +14,7 @@ internal object RustHttpEngine {
     suspend fun start(): Boolean = withIO {
         try {
             RustContentApi.start()
+            com.ismartcoding.plain.platform.RustWebAssets.ensure()
             val config = buildJsonObject {
                 put("httpPort", UserPrefs.httpPort.value)
                 put("httpsPort", UserPrefs.httpsPort.value)
