@@ -8,6 +8,9 @@ import com.ismartcoding.plain.platform.notificationFacts
 import com.ismartcoding.plain.platform.isGranted
 import kotlinx.serialization.json.*
 
+private fun contactInput(params: JsonObject): com.ismartcoding.plain.httpserver.models.ContactInput =
+    JsonHelper.jsonDecode(params.getValue("input").toString())
+
 object SystemProviderHost {
     suspend fun handle(method: String, params: JsonObject): JsonElement = when (method) {
         "systemPackageFacts" -> JsonArray(installedPackageFacts().map { item ->
@@ -46,6 +49,31 @@ object SystemProviderHost {
         "systemDeleteRecords" -> JsonArray(com.ismartcoding.plain.platform.deleteSystemProviderFacts(
             com.ismartcoding.plain.enums.DataType.valueOf(params.getValue("provider").jsonPrimitive.content),
             params.getValue("ids").jsonArray.map { it.jsonPrimitive.content }.toSet()).map(::JsonPrimitive))
+        "systemCreateContact" -> JsonPrimitive(com.ismartcoding.plain.platform.createContact(
+            contactInput(params)))
+        "systemUpdateContact" -> {
+            com.ismartcoding.plain.platform.updateContact(
+                params.getValue("id").jsonPrimitive.content,
+                contactInput(params),
+            )
+            JsonPrimitive(true)
+        }
+        "systemCreateContactGroup" -> JsonPrimitive(com.ismartcoding.plain.platform.createContactGroup(
+            params.getValue("name").jsonPrimitive.content,
+            params.getValue("accountName").jsonPrimitive.content,
+            params.getValue("accountType").jsonPrimitive.content,
+        ).id.toString())
+        "systemUpdateContactGroup" -> {
+            com.ismartcoding.plain.platform.updateContactGroup(
+                params.getValue("id").jsonPrimitive.content,
+                params.getValue("name").jsonPrimitive.content,
+            )
+            JsonPrimitive(true)
+        }
+        "systemDeleteContactGroup" -> {
+            com.ismartcoding.plain.platform.deleteContactGroup(params.getValue("id").jsonPrimitive.content)
+            JsonPrimitive(true)
+        }
         "systemCancelNotifications" -> JsonArray(com.ismartcoding.plain.platform.cancelNotificationFacts(
             params.getValue("ids").jsonArray.map { it.jsonPrimitive.content }.toSet()).map(::JsonPrimitive))
         "systemReplyNotification" -> JsonPrimitive(com.ismartcoding.plain.platform.replyNotification(

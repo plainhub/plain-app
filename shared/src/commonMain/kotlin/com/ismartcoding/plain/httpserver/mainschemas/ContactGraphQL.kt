@@ -11,6 +11,7 @@ import com.ismartcoding.plain.data.DContact
 import com.ismartcoding.plain.enums.DataType
 import com.ismartcoding.plain.platform.Permission
 import com.ismartcoding.plain.features.TagHelper
+import com.ismartcoding.plain.features.system.RustContactWriter
 import com.ismartcoding.plain.platform.checkEnabledAsync
 import com.ismartcoding.plain.features.checkEnabledAsync
 import com.ismartcoding.plain.platform.enabledAndIsGrantedAsync
@@ -67,37 +68,31 @@ suspend fun deleteContacts(query: String): ActionResult {
 
 @GraphQLMutation
 suspend fun updateContact(id: ID, input: ContactInput): Contact {
-    Permission.WRITE_CONTACTS.checkEnabledAsync()
-    com.ismartcoding.plain.platform.updateContact(id.value, input)
+    RustContactWriter.update(id.value, input)
     return getContactById(id.value)?.toModel()
         ?: throw GraphQLError("Contact ${id.value} not found after update")
 }
 
 @GraphQLMutation
 suspend fun createContact(input: ContactInput): Contact {
-    Permission.WRITE_CONTACTS.checkEnabledAsync()
-    val id = com.ismartcoding.plain.platform.createContact(input)
-    if (id.isEmpty()) throw GraphQLError("Failed to create contact")
+    val id = RustContactWriter.create(input)
     return getContactById(id)?.toModel() ?: throw GraphQLError("Contact $id not found after create")
 }
 
 @GraphQLMutation
 suspend fun createContactGroup(name: String, accountName: String, accountType: String): ContactGroup {
-    Permission.WRITE_CONTACTS.checkEnabledAsync()
-    return com.ismartcoding.plain.platform.createContactGroup(name, accountName, accountType).toModel()
+    return ContactGroup(ID(RustContactWriter.createGroup(name, accountName, accountType)), name)
 }
 
 @GraphQLMutation
 suspend fun updateContactGroup(id: ID, name: String): ContactGroup {
-    Permission.WRITE_CONTACTS.checkEnabledAsync()
-    com.ismartcoding.plain.platform.updateContactGroup(id.value, name)
+    RustContactWriter.updateGroup(id.value, name)
     return ContactGroup(id, name)
 }
 
 @GraphQLMutation
 suspend fun deleteContactGroup(id: ID): Boolean {
-    Permission.WRITE_CONTACTS.checkEnabledAsync()
-    com.ismartcoding.plain.platform.deleteContactGroup(id.value)
+    RustContactWriter.deleteGroup(id.value)
     return true
 }
 
