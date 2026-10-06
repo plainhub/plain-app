@@ -466,6 +466,71 @@ object SystemProviderHost {
             com.ismartcoding.plain.platform.getDocExtGroups("").map { (ext, count) ->
                 buildJsonObject { put("ext", JsonPrimitive(ext)); put("count", JsonPrimitive(count)) } })
         "systemMediaTagFacts" -> mediaTagFacts(params)
+        "systemChatChannelFacts" -> JsonArray(
+            com.ismartcoding.plain.chat.channel.ChannelCacher.channels.value
+                .sortedBy { it.name }
+                .map { channelFacts(it) })
+        "systemChatChannelAction" -> chatChannelAction(params)
+        "systemChatSend" -> {
+            val item = com.ismartcoding.plain.chat.ChatManager.sendContent(
+                com.ismartcoding.plain.chat.data.ChatTarget.parseId(
+                    params.getValue("target").jsonPrimitive.content),
+                com.ismartcoding.plain.db.DChat.parseContent(
+                    params.getValue("content").jsonPrimitive.content))
+            com.ismartcoding.plain.chat.ChatViewModel.onMessagesCreated(
+                com.ismartcoding.plain.chat.data.ChatTarget.parseId(
+                    params.getValue("target").jsonPrimitive.content), listOf(item))
+            JsonArray(listOf(Json.parseToJsonElement(JsonHelper.jsonEncode(item))))
+        }
+        "systemChatDeleteOne" -> {
+            val id = params.getValue("id").jsonPrimitive.content
+            com.ismartcoding.plain.chat.ChatManager.getChatItem(id)?.let {
+                com.ismartcoding.plain.chat.ChatManager.deleteOne(it.id)
+                com.ismartcoding.plain.chat.ChatViewModel.onMessagesDeleted(setOf(it.id))
+            }
+            JsonPrimitive(true)
+        }
+        "systemChatDeleteQuery" -> JsonPrimitive(
+            com.ismartcoding.plain.chat.ChatManager.deleteQuery(
+                params.getValue("query").jsonPrimitive.content))
+        "systemChatRetry" -> Json.parseToJsonElement(JsonHelper.jsonEncode(
+            com.ismartcoding.plain.chat.ChatManager.retry(
+                params.getValue("id").jsonPrimitive.content)))
+        "systemPeerFacts" -> JsonArray(
+            com.ismartcoding.plain.chat.peer.PeerCacher.peersMap.value.values
+                .map { Json.parseToJsonElement(JsonHelper.jsonEncode(it.peer)) })
+        "systemDeletePeer" -> JsonPrimitive(
+            com.ismartcoding.plain.chat.peer.PeerManager.deletePeer(
+                params.getValue("id").jsonPrimitive.content))
+        "systemUnpairPeer" -> {
+            com.ismartcoding.plain.ui.models.NearbyViewModel.unpairDevice(
+                params.getValue("id").jsonPrimitive.content)
+            JsonPrimitive(true)
+        }
+        "systemPairDevice" -> {
+            val input = params.getValue("input").jsonObject
+            com.ismartcoding.plain.ui.models.NearbyViewModel.startPairing(nearbyDevice(input))
+            JsonPrimitive(true)
+        }
+        "systemCancelPairing" -> {
+            com.ismartcoding.plain.ui.models.NearbyViewModel.cancelPairing(
+                params.getValue("deviceId").jsonPrimitive.content)
+            JsonPrimitive(true)
+        }
+        "systemRespondToPairing" -> {
+            com.ismartcoding.plain.discover.PairingResponder.respond(
+                pairingRequest(params.getValue("input").jsonObject),
+                params.getValue("accepted").jsonPrimitive.boolean)
+            JsonPrimitive(true)
+        }
+        "systemSimFacts" -> JsonArray(com.ismartcoding.plain.platform.getSims().map { sim ->
+            buildJsonObject {
+                put("id", JsonPrimitive(sim.id)); put("label", JsonPrimitive(sim.label))
+                put("number", JsonPrimitive(sim.number))
+                put("subscriptionId", JsonPrimitive(sim.subscriptionId))
+            }
+        })
+
         // One playlist row per path: the metadata is read off the file, which
         // is the platform's job — Rust stores whatever this reports.
         "systemAudioPlaylistTracks" -> JsonArray(
@@ -737,6 +802,76 @@ private fun fileSortBy(params: JsonObject) =
  * than omitted — an omitted field and a null one mean the same thing to
  * the client, but only one of them survives a round trip through a
  * positional row. */
+/** The `ChatChannel` contract row. `members` is a JSON array string in the
+ * store, so it is projected into the contract's list shape here rather than
+ * handed to Rust as an opaque blob. */
+private fun channelFacts(channel: com.ismartcoding.plain.db.DChatChannel): JsonObject {
+    val members = channel.members.map { member ->
+        buildJsonObject {
+            put("peerId", JsonPrimitive(member.peerId))
+            put("status", JsonPrimitive(member.status.name))
+        }
+    }
+    return buildJsonObject {
+        put("id", JsonPrimitive(channel.id)); put("ownerId", JsonPrimitive(channel.ownerId))
+        put("name", JsonPrimitive(channel.name)); put("members", JsonArray(members))
+        put("version", JsonPrimitive(channel.version)); put("status", JsonPrimitive(channel.status.name))
+        put("createdAt", JsonPrimitive(channel.createdAt.toString()))
+        put("updatedAt", JsonPrimitive(channel.updatedAt.toString()))
+    }
+}
+
+/** One channel mutation. The manager owns the delivery and the cache fan-out,
+ * so the public root only has to name the action and read the result back. */
+private suspend fun chatChannelAction(params: JsonObject): JsonElement {
+    val manager = com.ismartcoding.plain.chat.channel.ChannelManager
+    val id = params["id"]?.jsonPrimitive?.content.orEmpty()
+    val peer = params["peerId"]?.jsonPrimitive?.content.orEmpty()
+    return when (params.getValue("action").jsonPrimitive.content) {
+        "create" -> Json.parseToJsonElement(JsonHelper.jsonEncode(
+            manager.createChannel(params.getValue("name").jsonPrimitive.content)))
+        "rename" -> Json.parseToJsonElement(JsonHelper.jsonEncode(manager.renameChannel(
+            id, params.getValue("name").jsonPrimitive.content)))
+        "delete" -> { manager.deleteChannel(id); JsonPrimitive(true) }
+        "leave" -> { manager.leaveChannel(id); JsonPrimitive(true) }
+        "invite" -> Json.parseToJsonElement(JsonHelper.jsonEncode(manager.inviteMember(id, peer)))
+        "kick" -> Json.parseToJsonElement(JsonHelper.jsonEncode(manager.kickMember(id, peer)))
+        "accept" -> { manager.acceptInvite(id); JsonPrimitive(true) }
+        "decline" -> { manager.declineInvite(id); JsonPrimitive(true) }
+        else -> error("Unsupported channel action")
+    }
+}
+
+private fun nearbyDevice(input: JsonObject) = com.ismartcoding.plain.data.DNearbyDevice(
+    id = input.getValue("id").jsonPrimitive.content,
+    name = input.getValue("name").jsonPrimitive.content,
+    ips = input["ips"]?.jsonArray?.map { it.jsonPrimitive.content } ?: emptyList(),
+    port = input.getValue("port").jsonPrimitive.int,
+    deviceType = com.ismartcoding.plain.enums.DeviceType.valueOf(
+        input.getValue("deviceType").jsonPrimitive.content),
+    version = input.getValue("version").jsonPrimitive.content,
+    platform = input.getValue("platform").jsonPrimitive.content,
+    lastSeen = kotlin.time.Instant.parse(input.getValue("lastSeen").jsonPrimitive.content),
+    discoveryMethods = input["discoveryMethods"]?.jsonArray
+        ?.map { com.ismartcoding.plain.enums.DiscoveryMethod.valueOf(it.jsonPrimitive.content) }
+        ?.toSet() ?: emptySet(),
+)
+
+private fun pairingRequest(input: JsonObject) = com.ismartcoding.plain.data.DPairingRequest(
+    fromId = input.getValue("fromId").jsonPrimitive.content,
+    fromName = input.getValue("fromName").jsonPrimitive.content,
+    port = input.getValue("port").jsonPrimitive.int,
+    deviceType = com.ismartcoding.plain.enums.DeviceType.valueOf(
+        input.getValue("deviceType").jsonPrimitive.content),
+    ecdhPublicKey = input.getValue("ecdhPublicKey").jsonPrimitive.content,
+    signaturePublicKey = input.getValue("signaturePublicKey").jsonPrimitive.content,
+    timestamp = input.getValue("timestamp").jsonPrimitive.long,
+    ips = input["ips"]?.jsonArray?.map { it.jsonPrimitive.content } ?: emptyList(),
+    signature = input["signature"]?.jsonPrimitive?.content.orEmpty(),
+    fromIp = input["fromIp"]?.jsonPrimitive?.content.orEmpty(),
+    awareSupported = input["awareSupported"]?.jsonPrimitive?.boolean ?: false,
+)
+
 /** The `AudioItem` contract row — the queue and playlist shape, which is a
  * subset of a library row: no id, no size, no bucket. */
 private fun playlistTrack(track: JsonObject) = com.ismartcoding.plain.audio.DPlaylistAudio(
