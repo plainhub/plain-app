@@ -1,99 +1,152 @@
 #!/bin/bash
-# GraphQL API Test Script for iOS App
-# Usage: ./scripts/test-graphql-api.sh [URL] [TOKEN] [CLIENT_ID]
-# Default: http://127.0.0.1:8080 with token from web login
+# GraphQL query surface, run against a phone's main listener the same way the
+# web client talks to it: log in over the WebSocket `auth=1` handshake, then
+# send xchacha-encrypted token-mode queries. `gql-client.mjs` speaks the
+# protocol; this script owns the query list and the pass/fail accounting.
+#
+#   ./scripts/test-graphql-api.sh <base-url> [client-id]
+#
+# 2FA is on by default (`ws_login.rs`: `auth_two_factor` defaults to true), so
+# the first login comes back PENDING and the phone shows "Allow Desktop
+# Access". Nothing here can tap that dialog — the caller passes a command to
+# run at that moment in PLAIN_APPROVE_CMD, e.g. `approve_desktop_access <serial>`.
+set -uo pipefail
 
 BASE_URL="${1:-http://127.0.0.1:8080}"
-TOKEN="${2:-f8g+0ySbsQPvLkrnuF6H3zarotMgRvvi0tBuWSDfzrw=}"
-CLIENT_ID="${3:-aUznhGpBKsqr1pkypob5S2}"
+CLIENT_ID="${2:-plain-api-test}"
+CLIENT="$(dirname "${BASH_SOURCE[0]}")/gql-client.mjs"
+QFILE="$(mktemp)"
+OUT="$(mktemp)"
+trap 'rm -f "$QFILE" "$OUT"' EXIT
+
+if ! command -v node >/dev/null 2>&1; then
+  echo "node is required (scripts/gql-client.mjs)" >&2
+  exit 1
+fi
+
+emit() { printf '%s\t%s\n' "$1" "$2" >>"$QFILE"; }
+
+# Roots behind an Android permission the phone may not hold: `public_gate`
+# answers `no_permission` (or a feature-specific variant) instead of data.
+# Either answer is correct — data once granted, a refusal while not — so they
+# are scored on refusing *consistently*, not on returning rows.
+emit_gated() { printf '@%s\t%s\n' "$1" "$2" >>"$QFILE"; }
+
+# --- app, device, peers ------------------------------------------------------
+emit app '{ app { clientId deviceName deviceType buildChannel developerMode debug downloadsDir httpPort httpsPort } }'
+emit device_info '{ deviceInfo { name manufacturer model osName osVersion appVersion appBuildNumber } }'
+emit device_status '{ deviceStatus { uptimeSec batteryLevel charging storageAvailable } }'
+emit peers '{ peers { id name ip port online } }'
+emit mounts '{ mounts { id name path mountPoint totalBytes freeBytes } }'
+emit path_exists '{ pathExists(path: "/sdcard") }'
+
+# --- notes, feeds, bookmarks, tags ------------------------------------------
+emit notes '{ notes(offset: 0, limit: 5, query: "") { id title deletedAt createdAt } }'
+emit feeds '{ feeds { id name url lastSyncAt } }'
+emit feed_entries '{ feedEntries(offset: 0, limit: 5, query: "") { feedId id title url } }'
+emit feed_sync_states '{ feedSyncStates { feedId status error } }'
+emit bookmarks '{ bookmarks { id url title groupId pinned } }'
+emit bookmark_groups '{ bookmarkGroups { id name itemCount } }'
+emit tags '{ tags(type: DEFAULT) { id name count } }'
+
+# --- media (READ_MEDIA_*/WRITE_EXTERNAL_STORAGE) ----------------------------
+emit_gated images '{ images(offset: 0, limit: 5, query: "", sortBy: DATE_DESC) { id title path size } }'
+emit_gated videos '{ videos(offset: 0, limit: 5, query: "", sortBy: DATE_DESC) { id title path size durationMs } }'
+emit_gated audios '{ audios(offset: 0, limit: 5, query: "", sortBy: DATE_DESC) { id title artist durationMs } }'
+emit_gated docs '{ docs(offset: 0, limit: 5, query: "", sortBy: DATE_DESC) { id title path extension size } }'
+emit doc_ext_groups '{ docExtGroups { ext count } }'
+emit_gated files '{ files(root: "", offset: 0, limit: 5, query: "", sortBy: NAME_ASC) { mediaId name path size isDir } }'
+emit_gated recent_files '{ recentFiles { mediaId name path size } }'
+emit favorite_folders '{ favoriteFolders { rootPath fullPath alias } }'
+
+# --- contacts, calls, sms ----------------------------------------------------
+emit_gated contacts '{ contacts(offset: 0, limit: 5, query: "") { id firstName lastName nickname } }'
+emit_gated calls '{ calls(offset: 0, limit: 5, query: "") { id number name durationSec } }'
+emit sims '{ sims { id label number } }'
+emit sms '{ sms(offset: 0, limit: 5, query: "") { id body address read } }'
+emit sms_box_counts '{ smsBoxCounts { total inbox sent drafts } }'
+
+# --- chat, clipboard, packages, notifications -------------------------------
+emit chat_channels '{ chatChannels { id name ownerId version } }'
+emit_gated clipboard_items '{ clipboardItems(offset: 0, limit: 5, query: "") { id text source sensitive } }'
+emit packages '{ packages(offset: 0, limit: 5, query: "", sortBy: NAME_ASC) { id name version } }'
+emit_gated notifications '{ notifications(offset: 0, limit: 5, query: "") { id appName title postedAt } }'
+
+# --- pomodoro, image editor, database, prefs, logs --------------------------
+emit pomodoro_today '{ pomodoroToday { date completedCount isRunning } }'
+emit pomodoro_settings '{ pomodoroSettings { workDurationMin shortBreakDurationMin } }'
+emit image_editor_projects '{ imageEditorProjects { id canvasWidth layerCount } }'
+emit db_tables '{ dbTables }'
+emit db_table_info '{ dbTableInfo(table: "sessions") { idKey } }'
+emit user_prefs '{ userPrefs }'
+emit system_prefs '{ systemPrefs }'
+emit app_logs '{ appLogs(offset: 0, limit: 5, query: "") }'
 
 PASS=0
 FAIL=0
 ERRORS=""
-
-gql() {
-    local query_name="$1"
-    local query="$2"
-    local response
-    response=$(curl -s -w "\n%{http_code}" -X POST "${BASE_URL}/graphql" \
-        -H "c-id: ${CLIENT_ID}" \
-        -H "Authorization: Bearer ${TOKEN}" \
-        -H "Content-Type: application/json" \
-        --data "{\"query\":\"${query}\"}" 2>&1)
-
-    local http_code=$(echo "$response" | tail -1)
-    local body=$(echo "$response" | head -n -1)
-
-    if [ "$http_code" = "200" ]; then
-        if echo "$body" | grep -q '"errors"'; then
-            FAIL=$((FAIL + 1))
-            ERRORS="${ERRORS}\n  FAIL [$query_name]: GraphQL errors in response: $(echo "$body" | head -c 200)"
-            echo "  FAIL [$query_name] — GraphQL errors"
-        else
-            PASS=$((PASS + 1))
-            echo "  PASS [$query_name] — 200 OK"
-        fi
-    elif [ "$http_code" = "500" ]; then
-        FAIL=$((FAIL + 1))
-        ERRORS="${ERRORS}\n  FAIL [$query_name]: 500 Internal Server Error"
-        echo "  FAIL [$query_name] — 500 Internal Server Error"
-    else
-        FAIL=$((FAIL + 1))
-        ERRORS="${ERRORS}\n  FAIL [$query_name]: HTTP $http_code"
-        echo "  FAIL [$query_name] — HTTP $http_code"
-    fi
-}
 
 echo "=== GraphQL API Test ==="
 echo "URL: ${BASE_URL}/graphql"
 echo "Client ID: ${CLIENT_ID}"
 echo ""
 
-echo "--- Queries ---"
+if node "$CLIENT" --host "$(printf '%s' "$BASE_URL" | sed -e 's#^[a-z]*://##' -e 's#:.*##')" \
+  --port "$(printf '%s' "$BASE_URL" | sed -n 's#.*:\([0-9]*\)/.*#\1#p')" \
+  --client-id "$CLIENT_ID" --queries "$QFILE" ${PLAIN_APPROVE_CMD:+--on-pending "$PLAIN_APPROVE_CMD"} >"$OUT"; then
+  :
+else
+  echo "  FAIL [login] — could not complete the login handshake (see the log above)"
+  echo ""
+  echo "--- Summary ---"
+  echo "Passed: 0"
+  echo "Failed: 1"
+  echo "Failures:\n  FAIL [login]: login handshake did not complete"
+  exit 1
+fi
 
-gql "app" "{ app { appVersion deviceName battery clientId urlToken httpPort httpsPort } }"
-gql "app_permissions" "{ app { permissions } }"
-gql "peers" "{ peers { id name ip status online port deviceType } }"
-gql "chatChannels" "{ chatChannels { id type name createdAt updatedAt } }"
-gql "feeds" "{ feeds { id title url } }"
-gql "feedEntries" "{ feedEntries(feedId: \"\") { id title } }"
-gql "notes" "{ notes { id title content } }"
-gql "images" "{ images(limit: 1) { id name size width height } }"
-gql "videos" "{ videos(limit: 1) { id name size duration width height } }"
-gql "audios" "{ audios(limit: 1) { id name size duration } }"
-gql "contacts" "{ contacts(limit: 1) { id name phoneNumbers { number } } }"
-gql "calls" "{ calls(limit: 1) { id number name } }"
-gql "files" "{ files(path: \"\") { id name size } }"
-gql "bookmarks" "{ bookmarks { id title url } }"
-gql "bookmarkGroups" "{ bookmarkGroups { id name } }"
-gql "tags" "{ tags { id name } }"
-gql "packages" "{ packages { id name versionName } }"
-gql "dbTables" "{ dbTables { name count } }"
-gql "notifications" "{ notifications(limit: 1) { id title text } }"
-gql "battery" "{ battery { level charging } }"
-gql "rules" "{ rules { id } }"
-gql "pomodoroToday" "{ pomodoroToday { date completedCycles } }"
-gql "pomodoroRuntimeInfo" "{ pomodoroRuntimeInfo { running } }"
-gql "pomodoroSettings" "{ pomodoroSettings { workDuration } }"
-gql "imageEditorProjects" "{ imageEditorProjects { id name } }"
-gql "prefs" "{ prefs { key value } }"
-gql "appLogs" "{ appLogs(limit: 1) { id level tag message } }"
-gql "ssdpDevices" "{ ssdpDevices { id name } }"
-gql "castDevices" "{ castDevices { id name } }"
-gql "storageMounts" "{ storageMounts { path label } }"
+while IFS=$'\t' read -r name status detail; do
+  [ -z "$name" ] && continue
+  case "$name" in
+    @*)
+      name="${name#@}"
+      if [ "$status" = "ok" ]; then
+        PASS=$((PASS + 1))
+        echo "  PASS [$name] — $detail (permission granted)"
+      elif printf '%s' "$detail" | grep -qE 'no_permission|_disabled'; then
+        PASS=$((PASS + 1))
+        echo "  PASS [$name] — refused: ${detail#GraphQL errors: }"
+      else
+        FAIL=$((FAIL + 1))
+        ERRORS="${ERRORS}\n  FAIL [$name]: ${detail}"
+        echo "  FAIL [$name] — ${detail}"
+      fi
+      ;;
+    *)
+      if [ "$status" = "ok" ]; then
+        PASS=$((PASS + 1))
+        echo "  PASS [$name] — $detail"
+      else
+        FAIL=$((FAIL + 1))
+        ERRORS="${ERRORS}\n  FAIL [$name]: ${detail}"
+        echo "  FAIL [$name] — ${detail}"
+      fi
+      ;;
+  esac
+done <"$OUT"
 
 echo ""
 echo "--- Summary ---"
 echo "Passed: $PASS"
 echo "Failed: $FAIL"
 if [ -n "$ERRORS" ]; then
-    echo -e "\nFailures:$ERRORS"
+  printf "$ERRORS\n"
 fi
 echo ""
 if [ "$FAIL" -eq 0 ]; then
-    echo "All GraphQL API tests passed!"
-    exit 0
+  echo "All GraphQL API tests passed!"
+  exit 0
 else
-    echo "Some tests failed. Check the output above."
-    exit 1
+  echo "Some tests failed. Check the output above."
+  exit 1
 fi

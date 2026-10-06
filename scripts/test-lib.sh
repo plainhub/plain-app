@@ -133,6 +133,33 @@ prepare_device() {
   sleep 5
 }
 
+# Accept the phone's "Allow Desktop Access" prompt. The Rust login answers
+# PENDING and issues no token until a human taps it (`auth_two_factor`
+# defaults to true in ws_login.rs), so a shell-driven login is only possible
+# if something taps for it. Finds the button by its label instead of a fixed
+# coordinate, and polls because the prompt lands a beat after the request.
+approve_desktop_access() {
+  local dev="$1" i dump bounds coords cx cy
+  for i in $(seq 1 15); do
+    adb -s "$dev" shell uiautomator dump /sdcard/plain-approve.xml >/dev/null 2>&1
+    dump=$(adb -s "$dev" shell cat /sdcard/plain-approve.xml 2>/dev/null | tr -d '\r')
+    bounds=$(printf '%s' "$dump" | grep -o 'text="Allow"[^>]*bounds="[^"]*"' \
+      | grep -o 'bounds="[^"]*"' | head -1 | sed 's/[^0-9,]//g' | tr ',' ' ')
+    coords=$(printf '%s' "$bounds" | awk '{ if (NF == 4) print int(($1 + $3) / 2), int(($2 + $4) / 2) }')
+    if [ -n "$coords" ]; then
+      set -- $coords
+      cx="$1"
+      cy="$2"
+      adb -s "$dev" shell input tap "$cx" "$cy"
+      sleep 2
+      return 0
+    fi
+    sleep 2
+  done
+  say "  (no 'Allow Desktop Access' prompt appeared — the login stays PENDING)"
+  return 1
+}
+
 # Wait for the HTTP service to answer on the device; prints nothing on success.
 wait_for_health() {
   local ip="$1" port="${2:-8080}" tries="${3:-20}" code

@@ -6,10 +6,9 @@
 #   ./scripts/test-api.sh <adb-serial>    # or pass one explicitly
 #
 # Covers what the Rust listener owns: the health probe, the web SPA deep links,
-# static assets, auth boundaries and the server-time injection. The GraphQL
-# query surface needs a logged-in session token, which cannot be obtained
-# without a human tapping the 2FA prompt — that case is reported BLOCKED rather
-# than silently skipped.
+# static assets, auth boundaries, the server-time injection and the GraphQL
+# query surface. The GraphQL case logs in over the real handshake and taps
+# through the 2FA prompt, so it reports real pass/fail rather than BLOCKED.
 set -uo pipefail
 source "$(dirname "${BASH_SOURCE[0]}")/test-lib.sh" "$@"
 
@@ -100,26 +99,26 @@ if [ "$T" = "200" ]; then case_pass "https_listener" "GET https://:8443/health -
 else case_block "https_listener" "https :8443 -> $T (TLS is off or the cert is not trusted by curl)"; fi
 
 # --- GraphQL surface ---------------------------------------------------------
-# The query surface already has a script (`test-graphql-api.sh`); reuse it
-# instead of duplicating the query list. It needs a session token, which cannot
-# be minted without a human tapping the 2FA prompt — so without credentials this
-# is BLOCKED, never silently skipped.
+# Reuses the existing query script rather than duplicating the list. It logs
+# in the way the web client does — WebSocket handshake, then token-mode
+# xchacha requests — so the surface is exercised the same way a browser
+# would, no bearer token required.
 #
-# Note that a token from an ordinary browser login is NOT enough here. The
-# browser authenticates in token mode (`c-id` plus an xchacha-encrypted body);
-# this script sends `Authorization: Bearer <token>`, and main_graphql.rs only
-# honours that path for SessionType.CUSTOM sessions. A WEB session's token
-# answers 401 even when it is the very value localStorage holds as
-# `auth_token`. So the two BLOCKED reasons below are both real, and neither is
-# cleared by supplying the browser's credentials.
+# The only thing a shell cannot do on its own is accept the 2FA prompt the
+# login returns PENDING for; PLAIN_APPROVE_CMD taps it, and the function is
+# exported so the client's child shell inherits it.
 head1 "graphql surface"
 GQL_SCRIPT="$REPO_ROOT/scripts/test-graphql-api.sh"
-if [ -z "${PLAIN_TOKEN:-}" ] || [ -z "${PLAIN_CLIENT_ID:-}" ]; then
-  case_block "graphql_queries" "no PLAIN_TOKEN + PLAIN_CLIENT_ID; and note a browser-login token alone would still 401 — see the comment above"
-elif [ ! -x "$GQL_SCRIPT" ]; then
+if [ ! -x "$GQL_SCRIPT" ]; then
   case_block "graphql_queries" "$GQL_SCRIPT is missing"
+elif ! command -v node >/dev/null 2>&1; then
+  case_block "graphql_queries" "node is not on PATH (scripts/gql-client.mjs needs it)"
 else
-  if "$GQL_SCRIPT" "$BASE" "$PLAIN_TOKEN" "$PLAIN_CLIENT_ID" > /tmp/plain-api-graphql.log 2>&1; then
+  # The client runs the approval in a child shell, so the function has to
+  # travel with the environment rather than just exist here.
+  export -f approve_desktop_access
+  export PLAIN_APPROVE_CMD="approve_desktop_access $DEV"
+  if "$GQL_SCRIPT" "$BASE" "plain-api-test-$DEV" >/tmp/plain-api-graphql.log 2>&1; then
     case_pass "graphql_queries" "$(grep -E '^Passed:' /tmp/plain-api-graphql.log | tail -1)"
   else
     case_fail "graphql_queries" "$(grep -E '^Failed:' /tmp/plain-api-graphql.log | tail -1); see /tmp/plain-api-graphql.log"
