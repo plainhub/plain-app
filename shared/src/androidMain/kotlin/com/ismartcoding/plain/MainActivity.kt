@@ -116,6 +116,17 @@ class MainActivity : AppCompatActivity() {
     internal val pickFileActivityLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
         val uris = result.data?.let { FilePickHelper.getUris(it) } ?: emptySet()
         if (uris.isNotEmpty()) {
+            if (pickFileType == PickFileType.FOLDER) {
+                val data = result.data
+                val resultFlags = data?.flags ?: 0
+                val grantFlags = resultFlags and (Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
+                if (data != null && resultFlags and Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION != 0 && grantFlags != 0) {
+                    uris.forEach { uri ->
+                        runCatching { contentResolver.takePersistableUriPermission(uri, grantFlags) }
+                            .onFailure { LogCat.e("Unable to persist selected folder permission for $uri", it) }
+                    }
+                }
+            }
             sendEvent(PickFileResultEvent(pickFileTag, pickFileType, uris.map { it.toString() }.toSet()))
         }
     }
