@@ -318,9 +318,17 @@ object HttpServerManager {
         sendWebLoginNotification(
             request.browserName, request.browserVersion, request.osName, request.osVersion, clientIp,
         )
-        session.send(
-            chaCha20Encrypt(passwordToToken(), JsonHelper.jsonEncode(signedResponse)),
-        )
+        // Best-effort like the broadcast pushes: the client can vanish between
+        // the confirmation prompt and this delivery (closed tab, a client that
+        // gave up). Sending to a dead socket throws, and an uncaught exception
+        // here takes the whole app down with it.
+        try {
+            session.send(
+                chaCha20Encrypt(passwordToToken(), JsonHelper.jsonEncode(signedResponse)),
+            )
+        } catch (ex: Exception) {
+            LogCat.e("ws: login result undeliverable, client already gone: ${ex.message}")
+        }
     }
 
     /** Second leg of a 2FA login, once the user accepted the prompt. */
