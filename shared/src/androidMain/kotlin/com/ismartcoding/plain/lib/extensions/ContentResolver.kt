@@ -91,11 +91,11 @@ fun ContentResolver.countWithBundle(uri: Uri, where: ContentWhere): Int {
             null,
             Bundle().apply {
                 where(where.toSelection(), where.args)
-                if (where.trash == true) {
-                    if (isRPlus()) {
-                        putInt(MediaStore.QUERY_ARG_MATCH_TRASHED, MediaStore.MATCH_ONLY)
-                    }
-                }
+                // No QUERY_ARG_MATCH_TRASHED here on purpose. Nothing in the app
+                // calls createTrashRequest, so MediaStore's trash is always empty
+                // and MATCH_ONLY would answer 0 for every trash:true query. The
+                // app's trash is a `.nas-trash` directory, filtered by the
+                // provider plan on `_data`.
             },
             null,
         )?.use {
@@ -150,11 +150,11 @@ fun ContentResolver.getPagingCursorWithBundle(
                 paging(offset, limit)
                 sort(sortBy)
                 where(where.toSelection(), where.args)
-                if (where.trash == true) {
-                    if (isRPlus()) {
-                        putInt(MediaStore.QUERY_ARG_MATCH_TRASHED, MediaStore.MATCH_ONLY)
-                    }
-                }
+                // No QUERY_ARG_MATCH_TRASHED here on purpose. Nothing in the app
+                // calls createTrashRequest, so MediaStore's trash is always empty
+                // and MATCH_ONLY would answer 0 for every trash:true query. The
+                // app's trash is a `.nas-trash` directory, filtered by the
+                // provider plan on `_data`.
             },
             null,
         )
@@ -206,11 +206,11 @@ fun ContentResolver.getSearchCursorWithBundle(
             projection,
             Bundle().apply {
                 where(where.toSelection(), where.args)
-                if (where.trash == true) {
-                    if (isRPlus()) {
-                        putInt(MediaStore.QUERY_ARG_MATCH_TRASHED, MediaStore.MATCH_ONLY)
-                    }
-                }
+                // No QUERY_ARG_MATCH_TRASHED here on purpose. Nothing in the app
+                // calls createTrashRequest, so MediaStore's trash is always empty
+                // and MATCH_ONLY would answer 0 for every trash:true query. The
+                // app's trash is a `.nas-trash` directory, filtered by the
+                // provider plan on `_data`.
             },
             null,
         )
