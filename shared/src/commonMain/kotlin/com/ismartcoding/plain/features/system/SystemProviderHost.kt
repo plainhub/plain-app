@@ -46,6 +46,22 @@ object SystemProviderHost {
             )
             JsonPrimitive(true)
         }
+        "zipItemsFacts" -> {
+            val type = params.getValue("type").jsonPrimitive.content
+            val items = com.ismartcoding.plain.platform.searchZipItems(
+                type,
+                params.getValue("query").jsonPrimitive.content,
+                params.getValue("id").jsonPrimitive.content,
+            ).filter { com.ismartcoding.plain.platform.fileExists(it.sourcePath) }
+            buildJsonObject {
+                put("items", JsonArray(items.map { entry ->
+                    buildJsonObject {
+                        put("path", JsonPrimitive(entry.sourcePath))
+                        put("name", JsonPrimitive(entry.entryName))
+                    }
+                }))
+            }
+        }
         "uploadTmpDirFacts" -> buildJsonObject {
             put("path", com.ismartcoding.plain.platform.getUploadTmpDirPath())
         }

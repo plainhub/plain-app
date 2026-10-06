@@ -11,7 +11,6 @@ import com.ismartcoding.plain.httpserver.routes.addGraphQLRoutes
 import com.ismartcoding.plain.httpserver.routes.addNearbyRoutes
 import com.ismartcoding.plain.httpserver.routes.addSystemRoutes
 import com.ismartcoding.plain.httpserver.routes.addWebSocketRoutes
-import com.ismartcoding.plain.httpserver.routes.addZipRoutes
 
 /**
  * Peer-to-peer communication channels that remain accessible when
@@ -139,7 +138,6 @@ object HttpRouteRegistry {
             addSystemRoutes()
             addNearbyRoutes()
             addFilesRoutes()
-            addZipRoutes()
             addDlnaRoutes()
             addGraphQLRoutes()
             addWebSocketRoutes()
