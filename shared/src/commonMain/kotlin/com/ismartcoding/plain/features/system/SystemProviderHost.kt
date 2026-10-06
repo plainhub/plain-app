@@ -19,6 +19,37 @@ object SystemProviderHost {
                 put("nameSortKey", Pinyin.toPinyin(item.name).lowercase())
             }
         })
+        "systemPackageStatuses" -> {
+            val ids = params.getValue("ids").jsonArray.map { it.jsonPrimitive.content }
+            JsonObject(
+                com.ismartcoding.plain.platform.getPackageInfoMap(ids).mapValues { (_, pkg) ->
+                    if (pkg == null) JsonNull else Json.parseToJsonElement(JsonHelper.jsonEncode(pkg))
+                }
+            )
+        }
+        "systemInstallPackage" -> {
+            val path = params.getValue("path").jsonPrimitive.content
+            val result = try {
+                com.ismartcoding.plain.platform.installPackage(path)
+            } catch (e: Exception) {
+                throw IllegalStateException("Installation failed: ${e.message}", e)
+            }
+            buildJsonObject {
+                put("packageName", JsonPrimitive(result.packageName))
+                put("lastUpdateTime", result.lastUpdateTime?.let { JsonPrimitive(it.toString()) } ?: JsonNull)
+                put("isNew", JsonPrimitive(result.isNew))
+            }
+        }
+        "systemUninstallPackages" -> {
+            params.getValue("ids").jsonArray.map { it.jsonPrimitive.content }.forEach {
+                com.ismartcoding.plain.platform.uninstallPackage(it)
+            }
+            JsonPrimitive(true)
+        }
+        "systemSetClipboard" -> {
+            com.ismartcoding.plain.platform.setClipboardText("plain", params.getValue("text").jsonPrimitive.content)
+            JsonPrimitive(true)
+        }
         "systemNotificationFacts" -> Json.parseToJsonElement(JsonHelper.jsonEncode(notificationFacts()))
         "systemMmsTextFacts", "systemSmsCountFacts", "systemSmsRowsFacts", "systemSmsIdsFacts", "systemSmsConversationFacts", "systemSmsThreadFacts" -> com.ismartcoding.plain.platform.systemSmsFacts(method, params)
         "systemEpochMillis" -> buildJsonObject {
