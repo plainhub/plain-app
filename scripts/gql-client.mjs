@@ -130,7 +130,16 @@ async function login(host, port, clientId) {
         approved = true
         console.error('PENDING — run the on-pending command, waiting for the app to confirm')
         // Its stdout goes to our stderr so it cannot corrupt the result stream.
-        if (opts['on-pending']) execSync(opts['on-pending'], { stdio: ['inherit', 2, 2] })
+        // A failing approval is not fatal to the process: the socket stays
+        // open and the dialog can still be accepted, so report it and keep
+        // waiting rather than throwing out of the message handler.
+        if (opts['on-pending']) {
+          try {
+            execSync(opts['on-pending'], { stdio: ['inherit', 2, 2] })
+          } catch (e) {
+            console.error(`approval command failed: ${e.message.split('\n')[0]}`)
+          }
+        }
         return
       }
       clearTimeout(timer)

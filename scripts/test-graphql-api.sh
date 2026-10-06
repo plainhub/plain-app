@@ -17,7 +17,8 @@ CLIENT_ID="${2:-plain-api-test}"
 CLIENT="$(dirname "${BASH_SOURCE[0]}")/gql-client.mjs"
 QFILE="$(mktemp)"
 OUT="$(mktemp)"
-trap 'rm -f "$QFILE" "$OUT"' EXIT
+ERR="$(mktemp)"
+trap 'rm -f "$QFILE" "$OUT" "$ERR"' EXIT
 
 if ! command -v node >/dev/null 2>&1; then
   echo "node is required (scripts/gql-client.mjs)" >&2
@@ -91,17 +92,25 @@ echo "URL: ${BASE_URL}/graphql"
 echo "Client ID: ${CLIENT_ID}"
 echo ""
 
+# The client's stderr carries the actual reason a login stalled (wrong
+# password, rate limited, prompt never accepted) — kept beside the results, and
+# printed when one fails. Kept out of $OUT on purpose: it is progress chatter,
+# not `name<TAB>status<TAB>detail` rows, and mixing them invents fake failures.
 if node "$CLIENT" --host "$(printf '%s' "$BASE_URL" | sed -e 's#^[a-z]*://##' -e 's#:.*##')" \
   --port "$(printf '%s' "$BASE_URL" | sed -n 's#.*:\([0-9]*\)/.*#\1#p')" \
-  --client-id "$CLIENT_ID" --queries "$QFILE" ${PLAIN_APPROVE_CMD:+--on-pending "$PLAIN_APPROVE_CMD"} >"$OUT"; then
+  --client-id "$CLIENT_ID" --queries "$QFILE" ${PLAIN_APPROVE_CMD:+--on-pending "$PLAIN_APPROVE_CMD"} \
+  >"$OUT" 2>"$ERR"; then
   :
 else
-  echo "  FAIL [login] — could not complete the login handshake (see the log above)"
+  echo ""
+  echo "--- login log ---"
+  cat "$ERR"
   echo ""
   echo "--- Summary ---"
   echo "Passed: 0"
   echo "Failed: 1"
-  echo "Failures:\n  FAIL [login]: login handshake did not complete"
+  echo "Failures:"
+  echo "  FAIL [login]: login handshake did not complete"
   exit 1
 fi
 
