@@ -68,7 +68,11 @@ run_rust() {
   # the next run test the wrong code.
   trap 'git -C "$DESKTOP_ROOT" worktree remove --force "$wt" 2>/dev/null' RETURN
 
-  if ! (cd "$wt" && cargo test --quiet --features content_api,http_transport) \
+  # -p plain-rs --lib: this suite is about plain-rs, not every workspace member.
+  # Running from the workspace root would also build nas and src-tauri, whose
+  # feature requests unify into plain-rs and change what its tests compile
+  # against.
+  if ! (cd "$wt" && cargo test --quiet -p plain-rs --lib --features content_api,http_transport) \
         > /tmp/plain-unit-rust.log 2>&1; then
     tail -40 /tmp/plain-unit-rust.log
     case_fail "rust_plain_rs" "cargo test failed, see /tmp/plain-unit-rust.log"
