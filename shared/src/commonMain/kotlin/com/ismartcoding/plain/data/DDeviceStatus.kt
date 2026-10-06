@@ -1,5 +1,8 @@
 package com.ismartcoding.plain.data
 
+import kotlinx.serialization.Serializable
+
+@Serializable
 class DTemperature {
     var label: String = ""
     var celsius: Double = 0.0
@@ -11,6 +14,7 @@ class DTemperature {
  * separate queries so lightweight consumers (battery badge) don't pay for
  * full info collection.
  */
+@Serializable
 class DDeviceStatus {
     var uptimeSec: Long = 0L
 

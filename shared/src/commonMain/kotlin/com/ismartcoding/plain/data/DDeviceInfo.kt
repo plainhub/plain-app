@@ -1,12 +1,15 @@
 package com.ismartcoding.plain.data
 
+import kotlinx.serialization.Serializable
 import kotlin.time.Instant
 import com.ismartcoding.plain.lib.TimeHelper
 
+@Serializable
 enum class DevicePlatform {
     ANDROID, IOS, MACOS, WINDOWS, LINUX
 }
 
+@Serializable
 class DAndroidExtras {
     var sdkVersion: Int = 0
     var versionCodeName: String = ""
@@ -24,12 +27,14 @@ class DAndroidExtras {
     var buildTime: Instant = TimeHelper.now()
 }
 
+@Serializable
 class DDisplayInfo {
     var width: Int = 0
     var height: Int = 0
     var density: Float = 0f
 }
 
+@Serializable
 class DDeviceInfo {
     var name: String = ""
     var platform: DevicePlatform = DevicePlatform.ANDROID
