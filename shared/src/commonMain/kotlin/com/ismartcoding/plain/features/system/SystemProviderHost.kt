@@ -476,6 +476,45 @@ object SystemProviderHost {
             put("ids", JsonArray(com.ismartcoding.plain.platform.getMediaIds(
                 mediaDataType(params), params.getValue("query").jsonPrimitive.content).map(::JsonPrimitive)))
         }
+        // Pref writes go through here rather than straight to the store:
+        // `Prefs` keeps an in-memory copy and fans the change out to the
+        // live flows the UI collects, so a write that skipped it would
+        // persist the value and leave every observer on the old one.
+        "systemSetUserPref" -> {
+            com.ismartcoding.plain.preferences.Prefs.setUserPref(
+                params.getValue("key").jsonPrimitive.content, params.getValue("value"))
+            JsonPrimitive(true)
+        }
+        "systemRemoveUserPref" -> {
+            com.ismartcoding.plain.preferences.Prefs.removeUserPref(params.getValue("key").jsonPrimitive.content)
+            JsonPrimitive(true)
+        }
+        "systemDbFacts" -> buildJsonObject {
+            put("path", JsonPrimitive(com.ismartcoding.plain.platform.getDbPath()))
+            put("tables", JsonArray(com.ismartcoding.plain.platform.getDbTableNames().map(::JsonPrimitive)))
+        }
+        "systemDbRowCount" -> JsonPrimitive(com.ismartcoding.plain.platform.getDbTableRowCount(
+            params.getValue("table").jsonPrimitive.content))
+        "systemDbRows" -> buildJsonObject {
+            put("rows", JsonArray(com.ismartcoding.plain.platform.getDbTableRows(
+                params.getValue("table").jsonPrimitive.content,
+                params.getValue("offset").jsonPrimitive.int,
+                params.getValue("limit").jsonPrimitive.int).map(::JsonPrimitive)))
+        }
+        "systemDbColumns" -> buildJsonObject {
+            put("columns", Json.parseToJsonElement(JsonHelper.jsonEncode(
+                com.ismartcoding.plain.platform.getDbTableColumns(params.getValue("table").jsonPrimitive.content))))
+        }
+        "systemDbInfo" -> buildJsonObject {
+            put("idKey", JsonPrimitive(
+                com.ismartcoding.plain.platform.getDbTableInfo(params.getValue("table").jsonPrimitive.content).idKey))
+        }
+        "systemCreateDbRow" -> JsonPrimitive(com.ismartcoding.plain.platform.createDbTableRow(
+            params.getValue("table").jsonPrimitive.content,
+            params.getValue("row").jsonPrimitive.content))
+        "systemDeleteDbRows" -> JsonPrimitive(com.ismartcoding.plain.platform.deleteDbTableRows(
+            params.getValue("table").jsonPrimitive.content,
+            params.getValue("ids").jsonArray.map { it.jsonPrimitive.content }))
         else -> error("Unsupported provider operation")
     }
 }
