@@ -143,6 +143,11 @@ android {
     }
     namespace = "com.ismartcoding.plain"
     sourceSets.getByName("main").jniLibs.srcDir(layout.buildDirectory.dir("generated/rustJniLibs").get().asFile)
+    // The web bundle ships under src/main/resources/web, which Gradle treats
+    // as a Java resources root and copies to the APK top level. The Rust HTTP
+    // listener cannot read that, so RustWebAssets unpacks it through
+    // AssetManager, which only sees src/main/assets.
+    sourceSets.getByName("main").assets.srcDir("src/main/resources")
 }
 
 val rustCoreDir = rootProject.file("rust/plain-rust")
