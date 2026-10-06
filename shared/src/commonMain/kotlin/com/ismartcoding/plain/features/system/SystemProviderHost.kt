@@ -410,6 +410,64 @@ object SystemProviderHost {
                 put("mimeType", com.ismartcoding.plain.platform.getContentTypeForPath(path).orEmpty())
             }
         }
+        "systemMountFacts" -> JsonArray(com.ismartcoding.plain.httpserver.loaders.MountsLoader.load().map { mount ->
+            buildJsonObject {
+                put("id", JsonPrimitive(mount.id.value)); put("name", JsonPrimitive(mount.name))
+                put("path", JsonPrimitive(mount.path)); put("mountPoint", JsonPrimitive(mount.mountPoint))
+                put("fsType", JsonPrimitive(mount.fsType)); put("totalBytes", JsonPrimitive(mount.totalBytes))
+                put("usedBytes", JsonPrimitive(mount.usedBytes)); put("freeBytes", JsonPrimitive(mount.freeBytes))
+                put("remote", JsonPrimitive(mount.remote)); put("alias", JsonPrimitive(mount.alias))
+                put("driveType", JsonPrimitive(mount.driveType.name)); put("diskId", JsonPrimitive(mount.diskId))
+            }
+        })
+        "systemRecentFileFacts" -> JsonArray(com.ismartcoding.plain.platform.getRecentFiles().map(::fileFacts))
+        "systemImageFileInfo" -> Json.parseToJsonElement(
+            JsonHelper.jsonEncode(fileInfoFacts(method, params)))
+        "systemVideoFileInfo" -> Json.parseToJsonElement(
+            JsonHelper.jsonEncode(fileInfoFacts(method, params)))
+        "systemAudioFileInfo" -> Json.parseToJsonElement(
+            JsonHelper.jsonEncode(fileInfoFacts(method, params)))
         else -> error("Unsupported provider operation")
+    }
+}
+
+/** The `File` contract row. `mediaId` stays an empty string for non-media
+ * entries; Rust maps that to `null` rather than carrying the sentinel. */
+private fun fileFacts(file: com.ismartcoding.plain.features.file.DFile): JsonObject = buildJsonObject {
+    put("name", JsonPrimitive(file.name)); put("path", JsonPrimitive(file.path))
+    put("mediaId", JsonPrimitive(file.mediaId))
+    put("createdAt", file.createdAt?.toEpochMilliseconds()?.let(::JsonPrimitive) ?: JsonNull)
+    put("updatedAt", file.updatedAt.toEpochMilliseconds())
+    put("size", JsonPrimitive(file.size)); put("isDir", JsonPrimitive(file.isDir))
+    put("childCount", JsonPrimitive(file.childCount))
+}
+
+private fun locationFacts(location: com.ismartcoding.plain.httpserver.models.Location?): JsonElement =
+    location?.let {
+        buildJsonObject {
+            put("latitude", JsonPrimitive(it.latitude)); put("longitude", JsonPrimitive(it.longitude))
+        }
+    } ?: JsonNull
+
+private fun fileInfoFacts(method: String, params: JsonObject): JsonObject {
+    val path = params.getValue("path").jsonPrimitive.content
+    return when (method) {
+        "systemImageFileInfo" -> com.ismartcoding.plain.platform.loadImageInfo(path).let {
+            buildJsonObject {
+                put("width", JsonPrimitive(it.width)); put("height", JsonPrimitive(it.height))
+                put("location", locationFacts(it.location))
+            }
+        }
+        "systemVideoFileInfo" -> com.ismartcoding.plain.platform.loadVideoInfo(path).let {
+            buildJsonObject {
+                put("width", JsonPrimitive(it.width)); put("height", JsonPrimitive(it.height))
+                put("durationMs", JsonPrimitive(it.durationMs)); put("location", locationFacts(it.location))
+            }
+        }
+        else -> com.ismartcoding.plain.platform.loadAudioInfo(path).let {
+            buildJsonObject {
+                put("durationMs", JsonPrimitive(it.durationMs)); put("location", locationFacts(it.location))
+            }
+        }
     }
 }
