@@ -88,7 +88,10 @@ run_rust() {
   fi
   local line passed
   line=$(grep -E '^test result:' /tmp/plain-unit-rust.log | tail -1)
-  passed=$(printf '%s' "$line" | sed -n 's/.*; \([0-9]*\) passed.*/\1/p')
+  # cargo prints "test result: ok. 934 passed; 0 failed; ..." — the count
+  # comes BEFORE the first semicolon, so match the count next to the word
+  # rather than after a separator.
+  passed=$(printf '%s' "$line" | grep -oE '[0-9]+ passed' | head -1 | cut -d' ' -f1)
   if [ -z "$passed" ]; then
     case_block "rust_plain_rs" "no 'test result:' line — did the suite run at all?"
     return
