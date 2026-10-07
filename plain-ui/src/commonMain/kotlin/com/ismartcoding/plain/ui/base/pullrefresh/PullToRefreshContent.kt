@@ -68,9 +68,10 @@ fun RefreshLayoutState.PullToRefreshContent(
             fontSize = 14.sp,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
-        elapsed?.let {
+        if (showLastRefresh) {
             Text(
-                text = lastRefreshLabel(it),
+                // Keep the header height stable when the first refresh succeeds.
+                text = elapsed?.let { lastRefreshLabel(it) }.orEmpty(),
                 fontSize = 12.sp,
                 color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
             )

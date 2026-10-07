@@ -72,7 +72,7 @@ fun RefreshLayout(
                 maxHeight = if (orientationIsHorizontal) contentPlaceable.height else Constraints.Infinity,
             )
         )
-        if (refreshContentThreshold == null && refreshLayoutState.refreshContentThresholdState.floatValue == 0f) {
+        if (refreshContentThreshold == null) {
             refreshLayoutState.refreshContentThresholdState.floatValue =
                 if (orientationIsHorizontal) {
                     refreshContentPlaceable.width.toFloat()
