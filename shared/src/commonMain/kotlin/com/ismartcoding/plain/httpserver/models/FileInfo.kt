@@ -1,22 +1,11 @@
 package com.ismartcoding.plain.httpserver.models
 
-import kotlin.time.Instant
-import kotlinx.serialization.Contextual
 import kotlinx.serialization.Polymorphic
 import kotlinx.serialization.Serializable
 
 data class Location(
     val latitude: Double,
     val longitude: Double,
-)
-
-@Polymorphic
-@Serializable
-class FileInfo(
-    val path: String,
-    val updatedAt: Instant,
-    val size: Long,
-    @Contextual var data: MediaFileInfo?,
 )
 
 @Polymorphic

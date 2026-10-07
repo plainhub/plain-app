@@ -1,6 +1,5 @@
 package com.ismartcoding.plain.httpserver.models
 
-import com.ismartcoding.plain.data.DDoc
 import kotlin.time.Instant
 
 data class Doc(
@@ -13,12 +12,3 @@ data class Doc(
     override val createdAt: Instant,
     override val updatedAt: Instant,
 ) : MediaItem
-
-data class DocExtGroup(
-    val ext: String,
-    val count: Int,
-)
-
-fun DDoc.toDocModel(): Doc {
-    return Doc(ID(id), title, path, extension, size, ID(bucketId), createdAt, updatedAt)
-}

@@ -140,13 +140,3 @@ internal fun getSslKeyStore(context: Context, password: String): KeyStore {
     cachedKeyStore = password to store
     return store
 }
-
-/**
- * Return the raw DER signature bytes of the HTTPS certificate, used by the
- * web UI to display the certificate fingerprint for trust verification.
- */
-fun getSslSignatureBytes(context: Context, password: String): ByteArray {
-    val keystore = getSslKeyStore(context, password)
-    val cert = keystore.getCertificate(SSL_KEY_ALIAS) as X509Certificate
-    return cert.signature
-}

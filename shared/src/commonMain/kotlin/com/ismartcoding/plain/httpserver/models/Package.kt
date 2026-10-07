@@ -16,5 +16,3 @@ data class Package(
 )
 
 data class Certificate(val issuer: String, val subject: String, val serialNumber: String, val validFrom: Instant, val validTo: Instant)
-
-data class PackageStatus(val id: ID, val exists: Boolean, val updatedAt: Instant?)

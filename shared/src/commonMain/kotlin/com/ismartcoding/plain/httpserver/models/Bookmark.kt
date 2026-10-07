@@ -31,15 +31,6 @@ data class BookmarkGroup(
     val updatedAt: Instant,
 )
 
-@Serializable
-data class BookmarkInput(
-    val url: String,
-    val title: String,
-    val groupId: ID,
-    val pinned: Boolean,
-    val sortOrder: Int,
-)
-
 fun DBookmark.toModel(): Bookmark {
     return Bookmark(
         id = ID(id),

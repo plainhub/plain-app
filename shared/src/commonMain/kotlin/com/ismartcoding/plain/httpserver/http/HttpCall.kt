@@ -1,6 +1,5 @@
 package com.ismartcoding.plain.httpserver.http
 
-import com.ismartcoding.plain.lib.JsonHelper
 import kotlin.jvm.JvmInline
 
 /**
@@ -112,11 +111,4 @@ interface HttpCall {
      * @return `true` on success, `false` if the file does not exist.
      */
     suspend fun respondDlnaFile(path: String): Boolean
-}
-
-inline suspend fun <reified T> HttpCall.respondJson(
-    value: T,
-    status: Int = HttpStatus.OK,
-) {
-    respondText(JsonHelper.jsonEncode(value), contentType = "application/json", status = status)
 }

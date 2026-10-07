@@ -23,14 +23,6 @@ data class AudioItem(
     val durationMs: Long,
 )
 
-data class AudioPlaylist(
-    val id: ID,
-    val name: String,
-    val itemCount: Int,
-    val createdAt: Instant,
-    val updatedAt: Instant,
-)
-
 data class AudioPlayHistory(
     val path: String,
     val title: String,

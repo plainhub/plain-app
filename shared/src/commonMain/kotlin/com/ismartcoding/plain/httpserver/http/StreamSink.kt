@@ -14,14 +14,3 @@ interface StreamSink {
     suspend fun flush()
     suspend fun close()
 }
-
-/**
- * Sink that discards all data. Handy as a fallback when a real sink is
- * unavailable (e.g. iOS stubs during migration).
- */
-object NullStreamSink : StreamSink {
-    override suspend fun write(bytes: ByteArray) {}
-    override suspend fun write(bytes: ByteArray, offset: Int, length: Int) {}
-    override suspend fun flush() {}
-    override suspend fun close() {}
-}
