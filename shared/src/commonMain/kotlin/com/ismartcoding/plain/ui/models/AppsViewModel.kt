@@ -6,6 +6,7 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import com.ismartcoding.plain.lib.withIO
+import com.ismartcoding.plain.helpers.SearchHelper
 import com.ismartcoding.plain.platform.LocaleHelper
 import com.ismartcoding.plain.platform.countPackages
 import com.ismartcoding.plain.platform.searchPackages
@@ -44,8 +45,8 @@ class AppsViewModel : ISearchableViewModel<VPackage>, ViewModel() {
     suspend fun loadAsync() = withIO {
         offset.intValue = 0
         _itemsFlow.value = searchPackages(getQuery(), limit.intValue, 0, sortBy.value).map { VPackage.from(it) }
-        total.intValue = countPackages(queryText.value)
-        totalSystem.intValue = countPackages("${queryText.value} type:${PackageType.SYSTEM.name}")
+        total.intValue = countPackages(SearchHelper.buildTextFilter(queryText.value))
+        totalSystem.intValue = countPackages("${SearchHelper.buildTextFilter(queryText.value)} type:${PackageType.SYSTEM.name}")
         noMore.value = _itemsFlow.value.size < limit.intValue
         tabs.value = listOf(
             VTabData(LocaleHelper.getStringAsync(Res.string.all), "", total.intValue),
@@ -56,7 +57,7 @@ class AppsViewModel : ISearchableViewModel<VPackage>, ViewModel() {
     }
 
     private fun getQuery(): String {
-        var query = queryText.value
+        var query = SearchHelper.buildTextFilter(queryText.value)
         if (appType.value.isNotEmpty()) {
             query += " type:${appType.value}"
         }

@@ -18,6 +18,7 @@ import com.ismartcoding.plain.features.feed.FeedEntryHelper
 import com.ismartcoding.plain.features.NoteHelper
 import com.ismartcoding.plain.features.file.DFile
 import com.ismartcoding.plain.features.file.FileSortBy
+import com.ismartcoding.plain.helpers.SearchHelper
 import com.ismartcoding.plain.lib.extensions.formatBytes
 import com.ismartcoding.plain.lib.extensions.formatDurationMs
 import com.ismartcoding.plain.platform.DPackageInfo
@@ -41,17 +42,22 @@ import com.ismartcoding.plain.i18n.devices
  * Data-source layer of the global search: how each domain is counted,
  * queried and re-synced, and how its source models map to result hits.
  * The [GlobalSearchViewModel] owns state and orchestration only.
+ *
+ * The box holds free text, and every domain below wants it as a `text:` value
+ * rather than spliced into the query as-is — `SearchHelper.buildTextFilter` is
+ * what keeps a term like `Meeting: notes` from arriving as the unknown field
+ * `Meeting`, which the notes and media query layers refuse by name.
  */
 
 internal suspend fun GlobalSearchViewModel.countDomain(d: GlobalSearchDomain, q: String): Int =
     when (d) {
-        GlobalSearchDomain.NOTES -> NoteHelper.count("$q trash:false")
-        GlobalSearchDomain.AUDIO -> countMedia(DataType.AUDIO, "$q trash:false")
-        GlobalSearchDomain.IMAGES -> countMedia(DataType.IMAGE, "$q trash:false")
-        GlobalSearchDomain.VIDEOS -> countMedia(DataType.VIDEO, "$q trash:false")
-        GlobalSearchDomain.DOCS -> countMedia(DataType.DOC, "$q trash:false")
-        GlobalSearchDomain.FILES -> countFiles(q)
-        GlobalSearchDomain.FEEDS -> FeedEntryHelper.count(q)
+        GlobalSearchDomain.NOTES -> NoteHelper.count("${SearchHelper.buildTextFilter(q)} trash:false")
+        GlobalSearchDomain.AUDIO -> countMedia(DataType.AUDIO, "${SearchHelper.buildTextFilter(q)} trash:false")
+        GlobalSearchDomain.IMAGES -> countMedia(DataType.IMAGE, "${SearchHelper.buildTextFilter(q)} trash:false")
+        GlobalSearchDomain.VIDEOS -> countMedia(DataType.VIDEO, "${SearchHelper.buildTextFilter(q)} trash:false")
+        GlobalSearchDomain.DOCS -> countMedia(DataType.DOC, "${SearchHelper.buildTextFilter(q)} trash:false")
+        GlobalSearchDomain.FILES -> countFiles(SearchHelper.buildTextFilter(q))
+        GlobalSearchDomain.FEEDS -> FeedEntryHelper.count(SearchHelper.buildTextFilter(q))
         GlobalSearchDomain.CHAT -> ChatDbHelper.countAsync(q)
         GlobalSearchDomain.APPS -> countPackages(q)
     }
@@ -64,23 +70,23 @@ internal suspend fun GlobalSearchViewModel.queryDomain(
 ): List<GlobalSearchHit> =
     when (d) {
         GlobalSearchDomain.NOTES ->
-            NoteHelper.search("$q trash:false", limit, offset).map { it.toHit(q) }
+            NoteHelper.search("${SearchHelper.buildTextFilter(q)} trash:false", limit, offset).map { it.toHit(q) }
         GlobalSearchDomain.AUDIO ->
-            searchMedia(DataType.AUDIO, "$q trash:false", limit, offset, FileSortBy.DATE_DESC)
+            searchMedia(DataType.AUDIO, "${SearchHelper.buildTextFilter(q)} trash:false", limit, offset, FileSortBy.DATE_DESC)
                 .filterIsInstance<DAudio>().map { it.toHit() }
         GlobalSearchDomain.IMAGES ->
-            searchMedia(DataType.IMAGE, "$q trash:false", limit, offset, FileSortBy.DATE_DESC)
+            searchMedia(DataType.IMAGE, "${SearchHelper.buildTextFilter(q)} trash:false", limit, offset, FileSortBy.DATE_DESC)
                 .filterIsInstance<DImage>().map { it.toHit() }
         GlobalSearchDomain.VIDEOS ->
-            searchMedia(DataType.VIDEO, "$q trash:false", limit, offset, FileSortBy.DATE_DESC)
+            searchMedia(DataType.VIDEO, "${SearchHelper.buildTextFilter(q)} trash:false", limit, offset, FileSortBy.DATE_DESC)
                 .filterIsInstance<DVideo>().map { it.toHit() }
         GlobalSearchDomain.DOCS ->
-            searchMedia(DataType.DOC, "$q trash:false", limit, offset, FileSortBy.DATE_DESC)
+            searchMedia(DataType.DOC, "${SearchHelper.buildTextFilter(q)} trash:false", limit, offset, FileSortBy.DATE_DESC)
                 .filterIsInstance<DDoc>().map { it.toHit() }
         GlobalSearchDomain.FILES ->
-            searchFiles(q, limit, offset, FileSortBy.DATE_DESC).map { it.toHit() }
+            searchFiles(SearchHelper.buildTextFilter(q), limit, offset, FileSortBy.DATE_DESC).map { it.toHit() }
         GlobalSearchDomain.FEEDS ->
-            FeedEntryHelper.search(q, limit, offset).map { it.toHit(q) }
+            FeedEntryHelper.search(SearchHelper.buildTextFilter(q), limit, offset).map { it.toHit(q) }
         GlobalSearchDomain.CHAT ->
             ChatDbHelper.searchAsync(q, limit, offset).map { it.toHit(q) }
         GlobalSearchDomain.APPS ->

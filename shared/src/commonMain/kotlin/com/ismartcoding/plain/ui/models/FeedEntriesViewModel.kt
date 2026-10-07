@@ -6,6 +6,7 @@ import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.ismartcoding.plain.helpers.SearchHelper
 import com.ismartcoding.plain.lib.withIO
 import com.ismartcoding.plain.enums.DataType
 import com.ismartcoding.plain.enums.FeedEntryFilterType
@@ -103,7 +104,7 @@ class FeedEntriesViewModel :
     }
 
     private fun getTotalAllQuery(): String {
-        var query = queryText.value
+        var query = SearchHelper.buildTextFilter(queryText.value)
         if (feedId.value.isNotEmpty()) {
             query += " feed_id:${feedId.value}"
         }
@@ -112,7 +113,7 @@ class FeedEntriesViewModel :
     }
 
     private fun getTotalTodayQuery(): String {
-        var query = "${queryText.value} today:true"
+        var query = "${SearchHelper.buildTextFilter(queryText.value)} today:true"
         if (feedId.value.isNotEmpty()) {
             query += " feed_id:${feedId.value}"
         }
@@ -121,7 +122,7 @@ class FeedEntriesViewModel :
     }
 
     private suspend fun getQuery(): String {
-        var query = queryText.value
+        var query = SearchHelper.buildTextFilter(queryText.value)
         if (filterType.value == FeedEntryFilterType.TODAY) {
             query += " today:true"
         }

@@ -140,4 +140,29 @@ object SearchHelper {
 
         return groups.filter { it.op != NOT_TYPE }
     }
+
+    /**
+     * Turns free text from a search box into a filter token the DSL can carry.
+     *
+     * The query language has no literal-text form. A bare `Meeting: notes`
+     * tokenizes into the *field* `Meeting`, and the query layer refuses a field
+     * the table has no column for — so before this existed, any search term
+     * containing a colon came back as an error instead of results. Escaping the
+     * characters the tokenizer treats specially keeps the phrase inside one
+     * token, so the LIKE gets the text the user actually typed.
+     *
+     * Text without a colon is emitted bare, which the parser reads as a `text`
+     * field directly and therefore without the operator sniffing that would eat
+     * a leading `=`, `<` or `>`.
+     */
+    fun buildTextFilter(text: String): String {
+        if (text.isBlank()) return ""
+        val escaped = buildString {
+            for (c in text) {
+                if (c == '\\' || c == '\'' || c == '"' || c.isWhitespace()) append('\\')
+                append(c)
+            }
+        }
+        return if (text.contains(FILTER_DELIMITER)) "text$FILTER_DELIMITER$escaped" else escaped
+    }
 }

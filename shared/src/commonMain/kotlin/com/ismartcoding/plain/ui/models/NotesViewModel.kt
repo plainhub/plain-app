@@ -4,6 +4,7 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import com.ismartcoding.plain.lib.withIO
+import com.ismartcoding.plain.helpers.SearchHelper
 import com.ismartcoding.plain.db.DNote
 import com.ismartcoding.plain.db.DTag
 import com.ismartcoding.plain.enums.DataType
@@ -101,15 +102,15 @@ object NotesViewModel : ISearchableViewModel<DNote>, ISelectableViewModel<DNote>
     }
 
     private fun getTotalQuery(): String {
-        return "${queryText.value} trash:false"
+        return "${SearchHelper.buildTextFilter(queryText.value)} trash:false"
     }
 
     private fun getTrashQuery(): String {
-        return "${queryText.value} trash:true"
+        return "${SearchHelper.buildTextFilter(queryText.value)} trash:true"
     }
 
     private suspend fun getQuery(): String {
-        var query = "${queryText.value} trash:${trash.value}"
+        var query = "${SearchHelper.buildTextFilter(queryText.value)} trash:${trash.value}"
         if (tag.value != null) {
             val tagId = tag.value!!.id
             val ids = TagHelper.getKeysByTagId(tagId)

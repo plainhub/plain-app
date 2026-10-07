@@ -7,6 +7,7 @@ import com.ismartcoding.plain.audio.DAudio
 import com.ismartcoding.plain.enums.DataType
 import com.ismartcoding.plain.features.audio.AudioPlaylistManager
 import com.ismartcoding.plain.features.audio.AudioQueueManager
+import com.ismartcoding.plain.helpers.SearchHelper
 import com.ismartcoding.plain.lib.withIO
 import com.ismartcoding.plain.platform.searchMedia
 
@@ -34,7 +35,7 @@ class PlaylistAddItemsViewModel : ViewModel(), ISearchableViewModel<DAudio> {
 
     suspend fun searchAsync() {
         items.value = withIO {
-            searchMedia(DataType.AUDIO, queryText.value, 500, 0, UserPrefs.audioSortByValue())
+            searchMedia(DataType.AUDIO, SearchHelper.buildTextFilter(queryText.value), 500, 0, UserPrefs.audioSortByValue())
         }.filterIsInstance<DAudio>()
     }
 }

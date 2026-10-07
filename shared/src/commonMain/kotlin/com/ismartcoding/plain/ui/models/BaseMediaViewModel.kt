@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ismartcoding.plain.lib.sendEvent
 import com.ismartcoding.plain.lib.withIO
+import com.ismartcoding.plain.helpers.SearchHelper
 import com.ismartcoding.plain.db.IData
 import com.ismartcoding.plain.db.DTag
 import com.ismartcoding.plain.enums.DataType
@@ -51,7 +52,7 @@ abstract class BaseMediaViewModel<T : IData> : ISearchableViewModel<T>, ViewMode
     abstract val dataType: DataType
 
     internal open fun getTotalQuery(): String {
-        var query = "${queryText.value} trash:false"
+        var query = "${SearchHelper.buildTextFilter(queryText.value)} trash:false"
         if (bucketId.value.isNotEmpty()) {
             query += " bucket_id:${bucketId.value}"
         }
@@ -59,7 +60,7 @@ abstract class BaseMediaViewModel<T : IData> : ISearchableViewModel<T>, ViewMode
     }
 
     internal fun getTrashQuery(): String {
-        var query = "${queryText.value} trash:true"
+        var query = "${SearchHelper.buildTextFilter(queryText.value)} trash:true"
         if (bucketId.value.isNotEmpty()) {
             query += " bucket_id:${bucketId.value}"
         }
@@ -67,7 +68,7 @@ abstract class BaseMediaViewModel<T : IData> : ISearchableViewModel<T>, ViewMode
     }
 
     internal open suspend fun getQuery(): String {
-        var query = "${queryText.value} trash:${trash.value}"
+        var query = "${SearchHelper.buildTextFilter(queryText.value)} trash:${trash.value}"
         if (tag.value != null) {
             val tagId = tag.value!!.id
             val ids = TagHelper.getKeysByTagId(tagId)

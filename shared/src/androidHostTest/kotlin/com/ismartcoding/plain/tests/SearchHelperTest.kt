@@ -69,4 +69,59 @@ class SearchHelperTest {
         assertTrue(fields[0].op.isEmpty())
         assertEquals("hello", fields[0].value)
     }
+
+    /**
+     * The exact tokens the escaper emits. `plain-rs` parses these same strings
+     * in `provider_plan_survives_every_token_this_emits`, so a change to either
+     * side of the wire shows up as one red test rather than as a search that
+     * silently stops matching.
+     */
+    @Test
+    fun buildTextFilter_emitsTokensTheQueryLanguageCanCarry() {
+        val cases = listOf(
+            "" to "",
+            "   " to "",
+            "hello" to "hello",
+            "hello world" to """hello\ world""",
+            "Meeting: notes" to """text:Meeting:\ notes""",
+            "http://x.com" to "text:http://x.com",
+            "12:30" to "text:12:30",
+            "don't" to """don\'t""",
+            "a\\b" to """a\\b""",
+            "=foo" to "=foo",
+            "50%_" to "50%_",
+        )
+        cases.forEach { (input, expected) ->
+            assertEquals("for input <$input>", expected, SearchHelper.buildTextFilter(input))
+        }
+    }
+
+    @Test
+    fun buildTextFilter_survivesItsOwnParser() {
+        listOf(
+            "hello",
+            "hello world",
+            "Meeting: notes",
+            "http://x.com",
+            "12:30",
+            "don't",
+            "a\\b",
+            "=foo",
+            "50%_",
+        ).forEach { text ->
+            val fields = SearchHelper.parse(SearchHelper.buildTextFilter(text))
+            assertEquals("for <$text>", 1, fields.size)
+            assertEquals("for <$text>", "text", fields[0].name)
+            assertEquals("for <$text>", text, fields[0].value)
+        }
+    }
+
+    @Test
+    fun buildTextFilter_keepsTheOtherFiltersAlongside() {
+        val query = "${SearchHelper.buildTextFilter("Meeting: notes")} trash:false ids:1,2"
+        val fields = SearchHelper.parse(query).associate { it.name to it.value }
+        assertEquals("Meeting: notes", fields["text"])
+        assertEquals("false", fields["trash"])
+        assertEquals("1,2", fields["ids"])
+    }
 }
