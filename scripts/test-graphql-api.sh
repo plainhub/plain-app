@@ -83,9 +83,55 @@ emit user_prefs '{ userPrefs }'
 emit system_prefs '{ systemPrefs }'
 emit app_logs '{ appLogs(offset: 0, limit: 5, query: "") }'
 
+# The served schema itself, so the contract snapshot can be put next to what
+# the server actually serves. No host test can do this: the schema only exists
+# inside the running Rust server. `raw:` makes gql-client return the decrypted
+# body; the case is scored by score_contract_types, never on "did it answer".
+emit 'raw:contract_types' '{ __schema { types { name kind } } }'
+
+# Bidirectional set comparison. A type the contract declares but the server
+# does not serve is dead documentation; one the server serves but the contract
+# omits means the App-side view of the schema is incomplete. ApiContractTest
+# can see neither — it only checks the snapshot against its own conventions —
+# which is how `interface MediaItem` and two platform enums sat in the
+# contract for weeks without anything going red.
+score_contract_types() {
+  local contract served declared only_served only_declared
+  contract="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)/shared/apitest/schema.graphqls"
+  if [ -z "${RAW_TYPES:-}" ]; then
+    FAIL=$((FAIL + 1))
+    ERRORS="${ERRORS}\n  FAIL [contract_types]: introspection returned no payload"
+    echo "  FAIL [contract_types] — introspection returned no payload"
+    return
+  fi
+  served=$(printf '%s' "$RAW_TYPES" | grep -o '"name":"[^"]*"' | sed 's/^"name":"//; s/"$//' \
+    | grep -vE '^__|^(String|Int|Float|Boolean|ID)$' | sort -u)
+  declared=$(grep -oE '^(type|interface|enum|union|input|scalar) [A-Za-z_][A-Za-z0-9_]*' "$contract" \
+    | awk '{print $2}' | grep -v '^__' | sort -u)
+  if [ -z "$served" ] || [ -z "$declared" ]; then
+    FAIL=$((FAIL + 1))
+    ERRORS="${ERRORS}\n  FAIL [contract_types]: served type list ($(printf '%s' "$served" | wc -l | tr -d ' ') parsed) or contract type list ($(printf '%s' "$declared" | wc -l | tr -d ' ') parsed) came out empty"
+    echo "  FAIL [contract_types] — a type list came out empty, nothing was compared"
+    return
+  fi
+  only_served=$(comm -23 <(printf '%s\n' "$served") <(printf '%s\n' "$declared"))
+  only_declared=$(comm -13 <(printf '%s\n' "$served") <(printf '%s\n' "$declared"))
+  if [ -n "$only_served" ] || [ -n "$only_declared" ]; then
+    FAIL=$((FAIL + 1))
+    ERRORS="${ERRORS}\n  FAIL [contract_types]: schema.graphqls drifted from the served schema — served only: $(echo "${only_served:-none}" | tr '\n' ' ')| declared only: $(echo "${only_declared:-none}" | tr '\n' ' ')"
+    echo "  FAIL [contract_types] — contract drifted from the served schema:"
+    [ -n "$only_served" ] && echo "      served but undeclared: $(echo "$only_served" | tr '\n' ' ')"
+    [ -n "$only_declared" ] && echo "      declared but not served: $(echo "$only_declared" | tr '\n' ' ')"
+    return
+  fi
+  PASS=$((PASS + 1))
+  echo "  PASS [contract_types] — $(printf '%s\n' "$served" | wc -l | tr -d ' ') served types, all declared in schema.graphqls"
+}
+
 PASS=0
 FAIL=0
 ERRORS=""
+RAW_TYPES=""
 
 echo "=== GraphQL API Test ==="
 echo "URL: ${BASE_URL}/graphql"
@@ -117,6 +163,11 @@ fi
 while IFS=$'\t' read -r name status detail; do
   [ -z "$name" ] && continue
   case "$name" in
+    raw:contract_types)
+      # Not scored here — the payload only means something once it has been
+      # compared against the contract snapshot.
+      RAW_TYPES="$detail"
+      ;;
     @*)
       name="${name#@}"
       if [ "$status" = "ok" ]; then
@@ -143,6 +194,8 @@ while IFS=$'\t' read -r name status detail; do
       ;;
   esac
 done <"$OUT"
+
+score_contract_types
 
 echo ""
 echo "--- Summary ---"

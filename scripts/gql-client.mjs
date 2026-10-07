@@ -253,5 +253,15 @@ for (const [name, query] of queries) {
   } catch (e) {
     result = { ok: false, detail: e.message }
   }
+  // A `raw:` case exists for its payload, not for its status line: "200 OK"
+  // tells the caller nothing, so hand back the decrypted body instead and let
+  // it decide what the answer means.
+  if (result.ok && name.startsWith('raw:')) {
+    try {
+      result.detail = await rawQuery(host, port, session.clientId, session.token, query)
+    } catch (e) {
+      result = { ok: false, detail: `raw fetch failed: ${e.message}` }
+    }
+  }
   console.log([name, result.ok ? 'ok' : 'fail', result.detail.replace(/[\t\n]/g, ' ')].join('\t'))
 }

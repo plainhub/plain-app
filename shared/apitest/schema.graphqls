@@ -302,7 +302,7 @@ type AppFile {
   updatedAt: Instant!
 }
 
-type Audio implements MediaItem {
+type Audio {
   id: ID!
   title: String!
   artist: String!
@@ -442,15 +442,6 @@ type Certificate {
 enum ChannelMemberStatus {
   JOINED
   PENDING
-}
-
-enum ChannelSystemMessageType {
-  INVITE
-  INVITE_ACCEPT
-  INVITE_DECLINE
-  UPDATE
-  KICK
-  LEAVE
 }
 
 type ChatChannel {
@@ -740,7 +731,7 @@ type DisplayInfo {
   density: Float!
 }
 
-type Doc implements MediaItem {
+type Doc {
   id: ID!
   title: String!
   path: String!
@@ -874,7 +865,7 @@ enum ImProtocol {
   NETMEETING
 }
 
-type Image implements MediaItem {
+type Image {
   id: ID!
   title: String!
   path: String!
@@ -976,16 +967,6 @@ enum MediaDataType {
 }
 
 union MediaFileInfo = AudioFileInfo | ImageFileInfo | VideoFileInfo
-
-interface MediaItem {
-  id: ID!
-  title: String!
-  path: String!
-  size: Long!
-  bucketId: ID!
-  createdAt: Instant!
-  updatedAt: Instant!
-}
 
 enum MediaPlayMode {
   REPEAT
@@ -1239,22 +1220,6 @@ enum PostalType {
   OTHER
 }
 
-enum ScreenMirrorControlAction {
-  TAP
-  LONG_PRESS
-  SWIPE
-  SCROLL
-  BACK
-  HOME
-  RECENTS
-  LOCK_SCREEN
-  KEY
-  TOUCH
-  TOUCH_DOWN
-  TOUCH_MOVE
-  TOUCH_UP
-}
-
 enum ScreenMirrorMode {
   HD
   SMOOTH
@@ -1349,7 +1314,7 @@ type Temperature {
   celsius: Float!
 }
 
-type Video implements MediaItem {
+type Video {
   id: ID!
   title: String!
   path: String!
