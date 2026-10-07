@@ -1,8 +1,5 @@
 package com.ismartcoding.plain.features.system
 
-import com.ismartcoding.plain.chat.channel.channelFacts
-import com.ismartcoding.plain.lib.JsonHelper
-import kotlinx.serialization.json.jsonPrimitive
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonObject
 
@@ -77,11 +74,6 @@ object SystemProviderHost {
         "systemMediaTagFacts",
         "systemTagQueryStubs",
         "systemTagQueryKeys" -> SystemTagsHost.handle(method, params)
-        "systemChatChannelFacts" -> JsonHelper.jsonEncodeToElement(
-            com.ismartcoding.plain.chat.channel.ChannelCacher.channels.value
-                .sortedBy { it.name }
-                .map { channelFacts(it) })
-        "systemChatChannelAction" -> chatChannelAction(params)
         "systemChatSend",
         "systemChatDeleteOne",
         "systemChatDeleteQuery",
@@ -133,24 +125,5 @@ object SystemProviderHost {
         "systemRelaunchApp",
         "systemUpdateDeviceName" -> SystemAppHost.handle(method, params)
         else -> error("Unsupported provider operation")
-    }
-}
-
-private suspend fun chatChannelAction(params: JsonObject): JsonElement {
-    val manager = com.ismartcoding.plain.chat.channel.ChannelManager
-    val id = params["id"]?.jsonPrimitive?.content.orEmpty()
-    val peer = params["peerId"]?.jsonPrimitive?.content.orEmpty()
-    return when (params.getValue("action").jsonPrimitive.content) {
-        "create" -> JsonHelper.jsonEncodeToElement(
-            manager.createChannel(params.getValue("name").jsonPrimitive.content))
-        "rename" -> JsonHelper.jsonEncodeToElement(manager.renameChannel(
-            id, params.getValue("name").jsonPrimitive.content))
-        "delete" -> { manager.deleteChannel(id); JsonHelper.jsonEncodeToElement(true) }
-        "leave" -> { manager.leaveChannel(id); JsonHelper.jsonEncodeToElement(true) }
-        "invite" -> JsonHelper.jsonEncodeToElement(manager.inviteMember(id, peer))
-        "kick" -> JsonHelper.jsonEncodeToElement(manager.kickMember(id, peer))
-        "accept" -> { manager.acceptInvite(id); JsonHelper.jsonEncodeToElement(true) }
-        "decline" -> { manager.declineInvite(id); JsonHelper.jsonEncodeToElement(true) }
-        else -> error("Unsupported channel action")
     }
 }

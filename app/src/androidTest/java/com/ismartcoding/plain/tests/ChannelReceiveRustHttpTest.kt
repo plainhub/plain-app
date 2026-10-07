@@ -37,28 +37,28 @@ class ChannelReceiveRustHttpTest {
         val invite = ChannelInvite(id, prefix, Base64.encode(ByteArray(32) { 7 }), owner.id, members, listOf(MemberPeerInfo(id = owner.id, name = prefix, publicKey = owner.publicKey)), 1, signature(1, ChannelSystemMessageAction.INVITE, actor))
         try {
             RustPeerStore.insert(owner)
-            assertFalse(ChannelSystemMessageReceiver.handle(owner.id, ChannelSystemMessageType.INVITE, jsonEncode(invite.copy(signature = ""))))
+            assertFalse(receive(owner.id, ChannelSystemMessageType.INVITE, jsonEncode(invite.copy(signature = ""))))
             assertNull(RustChannelStore.getById(id))
-            assertTrue(ChannelSystemMessageReceiver.handle(owner.id, ChannelSystemMessageType.INVITE, jsonEncode(invite)))
+            assertTrue(receive(owner.id, ChannelSystemMessageType.INVITE, jsonEncode(invite)))
             val first = RustChannelStore.getById(id)!!
             assertEquals(prefix, first.name)
             assertEquals(1L, first.version)
             assertEquals(ChannelMemberStatus.PENDING, first.members.single { it.peerId == actor }.status)
             val update = ChannelUpdate(id, "$prefix updated", members, version = 2, signature = signature(2, ChannelSystemMessageAction.UPDATE, ""))
-            assertFalse(ChannelSystemMessageReceiver.handle(owner.id, ChannelSystemMessageType.UPDATE, jsonEncode(update.copy(signature = ""))))
+            assertFalse(receive(owner.id, ChannelSystemMessageType.UPDATE, jsonEncode(update.copy(signature = ""))))
             assertEquals(prefix, RustChannelStore.getById(id)!!.name)
-            assertTrue(ChannelSystemMessageReceiver.handle(owner.id, ChannelSystemMessageType.UPDATE, jsonEncode(update)))
+            assertTrue(receive(owner.id, ChannelSystemMessageType.UPDATE, jsonEncode(update)))
             assertEquals(update.channelName, RustChannelStore.getById(id)!!.name)
             val stale = ChannelKick(id, 1, signature(1, ChannelSystemMessageAction.KICK, actor))
-            assertTrue(ChannelSystemMessageReceiver.handle(owner.id, ChannelSystemMessageType.KICK, jsonEncode(stale)))
+            assertTrue(receive(owner.id, ChannelSystemMessageType.KICK, jsonEncode(stale)))
             assertEquals(ChatChannelStatus.JOINED, RustChannelStore.getById(id)!!.status)
             val kick = ChannelKick(id, 2, signature(2, ChannelSystemMessageAction.KICK, ""))
-            assertTrue(ChannelSystemMessageReceiver.handle(owner.id, ChannelSystemMessageType.KICK, jsonEncode(kick)))
+            assertTrue(receive(owner.id, ChannelSystemMessageType.KICK, jsonEncode(kick)))
             assertEquals(ChatChannelStatus.KICKED, RustChannelStore.getById(id)!!.status)
             assertFalse(RustChannelStore.getById(id)!!.members.any { it.peerId == actor })
-            assertFalse(ChannelSystemMessageReceiver.handle(owner.id, ChannelSystemMessageType.INVITE, jsonEncode(invite)))
+            assertFalse(receive(owner.id, ChannelSystemMessageType.INVITE, jsonEncode(invite)))
             val reinvite = invite.copy(version = 3, signature = signature(3, ChannelSystemMessageAction.INVITE, actor))
-            assertTrue(ChannelSystemMessageReceiver.handle(owner.id, ChannelSystemMessageType.INVITE, jsonEncode(reinvite)))
+            assertTrue(receive(owner.id, ChannelSystemMessageType.INVITE, jsonEncode(reinvite)))
             assertEquals(first.createdAt, RustChannelStore.getById(id)!!.createdAt)
             assertEquals(ChatChannelStatus.JOINED, RustChannelStore.getById(id)!!.status)
             assertEquals(owner.publicKey, RustPeerStore.getById(owner.id)!!.publicKey)
@@ -78,7 +78,10 @@ class ChannelReceiveRustHttpTest {
         val publicKey = Base64.decode(com.ismartcoding.plain.helpers.SignatureHelper.getRawPublicKeyBase64Async())
         val channel = RustChannelStore.create("中文 $prefix")
         try {
-            ChannelSystemMessageSender.broadcastUpdate(channel)
+            com.ismartcoding.plain.api.RustContentApi.postJsonOrThrow("chat/channel", buildJsonObject {
+                put("action", "send"); put("id", channel.id)
+                put("message_type", ChannelSystemMessageType.UPDATE.name); put("target", "")
+            }, longRunning = true)
             RustPeerStore.insert(paired, group)
             RustChannelStore.action(channel.id, "invite", peer = paired.id)
             val current = RustChannelStore.action(channel.id, "invite", peer = group.id)
@@ -107,6 +110,15 @@ class ChannelReceiveRustHttpTest {
             ChannelCacher.load()
             PeerCacher.load()
         }
+    }
+
+    private suspend fun receive(from: String, type: ChannelSystemMessageType, payload: String): Boolean {
+        val result = com.ismartcoding.plain.api.RustContentApi.postJson("chat/store", buildJsonObject {
+            put("action", "receiveChannel"); put("actor", TempData.clientId)
+            put("from_id", from); put("message_type", type.name); put("payload", payload)
+        }).getOrNull()?.get("result")?.jsonObject ?: return false
+        ChannelCacher.load()
+        return result.getValue("accepted").jsonPrimitive.boolean
     }
 
 }

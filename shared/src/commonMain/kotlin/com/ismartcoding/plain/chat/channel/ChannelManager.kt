@@ -4,36 +4,11 @@ package com.ismartcoding.plain.chat.channel
 import com.ismartcoding.plain.chat.ChatManager
 import com.ismartcoding.plain.chat.peer.GraphQLResponse
 import com.ismartcoding.plain.db.DChatChannel
-import com.ismartcoding.plain.events.EventType
-import com.ismartcoding.plain.events.WebSocketEvent
-import com.ismartcoding.plain.lib.JsonHelper
-import com.ismartcoding.plain.lib.coIO
 import com.ismartcoding.plain.lib.withIO
-import com.ismartcoding.plain.lib.sendEvent
-import kotlinx.serialization.json.JsonArray
 
 import kotlinx.serialization.json.put
 
 object ChannelManager {
-
-    init {
-        startChannelBroadcaster()
-    }
-
-    private fun startChannelBroadcaster() {
-        coIO {
-            ChannelCacher.channels
-                .collect { channels ->
-                    sendEvent(
-                        WebSocketEvent(
-                            EventType.CHANNELS_UPDATED,
-                            channelsToJsonModelString(channels),
-                        ),
-                    )
-                    ChatManager.refreshLatestChats()
-                }
-        }
-    }
 
     private suspend fun mutate(action: String, id: String? = null, fields: kotlinx.serialization.json.JsonObjectBuilder.() -> Unit = {}): kotlinx.serialization.json.JsonObject {
         val result = RustChannelRuntime.call(action, id, fields)
@@ -62,6 +37,3 @@ object ChannelManager {
     }
     suspend fun declineInvite(channelId: String) { withIO { mutate("decline", channelId) } }
 }
-
-private fun channelsToJsonModelString(channels: List<DChatChannel>): String =
-    JsonHelper.jsonEncode(JsonArray(channels.map(::channelFacts)))

@@ -44,7 +44,9 @@ class ChatStorageRustHttpTest {
             assertEquals(channel.version, RustChannelStore.getById(channel.id)!!.version)
             assertEquals(peer.id, RustChannelStore.getById(channel.id)!!.members.single().peerId)
             ChannelCacher.load()
-            ChannelCacher.mutateChannel(channel.id) { it.version += 1; it.name = "$prefix patched" }
+            val before = RustChannelStore.getById(channel.id)!!
+            RustChannelStore.patch(before, before.copy(version = before.version + 1, name = "$prefix patched"))
+            ChannelCacher.load()
             assertEquals(channel.version + 1, RustChannelStore.getById(channel.id)!!.version)
             RustChatStore.insert(one, two, group)
             assertEquals(listOf(one.id, two.id), RustChatStore.getByPeerId(peer.id).map { it.id })

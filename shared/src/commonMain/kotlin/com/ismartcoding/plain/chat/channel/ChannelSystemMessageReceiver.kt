@@ -1,39 +1,18 @@
 package com.ismartcoding.plain.chat.channel
 
 import com.ismartcoding.plain.TempData
-import com.ismartcoding.plain.chat.callChatStore
 import com.ismartcoding.plain.chat.peer.PeerCacher
-import com.ismartcoding.plain.enums.ChannelSystemMessageType
 import com.ismartcoding.plain.events.ChannelInviteReceivedEvent
 import com.ismartcoding.plain.events.ChannelInviteCanceledEvent
-import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.lib.sendEvent
 import kotlinx.serialization.json.*
-import kotlinx.coroutines.CancellationException
 
 object ChannelSystemMessageReceiver {
-    suspend fun handle(fromId: String, type: ChannelSystemMessageType, payload: String): Boolean = try {
-        val result = callChatStore("receiveChannel") {
-            put("actor", TempData.clientId)
-            put("from_id", fromId)
-            put("message_type", type.name)
-            put("payload", payload)
-        }.jsonObject
-        applyCommitted(result)
-        if (result.getValue("broadcast").jsonPrimitive.boolean) {
-            ChannelSystemMessageSender.broadcastUpdate(RustChannelStore.decode(result.getValue("channel")))
-        }
-        result.getValue("accepted").jsonPrimitive.boolean
-    } catch (cancelled: CancellationException) { throw cancelled }
-    catch (error: Exception) {
-        LogCat.e("Channel message rejected [${type.name}] from $fromId: ${error.message}")
-        false
-    }
-
     suspend fun applyCommitted(result: JsonObject) {
         if (result.getValue("changed").jsonPrimitive.boolean) {
             PeerCacher.load()
             ChannelCacher.load()
+            com.ismartcoding.plain.chat.ChatManager.refreshLatestChats()
         }
         result["invite"]?.takeUnless { it is JsonNull }?.jsonObject?.let { invite ->
             val channelId = invite.getValue("channelId").jsonPrimitive.content

@@ -88,7 +88,7 @@ fun ChannelInfoPage(
 ) {
     val chatTarget = chatVM.target.collectAsState()
     // Collect channels as state so the UI recomposes whenever ChannelCacher
-    // updates (invite/kick/accept all call ChannelCacher.mutateChannel).
+    // updates after Rust commits an invite, kick, or acceptance.
     val channels = ChannelCacher.channels.collectAsState()
     val liveChannel = channels.value.find { it.id == chatTarget.value.toId }
     val ownedByMe = liveChannel?.isOwnedByMe() == true

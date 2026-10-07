@@ -1,7 +1,7 @@
 package com.ismartcoding.plain.chat.channel
 
 import com.ismartcoding.plain.TempData
-import com.ismartcoding.plain.chat.callChatStore
+import com.ismartcoding.plain.api.RustContentApi
 import com.ismartcoding.plain.db.DChatChannel
 import com.ismartcoding.plain.enums.ChannelSystemMessageType
 import com.ismartcoding.plain.platform.getDeviceType
@@ -20,3 +20,6 @@ object RustChannelOutgoingStore {
         put("payload", prepared.getValue("payload"))
     }.jsonPrimitive.content
 }
+
+private suspend fun callChatStore(action: String, fields: JsonObjectBuilder.() -> Unit = {}): JsonElement =
+    RustContentApi.postJsonOrThrow("chat/store", buildJsonObject { put("action", action); fields() }).getValue("result")

@@ -188,8 +188,9 @@ object RustContentApi {
                                 sendEvent(WebSocketEvent(EventType.MESSAGE_DELETED, payload))
                             }
                             EventType.CHANNELS_UPDATED.value -> {
-                                com.ismartcoding.plain.chat.channel.ChannelSystemMessageReceiver.applyCommitted(Json.parseToJsonElement(payload).jsonObject)
-                                sendEvent(WebSocketEvent(EventType.CHANNELS_UPDATED, ""))
+                                val result = Json.parseToJsonElement(payload).jsonObject
+                                com.ismartcoding.plain.chat.channel.ChannelSystemMessageReceiver.applyCommitted(result)
+                                sendEvent(WebSocketEvent(EventType.CHANNELS_UPDATED, result.getValue("channels").toString()))
                             }
                             EventType.MESSAGE_UPDATED.value -> {
                                 val items = Json.parseToJsonElement(payload).jsonArray.mapNotNull { value ->
@@ -211,6 +212,9 @@ object RustContentApi {
                             }
                             10004 -> com.ismartcoding.plain.features.share.SharedFolderDownloadEngine.refresh()
                             EventType.CONTENT_CHANGED.value -> {
+                                val channels = com.ismartcoding.plain.chat.channel.RustChannelRuntime.call("snapshot")
+                                com.ismartcoding.plain.chat.channel.ChannelSystemMessageReceiver.applyCommitted(channels)
+                                sendEvent(WebSocketEvent(EventType.CHANNELS_UPDATED, channels.getValue("channels").toString()))
                                 try { com.ismartcoding.plain.features.FavoriteFolderHelper.refresh() }
                                 catch (cancelled: CancellationException) { throw cancelled }
                                 catch (error: Exception) { com.ismartcoding.plain.lib.logcat.LogCat.e("Favorite folders refresh",error) }
