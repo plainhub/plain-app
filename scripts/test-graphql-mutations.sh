@@ -144,8 +144,14 @@ pass selector "${PROBE} matches 0 rows"
 sleep 6
 
 # --- phase B: seed, then every probe, in one ordered document ----------------
+# Two seeds, because `deleteNotes` only ever reaches notes that are already in
+# the trash — it resolves its ids with `deleted_at IS NOT NULL` forced on, so a
+# probe that widened to every trashed note would sail straight past a live seed
+# and phase C would still call the table unchanged.
 cat >"$TMP/b.tsv" <<EOF
 raw:b_seed	mutation { seed: createNote(input: { title: "${SEED}", content: "disposable ${SEED}" }) { id } }
+raw:b_seedTrashed	mutation { seedT: createNote(input: { title: "${SEED}-t", content: "disposable ${SEED}-t" }) { id } }
+raw:b_trashSeed	mutation { trashNotes(query: "text:${SEED}-t") { affectedCount } }
 raw:b_trashNotes	mutation { trashNotes(query: "${PROBE}") { affectedCount } }
 raw:b_restoreNotes	mutation { restoreNotes(query: "${PROBE}") { affectedCount } }
 raw:b_deleteNotes	mutation { deleteNotes(query: "${PROBE}") { affectedCount } }
@@ -161,8 +167,9 @@ raw:b_restoreSms_selects_nothing	mutation { restoreSms(query: "zzz_no_such_field
 raw:b_trashSms_real_selector	mutation { trashSms(query: "${PROBE}") { affectedCount } }
 raw:b_sms_read_selects_nothing	{ sms: sms(offset: 0, limit: 10, query: "archived:1") { id } }
 EOF
-send "$TMP/b.tsv" 15 B
+send "$TMP/b.tsv" 17 B
 SEED_ID=$(field "$(detail_of b_seed)" id)
+TRASHED_SEED_ID=$(field "$(detail_of b_seedTrashed)" id)
 if [ -z "$SEED_ID" ]; then
   fail seed "createNote returned no id"
   tail -6 "$TMP/err" >&2
@@ -170,6 +177,15 @@ if [ -z "$SEED_ID" ]; then
   exit 1
 fi
 pass seed "created note ${SEED_ID}"
+# The trashed seed is what the delete probes could actually reach, so it has to
+# be in the trash before they run, not after.
+if [ -z "$TRASHED_SEED_ID" ] || [ "$(field "$(detail_of b_trashSeed)" affectedCount)" != "1" ]; then
+  fail trashed_seed "could not create and trash the second seed — the delete probes are unchecked"
+  tail -6 "$TMP/err" >&2
+  echo ""; echo "--- Summary ---"; echo "Passed: $PASS"; echo "Failed: $((FAIL + 1))"
+  exit 1
+fi
+pass trashed_seed "created and trashed note ${TRASHED_SEED_ID}"
 sleep 6
 
 # Bulk probes. Each expects affectedCount 0, or a refusal from a permission gate
@@ -246,12 +262,17 @@ sleep 6
 
 # --- phase C: the invariant -------------------------------------------------
 # If any probe above had widened to the whole table, the seeded note is gone.
+# The trashed seed is checked separately: `deleteNotes` resolves its ids with
+# `deleted_at IS NOT NULL` forced on, so it only ever reaches trashed rows and
+# would not touch a live one however far it widened.
 cat >"$TMP/c.tsv" <<EOF
 raw:c_note	{ note(id: "${SEED_ID}") { id } }
+raw:c_trashedNote	{ note(id: "${TRASHED_SEED_ID}") { id } }
 raw:c_total	{ total: noteCount(query: "") }
 EOF
-if ! send "$TMP/c.tsv" 2 C; then
+if ! send "$TMP/c.tsv" 3 C; then
   fail seeded_note_survived "the invariant check could not be sent or answered — see the phase error above"
+  fail trashed_seed_survived "the invariant check could not be sent or answered — see the phase error above"
   fail table_unchanged "the invariant check could not be sent or answered"
   echo ""; echo "--- Summary ---"; echo "Passed: $PASS"; echo "Failed: $FAIL"
   printf "$ERRORS\n"; echo ""
@@ -270,6 +291,14 @@ elif printf '%s' "$d" | grep -q '"note":null'; then
 else
   fail seeded_note_survived "the check did not return a usable answer: '${d:-<no line at all>}'"
 fi
+d="$(detail_of c_trashedNote)"
+if printf '%s' "$d" | grep -q "\"$TRASHED_SEED_ID\""; then
+  pass trashed_seed_survived "trashed note ${TRASHED_SEED_ID} is still there — deleteNotes never reached past its selector"
+elif printf '%s' "$d" | grep -q '"note":null'; then
+  fail trashed_seed_survived "trashed note ${TRASHED_SEED_ID} came back null — a delete probe widened to every trashed note"
+else
+  fail trashed_seed_survived "the check did not return a usable answer: '${d:-<no line at all>}'"
+fi
 MID=$(field "$(detail_of c_total)" total)
 if [ -z "$MID" ]; then
   fail table_unchanged "could not read the count: '$(detail_of c_total)'"
@@ -285,16 +314,20 @@ sleep 6
 # Addressing it by marker keeps cleanup in its own batch instead of needing the
 # id to be known before the document is built.
 cat >"$TMP/d.tsv" <<EOF
+raw:d_deleteTrashed	mutation { deleteNotes(query: "ids:${TRASHED_SEED_ID}") { affectedCount } }
 raw:d_trash	mutation { trashNotes(query: "text:${SEED}") { affectedCount } }
 raw:d_delete	mutation { deleteNotes(query: "text:${SEED}") { affectedCount } }
 EOF
-send "$TMP/d.tsv" 2 D
+send "$TMP/d.tsv" 3 D
+X=$(field "$(detail_of d_deleteTrashed)" affectedCount)
 T=$(field "$(detail_of d_trash)" affectedCount)
 R=$(field "$(detail_of d_delete)" affectedCount)
-if [ "$T" = "1" ] && [ "$R" = "1" ]; then
-  pass cleaned_up "seed trashed and deleted (1 and 1)"
+if [ "$X" = "1" ] && [ "$T" = "1" ] && [ "$R" = "1" ]; then
+  pass cleaned_up "both seeds removed (trashed seed by id, live seed trashed then deleted)"
 else
-  fail cleaned_up "cleanup hit ${T} and ${R}, expected 1 and 1"
+  # The trashed seed goes first because its body also carries ${SEED}, so
+  # leaving it in place makes the final delete match two rows instead of one.
+  fail cleaned_up "cleanup hit ${X}, ${T} and ${R}, expected 1, 1 and 1"
 fi
 
 echo ""
