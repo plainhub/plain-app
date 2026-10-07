@@ -1,5 +1,6 @@
 package com.ismartcoding.plain.features.system
 
+import com.ismartcoding.plain.chat.channel.channelFacts
 import com.ismartcoding.plain.data.DCall
 import com.ismartcoding.plain.data.DContact
 import com.ismartcoding.plain.data.DScreenMirrorQuality
@@ -805,25 +806,6 @@ private fun fileSortBy(params: JsonObject) =
  * than omitted — an omitted field and a null one mean the same thing to
  * the client, but only one of them survives a round trip through a
  * positional row. */
-/** The `ChatChannel` contract row. `members` is a JSON array string in the
- * store, so it is projected into the contract's list shape here rather than
- * handed to Rust as an opaque blob. */
-private fun channelFacts(channel: com.ismartcoding.plain.db.DChatChannel): JsonObject {
-    val members = channel.members.map { member ->
-        buildJsonObject {
-            put("peerId", JsonPrimitive(member.peerId))
-            put("status", JsonPrimitive(member.status.name))
-        }
-    }
-    return buildJsonObject {
-        put("id", JsonPrimitive(channel.id)); put("ownerId", JsonPrimitive(channel.ownerId))
-        put("name", JsonPrimitive(channel.name)); put("members", JsonArray(members))
-        put("version", JsonPrimitive(channel.version)); put("status", JsonPrimitive(channel.status.name))
-        put("createdAt", JsonPrimitive(channel.createdAt.toString()))
-        put("updatedAt", JsonPrimitive(channel.updatedAt.toString()))
-    }
-}
-
 /** One channel mutation. The manager owns the delivery and the cache fan-out,
  * so the public root only has to name the action and read the result back. */
 private suspend fun chatChannelAction(params: JsonObject): JsonElement {

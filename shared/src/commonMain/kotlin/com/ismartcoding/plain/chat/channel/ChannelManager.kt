@@ -10,7 +10,7 @@ import com.ismartcoding.plain.lib.JsonHelper
 import com.ismartcoding.plain.lib.coIO
 import com.ismartcoding.plain.lib.withIO
 import com.ismartcoding.plain.lib.sendEvent
-import com.ismartcoding.plain.httpserver.models.toModel
+import kotlinx.serialization.json.JsonArray
 
 import kotlinx.serialization.json.put
 
@@ -64,4 +64,4 @@ object ChannelManager {
 }
 
 private fun channelsToJsonModelString(channels: List<DChatChannel>): String =
-    JsonHelper.jsonEncode(channels.map { it.toModel() })
+    JsonHelper.jsonEncode(JsonArray(channels.map(::channelFacts)))
