@@ -96,11 +96,6 @@ ai_models/
 # Project-local skills (symlink to private harness repo, do not leak path)
 .harness/
 
-# apitest — raw per-run API responses (may contain PII from device data)
-apitest/results/
-
-# apitest — config has the bearer token / cid for /graphql auth
-apitest/config.json
 .trae
 /docs
 

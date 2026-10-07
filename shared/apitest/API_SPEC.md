@@ -25,11 +25,13 @@
    > 已随 Ktor 删除（`42ed1fa17`），命令无法执行，所以这条指令是假的。
 
 3. `ApiContractTest` 必须绿（快照 + 结构约定；例外清单需同步更新本文件 §8）。
-4. `apitest/groups/*.sh` **目前没有接进任何门禁**（`scripts/test-*.sh` 与 CI 都不跑它），
-   `schema.sh` 的 expected_queries / expected_mutations 已经双向过期
-   （2026-10-07 实测：少登记 8 个 Query / 4 个 Mutation，仍留着 `prefsPath`、`prefs`、
-   `prefEntries`、`setPref`、`deletePref`、`deletePrefEntry` 这些 §7 明令禁止的旧名）。
-   要么同步它，要么连同 `apitest/groups/` 一起退役 —— 别把它当门禁。
+4. ~~`apitest/groups/*.sh` 目前没有接进任何门禁~~ — **已退役（2026-10-07 用户拍板）**。
+   顶层 `apitest/` 那套 shell harness（`runner.sh` / `groups/*.sh` / `setup-session.sh` / `config.json`）
+   连同它的 `.gitignore` 白名单一起删掉了。它测的是 `app/src/main/java/.../web/schemas/`，
+   那个目录已随 Ktor→Rust 迁移删除，所以它早就测不了任何东西；`schema.sh` 的
+   expected_queries / expected_mutations 也早已双向过期（少登记 8 个 Query / 4 个 Mutation，
+   还留着 §7 明令禁止的 `prefsPath` / `prefs` / `prefEntries` 等旧名）。别再把它当门禁，
+   也别把 `shared/apitest/` 和它混为一谈——`shared/apitest/` 是活的契约源，**没有**退役。
 5. plain-desktop 与 plain-nas 同步适配（同一次提交周期内），NAS 的 SDL 再生后必须与主 SDL 对齐。
 6. 汇报中给出各仓 commit message，等用户验收提交。
 
