@@ -247,21 +247,23 @@ const queries = readFileSync(opts.queries, 'utf8')
   .map((line) => line.split('\t'))
 
 for (const [name, query] of queries) {
+  const raw = name.startsWith('raw:')
   let result
   try {
-    result = await graphql(host, port, session.clientId, session.token, query)
+    // A `raw:` case exists for its payload, not for its status line, and it
+    // must be sent ONCE. Sending it twice would replay the document, which is
+    // harmless for a query and unacceptable for a mutation.
+    if (raw) {
+      const detail = await rawQuery(host, port, session.clientId, session.token, query)
+      const failed = /"errors"/.test(detail)
+      result = failed
+        ? { ok: false, detail: `GraphQL errors: ${detail.slice(0, 200)}` }
+        : { ok: true, detail }
+    } else {
+      result = await graphql(host, port, session.clientId, session.token, query)
+    }
   } catch (e) {
     result = { ok: false, detail: e.message }
-  }
-  // A `raw:` case exists for its payload, not for its status line: "200 OK"
-  // tells the caller nothing, so hand back the decrypted body instead and let
-  // it decide what the answer means.
-  if (result.ok && name.startsWith('raw:')) {
-    try {
-      result.detail = await rawQuery(host, port, session.clientId, session.token, query)
-    } catch (e) {
-      result = { ok: false, detail: `raw fetch failed: ${e.message}` }
-    }
   }
   console.log([name, result.ok ? 'ok' : 'fail', result.detail.replace(/[\t\n]/g, ' ')].join('\t'))
 }
