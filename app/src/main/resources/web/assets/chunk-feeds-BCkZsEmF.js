@@ -1,0 +1,1 @@
+import{s as e}from"./chunk-strutil-6bdgY2kj.js";import{t}from"./chunk-router-DazCZTs5.js";import{t as n}from"./chunk-search-C2tc9Sf2.js";var r=r=>({viewAll:()=>{t(r,`/feeds`)},viewFeed:i=>{t(r,`/feeds?q=${e(n([{name:`feed_id`,op:``,value:i.id}]))}`)},viewToday:()=>{t(r,`/feeds?q=${e(n([{name:`today`,op:``,value:`true`}]))}`)}});export{r as t};

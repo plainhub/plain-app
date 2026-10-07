@@ -1,1 +1,0 @@
-import{On as e,k as t,mt as n,v as r}from"./chunk-runtime-core.esm-bundler-DrnlzXx3.js";import{i}from"./chunk-feature-C-8tJkJj.js";import{A as a}from"./chunk-query-DMewK5cq.js";import{t as o}from"./chunk-MediaSidebar-CdIjdc0M.js";var s=t({__name:`DocsSidebar`,setup(t){return(t,s)=>{let c=o;return n(),r(c,{type:e(i).DOC,gql:e(a)},null,8,[`type`,`gql`])}}});export{s as default};
