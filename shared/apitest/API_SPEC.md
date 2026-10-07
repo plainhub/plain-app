@@ -10,9 +10,26 @@
 ## 0. 变更流程（改 schema 的固定动作）
 
 1. 改 resolver/model（plain-app）。
-2. 跑 `./gradlew :shared:testAndroidHostTest --tests "com.ismartcoding.plain.PrintSchemaTest"` 再生 `shared/apitest/schema.graphqls` 并提交。
+2. **契约 SDL 有两份，各有各的产出方式，别指望一条命令通吃：**
+   - **Rust 打印的那份** `plain-rs/testdata/public-schema.graphqls` 是自动重生的：
+     `UPDATE_PUBLIC_SCHEMA=1 cargo test -p plain-rs --lib public_schema_matches_committed_sdl`。
+     schema 由 Rust 构建，也只有 Rust 能打印它。
+   - **本仓这份** `shared/apitest/schema.graphqls` 带说明文字，是人工维护的契约副本，
+     改 schema 时**手工同步**。它由两道门禁看着：`ApiContractTest` 管结构约定，
+     `scripts/test-graphql-api.sh` 的 `contract_types` 用例管它与线上服务一致
+     （同一次登录里 introspect 真机，再与本文件双向对撞）。
+
+   > 2026-10-07 更正：原文此处写的是跑 `PrintSchemaTest` 再生本仓 SDL。那个测试只打印
+   > **peer / guest 两个 Kotlin schema**，主 API 的 SDL 从来不由它打印（它自己的注释就写了
+   > 「Rust owns that schema」）。它依赖的 `PeerGraphQLService` / `GuestGraphQLService`
+   > 已随 Ktor 删除（`42ed1fa17`），命令无法执行，所以这条指令是假的。
+
 3. `ApiContractTest` 必须绿（快照 + 结构约定；例外清单需同步更新本文件 §8）。
-4. 同步 `apitest/groups/schema.sh` 的 expected_queries/expected_mutations 与受影响的 groups/*.sh。
+4. `apitest/groups/*.sh` **目前没有接进任何门禁**（`scripts/test-*.sh` 与 CI 都不跑它），
+   `schema.sh` 的 expected_queries / expected_mutations 已经双向过期
+   （2026-10-07 实测：少登记 8 个 Query / 4 个 Mutation，仍留着 `prefsPath`、`prefs`、
+   `prefEntries`、`setPref`、`deletePref`、`deletePrefEntry` 这些 §7 明令禁止的旧名）。
+   要么同步它，要么连同 `apitest/groups/` 一起退役 —— 别把它当门禁。
 5. plain-desktop 与 plain-nas 同步适配（同一次提交周期内），NAS 的 SDL 再生后必须与主 SDL 对齐。
 6. 汇报中给出各仓 commit message，等用户验收提交。
 
