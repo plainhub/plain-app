@@ -30,7 +30,6 @@ class LikeEscapeGuardTest {
     /** Files allowed to call escapeLike (the pairing half outside ContentWhere). */
     private val escapeLikeAllowlist = setOf(
         "plain-common/src/commonMain/kotlin/com/ismartcoding/plain/helpers/ContentWhere.kt",
-        "shared/src/androidMain/kotlin/com/ismartcoding/plain/docs/DocMediaStoreHelper.kt",
     )
 
     /** LIKE-with-placeholder lines exempt because the pattern arg is a code constant. */
