@@ -79,8 +79,11 @@ class SystemProviderSerializationTest {
     fun systemProviderSerializationUsesOnlyJsonHelper() {
         val root = generateSequence(File(System.getProperty("user.dir"))) { it.parentFile }
             .first { File(it, "shared/src/commonMain").isDirectory }
-        val sources = listOf(
-            "shared/src/commonMain/kotlin/com/ismartcoding/plain/features/system/SystemProviderHost.kt",
+        val systemSources = File(root, "shared/src/commonMain/kotlin/com/ismartcoding/plain/features/system")
+            .walkTopDown()
+            .filter { it.isFile && it.extension == "kt" && it.name.startsWith("System") }
+            .map { it.relativeTo(root).path }.toList()
+        val sources = systemSources + listOf(
             "shared/src/androidMain/kotlin/com/ismartcoding/plain/features/sms/SmsHelper.kt",
             "shared/src/androidMain/kotlin/com/ismartcoding/plain/features/sms/SmsConversationHelper.kt",
             "shared/src/iosMain/kotlin/com/ismartcoding/plain/platform/SystemProviders.ios.kt",
