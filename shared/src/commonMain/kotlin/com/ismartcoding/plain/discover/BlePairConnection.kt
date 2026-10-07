@@ -1,24 +1,28 @@
 package com.ismartcoding.plain.discover
 
 import com.ismartcoding.plain.api.clientHeadersMap
-import com.ismartcoding.plain.ble.BleRequestData
+import com.ismartcoding.plain.ble.RustBleWire
 import com.ismartcoding.plain.ble.BleServices
 import com.ismartcoding.plain.ble.client.BleDeviceApi
 import com.ismartcoding.plain.ble.client.BleGattClient
 import com.ismartcoding.plain.platform.bleTransport
+import com.ismartcoding.plain.lib.JsonHelper
 import kotlinx.coroutines.*
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.serialization.json.*
+import kotlinx.serialization.Serializable
 
 internal class BlePairConnection(private val device: BleGattClient) {
     private val scanner = bleTransport().createScanner()
-    private val api = BleDeviceApi(device)
+    private val api = BleDeviceApi(device, RustBleWire)
     private val mutex = Mutex()
     private var job: Job? = null
     private var paused = false
     private var notifications = false
     private var closed = false
+    private val assembly = RustBleWire.assembler()
+    private var requestId = 0
 
     suspend fun connect(): Boolean {
         mutex.withLock {
@@ -36,7 +40,8 @@ internal class BlePairConnection(private val device: BleGattClient) {
             job = currentCoroutineContext()[Job]
             notifications = true
         }
-        return api.sendRequest(BleServices.nearby, BleRequestData.create(clientHeadersMap()).copy(body = body))
+        requestId = RustBleWire.nextRequestId()
+        return api.sendRequest(BleServices.nearby, RustBleWire.nearby(body.encodeToByteArray()), requestId)
     }
 
     suspend fun wait(timeoutMs: Long): JsonObject {
@@ -44,17 +49,26 @@ internal class BlePairConnection(private val device: BleGattClient) {
             check(!closed) { "BLE handle closed" }
             job = currentCoroutineContext()[Job]
         }
-        val notification = device.waitForNotification(BleServices.nearby, timeoutMs)
-        return buildJsonObject {
-            put("connected", api.isConnected())
-            put("notification", notification?.let(::JsonPrimitive) ?: JsonNull)
+        val notification = withTimeoutOrNull(timeoutMs) {
+            var body: String? = null
+            while (body == null) {
+                val frame = device.waitForNotification(BleServices.nearby, timeoutMs) ?: break
+                val message = assembly.push(frame)
+                check(assembly.response && assembly.requestId == requestId) { "Unexpected Nearby response" }
+                if (message != null) body = RustBleWire.nearbyBody(message).decodeToString(throwOnInvalidSequence = true)
+            }
+            body
         }
+        return JsonHelper.jsonEncodeToElement(PollFacts(api.isConnected(), notification)).jsonObject
     }
+
+    @Serializable private data class PollFacts(val connected: Boolean, val notification: String?)
 
     suspend fun close() {
         val state = mutex.withLock {
             if (closed) return
             closed = true
+            assembly.close()
             Triple(job, paused, notifications)
         }
         if (state.first != currentCoroutineContext()[Job]) state.first?.cancel()

@@ -5,7 +5,7 @@ interface BleGattServer {
     fun stop()
     fun refreshAdvertising()
 
-    fun sendNotification(mac: String, charUuid: String, value: String): Boolean
+    fun sendNotification(mac: String, charUuid: String, value: ByteArray): Boolean
 
     /**
      * Send a notification and suspend until the BLE stack confirms it has
@@ -16,5 +16,5 @@ interface BleGattServer {
      *
      * Returns true if the notification was sent, false on failure or timeout.
      */
-    suspend fun sendNotificationBlocking(mac: String, charUuid: String, value: String): Boolean
+    suspend fun sendNotificationBlocking(mac: String, charUuid: String, value: ByteArray): Boolean
 }

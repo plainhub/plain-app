@@ -235,6 +235,7 @@ object IosBleScanner : BleScanner {
     internal fun onPeripheralDisconnected(peripheral: CBPeripheral) {
         val id = peripheral.identifier.UUIDString
         pendingConnections[id]?.complete(false)
+        allDevices[id]?.onDisconnected()
     }
 }
 

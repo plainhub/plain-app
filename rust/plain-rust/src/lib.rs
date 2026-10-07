@@ -6,6 +6,7 @@
 #![recursion_limit = "512"]
 
 mod core;
+mod ble;
 mod tls;
 use plain_rs::prefs::Prefs;
 use serde_json::{Map, Value};

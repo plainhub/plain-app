@@ -64,6 +64,9 @@ class AndroidBleGattClient(
     var bluetoothGatt: BluetoothGatt? = null
         private set
 
+    @Volatile private var negotiatedMtu = 23
+    override val maximumWriteValueLength: Int get() = minOf(negotiatedMtu - 3, 512)
+    private val notifications = java.util.concurrent.ConcurrentHashMap<UUID, Channel<ByteArray>>()
     private val channels = mutableMapOf<ActionType, Channel<ActionResult>>()
 
     // Per-connection operation queue. This MUST be an instance member (not
@@ -87,8 +90,7 @@ class AndroidBleGattClient(
             val uuid = characteristic.uuid
             when (status) {
                 GATT_SUCCESS -> {
-                    val strValue = try { String(value) } catch (_: Exception) { null }
-                    publish(ActionType.READ, ActionResult(uuid, strValue, true))
+                    publish(ActionType.READ, ActionResult(uuid, value.copyOf(), true))
                 }
                 else -> {
                     error("Characteristic read failed for $uuid, error: $status")
@@ -96,6 +98,15 @@ class AndroidBleGattClient(
                 }
             }
             signalEndOfOperation()
+        }
+
+        @Suppress("DEPRECATION")
+        override fun onCharacteristicRead(gatt: BluetoothGatt, characteristic: BluetoothGattCharacteristic, status: Int) {
+            onCharacteristicRead(gatt, characteristic, characteristic.value ?: ByteArray(0), status)
+        }
+        @Suppress("DEPRECATION")
+        override fun onCharacteristicChanged(gatt: BluetoothGatt, characteristic: BluetoothGattCharacteristic) {
+            onCharacteristicChanged(gatt, characteristic, characteristic.value ?: ByteArray(0))
         }
 
         @Suppress("DEPRECATION")
@@ -135,10 +146,11 @@ class AndroidBleGattClient(
             characteristic: BluetoothGattCharacteristic,
             value: ByteArray,
         ) {
+            if (gatt !== bluetoothGatt) return
             val uuid = characteristic.uuid
-            val strValue = String(value)
-//            LogCat.v("[BLE] onCharacteristicChanged value $strValue for uuid $uuid")
-            publish(ActionType.NOTIFY_VALUE, ActionResult(uuid, strValue, true))
+            notifications[uuid]?.let { queue ->
+                if (queue.trySend(value.copyOf()).isFailure) queue.close(IllegalStateException("BLE notification queue overflow"))
+            }
         }
 
         override fun onConnectionStateChange(
@@ -203,12 +215,16 @@ class AndroidBleGattClient(
             if (status != GATT_SUCCESS) {
                 warning("[BLE] onMtuChanged ${mac}: MTU negotiation failed status=$status, using default MTU")
             }
+            if (gatt === bluetoothGatt && status == GATT_SUCCESS) negotiatedMtu = mtu
             publish(ActionType.MTU, ActionResult(null, null, true))
             signalEndOfOperation()
         }
     }
 
     override fun disconnect() {
+        notifications.values.forEach { it.close() }
+        notifications.clear()
+        negotiatedMtu = 23
         debug("Disconnect ${mac} gatt=${bluetoothGatt != null}")
         bluetoothGatt?.close()
         bluetoothGatt = null
@@ -244,7 +260,7 @@ class AndroidBleGattClient(
         return false
     }
 
-    override suspend fun writeCharacteristic(service: BleService, value: String): Boolean {
+    override suspend fun writeCharacteristic(service: BleService, value: ByteArray): Boolean {
         val gatt = bluetoothGatt ?: run {
             error("[BLE] writeCharacteristic ${service.name} ${mac}: FAIL bluetoothGatt is null")
             return false
@@ -263,7 +279,7 @@ class AndroidBleGattClient(
         return ok
     }
 
-    override suspend fun readCharacteristic(service: BleService): String? {
+    override suspend fun readCharacteristic(service: BleService): ByteArray? {
         val gatt = bluetoothGatt ?: run {
             error("[BLE] readCharacteristic ${service.name} ${mac}: FAIL bluetoothGatt is null")
             return null
@@ -278,7 +294,7 @@ class AndroidBleGattClient(
         if (result?.success != true) {
             error("[BLE] readCharacteristic ${service.name} ${mac}: FAIL result=$result")
         }
-        return if (result?.success == true) result.value else null
+        return if (result?.success == true) result.value as? ByteArray else null
     }
 
     override suspend fun setNotification(service: BleService, enable: Boolean): Boolean {
@@ -291,6 +307,8 @@ class AndroidBleGattClient(
             error("[BLE] setNotification ${service.name} ${mac}: FAIL characteristic not found, services=${gatt.services?.size ?: 0}")
             return false
         }
+        if (enable) notifications.put(charUuid, Channel(64))?.close()
+        else notifications.remove(charUuid)?.close()
         if (!gatt.setCharacteristicNotification(char, enable)) {
             error("[BLE] setNotification ${service.name} ${mac}: FAIL setCharacteristicNotification returned false")
             return false
@@ -308,10 +326,9 @@ class AndroidBleGattClient(
         return ok
     }
 
-    override suspend fun waitForNotification(service: BleService, timeoutMs: Long): String? {
-        val charUuid = UUID.fromString(service.charUuid)
-        val result = waitForResult(ActionType.NOTIFY_VALUE, charUuid, timeoutMs)
-        return if (result?.success == true) result.value else null
+    override suspend fun waitForNotification(service: BleService, timeoutMs: Long): ByteArray? {
+        val queue = notifications[UUID.fromString(service.charUuid)] ?: return null
+        return withTimeoutOrNull(timeoutMs) { queue.receive() }
     }
 
     private fun getChannel(type: ActionType): Channel<ActionResult> {
@@ -379,7 +396,7 @@ class AndroidBleGattClient(
 
     data class ActionResult(
         val uuid: UUID?,
-        val value: String?,
+        val value: Any?,
         val success: Boolean,
     )
 
@@ -395,14 +412,14 @@ class AndroidBleGattClient(
         class Write(
             override val client: AndroidBleGattClient,
             val char: BluetoothGattCharacteristic,
-            val value: String,
+            val value: ByteArray,
         ) : Operation() {
             @Suppress("DEPRECATION")
             override fun run() {
                 char.setValue(value)
                 char.writeType = BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT
                 val ok = client.bluetoothGatt?.writeCharacteristic(char) ?: false
-                client.debug("[BLE] Write op ${client.mac} charUuid=${char.uuid} valueLen=${value.length} writeCharacteristic=$ok")
+                client.debug("[BLE] Write op ${client.mac} charUuid=${char.uuid} valueLen=${value.size} writeCharacteristic=$ok")
                 if (!ok) {
                     client.error("[BLE] Write op ${client.mac}: writeCharacteristic returned false, failing operation")
                     client.failOperation(ActionType.WRITE, char.uuid)

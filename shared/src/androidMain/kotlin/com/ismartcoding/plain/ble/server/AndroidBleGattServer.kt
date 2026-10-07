@@ -15,7 +15,8 @@ import android.bluetooth.le.BluetoothLeAdvertiser
 import android.content.Context
 import android.os.ParcelUuid
 import com.ismartcoding.plain.appContext
-import com.ismartcoding.plain.ble.BleSegmentData
+import com.ismartcoding.plain.ble.BleMessage
+import com.ismartcoding.plain.ble.RustBleWire
 import com.ismartcoding.plain.discover.RustDiscoveryAdvertisement
 import com.ismartcoding.plain.ble.BleUuids
 import com.ismartcoding.plain.lib.JsonHelper
@@ -28,6 +29,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withTimeoutOrNull
 import java.util.UUID
 import java.util.concurrent.ConcurrentHashMap
@@ -53,12 +55,8 @@ class AndroidBleGattServer : BleGattServer {
      */
     private val pendingNotificationAcks = ConcurrentHashMap<String, CompletableDeferred<Boolean>>()
 
-    /**
-     * Notification chunk size for response delivery. Matches the request
-     * segment size used by [com.ismartcoding.plain.ble.client.BleDeviceApi]
-     * so both directions share the same BLE MTU headroom.
-     */
-    private val notifyChunkSize = 380
+    private val mtus = ConcurrentHashMap<String, Int>()
+    private val sending = ConcurrentHashMap<String, kotlinx.coroutines.sync.Mutex>()
 
     override fun start() {
         val adapter = bluetoothManager.adapter ?: return
@@ -70,6 +68,11 @@ class AndroidBleGattServer : BleGattServer {
     }
 
     override fun stop() {
+        protocol.clear()
+        mtus.clear()
+        connectedDevices.clear()
+        pendingNotificationAcks.values.forEach { it.complete(false) }
+        pendingNotificationAcks.clear()
         synchronized(advertisingLock) {
             advertisingJob?.cancel()
             advertisingJob = null
@@ -91,24 +94,15 @@ class AndroidBleGattServer : BleGattServer {
     }
 
     @Suppress("DEPRECATION")
-    override fun sendNotification(mac: String, charUuid: String, value: String): Boolean {
-        val server = gattServer ?: run {
-            LogCat.e("[GATT] sendNotification: gattServer is null")
-            return false
+    override fun sendNotification(mac: String, charUuid: String, value: ByteArray): Boolean {
+        val requestId = protocol.nearbyRequestId(mac) ?: return false
+        val device = connectedDevices[mac] ?: return false
+        scope.launch {
+            try { sendChunkedResponse(device, UUID.fromString(charUuid), BleMessage(requestId, RustBleWire.nearby(value))) }
+            catch (cancelled: CancellationException) { throw cancelled }
+            catch (error: Exception) { LogCat.e("GATT notification error: ${error.message}") }
         }
-        val device = connectedDevices[mac] ?: run {
-            LogCat.e("[GATT] sendNotification: device $mac not connected")
-            return false
-        }
-        val char = server.getService(UUID.fromString(BleUuids.SERVICE_UUID))
-            ?.getCharacteristic(UUID.fromString(charUuid)) ?: run {
-            LogCat.e("[GATT] sendNotification: characteristic $charUuid not found")
-            return false
-        }
-        char.value = value.toByteArray(Charsets.UTF_8)
-        val sent = server.notifyCharacteristicChanged(device, char, false)
-        LogCat.d("[GATT] sendNotification mac=$mac charUuid=$charUuid valueSize=${value.length} sent=$sent")
-        return sent
+        return true
     }
 
     private fun startAdvertising() {
@@ -190,11 +184,15 @@ class AndroidBleGattServer : BleGattServer {
                     connectedDevices[device.address] = device
                 }
                 BluetoothProfile.STATE_DISCONNECTED -> {
+                    mtus.remove(device.address)
                     connectedDevices.remove(device.address)
+                    pendingNotificationAcks.remove(device.address)?.complete(false)
                     protocol.clearClient(device.address)
                 }
             }
         }
+
+        override fun onMtuChanged(device: android.bluetooth.BluetoothDevice, mtu: Int) { mtus[device.address] = mtu }
 
         override fun onCharacteristicReadRequest(
             device: android.bluetooth.BluetoothDevice,
@@ -202,10 +200,7 @@ class AndroidBleGattServer : BleGattServer {
             offset: Int,
             characteristic: BluetoothGattCharacteristic,
         ) {
-            // Responses are now delivered via chunked notifications — see
-            // [sendChunkedResponse]. Keep a no-op read response so legacy
-            // clients that still issue a Read Request get GATT_SUCCESS with
-            // an empty payload instead of an error.
+            // Responses are delivered through notifications.
             gattServer?.sendResponse(device, requestId, BluetoothGatt.GATT_SUCCESS, 0, ByteArray(0))
         }
 
@@ -225,11 +220,12 @@ class AndroidBleGattServer : BleGattServer {
                 gattServer?.sendResponse(device, requestId, BluetoothGatt.GATT_SUCCESS, 0, null)
             }
 
-            scope.launch {
-                val response = protocol.handleWrite(mac, charUuid, value)
-                if (response != null) {
-                    sendChunkedResponse(device, characteristic.uuid, response)
-                }
+            scope.launch(start = kotlinx.coroutines.CoroutineStart.UNDISPATCHED) {
+                try {
+                    val response = protocol.handleWrite(mac, charUuid, value)
+                    if (response != null) sendChunkedResponse(device, characteristic.uuid, response)
+                } catch (cancelled: CancellationException) { throw cancelled }
+                catch (error: Exception) { protocol.clearClient(mac); LogCat.e("BLE exchange failed: ${error.message}") }
             }
         }
 
@@ -266,46 +262,22 @@ class AndroidBleGattServer : BleGattServer {
         }
     }
 
-    /**
-     * Chunk [response] into [BleSegmentData] notifications and send each one
-     * to the peer with flow control. The client reassembles the segments into
-     * the original response string. This bypasses the 512-byte ATT attribute
-     * value limit that truncates large `readCharacteristic` responses.
-     */
-    @Suppress("DEPRECATION")
-    private suspend fun sendChunkedResponse(
-        device: android.bluetooth.BluetoothDevice,
-        charUuid: UUID,
-        response: String,
-    ) {
+    private suspend fun sendChunkedResponse(device: android.bluetooth.BluetoothDevice, charUuid: UUID, response: BleMessage) {
         val mac = device.address
-        val server = gattServer
-        val char = server?.getService(UUID.fromString(BleUuids.SERVICE_UUID))?.getCharacteristic(charUuid)
-        if (server == null || char == null) {
-            LogCat.e("[GATT] sendChunkedResponse mac=$mac charUuid=$charUuid: server/char unavailable")
-            return
-        }
-
-        val chunks = if (response.isEmpty()) listOf("") else response.chunked(notifyChunkSize)
-        LogCat.d("[GATT] sendChunkedResponse mac=$mac charUuid=$charUuid responseLen=${response.length} chunks=${chunks.size}")
-
-        for ((index, chunk) in chunks.withIndex()) {
-            val segment = BleSegmentData.build(
-                data = chunk,
-                start = index == 0,
-                end = index == chunks.lastIndex,
-            )
-            val payload = JsonHelper.jsonEncode(segment)
-            val ok = sendNotificationBlocking(mac, charUuid.toString(), payload)
-            if (!ok) {
-                LogCat.e("[GATT] sendChunkedResponse mac=$mac chunk $index/${chunks.size} failed, aborting")
-                return
-            }
+        sending.getOrPut(mac) { kotlinx.coroutines.sync.Mutex() }.withLock {
+            val limit = minOf((mtus[mac] ?: 23) - 3, 512)
+            val encoder = RustBleWire.encoder(response.bytes, response.requestId, true, limit)
+            try {
+                while (connectedDevices[mac] === device) {
+                    val frame = encoder.next() ?: break
+                    check(sendNotificationBlocking(mac, charUuid.toString(), frame)) { "BLE response notification failed" }
+                }
+            } finally { encoder.close() }
         }
     }
 
     @Suppress("DEPRECATION")
-    override suspend fun sendNotificationBlocking(mac: String, charUuid: String, value: String): Boolean {
+    override suspend fun sendNotificationBlocking(mac: String, charUuid: String, value: ByteArray): Boolean {
         val server = gattServer ?: return false
         val device = connectedDevices[mac] ?: return false
         val char = server.getService(UUID.fromString(BleUuids.SERVICE_UUID))
@@ -314,7 +286,7 @@ class AndroidBleGattServer : BleGattServer {
         val ack = CompletableDeferred<Boolean>()
         pendingNotificationAcks[mac] = ack
 
-        char.value = value.toByteArray(Charsets.UTF_8)
+        char.value = value
         val queued = server.notifyCharacteristicChanged(device, char, false)
         if (!queued) {
             pendingNotificationAcks.remove(mac)

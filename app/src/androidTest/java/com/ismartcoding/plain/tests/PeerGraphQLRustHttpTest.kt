@@ -2,9 +2,6 @@ package com.ismartcoding.plain.tests
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.ismartcoding.plain.TempData
-import com.ismartcoding.plain.ble.BleHttpRequest
-import com.ismartcoding.plain.ble.BleHttpResponse
-import com.ismartcoding.plain.ble.BleRequestData
 import com.ismartcoding.plain.ble.server.HttpServiceHandler
 import com.ismartcoding.plain.chat.RustChatStore
 import com.ismartcoding.plain.chat.channel.*
@@ -45,10 +42,7 @@ class PeerGraphQLRustHttpTest {
             return RustPeerWireStore.encrypt(key, "$signature|$timestamp|$content")
         }
         fun decode(body: ByteArray): JsonObject = Json.parseToJsonElement(chaCha20Decrypt(key, body)!!.decodeToString()).jsonObject
-        suspend fun ble(body: ByteArray): BleHttpResponse = JsonHelper.jsonDecode(checkNotNull(HttpServiceHandler().handleRequest(
-            BleRequestData(headers = mapOf("c-id" to id), body = JsonHelper.jsonEncode(BleHttpRequest(path = "/peer_graphql", body = Base64.encode(body), bodyBase64 = true))),
-            "synthetic-mac",
-        )))
+        suspend fun ble(body: ByteArray): Pair<Int, ByteArray> = BleBinaryFixture.response(HttpServiceHandler().handleRequest(BleBinaryFixture.peer(id, body), "synthetic-mac"))
         try {
             TempData.activeToId = "peer:$id"
             RustPeerStore.insert(peer)
@@ -74,13 +68,13 @@ class PeerGraphQLRustHttpTest {
             assertTrue(item.getValue("channelId") is JsonNull)
             assertNotNull(RustChatStore.getById(item.getValue("id").jsonPrimitive.content))
             val replay = ble(encrypted)
-            assertEquals(200, replay.status)
-            assertTrue(decode(Base64.decode(replay.body)).getValue("data").jsonObject.getValue("received").jsonArray.isEmpty())
+            assertEquals(200, replay.first)
+            assertTrue(decode(replay.second).getValue("data").jsonObject.getValue("received").jsonArray.isEmpty())
             val invalid = ble(wire(buildJsonObject { put("query", "mutation { createChatItem { id } }") }))
-            assertEquals(200, invalid.status)
-            assertTrue(decode(Base64.decode(invalid.body)).getValue("errors").jsonArray.isNotEmpty())
+            assertEquals(200, invalid.first)
+            assertTrue(decode(invalid.second).getValue("errors").jsonArray.isNotEmpty())
             UserPrefs.service.value = false
-            assertEquals(403, ble(encrypted).status)
+            assertEquals(403, ble(encrypted).first)
             client.post(url, encrypted, "application/octet-stream", mapOf("c-id" to id)).use { assertEquals(403, it.status.value) }
         } finally {
             client.close()
@@ -118,10 +112,9 @@ class PeerGraphQLRustHttpTest {
             val timestamp = System.currentTimeMillis()
             val signature = Base64.encode(signEd25519(privateKey, "$timestamp$content".encodeToByteArray()))
             val body = RustPeerWireStore.encrypt(key, "$signature|$timestamp|$content")
-            val response: BleHttpResponse = JsonHelper.jsonDecode(checkNotNull(HttpServiceHandler().handleRequest(
-                BleRequestData(headers = mapOf("c-id" to owner.id), body = JsonHelper.jsonEncode(BleHttpRequest(path = "/peer_graphql", body = Base64.encode(body), bodyBase64 = true))), "synthetic-mac")))
-            assertEquals(200, response.status)
-            val result = Json.parseToJsonElement(chaCha20Decrypt(key, Base64.decode(response.body))!!.decodeToString()).jsonObject
+            val response = BleBinaryFixture.response(HttpServiceHandler().handleRequest(BleBinaryFixture.peer(owner.id, body), "synthetic-mac"))
+            assertEquals(200, response.first)
+            val result = Json.parseToJsonElement(chaCha20Decrypt(key, response.second)!!.decodeToString()).jsonObject
             assertFalse(result.containsKey("errors"))
             return result.getValue("data").jsonObject.getValue("channelSystemMessage").jsonPrimitive.boolean
         }

@@ -53,15 +53,11 @@ class ChatServiceRustHttpTest {
             assertEquals(ChatStatus.SENT, forward.status)
             assertEquals(3, AppFileStore.getById(hash)!!.refCount)
             val encoded = com.ismartcoding.plain.helpers.UrlHelper.encrypt(attachment.uri)
-            val rawRequest = buildJsonObject {
-                put("m", "GET"); put("p", "/fs")
-                put("q", buildJsonObject { put("id", JsonArray(listOf(JsonPrimitive(encoded)))); put("offset", JsonArray(listOf(JsonPrimitive("0")))); put("length", JsonArray(listOf(JsonPrimitive("8192")))) })
-            }
-            val request = com.ismartcoding.plain.ble.BleRequestData.create(emptyMap()).copy(body = rawRequest.toString())
+            val request = BleBinaryFixture.file("local", encoded, 0, 8192)
             val rawReply = com.ismartcoding.plain.ble.server.HttpServiceHandler().handleRequest(request, "synthetic BLE MAC")
-            val compact = Json.parseToJsonElement(rawReply).jsonObject
-            assertEquals(200, compact.getValue("s").jsonPrimitive.int)
-            assertArrayEquals(source.readBytes(), kotlin.io.encoding.Base64.decode(compact.getValue("b").jsonPrimitive.content))
+            val (status, body) = BleBinaryFixture.response(rawReply)
+            assertEquals(200, status)
+            assertArrayEquals(source.readBytes(), body)
             ChatManager.deleteOne(picked.first().id)
             assertEquals(2, AppFileStore.getById(hash)!!.refCount)
             val page = RustContentApi.query("""chatItems(target: "peer:local", offset: 0, limit: 20, query: "text:$marker") { id }""")["data"]!!.jsonObject["chatItems"]!!.jsonArray

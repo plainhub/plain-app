@@ -1,6 +1,7 @@
 package com.ismartcoding.plain.chat.peer.transport
 
-import com.ismartcoding.plain.ble.BleRequestData
+import com.ismartcoding.plain.ble.RustBleWire
+import com.ismartcoding.plain.ble.BleDataChannel
 import com.ismartcoding.plain.ble.BleServices
 import com.ismartcoding.plain.ble.client.BleDeviceApi
 import com.ismartcoding.plain.platform.PlatformLock
@@ -25,13 +26,15 @@ object BleTransport {
             ?: error("BLE device not found")
         val mutex = lock.withLock { mutexes.getOrPut(shortId) { Mutex() } }
         return mutex.withLock {
-            val api = BleDeviceApi(client)
-            check(api.ensureConnected()) { "BLE connect failed" }
-            val headers = params.getValue("headers").jsonObject.mapValues { it.value.jsonPrimitive.content }
-            val request = BleRequestData.create(headers).copy(body = params.getValue("body").jsonPrimitive.content)
-            val result = api.requestAsync(BleServices.http, request)
-            check(result.isSuccess()) { "BLE SDK request failed: ${result.status}" }
-            JsonPrimitive(checkNotNull(result.value as? String) { "Empty BLE SDK response" })
+            val api = BleDeviceApi(client, RustBleWire)
+            scanner.pauseScan()
+            try {
+                BleDataChannel.outgoing(params.getValue("token").jsonPrimitive.content) { message ->
+                    check(api.ensureConnected()) { "BLE connect failed" }
+                    api.requestAsync(BleServices.http, message)
+                }
+                JsonPrimitive(true)
+            } finally { scanner.resumeScan() }
         }
     }
 }

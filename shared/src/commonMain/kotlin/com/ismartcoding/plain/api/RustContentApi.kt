@@ -26,6 +26,11 @@ object RustContentApi {
     private var localSession: ContentApiSession? = null
     private val syncStates = MutableStateFlow<Map<String, Pair<String, String>>>(emptyMap())
 
+    internal suspend fun transportSession(): ContentApiSession {
+        start()
+        return checkNotNull(localSession)
+    }
+
     val directory: String get() = "${prefsFilePath().substringBeforeLast('/')}/rust-content"
 
     fun start() = lock.withLock {

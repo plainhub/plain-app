@@ -55,7 +55,7 @@ object PairingTransport {
     }
 
     fun sendNotification(mac: String, charUuid: String, value: String): Boolean {
-        return server?.sendNotification(mac, charUuid, value) ?: false
+        return server?.sendNotification(mac, charUuid, value.encodeToByteArray()) ?: false
     }
 
     private fun startAwareObserver() {
@@ -93,22 +93,14 @@ object PairingTransport {
             // Bluetooth radio with scanning; pausing discovery for the GATT
             // session prevents scan traffic from starving them into timeouts.
             scanner.pauseScan()
-            val api = BleDeviceApi(device)
+            val api = BleDeviceApi(device, RustBleWire)
             api.ensureConnected()
             if (!api.isConnected()) return null
 
-            val requestData = BleRequestData.create(clientHeadersMap()).copy(
-                body = PairingCore.formatMessage(NearbyMessageType.DISCOVER, "")
-            )
-            val result = api.requestAsync(BleServices.nearby, requestData)
+            val message = RustBleWire.nearby(PairingCore.formatMessage(NearbyMessageType.DISCOVER, "").encodeToByteArray())
+            val result = api.requestAsync(BleServices.nearby, message)
             api.disconnect()
-            if (!result.isSuccess()) {
-                LogCat.e("[BLE] readDiscoverReply failed: ${result.status}")
-                return null
-            }
-            val json = result.value as? String ?: return null
-            if (json.isEmpty()) return null
-            json
+            RustBleWire.nearbyBody(result).decodeToString(throwOnInvalidSequence = true).takeIf { it.isNotEmpty() }
         } catch (cancelled: CancellationException) { throw cancelled }
         catch (e: Exception) {
             LogCat.e("[BLE] readDiscoverReply error: ${e.message}")

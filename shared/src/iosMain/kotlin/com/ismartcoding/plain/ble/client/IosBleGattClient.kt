@@ -45,9 +45,11 @@ class IosBleGattClient(
     private var charDiscoveryDeferred: CompletableDeferred<Boolean>? = null
 
     private var writeDeferred: CompletableDeferred<Boolean>? = null
-    private var readDeferred: CompletableDeferred<String?>? = null
+    private var readDeferred: CompletableDeferred<ByteArray?>? = null
     private var notifyStateDeferred: CompletableDeferred<Boolean>? = null
-    private var notifyValueDeferred: CompletableDeferred<String?>? = null
+    private val notificationLock = com.ismartcoding.plain.platform.PlatformLock()
+    private val notifications = mutableMapOf<String, kotlinx.coroutines.channels.Channel<ByteArray>>()
+    override val maximumWriteValueLength: Int get() = minOf(512, peripheral.maximumWriteValueLengthForType(0L).toInt())
 
     private val characteristics = mutableMapOf<String, CBCharacteristic>()
 
@@ -108,9 +110,9 @@ class IosBleGattClient(
         return char
     }
 
-    override suspend fun writeCharacteristic(service: BleService, value: String): Boolean {
+    override suspend fun writeCharacteristic(service: BleService, value: ByteArray): Boolean {
         val char = getCharacteristic(service) ?: return false
-        val data = value.encodeToByteArray().toNSData()
+        val data = value.toNSData()
         val deferred = CompletableDeferred<Boolean>()
         writeDeferred = deferred
         peripheral.writeValue(data, forCharacteristic = char, type = 0L)
@@ -119,9 +121,9 @@ class IosBleGattClient(
         return result == true
     }
 
-    override suspend fun readCharacteristic(service: BleService): String? {
+    override suspend fun readCharacteristic(service: BleService): ByteArray? {
         val char = getCharacteristic(service) ?: return null
-        val deferred = CompletableDeferred<String?>()
+        val deferred = CompletableDeferred<ByteArray?>()
         readDeferred = deferred
         peripheral.readValueForCharacteristic(char)
         val result = withTimeoutOrNull(10_000L.milliseconds) { deferred.await() }
@@ -133,22 +135,32 @@ class IosBleGattClient(
         val char = getCharacteristic(service) ?: return false
         val deferred = CompletableDeferred<Boolean>()
         notifyStateDeferred = deferred
+        val key = service.charUuid.lowercase()
+        notificationLock.withLock {
+            if (enable) notifications.put(key, kotlinx.coroutines.channels.Channel(64))?.close()
+            else notifications.remove(key)?.close()
+        }
         peripheral.setNotifyValue(enable, char)
         val result = withTimeoutOrNull(5_000L.milliseconds) { deferred.await() }
         notifyStateDeferred = null
         return result == true
     }
 
-    override suspend fun waitForNotification(service: BleService, timeoutMs: Long): String? {
-        val deferred = CompletableDeferred<String?>()
-        notifyValueDeferred = deferred
-        val result = withTimeoutOrNull(timeoutMs.milliseconds) { deferred.await() }
-        notifyValueDeferred = null
-        return result
+    override suspend fun waitForNotification(service: BleService, timeoutMs: Long): ByteArray? {
+        val queue = notificationLock.withLock { notifications[service.charUuid.lowercase()] } ?: return null
+        return withTimeoutOrNull(timeoutMs) { queue.receive() }
     }
 
     override fun disconnect() {
+        onDisconnected()
         IosBleScanner.teardownConnection(this)
+    }
+
+    internal fun onDisconnected() {
+        notificationLock.withLock { notifications.values.forEach { it.close() }; notifications.clear() }
+        writeDeferred?.complete(false)
+        readDeferred?.complete(null)
+        notifyStateDeferred?.complete(false)
     }
 
     internal fun onServicesDiscovered(error: NSError?) {
@@ -172,12 +184,13 @@ class IosBleGattClient(
 
     internal fun onCharacteristicUpdated(char: CBCharacteristic, error: NSError?) {
         val value = if (error == null) {
-            char.value?.toByteArray()?.decodeToString()
+            char.value?.toByteArray()
         } else null
 
-        val notifyDeferred = notifyValueDeferred
-        if (notifyDeferred != null && notifyDeferred.isActive) {
-            notifyDeferred.complete(value)
+        val queue = notificationLock.withLock { notifications[char.UUID.UUIDString.lowercase()] }
+        if (queue != null && char.isNotifying()) {
+            if (value == null) queue.close(IllegalStateException("BLE notification failed"))
+            else if (queue.trySend(value).isFailure) queue.close(IllegalStateException("BLE notification queue overflow"))
             return
         }
 

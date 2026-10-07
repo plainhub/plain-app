@@ -28,13 +28,15 @@ interface BleGattClient {
 
     fun disconnect()
 
-    suspend fun writeCharacteristic(service: BleService, value: String): Boolean
+    val maximumWriteValueLength: Int
 
-    suspend fun readCharacteristic(service: BleService): String?
+    suspend fun writeCharacteristic(service: BleService, value: ByteArray): Boolean
+
+    suspend fun readCharacteristic(service: BleService): ByteArray?
 
     suspend fun setNotification(service: BleService, enable: Boolean): Boolean
 
-    suspend fun waitForNotification(service: BleService, timeoutMs: Long): String?
+    suspend fun waitForNotification(service: BleService, timeoutMs: Long): ByteArray?
 }
 
 interface BleScanner {

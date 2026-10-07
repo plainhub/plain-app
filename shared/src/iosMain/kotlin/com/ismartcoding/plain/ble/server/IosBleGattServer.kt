@@ -2,7 +2,8 @@
 
 package com.ismartcoding.plain.ble.server
 
-import com.ismartcoding.plain.ble.BleSegmentData
+import com.ismartcoding.plain.ble.BleMessage
+import com.ismartcoding.plain.ble.RustBleWire
 import com.ismartcoding.plain.discover.RustDiscoveryAdvertisement
 import com.ismartcoding.plain.ble.BleUuids
 import com.ismartcoding.plain.lib.JsonHelper
@@ -19,6 +20,8 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.withLock
+import platform.CoreBluetooth.CBCentral
 import kotlinx.coroutines.withTimeoutOrNull
 import platform.CoreBluetooth.CBATTErrorSuccess
 import platform.CoreBluetooth.CBATTRequest
@@ -51,11 +54,9 @@ class IosBleGattServer : BleGattServer {
     private var advertising = false
     private var advertisingJob: Job? = null
 
-    /**
-     * Notification chunk size for response delivery. Matches the request
-     * segment size used by [com.ismartcoding.plain.ble.client.BleDeviceApi].
-     */
-    private val notifyChunkSize = 380
+    private val centralLock = com.ismartcoding.plain.platform.PlatformLock()
+    private val centrals = mutableMapOf<String, CBCentral>()
+    private val sending = kotlinx.coroutines.sync.Mutex()
 
     private val notifyAckTimeoutMs = 10_000L
 
@@ -69,6 +70,8 @@ class IosBleGattServer : BleGattServer {
     }
 
     override fun stop() {
+        protocol.clear()
+        centralLock.withLock { centrals.clear() }
         scope.launch(Dispatchers.Main.immediate) {
             advertisingJob?.cancel()
             advertisingJob = null
@@ -91,22 +94,18 @@ class IosBleGattServer : BleGattServer {
         }
     }
 
-    override fun sendNotification(mac: String, charUuid: String, value: String): Boolean {
-        val manager = peripheralManager ?: return false
-        val char = characteristics[charUuid] ?: run {
-            LogCat.e("[BLE] sendNotification: characteristic $charUuid not found")
-            return false
-        }
-        val data = value.encodeToByteArray().toNSData()
-        val sent = manager.updateValue(data, forCharacteristic = char, onSubscribedCentrals = null)
-        LogCat.d("[BLE] sendNotification charUuid=$charUuid valueSize=${value.length} sent=$sent")
-        return sent
+    override fun sendNotification(mac: String, charUuid: String, value: ByteArray): Boolean {
+        val requestId = protocol.nearbyRequestId(mac) ?: return false
+        if (centralLock.withLock { centrals[mac] } == null) return false
+        scope.launch(Dispatchers.Main.immediate) { sendChunkedResponse(mac, charUuid, BleMessage(requestId, RustBleWire.nearby(value))) }
+        return true
     }
 
-    override suspend fun sendNotificationBlocking(mac: String, charUuid: String, value: String): Boolean {
+    override suspend fun sendNotificationBlocking(mac: String, charUuid: String, value: ByteArray): Boolean {
         val manager = peripheralManager ?: return false
         val char = characteristics[charUuid] ?: return false
-        val data = value.encodeToByteArray().toNSData()
+        val central = centralLock.withLock { centrals[mac] } ?: return false
+        val data = value.toNSData()
 
         // iOS `updateValue` returns false when the internal queue is full.
         // Wait for `peripheralManagerIsReadyToUpdateSubscribers` and retry.
@@ -115,7 +114,7 @@ class IosBleGattServer : BleGattServer {
             val deferred = CompletableDeferred<Unit>()
             // Stash the deferred so the delegate can complete it.
             pendingReadyDeferred.value = deferred
-            val sent = manager.updateValue(data, forCharacteristic = char, onSubscribedCentrals = null)
+            val sent = manager.updateValue(data, forCharacteristic = char, onSubscribedCentrals = listOf(central))
             if (sent) {
                 pendingReadyDeferred.value = null
                 return true
@@ -214,42 +213,34 @@ class IosBleGattServer : BleGattServer {
     internal fun onWriteRequests(manager: CBPeripheralManager, requests: List<CBATTRequest>) {
         for (request in requests) {
             manager.respondToRequest(request, CBATTErrorSuccess)
-        }
-
-        val firstRequest = requests.firstOrNull() ?: return
-        val charUuid = firstRequest.characteristic.UUID.UUIDString
-        val centralId = firstRequest.central.identifier.UUIDString
-        val value = firstRequest.value?.toByteArray() ?: return
-
-        scope.launch {
-            val response = protocol.handleWrite(centralId, charUuid, value)
-            if (response != null) {
-                sendChunkedResponse(centralId, charUuid, response)
+            val charUuid = request.characteristic.UUID.UUIDString
+            val centralId = request.central.identifier.UUIDString
+            centralLock.withLock { centrals[centralId] = request.central }
+            val value = request.value?.toByteArray() ?: continue
+            scope.launch(Dispatchers.Main.immediate) {
+                try {
+                    val response = protocol.handleWrite(centralId, charUuid, value)
+                    if (response != null) sendChunkedResponse(centralId, charUuid, response)
+                } catch (cancelled: CancellationException) { throw cancelled }
+                catch (error: Exception) { protocol.clearClient(centralId); LogCat.e("BLE exchange failed: ${error.message}") }
             }
         }
     }
-
-    /**
-     * Chunk [response] into [BleSegmentData] notifications and send each one
-     * with flow control. Mirrors [AndroidBleGattServer.sendChunkedResponse].
-     */
-    private suspend fun sendChunkedResponse(centralId: String, charUuid: String, response: String) {
-        val chunks = if (response.isEmpty()) listOf("") else response.chunked(notifyChunkSize)
-        LogCat.d("[BLE] sendChunkedResponse central=$centralId charUuid=$charUuid responseLen=${response.length} chunks=${chunks.size}")
-
-        for ((index, chunk) in chunks.withIndex()) {
-            val segment = BleSegmentData.build(
-                data = chunk,
-                start = index == 0,
-                end = index == chunks.lastIndex,
-            )
-            val payload = JsonHelper.jsonEncode(segment)
-            val ok = sendNotificationBlocking(centralId, charUuid, payload)
-            if (!ok) {
-                LogCat.e("[BLE] sendChunkedResponse central=$centralId chunk $index/${chunks.size} failed, aborting")
-                return
+    private suspend fun sendChunkedResponse(centralId: String, charUuid: String, response: BleMessage) = sending.withLock {
+        val central = centralLock.withLock { centrals[centralId] } ?: return@withLock
+        val limit = minOf(512, central.maximumUpdateValueLength.toInt())
+        val encoder = RustBleWire.encoder(response.bytes, response.requestId, true, limit)
+        try {
+            while (centralLock.withLock { centrals[centralId] } === central) {
+                val frame = encoder.next() ?: break
+                check(sendNotificationBlocking(centralId, charUuid, frame)) { "BLE response notification failed" }
             }
-        }
+        } finally { encoder.close() }
+    }
+    internal fun onUnsubscribe(central: CBCentral) {
+        val id = central.identifier.UUIDString
+        centralLock.withLock { centrals.remove(id) }
+        protocol.clearClient(id)
     }
 }
 
@@ -270,6 +261,10 @@ private class PeripheralManagerDelegate(
         } else {
             LogCat.d("BLE advertising started successfully")
         }
+    }
+
+    override fun peripheralManager(peripheral: CBPeripheralManager, central: CBCentral, didUnsubscribeFromCharacteristic: platform.CoreBluetooth.CBCharacteristic) {
+        server.onUnsubscribe(central)
     }
 
     override fun peripheralManager(
