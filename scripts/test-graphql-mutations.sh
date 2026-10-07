@@ -17,10 +17,17 @@
 #      widened to the whole table the note would be gone and the run fails,
 #      whatever the affectedCount said.
 #
-# Only entities whose filter rejects unknown fields are probed. sms, contacts,
-# calls and media build their clauses on the Kotlin ContentWhere path, where an
-# unrecognised field still collapses to `1=1` — a probe there would become a
-# real delete the moment those permissions are granted.
+# Only entities whose filter refuses are probed for an unknown field. sms used
+# to be excluded from this: it built its clauses on the Kotlin ContentWhere
+# path, where an unrecognised field collapsed to `1=1`, so a probe there would
+# have become a real delete the moment those permissions were granted. The
+# `Ids` request sms resolves through now refuses a query that narrows nothing,
+# so the probes are back — and they are the proof that the refusal is real:
+# `trashSms`/`restoreSms` with a query that selects nothing must come back
+# refused, while the same mutation with a real selector must come back a
+# no-op. `deleteSms` is left out of that pair on purpose, because it checks
+# Shizuku before it resolves anything, so its failure would say nothing about
+# the guard.
 #
 # One login per phase, not per case: the device allows 5 logins a minute and a
 # per-case loop burns them all on 90-second timeouts. Operations inside a single
@@ -149,8 +156,12 @@ raw:b_saveFeedEntriesToNotes	mutation { saveFeedEntriesToNotes(query: "${PROBE}"
 raw:b_unknownField	mutation { trashNotes(query: "id:__probe__") { affectedCount } }
 raw:b_updateNote	mutation { updateNote(id: "__probe__", input: { title: "x", content: "y" }) { id } }
 raw:b_updateTag	mutation { updateTag(id: "__probe__", name: "x") { id } }
+raw:b_trashSms_selects_nothing	mutation { trashSms(query: "archived:1") { affectedCount } }
+raw:b_restoreSms_selects_nothing	mutation { restoreSms(query: "zzz_no_such_field:x") { affectedCount } }
+raw:b_trashSms_real_selector	mutation { trashSms(query: "${PROBE}") { affectedCount } }
+raw:b_sms_read_selects_nothing	{ sms: sms(offset: 0, limit: 10, query: "archived:1") { id } }
 EOF
-send "$TMP/b.tsv" 11 B
+send "$TMP/b.tsv" 15 B
 SEED_ID=$(field "$(detail_of b_seed)" id)
 if [ -z "$SEED_ID" ]; then
   fail seed "createNote returned no id"
@@ -208,6 +219,29 @@ for pair in "b_updateNote:updateNote" "b_updateTag:updateTag"; do
     fail "${pair##*:}" "$d"
   fi
 done
+
+# sms resolves its ids through a request that refuses a query narrowing nothing.
+# Both spellings have to be refused — `archived:1` builds no clause at all
+# while looking like a filter, and a misspelt name is what used to reach `1=1`.
+# The pair is only meaningful next to a real selector going through the same
+# mutation, and next to the read path staying unguarded: a guard that also
+# refused reads would break search, which is why it is scoped to this request.
+for pair in "b_trashSms_selects_nothing:trashSms" "b_restoreSms_selects_nothing:restoreSms"; do
+  d="$(detail_of "${pair%%:*}")"
+  if printf '%s' "$d" | grep -q 'selects no sms message'; then
+    pass "${pair##*:}" "refused: the query narrows nothing, so it would be a whole-table delete"
+  else
+    fail "${pair##*:}" "$d"
+  fi
+done
+check_action b_trashSms_real_selector trashSms_real_selector
+
+d="$(detail_of b_sms_read_selects_nothing)"
+if printf '%s' "$d" | grep -qE '"sms"|no_permission'; then
+  pass sms_read_unaffected "a query that narrows nothing still lists; the guard is destructive-only"
+else
+  fail sms_read_unaffected "$d"
+fi
 sleep 6
 
 # --- phase C: the invariant -------------------------------------------------
