@@ -1,10 +1,8 @@
 package com.ismartcoding.plain.httpserver.models
 
 import com.ismartcoding.plain.enums.PackageType
-import com.ismartcoding.plain.lib.kgraphql.annotations.GraphQLType
 import kotlin.time.Instant
 
-@GraphQLType
 data class Package(
     val id: ID,
     val name: String,
@@ -17,8 +15,6 @@ data class Package(
     val updatedAt: Instant,
 )
 
-@GraphQLType
 data class Certificate(val issuer: String, val subject: String, val serialNumber: String, val validFrom: Instant, val validTo: Instant)
 
-@GraphQLType
 data class PackageStatus(val id: ID, val exists: Boolean, val updatedAt: Instant?)

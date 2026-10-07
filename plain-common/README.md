@@ -4,9 +4,8 @@ Reusable Kotlin Multiplatform code extracted from PlainApp. Source packages are
 kept unchanged under `com.ismartcoding.plain`.
 
 The module includes common helpers, crypto, extensions, logcat, KDataLoader,
-KGraphQL, mDNS, XML/RSS support, and the vendored Ktor server required by the
-KGraphQL Ktor plugin. Supporting sources are included here so this module has no
-dependency on `shared-lib`.
+mDNS, and XML/RSS support. Supporting sources are included here so this module
+has no dependency on `shared-lib`.
 
 ## Maven coordinates
 

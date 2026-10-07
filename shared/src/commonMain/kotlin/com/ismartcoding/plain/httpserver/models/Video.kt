@@ -1,10 +1,8 @@
 package com.ismartcoding.plain.httpserver.models
 
 import com.ismartcoding.plain.data.DVideo
-import com.ismartcoding.plain.lib.kgraphql.annotations.GraphQLType
 import kotlin.time.Instant
 
-@GraphQLType
 data class Video(
     override var id: ID,
     override var title: String,

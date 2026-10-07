@@ -2,12 +2,9 @@ package com.ismartcoding.plain.httpserver.models
 
 import com.ismartcoding.plain.db.DBookmark
 import com.ismartcoding.plain.db.DBookmarkGroup
-import com.ismartcoding.plain.lib.kgraphql.annotations.GraphQLInput
-import com.ismartcoding.plain.lib.kgraphql.annotations.GraphQLType
 import kotlinx.serialization.Serializable
 import kotlin.time.Instant
 
-@GraphQLType
 @Serializable
 data class Bookmark(
     val id: ID,
@@ -23,7 +20,6 @@ data class Bookmark(
     val updatedAt: Instant,
 )
 
-@GraphQLType
 data class BookmarkGroup(
     val id: ID,
     val name: String,
@@ -35,7 +31,6 @@ data class BookmarkGroup(
     val updatedAt: Instant,
 )
 
-@GraphQLInput
 @Serializable
 data class BookmarkInput(
     val url: String,

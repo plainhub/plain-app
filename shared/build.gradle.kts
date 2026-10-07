@@ -4,7 +4,6 @@ plugins {
     alias(libs.plugins.compose.multiplatform)
     alias(libs.plugins.compose.compiler)
     alias(libs.plugins.kotlin.serialization)
-    alias(libs.plugins.devtools.ksp)
     kotlin("plugin.parcelize")
 }
 
@@ -182,17 +181,8 @@ kotlin {
 }
 
 dependencies {
-    // KGraphQL KSP2 processor — generates reflection-free schema descriptors.
-    // Uses expect/actual pattern: commonMain declares expect, each platform's
-    // KSP generates the actual + descriptor objects. No kspCommonMainMetadata
-    // needed (platform KSP is sufficient).
-    add("kspAndroid", project(":kgraphql-ksp"))
-    if (enableDeviceTarget) add("kspIosArm64", project(":kgraphql-ksp"))
-    add("kspIosSimulatorArm64", project(":kgraphql-ksp"))
     add("androidHostTestImplementation", kotlin("test"))
     add("androidHostTestImplementation", libs.junit)
-    // Test-only: KGraphQLTest synthesizes accessor lambdas via memberProperties
-    add("androidHostTestImplementation", libs.kotlin.reflect)
     // Test-only: Migration30to31Test drives the raw SQLite connection
     add("androidHostTestImplementation", libs.sqlite.bundled)
 }

@@ -1,9 +1,7 @@
 package com.ismartcoding.plain.httpserver.models
 
 import com.ismartcoding.plain.data.DFavoriteFolder
-import com.ismartcoding.plain.lib.kgraphql.annotations.GraphQLType
 
-@GraphQLType
 data class FavoriteFolder(
     val rootPath: String,
     val fullPath: String,

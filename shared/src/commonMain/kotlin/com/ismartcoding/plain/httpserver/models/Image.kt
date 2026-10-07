@@ -1,10 +1,8 @@
 package com.ismartcoding.plain.httpserver.models
 
 import com.ismartcoding.plain.data.DImage
-import com.ismartcoding.plain.lib.kgraphql.annotations.GraphQLType
 import kotlin.time.Instant
 
-@GraphQLType
 data class Image(
     override var id: ID,
     override var title: String,

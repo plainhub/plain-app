@@ -1,6 +1,5 @@
 package com.ismartcoding.plain.httpserver.models
 
-import com.ismartcoding.plain.lib.kgraphql.annotations.GraphQLInterface
 import kotlin.time.Instant
 
 /**
@@ -8,7 +7,6 @@ import kotlin.time.Instant
  * Clients define one fragment on this interface and spread it into any media
  * list query; future cross-type media queries can return [MediaItem].
  */
-@GraphQLInterface
 interface MediaItem {
     val id: ID
     val title: String

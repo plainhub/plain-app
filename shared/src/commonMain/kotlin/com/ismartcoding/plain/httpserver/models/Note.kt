@@ -1,11 +1,9 @@
 package com.ismartcoding.plain.httpserver.models
 
 import com.ismartcoding.plain.db.DNote
-import com.ismartcoding.plain.lib.kgraphql.annotations.GraphQLType
 import kotlin.time.Instant
 import kotlinx.serialization.Serializable
 
-@GraphQLType
 data class Note(
     val id: ID,
     val title: String,
@@ -19,8 +17,6 @@ fun DNote.toModel(): Note {
     return Note(ID(id), title, content, deletedAt, createdAt, updatedAt)
 }
 
-
-@GraphQLType
 @Serializable
 data class ExportNote(
     val id: ID,

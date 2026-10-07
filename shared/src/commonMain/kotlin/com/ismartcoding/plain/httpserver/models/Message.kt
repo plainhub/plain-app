@@ -3,10 +3,8 @@ package com.ismartcoding.plain.httpserver.models
 import com.ismartcoding.plain.features.sms.DMessage
 import com.ismartcoding.plain.enums.SmsType
 import com.ismartcoding.plain.features.sms.DMessageAttachment
-import com.ismartcoding.plain.lib.kgraphql.annotations.GraphQLType
 import kotlin.time.Instant
 
-@GraphQLType
 data class Sms(
     val id: ID,
     val body: String,
@@ -21,7 +19,6 @@ data class Sms(
     val attachments: List<SmsAttachment>,
 )
 
-@GraphQLType
 data class SmsAttachment(
     val path: String,
     val contentType: String,

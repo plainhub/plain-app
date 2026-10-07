@@ -1,9 +1,7 @@
 package com.ismartcoding.plain.httpserver.models
 
 import com.ismartcoding.plain.data.DMediaBucket
-import com.ismartcoding.plain.lib.kgraphql.annotations.GraphQLType
 
-@GraphQLType
 data class MediaBucket(
     val id: ID,
     val name: String,

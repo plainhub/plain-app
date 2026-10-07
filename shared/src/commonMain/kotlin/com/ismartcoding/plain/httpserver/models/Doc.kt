@@ -1,10 +1,8 @@
 package com.ismartcoding.plain.httpserver.models
 
 import com.ismartcoding.plain.data.DDoc
-import com.ismartcoding.plain.lib.kgraphql.annotations.GraphQLType
 import kotlin.time.Instant
 
-@GraphQLType
 data class Doc(
     override val id: ID,
     override val title: String,
@@ -16,7 +14,6 @@ data class Doc(
     override val updatedAt: Instant,
 ) : MediaItem
 
-@GraphQLType
 data class DocExtGroup(
     val ext: String,
     val count: Int,

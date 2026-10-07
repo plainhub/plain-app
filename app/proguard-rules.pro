@@ -36,11 +36,6 @@
     *** Companion;
 }
 
-# ===== kgraphql engine + app GraphQL models =====
-# Fully reflection-free since the KSP accessor-lambda migration: field access,
-# type names, and unions are all compile-time fixed; the last kotlin-reflect
-# dependency was removed. R8 may shrink/optimize/obfuscate everything here.
-
 # ===== Enum names (cross-process data contracts) =====
 # Enum class names and constant names ARE data contracts and cannot be fixed at
 # compile time:

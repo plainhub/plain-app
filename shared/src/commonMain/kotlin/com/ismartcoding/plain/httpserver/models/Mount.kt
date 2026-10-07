@@ -1,9 +1,7 @@
 package com.ismartcoding.plain.httpserver.models
 
 import com.ismartcoding.plain.enums.DriveType
-import com.ismartcoding.plain.lib.kgraphql.annotations.GraphQLType
 
-@GraphQLType
 data class Mount(
     val id: ID = ID(""),
     val name: String = "",
