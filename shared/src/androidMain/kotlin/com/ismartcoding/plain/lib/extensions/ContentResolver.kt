@@ -91,11 +91,16 @@ fun ContentResolver.countWithBundle(uri: Uri, where: ContentWhere): Int {
             null,
             Bundle().apply {
                 where(where.toSelection(), where.args)
-                // No QUERY_ARG_MATCH_TRASHED here on purpose. Nothing in the app
-                // calls createTrashRequest, so MediaStore's trash is always empty
-                // and MATCH_ONLY would answer 0 for every trash:true query. The
-                // app's trash is a `.nas-trash` directory, filtered by the
-                // provider plan on `_data`.
+                // MediaStore owns the phone's trash and answers a trashed-only
+                // read with this argument, not a selection clause: it parses a
+                // legacy selection with a strict grammar that rejects
+                // `is_trashed`. `createTrashRequest` is the wrapper that asks
+                // the user first — skipping it skips the dialog, not the trash.
+                if (where.trash == true) {
+                    if (isRPlus()) {
+                        putInt(MediaStore.QUERY_ARG_MATCH_TRASHED, MediaStore.MATCH_ONLY)
+                    }
+                }
             },
             null,
         )?.use {
@@ -150,11 +155,16 @@ fun ContentResolver.getPagingCursorWithBundle(
                 paging(offset, limit)
                 sort(sortBy)
                 where(where.toSelection(), where.args)
-                // No QUERY_ARG_MATCH_TRASHED here on purpose. Nothing in the app
-                // calls createTrashRequest, so MediaStore's trash is always empty
-                // and MATCH_ONLY would answer 0 for every trash:true query. The
-                // app's trash is a `.nas-trash` directory, filtered by the
-                // provider plan on `_data`.
+                // MediaStore owns the phone's trash and answers a trashed-only
+                // read with this argument, not a selection clause: it parses a
+                // legacy selection with a strict grammar that rejects
+                // `is_trashed`. `createTrashRequest` is the wrapper that asks
+                // the user first — skipping it skips the dialog, not the trash.
+                if (where.trash == true) {
+                    if (isRPlus()) {
+                        putInt(MediaStore.QUERY_ARG_MATCH_TRASHED, MediaStore.MATCH_ONLY)
+                    }
+                }
             },
             null,
         )
@@ -206,11 +216,16 @@ fun ContentResolver.getSearchCursorWithBundle(
             projection,
             Bundle().apply {
                 where(where.toSelection(), where.args)
-                // No QUERY_ARG_MATCH_TRASHED here on purpose. Nothing in the app
-                // calls createTrashRequest, so MediaStore's trash is always empty
-                // and MATCH_ONLY would answer 0 for every trash:true query. The
-                // app's trash is a `.nas-trash` directory, filtered by the
-                // provider plan on `_data`.
+                // MediaStore owns the phone's trash and answers a trashed-only
+                // read with this argument, not a selection clause: it parses a
+                // legacy selection with a strict grammar that rejects
+                // `is_trashed`. `createTrashRequest` is the wrapper that asks
+                // the user first — skipping it skips the dialog, not the trash.
+                if (where.trash == true) {
+                    if (isRPlus()) {
+                        putInt(MediaStore.QUERY_ARG_MATCH_TRASHED, MediaStore.MATCH_ONLY)
+                    }
+                }
             },
             null,
         )
