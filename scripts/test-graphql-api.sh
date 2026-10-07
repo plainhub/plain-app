@@ -91,7 +91,10 @@ emit_gated videos '{ videos(offset: 0, limit: 5, query: "", sortBy: DATE_DESC) {
 emit_gated audios '{ audios(offset: 0, limit: 5, query: "", sortBy: DATE_DESC) { id title artist durationMs } }'
 emit_gated docs '{ docs(offset: 0, limit: 5, query: "", sortBy: DATE_DESC) { id title path extension size } }'
 emit doc_ext_groups '{ docExtGroups { ext count } }'
-emit_gated files '{ files(root: "", offset: 0, limit: 5, query: "", sortBy: NAME_ASC) { mediaId name path size isDir } }'
+# `/sdcard`, not "": the resolver rejects a relative root, and while the
+# permission gate was short-circuiting this case the rejection was scored as the
+# expected "no permission" answer — a wrong argument passing as a granted one.
+emit_gated files '{ files(root: "/sdcard", offset: 0, limit: 5, query: "", sortBy: NAME_ASC) { mediaId name path size isDir } }'
 emit_gated recent_files '{ recentFiles { mediaId name path size } }'
 emit favorite_folders '{ favoriteFolders { rootPath fullPath alias } }'
 

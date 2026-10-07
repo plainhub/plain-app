@@ -272,22 +272,40 @@ verify_app_under_test() {
 
 # The ports this build actually bound. They are a stored preference, not a
 # constant: a phone that once ran the release build keeps that build's port, so
-# a hardcoded 8080 silently measures whichever app answers there. Filtered by
-# pid so that, with both builds running, the line belongs to the one asked for.
+# a hardcoded 8080 silently measures whichever app answers there.
+#
+# Two sources, because neither alone holds up. The prefs file is authoritative
+# but only readable for a debuggable package; logcat's startup line works for
+# any build but is a ring buffer that scrolls the line away once the app has
+# been up for a while — which is exactly when a long test run asks for it.
 app_ports() {
-  local dev="$1" pid line
+  local dev="$1" pid line http https
   pid="$(adb -s "$dev" shell "pidof $PACKAGE" 2>/dev/null | tr -d '\r' | awk '{print $1}')"
   if [ -z "$pid" ]; then say "!! $PACKAGE is not running on $dev"; return 1; fi
+
+  http="$(adb -s "$dev" shell "run-as $PACKAGE cat files/user_prefs.json" 2>/dev/null \
+    | sed -n 's/.*"http_port"[[:space:]]*:[[:space:]]*\([0-9]*\).*/\1/p' | tr -d '\r')"
+  https="$(adb -s "$dev" shell "run-as $PACKAGE cat files/user_prefs.json" 2>/dev/null \
+    | sed -n 's/.*"https_port"[[:space:]]*:[[:space:]]*\([0-9]*\).*/\1/p' | tr -d '\r')"
+  if [ -n "$http" ] && [ -n "$https" ]; then
+    # The trailing newline matters: `read` reports failure on input that ends
+    # without one, so `printf '%s'` made every caller treat a successful lookup
+    # as a missing one.
+    printf '%s %s\n' "$http" "$https"
+    return 0
+  fi
+
   line="$(adb -s "$dev" logcat -d --pid="$pid" 2>/dev/null \
     | grep -F 'HTTP server started on ports' | tail -1 | tr -d '\r')"
-  if [ -z "$line" ]; then
-    say "!! no 'HTTP server started on ports' line in $PACKAGE's log (pid $pid)"
-    return 1
+  if [ -n "$line" ]; then
+    printf '%s\n' "$line" | sed -n 's/.*on ports \([0-9]*\)\/\([0-9]*\).*/\1 \2/p'
+    return 0
   fi
-  # The trailing newline matters: `read` reports failure on input that ends
-  # without one, so `printf '%s'` made every caller treat a successful lookup
-  # as a missing one.
-  printf '%s\n' "$line" | sed -n 's/.*on ports \([0-9]*\)\/\([0-9]*\).*/\1 \2/p'
+
+  say "!! no source for the ports $PACKAGE bound (pid $pid)"
+  say "   run-as needs a debuggable package and logcat scrolls its startup line away;"
+  say "   restart $PACKAGE and read the ports immediately, or grant the script one"
+  return 1
 }
 
 # Splits `app_ports` output into the two variables named by `http_var` and
