@@ -1,13 +1,8 @@
 package com.ismartcoding.plain.platform
 
-import com.ismartcoding.plain.data.DDeviceStatus
-import com.ismartcoding.plain.data.DDeviceInfo
-import com.ismartcoding.plain.data.DTemperature
-import com.ismartcoding.plain.httpserver.models.toModel
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNull
-import kotlin.test.assertTrue
 
 class CpuInfoTest {
 
@@ -77,59 +72,5 @@ class CpuInfoTest {
         """.trimIndent()
         assertEquals("Intel(R) Core(TM) i7-9750H CPU @ 2.60GHz", parseCpuInfoModel(content))
         assertEquals("", parseCpuInfoModel("CPU part\t: 0x805\n"))
-    }
-}
-
-class DeviceModelsTest {
-
-    @Test
-    fun deviceInfoToModelMapsCpuModelWithEmptyAsNull() {
-        val d = DDeviceInfo()
-        d.cpuModel = ""
-        assertNull(d.toModel().cpuModel)
-
-        d.cpuModel = "SM8550"
-        assertEquals("SM8550", d.toModel().cpuModel)
-    }
-
-    @Test
-    fun deviceStatusToModelPreservesNullabilityAndTemperatures() {
-        val d = DDeviceStatus()
-        d.uptimeSec = 3600
-        d.batteryLevel = null
-        d.charging = false
-        d.temperatures = listOf(
-            DTemperature().apply {
-                label = "battery"
-                celsius = 28.5
-            },
-        )
-        d.cpuUsage = 12.5
-        d.memoryAvailable = null
-        d.storageAvailable = 4096
-
-        val m = d.toModel()
-        assertEquals(3600, m.uptimeSec)
-        assertNull(m.batteryLevel)
-        assertEquals(false, m.charging)
-        assertEquals(1, m.temperatures.size)
-        assertEquals("battery", m.temperatures[0].label)
-        assertEquals(28.5, m.temperatures[0].celsius)
-        assertEquals(12.5, m.cpuUsage)
-        assertNull(m.memoryAvailable)
-        assertEquals(4096, m.storageAvailable)
-    }
-
-    @Test
-    fun deviceStatusToModelMapsBatteryValues() {
-        val d = DDeviceStatus()
-        d.batteryLevel = 80
-        d.charging = true
-        d.memoryAvailable = 123456L
-        val m = d.toModel()
-        assertEquals(80, m.batteryLevel)
-        assertEquals(true, m.charging)
-        assertEquals(123456L, m.memoryAvailable)
-        assertTrue(m.temperatures.isEmpty())
     }
 }

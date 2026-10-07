@@ -2,15 +2,10 @@ package com.ismartcoding.plain.httpserver
 
 import com.ismartcoding.plain.preferences.*
 
-import android.content.Context
 import com.ismartcoding.plain.Constants
-import com.ismartcoding.plain.TempData
-import com.ismartcoding.plain.appContext
 import com.ismartcoding.plain.lib.coIO
-import com.ismartcoding.plain.lib.withIO
 import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.platform.createHttpClient
-import org.slf4j.LoggerFactory
 import java.io.ByteArrayInputStream
 import java.io.File
 import java.io.FileOutputStream
@@ -84,7 +79,6 @@ fun replaceSslKeyStoreFromPem(file: File, certPem: String, keyPem: String, keyst
  * signature bytes.
  */
 private fun storeSslKeyStore(file: File, key: PrivateKey, chain: Array<Certificate>, keystorePassword: String): ByteArray {
-    cachedKeyStore = null
     val keystore = KeyStore.getInstance("PKCS12").apply { load(null, null) }
     keystore.setKeyEntry(SSL_KEY_ALIAS, key, keystorePassword.toCharArray(), chain)
     val tmp = File(file.parent, "${file.name}.tmp")
@@ -125,18 +119,4 @@ private fun parsePemPrivateKey(pem: String): PrivateKey {
     val der = decodePemBlock(pem, "PRIVATE KEY")
     val keyFactory = KeyFactory.getInstance("EC")
     return keyFactory.generatePrivate(PKCS8EncodedKeySpec(der))
-}
-
-/** Last keystore parsed by [getSslKeyStore], with the password it was opened with. */
-@Volatile
-private var cachedKeyStore: Pair<String, KeyStore>? = null
-
-@Synchronized
-internal fun getSslKeyStore(context: Context, password: String): KeyStore {
-    cachedKeyStore?.let { (cachedPassword, keyStore) -> if (cachedPassword == password) return keyStore }
-    val store = KeyStore.getInstance("PKCS12").apply {
-        File(context.filesDir, Constants.KEY_STORE_FILE_NAME).inputStream().use { load(it, password.toCharArray()) }
-    }
-    cachedKeyStore = password to store
-    return store
 }
