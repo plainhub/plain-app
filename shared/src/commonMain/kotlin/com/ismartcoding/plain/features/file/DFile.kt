@@ -3,7 +3,9 @@ package com.ismartcoding.plain.features.file
 import com.ismartcoding.plain.lib.extensions.getFilenameExtension
 import com.ismartcoding.plain.db.IData
 import kotlin.time.Instant
+import kotlinx.serialization.Serializable
 
+@Serializable
 data class DFile(
     var name: String,
     var path: String,
