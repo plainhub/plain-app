@@ -27,11 +27,29 @@
 # document run in order, so a phase can carry its whole batch.
 set -uo pipefail
 
-BASE_URL="${1:-http://127.0.0.1:8080}"
+source "$(dirname "${BASH_SOURCE[0]}")/test-lib.sh" "$@"
+
+# No default port: the caller must name the build under test explicitly.
+BASE_URL="${1:?usage: %s <base-url> [client-id]  (port is the one the build under test bound)}"
 CLIENT_ID="${2:-plain-mutation-test}"
 CLIENT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/gql-client.mjs"
 HOST="$(printf '%s' "$BASE_URL" | sed -e 's#^[a-z]*://##' -e 's#:.*##')"
-PORT="$(printf '%s' "$BASE_URL" | sed -n 's#.*:\([0-9]*\)/.*#\1#p')"
+PORT="$(printf '%s' "$BASE_URL" | sed -n 's#.*:\([0-9][0-9]*\)\(/\{0,1\}\).*#\1#p')"
+
+# These probes seed a note and delete things. Running them against a build this
+# checkout did not produce would report on the wrong app entirely, so the
+# device has to be proven first — see verify_app_under_test.
+if [ -z "${PLAIN_SERIAL:-}" ]; then
+  echo "!! PLAIN_SERIAL is not set — refusing to mutate an unidentified device" >&2
+  exit 1
+fi
+if ! verify_app_under_test "$PLAIN_SERIAL" "$PORT"; then
+  echo "Passed: 0" >&2
+  echo "Failed: 1" >&2
+  echo "  FAIL [app_under_test]: the device is not running the build this checkout produced" >&2
+  exit 1
+fi
+
 # `ids:` is supported on notes, feed entries and clipboard. The value cannot
 # exist, so every bulk mutation below resolves to zero rows.
 PROBE='ids:__plain_probe_no_match__'

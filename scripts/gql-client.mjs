@@ -215,7 +215,9 @@ function parseArgs(argv) {
 
 const opts = parseArgs(process.argv.slice(2))
 const host = opts.host
-const port = opts.port || '8080'
+// No default: the ports are a stored preference, so guessing one is how a
+// request ends up on the other build that shares the phone.
+const port = opts.port
 const clientId = opts['client-id'] || `plain-api-test-${crypto.randomBytes(4).toString('hex')}`
 
 if (!host || (!opts.queries && !opts.raw)) {

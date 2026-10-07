@@ -102,10 +102,18 @@ if [ "${PLAIN_SCREEN_TAPS:-0}" = "1" ]; then
   adb -s "$DEV" shell input tap 540 763; sleep 6
   shot "ui-service-started"
 fi
-if wait_for_health "$IP" 8080 12; then
-  case_pass "service_serving" "http://${IP}:8080/health -> 200"
+if ! verify_app_under_test "$DEV"; then
+  case_fail "app_under_test" "$PACKAGE is not the build this checkout produced — every case below would describe the wrong app"
+  report_write; exit 1
+fi
+if split_app_ports "$DEV" UI_HTTP_PORT _UI_HTTPS_PORT; then
+  if wait_for_health "$IP" "$UI_HTTP_PORT" 12; then
+    case_pass "service_serving" "http://${IP}:${UI_HTTP_PORT}/health -> 200"
+  else
+    case_block "service_serving" "service not answering on ${IP}:${UI_HTTP_PORT} (start it from the Home page)"
+  fi
 else
-  case_block "service_serving" "service not answering on ${IP}:8080 (start it from the Home page)"
+  case_block "service_serving" "could not read the ports $PACKAGE bound"
 fi
 
 # --- files screen ------------------------------------------------------------

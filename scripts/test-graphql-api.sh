@@ -10,11 +10,38 @@
 # the first login comes back PENDING and the phone shows "Allow Desktop
 # Access". Nothing here can tap that dialog — the caller passes a command to
 # run at that moment in PLAIN_APPROVE_CMD, e.g. `approve_desktop_access <serial>`.
+#
+# The base url must name the build under test. `verify_app_under_test` refuses
+# to let a request out until the package answering on that port is the one this
+# checkout produced: a release build and a debug build sit on the same phone,
+# each holding its own port, and a probe aimed at the wrong one answers
+# perfectly normally. The caller passes the device as $PLAIN_SERIAL.
 set -uo pipefail
 
-BASE_URL="${1:-http://127.0.0.1:8080}"
+source "$(dirname "${BASH_SOURCE[0]}")/test-lib.sh" "$@"
+
+# No default port: the caller must name the build under test explicitly.
+BASE_URL="${1:?usage: %s <base-url> [client-id]  (port is the one the build under test bound)}"
 CLIENT_ID="${2:-plain-api-test}"
 CLIENT="$(dirname "${BASH_SOURCE[0]}")/gql-client.mjs"
+GQL_PORT="$(printf '%s' "$BASE_URL" | sed -n 's#.*:\([0-9][0-9]*\)\(/\{0,1\}\).*#\1#p')"
+
+if [ -z "${PLAIN_SERIAL:-}" ]; then
+  echo "!! PLAIN_SERIAL is not set — refusing to measure an unidentified device" >&2
+  echo "   the release and the debug build answer on different ports, so an" >&2
+  echo "   unverified target silently returns results from the wrong app" >&2
+  exit 1
+fi
+if ! verify_app_under_test "$PLAIN_SERIAL" "$GQL_PORT"; then
+  echo "" >&2
+  echo "--- Summary ---" >&2
+  echo "Passed: 0" >&2
+  echo "Failed: 1" >&2
+  echo "Failures:" >&2
+  echo "  FAIL [app_under_test]: the device is not running the build this checkout produced" >&2
+  exit 1
+fi
+
 QFILE="$(mktemp)"
 OUT="$(mktemp)"
 ERR="$(mktemp)"
@@ -43,6 +70,14 @@ emit path_exists '{ pathExists(path: "/sdcard") }'
 
 # --- notes, feeds, bookmarks, tags ------------------------------------------
 emit notes '{ notes(offset: 0, limit: 5, query: "") { id title deletedAt createdAt } }'
+# A search box holds free text, so `SearchHelper.buildTextFilter` escapes it into
+# one `text:` token before the query is built. The `\\` below is a GraphQL
+# escape, so the phone receives the single backslash its tokenizer needs —
+# without it the term arrives as the field `Meeting` and the search fails
+# instead of matching. Paired with the `!` case below: escaping must not have
+# weakened the refusal.
+emit notes_freetext_with_colon '{ notes(offset: 0, limit: 1, query: "text:Meeting:\\ notes trash:false") { id } }'
+emit '!notes_unknown_field_refused=zzz_no_such_field' '{ notes(offset: 0, limit: 1, query: "zzz_no_such_field:x trash:false") { id } }'
 emit feeds '{ feeds { id name url lastSyncAt } }'
 emit feed_entries '{ feedEntries(offset: 0, limit: 5, query: "") { feedId id title url } }'
 emit feed_sync_states '{ feedSyncStates { feedId status error } }'
@@ -143,7 +178,7 @@ echo ""
 # printed when one fails. Kept out of $OUT on purpose: it is progress chatter,
 # not `name<TAB>status<TAB>detail` rows, and mixing them invents fake failures.
 if node "$CLIENT" --host "$(printf '%s' "$BASE_URL" | sed -e 's#^[a-z]*://##' -e 's#:.*##')" \
-  --port "$(printf '%s' "$BASE_URL" | sed -n 's#.*:\([0-9]*\)/.*#\1#p')" \
+  --port "$(printf '%s' "$BASE_URL" | sed -n 's#.*:\([0-9][0-9]*\)\(/\{0,1\}\).*#\1#p')" \
   --client-id "$CLIENT_ID" --queries "$QFILE" ${PLAIN_APPROVE_CMD:+--on-pending "$PLAIN_APPROVE_CMD"} \
   >"$OUT" 2>"$ERR"; then
   :
@@ -180,6 +215,27 @@ while IFS=$'\t' read -r name status detail; do
         FAIL=$((FAIL + 1))
         ERRORS="${ERRORS}\n  FAIL [$name]: ${detail}"
         echo "  FAIL [$name] — ${detail}"
+      fi
+      ;;
+    !*)
+      # Must be refused, and the refusal has to name the offending field — a
+      # query that silently matched everything is the hazard this guards. The
+      # field to look for rides along in the case name after `=`, since the
+      # wire format has no column to spare.
+      ref="${name#!}"
+      expected="${ref#*=}"
+      name="${ref%%=*}"
+      if [ "$status" = "ok" ]; then
+        FAIL=$((FAIL + 1))
+        ERRORS="${ERRORS}\n  FAIL [$name]: the query was accepted; it should have been refused by name"
+        echo "  FAIL [$name] — accepted, but an unknown field must be refused"
+      elif [ -n "$expected" ] && printf '%s' "$detail" | grep -qF "$expected"; then
+        PASS=$((PASS + 1))
+        echo "  PASS [$name] — refused: ${detail#GraphQL errors: }"
+      else
+        FAIL=$((FAIL + 1))
+        ERRORS="${ERRORS}\n  FAIL [$name]: refused, but not by name: ${detail}"
+        echo "  FAIL [$name] — refused without naming the field: ${detail}"
       fi
       ;;
     *)

@@ -106,7 +106,7 @@ run_web() {
     case_block "web_vitest" "plain-desktop not found at $DESKTOP_ROOT"
     return
   fi
-  # `integration` needs a phone serving on 127.0.0.1:8080, so it is not part of
+  # `integration` needs a phone serving its own port, so it is not part of
   # the unit gate — running it here would report 51 ECONNREFUSED as regressions.
   if ! (cd "$DESKTOP_ROOT" && yarn vitest run --project=unit --project=cws \
           --project=graphql --project=docs) > /tmp/plain-unit-web.log 2>&1; then
@@ -122,8 +122,9 @@ run_web() {
 
   local dev
   dev=$(serial_for_model Pixel_7 || serial_for_model Pixel_9 || true)
-  if [ -n "$dev" ] && wait_for_health "$(device_ip "$dev")" 8080 3; then
-    case_block "web_integration" "needs the device reachable on 127.0.0.1:8080 — run scripts/api.sh"
+  UNIT_PORT=""; _UH=""; split_app_ports "$dev" UNIT_PORT _UH 2>/dev/null || true
+  if [ -n "$dev" ] && [ -n "$UNIT_PORT" ] && wait_for_health "$(device_ip "$dev")" "$UNIT_PORT" 3; then
+    case_block "web_integration" "needs the device reachable on :$UNIT_PORT — run scripts/api.sh"
   else
     case_block "web_integration" "no reachable device; 51 integration specs not executed"
   fi

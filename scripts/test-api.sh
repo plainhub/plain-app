@@ -35,8 +35,22 @@ if [ -z "$IP" ]; then
   report_write; exit 1
 fi
 
-BASE="http://${IP}:8080"
-wait_for_health "$IP" 8080 20 || say "  (service not answering yet — probing anyway)"
+# The ports are a stored preference, not a constant: a phone that also carries
+# the release build keeps that build's port, and a hardcoded default then
+# silently measures whichever app answers there. Prove the build first, then
+# read the ports from this build's own log.
+if ! verify_app_under_test "$DEV"; then
+  case_fail "app_under_test" "$PACKAGE is not the build this checkout produced — every case below would describe the wrong app"
+  report_write; exit 1
+fi
+if ! split_app_ports "$DEV" HTTP_PORT HTTPS_PORT; then
+  case_fail "app_ports" "could not read the ports $PACKAGE bound"
+  report_write; exit 1
+fi
+say "ports http=$HTTP_PORT https=$HTTPS_PORT"
+
+BASE="http://${IP}:${HTTP_PORT}"
+wait_for_health "$IP" "$HTTP_PORT" 20 || say "  (service not answering yet — probing anyway)"
 
 code() { curl -s -m 8 -o /dev/null -w '%{http_code}' "$@" 2>/dev/null || printf '000'; }
 
@@ -94,9 +108,9 @@ fi
 
 # --- TLS listener ------------------------------------------------------------
 head1 "https listener"
-T=$(code -k "https://${IP}:8443/health")
-if [ "$T" = "200" ]; then case_pass "https_listener" "GET https://:8443/health -> 200"
-else case_block "https_listener" "https :8443 -> $T (TLS is off or the cert is not trusted by curl)"; fi
+T=$(code -k "https://${IP}:${HTTPS_PORT}/health")
+if [ "$T" = "200" ]; then case_pass "https_listener" "GET https://:${HTTPS_PORT}/health -> 200"
+else case_block "https_listener" "https :${HTTPS_PORT} -> $T (TLS is off or the cert is not trusted by curl)"; fi
 
 # --- GraphQL surface ---------------------------------------------------------
 # Reuses the existing query script rather than duplicating the list. It logs
@@ -118,6 +132,8 @@ else
   # travel with the environment rather than just exist here.
   export -f approve_desktop_access
   export PLAIN_APPROVE_CMD="approve_desktop_access $DEV"
+  # The device is what proves which build is answering on $BASE.
+  export PLAIN_SERIAL="$DEV"
   if "$GQL_SCRIPT" "$BASE" "plain-api-test-$DEV" >/tmp/plain-api-graphql.log 2>&1; then
     case_pass "graphql_queries" "$(grep -E '^Passed:' /tmp/plain-api-graphql.log | tail -1)"
   else
