@@ -68,7 +68,7 @@ internal object RustHttpHost {
             val entry = HttpRouteRegistry.router.webSocketEntries().firstOrNull { it.path == call.path }
             if (entry == null) { call.respondNoBody(HttpStatus.NOT_FOUND); return }
             call.upgrade()
-            val session = RustWsSession(socket, call.remoteHost)
+            val session = RustWsSession(socket)
             try { entry.handler(session, call) } finally { session.close() }
         } else if (!HttpRouteRegistry.dispatch(call.method, call.path, call)) {
             // SPA assets are served by the Rust public listener before the

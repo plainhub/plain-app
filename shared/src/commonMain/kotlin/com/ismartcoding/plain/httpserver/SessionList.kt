@@ -17,30 +17,6 @@ object SessionList {
         AppDatabase.instance.sessionDao().getByClientId(clientId)
     }
 
-    suspend fun addOrUpdateAsync(
-        clientId: String,
-        updateItem: (DSession) -> Unit,
-    ) = withIO {
-        var item = AppDatabase.instance.sessionDao().getByClientId(clientId)
-        var isInsert = false
-        if (item == null) {
-            item = DSession()
-            item.clientId = clientId
-            item.type = SessionType.WEB
-            isInsert = true
-        } else {
-            item.updatedAt = TimeHelper.now()
-        }
-
-        updateItem(item)
-
-        if (isInsert) {
-            AppDatabase.instance.sessionDao().insert(item)
-        } else {
-            AppDatabase.instance.sessionDao().update(item)
-        }
-    }
-
     suspend fun deleteAsync(clientId: String) = withIO {
         AppDatabase.instance.sessionDao().delete(clientId)
     }

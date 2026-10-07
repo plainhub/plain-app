@@ -11,31 +11,8 @@ value class HttpMethod(val name: String) {
     companion object {
         val GET = HttpMethod("GET")
         val POST = HttpMethod("POST")
-        val PUT = HttpMethod("PUT")
-        val DELETE = HttpMethod("DELETE")
-        val HEAD = HttpMethod("HEAD")
         val OPTIONS = HttpMethod("OPTIONS")
     }
-}
-
-/**
- * A single multipart part produced by [HttpCall.handleMultipart].
- *
- * [readBytes] is intended for small parts (e.g. encrypted JSON metadata),
- * while [copyTo] streams large parts to a [StreamSink] (e.g. a file sink
- * created by `platform.createFileSink`) without holding the whole payload
- * in memory.
- */
-interface HttpMultipartPart {
-    val name: String?
-    val originalFileName: String?
-    val contentType: String?
-
-    /** Read the entire part payload into memory. */
-    suspend fun readBytes(): ByteArray
-
-    /** Stream the part payload to [sink]. Closes [sink] on completion. */
-    suspend fun copyTo(sink: StreamSink)
 }
 
 /**
@@ -56,13 +33,6 @@ interface HttpCall {
 
     suspend fun receiveBody(): ByteArray
     suspend fun receiveText(): String
-
-    /**
-     * Iterate multipart parts. Each [HttpMultipartPart] is only valid inside
-     * the [handler] callback and must not escape it — platforms dispose of
-     * the underlying resource once [handler] returns.
-     */
-    suspend fun handleMultipart(handler: suspend (HttpMultipartPart) -> Unit)
 
     // --- response side ---
 

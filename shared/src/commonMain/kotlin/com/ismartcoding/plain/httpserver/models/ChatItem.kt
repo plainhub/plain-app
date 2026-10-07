@@ -22,5 +22,3 @@ data class ChatItem(
 fun DChat.toModel(): ChatItem {
     return ChatItem(ID(id), fromId, toId, channelId, content.toJSONString(), createdAt, updatedAt, status = status, statusData = statusData)
 }
-
-fun dchatToModel(c: DChat): ChatItem = c.toModel()

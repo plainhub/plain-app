@@ -2,7 +2,6 @@ package com.ismartcoding.plain.httpserver
 
 import com.ismartcoding.plain.httpserver.http.HttpCall
 import com.ismartcoding.plain.httpserver.http.HttpMethod
-import com.ismartcoding.plain.httpserver.http.HttpMultipartPart
 import com.ismartcoding.plain.httpserver.http.HttpStatus
 import com.ismartcoding.plain.httpserver.http.StreamSink
 import java.io.File
@@ -36,7 +35,6 @@ class FileServerCodecRouteTest {
         override fun header(name: String): String? = null
         override suspend fun receiveBody(): ByteArray = ByteArray(0)
         override suspend fun receiveText(): String = ""
-        override suspend fun handleMultipart(handler: suspend (HttpMultipartPart) -> Unit) {}
         override fun responseHeader(name: String, value: String) { headers[name] = value }
         override fun responseStatus(status: Int) { this.status = status }
         override suspend fun respond(bytes: ByteArray, contentType: String?) { body = "${bytes.size} bytes"; bodyContentType = contentType }

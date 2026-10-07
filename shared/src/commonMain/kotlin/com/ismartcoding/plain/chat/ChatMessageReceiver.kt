@@ -20,7 +20,7 @@ import com.ismartcoding.plain.i18n.Res
 import com.ismartcoding.plain.i18n.peer_chat
 import com.ismartcoding.plain.lib.sendEvent
 import com.ismartcoding.plain.httpserver.models.ChatItem
-import com.ismartcoding.plain.httpserver.models.dchatToModel
+import com.ismartcoding.plain.httpserver.models.toModel
 
 object ChatMessageReceiver {
 
@@ -36,7 +36,7 @@ object ChatMessageReceiver {
             items = listOf(item),
         )
         ChatManager.refreshLatestChats()
-        val model: ChatItem = dchatToModel(item)
+        val model: ChatItem = item.toModel()
         sendEvent(
             WebSocketEvent(
                 EventType.MESSAGE_CREATED,

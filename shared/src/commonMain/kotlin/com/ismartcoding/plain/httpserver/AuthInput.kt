@@ -32,15 +32,9 @@ data class AuthResponse(
     val signature: String = "",
     val timestamp: Long = 0L,
     val chatPaired: Boolean = false,
-) {
-    fun toSignatureData(): String =
-        "$clientId|${status.name}|$ecdhPublicKey|$timestamp" + if (chatPaired) "|true" else ""
-}
+)
 
 enum class AuthStatus {
     PENDING,
     COMPLETED,
 }
-
-fun requiresLoginConfirmation(request: AuthRequest, twoFactorEnabled: Boolean): Boolean =
-    request.peer != null || twoFactorEnabled

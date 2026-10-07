@@ -64,23 +64,6 @@ internal class RustHttpCall(
         return result
     }
     override suspend fun receiveText() = receiveBody().decodeToString()
-    override suspend fun handleMultipart(handler: suspend (HttpMultipartPart) -> Unit) {
-        while (true) {
-            val frame = receiveFrame()
-            val packet = Json.parseToJsonElement(checkNotNull(frame.text)).jsonObject
-            when (packet["kind"]?.jsonPrimitive?.content) {
-                "end" -> return
-                "error" -> error(packet["message"]?.jsonPrimitive?.content ?: "Invalid multipart body")
-                "part" -> {
-                    val part = RustHttpMultipartPart(this, packet)
-                    handler(part)
-                    part.discard()
-                }
-                else -> error("Unexpected multipart packet")
-            }
-        }
-    }
-
     internal suspend fun sendPacket(kind: String, fields: JsonObject = JsonObject(emptyMap())) {
         socket.sendText(buildJsonObject {
             put("kind", kind)

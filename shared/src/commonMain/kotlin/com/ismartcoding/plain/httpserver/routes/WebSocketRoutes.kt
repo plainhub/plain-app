@@ -24,7 +24,6 @@ import com.ismartcoding.plain.httpserver.AuthResponse
 import com.ismartcoding.plain.httpserver.AuthStatus
 import com.ismartcoding.plain.httpserver.HttpServerManager
 import com.ismartcoding.plain.httpserver.RustWebLogin
-import com.ismartcoding.plain.httpserver.requiresLoginConfirmation
 import com.ismartcoding.plain.httpserver.setOnlineClientIds
 import com.ismartcoding.plain.httpserver.http.HttpCall
 import com.ismartcoding.plain.httpserver.http.HttpRouter
