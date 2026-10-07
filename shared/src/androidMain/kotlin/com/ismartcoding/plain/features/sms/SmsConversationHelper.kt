@@ -51,12 +51,12 @@ object SmsConversationHelper {
             val resolved=SmsProviderContract.selectConversationAddresses(recipientIds[item.id].orEmpty().mapNotNull(addressMap::get),own.toSet())
             item.copy(address=resolved.firstOrNull().orEmpty(),addresses=resolved)
         }
-        kotlinx.serialization.json.buildJsonObject {
-            put("items",kotlinx.serialization.json.Json.parseToJsonElement(com.ismartcoding.plain.lib.JsonHelper.jsonEncode(rows)))
-            put("snippets",kotlinx.serialization.json.buildJsonObject {
-                beforeDates.forEach{(id,value)->getSnippetBeforeDate(context,id,value.jsonPrimitive.long)?.let{put(id,kotlinx.serialization.json.JsonPrimitive(it))}}
-            })
-        }
+        com.ismartcoding.plain.lib.JsonHelper.jsonEncodeToElement(SmsConversationFacts(
+            items = rows,
+            snippets = beforeDates.mapNotNull { (id, value) ->
+                getSnippetBeforeDate(context, id, value.jsonPrimitive.long)?.let { id to it }
+            }.toMap(),
+        ))
     }
 
     private val conversationsUri = "content://mms-sms/conversations?simple=true".toUri()

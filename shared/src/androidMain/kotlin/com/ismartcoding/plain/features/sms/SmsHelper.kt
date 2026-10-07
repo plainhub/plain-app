@@ -418,7 +418,7 @@ object SmsHelper {
         if (context.checkSelfPermission(Manifest.permission.READ_SMS) != PackageManager.PERMISSION_GRANTED) {
             throw SecurityException("READ_SMS permission revoked")
         }
-        if (method == "systemMmsTextFacts") return@withIO Json.parseToJsonElement(JsonHelper.jsonEncode(mmsTextFacts(context)))
+        if (method == "systemMmsTextFacts") return@withIO JsonHelper.jsonEncodeToElement(mmsTextFacts(context))
         if (method == "systemSmsConversationFacts") return@withIO SmsConversationHelper.facts(context, params)
         val plans = if (method == "systemSmsRowsFacts" || method == "systemSmsThreadFacts") params.getValue("plans").jsonObject else params
         val smsWhere = plans.getValue("sms").where()
@@ -436,12 +436,12 @@ object SmsHelper {
                         hits.add(cursor.getStringValue(Telephony.Mms.THREAD_ID,cache) to cursor.getTimeSecondsValue(Telephony.Mms.DATE,cache).toString())
                     }
                 }
-                Json.parseToJsonElement(JsonHelper.jsonEncode(hits))
+                JsonHelper.jsonEncodeToElement(hits)
             }
-            "systemSmsCountFacts" -> buildJsonObject {
-                put("sms", queryCount(context, smsUri, smsWhere.toSelection(), smsWhere.args.toTypedArray()))
-                put("mms", mmsWhere?.let { queryCount(context, mmsUri, it.toSelection(), it.args.toTypedArray()) } ?: 0)
-            }
+            "systemSmsCountFacts" -> JsonHelper.jsonEncodeToElement(SmsCountFacts(
+                sms = queryCount(context, smsUri, smsWhere.toSelection(), smsWhere.args.toTypedArray()),
+                mms = mmsWhere?.let { queryCount(context, mmsUri, it.toSelection(), it.args.toTypedArray()) } ?: 0,
+            ))
             "systemSmsIdsFacts" -> {
                 val smsIds = context.contentResolver.queryCursor(smsUri, arrayOf(BaseColumns._ID), smsWhere.toSelection(), smsWhere.args.toTypedArray(), null)
                     ?.map { cursor, cache -> cursor.getStringValue(BaseColumns._ID, cache) }.orEmpty()
@@ -449,7 +449,7 @@ object SmsHelper {
                     context.contentResolver.queryCursor(mmsUri, arrayOf(BaseColumns._ID), where.toSelection(), where.args.toTypedArray(), null)
                         ?.map { cursor, cache -> "mms_${cursor.getStringValue(BaseColumns._ID, cache)}" }
                 }.orEmpty()
-                JsonArray((smsIds + mmsIds).map(::JsonPrimitive))
+                JsonHelper.jsonEncodeToElement(smsIds + mmsIds)
             }
             "systemSmsRowsFacts" -> {
                 val limit = params.getValue("limit").jsonPrimitive.long
@@ -462,10 +462,10 @@ object SmsHelper {
                         ?.map { cursor, cache -> cursorToMmsMessage(context, cursor, cache) }
                 }.orEmpty()
                 val threadId = plans.getValue("threadId").jsonPrimitive.content
-                buildJsonObject {
-                    put("items", Json.parseToJsonElement(JsonHelper.jsonEncode(sms + mms)))
-                    put("canonicalAddress", if (threadId.isNotEmpty()) getCanonicalAddressForThread(context, threadId) else "")
-                }
+                JsonHelper.jsonEncodeToElement(SmsRowsFacts(
+                    items = sms + mms,
+                    canonicalAddress = if (threadId.isNotEmpty()) getCanonicalAddressForThread(context, threadId) else "",
+                ))
             }
             else -> error("Unsupported SMS facts")
         }

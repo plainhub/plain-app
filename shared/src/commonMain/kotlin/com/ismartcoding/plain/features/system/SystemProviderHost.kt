@@ -24,102 +24,98 @@ import kotlinx.coroutines.launch
 import kotlinx.serialization.json.*
 
 private fun contactInput(params: JsonObject): com.ismartcoding.plain.httpserver.models.ContactInput =
-    JsonHelper.jsonDecode(params.getValue("input").toString())
+    JsonHelper.jsonDecodeFromElement(params.getValue("input"))
 
 /**
  * The public contact contract, field for field. The `ContactsContract`
  * `DATA2` code stays a raw int on each detail row: Rust owns the enum, so the
  * wire keeps the number and the mapping stays in one place.
  */
-private fun contactFacts(contact: DContact): JsonObject {
-    fun contentItem(item: DContentItem): JsonObject = buildJsonObject {
-        put("value", JsonPrimitive(item.value))
-        put("type", JsonPrimitive(item.type))
-        put("label", JsonPrimitive(item.label))
-    }
-    fun contentItems(items: List<DContentItem>): JsonArray = JsonArray(items.map(::contentItem))
-    return buildJsonObject {
-        put("id", JsonPrimitive(contact.id))
-        put("prefix", JsonPrimitive(contact.prefix))
-        put("firstName", JsonPrimitive(contact.givenName))
-        put("middleName", JsonPrimitive(contact.middleName))
-        put("lastName", JsonPrimitive(contact.familyName))
-        put("suffix", JsonPrimitive(contact.suffix))
-        put("nickname", JsonPrimitive(contact.nickname))
-        put("photoId", JsonPrimitive(contact.photoUri))
-        put("phoneNumbers", JsonArray(contact.phoneNumbers.map { phone ->
-            buildJsonObject {
-                put("value", JsonPrimitive(phone.value))
-                put("type", JsonPrimitive(phone.type))
-                put("label", JsonPrimitive(phone.label))
-                put("normalizedNumber", JsonPrimitive(phone.normalizedNumber))
-            }
-        }))
-        put("emails", contentItems(contact.emails))
-        put("addresses", contentItems(contact.addresses))
-        put("events", contentItems(contact.events))
-        put("websites", contentItems(contact.websites))
-        put("ims", contentItems(contact.ims))
-        put("source", JsonPrimitive(contact.source))
-        put("starred", JsonPrimitive(contact.starred != 0))
-        put("contactId", JsonPrimitive(contact.contactId))
-        put("thumbnailId", JsonPrimitive(contact.thumbnailUri))
-        put("notes", JsonPrimitive(contact.notes))
-        put("groups", JsonArray(contact.groups.map { group ->
-            buildJsonObject {
-                put("id", JsonPrimitive(group.id.toString()))
-                put("name", JsonPrimitive(group.name))
-            }
-        }))
-        put("organization", contact.organization?.let { organization ->
-            buildJsonObject {
-                put("company", JsonPrimitive(organization.company))
-                put("title", JsonPrimitive(organization.title))
-            }
-        } ?: JsonNull)
-        put("ringtone", JsonPrimitive(contact.ringtone))
-        put("updatedAt", JsonPrimitive(contact.updatedAt.toString()))
-    }
+private fun contactFacts(contact: DContact): ContactFacts {
+    fun contentItem(item: DContentItem): ContactDetailFacts = ContactDetailFacts(
+        value = item.value,
+        type = item.type,
+        label = item.label,
+    )
+    fun contentItems(items: List<DContentItem>): List<ContactDetailFacts> = items.map(::contentItem)
+    return ContactFacts(
+        id = contact.id,
+        prefix = contact.prefix,
+        firstName = contact.givenName,
+        middleName = contact.middleName,
+        lastName = contact.familyName,
+        suffix = contact.suffix,
+        nickname = contact.nickname,
+        photoId = contact.photoUri,
+        phoneNumbers = contact.phoneNumbers.map { phone ->
+            ContactPhoneFacts(
+                value = phone.value,
+                type = phone.type,
+                label = phone.label,
+                normalizedNumber = phone.normalizedNumber,
+            )
+        },
+        emails = contentItems(contact.emails),
+        addresses = contentItems(contact.addresses),
+        events = contentItems(contact.events),
+        websites = contentItems(contact.websites),
+        ims = contentItems(contact.ims),
+        source = contact.source,
+        starred = contact.starred != 0,
+        contactId = contact.contactId,
+        thumbnailId = contact.thumbnailUri,
+        notes = contact.notes,
+        groups = contact.groups.map { group ->
+            ContactGroupFacts(
+                id = group.id.toString(),
+                name = group.name,
+            )
+        },
+        organization = contact.organization?.let { organization ->
+            ContactOrganizationFacts(
+                company = organization.company,
+                title = organization.title,
+            )
+        },
+        ringtone = contact.ringtone,
+        updatedAt = contact.updatedAt.toString(),
+    )
 }
 
 /** The public call-log contract; the geo lookup stays on the platform. */
-private fun callFacts(call: DCall): JsonObject {
+private fun callFacts(call: DCall): CallFacts {
     val geo = call.getGeo()
-    return buildJsonObject {
-        put("id", JsonPrimitive(call.id))
-        put("number", JsonPrimitive(call.number))
-        put("name", JsonPrimitive(call.name))
-        put("photoId", JsonPrimitive(com.ismartcoding.plain.helpers.getFileId(call.photoUri)))
-        put("startedAt", JsonPrimitive(call.startedAt.toString()))
-        put("durationSec", JsonPrimitive(call.durationSec))
-        put("type", JsonPrimitive(call.type))
-        put("accountId", JsonPrimitive(call.accountId))
-        put("geo", geo?.let { value ->
-            buildJsonObject {
-                put("country", JsonPrimitive(value.country))
-                put("numberType", JsonPrimitive(value.numberType))
-                put("carrier", JsonPrimitive(value.carrier))
-                put("description", JsonPrimitive(value.description))
-            }
-        } ?: JsonNull)
-    }
+    return CallFacts(
+        id = call.id,
+        number = call.number,
+        name = call.name,
+        photoId = com.ismartcoding.plain.helpers.getFileId(call.photoUri),
+        startedAt = call.startedAt.toString(),
+        durationSec = call.durationSec,
+        type = call.type,
+        accountId = call.accountId,
+        geo = geo?.let { value ->
+            PhoneGeoFacts(
+                country = value.country,
+                numberType = value.numberType,
+                carrier = value.carrier,
+                description = value.description,
+            )
+        },
+    )
 }
 
 object SystemProviderHost {
     suspend fun handle(method: String, params: JsonObject): JsonElement = when (method) {
-        "systemPackageFacts" -> JsonArray(installedPackageFacts().map { item ->
-            buildJsonObject {
-                put("item", Json.parseToJsonElement(JsonHelper.jsonEncode(item)))
-                put("nameSortKey", Pinyin.toPinyin(item.name).lowercase())
-            }
+        "systemPackageFacts" -> JsonHelper.jsonEncodeToElement(installedPackageFacts().map { item ->
+            PackageFacts(
+                item = item,
+                nameSortKey = Pinyin.toPinyin(item.name).lowercase(),
+            )
         })
         "systemPackageStatuses" -> {
             val ids = params.getValue("ids").jsonArray.map { it.jsonPrimitive.content }
-            JsonObject(
-                com.ismartcoding.plain.platform.getPackageInfoMap(ids).mapValues { (_, pkg) ->
-                    if (pkg == null) JsonNull else Json.parseToJsonElement(JsonHelper.jsonEncode(pkg))
-                }
-            )
+            JsonHelper.jsonEncodeToElement(com.ismartcoding.plain.platform.getPackageInfoMap(ids))
         }
         "systemInstallPackage" -> {
             val path = params.getValue("path").jsonPrimitive.content
@@ -128,38 +124,36 @@ object SystemProviderHost {
             } catch (e: Exception) {
                 throw IllegalStateException("Installation failed: ${e.message}", e)
             }
-            buildJsonObject {
-                put("packageName", JsonPrimitive(result.packageName))
-                put("lastUpdateTime", result.lastUpdateTime?.let { JsonPrimitive(it.toString()) } ?: JsonNull)
-                put("isNew", JsonPrimitive(result.isNew))
-            }
+            JsonHelper.jsonEncodeToElement(PackageInstallFacts(
+                packageName = result.packageName,
+                lastUpdateTime = result.lastUpdateTime?.toString(),
+                isNew = result.isNew,
+            ))
         }
         "systemUninstallPackages" -> {
             params.getValue("ids").jsonArray.map { it.jsonPrimitive.content }.forEach {
                 com.ismartcoding.plain.platform.uninstallPackage(it)
             }
-            JsonPrimitive(true)
+            JsonHelper.jsonEncodeToElement(true)
         }
         "systemSetClipboard" -> {
             com.ismartcoding.plain.platform.setClipboardText("plain", params.getValue("text").jsonPrimitive.content)
-            JsonPrimitive(true)
+            JsonHelper.jsonEncodeToElement(true)
         }
-        "systemNotificationFacts" -> Json.parseToJsonElement(JsonHelper.jsonEncode(notificationFacts()))
+        "systemNotificationFacts" -> JsonHelper.jsonEncodeToElement(notificationFacts())
         "systemMmsTextFacts", "systemSmsCountFacts", "systemSmsRowsFacts", "systemSmsIdsFacts", "systemSmsConversationFacts", "systemSmsThreadFacts" -> com.ismartcoding.plain.platform.systemSmsFacts(method, params)
-        "systemEpochMillis" -> buildJsonObject {
-            params.getValue("values").jsonArray.forEach { value ->
-                val text = value.jsonPrimitive.content
-                put(text, text.parseEpochMillis()?.let(::JsonPrimitive) ?: JsonNull)
+        "systemEpochMillis" -> JsonHelper.jsonEncodeToElement(params.getValue("values").jsonArray.associate { value ->
+            val text = value.jsonPrimitive.content
+            text to text.parseEpochMillis()
+        })
+        "systemPermissionFacts" -> run {
+            val granted = params.getValue("permissions").jsonArray.associate { item ->
+                val name = item.jsonPrimitive.content
+                name to com.ismartcoding.plain.platform.Permission.valueOf(name).isGranted()
             }
-        }
-        "systemPermissionFacts" -> buildJsonObject {
-            val granted = buildJsonObject {
-                params.getValue("permissions").jsonArray.forEach { item ->
-                    val name = item.jsonPrimitive.content
-                    put(name, com.ismartcoding.plain.platform.Permission.valueOf(name).isGranted())
-                }
-            }
-            put("granted", granted)
+            JsonHelper.jsonEncodeToElement(PermissionFacts(
+                granted = granted,
+            ))
         }
         "systemSendSms" -> {
             com.ismartcoding.plain.platform.sendSmsText(
@@ -169,7 +163,7 @@ object SystemProviderHost {
                 params["clientId"]?.takeUnless { it is JsonNull }?.jsonPrimitive?.content,
                 params["clientRequestId"]?.takeUnless { it is JsonNull }?.jsonPrimitive?.content,
             )
-            JsonPrimitive(true)
+            JsonHelper.jsonEncodeToElement(true)
         }
         "zipItemsFacts" -> {
             val type = params.getValue("type").jsonPrimitive.content
@@ -178,103 +172,103 @@ object SystemProviderHost {
                 params.getValue("query").jsonPrimitive.content,
                 params.getValue("id").jsonPrimitive.content,
             ).filter { com.ismartcoding.plain.platform.fileExists(it.sourcePath) }
-            buildJsonObject {
-                put("items", JsonArray(items.map { entry ->
-                    buildJsonObject {
-                        put("path", JsonPrimitive(entry.sourcePath))
-                        put("name", JsonPrimitive(entry.entryName))
-                    }
-                }))
-            }
+            JsonHelper.jsonEncodeToElement(ZipItemsFacts(
+                items = items.map { entry ->
+                    ZipEntryFacts(
+                        path = entry.sourcePath,
+                        name = entry.entryName,
+                    )
+                },
+            ))
         }
-        "uploadTmpDirFacts" -> buildJsonObject {
-            put("path", com.ismartcoding.plain.platform.getUploadTmpDirPath())
-        }
+        "uploadTmpDirFacts" -> JsonHelper.jsonEncodeToElement(PathFacts(
+            path = com.ismartcoding.plain.platform.getUploadTmpDirPath(),
+        ))
         "scanFilesFacts" -> {
             com.ismartcoding.plain.platform.scanFiles(
                 params.getValue("paths").jsonArray.map { it.jsonPrimitive.content }.toTypedArray()
             )
-            JsonPrimitive(true)
+            JsonHelper.jsonEncodeToElement(true)
         }
         "systemContactFacts" -> {
             val query = params.getValue("query").jsonPrimitive.content
             val offset = params.getValue("offset").jsonPrimitive.int
             val limit = params.getValue("limit").jsonPrimitive.int
-            JsonArray(
+            JsonHelper.jsonEncodeToElement(
                 com.ismartcoding.plain.platform.searchMedia(
                     com.ismartcoding.plain.enums.DataType.CONTACT, query, limit, offset,
                     com.ismartcoding.plain.features.file.FileSortBy.DATE_DESC,
                 ).filterIsInstance<DContact>().map(::contactFacts)
             )
         }
-        "systemContactCount" -> JsonPrimitive(
+        "systemContactCount" -> JsonHelper.jsonEncodeToElement(
             com.ismartcoding.plain.platform.countMedia(
                 com.ismartcoding.plain.enums.DataType.CONTACT,
                 params.getValue("query").jsonPrimitive.content,
             )
         )
-        "systemContactIds" -> JsonArray(
+        "systemContactIds" -> JsonHelper.jsonEncodeToElement(
             com.ismartcoding.plain.platform.getMediaIds(
                 com.ismartcoding.plain.enums.DataType.CONTACT,
                 params.getValue("query").jsonPrimitive.content,
-            ).map(::JsonPrimitive)
+            )
         )
-        "systemContactGroupFacts" -> JsonArray(
+        "systemContactGroupFacts" -> JsonHelper.jsonEncodeToElement(
             com.ismartcoding.plain.platform.getContactGroups().map { group ->
-                buildJsonObject {
-                    put("id", JsonPrimitive(group.id.toString()))
-                    put("name", JsonPrimitive(group.name))
-                }
+                ContactGroupFacts(
+                    id = group.id.toString(),
+                    name = group.name,
+                )
             }
         )
-        "systemContactSources" -> JsonArray(
+        "systemContactSources" -> JsonHelper.jsonEncodeToElement(
             com.ismartcoding.plain.platform.getContactSources().map { source ->
-                buildJsonObject {
-                    put("name", JsonPrimitive(source.name))
-                    put("type", JsonPrimitive(source.type))
-                }
+                ContactSourceFacts(
+                    name = source.name,
+                    type = source.type,
+                )
             }
         )
         "systemCallFacts" -> {
             val query = params.getValue("query").jsonPrimitive.content
             val offset = params.getValue("offset").jsonPrimitive.int
             val limit = params.getValue("limit").jsonPrimitive.int
-            JsonArray(
+            JsonHelper.jsonEncodeToElement(
                 com.ismartcoding.plain.platform.searchMedia(
                     com.ismartcoding.plain.enums.DataType.CALL, query, limit, offset,
                     com.ismartcoding.plain.features.file.FileSortBy.DATE_DESC,
                 ).filterIsInstance<DCall>().map(::callFacts)
             )
         }
-        "systemCallCount" -> JsonPrimitive(
+        "systemCallCount" -> JsonHelper.jsonEncodeToElement(
             com.ismartcoding.plain.platform.countMedia(
                 com.ismartcoding.plain.enums.DataType.CALL,
                 params.getValue("query").jsonPrimitive.content,
             )
         )
-        "systemCallIds" -> JsonArray(
+        "systemCallIds" -> JsonHelper.jsonEncodeToElement(
             com.ismartcoding.plain.platform.getMediaIds(
                 com.ismartcoding.plain.enums.DataType.CALL,
                 params.getValue("query").jsonPrimitive.content,
-            ).map(::JsonPrimitive)
+            )
         )
         "systemMakeCall" -> {
             com.ismartcoding.plain.platform.call(
                 params.getValue("number").jsonPrimitive.content,
                 params.getValue("showDialer").jsonPrimitive.boolean,
             )
-            JsonPrimitive(true)
+            JsonHelper.jsonEncodeToElement(true)
         }
-        "systemTrashSms" -> JsonPrimitive(
+        "systemTrashSms" -> JsonHelper.jsonEncodeToElement(
             com.ismartcoding.plain.platform.trashSms(params.getValue("query").jsonPrimitive.content)
         )
-        "systemRestoreSms" -> JsonPrimitive(
+        "systemRestoreSms" -> JsonHelper.jsonEncodeToElement(
             com.ismartcoding.plain.platform.restoreSms(params.getValue("query").jsonPrimitive.content)
         )
-        "systemDeleteSms" -> JsonPrimitive(
+        "systemDeleteSms" -> JsonHelper.jsonEncodeToElement(
             com.ismartcoding.plain.platform.deleteSms(params.getValue("query").jsonPrimitive.content)
         )
-        "systemSendMms" -> JsonPrimitive(
+        "systemSendMms" -> JsonHelper.jsonEncodeToElement(
             sendMms(
                 params.getValue("number").jsonPrimitive.content,
                 params.getValue("body").jsonPrimitive.content,
@@ -284,20 +278,18 @@ object SystemProviderHost {
         )
         "systemScreenMirrorState" -> {
             val codec = com.ismartcoding.plain.platform.getScreenMirrorVideoCodec()
-            buildJsonObject {
-                put("running", JsonPrimitive(com.ismartcoding.plain.platform.isScreenMirrorRunning()))
-                put("controlEnabled", JsonPrimitive(com.ismartcoding.plain.platform.isScreenMirrorControlEnabled()))
-                put("codec", codec?.let { value ->
-                    buildJsonObject {
-                        put("annexB", JsonPrimitive(value.annexB))
-                        put("keyFrame", value.keyFrame?.let { JsonPrimitive(it) } ?: JsonNull)
-                    }
-                } ?: JsonNull)
-            }
+            JsonHelper.jsonEncodeToElement(ScreenMirrorStateFacts(
+                running = com.ismartcoding.plain.platform.isScreenMirrorRunning(),
+                controlEnabled = com.ismartcoding.plain.platform.isScreenMirrorControlEnabled(),
+                codec = codec?.let { value ->
+                    ScreenMirrorCodecFacts(
+                        annexB = value.annexB,
+                        keyFrame = value.keyFrame,
+                    )
+                },
+            ))
         }
-        "systemScreenMirrorQuality" -> Json.parseToJsonElement(
-            JsonHelper.jsonEncode(UserPrefs.screenMirrorQualityValue().toModel())
-        )
+        "systemScreenMirrorQuality" -> JsonHelper.jsonEncodeToElement(UserPrefs.screenMirrorQualityValue().toModel())
         "systemStartScreenMirror" -> {
             com.ismartcoding.plain.platform.applyScreenMirrorQualityPreference()
             sendEvent(
@@ -305,11 +297,11 @@ object SystemProviderHost {
                     params.getValue("audio").jsonPrimitive.boolean
                 )
             )
-            JsonPrimitive(true)
+            JsonHelper.jsonEncodeToElement(true)
         }
         "systemStopScreenMirror" -> {
             com.ismartcoding.plain.platform.stopScreenMirror()
-            JsonPrimitive(true)
+            JsonHelper.jsonEncodeToElement(true)
         }
         "systemRequestScreenMirrorAudio" -> {
             val granted = com.ismartcoding.plain.platform.Permission.RECORD_AUDIO.isGranted()
@@ -318,11 +310,11 @@ object SystemProviderHost {
                     com.ismartcoding.plain.events.HRequestScreenMirrorAudioEvent()
                 )
             }
-            JsonPrimitive(granted)
+            JsonHelper.jsonEncodeToElement(granted)
         }
         "systemRequestScreenMirrorKeyFrame" -> {
             com.ismartcoding.plain.platform.requestScreenMirrorKeyFrame()
-            JsonPrimitive(true)
+            JsonHelper.jsonEncodeToElement(true)
         }
         "systemUpdateScreenMirrorQuality" -> {
             val mode = when (params.getValue("mode").jsonPrimitive.content) {
@@ -334,113 +326,116 @@ object SystemProviderHost {
             )
             com.ismartcoding.plain.preferences.UserPrefs.setScreenMirrorQuality(quality)
             com.ismartcoding.plain.platform.onScreenMirrorQualityChanged(mode)
-            JsonPrimitive(true)
+            JsonHelper.jsonEncodeToElement(true)
         }
         "systemOpenAccessibilitySettings" -> {
             sendEvent(com.ismartcoding.plain.events.HOpenAccessibilitySettingsEvent())
-            JsonPrimitive(true)
+            JsonHelper.jsonEncodeToElement(true)
         }
         "systemOpenWebSettings" -> {
             val feature = params["feature"]
-                ?.takeUnless { it is JsonNull }
-                ?.jsonPrimitive
-                ?.content
-                ?.let { name ->
-                    WebSettingsFeature.entries
-                        .firstOrNull { it.name == name }
-                }
+            ?.takeUnless { it is JsonNull }
+            ?.jsonPrimitive
+            ?.content
+            ?.let { name ->
+                WebSettingsFeature.entries
+                .firstOrNull { it.name == name }
+            }
             sendEvent(com.ismartcoding.plain.events.HOpenWebSettingsEvent(feature))
-            JsonPrimitive(true)
+            JsonHelper.jsonEncodeToElement(true)
         }
-        "systemImageSearchStatus" -> Json.parseToJsonElement(
-            JsonHelper.jsonEncode(com.ismartcoding.plain.platform.buildImageSearchStatus())
-        )
+        "systemImageSearchStatus" -> JsonHelper.jsonEncodeToElement(com.ismartcoding.plain.platform.buildImageSearchStatus())
         "systemEnableImageSearch" -> {
             sendEvent(com.ismartcoding.plain.events.HEnableImageSearchEvent())
-            JsonPrimitive(true)
+            JsonHelper.jsonEncodeToElement(true)
         }
         "systemDisableImageSearch" -> {
             sendEvent(com.ismartcoding.plain.events.HDisableImageSearchEvent())
-            JsonPrimitive(true)
+            JsonHelper.jsonEncodeToElement(true)
         }
         "systemCancelImageModelDownload" -> {
             sendEvent(com.ismartcoding.plain.events.HCancelImageModelDownloadEvent())
-            JsonPrimitive(true)
+            JsonHelper.jsonEncodeToElement(true)
         }
         "systemStartImageIndex" -> {
             com.ismartcoding.plain.platform.startImageIndexFullScan(
                 params.getValue("force").jsonPrimitive.boolean
             )
-            JsonPrimitive(true)
+            JsonHelper.jsonEncodeToElement(true)
         }
         "systemCancelImageIndex" -> {
             com.ismartcoding.plain.platform.cancelImageIndex()
-            JsonPrimitive(true)
+            JsonHelper.jsonEncodeToElement(true)
         }
-        "systemDeleteRecords" -> JsonArray(com.ismartcoding.plain.platform.deleteSystemProviderFacts(
+        "systemDeleteRecords" -> JsonHelper.jsonEncodeToElement(com.ismartcoding.plain.platform.deleteSystemProviderFacts(
             com.ismartcoding.plain.enums.DataType.valueOf(params.getValue("provider").jsonPrimitive.content),
-            params.getValue("ids").jsonArray.map { it.jsonPrimitive.content }.toSet()).map(::JsonPrimitive))
-        "systemCreateContact" -> JsonPrimitive(com.ismartcoding.plain.platform.createContact(
+            params.getValue("ids").jsonArray.map { it.jsonPrimitive.content }.toSet()))
+        "systemCreateContact" -> JsonHelper.jsonEncodeToElement(com.ismartcoding.plain.platform.createContact(
             contactInput(params)))
         "systemUpdateContact" -> {
             com.ismartcoding.plain.platform.updateContact(
                 params.getValue("id").jsonPrimitive.content,
                 contactInput(params),
             )
-            JsonPrimitive(true)
+            JsonHelper.jsonEncodeToElement(true)
         }
-        "systemCreateContactGroup" -> JsonPrimitive(com.ismartcoding.plain.platform.createContactGroup(
+        "systemCreateContactGroup" -> JsonHelper.jsonEncodeToElement(com.ismartcoding.plain.platform.createContactGroup(
             params.getValue("name").jsonPrimitive.content,
             params.getValue("accountName").jsonPrimitive.content,
             params.getValue("accountType").jsonPrimitive.content,
-        ).id.toString())
+            ).id.toString())
         "systemUpdateContactGroup" -> {
             com.ismartcoding.plain.platform.updateContactGroup(
                 params.getValue("id").jsonPrimitive.content,
                 params.getValue("name").jsonPrimitive.content,
             )
-            JsonPrimitive(true)
+            JsonHelper.jsonEncodeToElement(true)
         }
         "systemDeleteContactGroup" -> {
             com.ismartcoding.plain.platform.deleteContactGroup(params.getValue("id").jsonPrimitive.content)
-            JsonPrimitive(true)
+            JsonHelper.jsonEncodeToElement(true)
         }
-        "systemCancelNotifications" -> JsonArray(com.ismartcoding.plain.platform.cancelNotificationFacts(
-            params.getValue("ids").jsonArray.map { it.jsonPrimitive.content }.toSet()).map(::JsonPrimitive))
-        "systemReplyNotification" -> JsonPrimitive(com.ismartcoding.plain.platform.replyNotification(
+        "systemCancelNotifications" -> JsonHelper.jsonEncodeToElement(com.ismartcoding.plain.platform.cancelNotificationFacts(
+            params.getValue("ids").jsonArray.map { it.jsonPrimitive.content }.toSet()))
+        "systemReplyNotification" -> JsonHelper.jsonEncodeToElement(com.ismartcoding.plain.platform.replyNotification(
             params.getValue("id").jsonPrimitive.content, params.getValue("actionIndex").jsonPrimitive.int, params.getValue("text").jsonPrimitive.content))
         "fileMetadataFacts" -> {
             val path = params.getValue("path").jsonPrimitive.content
-            buildJsonObject {
-                put("size", com.ismartcoding.plain.platform.statFile(path)?.size ?: 0)
-                put("mimeType", com.ismartcoding.plain.platform.getContentTypeForPath(path).orEmpty())
-            }
+            JsonHelper.jsonEncodeToElement(FileMetadataFacts(
+                size = com.ismartcoding.plain.platform.statFile(path)?.size ?: 0,
+                mimeType = com.ismartcoding.plain.platform.getContentTypeForPath(path).orEmpty(),
+            ))
         }
-        "systemMountFacts" -> JsonArray(com.ismartcoding.plain.httpserver.loaders.MountsLoader.load().map { mount ->
-            buildJsonObject {
-                put("id", JsonPrimitive(mount.id.value)); put("name", JsonPrimitive(mount.name))
-                put("path", JsonPrimitive(mount.path)); put("mountPoint", JsonPrimitive(mount.mountPoint))
-                put("fsType", JsonPrimitive(mount.fsType)); put("totalBytes", JsonPrimitive(mount.totalBytes))
-                put("usedBytes", JsonPrimitive(mount.usedBytes)); put("freeBytes", JsonPrimitive(mount.freeBytes))
-                put("remote", JsonPrimitive(mount.remote)); put("alias", JsonPrimitive(mount.alias))
-                put("driveType", JsonPrimitive(mount.driveType.name)); put("diskId", JsonPrimitive(mount.diskId))
-            }
+        "systemMountFacts" -> JsonHelper.jsonEncodeToElement(com.ismartcoding.plain.httpserver.loaders.MountsLoader.load().map { mount ->
+            MountFacts(
+                id = mount.id.value,
+                name = mount.name,
+                path = mount.path,
+                mountPoint = mount.mountPoint,
+                fsType = mount.fsType,
+                totalBytes = mount.totalBytes,
+                usedBytes = mount.usedBytes,
+                freeBytes = mount.freeBytes,
+                remote = mount.remote,
+                alias = mount.alias,
+                driveType = mount.driveType.name,
+                diskId = mount.diskId,
+            )
         })
-        "systemRecentFileFacts" -> JsonArray(com.ismartcoding.plain.platform.getRecentFiles().map(::fileFacts))
-        "systemImageFileInfo" -> Json.parseToJsonElement(
-            JsonHelper.jsonEncode(fileInfoFacts(method, params)))
-        "systemVideoFileInfo" -> Json.parseToJsonElement(
-            JsonHelper.jsonEncode(fileInfoFacts(method, params)))
-        "systemAudioFileInfo" -> Json.parseToJsonElement(
-            JsonHelper.jsonEncode(fileInfoFacts(method, params)))
-        "systemMediaBucketItemFacts" -> JsonArray(
+        "systemRecentFileFacts" -> JsonHelper.jsonEncodeToElement(com.ismartcoding.plain.platform.getRecentFiles().map(::fileFacts))
+        "systemImageFileInfo" -> fileInfoFacts(method, params)
+        "systemVideoFileInfo" -> fileInfoFacts(method, params)
+        "systemAudioFileInfo" -> fileInfoFacts(method, params)
+        "systemMediaBucketItemFacts" -> JsonHelper.jsonEncodeToElement(
             com.ismartcoding.plain.platform.mediaBucketItemFacts(mediaDataType(params)).map { item ->
-                buildJsonObject {
-                    put("id", JsonPrimitive(item.id)); put("name", JsonPrimitive(item.name))
-                    put("size", JsonPrimitive(item.size)); put("path", JsonPrimitive(item.path))
-                    put("sortName", JsonPrimitive(item.sortName))
-                }
-            })
+                MediaBucketItemFacts(
+                    id = item.id,
+                    name = item.name,
+                    size = item.size,
+                    path = item.path,
+                    sortName = item.sortName,
+                )
+        })
         "systemMediaRows" -> {
             val items = com.ismartcoding.plain.platform.searchMedia(
                 mediaDataType(params),
@@ -449,7 +444,7 @@ object SystemProviderHost {
                 params.getValue("offset").jsonPrimitive.int,
                 fileSortBy(params),
             )
-            JsonArray(items.map { mediaFacts(it) })
+            JsonHelper.jsonEncodeToElement(items.map { mediaFacts(it) })
         }
         "systemImageRows" -> {
             val items = com.ismartcoding.plain.platform.searchImagesCombined(
@@ -459,18 +454,21 @@ object SystemProviderHost {
                 params.getValue("offset").jsonPrimitive.int,
                 fileSortBy(params),
             )
-            JsonArray(items.map { mediaFacts(it) })
+            JsonHelper.jsonEncodeToElement(items.map { mediaFacts(it) })
         }
-        "systemMediaCount" -> JsonPrimitive(com.ismartcoding.plain.platform.countMedia(
+        "systemMediaCount" -> JsonHelper.jsonEncodeToElement(com.ismartcoding.plain.platform.countMedia(
             mediaDataType(params), params.getValue("query").jsonPrimitive.content))
-        "systemImageCount" -> JsonPrimitive(com.ismartcoding.plain.platform.countImagesCombined(
+        "systemImageCount" -> JsonHelper.jsonEncodeToElement(com.ismartcoding.plain.platform.countImagesCombined(
             params.getValue("queryText").jsonPrimitive.content,
             params.getValue("extraQuery").jsonPrimitive.content))
-        "systemDocExtGroups" -> JsonArray(
+        "systemDocExtGroups" -> JsonHelper.jsonEncodeToElement(
             com.ismartcoding.plain.platform.getDocExtGroups("").map { (ext, count) ->
-                buildJsonObject { put("ext", JsonPrimitive(ext)); put("count", JsonPrimitive(count)) } })
+                DocExtensionFacts(
+                    ext = ext,
+                    count = count,
+                ) })
         "systemMediaTagFacts" -> mediaTagFacts(params)
-        "systemChatChannelFacts" -> JsonArray(
+        "systemChatChannelFacts" -> JsonHelper.jsonEncodeToElement(
             com.ismartcoding.plain.chat.channel.ChannelCacher.channels.value
                 .sortedBy { it.name }
                 .map { channelFacts(it) })
@@ -484,7 +482,7 @@ object SystemProviderHost {
             com.ismartcoding.plain.chat.ChatViewModel.onMessagesCreated(
                 com.ismartcoding.plain.chat.data.ChatTarget.parseId(
                     params.getValue("target").jsonPrimitive.content), listOf(item))
-            JsonArray(listOf(Json.parseToJsonElement(JsonHelper.jsonEncode(item))))
+            JsonHelper.jsonEncodeToElement(listOf(item))
         }
         "systemChatDeleteOne" -> {
             val id = params.getValue("id").jsonPrimitive.content
@@ -492,58 +490,59 @@ object SystemProviderHost {
                 com.ismartcoding.plain.chat.ChatManager.deleteOne(it.id)
                 com.ismartcoding.plain.chat.ChatViewModel.onMessagesDeleted(setOf(it.id))
             }
-            JsonPrimitive(true)
+            JsonHelper.jsonEncodeToElement(true)
         }
-        "systemChatDeleteQuery" -> JsonPrimitive(
+        "systemChatDeleteQuery" -> JsonHelper.jsonEncodeToElement(
             com.ismartcoding.plain.chat.ChatManager.deleteQuery(
                 params.getValue("query").jsonPrimitive.content))
-        "systemChatRetry" -> Json.parseToJsonElement(JsonHelper.jsonEncode(
+        "systemChatRetry" -> JsonHelper.jsonEncodeToElement(
             com.ismartcoding.plain.chat.ChatManager.retry(
-                params.getValue("id").jsonPrimitive.content)))
-        "systemPeerFacts" -> JsonArray(
+                params.getValue("id").jsonPrimitive.content))
+        "systemPeerFacts" -> JsonHelper.jsonEncodeToElement(
             com.ismartcoding.plain.chat.peer.PeerCacher.peersMap.value.values
-                .map { Json.parseToJsonElement(JsonHelper.jsonEncode(it.peer)) })
-        "systemDeletePeer" -> JsonPrimitive(
+            .map { it.peer })
+        "systemDeletePeer" -> JsonHelper.jsonEncodeToElement(
             com.ismartcoding.plain.chat.peer.PeerManager.deletePeer(
                 params.getValue("id").jsonPrimitive.content))
         "systemUnpairPeer" -> {
             com.ismartcoding.plain.ui.models.NearbyViewModel.unpairDevice(
                 params.getValue("id").jsonPrimitive.content)
-            JsonPrimitive(true)
+            JsonHelper.jsonEncodeToElement(true)
         }
         "systemPairDevice" -> {
             val input = params.getValue("input").jsonObject
             com.ismartcoding.plain.ui.models.NearbyViewModel.startPairing(nearbyDevice(input))
-            JsonPrimitive(true)
+            JsonHelper.jsonEncodeToElement(true)
         }
         "systemCancelPairing" -> {
             com.ismartcoding.plain.ui.models.NearbyViewModel.cancelPairing(
                 params.getValue("deviceId").jsonPrimitive.content)
-            JsonPrimitive(true)
+            JsonHelper.jsonEncodeToElement(true)
         }
         "systemRespondToPairing" -> {
             com.ismartcoding.plain.discover.PairingResponder.respond(
                 pairingRequest(params.getValue("input").jsonObject),
                 params.getValue("accepted").jsonPrimitive.boolean)
-            JsonPrimitive(true)
+            JsonHelper.jsonEncodeToElement(true)
         }
-        "systemSimFacts" -> JsonArray(com.ismartcoding.plain.platform.getSims().map { sim ->
-            buildJsonObject {
-                put("id", JsonPrimitive(sim.id)); put("label", JsonPrimitive(sim.label))
-                put("number", JsonPrimitive(sim.number))
-                put("subscriptionId", JsonPrimitive(sim.subscriptionId))
-            }
+        "systemSimFacts" -> JsonHelper.jsonEncodeToElement(com.ismartcoding.plain.platform.getSims().map { sim ->
+            SimFacts(
+                id = sim.id,
+                label = sim.label,
+                number = sim.number,
+                subscriptionId = sim.subscriptionId,
+            )
         })
 
         // One playlist row per path: the metadata is read off the file, which
         // is the platform's job — Rust stores whatever this reports.
-        "systemAudioPlaylistTracks" -> JsonArray(
+        "systemAudioPlaylistTracks" -> JsonHelper.jsonEncodeToElement(
             params.getValue("paths").jsonArray.map { value ->
                 val track = com.ismartcoding.plain.platform.playlistAudioFromPath(
                     value.jsonPrimitive.content)
                 playlistTrackFacts(track)
-            })
-        "systemAudioSearchTracks" -> JsonArray(
+        })
+        "systemAudioSearchTracks" -> JsonHelper.jsonEncodeToElement(
             com.ismartcoding.plain.platform.searchMedia(
                 com.ismartcoding.plain.enums.DataType.AUDIO,
                 params.getValue("query").jsonPrimitive.content,
@@ -552,48 +551,49 @@ object SystemProviderHost {
                 com.ismartcoding.plain.features.file.FileSortBy.valueOf(
                     params.getValue("sortBy").jsonPrimitive.content),
             ).filterIsInstance<com.ismartcoding.plain.audio.DAudio>()
-                .map { playlistTrackFacts(com.ismartcoding.plain.audio.DPlaylistAudio(
-                    title = it.title, path = it.path, artist = it.artist,
-                    durationMs = it.durationMs)) })
-        "systemAudioLyrics" -> JsonPrimitive(
+            .map { playlistTrackFacts(com.ismartcoding.plain.audio.DPlaylistAudio(
+                title = it.title, path = it.path, artist = it.artist,
+                durationMs = it.durationMs)) })
+        "systemAudioLyrics" -> JsonHelper.jsonEncodeToElement(
             com.ismartcoding.plain.platform.getAudioLyrics(
                 params.getValue("path").jsonPrimitive.content))
-        "systemAudioPlaybackState" -> buildJsonObject {
-            put("isPlaying", JsonPrimitive(com.ismartcoding.plain.platform.audioIsPlayingFlow().value))
-            put("positionMs", JsonPrimitive(com.ismartcoding.plain.platform.audioPlayerProgressAsync()))
-        }
+        "systemAudioPlaybackState" -> JsonHelper.jsonEncodeToElement(AudioPlaybackFacts(
+            isPlaying = com.ismartcoding.plain.platform.audioIsPlayingFlow().value,
+            positionMs = com.ismartcoding.plain.platform.audioPlayerProgressAsync(),
+        ))
         "systemAudioPlayMode" -> when (val mode = params["mode"]) {
-            null -> JsonPrimitive(UserPrefs.audioPlayMode.value.name)
+            null -> JsonHelper.jsonEncodeToElement(UserPrefs.audioPlayMode.value.name)
             else -> {
                 UserPrefs.audioPlayMode.value = com.ismartcoding.plain.enums.MediaPlayMode
-                    .valueOf(mode.jsonPrimitive.content)
-                JsonPrimitive(UserPrefs.audioPlayMode.value.name)
+                .valueOf(mode.jsonPrimitive.content)
+                JsonHelper.jsonEncodeToElement(UserPrefs.audioPlayMode.value.name)
             }
         }
-        "systemAudioLibrarySort" -> JsonPrimitive(UserPrefs.audioSortByValue().name)
+        "systemAudioLibrarySort" -> JsonHelper.jsonEncodeToElement(UserPrefs.audioSortByValue().name)
         "systemAudioPlay" -> {
             com.ismartcoding.plain.platform.audioJustPlayWithNotificationCheck(
                 playlistTrack(params.getValue("track").jsonObject))
-            JsonPrimitive(true)
+            JsonHelper.jsonEncodeToElement(true)
         }
         "systemAudioClear" -> {
             com.ismartcoding.plain.platform.audioClear()
             com.ismartcoding.plain.lib.sendEvent(
                 com.ismartcoding.plain.events.ClearAudioQueueEvent())
-            JsonPrimitive(true)
+            JsonHelper.jsonEncodeToElement(true)
         }
-        "systemTagQueryStubs" -> JsonArray(
+        "systemTagQueryStubs" -> JsonHelper.jsonEncodeToElement(
             com.ismartcoding.plain.platform.getMediaTagRelationStubs(
                 mediaDataType(params), params.getValue("query").jsonPrimitive.content).map { stub ->
-                buildJsonObject {
-                    put("key", JsonPrimitive(stub.key)); put("title", JsonPrimitive(stub.title))
-                    put("size", JsonPrimitive(stub.size))
-                }
-            })
-        "systemTagQueryKeys" -> buildJsonObject {
-            put("ids", JsonArray(com.ismartcoding.plain.platform.getMediaIds(
-                mediaDataType(params), params.getValue("query").jsonPrimitive.content).map(::JsonPrimitive)))
-        }
+                TagQueryStubFacts(
+                    key = stub.key,
+                    title = stub.title,
+                    size = stub.size,
+                )
+        })
+        "systemTagQueryKeys" -> JsonHelper.jsonEncodeToElement(IdsFacts(
+            ids = com.ismartcoding.plain.platform.getMediaIds(
+                mediaDataType(params), params.getValue("query").jsonPrimitive.content).toList(),
+        ))
         // Pref writes go through here rather than straight to the store:
         // `Prefs` keeps an in-memory copy and fans the change out to the
         // live flows the UI collects, so a write that skipped it would
@@ -601,104 +601,98 @@ object SystemProviderHost {
         "systemSetUserPref" -> {
             com.ismartcoding.plain.preferences.Prefs.setUserPref(
                 params.getValue("key").jsonPrimitive.content, params.getValue("value"))
-            JsonPrimitive(true)
+            JsonHelper.jsonEncodeToElement(true)
         }
         "systemRemoveUserPref" -> {
             com.ismartcoding.plain.preferences.Prefs.removeUserPref(params.getValue("key").jsonPrimitive.content)
-            JsonPrimitive(true)
+            JsonHelper.jsonEncodeToElement(true)
         }
-        "systemDbFacts" -> buildJsonObject {
-            put("path", JsonPrimitive(com.ismartcoding.plain.platform.getDbPath()))
-            put("tables", JsonArray(com.ismartcoding.plain.platform.getDbTableNames().map(::JsonPrimitive)))
-        }
-        "systemDbRowCount" -> JsonPrimitive(com.ismartcoding.plain.platform.getDbTableRowCount(
+        "systemDbFacts" -> JsonHelper.jsonEncodeToElement(DatabaseFacts(
+            path = com.ismartcoding.plain.platform.getDbPath(),
+            tables = com.ismartcoding.plain.platform.getDbTableNames(),
+        ))
+        "systemDbRowCount" -> JsonHelper.jsonEncodeToElement(com.ismartcoding.plain.platform.getDbTableRowCount(
             params.getValue("table").jsonPrimitive.content))
-        "systemDbRows" -> buildJsonObject {
-            put("rows", JsonArray(com.ismartcoding.plain.platform.getDbTableRows(
+        "systemDbRows" -> JsonHelper.jsonEncodeToElement(DatabaseRowsFacts(
+            rows = com.ismartcoding.plain.platform.getDbTableRows(
                 params.getValue("table").jsonPrimitive.content,
                 params.getValue("offset").jsonPrimitive.int,
-                params.getValue("limit").jsonPrimitive.int).map(::JsonPrimitive)))
-        }
-        "systemDbColumns" -> buildJsonObject {
-            put("columns", Json.parseToJsonElement(JsonHelper.jsonEncode(
-                com.ismartcoding.plain.platform.getDbTableColumns(params.getValue("table").jsonPrimitive.content))))
-        }
-        "systemDbInfo" -> buildJsonObject {
-            put("idKey", JsonPrimitive(
-                com.ismartcoding.plain.platform.getDbTableInfo(params.getValue("table").jsonPrimitive.content).idKey))
-        }
-        "systemCreateDbRow" -> JsonPrimitive(com.ismartcoding.plain.platform.createDbTableRow(
+                params.getValue("limit").jsonPrimitive.int),
+        ))
+        "systemDbColumns" -> JsonHelper.jsonEncodeToElement(DatabaseColumnsFacts(
+            columns = com.ismartcoding.plain.platform.getDbTableColumns(params.getValue("table").jsonPrimitive.content),
+        ))
+        "systemDbInfo" -> JsonHelper.jsonEncodeToElement(DatabaseInfoFacts(
+            idKey = com.ismartcoding.plain.platform.getDbTableInfo(params.getValue("table").jsonPrimitive.content).idKey,
+        ))
+        "systemCreateDbRow" -> JsonHelper.jsonEncodeToElement(com.ismartcoding.plain.platform.createDbTableRow(
             params.getValue("table").jsonPrimitive.content,
             params.getValue("row").jsonPrimitive.content))
-        "systemDeleteDbRows" -> JsonPrimitive(com.ismartcoding.plain.platform.deleteDbTableRows(
+        "systemDeleteDbRows" -> JsonHelper.jsonEncodeToElement(com.ismartcoding.plain.platform.deleteDbTableRows(
             params.getValue("table").jsonPrimitive.content,
             params.getValue("ids").jsonArray.map { it.jsonPrimitive.content }))
-        "systemDeleteFiles" -> JsonPrimitive(params.getValue("paths").jsonArray.count { path ->
+        "systemDeleteFiles" -> JsonHelper.jsonEncodeToElement(params.getValue("paths").jsonArray.count { path ->
             com.ismartcoding.plain.platform.deleteFileOrDir(path.jsonPrimitive.content)
         })
-        "systemCreateDir" -> Json.parseToJsonElement(JsonHelper.jsonEncode(
-            com.ismartcoding.plain.platform.createDirectory(params.getValue("path").jsonPrimitive.content)))
-        "systemRenameFile" -> JsonPrimitive(com.ismartcoding.plain.platform.renameAndScanFile(
+        "systemCreateDir" -> JsonHelper.jsonEncodeToElement(
+            com.ismartcoding.plain.platform.createDirectory(params.getValue("path").jsonPrimitive.content))
+        "systemRenameFile" -> JsonHelper.jsonEncodeToElement(com.ismartcoding.plain.platform.renameAndScanFile(
             params.getValue("path").jsonPrimitive.content,
             params.getValue("name").jsonPrimitive.content) != null)
-        "systemWriteTextFile" -> Json.parseToJsonElement(JsonHelper.jsonEncode(
+        "systemWriteTextFile" -> JsonHelper.jsonEncodeToElement(
             com.ismartcoding.plain.platform.writeFileText(
                 params.getValue("path").jsonPrimitive.content,
                 params.getValue("content").jsonPrimitive.content,
-                params.getValue("overwrite").jsonPrimitive.boolean)))
-        "systemTransferFile" -> JsonPrimitive(com.ismartcoding.plain.features.file.FileTaskHelper.execute(
+                params.getValue("overwrite").jsonPrimitive.boolean))
+        "systemTransferFile" -> JsonHelper.jsonEncodeToElement(com.ismartcoding.plain.features.file.FileTaskHelper.execute(
             com.ismartcoding.plain.features.file.FileTaskType.valueOf(params.getValue("type").jsonPrimitive.content),
             listOf(com.ismartcoding.plain.features.file.FileTaskOp(
                 params.getValue("src").jsonPrimitive.content,
                 params.getValue("dst").jsonPrimitive.content,
                 params.getValue("overwrite").jsonPrimitive.boolean),
             )).status == com.ismartcoding.plain.features.file.FileTaskStatus.DONE)
-        "systemUploadedChunkFacts" -> buildJsonObject {
-            put("chunks", JsonArray(com.ismartcoding.plain.platform.listUploadedChunks(
-                params.getValue("fileId").jsonPrimitive.content).map(::JsonPrimitive)))
-        }
-        "systemMergeStatusFacts" -> Json.parseToJsonElement(JsonHelper.jsonEncode(
-            mergeStatusFacts(params.getValue("fileId").jsonPrimitive.content)))
-        "systemDeleteChunks" -> JsonPrimitive(com.ismartcoding.plain.platform.deleteUploadedChunks(
+        "systemUploadedChunkFacts" -> JsonHelper.jsonEncodeToElement(UploadedChunksFacts(
+            chunks = com.ismartcoding.plain.platform.listUploadedChunks(
+                params.getValue("fileId").jsonPrimitive.content),
+        ))
+        "systemMergeStatusFacts" -> mergeStatusFacts(params.getValue("fileId").jsonPrimitive.content)
+        "systemDeleteChunks" -> JsonHelper.jsonEncodeToElement(com.ismartcoding.plain.platform.deleteUploadedChunks(
             params.getValue("fileId").jsonPrimitive.content))
         "systemMergeChunks" -> startMerge(params, isAppFile = false)
         "systemMergeAppFileChunks" -> startMerge(params, isAppFile = true)
         "systemMediaAction" -> runMediaAction(params)
         "systemStopDiscovery" -> {
             com.ismartcoding.plain.discover.RustMdnsRuntime.control("stop")
-            JsonPrimitive(true)
+            JsonHelper.jsonEncodeToElement(true)
         }
         "systemStartDiscovery" -> {
             com.ismartcoding.plain.discover.RustMdnsRuntime.control("start")
-            JsonPrimitive(true)
+            JsonHelper.jsonEncodeToElement(true)
         }
-        "systemDiscoveryFacts" -> Json.parseToJsonElement(
-            JsonHelper.jsonEncode(com.ismartcoding.plain.discover.RustMdnsRuntime.snapshot()))
-        "systemDeviceInfoFacts" -> Json.parseToJsonElement(
-            JsonHelper.jsonEncode(com.ismartcoding.plain.platform.getDeviceInfo()))
-        "systemDeviceStatusFacts" -> Json.parseToJsonElement(
-            JsonHelper.jsonEncode(com.ismartcoding.plain.platform.getDeviceStatus()))
+        "systemDiscoveryFacts" -> JsonHelper.jsonEncodeToElement(com.ismartcoding.plain.discover.RustMdnsRuntime.snapshot())
+        "systemDeviceInfoFacts" -> JsonHelper.jsonEncodeToElement(com.ismartcoding.plain.platform.getDeviceInfo())
+        "systemDeviceStatusFacts" -> JsonHelper.jsonEncodeToElement(com.ismartcoding.plain.platform.getDeviceStatus())
         "systemAppFacts" -> appFacts()
         "systemAppLogFacts" -> appLogFacts(params)
         "systemClearAppLogs" -> {
             com.ismartcoding.plain.platform.clearLatestLogFile()
-            JsonPrimitive(true)
+            JsonHelper.jsonEncodeToElement(true)
         }
         "systemSetTempValue" -> {
             com.ismartcoding.plain.helpers.TempHelper.setValue(
                 params.getValue("key").jsonPrimitive.content, params.getValue("value").jsonPrimitive.content)
-            JsonPrimitive(true)
+            JsonHelper.jsonEncodeToElement(true)
         }
         "systemRelaunchApp" -> {
             com.ismartcoding.plain.lib.sendEvent(com.ismartcoding.plain.events.RestartAppEvent())
-            JsonPrimitive(true)
+            JsonHelper.jsonEncodeToElement(true)
         }
         "systemUpdateDeviceName" -> {
             val name = params.getValue("name").jsonPrimitive.content
             com.ismartcoding.plain.preferences.UserPrefs.deviceName.value = name
             com.ismartcoding.plain.TempData.deviceName.value = name
             com.ismartcoding.plain.discover.MdnsDiscoverManager.updateAdvertisedService()
-            JsonPrimitive(true)
+            JsonHelper.jsonEncodeToElement(true)
         }
         else -> error("Unsupported provider operation")
     }
@@ -707,12 +701,12 @@ object SystemProviderHost {
 /** Log lines, newest first. A non-blank `text` filters the whole buffer
  * before paging, so a search cannot be cut short by the page size; Rust
  * passes `pathOnly` when it wants the log file path instead. */
-private suspend fun appLogFacts(params: JsonObject): JsonObject {
+private suspend fun appLogFacts(params: JsonObject): JsonElement {
     if (params["pathOnly"]?.jsonPrimitive?.boolean == true) {
-        return buildJsonObject {
-            put("path", JsonPrimitive(com.ismartcoding.plain.platform.getLatestLogFilePath()))
-            put("lines", JsonArray(emptyList()))
-        }
+        return JsonHelper.jsonEncodeToElement(AppLogFacts(
+            path = com.ismartcoding.plain.platform.getLatestLogFilePath(),
+            lines = emptyList(),
+        ))
     }
     val offset = params.getValue("offset").jsonPrimitive.int
     val limit = params.getValue("limit").jsonPrimitive.int
@@ -721,75 +715,80 @@ private suspend fun appLogFacts(params: JsonObject): JsonObject {
         com.ismartcoding.plain.platform.readLogLinesNewestFirst(offset, limit)
     } else {
         com.ismartcoding.plain.platform.readLogLinesNewestFirst(0, Int.MAX_VALUE)
-            .filter { it.contains(text, ignoreCase = true) }
-            .drop(offset.coerceAtLeast(0))
-            .take(limit.coerceAtLeast(0))
+        .filter { it.contains(text, ignoreCase = true) }
+        .drop(offset.coerceAtLeast(0))
+        .take(limit.coerceAtLeast(0))
     }
-    return buildJsonObject {
-        put("path", JsonPrimitive(com.ismartcoding.plain.platform.getLatestLogFilePath()))
-        put("lines", JsonArray(lines.map(::JsonPrimitive)))
-    }
+    return JsonHelper.jsonEncodeToElement(AppLogFacts(
+        path = com.ismartcoding.plain.platform.getLatestLogFilePath(),
+        lines = lines,
+    ))
 }
 
 /** The `App` contract row. Capabilities and permissions are named rather
  * than encoded: both enums are the contract's own, so there is no mapping. */
 @OptIn(kotlin.io.encoding.ExperimentalEncodingApi::class)
-private suspend fun appFacts(): JsonObject = buildJsonObject {
-    put("clientId", JsonPrimitive(com.ismartcoding.plain.TempData.clientId))
-    put("urlToken", JsonPrimitive(kotlin.io.encoding.Base64.encode(com.ismartcoding.plain.TempData.urlToken)))
-    put("httpPort", JsonPrimitive(UserPrefs.httpPort.value))
-    put("httpsPort", JsonPrimitive(UserPrefs.httpsPort.value))
-    put("appDir", JsonPrimitive(com.ismartcoding.plain.platform.appDir()))
-    put("deviceName", JsonPrimitive(com.ismartcoding.plain.TempData.deviceName.value))
-    put("deviceType", JsonPrimitive(com.ismartcoding.plain.platform.getDeviceType().name))
-    put("capabilities", JsonArray(
-        com.ismartcoding.plain.platform.getDeviceCapabilities().map { JsonPrimitive(it.name) }))
-    put("buildChannel", JsonPrimitive(com.ismartcoding.plain.enums.AppChannelType
-        .fromString(com.ismartcoding.plain.buildChannel).name))
-    put("permissions", JsonArray(
-        com.ismartcoding.plain.features.getGrantedWebPermissionsAsync().map { JsonPrimitive(it.name) }))
-    put("downloadsDir", JsonPrimitive(com.ismartcoding.plain.platform.getDownloadsDirPath()))
-    put("developerMode", JsonPrimitive(UserPrefs.developerMode.value))
-    put("debug", JsonPrimitive(com.ismartcoding.plain.platform.isDebugBuild()))
-}
+private suspend fun appFacts(): JsonElement = JsonHelper.jsonEncodeToElement(AppFacts(
+    clientId = com.ismartcoding.plain.TempData.clientId,
+    urlToken = kotlin.io.encoding.Base64.encode(com.ismartcoding.plain.TempData.urlToken),
+    httpPort = UserPrefs.httpPort.value,
+    httpsPort = UserPrefs.httpsPort.value,
+    appDir = com.ismartcoding.plain.platform.appDir(),
+    deviceName = com.ismartcoding.plain.TempData.deviceName.value,
+    deviceType = com.ismartcoding.plain.platform.getDeviceType().name,
+    capabilities = com.ismartcoding.plain.platform.getDeviceCapabilities().map { it.name },
+    buildChannel = com.ismartcoding.plain.enums.AppChannelType
+        .fromString(com.ismartcoding.plain.buildChannel).name,
+    permissions = com.ismartcoding.plain.features.getGrantedWebPermissionsAsync().map { it.name },
+    downloadsDir = com.ismartcoding.plain.platform.getDownloadsDirPath(),
+    developerMode = UserPrefs.developerMode.value,
+    debug = com.ismartcoding.plain.platform.isDebugBuild(),
+))
 
 /** The `File` contract row. `mediaId` stays an empty string for non-media
  * entries; Rust maps that to `null` rather than carrying the sentinel. */
-private fun fileFacts(file: com.ismartcoding.plain.features.file.DFile): JsonObject = buildJsonObject {
-    put("name", JsonPrimitive(file.name)); put("path", JsonPrimitive(file.path))
-    put("mediaId", JsonPrimitive(file.mediaId))
-    put("createdAt", file.createdAt?.toEpochMilliseconds()?.let(::JsonPrimitive) ?: JsonNull)
-    put("updatedAt", file.updatedAt.toEpochMilliseconds())
-    put("size", JsonPrimitive(file.size)); put("isDir", JsonPrimitive(file.isDir))
-    put("childCount", JsonPrimitive(file.childCount))
-}
+private fun fileFacts(file: com.ismartcoding.plain.features.file.DFile): FileFacts = FileFacts(
+    name = file.name,
+    path = file.path,
+    mediaId = file.mediaId,
+    createdAt = file.createdAt?.toEpochMilliseconds(),
+    updatedAt = file.updatedAt.toEpochMilliseconds(),
+    size = file.size,
+    isDir = file.isDir,
+    childCount = file.childCount,
+)
 
-private fun locationFacts(location: com.ismartcoding.plain.httpserver.models.Location?): JsonElement =
+private fun locationFacts(location: com.ismartcoding.plain.httpserver.models.Location?): LocationFacts? =
     location?.let {
-        buildJsonObject {
-            put("latitude", JsonPrimitive(it.latitude)); put("longitude", JsonPrimitive(it.longitude))
-        }
-    } ?: JsonNull
+        LocationFacts(
+            latitude = it.latitude,
+            longitude = it.longitude,
+        )
+    }
 
-private fun fileInfoFacts(method: String, params: JsonObject): JsonObject {
+private fun fileInfoFacts(method: String, params: JsonObject): JsonElement {
     val path = params.getValue("path").jsonPrimitive.content
     return when (method) {
         "systemImageFileInfo" -> com.ismartcoding.plain.platform.loadImageInfo(path).let {
-            buildJsonObject {
-                put("width", JsonPrimitive(it.width)); put("height", JsonPrimitive(it.height))
-                put("location", locationFacts(it.location))
-            }
+            JsonHelper.jsonEncodeToElement(ImageInfoFacts(
+                width = it.width,
+                height = it.height,
+                location = locationFacts(it.location),
+            ))
         }
         "systemVideoFileInfo" -> com.ismartcoding.plain.platform.loadVideoInfo(path).let {
-            buildJsonObject {
-                put("width", JsonPrimitive(it.width)); put("height", JsonPrimitive(it.height))
-                put("durationMs", JsonPrimitive(it.durationMs)); put("location", locationFacts(it.location))
-            }
+            JsonHelper.jsonEncodeToElement(VideoInfoFacts(
+                width = it.width,
+                height = it.height,
+                durationMs = it.durationMs,
+                location = locationFacts(it.location),
+            ))
         }
         else -> com.ismartcoding.plain.platform.loadAudioInfo(path).let {
-            buildJsonObject {
-                put("durationMs", JsonPrimitive(it.durationMs)); put("location", locationFacts(it.location))
-            }
+            JsonHelper.jsonEncodeToElement(AudioInfoFacts(
+                durationMs = it.durationMs,
+                location = locationFacts(it.location),
+            ))
         }
     }
 }
@@ -800,90 +799,56 @@ private fun mediaDataType(params: JsonObject) =
 private fun fileSortBy(params: JsonObject) =
     com.ismartcoding.plain.features.file.FileSortBy.valueOf(params.getValue("sortBy").jsonPrimitive.content)
 
-/** One row of a library list. The three kinds share the `MediaItem`
- * fields; the per-kind extras ride along so a single decoder reads all
- * three lists, with a field a kind does not have reported as null rather
- * than omitted — an omitted field and a null one mean the same thing to
- * the client, but only one of them survives a round trip through a
- * positional row. */
-/** One channel mutation. The manager owns the delivery and the cache fan-out,
- * so the public root only has to name the action and read the result back. */
 private suspend fun chatChannelAction(params: JsonObject): JsonElement {
     val manager = com.ismartcoding.plain.chat.channel.ChannelManager
     val id = params["id"]?.jsonPrimitive?.content.orEmpty()
     val peer = params["peerId"]?.jsonPrimitive?.content.orEmpty()
     return when (params.getValue("action").jsonPrimitive.content) {
-        "create" -> Json.parseToJsonElement(JsonHelper.jsonEncode(
-            manager.createChannel(params.getValue("name").jsonPrimitive.content)))
-        "rename" -> Json.parseToJsonElement(JsonHelper.jsonEncode(manager.renameChannel(
-            id, params.getValue("name").jsonPrimitive.content)))
-        "delete" -> { manager.deleteChannel(id); JsonPrimitive(true) }
-        "leave" -> { manager.leaveChannel(id); JsonPrimitive(true) }
-        "invite" -> Json.parseToJsonElement(JsonHelper.jsonEncode(manager.inviteMember(id, peer)))
-        "kick" -> Json.parseToJsonElement(JsonHelper.jsonEncode(manager.kickMember(id, peer)))
-        "accept" -> { manager.acceptInvite(id); JsonPrimitive(true) }
-        "decline" -> { manager.declineInvite(id); JsonPrimitive(true) }
+        "create" -> JsonHelper.jsonEncodeToElement(
+            manager.createChannel(params.getValue("name").jsonPrimitive.content))
+        "rename" -> JsonHelper.jsonEncodeToElement(manager.renameChannel(
+            id, params.getValue("name").jsonPrimitive.content))
+        "delete" -> { manager.deleteChannel(id); JsonHelper.jsonEncodeToElement(true) }
+        "leave" -> { manager.leaveChannel(id); JsonHelper.jsonEncodeToElement(true) }
+        "invite" -> JsonHelper.jsonEncodeToElement(manager.inviteMember(id, peer))
+        "kick" -> JsonHelper.jsonEncodeToElement(manager.kickMember(id, peer))
+        "accept" -> { manager.acceptInvite(id); JsonHelper.jsonEncodeToElement(true) }
+        "decline" -> { manager.declineInvite(id); JsonHelper.jsonEncodeToElement(true) }
         else -> error("Unsupported channel action")
     }
 }
 
-private fun nearbyDevice(input: JsonObject) = com.ismartcoding.plain.data.DNearbyDevice(
-    id = input.getValue("id").jsonPrimitive.content,
-    name = input.getValue("name").jsonPrimitive.content,
-    ips = input["ips"]?.jsonArray?.map { it.jsonPrimitive.content } ?: emptyList(),
-    port = input.getValue("port").jsonPrimitive.int,
-    deviceType = com.ismartcoding.plain.enums.DeviceType.valueOf(
-        input.getValue("deviceType").jsonPrimitive.content),
-    version = input.getValue("version").jsonPrimitive.content,
-    platform = input.getValue("platform").jsonPrimitive.content,
-    lastSeen = kotlin.time.Instant.parse(input.getValue("lastSeen").jsonPrimitive.content),
-    discoveryMethods = input["discoveryMethods"]?.jsonArray
-        ?.map { com.ismartcoding.plain.enums.DiscoveryMethod.valueOf(it.jsonPrimitive.content) }
-        ?.toSet() ?: emptySet(),
+private fun nearbyDevice(input: JsonObject): com.ismartcoding.plain.data.DNearbyDevice =
+    JsonHelper.jsonDecodeFromElement(input)
+
+private fun pairingRequest(input: JsonObject): com.ismartcoding.plain.data.DPairingRequest =
+    JsonHelper.jsonDecodeFromElement(input)
+
+private fun playlistTrack(track: JsonObject): com.ismartcoding.plain.audio.DPlaylistAudio =
+    JsonHelper.jsonDecodeFromElement(track)
+
+private fun playlistTrackFacts(track: com.ismartcoding.plain.audio.DPlaylistAudio): PlaylistTrackFacts =
+    PlaylistTrackFacts(
+    title = track.title,
+    artist = track.artist,
+    path = track.path,
+    durationMs = track.durationMs,
 )
 
-private fun pairingRequest(input: JsonObject) = com.ismartcoding.plain.data.DPairingRequest(
-    fromId = input.getValue("fromId").jsonPrimitive.content,
-    fromName = input.getValue("fromName").jsonPrimitive.content,
-    port = input.getValue("port").jsonPrimitive.int,
-    deviceType = com.ismartcoding.plain.enums.DeviceType.valueOf(
-        input.getValue("deviceType").jsonPrimitive.content),
-    ecdhPublicKey = input.getValue("ecdhPublicKey").jsonPrimitive.content,
-    signaturePublicKey = input.getValue("signaturePublicKey").jsonPrimitive.content,
-    timestamp = input.getValue("timestamp").jsonPrimitive.long,
-    ips = input["ips"]?.jsonArray?.map { it.jsonPrimitive.content } ?: emptyList(),
-    signature = input["signature"]?.jsonPrimitive?.content.orEmpty(),
-    fromIp = input["fromIp"]?.jsonPrimitive?.content.orEmpty(),
-    awareSupported = input["awareSupported"]?.jsonPrimitive?.boolean ?: false,
-)
-
-/** The `AudioItem` contract row — the queue and playlist shape, which is a
- * subset of a library row: no id, no size, no bucket. */
-private fun playlistTrack(track: JsonObject) = com.ismartcoding.plain.audio.DPlaylistAudio(
-    title = track.getValue("title").jsonPrimitive.content,
-    path = track.getValue("path").jsonPrimitive.content,
-    artist = track.getValue("artist").jsonPrimitive.content,
-    durationMs = track.getValue("durationMs").jsonPrimitive.long,
-)
-
-private fun playlistTrackFacts(track: com.ismartcoding.plain.audio.DPlaylistAudio): JsonObject =
-    buildJsonObject {
-        put("title", JsonPrimitive(track.title)); put("artist", JsonPrimitive(track.artist))
-        put("path", JsonPrimitive(track.path)); put("durationMs", JsonPrimitive(track.durationMs))
-    }
-
-private fun mediaFacts(item: com.ismartcoding.plain.db.IData): JsonObject = when (item) {
-    is com.ismartcoding.plain.audio.DAudio -> buildJsonObject {
-        put("id", JsonPrimitive(item.id)); put("title", JsonPrimitive(item.title))
-        put("artist", JsonPrimitive(item.artist)); put("path", JsonPrimitive(item.path))
-        put("size", JsonPrimitive(item.size)); put("bucketId", JsonPrimitive(item.bucketId))
-        put("durationMs", JsonPrimitive(item.durationMs))
-        put("albumFileId", JsonPrimitive(
-            com.ismartcoding.plain.platform.getAudioAlbumArtFileId(item)))
-        put("createdAt", JsonPrimitive(item.createdAt.toString()))
-        put("updatedAt", JsonPrimitive(item.updatedAt.toString()))
-        put("isFavorite", JsonPrimitive(item.isFavorite))
-    }
+private fun mediaFacts(item: com.ismartcoding.plain.db.IData): JsonElement = when (item) {
+    is com.ismartcoding.plain.audio.DAudio -> JsonHelper.jsonEncodeToElement(AudioFacts(
+        id = item.id,
+        title = item.title,
+        artist = item.artist,
+        path = item.path,
+        size = item.size,
+        bucketId = item.bucketId,
+        durationMs = item.durationMs,
+        albumFileId = com.ismartcoding.plain.platform.getAudioAlbumArtFileId(item),
+        createdAt = item.createdAt.toString(),
+        updatedAt = item.updatedAt.toString(),
+        isFavorite = item.isFavorite,
+    ))
     is com.ismartcoding.plain.data.DImage -> mediaFacts(
         item.id, item.title, item.path, item.size, item.bucketId, item.createdAt, item.updatedAt,
         durationMs = 0L, takenAt = item.takenAt, isFavorite = item.isFavorite)
@@ -907,63 +872,69 @@ private fun mediaFacts(
     durationMs: Long,
     takenAt: kotlin.time.Instant?,
     isFavorite: Boolean,
-): JsonObject = buildJsonObject {
-    put("id", JsonPrimitive(id)); put("title", JsonPrimitive(title))
-    put("path", JsonPrimitive(path)); put("size", JsonPrimitive(size))
-    put("bucketId", JsonPrimitive(bucketId)); put("createdAt", JsonPrimitive(createdAt.toString()))
-    put("updatedAt", JsonPrimitive(updatedAt.toString()))
-    put("durationMs", JsonPrimitive(durationMs))
-    put("takenAt", takenAt?.let { JsonPrimitive(it.toString()) } ?: JsonNull)
-    put("isFavorite", JsonPrimitive(isFavorite))
-}
+): JsonElement = JsonHelper.jsonEncodeToElement(MediaFacts(
+    id = id,
+    title = title,
+    path = path,
+    size = size,
+    bucketId = bucketId,
+    createdAt = createdAt.toString(),
+    updatedAt = updatedAt.toString(),
+    durationMs = durationMs,
+    takenAt = takenAt?.let { it.toString() },
+    isFavorite = isFavorite,
+))
 
 /** One entry per key that actually has relations; keys with none are
  * omitted and Rust defaults them to an empty list, so an explicit empty
  * row would just be noise on the wire. */
-private suspend fun mediaTagFacts(params: JsonObject): JsonArray {
+private suspend fun mediaTagFacts(params: JsonObject): JsonElement {
     val type = mediaDataType(params)
     val keys = params.getValue("keys").jsonArray.map { it.jsonPrimitive.content }.toSet()
-    if (keys.isEmpty()) return JsonArray(emptyList())
+    if (keys.isEmpty()) return JsonHelper.jsonEncodeToElement(emptyList<String>())
     val relations = com.ismartcoding.plain.features.TagHelper
-        .getTagRelationsByKeys(keys, type).groupBy { it.key }
+    .getTagRelationsByKeys(keys, type).groupBy { it.key }
     val tags = com.ismartcoding.plain.features.TagHelper.getAll(type).associateBy { it.id }
-    return JsonArray(keys.mapNotNull { key ->
+    return JsonHelper.jsonEncodeToElement(keys.mapNotNull { key ->
         val ids = relations[key]?.map { it.tagId } ?: return@mapNotNull null
         if (ids.isEmpty()) return@mapNotNull null
-        buildJsonObject {
-            put("key", JsonPrimitive(key))
-            put("tags", JsonArray(ids.mapNotNull { tags[it] }.map { tag ->
-                buildJsonObject {
-                    put("id", JsonPrimitive(tag.id)); put("name", JsonPrimitive(tag.name))
-                    put("count", JsonPrimitive(tag.count))
-                }
-            }))
-        }
+        MediaTagsFacts(
+            key = key,
+            tags = ids.mapNotNull { tags[it] }.map { tag ->
+                TagFacts(
+                    id = tag.id,
+                    name = tag.name,
+                    count = tag.count,
+                )
+            },
+        )
     })
 }
 
-private suspend fun mergeStatusFacts(fileId: String): JsonObject {
+private suspend fun mergeStatusFacts(fileId: String): JsonElement {
     val task = MergeJobs.status(fileId)
-    return buildJsonObject {
-        put("status", JsonPrimitive(task.status.name))
-        put("value", task.value?.let(::JsonPrimitive) ?: JsonNull)
-        put("mergedSize", task.mergedSize?.let(::JsonPrimitive) ?: JsonNull)
-        put("error", task.error?.let(::JsonPrimitive) ?: JsonNull)
-    }
+    return JsonHelper.jsonEncodeToElement(MergeStatusFacts(
+        status = task.status.name,
+        value = task.value,
+        mergedSize = task.mergedSize,
+        error = task.error,
+    ))
 }
 
 /** Starts the merge and returns immediately. The claim makes a repeated
  * call idempotent, and the job table is what `mergeStatus` polls when the
  * websocket result is lost. */
-private suspend fun startMerge(params: JsonObject, isAppFile: Boolean): JsonObject {
+private suspend fun startMerge(params: JsonObject, isAppFile: Boolean): JsonElement {
     val fileId = params.getValue("fileId").jsonPrimitive.content
     val totalChunks = params.getValue("totalChunks").jsonPrimitive.int
     val totalSize = params.getValue("totalSize").jsonPrimitive.long
     when (val claim = MergeJobs.claim(fileId)) {
         is MergeClaim.AlreadyDone ->
-            return mergeStatusFacts(fileId)
+        return mergeStatusFacts(fileId)
         MergeClaim.InProgress ->
-            return buildJsonObject { put("status", JsonPrimitive("MERGING")) }
+        return JsonHelper.jsonEncodeToElement(MergeStartFacts(
+            status = "MERGING",
+        ))
         MergeClaim.Claimed -> {}
     }
     if (com.ismartcoding.plain.platform.listUploadedChunks(fileId).isEmpty()) {
@@ -1011,13 +982,15 @@ private suspend fun startMerge(params: JsonObject, isAppFile: Boolean): JsonObje
         }
         if (message != null) error(message)
     }
-    return buildJsonObject { put("status", JsonPrimitive("STARTED")) }
+    return JsonHelper.jsonEncodeToElement(MergeStartFacts(
+        status = "STARTED",
+    ))
 }
 
 /** Each action resolves its own id source: a restore looks in the trash,
  * a trash or a move looks in the live library, and only a delete has to
  * ask whether the trash feature is on at all. */
-private suspend fun runMediaAction(params: JsonObject): JsonPrimitive {
+private suspend fun runMediaAction(params: JsonObject): JsonElement {
     val action = params.getValue("action").jsonPrimitive.content
     val type = mediaDataType(params)
     val query = params.getValue("query").jsonPrimitive.content
@@ -1028,7 +1001,7 @@ private suspend fun runMediaAction(params: JsonObject): JsonPrimitive {
         fromTrash -> com.ismartcoding.plain.platform.getTrashedMediaIds(type, query)
         else -> com.ismartcoding.plain.platform.getMediaIds(type, query)
     }
-    return JsonPrimitive(com.ismartcoding.plain.features.mediaactions.MediaActionHelper.run(
+    return JsonHelper.jsonEncodeToElement(com.ismartcoding.plain.features.mediaactions.MediaActionHelper.run(
         type,
         com.ismartcoding.plain.features.mediaactions.MediaAction.valueOf(action.uppercase()),
         ids,
