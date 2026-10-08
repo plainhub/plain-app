@@ -25,7 +25,7 @@ class SystemProviderSerializationTest {
     fun mediaFactsKeepStringTimestampsAndNullableTakenAt() {
         val facts = MediaFacts("1", "Photo", "/photo", 9, "2", "2026-10-08T00:00:00Z", "2026-10-08T00:00:00Z", 0, null, true)
         assertEquals(
-            """{"id":"1","title":"Photo","path":"/photo","size":9,"bucketId":"2","createdAt":"2026-10-08T00:00:00Z","updatedAt":"2026-10-08T00:00:00Z","durationMs":0,"takenAt":null,"isFavorite":true}""",
+            """{"id":"1","title":"Photo","path":"/photo","size":9,"bucketId":"2","createdAt":"2026-10-08T00:00:00Z","updatedAt":"2026-10-08T00:00:00Z","durationMs":0,"takenAt":null,"isFavorite":true,"width":0,"height":0,"rotation":0}""",
             JsonHelper.jsonEncode(facts),
         )
     }
