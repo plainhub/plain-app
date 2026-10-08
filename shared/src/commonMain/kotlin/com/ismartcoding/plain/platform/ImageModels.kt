@@ -1,7 +1,7 @@
 package com.ismartcoding.plain.platform
 
-internal expect fun imageModelsAvailableOnPlatform(): Boolean
-internal expect suspend fun loadImageModels(files: ImageModelsFiles)
-internal expect suspend fun closeImageModels()
+internal expect suspend fun observeImageModels(enabled: Boolean)
 
-internal expect suspend fun embedImageSearchText(tokenIds: List<Int>): FloatArray
+suspend fun releaseImageModelMemory() {
+    com.ismartcoding.plain.ai.RustImageModels.call(com.ismartcoding.plain.ai.ImageModelsCommand.Release)
+}

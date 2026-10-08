@@ -8,7 +8,6 @@ object ImageSearchManager {
     val downloadProgress = RustImageModels.snapshot.map { it.downloadProgress }
     val errorMessage = RustImageModels.snapshot.map { it.errorMessage }
     fun getModelDir(): String = RustImageModels.snapshot.value.modelDir
-    fun imageModelPath(): String = RustImageModels.snapshot.value.imageModel
     fun isModelReady(): Boolean = RustImageModels.snapshot.value.status == ImageSearchStatusType.READY
     suspend fun restoreIfEnabled() { RustImageModels.call(ImageModelsCommand.Restore) }
     suspend fun enableAsync() { RustImageModels.call(ImageModelsCommand.Enable) }

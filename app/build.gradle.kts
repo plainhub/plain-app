@@ -88,7 +88,7 @@ android {
             // NOTE: Do NOT set CHANNEL here. Build-type buildConfigFields override
             // product-flavor values in AGP, which would mask the real flavor
             // (e.g. fdroidDebug would report CHANNEL="GITHUB" instead of "FDROID",
-            // hiding the fact that LiteRT stubs are in use). The flavor's own
+            // hiding the selected distribution channel). The flavor's own
             // CHANNEL field is authoritative.
             setProguardFiles(listOf(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro"))
         }
@@ -152,6 +152,7 @@ android {
 
 val rustCoreDir = rootProject.file("plain-rs")
 val rustTargetDir = layout.buildDirectory.dir("rust-target")
+val onnxRuntimeDir = layout.buildDirectory.dir("onnxruntime")
 val rustAbi = providers.gradleProperty("abiFilters").orNull?.split(';')?.singleOrNull() ?: "arm64-v8a"
 val rustAndroidTarget = when (rustAbi) {
     "arm64-v8a" -> "aarch64-linux-android"
@@ -175,6 +176,7 @@ val clangTarget = when (rustAndroidTarget) {
     else -> rustAndroidTarget
 }
 val androidClang = File(ndkHost, "bin/${clangTarget}28-clang")
+val libcxxTarget = if (rustAbi == "armeabi-v7a") "arm-linux-androideabi" else rustAndroidTarget
 
 val installRustAndroidTarget by tasks.registering(Exec::class) {
     commandLine("rustup", "target", "add", rustAndroidTarget)
@@ -186,7 +188,11 @@ val buildPlainRustAndroid by tasks.registering(Exec::class) {
     inputs.file(File(rustCoreDir, "Cargo.lock"))
     inputs.dir(File(rustCoreDir, "src"))
     outputs.file(rustTargetDir.map { it.file("$rustAndroidTarget/release/libplain_rust.so") })
+    outputs.file(onnxRuntimeDir.map { it.file("libonnxruntime.so") })
     environment("CARGO_TARGET_DIR", rustTargetDir.get().asFile.absolutePath)
+    environment("ANDROID_HOME", androidSdk.absolutePath)
+    environment("ANDROID_NDK_HOME", androidNdk.absolutePath)
+    environment("PLAIN_ONNX_RUNTIME_DIR", onnxRuntimeDir.get().asFile.absolutePath)
     environment("CARGO_TARGET_${rustAndroidTarget.uppercase().replace('-', '_')}_LINKER", androidClang.absolutePath)
     environment("CC_${rustAndroidTarget.replace('-', '_')}", androidClang.absolutePath)
     environment("AR_${rustAndroidTarget.replace('-', '_')}", File(ndkHost, "bin/llvm-ar").absolutePath)
@@ -197,9 +203,21 @@ val buildPlainRustAndroid by tasks.registering(Exec::class) {
 val packagePlainRustAndroid by tasks.registering(Sync::class) {
     dependsOn(buildPlainRustAndroid)
     from(rustTargetDir.map { it.file("$rustAndroidTarget/release/libplain_rust.so") })
+    from(onnxRuntimeDir.map { it.file("libonnxruntime.so") })
+    from(File(ndkHost, "sysroot/usr/lib/$libcxxTarget/libc++_shared.so"))
     into(layout.buildDirectory.dir("generated/rustJniLibs"))
     eachFile { path = "$rustAbi/$name" }
     includeEmptyDirs = false
+}
+
+val packageOnnxRuntimeLicenses by tasks.registering(Sync::class) {
+    dependsOn(buildPlainRustAndroid)
+    from(onnxRuntimeDir) { include("LICENSE", "ThirdPartyNotices.txt") }
+    into(layout.buildDirectory.dir("generated/onnxLicenses/onnxruntime"))
+}
+android.sourceSets.getByName("main").assets.srcDir(layout.buildDirectory.dir("generated/onnxLicenses").get().asFile)
+tasks.matching { it.name.startsWith("merge") && it.name.endsWith("Assets") }.configureEach {
+    dependsOn(packageOnnxRuntimeLicenses)
 }
 
 tasks.matching { it.name.startsWith("merge") && it.name.endsWith("JniLibFolders") }.configureEach {
@@ -281,13 +299,6 @@ dependencies {
     debugImplementation(libs.androidx.work.multiprocess)
     implementation(kotlin("stdlib", libs.versions.kotlin.get()))
 
-    // AI Image Search: both MediaPipe and LiteRT are excluded from fdroid
-    // to pass F-Droid FOSS checks (com.google.ai.edge.litert is non-FLOSS
-    // after 1.2.0 — see issue #333). The shared module compiles against
-    // local stubs (project(":litert-stubs")); github/google flavors provide
-    // the real runtime here.
     "githubImplementation"(libs.mediapipe.tasks.vision)
     "googleImplementation"(libs.mediapipe.tasks.vision)
-    "githubImplementation"(libs.litert)
-    "googleImplementation"(libs.litert)
 }

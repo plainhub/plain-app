@@ -51,6 +51,7 @@ kotlin {
     iosTargets.forEach { iosTarget ->
         val rustTarget = if (iosTarget.name == "iosArm64") "aarch64-apple-ios" else "aarch64-apple-ios-sim"
         val rustTargetDir = layout.buildDirectory.dir("rust-target")
+        val onnxRuntimeDir = layout.buildDirectory.dir("onnxruntime/$rustTarget")
         val installRustTarget = tasks.register<Exec>("installPlainRustTarget${iosTarget.name.replaceFirstChar { it.uppercase() }}") {
             commandLine("rustup", "target", "add", rustTarget)
         }
@@ -61,6 +62,7 @@ kotlin {
             inputs.dir(rootProject.file("plain-rs/src"))
             outputs.file(rustTargetDir.map { it.file("$rustTarget/release/libplain_rust.a") })
             environment("CARGO_TARGET_DIR", rustTargetDir.get().asFile.absolutePath)
+            environment("PLAIN_ONNX_RUNTIME_DIR", onnxRuntimeDir.get().asFile.absolutePath)
             commandLine("cargo", "build", "--locked", "--manifest-path", rootProject.file("plain-rs/Cargo.toml"), "--release", "--target", rustTarget)
         }
         iosTarget.compilations.getByName("main").cinterops.create("plainPrefs") {
@@ -74,7 +76,7 @@ kotlin {
             baseName = "PlainShared"
             isStatic = true
             debuggable = kotlinDebuggable
-            linkerOpts("-L${rustTargetDir.get().asFile.absolutePath}/$rustTarget/release", "-lplain_rust")
+            linkerOpts("-L${rustTargetDir.get().asFile.absolutePath}/$rustTarget/release", "-lplain_rust", "-L${onnxRuntimeDir.get().asFile.absolutePath}", "-lonnxruntime", "-lc++", "-framework", "Foundation", "-framework", "CoreML", "-framework", "Accelerate")
         }
         tasks.matching { it.name.startsWith("link") && it.name.contains(iosTarget.name.replaceFirstChar { c -> c.uppercase() }) }.configureEach {
             dependsOn(buildPlainRust)
@@ -164,11 +166,7 @@ kotlin {
             // Transitions (UI animations)
             implementation(libs.androidx.transition)
 
-            // LiteRT (AI image search) — compileOnly stubs; real runtime provided by
-            // app flavors (github/google). Declaring a local FLOSS stubs module here
-            // instead of `libs.litert` keeps the non-FLOSS artifact out of the shared
-            // module's dependency tree so F-Droid's scanner doesn't flag it.
-            compileOnly(project(":litert-stubs"))
+
         }
         iosMain.dependencies {
             implementation(libs.coil)

@@ -47,7 +47,6 @@ devtoolsKspVersion = "2.3.12"
 tinkAndroidVersion = "1.23.0"
 playPublisherVersion = "4.1.1"
 mediapipeVisionVersion = "1.0.0"
-liteRtVersion = "2.2.0"
 pdfiumAndroidVersion = "1.9.5-beta01"
 androidxTestRunner = "1.7.0"
 androidxTestRules = "1.7.0"
@@ -164,7 +163,6 @@ shizuku-aidl = { module = "dev.rikka.shizuku:aidl", version.ref = "shizukuVersio
 leakcanary-android = { module = "com.squareup.leakcanary:leakcanary-android", version.ref = "leakcanaryAndroidVersion" }
 tink-android = { module = "com.google.crypto.tink:tink-android", version.ref = "tinkAndroidVersion" }
 mediapipe-tasks-vision = { module = "com.google.mediapipe:tasks-vision", version.ref = "mediapipeVisionVersion" }
-litert = { module = "com.google.ai.edge.litert:litert", version.ref = "liteRtVersion" }
 pdfium-android = { module = "io.github.oothp:pdfium-android", version.ref = "pdfiumAndroidVersion" }
 
 

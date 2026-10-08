@@ -54,7 +54,7 @@ object ImageIndexManager {
         observer?.let { appContext.contentResolver.unregisterContentObserver(it) }
         observer = null
         sending.withLock { while (requests.tryReceive().isSuccess) { } }
-        ImageIndexInference.disconnect()
+        ImageIndexCatalog.close()
     }
     fun enqueueAdd(ids: Set<String>) { if (ids.isNotEmpty() && active) send(Action.Add(ids)) }
     fun enqueueRemove(ids: Set<String>) { if (ids.isNotEmpty()) send(Action.Remove(ids)) }

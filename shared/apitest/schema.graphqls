@@ -194,6 +194,7 @@ type Mutation {
   """Queue the whole audio library and start playback (first track, or shuffled order when `shuffle` is set). Returns the item that starts playing, null when the library is empty."""
   playAllAudios(shuffle: Boolean!): AudioItem
   enableImageSearch: Boolean!
+  importImageSearchModel: Boolean!
   disableImageSearch: Boolean!
   cancelImageModelDownload: Boolean!
   startImageIndex(force: Boolean): Boolean!

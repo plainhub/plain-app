@@ -51,10 +51,7 @@ object SystemProviderHost {
         "systemRequestScreenMirrorAudio",
         "systemRequestScreenMirrorKeyFrame",
         "systemUpdateScreenMirrorQuality" -> SystemScreenMirrorHost.handle(method, params)
-        "systemImageTextEmbed",
-        "systemImageModelAvailability",
-        "systemImageModelsLoad",
-        "systemImageModelsClose" -> SystemImageSearchHost.handle(method, params)
+        "systemImageModelsObserve" -> SystemImageSearchHost.handle(method, params)
         "systemCastAddressFacts" -> com.ismartcoding.plain.platform.CastHost.handle(method, params)
         "systemFileResource" -> com.ismartcoding.plain.platform.FileResourceHost.handle(params)
         "zipItemsFacts",
