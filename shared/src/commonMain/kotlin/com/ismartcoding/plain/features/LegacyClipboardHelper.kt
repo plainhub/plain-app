@@ -82,6 +82,6 @@ object LegacyClipboardHelper {
 
     /** Resolves a source client id to the peer name; empty source = this device. */
     suspend fun getSourceName(source: String): String = withIO {
-        if (source.isBlank()) "" else AppDatabase.instance.peerDao().getById(source)?.name ?: source
+        if (source.isBlank()) "" else com.ismartcoding.plain.chat.peer.RustPeerStore.getById(source)?.name ?: source
     }
 }

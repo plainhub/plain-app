@@ -43,8 +43,8 @@ object PeerManager {
         PeerCacher.load()
         PeerCacher.setOnlineMap(
             PeerCacher.peersMap.value.values
-                .filter { it.peer.isPaired() }
-                .associate { it.peer.id to PeerStatusManager.isOnline(it.peer.id) }
+                .filter { it.isPaired() }
+                .associate { it.id to PeerStatusManager.isOnline(it.id) }
         )
     }
 }

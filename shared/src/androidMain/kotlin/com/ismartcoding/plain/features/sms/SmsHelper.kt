@@ -28,7 +28,7 @@ import com.ismartcoding.plain.helpers.QueryHelper
 import com.ismartcoding.plain.events.EventType
 import com.ismartcoding.plain.events.SmsSendResultData
 import com.ismartcoding.plain.events.WebSocketEvent
-import com.ismartcoding.plain.httpserver.websocket.WebSocketHelper
+import com.ismartcoding.plain.api.WebSocketHelper
 import com.ismartcoding.plain.lib.JsonHelper
 import kotlinx.serialization.json.*
 import com.ismartcoding.plain.lib.TimeHelper

@@ -49,8 +49,6 @@ import com.ismartcoding.plain.platform.audioPlay
 import com.ismartcoding.plain.ui.page.audioplayer.components.AudioPlayerCover
 import org.jetbrains.compose.resources.painterResource
 import com.ismartcoding.plain.ui.resources.Res as UiRes
-import com.ismartcoding.plain.ui.resources.pause as ui_drawable_pause
-import com.ismartcoding.plain.ui.resources.play_arrow as ui_drawable_play_arrow
 import com.ismartcoding.plain.i18n.pause
 
 internal enum class PlayerView { COVER, LYRICS }

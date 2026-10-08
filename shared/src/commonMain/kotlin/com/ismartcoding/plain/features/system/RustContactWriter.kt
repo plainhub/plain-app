@@ -1,7 +1,7 @@
 package com.ismartcoding.plain.features.system
 
 import com.ismartcoding.plain.api.RustContentApi
-import com.ismartcoding.plain.httpserver.models.ContactInput
+import com.ismartcoding.plain.features.contact.ContactInput
 import com.ismartcoding.plain.lib.JsonHelper
 import kotlinx.serialization.json.*
 

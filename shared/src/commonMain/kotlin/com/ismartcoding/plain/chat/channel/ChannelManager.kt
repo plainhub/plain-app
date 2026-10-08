@@ -1,39 +1,36 @@
 package com.ismartcoding.plain.chat.channel
 
-
 import com.ismartcoding.plain.chat.ChatManager
 import com.ismartcoding.plain.chat.peer.GraphQLResponse
 import com.ismartcoding.plain.db.DChatChannel
 import com.ismartcoding.plain.lib.withIO
-
-import kotlinx.serialization.json.put
+import kotlinx.serialization.json.JsonObject
 
 object ChannelManager {
-
-    private suspend fun mutate(action: String, id: String? = null, fields: kotlinx.serialization.json.JsonObjectBuilder.() -> Unit = {}): kotlinx.serialization.json.JsonObject {
-        val result = RustChannelRuntime.call(action, id, fields)
+    private suspend fun mutate(command: ChannelCommand): JsonObject {
+        val result = RustChannelRuntime.call(command)
         ChannelCacher.load()
         ChatManager.refreshLatestChats()
         return result
     }
 
     suspend fun createChannel(name: String): DChatChannel = withIO {
-        RustChannelRuntime.channel(mutate("create") { put("name", name) })
+        RustChannelRuntime.channel(mutate(ChannelCommand.Create(name)))
     }
     suspend fun renameChannel(channelId: String, newName: String): DChatChannel = withIO {
-        RustChannelRuntime.channel(mutate("rename", channelId) { put("name", newName) })
+        RustChannelRuntime.channel(mutate(ChannelCommand.Rename(channelId, newName)))
     }
-    suspend fun deleteChannel(channelId: String) { withIO { mutate("delete", channelId) } }
-    suspend fun leaveChannel(channelId: String) { withIO { mutate("leave", channelId) } }
+    suspend fun deleteChannel(channelId: String) { withIO { mutate(ChannelCommand.Delete(channelId)) } }
+    suspend fun leaveChannel(channelId: String) { withIO { mutate(ChannelCommand.Leave(channelId)) } }
     suspend fun inviteMember(channelId: String, peerId: String): DChatChannel = withIO {
-        RustChannelRuntime.channel(mutate("invite", channelId) { put("peer", peerId) })
+        RustChannelRuntime.channel(mutate(ChannelCommand.Invite(channelId, peerId)))
     }
-    suspend fun resendInvite(channelId: String, peerId: String) { withIO { mutate("resend", channelId) { put("peer", peerId) } } }
+    suspend fun resendInvite(channelId: String, peerId: String) { withIO { mutate(ChannelCommand.Resend(channelId, peerId)) } }
     suspend fun kickMember(channelId: String, peerId: String): DChatChannel = withIO {
-        RustChannelRuntime.channel(mutate("kick", channelId) { put("peer", peerId) })
+        RustChannelRuntime.channel(mutate(ChannelCommand.Kick(channelId, peerId)))
     }
     suspend fun acceptInvite(channelId: String): GraphQLResponse = withIO {
-        RustChannelRuntime.response(mutate("accept", channelId))
+        RustChannelRuntime.response(mutate(ChannelCommand.Accept(channelId)))
     }
-    suspend fun declineInvite(channelId: String) { withIO { mutate("decline", channelId) } }
+    suspend fun declineInvite(channelId: String) { withIO { mutate(ChannelCommand.Decline(channelId)) } }
 }

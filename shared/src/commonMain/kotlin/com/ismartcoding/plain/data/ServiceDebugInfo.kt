@@ -4,8 +4,8 @@ import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.ble.BleUuids
 import com.ismartcoding.plain.ble.PairingTransport
 import com.ismartcoding.plain.features.dlna.DlnaRendererState
-import com.ismartcoding.plain.httpserver.HttpServerManager
-import com.ismartcoding.plain.httpserver.onlineClientIds
+import com.ismartcoding.plain.platform.HttpServerManager
+import com.ismartcoding.plain.features.session.onlineClientIds
 import com.ismartcoding.plain.platform.getAwareAttachStatus
 import com.ismartcoding.plain.platform.getAwareDiscoveredPeerCount
 import com.ismartcoding.plain.platform.isHttpServerRunning

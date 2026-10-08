@@ -63,8 +63,6 @@ object UserPrefs {
     val notificationFilter = flow("notification_filter", "")
     val pomodoroSettings = flow("pomodoro_settings", "")
     val videoPlaylist = flow("video_playlist", "")
-    val dlnaAllowedSenders = flow("dlna_allowed_senders", setOf<String>())
-    val dlnaDeniedSenders = flow("dlna_denied_senders", setOf<String>())
     val homeFeatures = flow("home_features_v2", listOf(AppFeatureType.IMAGES, AppFeatureType.VIDEOS, AppFeatureType.AUDIO, AppFeatureType.DOCS, AppFeatureType.FILES, AppFeatureType.NOTES, AppFeatureType.FEEDS).joinToString("|") { it.name })
     val quickNoteDraft = flow("quick_note_draft", "")
     val launcherShortcuts = flow("launcher_shortcuts_v1", com.ismartcoding.plain.ui.nav.LauncherShortcutTools.DEFAULT.joinToString("|") { it.name })
@@ -128,11 +126,6 @@ object UserPrefs {
     fun setVideoPlaylist(value: List<DVideo>) { videoPlaylist.value = Prefs.json.encodeToString(value) }
     fun deleteVideos(paths: Set<String>) { setVideoPlaylist(videoPlaylistValue().filterNot { it.path in paths }) }
 
-    fun addAllowedDlnaSender(ip: String, name: String) { dlnaAllowedSenders.value = Prefs.senderEntriesWith(dlnaAllowedSenders.value, ip, name) }
-    fun removeAllowedDlnaSender(ip: String) { dlnaAllowedSenders.value = Prefs.senderEntriesWithout(dlnaAllowedSenders.value, ip) }
-    fun addDeniedDlnaSender(ip: String, name: String) { dlnaDeniedSenders.value = Prefs.senderEntriesWith(dlnaDeniedSenders.value, ip, name) }
-    fun removeDeniedDlnaSender(ip: String) { dlnaDeniedSenders.value = Prefs.senderEntriesWithout(dlnaDeniedSenders.value, ip) }
-    fun containsDlnaSender(entries: Set<String>, ip: String) = entries.any { Prefs.decodeSenderEntry(it).first == ip }
 
     fun parseFeatures(value: String): List<String> = parseNames(value)
     fun formatFeatures(value: List<String>): String = value.joinToString("|")

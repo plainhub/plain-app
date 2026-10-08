@@ -8,13 +8,13 @@ import com.ismartcoding.plain.lib.extensions.getIntValue
 import com.ismartcoding.plain.lib.extensions.getStringValue
 import com.ismartcoding.plain.lib.extensions.normalizePhoneNumber
 import com.ismartcoding.plain.lib.extensions.queryCursor
-import com.ismartcoding.plain.httpserver.models.ContactAddressInput
-import com.ismartcoding.plain.httpserver.models.ContactEmailInput
-import com.ismartcoding.plain.httpserver.models.ContactEventInput
-import com.ismartcoding.plain.httpserver.models.ContactImInput
-import com.ismartcoding.plain.httpserver.models.ContactPhoneInput
-import com.ismartcoding.plain.httpserver.models.ContactWebsiteInput
-import com.ismartcoding.plain.httpserver.models.OrganizationInput
+import com.ismartcoding.plain.features.contact.ContactAddressInput
+import com.ismartcoding.plain.features.contact.ContactEmailInput
+import com.ismartcoding.plain.features.contact.ContactEventInput
+import com.ismartcoding.plain.features.contact.ContactImInput
+import com.ismartcoding.plain.features.contact.ContactPhoneInput
+import com.ismartcoding.plain.features.contact.ContactWebsiteInput
+import com.ismartcoding.plain.features.contact.OrganizationInput
 import java.util.ArrayList
 
 data class Content(

@@ -3,7 +3,6 @@ package com.ismartcoding.plain.chat
 import com.ismartcoding.plain.lib.withIO
 import com.ismartcoding.plain.chat.data.ChatTarget
 import com.ismartcoding.plain.db.DChat
-import com.ismartcoding.plain.db.DChatChannel
 import com.ismartcoding.plain.db.DMessageContent
 import com.ismartcoding.plain.db.DMessageFile
 
@@ -25,24 +24,7 @@ object ChatManager {
     suspend fun sharePicked(target: ChatTarget, uris: List<String>, images: Boolean, normalize: Boolean): Boolean =
         RustChatService.share(listOf(target), uris, null, null, images, normalize)
 
-    suspend fun createChatItem(target: ChatTarget, content: DMessageContent): DChat = withIO {
-        val item = RustChatService.create(target, content)
-        refreshLatestChats()
-        item
-    }
-
-    suspend fun sendMessage(item: DChat, target: ChatTarget, onlinePeerIds: Set<String>) = withIO {
-        ChatSender.send(item)
-    }
-
-    suspend fun resendMessage(item: DChat) = withIO {
-        ChatSender.send(item)
-        ChatViewModel.onMessageUpdated(item.id)
-    }
-
-    suspend fun sendToChannelMembers(item: DChat, channel: DChatChannel, peerIds: List<String>) = withIO {
-        ChatSender.sendToChannelMembers(item, peerIds)
-    }
+    suspend fun deliver(id: String, recipients: List<String>? = null): DChat = RustChatService.deliver(id, recipients)
 
     suspend fun insertFilesImmediate(target: ChatTarget, files: List<DMessageFile>, isImageVideo: Boolean): DChat = withIO {
         val item = RustChatService.createFiles(target, files, isImageVideo)
@@ -53,8 +35,6 @@ object ChatManager {
     suspend fun updateFilesMessage(
         messageId: String,
         files: List<DMessageFile>,
-        target: ChatTarget,
-        onlinePeerIds: Set<String>,
     ): DChat? = withIO {
         val item = RustChatService.replaceFiles(messageId, files)
         refreshLatestChats()

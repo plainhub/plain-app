@@ -23,7 +23,7 @@ import com.ismartcoding.plain.platform.Permission
 import com.ismartcoding.plain.platform.isGranted
 import com.ismartcoding.plain.platform.isEnabledAsync
 import com.ismartcoding.plain.packageManager
-import com.ismartcoding.plain.httpserver.models.toModel
+import com.ismartcoding.plain.features.notification.RustNotificationEvents
 import com.ismartcoding.plain.events.EventType
 import com.ismartcoding.plain.events.WebSocketEvent
 import com.ismartcoding.plain.lib.receiveEventHandler
@@ -76,22 +76,8 @@ class PNotificationListenerService : NotificationListenerService() {
             } else {
                 AndroidTempData.notificationActions.remove(n.id)
             }
-            coIO {
-                val enable = Permission.NOTIFICATION_LISTENER.isEnabledAsync()
-                if (enable) {
-                    val isAllowed = UserPrefs.isNotificationAllowed(statusBarNotification.packageName)
-                    if (isAllowed) {
-                        sendEvent(
-                            WebSocketEvent(
-                                if (old == null) EventType.NOTIFICATION_CREATED else EventType.NOTIFICATION_UPDATED,
-                                JsonHelper.jsonEncode(
-                                    n.toModel()
-                                ),
-                            )
-                        )
-                    }
-                }
-            }
+            coIO { RustNotificationEvents.publish(if (old == null) EventType.NOTIFICATION_CREATED else EventType.NOTIFICATION_UPDATED, n) }
+
         }
     }
 
@@ -101,14 +87,7 @@ class PNotificationListenerService : NotificationListenerService() {
             if (old != null) {
                 AndroidTempData.notifications.remove(old)
                 AndroidTempData.notificationActions.remove(old.id)
-                sendEvent(
-                    WebSocketEvent(
-                        EventType.NOTIFICATION_DELETED,
-                        JsonHelper.jsonEncode(
-                            old.toModel()
-                        ),
-                    )
-                )
+                coIO { RustNotificationEvents.publish(EventType.NOTIFICATION_DELETED, old) }
             }
         }
     }
@@ -237,4 +216,3 @@ class PNotificationListenerService : NotificationListenerService() {
         }
     }
 }
-

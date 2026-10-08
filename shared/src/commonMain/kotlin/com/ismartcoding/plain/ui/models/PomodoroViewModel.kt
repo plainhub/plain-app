@@ -7,7 +7,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ismartcoding.plain.data.DPomodoroSettings
 import com.ismartcoding.plain.features.PomodoroHelper
-import com.ismartcoding.plain.httpserver.models.PomodoroToday
+import com.ismartcoding.plain.ui.page.pomodoro.PomodoroToday
 import com.ismartcoding.plain.db.DPomodoroItem
 import com.ismartcoding.plain.lib.TimeHelper
 import com.ismartcoding.plain.ui.page.pomodoro.PomodoroState

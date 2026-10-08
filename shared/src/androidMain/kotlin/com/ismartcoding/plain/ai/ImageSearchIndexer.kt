@@ -32,7 +32,6 @@ object ImageSearchIndexer {
         isRunning = status.getValue("isRunning").jsonPrimitive.boolean
         totalImages = status.getValue("totalImages").jsonPrimitive.int
         indexedImages = status.getValue("indexedImages").jsonPrimitive.int
-        ImageSearchManager.setIndexError(status.string("errorMessage"))
         sendEvent(ImageIndexProgressEvent(totalImages,indexedImages,isRunning))
     }
 }

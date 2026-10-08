@@ -26,7 +26,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
-import com.ismartcoding.plain.audio.DAudio
+import com.ismartcoding.plain.features.dlna.sender.CastItem
 import com.ismartcoding.plain.db.IMedia
 import com.ismartcoding.plain.lib.withIO
 import com.ismartcoding.plain.i18n.Res
@@ -46,8 +46,6 @@ import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import kotlin.text.ifEmpty
 import com.ismartcoding.plain.ui.resources.Res as UiRes
-import com.ismartcoding.plain.ui.resources.file as ui_drawable_file
-import com.ismartcoding.plain.ui.resources.playlist_remove as ui_drawable_playlist_remove
 import com.ismartcoding.plain.i18n.file
 
 @Composable
@@ -60,7 +58,7 @@ fun CastSessionPlaylistItem(
     var subtitle by remember { mutableStateOf("") }
 
     LaunchedEffect(item.path) {
-        if (item is DAudio) {
+        if (item is CastItem && item.audio) {
             val (t, a) = withIO { getAudioMetadata(item.path) }
             title = t; subtitle = a
         } else {

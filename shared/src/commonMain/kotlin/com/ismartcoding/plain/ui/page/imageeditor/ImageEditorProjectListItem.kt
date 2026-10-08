@@ -33,7 +33,7 @@ import com.ismartcoding.plain.ui.resources.image as ui_drawable_image
 
 @Composable
 fun ImageEditorProjectListItem(
-    project: com.ismartcoding.plain.httpserver.models.ImageEditorProjectSummary,
+    project: com.ismartcoding.plain.features.imageeditor.ImageEditorProjectSummary,
     onClick: () -> Unit,
 ) {
     Row(

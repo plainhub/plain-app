@@ -23,7 +23,6 @@ import com.ismartcoding.plain.lib.ChannelEvent
 import com.ismartcoding.plain.lib.sendEvent
 import com.ismartcoding.plain.platform.Permission
 import com.ismartcoding.plain.platform.audioPause
-import com.ismartcoding.plain.platform.buildImageSearchStatus
 import com.ismartcoding.plain.platform.cancelImageModelDownload
 import com.ismartcoding.plain.platform.cancelUpdateDownloadAsync
 import com.ismartcoding.plain.platform.disableImageSearchAsync
@@ -34,25 +33,20 @@ import com.ismartcoding.plain.platform.restartAudioIfPlaying
 import com.ismartcoding.plain.platform.sendChatMessageNotification
 import com.ismartcoding.plain.platform.setBluetoothCanContinue
 import com.ismartcoding.plain.platform.startHttpServerService
-import com.ismartcoding.plain.platform.startMmsPolling
 import com.ismartcoding.plain.ui.models.FolderOption
-import com.ismartcoding.plain.httpserver.AuthRequest
-import com.ismartcoding.plain.httpserver.WsSessionHandle
-import com.ismartcoding.plain.httpserver.websocket.WebSocketHelper
+import com.ismartcoding.plain.features.session.AuthRequest
+import com.ismartcoding.plain.api.WebSocketHelper
 import com.ismartcoding.plain.platform.MediaDurationFixQueue
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlin.time.Duration.Companion.milliseconds
 
-/**
- * A web login request that needs user confirmation. The [session] handle is
- * platform-agnostic so the event can flow through commonMain business logic.
- */
+/** Native confirmation UI for a Rust-owned pending login. */
 class ConfirmToAcceptLoginEvent(
-    val session: WsSessionHandle,
     val clientId: String,
     val request: AuthRequest,
-    val clientEcdhPublicKey: String = "",
+    val requestId: String,
+    val clientIp: String,
 ) : ChannelEvent()
 
 // Pairing events
@@ -71,7 +65,7 @@ class ShowPermissionWizardEvent : ChannelEvent()
 class RestartAppEvent : ChannelEvent()
 
 
-class PomodoroChangedEvent(val today: com.ismartcoding.plain.httpserver.models.PomodoroToday) : ChannelEvent()
+class PomodoroChangedEvent(val today: com.ismartcoding.plain.ui.page.pomodoro.PomodoroToday) : ChannelEvent()
 
 class FetchBookmarkMetadataEvent(val bookmarkId: String, val url: String) : ChannelEvent()
 
@@ -224,24 +218,6 @@ object AppEvents {
                         }
                     }
 
-                    is ImageSearchStatusChangedEvent -> {
-                        sendEvent(
-                            WebSocketEvent(
-                                EventType.IMAGE_SEARCH_UPDATED,
-                                jsonEncode(buildImageSearchStatus()),
-                            ),
-                        )
-                    }
-
-                    is ImageIndexProgressEvent -> {
-                        sendEvent(
-                            WebSocketEvent(
-                                EventType.IMAGE_SEARCH_UPDATED,
-                                jsonEncode(buildImageSearchStatus()),
-                            ),
-                        )
-                    }
-
                     is HEnableImageSearchEvent -> {
                         coIO { enableImageSearchAsync() }
                     }
@@ -252,19 +228,6 @@ object AppEvents {
 
                     is HCancelImageModelDownloadEvent -> {
                         cancelImageModelDownload()
-                    }
-
-                    is HStartMmsPollingEvent -> {
-                        startMmsPolling(
-                            event.pendingId,
-                            event.launchTimeSec,
-                            event.minimumMmsId,
-                            event.number,
-                            event.body,
-                            event.threadId,
-                            event.attachmentPaths,
-                            event.attachmentContentTypes,
-                        )
                     }
 
                     is DownloadUpdateEvent -> {

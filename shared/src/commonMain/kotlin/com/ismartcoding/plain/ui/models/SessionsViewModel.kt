@@ -15,7 +15,7 @@ class SessionsViewModel : ViewModel() {
 
     fun fetch() {
         viewModelScope.launchSafe {
-            _itemsFlow.value = fetchSessionsListItemsAsync().map { VSession.from(it) }
+            _itemsFlow.value = fetchSessionsListItemsAsync()
         }
     }
 
@@ -29,7 +29,7 @@ class SessionsViewModel : ViewModel() {
     fun createCustomToken(name: String) {
         viewModelScope.launchSafe {
             createCustomSessionTokenAsync(name)
-            _itemsFlow.value = fetchSessionsListItemsAsync().map { VSession.from(it) }
+            _itemsFlow.value = fetchSessionsListItemsAsync()
         }
     }
 
@@ -37,7 +37,7 @@ class SessionsViewModel : ViewModel() {
         viewModelScope.launchSafe {
             val changed = renameSessionListItemAsync(clientId, name)
             if (changed) {
-                _itemsFlow.value = fetchSessionsListItemsAsync().map { VSession.from(it) }
+                _itemsFlow.value = fetchSessionsListItemsAsync()
             }
         }
     }

@@ -1,6 +1,5 @@
 package com.ismartcoding.plain.chat.peer
 
-import com.ismartcoding.plain.helpers.Base64Lenient
 import com.ismartcoding.plain.lib.withIO
 import com.ismartcoding.plain.chat.ChatCacher
 import com.ismartcoding.plain.chat.peer.transport.PeerTransportType
@@ -14,17 +13,15 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
-import kotlin.io.encoding.ExperimentalEncodingApi
 import kotlin.time.Instant
 
 object PeerCacher {
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
 
-    val peersMap = MutableStateFlow<Map<String, PeerRuntime>>(emptyMap())
+    val peersMap = MutableStateFlow<Map<String, DPeer>>(emptyMap())
     val onlineMap = MutableStateFlow<Map<String, Boolean>>(emptyMap())
 
     // Transport currently being attempted for a peer, or absent when idle. Set
@@ -48,11 +45,11 @@ object PeerCacher {
     private val awareSupportedMap = mutableStateMapOf<String, Boolean>()
 
     val pairedPeers: StateFlow<List<DPeer>> = combine(peersMap, ChatCacher.latestChatMap, onlineMap) { p, c, o ->
-        sortPeers(p.values.filter { it.peer.isPaired() }.map { it.peer }, c, o)
+        sortPeers(p.values.filter { it.isPaired() }, c, o)
     }.stateIn(scope, SharingStarted.Eagerly, emptyList())
 
     val unpairedPeers: StateFlow<List<DPeer>> = combine(peersMap, ChatCacher.latestChatMap, onlineMap) { p, c, o ->
-        sortPeers(p.values.filter { it.peer.status == PeerStatus.UNPAIRED }.map { it.peer }, c, o)
+        sortPeers(p.values.filter { it.status == PeerStatus.UNPAIRED }, c, o)
     }.stateIn(scope, SharingStarted.Eagerly, emptyList())
 
     val onlinePeerIds: StateFlow<Set<String>> = onlineMap
@@ -86,37 +83,7 @@ object PeerCacher {
         }
     }
 
-    fun getPeer(peerId: String): DPeer? = peersMap.value[peerId]?.peer
-
-    fun getKeyBytes(peerId: String): ByteArray? = peersMap.value[peerId]?.keyBytes?.takeIf { it.isNotEmpty() }
-
-    fun getPublicKeyBytes(peerId: String): ByteArray? = peersMap.value[peerId]?.publicKeyBytes?.takeIf { it.isNotEmpty() }
-
-    /**
-     * 在 [peerId] 对应 peer 的副本上执行 [block] 进行修改，
-     * 然后将修改后的副本写回缓存和数据库。
-     *
-     * 使用副本确保缓存内的旧对象不被破坏，从而让 [pairedPeers]/[unpairedPeers]
-     * 等 StateFlow 能通过引用差异检测到变化并发射更新（StateFlow 的
-     * distinctUntilChanged 基于内容比较，原地修改缓存引用会导致新旧 list
-     * 内容相同而不发射）。
-     *
-     * 内部已通过 [withIO] 切换到 IO dispatcher，调用方无需自行指定。
-     *
-     * @return 修改后的新 peer 实例；若 peerId 不存在则返回 null。
-     */
-    @OptIn(ExperimentalEncodingApi::class)
-    suspend fun mutatePeer(peerId: String, block: (DPeer) -> Unit): DPeer? = withIO {
-        val current = peersMap.value
-        val runtime = current[peerId] ?: return@withIO null
-        val newPeer = runtime.peer.copy()
-        block(newPeer)
-        val saved = RustPeerStore.patch(runtime.peer, newPeer) ?: return@withIO null
-        val keyBytes = if (saved.key.isNotEmpty()) Base64Lenient.decode(saved.key) else ByteArray(0)
-        val publicKeyBytes = if (saved.publicKey.isNotEmpty()) Base64Lenient.decode(saved.publicKey) else ByteArray(0)
-        peersMap.update { it + (peerId to PeerRuntime(saved, keyBytes, publicKeyBytes)) }
-        saved
-    }
+    fun getPeer(peerId: String): DPeer? = peersMap.value[peerId]
 
     /** Returns whether the peer's Wi-Fi Aware service is currently running (from DISCOVER reply). */
     fun isAwareRunning(peerId: String): Boolean = awareRunningMap[peerId] == true
@@ -148,13 +115,10 @@ object PeerCacher {
         awareSupportedMap.remove(peerId)
     }
 
-    @OptIn(ExperimentalEncodingApi::class)
     suspend fun load() = withIO {
         val peers = RustPeerStore.getAll()
         val runtimeMap = peers.associate { peer ->
-            val keyBytes = if (peer.key.isNotEmpty()) Base64Lenient.decode(peer.key) else ByteArray(0)
-            val publicKeyBytes = if (peer.publicKey.isNotEmpty()) Base64Lenient.decode(peer.publicKey) else ByteArray(0)
-            peer.id to PeerRuntime(peer, keyBytes, publicKeyBytes)
+            peer.id to peer
         }
         peersMap.value = runtimeMap
     }

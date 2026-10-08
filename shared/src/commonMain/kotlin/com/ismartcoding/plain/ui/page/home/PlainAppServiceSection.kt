@@ -19,7 +19,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.ismartcoding.plain.enums.ButtonSize
 import com.ismartcoding.plain.enums.ButtonType
-import com.ismartcoding.plain.httpserver.HttpServerManager
+import com.ismartcoding.plain.platform.HttpServerManager
 import com.ismartcoding.plain.i18n.Res
 import com.ismartcoding.plain.i18n.access_settings
 import com.ismartcoding.plain.i18n.plainapp_service_failed
@@ -41,7 +41,6 @@ import com.ismartcoding.plain.ui.nav.Routing
 import com.ismartcoding.plain.ui.theme.PlainTheme
 import org.jetbrains.compose.resources.stringResource
 import com.ismartcoding.plain.ui.resources.Res as UiRes
-import com.ismartcoding.plain.ui.resources.tune as ui_drawable_tune
 import com.ismartcoding.plain.i18n.troubleshoot
 
 @Composable

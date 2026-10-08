@@ -3,6 +3,8 @@ package com.ismartcoding.plain.ai
 import java.io.File
 
 object PlatformImageIndexWorkerFactory : ImageIndexWorkerFactory {
-    override fun isReady(): Boolean = ImageSearchManager.isModelReady()
-    override fun create(): ImageIndexWorker = ImageEmbedWorker(File(ImageSearchManager.getModelDir(),"mobileclip_s2_image.tflite"))
+    @Volatile private var modelFile: File? = null
+    internal fun configure(path: String?) { modelFile = path?.let(::File) }
+    override fun isReady(): Boolean = modelFile != null
+    override fun create(): ImageIndexWorker = ImageEmbedWorker(checkNotNull(modelFile))
 }

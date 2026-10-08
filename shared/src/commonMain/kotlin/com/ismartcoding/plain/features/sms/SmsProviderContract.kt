@@ -18,21 +18,6 @@ object SmsProviderContract {
         val data: String,
     )
 
-    data class MmsSendFingerprint(
-        val address: String,
-        val body: String,
-        val threadId: String,
-        val attachmentContentTypes: List<String>,
-    )
-
-    data class MmsCandidateFingerprint(
-        val id: Long,
-        val address: String,
-        val body: String,
-        val threadId: String,
-        val attachmentContentTypes: List<String>,
-    )
-
     fun partitionMessageIds(value: String): MessageIds {
         val ids = value.split(',').map(String::trim).filter(String::isNotEmpty)
         return MessageIds(
@@ -85,37 +70,6 @@ object SmsProviderContract {
         )
     }
 
-    fun matchingMmsCandidateIds(
-        requested: MmsSendFingerprint,
-        candidates: List<MmsCandidateFingerprint>,
-    ): List<Long> {
-        val fingerprintMatches = candidates.filter { candidate ->
-            val threadMatches = requested.threadId.isEmpty() || candidate.threadId == requested.threadId
-            val bodyMatches = requested.body.isEmpty() || candidate.body.trim() == requested.body.trim()
-            val attachmentsMatch = normalizedContentTypes(candidate.attachmentContentTypes) ==
-                normalizedContentTypes(requested.attachmentContentTypes)
-            threadMatches && bodyMatches && attachmentsMatch
-        }
-        if (requested.address.isEmpty()) return fingerprintMatches.map { it.id }
-        val addressContext = fingerprintMatches.map { it.address }.filter(String::isNotBlank)
-        return fingerprintMatches.filter { candidate ->
-            addressesMatch(candidate.address, requested.address, addressContext)
-        }.map { it.id }
-    }
-
-    fun mmsOperationsAreIndistinguishable(
-        first: MmsSendFingerprint,
-        second: MmsSendFingerprint,
-    ): Boolean {
-        val bodiesOverlap = first.body.isEmpty() || second.body.isEmpty() || first.body.trim() == second.body.trim()
-        val threadsOverlap = first.threadId.isEmpty() || second.threadId.isEmpty() || first.threadId == second.threadId
-        return addressesMatch(first.address, second.address) &&
-            bodiesOverlap &&
-            threadsOverlap &&
-            normalizedContentTypes(first.attachmentContentTypes) ==
-            normalizedContentTypes(second.attachmentContentTypes)
-    }
-
     fun numericIdPredicate(
         field: String,
         values: Collection<String>,
@@ -138,18 +92,6 @@ object SmsProviderContract {
     }
 
     private data class NormalizedAddress(val value: String, val isPhone: Boolean)
-
-    private fun normalizedContentTypes(values: List<String>): List<String> {
-        return values.map { value ->
-            val contentType = value.substringBefore(';').trim().lowercase()
-            when {
-                contentType.startsWith("image/") -> "image/*"
-                contentType.startsWith("video/") -> "video/*"
-                contentType.startsWith("audio/") -> "audio/*"
-                else -> contentType
-            }
-        }.sorted()
-    }
 
     private fun normalizedAddress(value: String): NormalizedAddress {
         val trimmed = value.trim()

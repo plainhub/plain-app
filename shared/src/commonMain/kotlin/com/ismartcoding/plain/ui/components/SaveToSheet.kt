@@ -38,9 +38,6 @@ import com.ismartcoding.plain.ui.base.VerticalSpace
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
 import com.ismartcoding.plain.ui.resources.Res as UiRes
-import com.ismartcoding.plain.ui.resources.download as ui_drawable_download
-import com.ismartcoding.plain.ui.resources.folder as ui_drawable_folder
-import com.ismartcoding.plain.ui.resources.folders as ui_drawable_folders
 import com.ismartcoding.plain.i18n.download
 import com.ismartcoding.plain.i18n.folders
 import com.ismartcoding.plain.i18n.folder

@@ -14,4 +14,5 @@ internal data class MediaFacts(
     val durationMs: Long,
     val takenAt: String?,
     val isFavorite: Boolean,
+    val width: Int = 0, val height: Int = 0, val rotation: Int = 0,
 )

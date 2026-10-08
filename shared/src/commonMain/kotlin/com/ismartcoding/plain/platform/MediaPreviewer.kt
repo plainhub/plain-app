@@ -64,8 +64,6 @@ import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import com.ismartcoding.plain.ui.resources.Res as UiRes
-import com.ismartcoding.plain.ui.resources.close as ui_drawable_close
-import com.ismartcoding.plain.ui.resources.double_arrow_right as ui_drawable_double_arrow_right
 import com.ismartcoding.plain.i18n.close
 
 // Grace period before showing a loading icon: media that becomes ready within

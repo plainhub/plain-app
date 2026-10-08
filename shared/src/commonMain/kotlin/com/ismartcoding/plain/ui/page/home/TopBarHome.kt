@@ -35,7 +35,6 @@ import com.ismartcoding.plain.ui.nav.Routing
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import com.ismartcoding.plain.ui.resources.Res as UiRes
-import com.ismartcoding.plain.ui.resources.pen as ui_drawable_pen
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

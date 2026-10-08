@@ -30,8 +30,6 @@ import com.ismartcoding.plain.ui.theme.green
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.painterResource
 import com.ismartcoding.plain.ui.resources.Res as UiRes
-import com.ismartcoding.plain.ui.resources.check as ui_drawable_check
-import com.ismartcoding.plain.ui.resources.download as ui_drawable_download
 import com.ismartcoding.plain.i18n.download
 
 /**

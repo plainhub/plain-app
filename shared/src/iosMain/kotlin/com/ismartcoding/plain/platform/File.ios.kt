@@ -14,7 +14,7 @@ import com.ismartcoding.plain.lib.extensions.isHeifHeader
 import com.ismartcoding.plain.lib.toNSData
 import com.ismartcoding.plain.thumbnail.DecodePolicy
 import com.ismartcoding.plain.lib.toByteArray
-import com.ismartcoding.plain.httpserver.http.StreamSink
+import com.ismartcoding.plain.platform.StreamSink
 import kotlinx.cinterop.BetaInteropApi
 import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.cinterop.addressOf

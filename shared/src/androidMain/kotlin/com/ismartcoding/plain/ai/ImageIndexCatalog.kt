@@ -3,6 +3,7 @@ package com.ismartcoding.plain.ai
 import android.database.ContentObserver
 import android.os.Bundle
 import android.provider.MediaStore
+import com.ismartcoding.plain.lib.JsonHelper
 import com.ismartcoding.plain.appContext
 import com.ismartcoding.plain.platform.Permission
 import com.ismartcoding.plain.platform.isGranted
@@ -43,7 +44,7 @@ object ImageIndexCatalog {
         val revision = revision()
         val total = checkNotNull(appContext.contentResolver.query(uri,arrayOf(MediaStore.Images.Media._ID),null,null,null)) { "Image catalog query failed" }.use { it.count }
         verify(revision)
-        return buildJsonObject { put("revision",revision);put("total",total) }
+        return JsonHelper.jsonEncodeToElement(ImageCatalogSnapshot(revision,total)).jsonObject
     }
     fun verify(expected: String) { check(revision() == expected) { "Image catalog changed during indexing" } }
     fun page(expected: String, cursor: String, limit: Int): JsonObject {
@@ -65,18 +66,18 @@ object ImageIndexCatalog {
         val items = checkNotNull(queried) { "Image catalog page failed" }.use { rows ->
             val idColumn = rows.getColumnIndexOrThrow(MediaStore.Images.Media._ID)
             val pathColumn = rows.getColumnIndexOrThrow(MediaStore.Images.Media.DATA)
-            buildJsonArray {
+            buildList<ImageCatalogItem> {
                 while (rows.moveToNext()) {
                     val id = rows.getLong(idColumn).toString()
                     val path = checkNotNull(rows.getString(pathColumn)) { "Image path unavailable" }
                     check(path.isNotEmpty()) { "Image path unavailable" }
-                    add(buildJsonObject { put("id",id);put("path",path) })
+                    add(ImageCatalogItem(id,path))
                     last = id
                 }
             }
         }
         verify(expected)
-        return buildJsonObject { put("revision",expected);put("items",items);put("nextCursor",last);put("done",items.size < limit) }
+        return JsonHelper.jsonEncodeToElement(ImageCatalogPage(expected,items,last,items.size < limit)).jsonObject
     }
     fun resolve(expected: String, ids: List<String>): JsonArray {
         require(ids.size <= 100)
@@ -87,16 +88,16 @@ object ImageIndexCatalog {
         val items = rows.use { cursor ->
             val idColumn = cursor.getColumnIndexOrThrow(MediaStore.Images.Media._ID)
             val pathColumn = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA)
-            buildJsonArray {
+            buildList<ImageCatalogItem> {
                 while (cursor.moveToNext()) {
                     val path = checkNotNull(cursor.getString(pathColumn)) { "Image path unavailable" }
                     check(path.isNotEmpty()) { "Image path unavailable" }
-                    add(buildJsonObject { put("id",cursor.getLong(idColumn).toString());put("path",path) })
+                    add(ImageCatalogItem(cursor.getLong(idColumn).toString(),path))
                 }
             }
         }
         verify(expected)
-        return items
+        return JsonHelper.jsonEncodeToElement(items).jsonArray
     }
     @Synchronized
     fun close() {

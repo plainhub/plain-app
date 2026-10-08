@@ -34,22 +34,7 @@ internal object SystemFilesHost {
                 mimeType = com.ismartcoding.plain.platform.getContentTypeForPath(path).orEmpty(),
             ))
         }
-        "systemMountFacts" -> JsonHelper.jsonEncodeToElement(com.ismartcoding.plain.httpserver.loaders.MountsLoader.load().map { mount ->
-            MountFacts(
-                id = mount.id.value,
-                name = mount.name,
-                path = mount.path,
-                mountPoint = mount.mountPoint,
-                fsType = mount.fsType,
-                totalBytes = mount.totalBytes,
-                usedBytes = mount.usedBytes,
-                freeBytes = mount.freeBytes,
-                remote = mount.remote,
-                alias = mount.alias,
-                driveType = mount.driveType.name,
-                diskId = mount.diskId,
-            )
-        })
+        "systemMountFacts" -> JsonHelper.jsonEncodeToElement(com.ismartcoding.plain.platform.storageVolumeFacts())
         "systemRecentFileFacts" -> JsonHelper.jsonEncodeToElement(com.ismartcoding.plain.platform.getRecentFiles().map(::fileFacts))
         "systemImageFileInfo" -> fileInfoFacts(method, params)
         "systemVideoFileInfo" -> fileInfoFacts(method, params)
@@ -90,38 +75,12 @@ internal object SystemFilesHost {
         childCount = file.childCount,
     )
 
-    private fun locationFacts(location: com.ismartcoding.plain.httpserver.models.Location?): LocationFacts? =
-        location?.let {
-            LocationFacts(
-                latitude = it.latitude,
-                longitude = it.longitude,
-            )
-        }
-
     private fun fileInfoFacts(method: String, params: JsonObject): JsonElement {
         val path = params.getValue("path").jsonPrimitive.content
         return when (method) {
-            "systemImageFileInfo" -> com.ismartcoding.plain.platform.loadImageInfo(path).let {
-                JsonHelper.jsonEncodeToElement(ImageInfoFacts(
-                    width = it.width,
-                    height = it.height,
-                    location = locationFacts(it.location),
-                ))
-            }
-            "systemVideoFileInfo" -> com.ismartcoding.plain.platform.loadVideoInfo(path).let {
-                JsonHelper.jsonEncodeToElement(VideoInfoFacts(
-                    width = it.width,
-                    height = it.height,
-                    durationMs = it.durationMs,
-                    location = locationFacts(it.location),
-                ))
-            }
-            else -> com.ismartcoding.plain.platform.loadAudioInfo(path).let {
-                JsonHelper.jsonEncodeToElement(AudioInfoFacts(
-                    durationMs = it.durationMs,
-                    location = locationFacts(it.location),
-                ))
-            }
+            "systemImageFileInfo" -> JsonHelper.jsonEncodeToElement(com.ismartcoding.plain.platform.loadImageInfo(path))
+            "systemVideoFileInfo" -> JsonHelper.jsonEncodeToElement(com.ismartcoding.plain.platform.loadVideoInfo(path))
+            else -> JsonHelper.jsonEncodeToElement(com.ismartcoding.plain.platform.loadAudioInfo(path))
         }
     }
 }

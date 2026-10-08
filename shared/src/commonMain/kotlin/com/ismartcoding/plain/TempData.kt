@@ -3,7 +3,6 @@ package com.ismartcoding.plain
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
-import com.ismartcoding.plain.features.sms.DPendingMms
 import com.ismartcoding.plain.preferences.*
 import kotlinx.coroutines.flow.MutableStateFlow
 
@@ -48,7 +47,6 @@ object TempData {
      * confirmed as sent.  Exposed through the sms query so the web can show a
      * "sending…" state before and after a page refresh.
      */
-    val pendingMmsMessages = mutableStateListOf<DPendingMms>()
 
     fun canDesktopAccess(): Boolean {
         return UserPrefs.desktopAccess.value && UserPrefs.service.value

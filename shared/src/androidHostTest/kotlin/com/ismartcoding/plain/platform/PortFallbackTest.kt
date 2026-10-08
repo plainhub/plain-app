@@ -1,7 +1,7 @@
 package com.ismartcoding.plain.platform
 
-import com.ismartcoding.plain.httpserver.httpPorts
-import com.ismartcoding.plain.httpserver.httpsPorts
+import com.ismartcoding.plain.platform.httpPorts
+import com.ismartcoding.plain.platform.httpsPorts
 import java.net.ServerSocket
 import kotlin.test.Test
 import kotlin.test.assertEquals

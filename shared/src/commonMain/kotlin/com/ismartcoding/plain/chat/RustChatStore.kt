@@ -2,6 +2,8 @@ package com.ismartcoding.plain.chat
 
 import com.ismartcoding.plain.db.*
 import com.ismartcoding.plain.enums.ChatStatus
+import com.ismartcoding.plain.api.RustContentApi
+import com.ismartcoding.plain.lib.JsonHelper
 import kotlinx.serialization.json.*
 import kotlin.time.Instant
 
@@ -28,7 +30,9 @@ object RustChatStore {
     suspend fun getByChannelIdPage(id: String, limit: Int, offset: Int): List<DChat> = page(channel = id, limit = limit, offset = offset, descending = true)
     suspend fun getByPeerIdPageText(id: String, text: String, limit: Int, offset: Int): List<DChat> = page(peer = id, text = text, limit = limit, offset = offset, descending = true)
     suspend fun getByChannelIdPageText(id: String, text: String, limit: Int, offset: Int): List<DChat> = page(channel = id, text = text, limit = limit, offset = offset, descending = true)
-    suspend fun getAllLatestChats(): List<DChat> = page(latest = true)
+    suspend fun getLatestConversations(): Map<String, DChat> = RustContentApi.postJsonOrThrow(
+        "chat/store", JsonHelper.jsonEncodeToElement(ChatLatestRequest()).jsonObject,
+    ).getValue("result").jsonObject.mapValues { (_, value) -> decode(value) }
     suspend fun search(text: String, limit: Int, offset: Int): List<DChat> = page(text = text, limit = limit, offset = offset, descending = true)
     suspend fun count(text: String): Int = query(text = text, countOnly = true).jsonPrimitive.int
     suspend fun getIds(query: String): Set<String> = callChatStore("chatIds") { put("query", query) }.jsonArray.map { it.jsonPrimitive.content }.toSet()

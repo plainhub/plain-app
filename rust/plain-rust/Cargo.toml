@@ -12,7 +12,6 @@ crate-type = ["cdylib", "staticlib"]
 # pins the exact commit that was built.
 plain-rs = { git = "https://github.com/plainhub/plain-desktop.git", branch = "main", features = ["content_api", "http_transport"] }
 serde_json = "1"
-rustls-pemfile = "2"
 tokio = { version = "1", features = ["rt-multi-thread", "sync"] }
 
 [target.'cfg(target_os = "android")'.dependencies]

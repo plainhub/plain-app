@@ -11,7 +11,6 @@ import com.ismartcoding.plain.lib.sendEvent
 import com.ismartcoding.plain.platform.getDeviceName
 import com.ismartcoding.plain.features.dlna.startDlnaRenderer
 import com.ismartcoding.plain.preferences.*
-import com.ismartcoding.plain.httpserver.HttpServerManager
 
 /**
  * Shared preference and TempData initialization, called by both Android
@@ -32,12 +31,11 @@ suspend fun initCommonPreferences() {
     SystemPrefs.ensureUrlToken()
     SystemPrefs.ensureMdnsHostname()
     if (SystemPrefs.password.value.isEmpty()) {
-        HttpServerManager.resetPasswordAsync()
+        com.ismartcoding.plain.platform.resetPasswordAsync()
     }
     PeerCacher.load()
     ChannelCacher.load()
     ChatCacher.load()
-    HttpServerManager.clientTsInterval()
     sendEvent(StartNearbyServiceEvent())
     if (TempData.canDLNAAccess()) {
         startDlnaRenderer()

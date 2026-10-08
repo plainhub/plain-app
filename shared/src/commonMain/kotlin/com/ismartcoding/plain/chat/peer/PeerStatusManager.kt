@@ -1,13 +1,9 @@
 package com.ismartcoding.plain.chat.peer
 
 import com.ismartcoding.plain.api.RustContentApi
-import com.ismartcoding.plain.events.EventType
-import com.ismartcoding.plain.events.PeerStatusData
-import com.ismartcoding.plain.events.WebSocketEvent
 import com.ismartcoding.plain.lib.JsonHelper
 import com.ismartcoding.plain.lib.coIO
 import com.ismartcoding.plain.lib.logcat.LogCat
-import com.ismartcoding.plain.lib.sendEvent
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.channels.Channel
 import kotlinx.serialization.json.*
@@ -20,7 +16,7 @@ object PeerStatusManager {
         coIO {
             for (action in commands) {
                 try {
-                    RustContentApi.postJsonOrThrow("chat/peer-status", buildJsonObject { put("action", action) })
+                    RustContentApi.postJsonOrThrow("chat/peer-status", JsonHelper.jsonEncodeToElement(PeerStatusRequest(action)).jsonObject)
                     PeerStatusProjection.refresh()
                 } catch (cancelled: CancellationException) { throw cancelled }
                 catch (error: Exception) { LogCat.e("Rust peer status control", error) }
@@ -43,7 +39,6 @@ object PeerStatusManager {
             val active = id in current
             if ((id in previous) != active) {
                 PeerManager.setOnlineStatus(id, active)
-                sendEvent(WebSocketEvent(EventType.PEER_STATUS_UPDATED, JsonHelper.jsonEncode(PeerStatusData(id, active))))
             }
         }
     }

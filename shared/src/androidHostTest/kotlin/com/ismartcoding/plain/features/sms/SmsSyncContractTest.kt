@@ -205,82 +205,6 @@ class SmsSyncContractTest {
     }
 
     @Test
-    fun `MMS matching rejects incomplete body and attachment evidence`() {
-        val requested = SmsProviderContract.MmsSendFingerprint("+16025550100", "hello", "7", listOf("image/jpeg"))
-        val candidates = listOf(
-            SmsProviderContract.MmsCandidateFingerprint(1, "+16025550100", "", "7", listOf("image/jpeg")),
-            SmsProviderContract.MmsCandidateFingerprint(2, "+16025550100", "hello", "7", emptyList()),
-            SmsProviderContract.MmsCandidateFingerprint(3, "+16025550100", "hello", "7", listOf("image/jpeg")),
-        )
-
-        assertEquals(listOf(3L), SmsProviderContract.matchingMmsCandidateIds(requested, candidates))
-    }
-
-    @Test
-    fun `MMS matching uses normalized transformation tolerant attachment types`() {
-        val requested = SmsProviderContract.MmsSendFingerprint(
-            "6025550100",
-            "same",
-            "",
-            listOf(" IMAGE/JPEG ", "text/x-vcard"),
-        )
-        val candidates = listOf(
-            SmsProviderContract.MmsCandidateFingerprint(
-                10,
-                "+16025550100",
-                "same",
-                "8",
-                listOf("text/x-vcard", "image/png"),
-            ),
-            SmsProviderContract.MmsCandidateFingerprint(
-                11,
-                "+16025550100",
-                "same",
-                "8",
-                listOf("audio/mpeg", "text/x-vcard"),
-            ),
-        )
-
-        assertEquals(listOf(10L), SmsProviderContract.matchingMmsCandidateIds(requested, candidates))
-    }
-
-    @Test
-    fun `indistinguishable pending MMS sends are serialized`() {
-        val first = SmsProviderContract.MmsSendFingerprint(
-            "+1 602 555 0100",
-            "same",
-            "8",
-            listOf("image/jpeg"),
-        )
-        val duplicate = SmsProviderContract.MmsSendFingerprint(
-            "6025550100",
-            "same",
-            "8",
-            listOf("IMAGE/JPEG"),
-        )
-        val transcoded = duplicate.copy(attachmentContentTypes = listOf("image/png"))
-        val distinct = duplicate.copy(attachmentContentTypes = listOf("audio/mpeg"))
-
-        assertTrue(SmsProviderContract.mmsOperationsAreIndistinguishable(first, duplicate))
-        assertTrue(SmsProviderContract.mmsOperationsAreIndistinguishable(first, transcoded))
-        assertFalse(SmsProviderContract.mmsOperationsAreIndistinguishable(first, distinct))
-    }
-
-    @Test
-    fun `MMS serialization covers wildcard body and thread matcher domains`() {
-        val wildcard = SmsProviderContract.MmsSendFingerprint(
-            "6025550100",
-            "",
-            "",
-            listOf("image/jpeg"),
-        )
-        val specific = wildcard.copy(body = "caption", threadId = "8")
-
-        assertTrue(SmsProviderContract.mmsOperationsAreIndistinguishable(wildcard, specific))
-        assertTrue(SmsProviderContract.mmsOperationsAreIndistinguishable(specific, wildcard))
-    }
-
-    @Test
     fun `MMS text matching spans parts and applies every filter`() {
         val parts = listOf("First line", "Second Line")
 
@@ -305,26 +229,6 @@ class SmsSyncContractTest {
         assertEquals(
             MmsSendResultData("pending", false, SendResultCodes.CANCELLED),
             MmsSendResultData.cancelled("pending"),
-        )
-    }
-
-    @Test
-    fun `MMS terminal outbox survives recreation expires by terminal time and stays bounded`() {
-        val store = FakeMmsSendResultStateStore()
-        MmsSendResultOutbox(store, maxEntries = 2).apply {
-            record(MmsSendResultData.success("old"), 100L)
-            record(MmsSendResultData.timeout("middle"), 200L)
-            record(MmsSendResultData.cancelled("new"), 300L)
-        }
-
-        val restored = MmsSendResultOutbox(store, maxEntries = 2)
-        assertEquals(
-            listOf(MmsSendResultData.timeout("middle"), MmsSendResultData.cancelled("new")),
-            restored.replayable(nowMillis = 350L, ttlMillis = 200L),
-        )
-        assertEquals(
-            listOf(MmsSendResultData.cancelled("new")),
-            restored.replayable(nowMillis = 450L, ttlMillis = 200L),
         )
     }
 
@@ -359,17 +263,4 @@ class SmsSyncContractTest {
         }
     }
 
-    private class FakeMmsSendResultStateStore : MmsSendResultStateStore {
-        private val states = mutableMapOf<String, MmsTerminalResultState>()
-
-        override fun readAll(): List<MmsTerminalResultState> = states.values.toList()
-
-        override fun write(state: MmsTerminalResultState) {
-            states[state.pendingId] = state
-        }
-
-        override fun remove(pendingId: String) {
-            states.remove(pendingId)
-        }
-    }
 }

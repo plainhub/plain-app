@@ -24,6 +24,5 @@ char *plain_core_start(const char *database_path, const char *token);
 void plain_core_stop(void);
 char *plain_http_start(const char *config_json);
 char *plain_http_stop(void);
-char *plain_tls_action(const char *config_json);
 
 #endif

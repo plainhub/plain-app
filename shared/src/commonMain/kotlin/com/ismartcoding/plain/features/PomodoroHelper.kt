@@ -2,7 +2,7 @@ package com.ismartcoding.plain.features
 
 import com.ismartcoding.plain.api.*
 import com.ismartcoding.plain.db.DPomodoroItem
-import com.ismartcoding.plain.httpserver.models.PomodoroToday
+import com.ismartcoding.plain.ui.page.pomodoro.PomodoroToday
 import com.ismartcoding.plain.lib.TimeHelper
 import com.ismartcoding.plain.ui.page.pomodoro.PomodoroState
 import kotlinx.datetime.TimeZone

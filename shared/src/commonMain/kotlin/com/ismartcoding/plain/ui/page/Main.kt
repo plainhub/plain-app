@@ -28,7 +28,7 @@ import com.ismartcoding.plain.enums.DarkTheme
 import com.ismartcoding.plain.events.ConfirmDialogEvent
 import com.ismartcoding.plain.events.LoadingDialogEvent
 import com.ismartcoding.plain.events.ShowPermissionWizardEvent
-import com.ismartcoding.plain.httpserver.HttpServerManager
+import com.ismartcoding.plain.platform.HttpServerManager
 import com.ismartcoding.plain.lib.Channel
 import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.ui.base.DebugCornerBadge

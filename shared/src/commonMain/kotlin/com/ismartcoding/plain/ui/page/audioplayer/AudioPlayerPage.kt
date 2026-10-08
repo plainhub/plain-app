@@ -56,8 +56,6 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.painterResource
 import com.ismartcoding.plain.ui.resources.Res as UiRes
-import com.ismartcoding.plain.ui.resources.chevron_left as ui_drawable_chevron_left
-import com.ismartcoding.plain.ui.resources.expand_more as ui_drawable_expand_more
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

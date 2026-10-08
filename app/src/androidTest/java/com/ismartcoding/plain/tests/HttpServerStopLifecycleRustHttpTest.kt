@@ -3,7 +3,7 @@ package com.ismartcoding.plain.tests
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.ismartcoding.plain.appContext
 import com.ismartcoding.plain.enums.HttpServerState
-import com.ismartcoding.plain.httpserver.HttpServerManager
+import com.ismartcoding.plain.platform.HttpServerManager
 import com.ismartcoding.plain.platform.startHttpEngineAsync
 import com.ismartcoding.plain.platform.stopHttpEngineAsync
 import com.ismartcoding.plain.platform.stopHttpServerCoreAsync

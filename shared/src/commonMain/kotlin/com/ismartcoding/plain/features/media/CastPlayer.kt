@@ -1,92 +1,39 @@
 package com.ismartcoding.plain.features.media
 
-import com.ismartcoding.plain.lib.dlna.common.DlnaDevice
 import com.ismartcoding.plain.db.IMedia
+import com.ismartcoding.plain.features.dlna.sender.*
+import com.ismartcoding.plain.lib.coIO
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
 object CastPlayer {
     var currentDevice: DlnaDevice? = null
-
-    private val _items = MutableStateFlow<List<IMedia>>(emptyList())
-    val items: StateFlow<List<IMedia>> = _items.asStateFlow()
-
-    private val _currentUri = MutableStateFlow("")
-    val currentUri: StateFlow<String> = _currentUri.asStateFlow()
+        private set
+    private val itemState = MutableStateFlow<List<IMedia>>(emptyList())
+    val items = itemState.asStateFlow()
+    private val uriState = MutableStateFlow("")
+    val currentUri = uriState.asStateFlow()
     val isPlaying = MutableStateFlow(false)
-
-    // 播放进度相关状态
-    val progressMs = MutableStateFlow(0f) // 当前播放位置（毫秒）
-    val durationMs = MutableStateFlow(0f) // 总时长（毫秒）
-    val supportsCallback = MutableStateFlow(false) // 是否支持回调
-
-    // 是否有正在进行的投屏任务（设备已选且有内容在投）
+    val progressMs = MutableStateFlow(0f)
+    val durationMs = MutableStateFlow(0f)
+    val supportsCallback = MutableStateFlow(false)
     val active = MutableStateFlow(false)
 
-    var sid: String = ""
-
     fun addItem(item: IMedia) {
-        _items.value += item
+        coIO { RustDlnaSender.call(CastCommand.Add(CastItem.from(item))) }
     }
-
-    fun removeItem(item: IMedia) {
-        _items.value = _items.value.filter { it.path != item.path }
-    }
-
-    fun removeItemAt(index: Int) {
-        val currentList = _items.value.toMutableList()
-        if (index in currentList.indices) {
-            currentList.removeAt(index)
-            _items.value = currentList
-        }
-    }
-
-    fun clearItems() {
-        _items.value = emptyList()
-        _currentUri.value = ""
-        isPlaying.value = false
-        progressMs.value = 0f
-        durationMs.value = 0f
-        supportsCallback.value = false
-    }
-
-    fun setCurrentUri(uri: String) {
-        _currentUri.value = uri
-    }
-
-    fun reorderItems(fromIndex: Int, toIndex: Int) {
-        val currentList = _items.value.toMutableList()
-        if (fromIndex in 0 until currentList.size && toIndex in 0 until currentList.size) {
-            val item = currentList.removeAt(fromIndex)
-            currentList.add(toIndex, item)
-            _items.value = currentList
-        }
-    }
-
-    /**
-     * 解析 UPnP 时间格式 (HH:MM:SS 或 HH:MM:SS.mmm) 到毫秒
-     */
-    fun parseTimeToMs(timeString: String): Float {
-        if (timeString.isEmpty() || timeString == "NOT_IMPLEMENTED") return 0f
-
-        return try {
-            val parts = timeString.split(":")
-            if (parts.size >= 3) {
-                val hours = parts[0].toFloat()
-                val minutes = parts[1].toFloat()
-                val seconds = parts[2].split(".")[0].toFloat()
-                (hours * 3600 + minutes * 60 + seconds) * 1000
-            } else {
-                0f
-            }
-        } catch (e: Exception) {
-            0f
-        }
-    }
-
-    fun updatePositionInfo(relTime: String, trackDurationText: String) {
-        progressMs.value = parseTimeToMs(relTime)
-        durationMs.value = parseTimeToMs(trackDurationText)
+    fun removeItem(item: IMedia) { coIO { RustDlnaSender.call(CastCommand.Remove(item.path)) } }
+    fun removeItemAt(index: Int) { coIO { RustDlnaSender.call(CastCommand.RemoveAt(index)) } }
+    fun clearItems() { coIO { RustDlnaSender.call(CastCommand.Clear) } }
+    fun reorderItems(fromIndex: Int, toIndex: Int) { coIO { RustDlnaSender.call(CastCommand.Reorder(fromIndex, toIndex)) } }
+    internal fun apply(state: CastSnapshot) {
+        currentDevice = state.currentDevice
+        itemState.value = state.items
+        uriState.value = state.currentUri
+        isPlaying.value = state.playing
+        progressMs.value = state.progressMs.toFloat()
+        durationMs.value = state.durationMs.toFloat()
+        supportsCallback.value = state.supportsCallback
+        active.value = state.active
     }
 }

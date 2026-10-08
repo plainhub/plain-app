@@ -1,14 +1,10 @@
 package com.ismartcoding.plain.db
 
 import androidx.room3.ColumnInfo
-import androidx.room3.Dao
 import com.ismartcoding.plain.lib.TimeHelper
 import kotlin.time.Instant
 import androidx.room3.Entity
-import androidx.room3.Insert
 import androidx.room3.PrimaryKey
-import androidx.room3.Query
-import androidx.room3.Update
 import com.ismartcoding.plain.enums.ChatChannelStatus
 import com.ismartcoding.plain.enums.ChannelMemberStatus
 import com.ismartcoding.plain.lib.generateId
@@ -66,58 +62,4 @@ data class DChatChannel(
     fun findMember(peerId: String): ChannelMember? = members.find { it.peerId == peerId }
 
     fun isJoined(): Boolean = status == ChatChannelStatus.JOINED
-
-    /**
-     * Elect a leader for this channel from the joined members.
-     *
-     * Rules (in priority order):
-     * 1. The owner is preferred if online.
-     * 2. Otherwise, the online joined member with the smallest id.
-     *
-     * @param onlinePeerIds set of peer ids known to be online right now.
-     *        The local device's own id is always considered online.
-     * @param myId the local device's peer id.
-     * @return the peer id of the elected leader, or null if no eligible member is online.
-     */
-    fun electLeader(onlinePeerIds: Set<String>, myId: String): String? {
-        val joined = joinedMembers()
-        val onlineJoined = joined.filter { it.peerId == myId || onlinePeerIds.contains(it.peerId) }
-        if (onlineJoined.isEmpty()) return null
-
-        // Resolve the owner's real peer id ("me" sentinel → myId)
-        val ownerPeerId = if (ownerId == "me") myId else ownerId
-        if (onlineJoined.any { it.peerId == ownerPeerId }) return ownerPeerId
-
-        // Fallback: smallest id among online joined members
-        return onlineJoined.minByOrNull { it.peerId }?.peerId
-    }
-
-    /** Check whether this device is currently the channel leader. */
-    fun isLeader(onlinePeerIds: Set<String>, myId: String): Boolean {
-        return electLeader(onlinePeerIds, myId) == myId
-    }
-}
-
-@Dao
-interface ChatChannelDao {
-    @Query("SELECT * FROM chat_channels")
-    suspend fun getAll(): List<DChatChannel>
-
-    @Query("SELECT * FROM chat_channels WHERE id = :id")
-    suspend fun getById(id: String): DChatChannel?
-
-    @Query("SELECT * FROM chat_channels WHERE owner_id = 'me'")
-    suspend fun getOwnedChannels(): List<DChatChannel>
-
-    @Insert
-    suspend fun insert(vararg item: DChatChannel)
-
-    @Update
-    suspend fun update(vararg item: DChatChannel)
-
-    @Query("DELETE FROM chat_channels WHERE id = :id")
-    suspend fun delete(id: String)
-
-    @Query("DELETE FROM chat_channels WHERE id in (:ids)")
-    suspend fun deleteByIds(ids: List<String>)
 }

@@ -106,8 +106,6 @@ class SortOrderUnifySpec : AutoMigrationSpec
     FeedErrorConverter::class,
 )
 abstract class AppDatabase : RoomDatabase() {
-    abstract fun chatDao(): ChatDao
-    abstract fun sessionDao(): SessionDao
     abstract fun tagDao(): TagDao
     abstract fun tagRelationDao(): TagRelationDao
     abstract fun noteDao(): NoteDao
@@ -116,8 +114,6 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun bookDao(): BookDao
     abstract fun bookChapterDao(): BookChapterDao
     abstract fun pomodoroItemDao(): PomodoroItemDao
-    abstract fun peerDao(): PeerDao
-    abstract fun chatChannelDao(): ChatChannelDao
     abstract fun bookmarkDao(): BookmarkDao
     abstract fun bookmarkGroupDao(): BookmarkGroupDao
     abstract fun appFileDao(): AppFileDao

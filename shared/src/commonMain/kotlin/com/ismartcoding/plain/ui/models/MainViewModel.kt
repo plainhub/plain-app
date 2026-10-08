@@ -11,7 +11,7 @@ import com.ismartcoding.plain.events.ChannelInviteReceivedEvent
 /**
  * UI-only state for the main screen. HTTP server lifecycle (state, error,
  * start/stop/restore intent) lives entirely in
- * [com.ismartcoding.plain.httpserver.HttpServerManager]; pages read its flows
+ * [com.ismartcoding.plain.platform.HttpServerManager]; pages read its flows
  * directly and dispatch commands through it.
  */
 class MainViewModel : ViewModel() {

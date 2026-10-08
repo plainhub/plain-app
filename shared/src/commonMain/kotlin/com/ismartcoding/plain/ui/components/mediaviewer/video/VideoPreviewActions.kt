@@ -42,7 +42,6 @@ import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import kotlin.time.Duration.Companion.seconds
 import com.ismartcoding.plain.ui.resources.Res as UiRes
-import com.ismartcoding.plain.ui.resources.ellipsis as ui_drawable_ellipsis
 
 /**
  * Shared bottom controls for the non-fullscreen video preview in

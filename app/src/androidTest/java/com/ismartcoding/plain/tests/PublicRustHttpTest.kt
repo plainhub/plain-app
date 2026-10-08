@@ -3,7 +3,6 @@ package com.ismartcoding.plain.tests
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.ismartcoding.plain.appContext
 import com.ismartcoding.plain.helpers.UrlHelper
-import com.ismartcoding.plain.httpserver.HttpServerManager
 import com.ismartcoding.plain.platform.*
 import com.ismartcoding.plain.preferences.*
 import kotlinx.coroutines.runBlocking
@@ -23,9 +22,10 @@ class PublicRustHttpTest {
         val oldDesktop = UserPrefs.desktopAccess.value
         val oldHttp = UserPrefs.httpPort.value
         val oldHttps = UserPrefs.httpsPort.value
-        val clientId = "synthetic-http-${UUID.randomUUID()}"
-        val key = ByteArray(32) { 42 }
-        val root = File(appContext.cacheDir, clientId).apply { mkdirs() }
+        val fixtureName = "synthetic-http-${UUID.randomUUID()}"
+        var clientId = ""
+        var key = ByteArray(0)
+        val root = File(appContext.cacheDir, fixtureName).apply { mkdirs() }
         val payload = ByteArray(512 * 1024 + 17) { (it % 251).toByte() }
         try {
             UserPrefs.service.value = true
@@ -51,7 +51,10 @@ class PublicRustHttpTest {
                 client.request("HEAD", "http://127.0.0.1:$port/health").use { assertEquals(200, it.status.value); assertEquals(0, it.bodyAsBytes().size) }
                 client.post("http://127.0.0.1:$port/init", ByteArray(0)).use { assertEquals(400, it.status.value) }
                 client.get("http://127.0.0.1:$port/").use { assertEquals(200, it.status.value); assertTrue(it.bodyAsText().contains("window.__SERVER_TIME__=")) }
-                HttpServerManager.tokenCache.put(clientId, key)
+                com.ismartcoding.plain.features.session.RustSessionStore.create(fixtureName)
+                val session = com.ismartcoding.plain.features.session.RustSessionStore.list().single { it.name == fixtureName }
+                clientId = session.clientId
+                key = com.ismartcoding.plain.helpers.Base64Lenient.decode(session.token)
                 val initBody = chaCha20Encrypt(key, "authenticated-init".encodeToByteArray())
                 client.post("http://127.0.0.1:$port/init", initBody, "application/octet-stream", mapOf("c-id" to clientId)).use {
                     val responseText = it.bodyAsText()
@@ -96,8 +99,7 @@ class PublicRustHttpTest {
             }
         } finally {
             stopHttpEngineAsync()
-            HttpServerManager.tokenCache.invalidate(clientId)
-            HttpServerManager.clientIpCache.invalidate(clientId)
+            if (clientId.isNotEmpty()) com.ismartcoding.plain.features.session.RustSessionStore.delete(clientId)
             root.deleteRecursively()
             UserPrefs.service.value = oldService
             UserPrefs.desktopAccess.value = oldDesktop

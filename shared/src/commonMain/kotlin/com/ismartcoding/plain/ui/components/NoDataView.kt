@@ -57,7 +57,7 @@ fun NoDataView(
             color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.85f),
             textAlign = TextAlign.Center
         )
-        
+
         if (showRefreshButton) {
             VerticalSpace(32.dp)
 
@@ -68,4 +68,4 @@ fun NoDataView(
             }
         }
     }
-} 
+}

@@ -15,7 +15,7 @@ import com.ismartcoding.plain.platform.isUPlus
 import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.lib.sendEvent
 import com.ismartcoding.plain.services.ScreenMirrorService
-import com.ismartcoding.plain.httpserver.models.ScreenMirrorVideoCodec
+import com.ismartcoding.plain.data.ScreenMirrorVideoCodec
 import com.ismartcoding.plain.lib.screenmirror.ScreenMirrorCaptureSize
 import com.ismartcoding.plain.lib.screenmirror.VideoPacket
 import com.ismartcoding.plain.platform.isRPlus

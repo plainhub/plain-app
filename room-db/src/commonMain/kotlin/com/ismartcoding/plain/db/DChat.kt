@@ -1,14 +1,8 @@
 package com.ismartcoding.plain.db
 
 import androidx.room3.ColumnInfo
-import androidx.room3.Dao
 import androidx.room3.Entity
-import androidx.room3.Insert
 import androidx.room3.PrimaryKey
-import androidx.room3.Query
-import androidx.room3.RawQuery
-import androidx.room3.RoomRawQuery
-import androidx.room3.Update
 import com.ismartcoding.plain.enums.ChatStatus
 import com.ismartcoding.plain.lib.TimeHelper
 import com.ismartcoding.plain.lib.generateId
@@ -304,104 +298,3 @@ data class ChatItemDataUpdate(
     @ColumnInfo(name = "updated_at")
     val updatedAt: Instant = TimeHelper.now(),
 )
-
-data class ChatItemStatusUpdate(
-    val id: String,
-    val status: ChatStatus,
-    @ColumnInfo(name = "status_data")
-    val statusData: String = "",
-    @ColumnInfo(name = "updated_at")
-    val updatedAt: Instant = TimeHelper.now(),
-)
-
-@Dao
-interface ChatDao {
-    @Query("SELECT * FROM chats")
-    suspend fun getAll(): List<DChat>
-
-    @RawQuery
-    suspend fun search(query: RoomRawQuery): List<DChat>
-
-    @RawQuery
-    suspend fun count(query: RoomRawQuery): Int
-
-    @Query("SELECT * FROM chats WHERE channel_id = '' AND (to_id = :toId OR from_id = :toId) ORDER BY created_at ASC")
-    suspend fun getByPeerId(toId: String): List<DChat>
-
-    @Query("SELECT * FROM chats WHERE channel_id = '' AND (to_id = :toId OR from_id = :toId) ORDER BY created_at DESC LIMIT :limit OFFSET :offset")
-    suspend fun getByPeerIdPage(toId: String, limit: Int, offset: Int): List<DChat>
-
-    @Query(
-        "SELECT * FROM chats WHERE channel_id = '' AND (to_id = :toId OR from_id = :toId) AND content LIKE :text ESCAPE '\\' " +
-            "ORDER BY created_at DESC LIMIT :limit OFFSET :offset",
-    )
-    suspend fun getByPeerIdPageText(toId: String, text: String, limit: Int, offset: Int): List<DChat>
-
-    @Query("SELECT * FROM chats WHERE channel_id = :channelId ORDER BY created_at ASC")
-    suspend fun getByChannelId(channelId: String): List<DChat>
-
-    @Query("SELECT * FROM chats WHERE channel_id = :channelId ORDER BY created_at DESC LIMIT :limit OFFSET :offset")
-    suspend fun getByChannelIdPage(channelId: String, limit: Int, offset: Int): List<DChat>
-
-    @Query(
-        "SELECT * FROM chats WHERE channel_id = :channelId AND content LIKE :text ESCAPE '\\' " +
-            "ORDER BY created_at DESC LIMIT :limit OFFSET :offset",
-    )
-    suspend fun getByChannelIdPageText(channelId: String, text: String, limit: Int, offset: Int): List<DChat>
-
-    @Query(
-        """
-        SELECT c.* FROM chats c
-        INNER JOIN (
-            SELECT '' as from_id, '' as to_id, channel_id, MAX(created_at) as max_created_at
-            FROM chats
-            WHERE channel_id != ''
-            GROUP BY channel_id
-            UNION ALL
-            SELECT from_id, to_id, '' as channel_id, MAX(created_at) as max_created_at
-            FROM chats
-            WHERE channel_id = ''
-            GROUP BY from_id, to_id
-        ) latest ON (
-            (c.channel_id != '' AND c.channel_id = latest.channel_id AND c.created_at = latest.max_created_at)
-            OR
-            (c.channel_id = '' AND c.from_id = latest.from_id AND c.to_id = latest.to_id AND c.created_at = latest.max_created_at)
-        )
-        ORDER BY c.created_at DESC
-    """
-    )
-    suspend fun getAllLatestChats(): List<DChat>
-
-    @Insert
-    suspend fun insert(vararg item: DChat)
-
-    @Query("SELECT * FROM chats WHERE id=:id")
-    suspend fun getById(id: String): DChat?
-
-    @Update
-    suspend fun update(vararg item: DChat)
-
-    @Query("UPDATE chats SET status = :status WHERE id = :id")
-    suspend fun updateStatus(id: String, status: ChatStatus)
-
-    @Query("UPDATE chats SET status = :status, status_data = :statusData WHERE id = :id")
-    suspend fun updateStatusAndData(id: String, status: ChatStatus, statusData: String)
-
-    @Update(entity = DChat::class)
-    suspend fun updateStatusData(item: ChatItemStatusUpdate)
-
-    @Update(entity = DChat::class)
-    suspend fun updateData(item: ChatItemDataUpdate)
-
-    @Query("DELETE FROM chats WHERE id = :id")
-    suspend fun delete(id: String)
-
-    @Query("DELETE FROM chats WHERE id in (:ids)")
-    suspend fun deleteByIds(ids: List<String>)
-
-    @Query("DELETE FROM chats WHERE channel_id = '' AND (to_id = :peerId OR from_id = :peerId)")
-    suspend fun deleteByPeerId(peerId: String)
-
-    @Query("DELETE FROM chats WHERE channel_id = :channelId")
-    suspend fun deleteByChannelId(channelId: String)
-}

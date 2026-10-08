@@ -52,7 +52,7 @@ class PeerStatusRustHttpTest {
                         client.webSocket(url) { socket ->
                             val timestamp = System.currentTimeMillis()
                             val signature = Base64.encode(signEd25519(privateKey, "$timestamp$id".encodeToByteArray()))
-                            socket.sendBinary(RustPeerWireStore.encrypt(key, "$signature|$timestamp|$id"))
+                            socket.sendBinary(PeerWireTestApi.encrypt(key, "$signature|$timestamp|$id"))
                             assertEquals("ok", socket.incoming.receive().text)
                             ready.complete(Unit)
                             release.await()

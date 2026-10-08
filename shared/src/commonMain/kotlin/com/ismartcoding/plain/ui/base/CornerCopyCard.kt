@@ -39,8 +39,6 @@ import kotlinx.coroutines.delay
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import com.ismartcoding.plain.ui.resources.Res as UiRes
-import com.ismartcoding.plain.ui.resources.check as ui_drawable_check
-import com.ismartcoding.plain.ui.resources.copy as ui_drawable_copy
 import com.ismartcoding.plain.i18n.copy
 
 // The corner copy button is a small circle whose center sits exactly on the

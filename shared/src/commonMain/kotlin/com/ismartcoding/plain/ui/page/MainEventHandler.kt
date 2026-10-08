@@ -6,21 +6,17 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import com.ismartcoding.plain.lib.Channel
 import com.ismartcoding.plain.lib.coIO
-import com.ismartcoding.plain.lib.JsonHelper
 import com.ismartcoding.plain.enums.AudioAction
 import androidx.navigation.NavHostController
 import androidx.navigation.NavDestination.Companion.hasRoute
 import com.ismartcoding.plain.events.AudioActionEvent
 import com.ismartcoding.plain.events.ConfirmDialogEvent
 import com.ismartcoding.plain.events.ConfirmToAcceptLoginEvent
-import com.ismartcoding.plain.events.EventType
 import com.ismartcoding.plain.events.LoadingDialogEvent
-import com.ismartcoding.plain.events.WebSocketEvent
 import com.ismartcoding.plain.events.HDownloadTaskDoneEvent
 import com.ismartcoding.plain.events.HPomodoroPauseEvent
 import com.ismartcoding.plain.events.HPomodoroStartEvent
 import com.ismartcoding.plain.events.HPomodoroStopEvent
-import com.ismartcoding.plain.lib.sendEvent
 import com.ismartcoding.plain.ui.base.ToastEvent
 import com.ismartcoding.plain.ui.models.AudioQueueViewModel
 import com.ismartcoding.plain.chat.ChatViewModel
@@ -28,7 +24,6 @@ import com.ismartcoding.plain.ui.models.MainViewModel
 import com.ismartcoding.plain.ui.models.PeerViewModel
 import com.ismartcoding.plain.ui.models.PomodoroViewModel
 import com.ismartcoding.plain.ui.nav.Routing
-import com.ismartcoding.plain.httpserver.models.toModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -83,8 +78,6 @@ fun MainEventCollector(
                         val chat = RustChatStore.getById(event.downloadTask.messageId)
                         if (chat != null) {
                             chatVM.update(chat)
-                            val m = chat.toModel()
-                            sendEvent(WebSocketEvent(EventType.MESSAGE_UPDATED, JsonHelper.jsonEncode(listOf(m))))
                         }
                     }
                 }

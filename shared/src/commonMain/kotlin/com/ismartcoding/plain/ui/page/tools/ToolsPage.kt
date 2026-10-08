@@ -55,8 +55,6 @@ import kotlinx.coroutines.flow.map
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import com.ismartcoding.plain.ui.resources.Res as UiRes
-import com.ismartcoding.plain.ui.resources.grid_3x3 as ui_drawable_grid_3x3
-import com.ismartcoding.plain.ui.resources.layout_grid as ui_drawable_layout_grid
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

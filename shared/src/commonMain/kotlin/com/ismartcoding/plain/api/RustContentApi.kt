@@ -1,7 +1,8 @@
 package com.ismartcoding.plain.api
 
+import com.ismartcoding.plain.lib.JsonHelper
+
 import com.ismartcoding.plain.events.*
-import com.ismartcoding.plain.httpserver.models.toModel
 import com.ismartcoding.plain.features.feed.FeedWorkerState
 import com.ismartcoding.plain.features.feed.FeedWorkerStatus
 import com.ismartcoding.plain.lib.sendEvent
@@ -12,6 +13,7 @@ import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.serialization.json.*
+import kotlin.concurrent.Volatile
 
 /** A refusal or transport failure from the local Rust core. */
 class RustApiException(message: String, cause: Throwable? = null) : Exception(message, cause)
@@ -23,8 +25,12 @@ object RustContentApi {
     private val transferClient by lazy { createPlainHttpClient(PlainHttpClientSpec.Local(15 * 60)) }
     private val eventClient by lazy { createPeerStatusHttpClient() }
     private val statusLock = Mutex()
-    private var localSession: ContentApiSession? = null
+    private val eventSendLock = Mutex()
+    private val eventSocket = MutableStateFlow<PlainWebSocketSession?>(null)
+    @Volatile private var localSession: ContentApiSession? = null
     private val syncStates = MutableStateFlow<Map<String, Pair<String, String>>>(emptyMap())
+
+    internal fun startedSession(): ContentApiSession? = localSession
 
     internal suspend fun transportSession(): ContentApiSession {
         start()
@@ -49,11 +55,11 @@ object RustContentApi {
     private suspend fun execute(document: String, session: ContentApiSession?, longRunning: Boolean = false): JsonObject {
         if (session == null) start()
         val target = session ?: checkNotNull(localSession)
-        val body = buildJsonObject { put("query", document) }.toString()
+        val body = JsonHelper.jsonEncode(ContentQueryRequest(document))
         val response = (if (longRunning) transferClient else client).postText("${target.baseUrl}/graphql", body, "application/json", target.headers())
         response.use {
             check(it.isOk()) { "Rust API returned HTTP ${it.status}" }
-            val result = Json.parseToJsonElement(it.bodyAsText()).jsonObject
+            val result = JsonHelper.jsonDecode<JsonElement>(it.bodyAsText()).jsonObject
             val errors = result["errors"] as? JsonArray
             check(errors.isNullOrEmpty()) { errors?.joinToString { error -> error.jsonObject["message"]?.jsonPrimitive?.content ?: "Rust API error" } ?: "Rust API error" }
             return result.getValue("data").jsonObject
@@ -69,11 +75,11 @@ object RustContentApi {
      * used to crash the app instead of surfacing the refusal. Callers that
      * already expect a refusal should unwrap with a message.
      */
-    suspend fun postJson(path: String, body: JsonObject, longRunning: Boolean = false): Result<JsonObject> {
-        start()
-        val target = checkNotNull(localSession)
+    suspend fun postJson(path: String, body: JsonObject, longRunning: Boolean = false, session: ContentApiSession? = null): Result<JsonObject> {
+        if (session == null) start()
+        val target = session ?: checkNotNull(localSession)
         return (if (longRunning) transferClient else client).postText("${target.baseUrl}/$path", body.toString(), "application/json", target.headers()).use {
-            val result = runCatching { Json.parseToJsonElement(it.bodyAsText()).jsonObject }
+            val result = runCatching { JsonHelper.jsonDecode<JsonElement>(it.bodyAsText()).jsonObject }
                 .getOrElse { error -> return Result.failure(RustApiException("Rust API returned an unreadable body", error)) }
             if (!it.isOk()) {
                 val message = result["error"]?.jsonPrimitive?.contentOrNull ?: "Rust API returned HTTP ${it.status}"
@@ -124,40 +130,60 @@ object RustContentApi {
         }
     }
 
+    suspend fun publish(event: WebSocketEvent): Int {
+        start()
+        return eventSendLock.withLock {
+            val socket = withTimeoutOrNull(5_000) { eventSocket.filterNotNull().first() } ?: return@withLock 0
+            try {
+                when (val data = event.data) {
+                    is WebSocketData.Text -> socket.sendText(JsonHelper.jsonEncode(ContentEventPacket(event.type.value, data.value)))
+                    is WebSocketData.Binary -> {
+                        val bytes = ByteArray(4 + data.value.size)
+                        repeat(4) { index -> bytes[index] = (event.type.value shr (index * 8)).toByte() }
+                        data.value.copyInto(bytes, 4)
+                        socket.sendBinary(bytes)
+                    }
+                }
+                com.ismartcoding.plain.features.session.onlineClientIds.value.size
+            } catch (cancelled: CancellationException) { throw cancelled }
+            catch (_: Exception) { 0 }
+        }
+    }
+
     private suspend fun collectEvents() {
         var retryMs = 500L
         while (currentCoroutineContext().isActive) {
             try {
                 eventClient.webSocket(localSession!!.baseUrl.replace("http://", "ws://") + "/events", localSession!!.headers()) { socket ->
                     retryMs = 500L
-                    runCatching { postJson("files/mutate", buildJsonObject { put("action", "recoverDeletions") }) }
+                    eventSocket.value = socket
+                    com.ismartcoding.plain.preferences.Prefs.refresh()
+                    com.ismartcoding.plain.features.session.refreshOnlineClientIds()
+                    runCatching { postJson("files/mutate", JsonHelper.jsonEncodeToElement(RecoverDeletionsRequest()).jsonObject) }
                     com.ismartcoding.plain.chat.download.DownloadQueue.refresh()
                     com.ismartcoding.plain.features.share.SharedFolderDownloadEngine.refresh()
                     com.ismartcoding.plain.discover.PairingProjection.reconcile()
                     com.ismartcoding.plain.discover.RustNearbyDevices.refresh()
                     com.ismartcoding.plain.discover.RustMdnsRuntime.refresh()
                     com.ismartcoding.plain.features.dlna.DlnaRendererState.refresh()
+                    com.ismartcoding.plain.features.dlna.sender.RustDlnaSender.refresh()
+                    com.ismartcoding.plain.ai.RustImageModels.refresh()
                     com.ismartcoding.plain.chat.peer.PeerTransportProjection.refresh()
                     com.ismartcoding.plain.chat.peer.PeerStatusProjection.refresh()
                     com.ismartcoding.plain.chat.peer.PeerCacher.load()
                     com.ismartcoding.plain.chat.channel.ChannelCacher.load()
                     com.ismartcoding.plain.chat.ChatCacher.load()
                     for (frame in socket.incoming) {
-                        frame.binary?.let { bytes ->
-                            if (bytes.size >= 4) {
-                                val type = (0..3).fold(0) { value, index -> value or ((bytes[index].toInt() and 255) shl (index * 8)) }
-                                if (type == EventType.IMAGE_EDITOR_UPDATE.value) {
-                                    com.ismartcoding.plain.httpserver.websocket.WebSocketHelper.sendEventAsync(
-                                        WebSocketEvent(EventType.IMAGE_EDITOR_UPDATE, bytes.copyOfRange(4, bytes.size)))
-                                }
-                            }
-                        }
                         val text = frame.text ?: continue
-                        val message = Json.parseToJsonElement(text).jsonObject
-                        val type = message.getValue("type").jsonPrimitive.int
-                        val payload = message.getValue("payload").jsonPrimitive.content
+                        val message = JsonHelper.jsonDecode<ContentEventPacket>(text)
+                        val type = message.type
+                        val payload = message.payload
                         when (type) {
-                            EventType.PEER_STATUS_UPDATED.value -> { com.ismartcoding.plain.chat.peer.PeerStatusProjection.refresh(); com.ismartcoding.plain.chat.peer.PeerCacher.load() }
+                            EventType.PEER_STATUS_UPDATED.value -> {
+                                com.ismartcoding.plain.chat.peer.PeerStatusProjection.refresh()
+                                com.ismartcoding.plain.chat.peer.PeerCacher.load()
+                                com.ismartcoding.plain.chat.ChatCacher.load()
+                            }
                             com.ismartcoding.plain.chat.peer.PeerTransportProjection.EVENT_UPDATED -> com.ismartcoding.plain.chat.peer.PeerTransportProjection.refresh()
                             com.ismartcoding.plain.chat.peer.PeerStatusProjection.EVENT_UPDATED -> com.ismartcoding.plain.chat.peer.PeerStatusProjection.refresh(payload)
                             com.ismartcoding.plain.discover.RustMdnsRuntime.EVENT_UPDATED, EventType.NEARBY_DISCOVERY_STARTED.value, EventType.NEARBY_DISCOVERY_STOPPED.value -> com.ismartcoding.plain.discover.RustMdnsRuntime.refresh(if (type == com.ismartcoding.plain.discover.RustMdnsRuntime.EVENT_UPDATED) payload else null)
@@ -169,15 +195,13 @@ object RustContentApi {
                             EventType.PAIRING_SUCCESS.value -> com.ismartcoding.plain.discover.PairingProjection.success(payload)
                             EventType.PAIRING_FAILED.value -> com.ismartcoding.plain.discover.PairingProjection.timeout(payload)
                             EventType.MESSAGE_CREATED.value -> {
-                                Json.parseToJsonElement(payload).jsonArray.forEach { value ->
+                                JsonHelper.jsonDecode<JsonElement>(payload).jsonArray.forEach { value ->
                                     com.ismartcoding.plain.chat.RustChatStore.getById(value.jsonObject.getValue("id").jsonPrimitive.content)?.let { item ->
                                         if (item.fromId == "me") {
                                             val target = if (item.channelId.isEmpty()) com.ismartcoding.plain.chat.data.ChatTarget.parseId("peer:" + item.toId)
                                                 else com.ismartcoding.plain.chat.data.ChatTarget.parseId("channel:" + item.channelId)
                                             com.ismartcoding.plain.chat.ChatViewModel.onMessagesCreated(target, listOf(item), scroll = true)
                                             com.ismartcoding.plain.chat.ChatCacher.load()
-                                            sendEvent(WebSocketEvent(EventType.MESSAGE_CREATED,
-                                                com.ismartcoding.plain.lib.JsonHelper.jsonEncode(listOf(item.toModel()))))
                                         } else com.ismartcoding.plain.chat.peer.RustPeerStore.getById(item.fromId)?.let { peer ->
                                             val channel = item.channelId.takeIf { it.isNotEmpty() }?.let { com.ismartcoding.plain.chat.channel.RustChannelStore.getById(it) }
                                             com.ismartcoding.plain.chat.ChatMessageReceiver.applyCommitted(item, peer, channel)
@@ -186,59 +210,54 @@ object RustContentApi {
                                 }
                             }
                             EventType.MESSAGE_DELETED.value -> {
-                                val target = Json.parseToJsonElement(payload).jsonPrimitive.content
+                                val target = JsonHelper.jsonDecode<JsonElement>(payload).jsonPrimitive.content
                                 if (target.startsWith("ids=")) com.ismartcoding.plain.chat.ChatViewModel.onMessagesDeleted(target.removePrefix("ids=").split(',').filter { it.isNotEmpty() }.toSet())
                                 else com.ismartcoding.plain.chat.ChatViewModel.onConversationCleared(target)
                                 com.ismartcoding.plain.chat.ChatCacher.load()
-                                sendEvent(WebSocketEvent(EventType.MESSAGE_DELETED, payload))
                             }
                             EventType.CHANNELS_UPDATED.value -> {
-                                val result = Json.parseToJsonElement(payload).jsonObject
+                                val result = JsonHelper.jsonDecode<JsonElement>(payload).jsonObject
                                 com.ismartcoding.plain.chat.channel.ChannelSystemMessageReceiver.applyCommitted(result)
-                                sendEvent(WebSocketEvent(EventType.CHANNELS_UPDATED, result.getValue("channels").toString()))
                             }
                             EventType.MESSAGE_UPDATED.value -> {
-                                val items = Json.parseToJsonElement(payload).jsonArray.mapNotNull { value ->
+                                val items = JsonHelper.jsonDecode<JsonElement>(payload).jsonArray.mapNotNull { value ->
                                     com.ismartcoding.plain.chat.RustChatStore.getById(value.jsonObject.getValue("id").jsonPrimitive.content)
                                 }
                                 items.forEach { com.ismartcoding.plain.chat.ChatViewModel.update(it) }
                                 com.ismartcoding.plain.chat.ChatCacher.load()
-                                if (items.isNotEmpty()) sendEvent(WebSocketEvent(EventType.MESSAGE_UPDATED,
-                                    com.ismartcoding.plain.lib.JsonHelper.jsonEncode(items.map { it.toModel() })))
                             }
                             EventType.DOWNLOAD_PROGRESS.value -> {
                                 com.ismartcoding.plain.chat.download.DownloadQueue.refresh()
-                                sendEvent(WebSocketEvent(EventType.DOWNLOAD_PROGRESS, payload))
                             }
-                            10005 -> {
-                                val request = Json.parseToJsonElement(payload).jsonObject
-                                com.ismartcoding.plain.httpserver.HttpServerManager.clientRequestTs[request.getValue("clientId").jsonPrimitive.content] = request.getValue("time").jsonPrimitive.long
+                            10006 -> com.ismartcoding.plain.features.session.setOnlineClientIds(
+                                JsonHelper.jsonDecode<JsonElement>(payload).jsonArray.map { it.jsonPrimitive.content }.toSet())
+                            10010 -> com.ismartcoding.plain.preferences.Prefs.refresh()
+                            10009 -> com.ismartcoding.plain.ai.RustImageModels.apply(JsonHelper.jsonDecode<JsonObject>(payload))
+                            10008 -> com.ismartcoding.plain.features.dlna.sender.RustDlnaSender.apply(JsonHelper.jsonDecode<JsonObject>(payload))
+                            10007 -> {
                                 sendEvent(WebRequestReceivedEvent())
                             }
                             10004 -> com.ismartcoding.plain.features.share.SharedFolderDownloadEngine.refresh()
                             EventType.CONTENT_CHANGED.value -> {
-                                val channels = com.ismartcoding.plain.chat.channel.RustChannelRuntime.call("snapshot")
+                                com.ismartcoding.plain.preferences.Prefs.refresh()
+                                val channels = com.ismartcoding.plain.chat.channel.RustChannelRuntime.call(com.ismartcoding.plain.chat.channel.ChannelCommand.Snapshot)
                                 com.ismartcoding.plain.chat.channel.ChannelSystemMessageReceiver.applyCommitted(channels)
-                                sendEvent(WebSocketEvent(EventType.CHANNELS_UPDATED, channels.getValue("channels").toString()))
                                 try { com.ismartcoding.plain.features.FavoriteFolderHelper.refresh() }
                                 catch (cancelled: CancellationException) { throw cancelled }
                                 catch (error: Exception) { com.ismartcoding.plain.lib.logcat.LogCat.e("Favorite folders refresh",error) }
                                 refreshSyncStates()
                                 NotesViewModel.reloadAsync()
                                 com.ismartcoding.plain.features.PomodoroHost.refresh()
-                                sendEvent(WebSocketEvent(EventType.CONTENT_CHANGED, payload))
                             }
                             EventType.POMODORO_ACTION.value -> {
                                 com.ismartcoding.plain.features.PomodoroHost.refresh()
-                                sendEvent(WebSocketEvent(EventType.POMODORO_ACTION, payload))
                             }
-                            EventType.BOOKMARK_UPDATED.value -> sendEvent(WebSocketEvent(EventType.BOOKMARK_UPDATED, payload))
-                            EventType.FEEDS_FETCHED.value -> sendEvent(WebSocketEvent(EventType.FEEDS_FETCHED, payload))
                         }
                     }
                 }
             } catch (cancelled: CancellationException) { throw cancelled }
             catch (_: Exception) { }
+            finally { eventSocket.value = null; com.ismartcoding.plain.features.session.setOnlineClientIds(emptySet()) }
             delay(retryMs)
             retryMs = (retryMs * 2).coerceAtMost(5_000)
         }

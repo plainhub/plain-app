@@ -60,9 +60,12 @@ fn public_start(config: &str) -> Result<String, String> {
             .and_then(|v| u16::try_from(v).ok())
             .ok_or_else(|| format!("Invalid {name}"))
     };
-    let (cert, key) = super::tls::identity()?;
+    let prefs = super::prefs()?;
+    let directory = prefs.path().parent().ok_or("Missing TLS directory")?;
+    let (cert, key) = plain_rs::tls_identity::identity(&directory.join("tls-identity.json"))?;
     let core = CORE.lock().map_err(|e| e.to_string())?;
     let core = core.as_ref().ok_or("Rust core is not initialized")?;
+    core.server.set_build_debug(config["debug"].as_bool().unwrap_or(false));
     let (http, https) = core.runtime.block_on(core.server.start_public(
         port("httpPort")?,
         port("httpsPort")?,
@@ -94,13 +97,6 @@ pub extern "C" fn plain_http_stop() -> *mut c_char {
         Err(e) => c_string(e),
     }
 }
-#[unsafe(no_mangle)]
-pub extern "C" fn plain_tls_action(config: *const c_char) -> *mut c_char {
-    c_string(match input(config).and_then(|v| super::tls::action(&v)) {
-        Ok(value) => value,
-        Err(e) => format!("ERROR:{e}"),
-    })
-}
 #[cfg(target_os = "android")]
 mod android {
     use super::*;
@@ -110,22 +106,6 @@ mod android {
         objects::{JObject, JString},
         sys::jstring,
     };
-    #[unsafe(no_mangle)]
-    pub extern "system" fn Java_com_ismartcoding_plain_api_RustCoreBridge_tlsNative(
-        mut env: EnvUnowned<'_>,
-        _: JObject<'_>,
-        config: JString<'_>,
-    ) -> jstring {
-        env.with_env(|env| -> jni::errors::Result<_> {
-            let value = match super::super::tls::action(&config.to_string()) {
-                Ok(v) => v,
-                Err(e) => format!("ERROR:{e}"),
-            };
-            env.new_string(value)
-        })
-        .resolve::<ThrowRuntimeExAndDefault>()
-        .into_raw()
-    }
     #[unsafe(no_mangle)]
     pub extern "system" fn Java_com_ismartcoding_plain_api_RustCoreBridge_startNative(
         mut env: EnvUnowned<'_>,

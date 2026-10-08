@@ -38,7 +38,8 @@ class ChatStorageRustHttpTest {
             RustPeerStore.update(peer)
             assertEquals(peer.name, RustPeerStore.getByIds(listOf(peer.id)).single().name)
             PeerCacher.load()
-            PeerCacher.mutatePeer(peer.id) { it.name = "$prefix patched" }
+            RustPeerStore.patch(peer, peer.copy(name = "$prefix patched"))
+            PeerCacher.load()
             assertEquals("$prefix patched", RustPeerStore.getById(peer.id)!!.name)
             RustChannelStore.insert(channel)
             assertEquals(channel.version, RustChannelStore.getById(channel.id)!!.version)

@@ -7,7 +7,7 @@ import com.ismartcoding.plain.lib.withIO
 import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.discover.RustMdnsRuntime
 import com.ismartcoding.plain.lib.toByteArray
-import com.ismartcoding.plain.httpserver.HttpServerManager
+import com.ismartcoding.plain.platform.HttpServerManager
 import platform.Foundation.NSFileManager
 import platform.Foundation.NSString
 import platform.Foundation.NSURL
@@ -16,9 +16,9 @@ import platform.Foundation.create
 
 // OS hooks for the Rust HTTP server and user certificate import.
 
-actual fun getSSLSignature(password: String): ByteArray = RustTlsCertificate.signature()
+actual suspend fun getSSLSignature(password: String): ByteArray = RustTlsCertificate.signature()
 
-actual fun generateSSLKeyStore(password: String) {
+actual suspend fun generateSSLKeyStore(password: String) {
     RustTlsCertificate.regenerate()
 }
 
@@ -28,13 +28,10 @@ actual suspend fun replaceSSLKeyStoreAsync(
     secondUri: String,
     password: String,
 ): ByteArray = withIO {
-    val provider = IosPlatformRegistry.sslCertProvider()
-        ?: throw IllegalStateException("SSL certificate provider not available")
     when (mode) {
         SslCertImportMode.PKCS12 -> {
             val data = readFileBytes(firstUri)
-            provider.replaceCertWithPkcs12(data, password)
-            RustTlsCertificate.importPem(provider.certificatePem(), provider.privateKeyPem())
+            RustTlsCertificate.importPkcs12(data, password)
         }
         SslCertImportMode.PEM -> {
             val certPem = readFileText(firstUri)
@@ -61,9 +58,9 @@ private fun readFileText(uriStr: String): String {
 }
 
 actual suspend fun startHttpEngineAsync(): Boolean =
-    com.ismartcoding.plain.httpserver.RustHttpEngine.start()
+    com.ismartcoding.plain.platform.RustHttpEngine.start()
 
-actual suspend fun stopHttpEngineAsync() = com.ismartcoding.plain.httpserver.RustHttpEngine.stop()
+actual suspend fun stopHttpEngineAsync() = com.ismartcoding.plain.platform.RustHttpEngine.stop()
 
 /** No platform side effects on iOS once the server is healthy. */
 actual suspend fun onHttpServerStarted() {
@@ -97,14 +94,9 @@ actual suspend fun stopHttpServiceAsync(): Unit = withIO {
 
 
 actual fun isHttpServerRunning(): Boolean =
-    com.ismartcoding.plain.httpserver.RustHttpEngine.isRunning
+    com.ismartcoding.plain.platform.RustHttpEngine.isRunning
 
 actual fun isMdnsRunning(): Boolean = RustMdnsRuntime.running
 
 actual fun getAwareAttachStatus(): String = "not available"
 actual fun getAwareDiscoveredPeerCount(): Int = 0
-
-
-
-
-

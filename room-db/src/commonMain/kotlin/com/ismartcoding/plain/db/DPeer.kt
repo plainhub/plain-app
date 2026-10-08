@@ -2,16 +2,11 @@ package com.ismartcoding.plain.db
 
 import androidx.compose.runtime.Composable
 import androidx.room3.ColumnInfo
-import androidx.room3.Dao
 import com.ismartcoding.plain.lib.TimeHelper
 import kotlin.time.Instant
 import androidx.room3.Entity
 import androidx.room3.Ignore
-import androidx.room3.Insert
 import androidx.room3.PrimaryKey
-import androidx.room3.Query
-import androidx.room3.Update
-import androidx.room3.Upsert
 import com.ismartcoding.plain.enums.DeviceType
 import com.ismartcoding.plain.enums.PeerStatus
 
@@ -34,37 +29,4 @@ data class DPeer(
     fun getIpList(): List<String> {
         return ip.split(",").map { it.trim() }.filter { it.isNotEmpty() }
     }
-}
-
-@Dao
-interface PeerDao {
-    @Query("SELECT * FROM peers")
-    suspend fun getAll(): List<DPeer>
-
-    @Query("SELECT * FROM peers where status = 'PAIRED'")
-    suspend fun getAllPaired(): List<DPeer>
-
-    @Query("SELECT * FROM peers where status IN ('PAIRED', 'CHANNEL')")
-    suspend fun getAllWithPublicKey(): List<DPeer>
-
-    @Query("SELECT * FROM peers WHERE id = :id")
-    suspend fun getById(id: String): DPeer?
-
-    @Query("SELECT * FROM peers WHERE id IN (:ids)")
-    suspend fun getByIds(ids: List<String>): List<DPeer>
-
-    @Insert
-    suspend fun insert(vararg item: DPeer)
-
-    @Update
-    suspend fun update(vararg item: DPeer)
-
-    @Upsert
-    suspend fun upsert(vararg item: DPeer)
-
-    @Query("DELETE FROM peers WHERE id = :id")
-    suspend fun delete(id: String)
-
-    @Query("DELETE FROM peers WHERE id in (:ids)")
-    suspend fun deleteByIds(ids: List<String>)
 }

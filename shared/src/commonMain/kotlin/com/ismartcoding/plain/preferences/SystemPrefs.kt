@@ -33,7 +33,6 @@ object SystemPrefs {
     val audioPlaying = flow("audio_playing", "")
     val audioQueueMigrated = flow("audio_queue_migrated", false)
     val mdnsHostname = flow("mdns_hostname", "plainapp.local")
-    val fidUriExtMigrated = flow("fid_uri_ext_migrated", false)
     val appFileRealPathMigrated = flow("app_file_real_path_migrated", false)
     val signatureKey = flow("signature_key_pair", "")
     val webAssetRoot = flow("web_asset_root", "")

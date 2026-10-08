@@ -2,8 +2,8 @@ package com.ismartcoding.plain.features
 
 import com.ismartcoding.plain.api.*
 import com.ismartcoding.plain.db.DImageEditorProject
-import com.ismartcoding.plain.httpserver.models.ID
-import com.ismartcoding.plain.httpserver.models.ImageEditorProjectSummary
+import com.ismartcoding.plain.data.ID
+import com.ismartcoding.plain.features.imageeditor.ImageEditorProjectSummary
 import kotlinx.serialization.json.*
 
 object ImageEditorProjectHelper {

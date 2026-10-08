@@ -46,10 +46,6 @@ import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import com.ismartcoding.plain.ui.resources.Res as UiRes
-import com.ismartcoding.plain.ui.resources.grid_3x3 as ui_drawable_grid_3x3
-import com.ismartcoding.plain.ui.resources.house as ui_drawable_house
-import com.ismartcoding.plain.ui.resources.message_circle as ui_drawable_message_circle
-import com.ismartcoding.plain.ui.resources.search as ui_drawable_search
 import com.ismartcoding.plain.i18n.search
 
 internal data class MainNavItem(

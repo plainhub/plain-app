@@ -8,7 +8,7 @@ package com.ismartcoding.plain.api
  * another's data, which only shows up as wrong payloads at runtime.
  */
 enum class HostRoute {
-    HttpExchange,
+    FileResourceStream,
     Thumbnail,
     ChatPicked,
     SharedTransfer,
@@ -33,7 +33,7 @@ enum class HostRoute {
  * `audio` prefixes are checked after the specific ones they could swallow.
  */
 fun routeForHostMethod(method: String): HostRoute = when {
-    method == "httpExchange" -> HostRoute.HttpExchange
+    method == "fileResourceStream" -> HostRoute.FileResourceStream
     method.startsWith("thumbnail") -> HostRoute.Thumbnail
     method.startsWith("chatPicked") -> HostRoute.ChatPicked
     method.startsWith("sharedTransfer") -> HostRoute.SharedTransfer
@@ -55,7 +55,7 @@ fun routeForHostMethod(method: String): HostRoute = when {
 
 /** Method names the Rust side actually sends, used to prove no route is dead. */
 internal val ALL_METHOD_NAMES = listOf(
-    "httpExchange", "thumbnailDecode", "chatPickedFacts", "sharedTransferSend",
+    "fileResourceStream", "thumbnailDecode", "chatPickedFacts", "sharedTransferSend",
     "blePairConnect", "mainGraphql", "mdnsMulticast", "discoveryFacts",
     "nearbyScanFacts", "pairingNotification", "peerStartAware", "peerTransportSocket",
     "systemAppFacts", "fileMetadataFacts", "audioEngineCommand", "fileTaskScan",

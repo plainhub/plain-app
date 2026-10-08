@@ -21,9 +21,6 @@ import kotlin.test.fail
  * 5. every audio list page (all-items, artist, playlist) uses MediaTopBar so
  *    the cast-mode top bar (title + secondary container) behaves the same, and
  *    exposes sort + cast actions.
- * 6. a finished cast track auto-advances: next cast queue item, or the audio
- *    playback order when the cast queue is empty (DlnaRoutes
- *    advanceCastToNextTrack + castItem's onPlaying) — audio casts only.
  */
 class AudioCastModeGuardTest {
 
@@ -43,8 +40,6 @@ class AudioCastModeGuardTest {
         "shared/src/commonMain/kotlin/com/ismartcoding/plain/ui/page/audio/components/AudioListItemActions.kt"
     private val castVmPath =
         "shared/src/commonMain/kotlin/com/ismartcoding/plain/ui/models/CastViewModel.kt"
-    private val dlnaRoutesPath =
-        "shared/src/commonMain/kotlin/com/ismartcoding/plain/httpserver/routes/DlnaRoutes.kt"
     private val fabPath =
         "shared/src/commonMain/kotlin/com/ismartcoding/plain/ui/page/cast/CastQueueFab.kt"
 
@@ -165,30 +160,9 @@ class AudioCastModeGuardTest {
             "castItem casts the tapped track immediately; auto-adding it to the cast playlist is queue mutation the user did not ask for (the row toggle adds on purpose)",
         )
         assertTrue(
-            "setAVTransportURIAsync(" in body && "playAVTransportAsync(" in body,
-            "castItem must set the transport URI and start playback on the device",
+            "castItemCommand(CastItem.from(item))" in body,
+            "castItem must send the media facts to the Rust cast command",
         )
     }
 
-    @Test
-    fun trackEndFallsBackToThePlaybackOrderWhenCastQueueIsEmpty() {
-        val routes = source(dlnaRoutesPath)
-        val body = functionBody(routes, "advanceCastToNextTrack")
-            ?: fail("advanceCastToNextTrack not found in $dlnaRoutesPath")
-        assertTrue(
-            "resolveNext(" in body,
-            "tap-to-cast no longer populates the cast playlist, so a finished cast track must fall back to AudioQueueManager.resolveNext — otherwise nothing auto-plays after the first track",
-        )
-        assertTrue(
-            "isAudioFast()" in body,
-            "the playback-order fallback must be audio-only: a finished video/image cast must never pull in an audio track",
-        )
-        val castVm = source(castVmPath)
-        val castBody = functionBody(castVm, "castItem")
-            ?: fail("castItem not found in $castVmPath")
-        assertTrue(
-            "onPlaying(" in castBody,
-            "castItem must mark the cast track current (onPlaying) so the fallback resolves the track after the one actually casting, not after the last locally played track",
-        )
-    }
 }

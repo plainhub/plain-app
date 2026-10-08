@@ -37,8 +37,6 @@ import com.ismartcoding.plain.ui.components.mediaviewer.PreviewerSoftWhite
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import com.ismartcoding.plain.ui.resources.Res as UiRes
-import com.ismartcoding.plain.ui.resources.arrow_left as ui_drawable_arrow_left
-import com.ismartcoding.plain.ui.resources.ellipsis as ui_drawable_ellipsis
 
 /**
  * Shared full-screen video overlay scaffold: top title bar (with exit + more

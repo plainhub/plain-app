@@ -18,8 +18,6 @@ import com.ismartcoding.plain.ui.extensions.collectAsStateValue
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.stringResource
 import com.ismartcoding.plain.ui.resources.Res as UiRes
-import com.ismartcoding.plain.ui.resources.bot as ui_drawable_bot
-import com.ismartcoding.plain.ui.resources.hash as ui_drawable_hash
 
 /**
  * A pickable chat destination for forwarding/selection UIs: local chat,

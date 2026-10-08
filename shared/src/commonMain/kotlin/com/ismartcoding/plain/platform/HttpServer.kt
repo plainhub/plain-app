@@ -11,19 +11,18 @@ import com.ismartcoding.plain.lib.withIO
 import com.ismartcoding.plain.i18n.*
 import com.ismartcoding.plain.lib.logcat.LogCat
 import kotlinx.coroutines.withTimeout
-import com.ismartcoding.plain.httpserver.HttpServerManager
-import com.ismartcoding.plain.httpserver.closeAllWsSessions
-import com.ismartcoding.plain.httpserver.httpPorts
-import com.ismartcoding.plain.httpserver.httpsPorts
+import com.ismartcoding.plain.platform.HttpServerManager
+import com.ismartcoding.plain.platform.httpPorts
+import com.ismartcoding.plain.platform.httpsPorts
 import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 
-expect fun getSSLSignature(password: String): ByteArray
+expect suspend fun getSSLSignature(password: String): ByteArray
 
-expect fun generateSSLKeyStore(password: String)
+expect suspend fun generateSSLKeyStore(password: String)
 
 /**
  * Source format of a user-provided SSL certificate for [replaceSSLKeyStoreAsync].
@@ -59,7 +58,7 @@ expect suspend fun replaceSSLKeyStoreAsync(
  * Reset the web console password to a new random value and persist it.
  * @return the new password
  */
-suspend fun resetPasswordAsync(): String = HttpServerManager.resetPasswordAsync()
+suspend fun resetPasswordAsync(): String = com.ismartcoding.plain.features.session.RustWebLogin.resetPassword()
 
 // ----------------------------------------------------------------------------------
 // Platform-lowest-level engine lifecycle hooks.
@@ -322,7 +321,7 @@ private const val STOP_HOOK_TIMEOUT_MS = 2_000L
 
 /**
  * Shared stop body: records STOPPING (intent marker, before the lock so the
- * UI reacts immediately), attempts graceful `/shutdown`, then tears the engine
+ * UI reacts immediately), then tears the Rust engine
  * down via [finishHttpServerStopAsync] (which serializes on [lifecycleMutex]
  * and records OFF). Called by the platform [stopHttpServiceAsync] actuals and
  * by the Android service's own lifecycle stop. Does NOT stop the Android
@@ -336,11 +335,6 @@ suspend fun stopHttpServerCoreAsync() = withIO {
     withContext(NonCancellable) {
         val t0 = TimeHelper.nowMillis()
         HttpServerManager.serverState.value = HttpServerState.STOPPING
-        // Close WebSocket sessions directly instead of GETting /shutdown: the
-        // old roundtrip ran the teardown inside a route call coroutine, so the
-        // engine stop's disposeAndJoin waited on the very coroutine performing
-        // the stop and always burned the full 5s shutdown timeout.
-        closeAllWsSessions()
         finishHttpServerStopAsync()
         LogCat.d("stopHttpServerCore total ${TimeHelper.nowMillis() - t0}ms")
     }

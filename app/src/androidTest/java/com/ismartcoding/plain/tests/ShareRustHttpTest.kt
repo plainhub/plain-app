@@ -7,7 +7,7 @@ import com.ismartcoding.plain.features.share.ShareManager
 import com.ismartcoding.plain.helpers.UrlHelper
 import com.ismartcoding.plain.platform.AppDatabase
 import com.ismartcoding.plain.platform.streamZipToSink
-import com.ismartcoding.plain.httpserver.http.StreamSink
+import com.ismartcoding.plain.platform.StreamSink
 import com.ismartcoding.plain.preferences.UserPrefs
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.*

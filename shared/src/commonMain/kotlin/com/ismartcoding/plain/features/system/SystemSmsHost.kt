@@ -1,6 +1,7 @@
 package com.ismartcoding.plain.features.system
 
-import com.ismartcoding.plain.httpserver.sendMms
+import com.ismartcoding.plain.features.sms.MmsLaunchRequest
+import com.ismartcoding.plain.features.sms.MmsProviderRequest
 import com.ismartcoding.plain.lib.JsonHelper
 import kotlinx.serialization.json.*
 
@@ -26,14 +27,16 @@ internal object SystemSmsHost {
         "systemDeleteSms" -> JsonHelper.jsonEncodeToElement(
             com.ismartcoding.plain.platform.deleteSms(params.getValue("query").jsonPrimitive.content)
         )
-        "systemSendMms" -> JsonHelper.jsonEncodeToElement(
-            sendMms(
-                params.getValue("number").jsonPrimitive.content,
-                params.getValue("body").jsonPrimitive.content,
-                params.getValue("attachmentPaths").jsonArray.map { it.jsonPrimitive.content },
-                com.ismartcoding.plain.httpserver.models.ID(params.getValue("threadId").jsonPrimitive.content),
-            )
-        )
+        "systemMmsLatest" -> JsonHelper.jsonEncodeToElement(com.ismartcoding.plain.platform.getLatestSentMmsId())
+        "systemMmsLaunch" -> {
+            val request = JsonHelper.jsonDecodeFromElement<MmsLaunchRequest>(params)
+            JsonHelper.jsonEncodeToElement(com.ismartcoding.plain.platform.launchDefaultSmsApp(request.number, request.body,
+                request.attachments.map { it.path to it.contentType }))
+        }
+        "systemMmsCandidates" -> {
+            val request = JsonHelper.jsonDecodeFromElement<MmsProviderRequest>(params)
+            JsonHelper.jsonEncodeToElement(com.ismartcoding.plain.platform.readSentMmsCandidates(request.minimumId, request.launchTimeSec))
+        }
         "systemSimFacts" -> JsonHelper.jsonEncodeToElement(com.ismartcoding.plain.platform.getSims().map { sim ->
             SimFacts(
                 id = sim.id,

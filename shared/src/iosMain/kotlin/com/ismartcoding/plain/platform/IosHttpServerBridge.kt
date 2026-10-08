@@ -101,9 +101,6 @@ object IosPlatformRegistry {
     private var _shareController: IosShareController? = null
 
     @Volatile
-    private var _sslCertProvider: IosSslCertProvider? = null
-
-    @Volatile
     private var _systemUiController: IosSystemUiController? = null
 
     @Volatile
@@ -158,13 +155,6 @@ object IosPlatformRegistry {
     }
 
     fun shareController(): IosShareController? = _shareController
-
-    fun setSslCertProvider(provider: IosSslCertProvider) {
-        _sslCertProvider = provider
-        LogCat.d("IosPlatformRegistry: SSL cert provider registered")
-    }
-
-    fun sslCertProvider(): IosSslCertProvider? = _sslCertProvider
 
     fun setSystemUiController(controller: IosSystemUiController) {
         _systemUiController = controller

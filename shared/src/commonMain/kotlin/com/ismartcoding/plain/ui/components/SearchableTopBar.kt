@@ -46,7 +46,7 @@ fun <T : IData> SearchableTopBar(
         )
         return
     }
-    
+
     val topBarModifier = if (scrollToTop != null) {
         Modifier.combinedClickable(onClick = {}, onDoubleClick = {
             scope.launch {
@@ -56,7 +56,7 @@ fun <T : IData> SearchableTopBar(
     } else {
         Modifier
     }
-    
+
     PTopAppBar(
         modifier = topBarModifier,
         onNavigateBack = { (navController as? NavHostController)?.navigateUp() },
@@ -68,4 +68,4 @@ fun <T : IData> SearchableTopBar(
         navigationIcon = navigationIcon,
         actions = actions
     )
-} 
+}

@@ -75,7 +75,7 @@ class MessageLifecycleRustHttpTest {
             })
             assertTrue(response.containsKey("result"))
             assertEquals(2, com.ismartcoding.plain.helpers.AppFileStore.getById(owned.id)!!.refCount)
-            val saved = manager.updateFilesMessage(first.id, listOf(imported), wrongTarget, emptySet())!!
+            val saved = manager.updateFilesMessage(first.id, listOf(imported))!!
             assertEquals(ChatStatus.SENT, saved.status)
             assertEquals(bytes.size.toLong(), (saved.content.value as DMessageFiles).items.single().size)
             RustChatStore.delete(first.id)

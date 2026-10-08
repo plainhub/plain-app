@@ -82,7 +82,7 @@ fun <T : IData> MediaTopBar(
     val title = getMediaPageTitle(
         mediaType = mediaVM.dataType,
         isCastMode = castVM.castMode.value,
-        castDeviceName = CastPlayer.currentDevice?.description?.device?.friendlyName,
+        castDeviceName = CastPlayer.currentDevice?.name,
         bucket = bucketsMap[mediaVM.bucketId.value],
         dragSelectState = dragSelectState,
         tagName = mediaVM.tag.value?.name,

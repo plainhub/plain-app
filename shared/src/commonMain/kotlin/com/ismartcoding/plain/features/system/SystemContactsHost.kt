@@ -74,7 +74,7 @@ internal object SystemContactsHost {
         else -> error("Unsupported provider operation")
     }
 
-    private fun contactInput(params: JsonObject): com.ismartcoding.plain.httpserver.models.ContactInput =
+    private fun contactInput(params: JsonObject): com.ismartcoding.plain.features.contact.ContactInput =
         JsonHelper.jsonDecodeFromElement(params.getValue("input"))
 
     /**

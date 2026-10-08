@@ -65,7 +65,7 @@ import com.ismartcoding.plain.ui.models.PeerViewModel
 import com.ismartcoding.plain.ui.models.UpdateViewModel
 import com.ismartcoding.plain.ui.page.MainNavScaffold
 import com.ismartcoding.plain.ui.page.settings.UpdateDialog
-import com.ismartcoding.plain.httpserver.HttpServerManager
+import com.ismartcoding.plain.platform.HttpServerManager
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
 

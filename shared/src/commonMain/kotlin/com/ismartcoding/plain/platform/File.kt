@@ -3,10 +3,8 @@ package com.ismartcoding.plain.platform
 import com.ismartcoding.plain.features.file.RustFileHelper
 import com.ismartcoding.plain.features.file.DFile
 import com.ismartcoding.plain.helpers.AppFileStore
-import com.ismartcoding.plain.lib.TimeHelper
 import com.ismartcoding.plain.lib.withIO
-import com.ismartcoding.plain.httpserver.http.StreamSink
-import com.ismartcoding.plain.lib.kgraphql.GraphQLError
+import com.ismartcoding.plain.platform.StreamSink
 import kotlin.time.Instant
 
 // ── Shared construction / detection helpers ────────────────────────────────
@@ -122,125 +120,6 @@ expect fun listFilesInDir(path: String): List<String>
 
 /** Recursively delete the directory at [path]. No-op if it does not exist. */
 expect fun deleteDirRecursively(path: String)
-
-/** Absolute directory holding the uploaded chunks of [fileId]. */
-private fun chunkDir(fileId: String): String = "${getUploadTmpDirPath()}/${fileId}"
-
-/**
- * List uploaded chunk files for [fileId]. Each entry is "<index>:<size>".
- * Returns an empty list if no chunks have been uploaded.
- */
-fun listUploadedChunks(fileId: String): List<String> {
-    val dir = chunkDir(fileId)
-    return listFilesInDir(dir)
-        .filter { it.startsWith("chunk_") }
-        .mapNotNull { name ->
-            val index = name.removePrefix("chunk_").toIntOrNull()
-            if (index != null) "${index}:${fileSize("$dir/$name")}" else null
-        }
-        .sortedBy { it.substringBefore(':').toInt() }
-}
-
-/**
- * Delete all uploaded chunk files for [fileId]. Returns true on success.
- */
-fun deleteUploadedChunks(fileId: String): Boolean {
-    deleteDirRecursively(chunkDir(fileId))
-    return true
-}
-
-/**
- * Save an uploaded chunk ([data]) for [fileId] at [chunkIndex] into the upload
- * tmp directory. Returns the absolute path of the saved chunk file.
- */
-fun saveUploadChunk(fileId: String, chunkIndex: Int, data: ByteArray): String {
-    val dir = chunkDir(fileId)
-    ensureDir(dir)
-    val chunkPath = "$dir/chunk_$chunkIndex"
-    writeBytesToPath(chunkPath, data)
-    return chunkPath
-}
-
-/**
- * Merge the uploaded chunks for [fileId] (expected [totalChunks] parts) into
- * the file at [path]. [totalSize] is the client-known file size; the summed
- * chunk sizes must match it before anything is written, so mixed or stale
- * chunk sets never produce a corrupt destination file. When [replace] is
- * false and the destination already exists, a new sibling path is used. When
- * [isAppFile] is true, the merged file is imported into the content-addressable
- * AppFileStore and the returned string is "{fidSuffix}:{mergedSize}";
- * otherwise the merged file is scanned via the media scanner and the returned
- * string is "{baseFileName}:{mergedSize}".
- *
- * Throws [com.ismartcoding.plain.lib.kgraphql.GraphQLError] on missing chunks
- * or integrity check failure.
- */
-suspend fun mergeUploadedChunks(
-    fileId: String,
-    totalChunks: Int,
-    path: String,
-    replace: Boolean,
-    isAppFile: Boolean,
-    totalSize: Long,
-): String = withIO {
-    val dir = chunkDir(fileId)
-    if (!fileExists(dir)) throw GraphQLError("No chunks found for $fileId")
-
-    var expectedSize = 0L
-    for (i in 0 until totalChunks) {
-        val chunkPath = "$dir/chunk_$i"
-        if (!fileExists(chunkPath)) throw GraphQLError("Missing chunk $i")
-        expectedSize += fileSize(chunkPath)
-    }
-
-    if (expectedSize != totalSize) {
-        // The chunk set does not belong to this file — discard it so a retry
-        // starts from a clean state instead of reusing the wrong chunks.
-        deleteUploadedChunks(fileId)
-        throw GraphQLError("Chunk total size $expectedSize != file size $totalSize")
-    }
-
-    val mergeDir = getUploadCacheMergeDirPath()
-    ensureDir(mergeDir)
-    val tempMergePath = "$mergeDir/.merge_tmp_${fileId}_${TimeHelper.nowMillis()}"
-
-    // Stream the chunks into a temp merge file (no full in-memory buffering).
-    val sink = createFileSink(tempMergePath)
-    try {
-        for (i in 0 until totalChunks) {
-            if (!streamFileTo("$dir/chunk_$i", sink)) throw GraphQLError("Failed to read chunk $i")
-        }
-    } finally {
-        sink.close()
-    }
-
-    val mergedSize = fileSize(tempMergePath)
-    if (mergedSize != expectedSize) {
-        deleteFileAt(tempMergePath)
-        throw GraphQLError("Merge integrity failed: expected $expectedSize, got $mergedSize")
-    }
-
-    if (isAppFile) {
-        val dFile = AppFileStore.importFile(tempMergePath, path.substringAfterLast('/'), "", deleteSrc = true)
-        deleteUploadedChunks(fileId)
-        return@withIO "${dFile.realPath.substringAfterLast('/')}:$mergedSize"
-    }
-
-    var destPath = path
-    if (!replace && fileExists(destPath)) {
-        destPath = getNewPath(destPath)
-    }
-    val parent = destPath.substringBeforeLast('/', "")
-    if (parent.isNotEmpty()) ensureDir(parent)
-    if (fileExists(destPath)) deleteFileAt(destPath)
-    if (!moveFile(tempMergePath, destPath)) {
-        copyFile(tempMergePath, destPath)
-        deleteFileAt(tempMergePath)
-    }
-    scanFiles(arrayOf(destPath))
-    deleteUploadedChunks(fileId)
-    return@withIO "${destPath.substringAfterLast('/')}:$mergedSize"
-}
 
 /**
  * Stream the contents of the file at [path] into [sink]. Returns true on success,

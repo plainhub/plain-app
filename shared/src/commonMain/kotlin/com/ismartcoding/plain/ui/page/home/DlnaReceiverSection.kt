@@ -30,7 +30,6 @@ import com.ismartcoding.plain.ui.nav.Routing
 import com.ismartcoding.plain.ui.theme.tipsText
 import org.jetbrains.compose.resources.stringResource
 import com.ismartcoding.plain.ui.resources.Res as UiRes
-import com.ismartcoding.plain.ui.resources.cast as ui_drawable_cast
 import com.ismartcoding.plain.i18n.cast
 
 @Composable

@@ -1,8 +1,5 @@
 package com.ismartcoding.plain.features.system
 
-import com.ismartcoding.plain.data.DScreenMirrorQuality
-import com.ismartcoding.plain.preferences.UserPrefs
-import com.ismartcoding.plain.httpserver.models.toModel
 import com.ismartcoding.plain.lib.JsonHelper
 import com.ismartcoding.plain.lib.sendEvent
 import com.ismartcoding.plain.platform.isGranted
@@ -23,7 +20,6 @@ internal object SystemScreenMirrorHost {
                 },
             ))
         }
-        "systemScreenMirrorQuality" -> JsonHelper.jsonEncodeToElement(UserPrefs.screenMirrorQualityValue().toModel())
         "systemStartScreenMirror" -> {
             com.ismartcoding.plain.platform.applyScreenMirrorQualityPreference()
             sendEvent(
@@ -51,14 +47,8 @@ internal object SystemScreenMirrorHost {
             JsonHelper.jsonEncodeToElement(true)
         }
         "systemUpdateScreenMirrorQuality" -> {
-            val mode = when (params.getValue("mode").jsonPrimitive.content) {
-                "SMOOTH" -> com.ismartcoding.plain.enums.ScreenMirrorMode.SMOOTH
-                else -> com.ismartcoding.plain.enums.ScreenMirrorMode.HD
-            }
-            val quality = DScreenMirrorQuality(
-                mode, if (mode == com.ismartcoding.plain.enums.ScreenMirrorMode.SMOOTH) 720 else 1080
-            )
-            com.ismartcoding.plain.preferences.UserPrefs.setScreenMirrorQuality(quality)
+            com.ismartcoding.plain.preferences.Prefs.refresh()
+            val mode = com.ismartcoding.plain.enums.ScreenMirrorMode.valueOf(params.getValue("mode").jsonPrimitive.content)
             com.ismartcoding.plain.platform.onScreenMirrorQualityChanged(mode)
             JsonHelper.jsonEncodeToElement(true)
         }

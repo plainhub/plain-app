@@ -35,9 +35,6 @@ import com.ismartcoding.plain.ui.models.CastViewModel
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
 import com.ismartcoding.plain.ui.resources.Res as UiRes
-import com.ismartcoding.plain.ui.resources.ellipsis as ui_drawable_ellipsis
-import com.ismartcoding.plain.ui.resources.rotate_cw_square as ui_drawable_rotate_cw_square
-import com.ismartcoding.plain.ui.resources.save as ui_drawable_save
 import com.ismartcoding.plain.i18n.save
 import com.ismartcoding.plain.i18n.image
 

@@ -7,10 +7,9 @@ internal data class CallFacts(
     val id: String,
     val number: String,
     val name: String,
-    val photoId: String,
+    val photoUri: String,
     val startedAt: String,
     val durationSec: Int,
     val type: Int,
     val accountId: String,
-    val geo: PhoneGeoFacts?,
 )

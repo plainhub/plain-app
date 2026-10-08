@@ -40,7 +40,7 @@ import com.ismartcoding.plain.ui.components.CheckCircle
 import com.ismartcoding.plain.ui.components.SaveToSheet
 import com.ismartcoding.plain.ui.base.PFilledButton
 import com.ismartcoding.plain.ui.helpers.DialogHelper
-import com.ismartcoding.plain.httpserver.http.StreamSink
+import com.ismartcoding.plain.platform.StreamSink
 import com.ismartcoding.plain.ui.base.HorizontalSpace
 import com.ismartcoding.plain.ui.theme.dialogSheetBackground
 import kotlinx.coroutines.delay

@@ -48,24 +48,12 @@ object ImageIndexManager {
         val next = ImageMediaObserver { enqueueSync() }
         appContext.contentResolver.registerContentObserver(uri,true,next)
         observer = next
-        enqueueSync()
     }
     suspend fun shutdown() {
         active = false
         observer?.let { appContext.contentResolver.unregisterContentObserver(it) }
         observer = null
-        sending.withLock {
-            while (requests.tryReceive().isSuccess) { }
-            ImageSearchIndexer.applyStatus(ImageIndexHelper.cancel())
-        }
-        withTimeout(45_000) {
-            while (true) {
-                val status = ImageIndexHelper.status()
-                ImageSearchIndexer.applyStatus(status)
-                if (!status.getValue("isRunning").jsonPrimitive.boolean) break
-                delay(50)
-            }
-        }
+        sending.withLock { while (requests.tryReceive().isSuccess) { } }
         ImageIndexInference.disconnect()
     }
     fun enqueueAdd(ids: Set<String>) { if (ids.isNotEmpty() && active) send(Action.Add(ids)) }

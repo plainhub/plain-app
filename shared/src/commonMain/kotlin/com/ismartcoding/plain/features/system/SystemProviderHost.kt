@@ -22,6 +22,8 @@ object SystemProviderHost {
         "systemCreateContactGroup",
         "systemUpdateContactGroup",
         "systemDeleteContactGroup" -> SystemContactsHost.handle(method, params)
+        "systemPhoneLocaleFacts",
+        "systemPhoneMetadata",
         "systemCallFacts",
         "systemCallCount",
         "systemCallIds",
@@ -36,21 +38,25 @@ object SystemProviderHost {
         "systemTrashSms",
         "systemRestoreSms",
         "systemDeleteSms",
-        "systemSendMms",
+        "systemMmsLatest", "systemMmsLaunch", "systemMmsCandidates",
         "systemSimFacts" -> SystemSmsHost.handle(method, params)
+        "systemWebLoginRequest",
+        "systemWebLoginCompleted",
+        "systemWebSocketRegistered",
+        "systemScreenMirrorControls",
+        "systemScreenMirrorResetTouch" -> com.ismartcoding.plain.platform.WebSocketHost.handle(method, params)
         "systemScreenMirrorState",
-        "systemScreenMirrorQuality",
         "systemStartScreenMirror",
         "systemStopScreenMirror",
         "systemRequestScreenMirrorAudio",
         "systemRequestScreenMirrorKeyFrame",
         "systemUpdateScreenMirrorQuality" -> SystemScreenMirrorHost.handle(method, params)
-        "systemImageSearchStatus",
-        "systemEnableImageSearch",
-        "systemDisableImageSearch",
-        "systemCancelImageModelDownload",
-        "systemStartImageIndex",
-        "systemCancelImageIndex" -> SystemImageSearchHost.handle(method, params)
+        "systemImageTextEmbed",
+        "systemImageModelAvailability",
+        "systemImageModelsLoad",
+        "systemImageModelsClose" -> SystemImageSearchHost.handle(method, params)
+        "systemCastAddressFacts" -> com.ismartcoding.plain.platform.CastHost.handle(method, params)
+        "systemFileResource" -> com.ismartcoding.plain.platform.FileResourceHost.handle(params)
         "zipItemsFacts",
         "scanFilesFacts",
         "fileMetadataFacts",
@@ -66,24 +72,13 @@ object SystemProviderHost {
         "systemTransferFile" -> SystemFilesHost.handle(method, params)
         "systemMediaBucketItemFacts",
         "systemMediaRows",
-        "systemImageRows",
+        "systemImageIdsFacts",
         "systemMediaCount",
-        "systemImageCount",
         "systemDocExtGroups",
         "systemMediaAction" -> SystemMediaHost.handle(method, params)
         "systemMediaTagFacts",
         "systemTagQueryStubs",
         "systemTagQueryKeys" -> SystemTagsHost.handle(method, params)
-        "systemChatSend",
-        "systemChatDeleteOne",
-        "systemChatDeleteQuery",
-        "systemChatRetry" -> SystemChatsHost.handle(method, params)
-        "systemPeerFacts",
-        "systemDeletePeer",
-        "systemUnpairPeer",
-        "systemPairDevice",
-        "systemCancelPairing",
-        "systemRespondToPairing" -> SystemPairingHost.handle(method, params)
         "systemAudioPlaylistTracks",
         "systemAudioSearchTracks",
         "systemAudioLyrics",
@@ -92,19 +87,8 @@ object SystemProviderHost {
         "systemAudioLibrarySort",
         "systemAudioPlay",
         "systemAudioClear" -> SystemAudioHost.handle(method, params)
-        "systemDbFacts",
-        "systemDbRowCount",
-        "systemDbRows",
-        "systemDbColumns",
-        "systemDbInfo",
-        "systemCreateDbRow",
-        "systemDeleteDbRows" -> SystemDatabaseHost.handle(method, params)
-        "uploadTmpDirFacts",
-        "systemUploadedChunkFacts",
-        "systemMergeStatusFacts",
-        "systemDeleteChunks",
-        "systemMergeChunks",
-        "systemMergeAppFileChunks" -> SystemUploadsHost.handle(method, params)
+        "systemDbPath" -> SystemDatabaseHost.handle(method, params)
+        "uploadTmpDirFacts" -> SystemUploadsHost.handle(method, params)
         "systemStopDiscovery",
         "systemStartDiscovery",
         "systemDiscoveryFacts" -> SystemDiscoveryHost.handle(method, params)
@@ -114,8 +98,6 @@ object SystemProviderHost {
         "systemPermissionFacts",
         "systemOpenAccessibilitySettings",
         "systemOpenWebSettings",
-        "systemSetUserPref",
-        "systemRemoveUserPref",
         "systemDeviceInfoFacts",
         "systemDeviceStatusFacts",
         "systemAppFacts",

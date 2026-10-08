@@ -15,13 +15,13 @@ import com.ismartcoding.plain.platform.isGranted
 import com.ismartcoding.plain.platform.LocaleHelper
 import com.ismartcoding.plain.helpers.NotificationHelper
 import com.ismartcoding.plain.notificationManager
-import com.ismartcoding.plain.httpserver.HttpServerManager
+import com.ismartcoding.plain.platform.HttpServerManager
 
 class NetworkStateReceiver : BroadcastReceiver() {
     @SuppressLint("MissingPermission")
     override fun onReceive(context: Context, intent: Intent) {
         if (intent.action == WifiManager.NETWORK_STATE_CHANGED_ACTION) {
-            
+
             if (Permission.POST_NOTIFICATIONS.isGranted()) {
                 try {
                     val notificationId = HttpServerManager.notificationId

@@ -5,8 +5,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ismartcoding.plain.db.DImageEditorProject
 import com.ismartcoding.plain.features.ImageEditorProjectHelper
-import com.ismartcoding.plain.httpserver.models.ImageEditorProjectSummary
-import com.ismartcoding.plain.httpserver.models.toSummary
+import com.ismartcoding.plain.features.imageeditor.ImageEditorProjectSummary
+import com.ismartcoding.plain.features.imageeditor.toSummary
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import com.ismartcoding.plain.lib.withIO

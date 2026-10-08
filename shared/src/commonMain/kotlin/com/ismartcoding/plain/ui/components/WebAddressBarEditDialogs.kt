@@ -26,8 +26,8 @@ import com.ismartcoding.plain.ui.base.PFilledButton
 import com.ismartcoding.plain.ui.base.PTextField
 import com.ismartcoding.plain.ui.base.RadioDialog
 import com.ismartcoding.plain.ui.base.RadioDialogOption
-import com.ismartcoding.plain.httpserver.httpPorts
-import com.ismartcoding.plain.httpserver.httpsPorts
+import com.ismartcoding.plain.platform.httpPorts
+import com.ismartcoding.plain.platform.httpsPorts
 import com.ismartcoding.plain.ui.theme.dialogSheetBackground
 
 @Composable

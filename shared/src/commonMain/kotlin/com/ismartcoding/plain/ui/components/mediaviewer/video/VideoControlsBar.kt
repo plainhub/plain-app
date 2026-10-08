@@ -34,13 +34,6 @@ import com.ismartcoding.plain.ui.components.mediaviewer.PreviewerSoftWhite
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import com.ismartcoding.plain.ui.resources.Res as UiRes
-import com.ismartcoding.plain.ui.resources.fullscreen as ui_drawable_fullscreen
-import com.ismartcoding.plain.ui.resources.fullscreen_exit as ui_drawable_fullscreen_exit
-import com.ismartcoding.plain.ui.resources.pause as ui_drawable_pause
-import com.ismartcoding.plain.ui.resources.pip as ui_drawable_pip
-import com.ismartcoding.plain.ui.resources.play_arrow as ui_drawable_play_arrow
-import com.ismartcoding.plain.ui.resources.volume_2 as ui_drawable_volume_2
-import com.ismartcoding.plain.ui.resources.volume_x as ui_drawable_volume_x
 import com.ismartcoding.plain.i18n.pause
 import com.ismartcoding.plain.i18n.fullscreen
 

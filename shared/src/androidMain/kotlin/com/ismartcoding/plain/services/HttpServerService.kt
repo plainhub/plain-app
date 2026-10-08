@@ -21,10 +21,10 @@ import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.mdns.MdnsRegister
 import com.ismartcoding.plain.mdns.NsdHelper
 import com.ismartcoding.plain.platform.LocaleHelper
-import com.ismartcoding.plain.platform.cancelMmsPolling
+import com.ismartcoding.plain.features.sms.RustMmsRuntime
 import com.ismartcoding.plain.platform.startHttpServerAsync
 import com.ismartcoding.plain.platform.stopHttpServerCoreAsync
-import com.ismartcoding.plain.httpserver.HttpServerManager
+import com.ismartcoding.plain.platform.HttpServerManager
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 
@@ -131,7 +131,7 @@ class HttpServerService : LifecycleService() {
         PeerStatusManager.stop()
         SmsProviderObserver.stop()
         SmsHelper.stopSmsSendTracking()
-        cancelMmsPolling()
+        com.ismartcoding.plain.features.sms.RustMmsRuntime.cancelAll()
         stopSelf()
     }
 
@@ -149,7 +149,7 @@ class HttpServerService : LifecycleService() {
         PeerStatusManager.stop()
         SmsProviderObserver.stop()
         SmsHelper.stopSmsSendTracking()
-        cancelMmsPolling()
+        com.ismartcoding.plain.features.sms.RustMmsRuntime.cancelAll()
         stopForeground(STOP_FOREGROUND_REMOVE)
         // Run the shared stop body (stop side-effect hooks — clipboard watcher,
         // notification listener — engine teardown again, terminal OFF) on the

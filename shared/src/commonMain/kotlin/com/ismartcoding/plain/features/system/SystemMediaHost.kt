@@ -26,21 +26,10 @@ internal object SystemMediaHost {
             )
             JsonHelper.jsonEncodeToElement(items.map { mediaFacts(it) })
         }
-        "systemImageRows" -> {
-            val items = com.ismartcoding.plain.platform.searchImagesCombined(
-                params.getValue("queryText").jsonPrimitive.content,
-                params.getValue("extraQuery").jsonPrimitive.content,
-                params.getValue("limit").jsonPrimitive.int,
-                params.getValue("offset").jsonPrimitive.int,
-                fileSortBy(params),
-            )
-            JsonHelper.jsonEncodeToElement(items.map { mediaFacts(it) })
-        }
+        "systemImageIdsFacts" -> JsonHelper.jsonEncodeToElement(com.ismartcoding.plain.platform.getMediaIds(
+            com.ismartcoding.plain.enums.DataType.IMAGE, params.getValue("query").jsonPrimitive.content))
         "systemMediaCount" -> JsonHelper.jsonEncodeToElement(com.ismartcoding.plain.platform.countMedia(
             mediaDataType(params), params.getValue("query").jsonPrimitive.content))
-        "systemImageCount" -> JsonHelper.jsonEncodeToElement(com.ismartcoding.plain.platform.countImagesCombined(
-            params.getValue("queryText").jsonPrimitive.content,
-            params.getValue("extraQuery").jsonPrimitive.content))
         "systemDocExtGroups" -> JsonHelper.jsonEncodeToElement(
             com.ismartcoding.plain.platform.getDocExtGroups("").map { (ext, count) ->
                 DocExtensionFacts(
@@ -67,7 +56,7 @@ internal object SystemMediaHost {
         ))
         is com.ismartcoding.plain.data.DImage -> mediaFacts(
             item.id, item.title, item.path, item.size, item.bucketId, item.createdAt, item.updatedAt,
-            durationMs = 0L, takenAt = item.takenAt, isFavorite = item.isFavorite)
+            durationMs = 0L, takenAt = item.takenAt, isFavorite = item.isFavorite, width = item.width, height = item.height, rotation = item.rotation)
         is com.ismartcoding.plain.data.DVideo -> mediaFacts(
             item.id, item.title, item.path, item.size, item.bucketId, item.createdAt, item.updatedAt,
             durationMs = item.durationMs, takenAt = item.takenAt, isFavorite = item.isFavorite)
@@ -88,6 +77,7 @@ internal object SystemMediaHost {
         durationMs: Long,
         takenAt: kotlin.time.Instant?,
         isFavorite: Boolean,
+        width: Int = 0, height: Int = 0, rotation: Int = 0,
     ): JsonElement = JsonHelper.jsonEncodeToElement(MediaFacts(
         id = id,
         title = title,
@@ -99,6 +89,7 @@ internal object SystemMediaHost {
         durationMs = durationMs,
         takenAt = takenAt?.let { it.toString() },
         isFavorite = isFavorite,
+        width = width, height = height, rotation = rotation,
     ))
 
     /** Each action resolves its own id source: a restore looks in the trash,

@@ -1,22 +1,13 @@
 package com.ismartcoding.plain.platform
 
-import com.ismartcoding.plain.db.DSession
-import com.ismartcoding.plain.helpers.Base64Lenient
-import com.ismartcoding.plain.httpserver.HttpServerManager
-import com.ismartcoding.plain.httpserver.SessionList
+import com.ismartcoding.plain.ui.models.VSession
+import com.ismartcoding.plain.features.session.RustSessionStore
 
-suspend fun fetchSessionsListItemsAsync(): List<DSession> = SessionList.getItemsAsync()
+suspend fun fetchSessionsListItemsAsync(): List<VSession> = RustSessionStore.list()
 
 suspend fun deleteSessionListItemAsync(clientId: String) {
-    SessionList.deleteAsync(clientId)
-    HttpServerManager.tokenCache.invalidate(clientId)
-    HttpServerManager.clientIpCache.invalidate(clientId)
+    RustSessionStore.delete(clientId)
 }
 
-suspend fun createCustomSessionTokenAsync(name: String) {
-    val item = SessionList.createCustomTokenAsync(name)
-    HttpServerManager.tokenCache.put(item.clientId, Base64Lenient.decode(item.token))
-}
-
-suspend fun renameSessionListItemAsync(clientId: String, name: String): Boolean =
-    SessionList.renameAsync(clientId, name)
+suspend fun createCustomSessionTokenAsync(name: String) = RustSessionStore.create(name)
+suspend fun renameSessionListItemAsync(clientId: String, name: String): Boolean = RustSessionStore.rename(clientId, name)

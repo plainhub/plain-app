@@ -54,6 +54,12 @@ object Prefs {
         }
     }
 
+    fun refresh() = lock.withLock {
+        systemEntries = (json.parseToJsonElement(backend.systemSnapshot()) as JsonObject).toMap()
+        userEntries = (json.parseToJsonElement(backend.userSnapshot()) as JsonObject).toMap()
+        fields.forEach { it.restore((if (it.isUserPref) userEntries else systemEntries)[it.key]) }
+    }
+
     fun save() = lock.withLock { saveLocked() }
 
     internal fun <T> update(field: PrefFlow<T>, value: T) = lock.withLock { updateLocked(field, value) }
@@ -87,19 +93,6 @@ object Prefs {
         val parts = value.split("-")
         return if (parts.size > 1) Locale(parts[0], parts[1]) else Locale(value, "")
     }
-
-    fun encodeSenderEntry(ip: String, name: String) = "$ip|$name"
-
-    fun decodeSenderEntry(entry: String): Pair<String, String> {
-        val index = entry.indexOf('|')
-        return if (index >= 0) entry.substring(0, index) to entry.substring(index + 1) else entry to ""
-    }
-
-    internal fun senderEntriesWithout(entries: Set<String>, ip: String) =
-        entries.filterNot { decodeSenderEntry(it).first == ip }.toSet()
-
-    internal fun senderEntriesWith(entries: Set<String>, ip: String, name: String) =
-        senderEntriesWithout(entries, ip) + encodeSenderEntry(ip, name)
 
     private fun <T> updateLocked(field: PrefFlow<T>, value: T) {
         val entries = entriesFor(field.isUserPref)
@@ -169,16 +162,4 @@ internal interface PrefsBackend {
     fun userSnapshot(): String
     fun set(isUserPref: Boolean, key: String, valueJson: String)
     fun remove(isUserPref: Boolean, key: String)
-}
-
-private object RustPrefsBackend : PrefsBackend {
-    override fun open(systemPath: String, userPath: String) = RustPrefsBridge.open(systemPath, userPath)
-    override fun systemSnapshot(): String = RustPrefsBridge.systemSnapshot()
-    override fun userSnapshot(): String = RustPrefsBridge.userSnapshot()
-    override fun set(isUserPref: Boolean, key: String, valueJson: String) {
-        if (isUserPref) RustPrefsBridge.setUser(key, valueJson) else RustPrefsBridge.setSystem(key, valueJson)
-    }
-    override fun remove(isUserPref: Boolean, key: String) {
-        if (isUserPref) RustPrefsBridge.removeUser(key) else RustPrefsBridge.removeSystem(key)
-    }
 }

@@ -2,12 +2,6 @@ package com.ismartcoding.plain.api
 
 internal actual object RustCoreBridge {
     init { System.loadLibrary("plain_rust") }
-    private external fun tlsNative(configJson: String): String
-    actual fun tls(configJson: String): String {
-        val value = tlsNative(configJson)
-        check(!value.startsWith("ERROR:")) { value.removePrefix("ERROR:") }
-        return value
-    }
     private external fun startPublicNative(configJson: String): String
     private external fun stopPublicNative(): String
     actual fun startPublic(configJson: String): String {

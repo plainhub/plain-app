@@ -49,12 +49,10 @@ class SystemProviderSerializationTest {
     }
 
     @Test
-    fun nestedCodecAndMergeStatusKeepNullFields() {
+    fun nestedCodecKeepsNullFields() {
         assertEquals("""{"running":true,"controlEnabled":false,"codec":{"annexB":"abc","keyFrame":null}}""",
             JsonHelper.jsonEncode(ScreenMirrorStateFacts(true, false, ScreenMirrorCodecFacts("abc", null))))
-        assertEquals("""{"status":"MERGING","value":null,"mergedSize":null,"error":null}""",
-            JsonHelper.jsonEncode(MergeStatusFacts("MERGING", null, null, null)))
-        assertEquals("""{"status":"STARTED"}""", JsonHelper.jsonEncode(MergeStartFacts("STARTED")))
+
     }
 
     @Test

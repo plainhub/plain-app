@@ -1,14 +1,14 @@
 package com.ismartcoding.plain.platform
 
-import com.ismartcoding.plain.httpserver.models.AudioFileInfo
-import com.ismartcoding.plain.httpserver.models.ImageFileInfo
-import com.ismartcoding.plain.httpserver.models.VideoFileInfo
+import com.ismartcoding.plain.features.system.AudioInfoFacts
+import com.ismartcoding.plain.features.system.ImageInfoFacts
+import com.ismartcoding.plain.features.system.VideoInfoFacts
 
-actual fun loadImageInfo(path: String): ImageFileInfo =
-    ImageFileInfo(0, 0, null)
+actual fun loadImageInfo(path: String): ImageInfoFacts =
+    ImageInfoFacts(0, 0, null)
 
-actual fun loadVideoInfo(path: String): VideoFileInfo =
-    VideoFileInfo(0, 0, 0L, null)
+actual fun loadVideoInfo(path: String): VideoInfoFacts =
+    VideoInfoFacts(0, 0, 0L, null)
 
-actual fun loadAudioInfo(path: String): AudioFileInfo =
-    AudioFileInfo(0L, null)
+actual fun loadAudioInfo(path: String): AudioInfoFacts =
+    AudioInfoFacts(0L, null)

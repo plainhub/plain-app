@@ -55,8 +55,6 @@ import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
 import com.ismartcoding.plain.ui.resources.Res as UiRes
-import com.ismartcoding.plain.ui.resources.check as ui_drawable_check
-import com.ismartcoding.plain.ui.resources.maximize_2 as ui_drawable_maximize_2
 import com.ismartcoding.plain.i18n.undo
 import com.ismartcoding.plain.i18n.save
 

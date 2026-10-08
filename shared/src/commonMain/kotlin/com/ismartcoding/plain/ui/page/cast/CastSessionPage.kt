@@ -11,7 +11,6 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -52,13 +51,6 @@ fun CastSessionPage(
     val supportsCallback by CastPlayer.supportsCallback.collectAsState()
     val castItems by CastPlayer.items.collectAsState()
     val deviceName = CastPlayer.currentDevice?.getDeviceName() ?: ""
-
-    LaunchedEffect(Unit) {
-        if (currentUri.isNotEmpty()) {
-            castVM.trySubscribeEvent()
-            castVM.startPositionUpdater()
-        }
-    }
 
     val titleText = if (deviceName.isNotEmpty()) {
         stringResource(Res.string.casting_to, deviceName)

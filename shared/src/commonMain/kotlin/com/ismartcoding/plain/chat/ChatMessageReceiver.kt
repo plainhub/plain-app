@@ -11,16 +11,11 @@ import com.ismartcoding.plain.db.DChat
 import com.ismartcoding.plain.db.DChatChannel
 import com.ismartcoding.plain.db.DPeer
 import com.ismartcoding.plain.db.getMessagePreview
-import com.ismartcoding.plain.events.EventType
 import com.ismartcoding.plain.events.ChatMessageNotificationEvent
-import com.ismartcoding.plain.events.WebSocketEvent
 import com.ismartcoding.plain.platform.LocaleHelper
-import com.ismartcoding.plain.lib.JsonHelper
 import com.ismartcoding.plain.i18n.Res
 import com.ismartcoding.plain.i18n.peer_chat
 import com.ismartcoding.plain.lib.sendEvent
-import com.ismartcoding.plain.httpserver.models.ChatItem
-import com.ismartcoding.plain.httpserver.models.toModel
 
 object ChatMessageReceiver {
 
@@ -36,14 +31,6 @@ object ChatMessageReceiver {
             items = listOf(item),
         )
         ChatManager.refreshLatestChats()
-        val model: ChatItem = item.toModel()
-        sendEvent(
-            WebSocketEvent(
-                EventType.MESSAGE_CREATED,
-                JsonHelper.jsonEncode(listOf(model)),
-            ),
-        )
-
         emitNotificationIfNeeded(item, fromPeer, fromChannel)
     }
 

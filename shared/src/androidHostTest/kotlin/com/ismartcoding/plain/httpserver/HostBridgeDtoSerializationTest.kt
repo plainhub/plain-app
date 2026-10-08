@@ -1,8 +1,6 @@
 package com.ismartcoding.plain.httpserver
 
 import com.ismartcoding.plain.features.file.DFile
-import com.ismartcoding.plain.httpserver.models.DbColumnType
-import com.ismartcoding.plain.httpserver.models.DbTableColumn
 import com.ismartcoding.plain.lib.JsonHelper.jsonEncode
 import com.ismartcoding.plain.platform.DPackageInfo
 import com.ismartcoding.plain.enums.PackageType
@@ -11,7 +9,7 @@ import kotlin.test.assertTrue
 import kotlin.time.Instant
 
 /**
- * `SystemProviderHost` hands these to the Rust side as JSON — `systemDbColumns`,
+ * `SystemProviderHost` hands these to the Rust side as JSON —
  * `systemCreateDir` and `systemWriteTextFile` all end in `jsonEncode(...)` on
  * the DTO. kotlinx serialization resolves a serializer from the static type, so
  * a DTO without `@Serializable` throws at the call instead of at compile time;
@@ -23,13 +21,6 @@ import kotlin.time.Instant
  */
 class HostBridgeDtoSerializationTest {
     private val epoch = Instant.fromEpochMilliseconds(0)
-
-    @Test
-    fun dbTableColumnsEncode() {
-        val json = jsonEncode(listOf(DbTableColumn("id", DbColumnType.INTEGER, true, null, true)))
-        assertTrue(json.contains("\"name\":\"id\""), json)
-        assertTrue(json.contains("INTEGER"), json)
-    }
 
     @Test
     fun fileFactsEncode() {

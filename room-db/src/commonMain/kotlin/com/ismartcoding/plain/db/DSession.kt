@@ -1,12 +1,8 @@
 package com.ismartcoding.plain.db
 
 import androidx.room3.ColumnInfo
-import androidx.room3.Dao
 import androidx.room3.Entity
-import androidx.room3.Insert
 import androidx.room3.PrimaryKey
-import androidx.room3.Query
-import androidx.room3.Update
 import com.ismartcoding.plain.enums.SessionType
 import com.ismartcoding.plain.lib.TimeHelper
 import kotlin.time.Instant
@@ -50,31 +46,3 @@ data class DSession(
     @ColumnInfo(name = "updated_at")
     var updatedAt: Instant = TimeHelper.now(),
 )
-
-data class SessionClientTsUpdate(
-    @ColumnInfo(name = "client_id")
-    var clientId: String,
-    @ColumnInfo(name = "last_active_at")
-    val lastActiveAt: Instant = TimeHelper.now(),
-)
-
-@Dao
-interface SessionDao {
-    @Query("SELECT * FROM sessions ORDER BY last_active_at DESC")
-    suspend fun getAll(): List<DSession>
-
-    @Query("SELECT * FROM sessions WHERE client_id=:clientId")
-    suspend fun getByClientId(clientId: String): DSession?
-
-    @Insert
-    suspend fun insert(vararg item: DSession)
-
-    @Update
-    suspend fun update(vararg item: DSession)
-
-    @Update(entity = DSession::class)
-    suspend fun updateTs(items: List<SessionClientTsUpdate>)
-
-    @Query("DELETE FROM sessions WHERE client_id=:clientId")
-    suspend fun delete(clientId: String)
-}

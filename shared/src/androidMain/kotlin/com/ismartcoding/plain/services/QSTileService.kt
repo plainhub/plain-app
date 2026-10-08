@@ -14,7 +14,7 @@ import android.service.quicksettings.TileService
 import androidx.core.content.ContextCompat
 import com.ismartcoding.plain.enums.HttpServerState
 import com.ismartcoding.plain.platform.stopHttpServiceAsync
-import com.ismartcoding.plain.httpserver.HttpServerManager
+import com.ismartcoding.plain.platform.HttpServerManager
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job

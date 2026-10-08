@@ -66,20 +66,6 @@ actual fun startImageIndexFullScan(force: Boolean) {}
 
 actual fun cancelImageIndex() {}
 
-actual fun buildImageSearchStatus(): com.ismartcoding.plain.httpserver.models.ImageSearchStatus =
-    com.ismartcoding.plain.httpserver.models.ImageSearchStatus(
-        status = ImageSearchStatusType.UNAVAILABLE,
-        downloadProgress = 0,
-        errorMessage = "",
-        modelSize = 0L,
-        modelDir = "",
-        isIndexing = false,
-        totalImages = 0,
-        indexedImages = 0,
-    )
-
-actual fun lookupPhoneGeo(number: String): com.ismartcoding.plain.httpserver.models.PhoneGeo? = null
-
 actual suspend fun searchSmsConversations(
     query: String,
     limit: Int,
@@ -134,22 +120,13 @@ actual fun getDownloadsDirPath(): String = appDir() + "/downloads"
 
 actual suspend fun getContactById(id: String): com.ismartcoding.plain.data.DContact? = null
 
-actual fun updateContact(id: String, input: com.ismartcoding.plain.httpserver.models.ContactInput) {}
+actual fun updateContact(id: String, input: com.ismartcoding.plain.features.contact.ContactInput) {}
 
-actual fun createContact(input: com.ismartcoding.plain.httpserver.models.ContactInput): String = ""
+actual fun createContact(input: com.ismartcoding.plain.features.contact.ContactInput): String = ""
 
 actual suspend fun deleteContacts(ids: Set<String>) {}
 
-actual fun startMmsPolling(
-    pendingId: String,
-    launchTimeSec: Long,
-    minimumMmsId: Long,
-    number: String,
-    body: String,
-    threadId: String,
-    attachmentPaths: List<String>,
-    attachmentContentTypes: List<String>,
-) {}
+actual fun readSentMmsCandidates(minimumId: Long, launchTimeSec: Long): List<com.ismartcoding.plain.features.sms.MmsCandidateFacts> = emptyList()
 
 actual suspend fun enableImageSearchAsync() {}
 

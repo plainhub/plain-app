@@ -3,6 +3,7 @@ package com.ismartcoding.plain.api
 import com.ismartcoding.plain.features.imageindex.ImageIndexHost
 import com.ismartcoding.plain.features.audio.AudioLibraryHost
 import com.ismartcoding.plain.features.audio.AudioEngineHost
+import com.ismartcoding.plain.lib.JsonHelper
 import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.platform.createPeerStatusHttpClient
 import com.ismartcoding.plain.platform.handleMediaActionHost
@@ -30,21 +31,21 @@ object RustHostApi {
                             try {
                                 for (frame in socket.incoming) {
                                     val text = frame.text ?: continue
-                                    val request = Json.parseToJsonElement(text).jsonObject
-                                    val id = request.getValue("id").jsonPrimitive.long
-                                    val method = request.string("method")
-                                    val params = request.getValue("params").jsonObject
+                                    val request = JsonHelper.jsonDecode<RustHostRequest>(text)
+                                    val id = request.id
+                                    val method = request.method
+                                    val params = request.params
                                     capacity.acquire()
                                     launch(start = kotlinx.coroutines.CoroutineStart.UNDISPATCHED) {
                                         try {
                                             val reply = try {
                                                 val result = when (routeForHostMethod(method)) {
-                                                    HostRoute.HttpExchange -> { com.ismartcoding.plain.httpserver.RustHttpHost.start(exchangeScope, session, params.getValue("id").jsonPrimitive.content); JsonNull }
+                                                    HostRoute.FileResourceStream -> { com.ismartcoding.plain.platform.FileResourceStreamHost.start(exchangeScope, session, params); JsonNull }
                                                     HostRoute.Thumbnail -> com.ismartcoding.plain.thumbnail.ThumbnailHost.handle(session, method, params)
                                                     HostRoute.ChatPicked -> com.ismartcoding.plain.chat.ChatPickedHost.handle(method, params)
                                                     HostRoute.SharedTransfer -> com.ismartcoding.plain.features.share.SharedTransferHost.handle(exchangeScope, method, params)
                                                     HostRoute.BlePairing -> com.ismartcoding.plain.discover.BlePairingHost.handle(method, params)
-                                                    HostRoute.MainGraphql -> com.ismartcoding.plain.httpserver.MainGraphQLHost.handle(method, params)
+                                                    HostRoute.MainGraphql -> com.ismartcoding.plain.platform.HttpServerHost.handle(method)
                                                     HostRoute.MdnsMulticast -> com.ismartcoding.plain.discover.MdnsMulticastHost.handle(params)
                                                     HostRoute.DiscoveryAdvertisement -> com.ismartcoding.plain.discover.DiscoveryAdvertisementHost.facts()
                                                     HostRoute.NearbyScan -> com.ismartcoding.plain.discover.NearbyScanHost.facts()
@@ -58,11 +59,11 @@ object RustHostApi {
                                                     HostRoute.ImageIndex -> ImageIndexHost.handle(method, params)
                                                     HostRoute.AudioLibrary -> AudioLibraryHost.handle(method, params)
                                                 }
-                                                buildJsonObject { put("id", id); put("result", result) }
+                                                RustHostReply(id, result = result)
                                             } catch (cancelled: CancellationException) { throw cancelled }
-                                            catch (e: Exception) { buildJsonObject { put("id", id); put("error", e.message ?: "Host operation failed") } }
+                                            catch (e: Exception) { RustHostReply(id, error = e.message ?: "Host operation failed") }
                                             sending.lock()
-                                            try { socket.sendText(reply.toString()) } finally { sending.unlock() }
+                                            try { socket.sendText(JsonHelper.jsonEncode(reply)) } finally { sending.unlock() }
                                         } finally { capacity.release() }
                                     }
                                 }

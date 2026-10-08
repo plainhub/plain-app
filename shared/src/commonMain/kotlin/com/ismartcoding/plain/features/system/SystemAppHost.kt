@@ -42,15 +42,6 @@ internal object SystemAppHost {
             sendEvent(com.ismartcoding.plain.events.HOpenWebSettingsEvent(feature))
             JsonHelper.jsonEncodeToElement(true)
         }
-        "systemSetUserPref" -> {
-            com.ismartcoding.plain.preferences.Prefs.setUserPref(
-                params.getValue("key").jsonPrimitive.content, params.getValue("value"))
-            JsonHelper.jsonEncodeToElement(true)
-        }
-        "systemRemoveUserPref" -> {
-            com.ismartcoding.plain.preferences.Prefs.removeUserPref(params.getValue("key").jsonPrimitive.content)
-            JsonHelper.jsonEncodeToElement(true)
-        }
         "systemDeviceInfoFacts" -> JsonHelper.jsonEncodeToElement(com.ismartcoding.plain.platform.getDeviceInfo())
         "systemDeviceStatusFacts" -> JsonHelper.jsonEncodeToElement(com.ismartcoding.plain.platform.getDeviceStatus())
         "systemAppFacts" -> appFacts()

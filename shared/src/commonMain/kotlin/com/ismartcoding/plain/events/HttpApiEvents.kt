@@ -19,22 +19,6 @@ class HOpenAccessibilitySettingsEvent : ChannelEvent()
 
 class HOpenWebSettingsEvent(val feature: WebSettingsFeature? = null) : ChannelEvent()
 
-/**
- * Fired after the default SMS app is launched for an MMS send.
- * AppEvents polls content://mms for the correlated row and always clears
- * temporary state, emitting MMS_SENT on success or MMS_SEND_RESULT on timeout.
- */
-data class HStartMmsPollingEvent(
-    val pendingId: String,
-    val launchTimeSec: Long,
-    val minimumMmsId: Long,
-    val number: String,
-    val body: String,
-    val threadId: String,
-    val attachmentPaths: List<String>,
-    val attachmentContentTypes: List<String>,
-) : ChannelEvent()
-
 class HEnableImageSearchEvent : ChannelEvent()
 class HDisableImageSearchEvent : ChannelEvent()
 class HCancelImageModelDownloadEvent : ChannelEvent()

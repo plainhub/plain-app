@@ -17,11 +17,11 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import org.jetbrains.compose.resources.painterResource
@@ -38,8 +38,7 @@ import com.ismartcoding.plain.ui.base.PFilledButton
 import com.ismartcoding.plain.ui.base.PListItem
 import com.ismartcoding.plain.ui.base.POutlinedButton
 import com.ismartcoding.plain.ui.base.VerticalSpace
-import com.ismartcoding.plain.httpserver.HttpServerManager
-import kotlinx.coroutines.launch
+import com.ismartcoding.plain.ui.models.launchSafe
 import com.ismartcoding.plain.ui.resources.Res as UiRes
 import com.ismartcoding.plain.ui.resources.chrome as ui_drawable_chrome
 import com.ismartcoding.plain.ui.resources.laptop as ui_drawable_laptop
@@ -140,8 +139,8 @@ fun LoginRequestPage(
                     enabled = !allowing && !denying,
                     onClick = {
                         allowing = true
-                        scope.launch {
-                            HttpServerManager.respondTokenAsync(event, clientIp)
+                        scope.launchSafe(onDone = { allowing = false }) {
+                            com.ismartcoding.plain.features.session.RustWebLogin.complete(event)
                             navController.popBackStack()
                         }
                     },
@@ -156,8 +155,8 @@ fun LoginRequestPage(
                     enabled = !allowing && !denying,
                     onClick = {
                         denying = true
-                        scope.launch {
-                            event.session.close(1013, "rejected")
+                        scope.launchSafe(onDone = { denying = false }) {
+                            com.ismartcoding.plain.features.session.RustWebLogin.cancel(event.requestId)
                             navController.popBackStack()
                         }
                     },

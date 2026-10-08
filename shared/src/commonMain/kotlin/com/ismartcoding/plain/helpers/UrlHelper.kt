@@ -1,11 +1,9 @@
 package com.ismartcoding.plain.helpers
 
 import com.ismartcoding.plain.preferences.*
+import kotlinx.serialization.json.jsonPrimitive
 
-import androidx.compose.runtime.mutableStateMapOf
 import com.ismartcoding.plain.TempData
-import com.ismartcoding.plain.lib.TimeHelper
-import com.ismartcoding.plain.lib.extensions.getFilenameExtension
 import com.ismartcoding.plain.platform.chaCha20Decrypt
 import com.ismartcoding.plain.platform.chaCha20Encrypt
 import com.ismartcoding.plain.platform.getDeviceIP4
@@ -23,37 +21,12 @@ object UrlHelper {
         return "$scheme://$host$portPart$path"
     }
 
-    // Written from every /media HTTP URL generation call (concurrent GraphQL/HTTP
-    // requests), so a plain mutableMapOf (LinkedHashMap) is not safe here.
-    private val mediaPathMap = mutableStateMapOf<String, String>() // format: <short_path>:<raw_path>
-
-    fun getMediaHttpUrl(path: String): String {
-        val id = TimeHelper.nowMillis().toString()
-        mediaPathMap[id] = path
-        val extension = path.getFilenameExtension()
-        return buildUrl("http", getDeviceIP4(), UserPrefs.httpPort.value, "/media/$id.$extension")
-    }
-
-    fun getAlbumArtHttpUrl(albumUri: String): String {
-        val id = "art_${TimeHelper.nowMillis()}"
-        mediaPathMap[id] = albumUri
-        return buildUrl("http", getDeviceIP4(), UserPrefs.httpPort.value, "/media/$id.jpg")
-    }
-
-    fun getCastCallbackUrl(): String {
-        return buildUrl("http", getDeviceIP4(), UserPrefs.httpPort.value, "/callback/cast")
-    }
-
     fun getHealthCheckUrl(): String {
         return buildUrl("http", "127.0.0.1", UserPrefs.httpPort.value, "/health")
     }
 
     fun getShutdownUrl(): String {
         return buildUrl("http", "127.0.0.1", UserPrefs.httpPort.value, "/shutdown")
-    }
-
-    fun getMediaPath(id: String): String {
-        return mediaPathMap[id] ?: ""
     }
 
     fun encrypt(path: String): String {

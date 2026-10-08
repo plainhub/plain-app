@@ -1,7 +1,5 @@
 package com.ismartcoding.plain.chat
 
-import com.ismartcoding.plain.chat.channel.RustChannelStore
-
 import com.ismartcoding.plain.chat.peer.RustPeerStore
 
 import androidx.compose.runtime.mutableStateListOf
@@ -9,7 +7,6 @@ import androidx.compose.runtime.mutableStateOf
 import com.ismartcoding.plain.lib.withIO
 import com.ismartcoding.plain.chat.data.ChatTarget
 import com.ismartcoding.plain.chat.data.ChatTargetType
-import com.ismartcoding.plain.chat.peer.PeerCacher
 import com.ismartcoding.plain.db.DChat
 import com.ismartcoding.plain.db.DMessageContent
 import com.ismartcoding.plain.db.DMessageFile
@@ -37,9 +34,8 @@ import kotlinx.coroutines.sync.withLock
  * Process-wide chat state holder. UI (ChatPage), non-UI writers
  * (ShareSendHelper, GraphQL mutations, ChatMessageReceiver, download
  * completion) all talk to this single instance directly instead of
- * synchronizing through events. Persistence stays behind [ChatManager] so
- * the data source can later be swapped from Room to HTTP without touching
- * callers.
+ * synchronizing through events. [ChatManager] sends business commands to
+ * the Rust HTTP service.
  *
  * Writers may run on arbitrary dispatchers; [mutex] serializes the
  * persist-then-publish sequence so per-message updates (placeholder insert
@@ -122,22 +118,17 @@ object ChatViewModel : ISelectableViewModel<VChat> {
 
     fun resendMessage(messageId: String) {
         launchSafe {
-            val item = ChatManager.getChatItem(messageId) ?: return@launchSafe
-            ChatManager.resendMessage(item)
+            update(ChatManager.deliver(messageId))
         }
     }
 
     fun resendToMembers(messageId: String, peerIds: List<String>) {
         launchSafe {
-            val target = target.value
-            val channel = RustChannelStore.getById(target.toId) ?: return@launchSafe
-            val item = ChatManager.getChatItem(messageId) ?: return@launchSafe
-            ChatManager.sendToChannelMembers(item, channel, peerIds)
-            update(item)
+            update(ChatManager.deliver(messageId, peerIds))
         }
     }
 
-    fun forwardMessage(messageId: String, target: ChatTarget, onlinePeerIds: Set<String>) {
+    fun forwardMessage(messageId: String, target: ChatTarget) {
         launchSafe {
             val item2 = ChatManager.forward(messageId, target)
             publishCreated(target, listOf(item2))
@@ -154,7 +145,7 @@ object ChatViewModel : ISelectableViewModel<VChat> {
         }
     }
 
-    private suspend fun doSendMessage(target: ChatTarget, content: DMessageContent, onlinePeerIds: Set<String>): Boolean = withIO {
+    private suspend fun doSendMessage(target: ChatTarget, content: DMessageContent): Boolean = withIO {
         val item = ChatManager.sendContent(target, content)
         publishCreated(target, listOf(item), scroll = true)
         item.status == ChatStatus.SENT
@@ -162,11 +153,11 @@ object ChatViewModel : ISelectableViewModel<VChat> {
 
     fun sendContent(content: DMessageContent, onResult: (Boolean) -> Unit = {}) {
         launchSafe {
-            onResult(doSendMessage(target.value, content, PeerCacher.getOnlinePeerIds()))
+            onResult(doSendMessage(target.value, content))
         }
     }
 
-    fun sendTextMessage(text: String, onlinePeerIds: Set<String>, onResult: (Boolean) -> Unit = {}) {
+    fun sendTextMessage(text: String, onResult: (Boolean) -> Unit = {}) {
         launchSafe {
             onResult(ChatManager.sendText(target.value, text).status == ChatStatus.SENT)
         }
@@ -176,14 +167,6 @@ object ChatViewModel : ISelectableViewModel<VChat> {
         val item = ChatManager.insertFilesImmediate(target.value, files, isImageVideo)
         publishCreated(target.value, listOf(item), scroll = true)
         item.id
-    }
-
-    fun updateFilesMessage(messageId: String, files: List<DMessageFile>, isImageVideo: Boolean, onlinePeerIds: Set<String>) {
-        launchSafe {
-            val target = target.value
-            val item = ChatManager.updateFilesMessage(messageId, files, target, onlinePeerIds) ?: return@launchSafe
-            publishUpdated(item)
-        }
     }
 
     /**
@@ -222,9 +205,4 @@ object ChatViewModel : ISelectableViewModel<VChat> {
     private suspend fun publishCreated(target: ChatTarget, items: List<DChat>, scroll: Boolean = false) =
         onMessagesCreated(target, items, scroll)
 
-    private suspend fun publishUpdated(item: DChat) {
-        mutex.withLock {
-            update(item)
-        }
-    }
 }

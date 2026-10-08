@@ -12,23 +12,20 @@ import com.ismartcoding.plain.data.TagRelationStub
 import com.ismartcoding.plain.docs.DocMediaStoreHelper
 import com.ismartcoding.plain.enums.DataType
 import com.ismartcoding.plain.events.EventType
-import com.ismartcoding.plain.events.MmsSendResultData
 import com.ismartcoding.plain.events.WebSocketEvent
-import com.ismartcoding.plain.features.call.PhoneGeoCache
 import com.ismartcoding.plain.features.media.CallMediaStoreHelper
 import com.ismartcoding.plain.features.media.ContactMediaStoreHelper
 import com.ismartcoding.plain.features.media.ImageMediaStoreHelper
 import com.ismartcoding.plain.features.media.VideoMediaStoreHelper
 import com.ismartcoding.plain.features.sms.SmsHelper
 import com.ismartcoding.plain.features.sms.DMessage
-import com.ismartcoding.plain.features.sms.MmsSendResultTracker
 import com.ismartcoding.plain.features.sms.SmsProviderContract
 import com.ismartcoding.plain.features.file.FileSortBy
 import com.ismartcoding.plain.lib.JsonHelper
 import com.ismartcoding.plain.lib.TimeHelper
 import com.ismartcoding.plain.lib.coIO
 import com.ismartcoding.plain.lib.sendEvent
-import com.ismartcoding.plain.httpserver.websocket.WebSocketHelper
+import com.ismartcoding.plain.api.WebSocketHelper
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.delay
@@ -36,57 +33,6 @@ import kotlin.time.Clock
 import kotlin.time.Duration.Companion.days
 import java.io.File
 import java.util.concurrent.ConcurrentHashMap
-
-private val claimedSentMmsIds = linkedSetOf<Long>()
-private val mmsPollingJobs = ConcurrentHashMap<String, Job>()
-private const val MMS_TERMINAL_RESULT_TTL_MILLIS = 5 * 60 * 1000L
-private const val MMS_CANCELLED_ATTACHMENT_RETENTION_MILLIS = 5 * 60 * 1000L
-
-private fun claimSentMmsId(id: Long): Boolean = synchronized(claimedSentMmsIds) {
-    if (!claimedSentMmsIds.add(id)) return@synchronized false
-    if (claimedSentMmsIds.size > 500) claimedSentMmsIds.remove(claimedSentMmsIds.first())
-    true
-}
-
-private fun dispatchMmsTerminalResult(result: MmsSendResultData, legacySuccessEvent: Boolean = false) {
-    MmsSendResultTracker.record(result, TimeHelper.nowMillis())
-    val data = if (legacySuccessEvent) {
-        JsonHelper.jsonEncode(result.pendingId)
-    } else {
-        JsonHelper.jsonEncode(result)
-    }
-    sendEvent(
-        WebSocketEvent(
-            if (legacySuccessEvent) EventType.MMS_SENT else EventType.MMS_SEND_RESULT,
-            data,
-        ),
-    )
-}
-
-suspend fun replayTerminalMmsSendResults() {
-    MmsSendResultTracker.replayable(
-        TimeHelper.nowMillis(),
-        MMS_TERMINAL_RESULT_TTL_MILLIS,
-    ).forEach { result ->
-        sendEvent(
-            WebSocketEvent(
-                EventType.MMS_SEND_RESULT,
-                JsonHelper.jsonEncode(result),
-            )
-        )
-    }
-}
-
-private fun deleteMmsAttachments(attachmentPaths: List<String>) {
-    attachmentPaths.forEach { path -> runCatching { File(path).delete() } }
-}
-
-private fun scheduleCancelledMmsAttachmentCleanup(attachmentPaths: List<String>) {
-    coIO {
-        delay(MMS_CANCELLED_ATTACHMENT_RETENTION_MILLIS)
-        deleteMmsAttachments(attachmentPaths)
-    }
-}
 
 actual suspend fun getMediaBuckets(dataType: DataType): List<DMediaBucket> {
     return com.ismartcoding.plain.features.system.RustSystemProviders.mediaBuckets(dataType)
@@ -235,14 +181,7 @@ actual suspend fun searchImagesCombined(
     limit: Int,
     offset: Int,
     sortBy: FileSortBy,
-): List<DImage> = com.ismartcoding.plain.features.media.ImageSearchHelper.searchCombinedAsync(
-    context = appContext,
-    queryText = queryText,
-    extraQuery = extraQuery,
-    limit = limit,
-    offset = offset,
-    sortBy = sortBy,
-)
+): List<DImage> = com.ismartcoding.plain.ai.RustImageSearch.rows(queryText,extraQuery,limit,offset,sortBy)
 
 actual fun isImageSearchModelReady(): Boolean =
     com.ismartcoding.plain.ai.ImageSearchManager.isModelReady()
@@ -301,35 +240,13 @@ actual suspend fun getMediaTagRelationStubs(dataType: DataType, query: String): 
 }
 
 actual suspend fun countImagesCombined(queryText: String, extraQuery: String): Int =
-    com.ismartcoding.plain.features.media.ImageSearchHelper.countCombinedAsync(
-        context = appContext,
-        queryText = queryText,
-        extraQuery = extraQuery,
-    )
+    com.ismartcoding.plain.ai.RustImageSearch.count(queryText,extraQuery)
 
 actual fun startImageIndexFullScan(force: Boolean) =
     com.ismartcoding.plain.ai.ImageIndexManager.fullScan(force)
 
 actual fun cancelImageIndex() =
     com.ismartcoding.plain.ai.ImageSearchIndexer.cancel()
-
-actual fun buildImageSearchStatus(): com.ismartcoding.plain.httpserver.models.ImageSearchStatus {
-    val mgr = com.ismartcoding.plain.ai.ImageSearchManager
-    val indexer = com.ismartcoding.plain.ai.ImageSearchIndexer
-    return com.ismartcoding.plain.httpserver.models.ImageSearchStatus(
-        status = mgr.status.value,
-        downloadProgress = mgr.downloadProgress.value,
-        errorMessage = mgr.errorMessage.value,
-        modelSize = mgr.totalModelSize(),
-        modelDir = mgr.getModelDir(),
-        isIndexing = indexer.isRunning,
-        totalImages = indexer.totalImages,
-        indexedImages = indexer.indexedImages,
-    )
-}
-
-actual fun lookupPhoneGeo(number: String): com.ismartcoding.plain.httpserver.models.PhoneGeo? =
-    PhoneGeoCache.lookup(number)
 
 actual suspend fun searchSmsConversations(query: String, limit: Int, offset: Int): List<com.ismartcoding.plain.features.sms.DMessageConversation> =
     com.ismartcoding.plain.features.sms.RustSmsQuery.conversations(query,limit,offset)
@@ -405,95 +322,37 @@ actual fun getDownloadsDirPath(): String =
 actual suspend fun getContactById(id: String): com.ismartcoding.plain.data.DContact? =
     com.ismartcoding.plain.features.media.ContactMediaStoreHelper.getByIdAsync(appContext, id)
 
-actual fun updateContact(id: String, input: com.ismartcoding.plain.httpserver.models.ContactInput) =
+actual fun updateContact(id: String, input: com.ismartcoding.plain.features.contact.ContactInput) =
     com.ismartcoding.plain.features.media.ContactMediaStoreHelper.updateAsync(id, input)
 
-actual fun createContact(input: com.ismartcoding.plain.httpserver.models.ContactInput): String =
+actual fun createContact(input: com.ismartcoding.plain.features.contact.ContactInput): String =
     com.ismartcoding.plain.features.media.ContactMediaStoreHelper.createAsync(input)
 
 actual suspend fun deleteContacts(ids: Set<String>) {
     com.ismartcoding.plain.features.media.ContactMediaStoreHelper.deleteByIdsAsync(appContext, ids)
 }
 
-actual fun startMmsPolling(
-    pendingId: String,
-    launchTimeSec: Long,
-    minimumMmsId: Long,
-    number: String,
-    body: String,
-    threadId: String,
-    attachmentPaths: List<String>,
-    attachmentContentTypes: List<String>,
-) {
-    mmsPollingJobs.remove(pendingId)?.cancel()
-    val job = coIO {
-        var cancelled = false
-        try {
-            val context = appContext
-            repeat(150) { // 2 s × 150 = 5 minutes max
-                delay(2000)
-                val matchedId = runCatching {
-                    context.contentResolver.query(
-                        Telephony.Mms.CONTENT_URI,
-                        arrayOf(Telephony.Mms._ID, Telephony.Mms.THREAD_ID),
-                        "${Telephony.Mms.MESSAGE_BOX} = 2 AND m_type = ${SmsProviderContract.MMS_PDU_SEND_REQ} " +
-                                "AND ${Telephony.Mms._ID} > ? AND ${Telephony.Mms.DATE} >= ?",
-                        arrayOf(minimumMmsId.toString(), launchTimeSec.toString()),
-                        "${Telephony.Mms._ID} ASC",
-                    )?.use { cursor ->
-                        val idIndex = cursor.getColumnIndexOrThrow(Telephony.Mms._ID)
-                        val threadIndex = cursor.getColumnIndexOrThrow(Telephony.Mms.THREAD_ID)
-                        val candidates = mutableListOf<SmsProviderContract.MmsCandidateFingerprint>()
-                        while (cursor.moveToNext()) {
-                            val id = cursor.getLong(idIndex)
-                            val bodyAndAttachments = SmsHelper.readMmsBodyAndAttachments(context, id.toString())
-                            candidates += SmsProviderContract.MmsCandidateFingerprint(
-                                id = id,
-                                address = SmsHelper.readMmsAddress(context, id.toString()),
-                                body = bodyAndAttachments.first,
-                                threadId = cursor.getString(threadIndex).orEmpty(),
-                                attachmentContentTypes = bodyAndAttachments.second
-                                    .filterNot { it.contentType.equals("application/smil", ignoreCase = true) }
-                                    .map { it.contentType },
-                            )
-                        }
-                        val requested = SmsProviderContract.MmsSendFingerprint(
-                            address = number,
-                            body = body,
-                            threadId = threadId,
-                            attachmentContentTypes = attachmentContentTypes,
-                        )
-                        SmsProviderContract.matchingMmsCandidateIds(requested, candidates)
-                            .firstOrNull(::claimSentMmsId)
-                    }
-                }.getOrNull()
-                if (matchedId != null) {
-                    dispatchMmsTerminalResult(MmsSendResultData.success(pendingId), legacySuccessEvent = true)
-                    return@coIO
-                }
+actual fun readSentMmsCandidates(minimumId: Long, launchTimeSec: Long): List<com.ismartcoding.plain.features.sms.MmsCandidateFacts> {
+    val context = appContext
+    return context.contentResolver.query(
+        Telephony.Mms.CONTENT_URI,
+        arrayOf(Telephony.Mms._ID, Telephony.Mms.THREAD_ID),
+        "${Telephony.Mms.MESSAGE_BOX} = 2 AND m_type = ${SmsProviderContract.MMS_PDU_SEND_REQ} AND ${Telephony.Mms._ID} > ? AND ${Telephony.Mms.DATE} >= ?",
+        arrayOf(minimumId.toString(), launchTimeSec.toString()),
+        "${Telephony.Mms._ID} ASC",
+    )?.use { cursor ->
+        val idIndex = cursor.getColumnIndexOrThrow(Telephony.Mms._ID)
+        val threadIndex = cursor.getColumnIndexOrThrow(Telephony.Mms.THREAD_ID)
+        buildList {
+            while (cursor.moveToNext()) {
+                val id = cursor.getLong(idIndex)
+                val (body, attachments) = SmsHelper.readMmsBodyAndAttachments(context, id.toString())
+                add(com.ismartcoding.plain.features.sms.MmsCandidateFacts(id,
+                    SmsHelper.readMmsAddress(context, id.toString()), body,
+                    cursor.getString(threadIndex).orEmpty(), attachments.map { it.contentType }))
             }
-            dispatchMmsTerminalResult(MmsSendResultData.timeout(pendingId))
-        } catch (e: CancellationException) {
-            cancelled = true
-            dispatchMmsTerminalResult(MmsSendResultData.cancelled(pendingId))
-            throw e
-        } finally {
-            TempData.pendingMmsMessages.removeIf { it.id == pendingId }
-            if (cancelled) {
-                scheduleCancelledMmsAttachmentCleanup(attachmentPaths)
-            } else {
-                deleteMmsAttachments(attachmentPaths)
-            }
-            mmsPollingJobs.remove(pendingId)
         }
-    }
-    mmsPollingJobs[pendingId] = job
-}
-
-fun cancelMmsPolling() {
-    val jobs = mmsPollingJobs.values.toList()
-    mmsPollingJobs.clear()
-    jobs.forEach(Job::cancel)
+    } ?: emptyList()
 }
 
 actual suspend fun enableImageSearchAsync() {

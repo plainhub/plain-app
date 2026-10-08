@@ -24,7 +24,7 @@ fun BreadcrumbView(
     onItemClick: (BreadcrumbItem) -> Unit
 ) {
     val scrollState = rememberScrollState()
-    
+
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -55,4 +55,4 @@ fun BreadcrumbView(
             }
         }
     }
-} 
+}

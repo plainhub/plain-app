@@ -20,9 +20,7 @@ import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.mdns.NsdHelper
 import com.ismartcoding.plain.services.HttpServerService
 import com.ismartcoding.plain.services.PNotificationListenerService
-import com.ismartcoding.plain.httpserver.HttpServerManager
-import com.ismartcoding.plain.httpserver.replaceSslKeyStoreBytes
-import com.ismartcoding.plain.httpserver.replaceSslKeyStoreFromPem
+import com.ismartcoding.plain.platform.HttpServerManager
 import com.ismartcoding.plain.discover.RustMdnsRuntime
 import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.delay
@@ -30,9 +28,9 @@ import kotlinx.coroutines.withContext
 import java.io.File
 import kotlin.time.Duration.Companion.milliseconds
 
-actual fun getSSLSignature(password: String): ByteArray = RustTlsCertificate.signature()
+actual suspend fun getSSLSignature(password: String): ByteArray = RustTlsCertificate.signature()
 
-actual fun generateSSLKeyStore(password: String) {
+actual suspend fun generateSSLKeyStore(password: String) {
     RustTlsCertificate.regenerate()
 }
 
@@ -42,11 +40,10 @@ actual suspend fun replaceSSLKeyStoreAsync(
     secondUri: String,
     password: String,
 ): ByteArray = withIO {
-    val (cert, key) = when (mode) {
-        SslCertImportMode.PKCS12 -> decodeRustTlsPkcs12(readUriBytes(firstUri), password)
-        SslCertImportMode.PEM -> readUriText(firstUri) to readUriText(secondUri)
+    when (mode) {
+        SslCertImportMode.PKCS12 -> RustTlsCertificate.importPkcs12(readUriBytes(firstUri), password)
+        SslCertImportMode.PEM -> RustTlsCertificate.importPem(readUriText(firstUri), readUriText(secondUri))
     }
-    RustTlsCertificate.importPem(cert, key)
 }
 
 private fun readUriBytes(uriStr: String): ByteArray {
@@ -58,10 +55,10 @@ private fun readUriBytes(uriStr: String): ByteArray {
 private fun readUriText(uriStr: String): String = readUriBytes(uriStr).toString(Charsets.UTF_8)
 
 actual suspend fun startHttpEngineAsync(): Boolean =
-    com.ismartcoding.plain.httpserver.RustHttpEngine.start()
+    com.ismartcoding.plain.platform.RustHttpEngine.start()
 
 actual suspend fun stopHttpEngineAsync(): Unit = withIO {
-    com.ismartcoding.plain.httpserver.RustHttpEngine.stop()
+    com.ismartcoding.plain.platform.RustHttpEngine.stop()
 }
 
 // The SMS/MMS hooks below serve the web desktop bridge, whose only clients are
@@ -84,7 +81,6 @@ actual suspend fun onHttpServerStarted() {
 
 actual suspend fun onWebSocketSessionStarted() {
     SmsHelper.replayTerminalSmsSendResults()
-    replayTerminalMmsSendResults()
 }
 
 actual suspend fun onHttpServerStopped() {
@@ -93,7 +89,6 @@ actual suspend fun onHttpServerStopped() {
     SmsProviderObserver.stop()
     ClipboardWatcher.stop()
     SmsHelper.stopSmsSendTracking()
-    cancelMmsPolling()
     HttpServerService.instance?.let { PNotificationListenerService.toggle(it, false) }
 }
 

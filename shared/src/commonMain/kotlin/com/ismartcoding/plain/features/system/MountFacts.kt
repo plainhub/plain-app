@@ -1,19 +1,7 @@
 package com.ismartcoding.plain.features.system
 
 import kotlinx.serialization.Serializable
+import com.ismartcoding.plain.enums.DriveType
 
 @Serializable
-internal data class MountFacts(
-    val id: String,
-    val name: String,
-    val path: String,
-    val mountPoint: String,
-    val fsType: String,
-    val totalBytes: Long,
-    val usedBytes: Long,
-    val freeBytes: Long,
-    val remote: Boolean,
-    val alias: String,
-    val driveType: String,
-    val diskId: String,
-)
+internal data class MountFacts(val name: String, val path: String, val totalBytes: Long, val freeBytes: Long, val driveType: DriveType)

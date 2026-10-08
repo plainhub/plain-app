@@ -29,7 +29,6 @@ import com.ismartcoding.plain.preferences.setDarkMode
 import com.ismartcoding.plain.preferences.ensureAdbToken
 import com.ismartcoding.plain.receivers.PlugInControlReceiver
 import com.ismartcoding.plain.platform.newImageLoader
-import com.ismartcoding.plain.httpserver.warmUpHttpServer
 import com.ismartcoding.plain.workers.FeedFetchWorker
 import dalvik.system.ZipPathValidator
 
@@ -85,7 +84,6 @@ object MainAppHelper {
             // SystemPrefs.ensureKeyStorePassword has run — warming up
             // earlier creates the file with an empty password and forces a
             // regenerate cycle on the first server start.
-            warmUpHttpServer()
             SystemPrefs.setDarkMode(DarkTheme.parse(UserPrefs.darkTheme.value))
             SystemPrefs.ensureAdbToken()
             if (UserPrefs.service.value && PlugInControlReceiver.isUSBConnected(app)) {

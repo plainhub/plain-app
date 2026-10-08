@@ -65,7 +65,7 @@ import com.ismartcoding.plain.ui.base.pullrefresh.rememberRefreshLayoutState
 import com.ismartcoding.plain.ui.base.pullrefresh.setRefreshState
 import com.ismartcoding.plain.platform.isBleReady
 import com.ismartcoding.plain.ui.extensions.collectAsStateValue
-import com.ismartcoding.plain.httpserver.HttpServerManager
+import com.ismartcoding.plain.platform.HttpServerManager
 import com.ismartcoding.plain.ui.models.ChannelViewModel
 import com.ismartcoding.plain.ui.models.PeerViewModel
 import com.ismartcoding.plain.ui.page.MainNavScaffold
@@ -76,8 +76,6 @@ import com.ismartcoding.plain.ui.theme.PlainTheme
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
 import com.ismartcoding.plain.ui.resources.Res as UiRes
-import com.ismartcoding.plain.ui.resources.bot as ui_drawable_bot
-import com.ismartcoding.plain.ui.resources.hash as ui_drawable_hash
 import com.ismartcoding.plain.i18n.devices
 
 @Composable

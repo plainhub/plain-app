@@ -17,7 +17,7 @@ import com.ismartcoding.plain.lib.extensions.isHeifHeader
 import com.ismartcoding.plain.lib.extensions.toHexString
 import com.ismartcoding.plain.lib.extensions.queryOpenableFile
 import com.ismartcoding.plain.lib.extensions.queryOpenableFileName
-import com.ismartcoding.plain.httpserver.http.StreamSink
+import com.ismartcoding.plain.platform.StreamSink
 import android.net.Uri
 import androidx.core.net.toUri
 import com.ismartcoding.plain.api.OkHttpClientFactory

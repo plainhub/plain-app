@@ -322,7 +322,7 @@ fun ChatPage(
                     onSend = {
                         if (inputValue.isEmpty()) return@ChatInput
                         scope.launch {
-                            chatVM.sendTextMessage(inputValue, PeerCacher.getOnlinePeerIds())
+                            chatVM.sendTextMessage(inputValue)
                             inputValue = ""
                             UserPrefs.chatInputText.value = ""
                         }
@@ -359,7 +359,7 @@ fun ChatPage(
                     messageToForward = null
                 },
                 onTargetsSelected = { targets ->
-                    targets.forEach { chatVM.forwardMessage(message.id, it, PeerCacher.getOnlinePeerIds()) }
+                    targets.forEach { chatVM.forwardMessage(message.id, it) }
                     showForwardDialog = false
                     messageToForward = null
                 },

@@ -84,10 +84,6 @@ import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import kotlin.math.abs
 import com.ismartcoding.plain.ui.resources.Res as UiRes
-import com.ismartcoding.plain.ui.resources.file_text as ui_drawable_file_text
-import com.ismartcoding.plain.ui.resources.folder as ui_drawable_folder
-import com.ismartcoding.plain.ui.resources.folder_plus as ui_drawable_folder_plus
-import com.ismartcoding.plain.ui.resources.x as ui_drawable_x
 import com.ismartcoding.plain.i18n.folder
 import com.ismartcoding.plain.i18n.save
 

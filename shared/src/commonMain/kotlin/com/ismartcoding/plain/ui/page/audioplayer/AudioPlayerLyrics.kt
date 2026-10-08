@@ -41,7 +41,6 @@ import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import com.ismartcoding.plain.ui.resources.Res as UiRes
-import com.ismartcoding.plain.ui.resources.music2 as ui_drawable_music2
 
 /**
  * Sibling .lrc file path for an audio file path. content:// URIs have no

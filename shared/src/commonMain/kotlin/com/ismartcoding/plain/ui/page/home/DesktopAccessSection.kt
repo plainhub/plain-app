@@ -36,13 +36,11 @@ import com.ismartcoding.plain.ui.extensions.collectAsStateValue
 import com.ismartcoding.plain.ui.models.launchSafe
 import com.ismartcoding.plain.ui.nav.Routing
 import com.ismartcoding.plain.ui.theme.tipsText
-import com.ismartcoding.plain.httpserver.HttpServerManager
-import com.ismartcoding.plain.httpserver.setOnlineClientIds
-import com.ismartcoding.plain.httpserver.onlineClientIds
+import com.ismartcoding.plain.platform.HttpServerManager
+import com.ismartcoding.plain.features.session.onlineClientIds
 import kotlinx.coroutines.flow.map
 import org.jetbrains.compose.resources.stringResource
 import com.ismartcoding.plain.ui.resources.Res as UiRes
-import com.ismartcoding.plain.ui.resources.devices as ui_drawable_devices
 import com.ismartcoding.plain.i18n.devices
 
 @Composable
@@ -59,9 +57,7 @@ fun DesktopAccessSection(navController: NavHostController) {
                     if (!enable) {
                         // Desktop access disabled: actively close all live WebSocket
                         // sessions so browsers stop talking to a disabled endpoint.
-                        HttpServerManager.wsSessions.toList().forEach { it.close() }
-                        HttpServerManager.wsSessions.clear()
-                        setOnlineClientIds(emptySet())
+                        com.ismartcoding.plain.features.session.closeAllWsSessions()
                     }
                 }
             }

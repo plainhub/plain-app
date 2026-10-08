@@ -41,7 +41,7 @@ import com.ismartcoding.plain.ui.base.TextFieldDialog
 import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.helpers.confirmActionAsync
 import com.ismartcoding.plain.ui.models.VSession
-import com.ismartcoding.plain.httpserver.onlineClientIds
+import com.ismartcoding.plain.features.session.onlineClientIds
 import com.ismartcoding.plain.ui.resources.Res as UiRes
 import com.ismartcoding.plain.ui.resources.laptop as ui_drawable_laptop
 import com.ismartcoding.plain.ui.resources.lock as ui_drawable_lock

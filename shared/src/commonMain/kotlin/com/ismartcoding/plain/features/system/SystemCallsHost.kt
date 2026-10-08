@@ -1,12 +1,14 @@
 package com.ismartcoding.plain.features.system
 
 import com.ismartcoding.plain.data.DCall
-import com.ismartcoding.plain.data.getGeo
 import com.ismartcoding.plain.lib.JsonHelper
 import kotlinx.serialization.json.*
 
 internal object SystemCallsHost {
     suspend fun handle(method: String, params: JsonObject): JsonElement = when (method) {
+        "systemPhoneLocaleFacts" -> JsonHelper.jsonEncodeToElement(com.ismartcoding.plain.platform.phoneLocaleFacts())
+        "systemPhoneMetadata" -> JsonHelper.jsonEncodeToElement(com.ismartcoding.plain.platform.phoneMetadata(
+            JsonHelper.jsonDecodeFromElement<com.ismartcoding.plain.features.call.PhoneMetadataRequest>(params)))
         "systemCallFacts" -> {
             val query = params.getValue("query").jsonPrimitive.content
             val offset = params.getValue("offset").jsonPrimitive.int
@@ -40,26 +42,8 @@ internal object SystemCallsHost {
         else -> error("Unsupported provider operation")
     }
 
-    /** The public call-log contract; the geo lookup stays on the platform. */
-    private fun callFacts(call: DCall): CallFacts {
-        val geo = call.getGeo()
-        return CallFacts(
-            id = call.id,
-            number = call.number,
-            name = call.name,
-            photoId = com.ismartcoding.plain.helpers.getFileId(call.photoUri),
-            startedAt = call.startedAt.toString(),
-            durationSec = call.durationSec,
-            type = call.type,
-            accountId = call.accountId,
-            geo = geo?.let { value ->
-                PhoneGeoFacts(
-                    country = value.country,
-                    numberType = value.numberType,
-                    carrier = value.carrier,
-                    description = value.description,
-                )
-            },
-        )
-    }
+    private fun callFacts(call: DCall) = CallFacts(
+        id = call.id, number = call.number, name = call.name, photoUri = call.photoUri,
+        startedAt = call.startedAt.toString(), durationSec = call.durationSec, type = call.type, accountId = call.accountId,
+    )
 }

@@ -9,7 +9,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavBackStackEntry
@@ -17,8 +16,9 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.NavHostController
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.remember
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.navigation.compose.NavHost
@@ -38,7 +38,6 @@ import com.ismartcoding.plain.chat.ChatViewModel
 import com.ismartcoding.plain.ui.models.FeedEntryPagerViewModel
 import com.ismartcoding.plain.ui.models.GlobalSearchViewModel
 import com.ismartcoding.plain.ui.models.MainViewModel
-import com.ismartcoding.plain.ui.models.NotesViewModel
 import com.ismartcoding.plain.ui.models.PeerViewModel
 import com.ismartcoding.plain.ui.models.PomodoroViewModel
 import com.ismartcoding.plain.ui.models.TagsViewModel
@@ -107,7 +106,6 @@ import com.ismartcoding.plain.platform.getOwnPackageName
 import com.ismartcoding.plain.platform.printText
 import com.ismartcoding.plain.platform.updateChatMessageTextAsync
 import com.ismartcoding.plain.lib.coIO
-import com.ismartcoding.plain.httpserver.HttpServerManager
 import com.ismartcoding.plain.i18n.*
 import com.ismartcoding.plain.ui.page.scan.ScanHistoryPage
 import com.ismartcoding.plain.ui.page.scan.ScanPage
@@ -383,7 +381,7 @@ fun MainNavGraph(
         composableNoAnim<Routing.LoginRequest> {
             val event = mainVM.pendingLoginEvent.value
             if (event != null) {
-                val clientIp = HttpServerManager.clientIpCache.getCachedOrNull(event.clientId) ?: ""
+                val clientIp = event.clientIp
                 LoginRequestPage(
                     event = event,
                     clientIp = clientIp,

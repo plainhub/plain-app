@@ -27,27 +27,27 @@ class PeerAuthRustHttpTest {
         val content = """{"query":"mutation { startAware }","variables":{}}"""
         suspend fun body(encryptionKey: ByteArray, timestamp: Long = System.currentTimeMillis()): ByteArray {
             val signature = Base64.encode(signEd25519(privateKey, "$timestamp$content".encodeToByteArray()))
-            return RustPeerWireStore.encrypt(encryptionKey, "$signature|$timestamp|$content")
+            return PeerWireTestApi.encrypt(encryptionKey, "$signature|$timestamp|$content")
         }
         try {
             RustPeerStore.insert(peer)
             val encrypted = body(key)
-            val result = RustPeerWireStore.authenticatePeer(peer.id, "", encrypted)
+            val result = PeerWireTestApi.authenticatePeer(peer.id, "", encrypted)
             assertEquals(200, result.getValue("status").jsonPrimitive.int)
             assertEquals(content, result.getValue("content").jsonPrimitive.content)
             assertEquals(peer.key, result.getValue("key").jsonPrimitive.content)
-            assertEquals(content, PeerChatParser.decrypt(key, peer.id, publicKey, encrypted).content)
-            assertEquals(400, RustPeerWireStore.authenticatePeer(peer.id, "", body(key, Long.MIN_VALUE)).getValue("status").jsonPrimitive.int)
+            assertEquals(content, PeerWireTestApi.authenticateEnvelope(key, publicKey, encrypted).getValue("content").jsonPrimitive.content)
+            assertEquals(400, PeerWireTestApi.authenticatePeer(peer.id, "", body(key, Long.MIN_VALUE)).getValue("status").jsonPrimitive.int)
             peer.key = Base64.encode(ByteArray(32) { 8 })
             RustPeerStore.update(peer)
-            assertEquals(401, RustPeerWireStore.authenticatePeer(peer.id, "", encrypted).getValue("status").jsonPrimitive.int)
+            assertEquals(401, PeerWireTestApi.authenticatePeer(peer.id, "", encrypted).getValue("status").jsonPrimitive.int)
             peer.status = PeerStatus.CHANNEL
             RustPeerStore.update(peer)
-            assertEquals(403, RustPeerWireStore.authenticatePeer(peer.id, "", encrypted).getValue("status").jsonPrimitive.int)
-            val group = RustPeerWireStore.authenticatePeer(peer.id, channel.id, body(Base64.decode(channel.key)))
+            assertEquals(403, PeerWireTestApi.authenticatePeer(peer.id, "", encrypted).getValue("status").jsonPrimitive.int)
+            val group = PeerWireTestApi.authenticatePeer(peer.id, channel.id, body(Base64.decode(channel.key)))
             assertEquals(200, group.getValue("status").jsonPrimitive.int)
             assertEquals(channel.key, group.getValue("key").jsonPrimitive.content)
-            assertEquals(401, RustPeerWireStore.authenticatePeer(peer.id, "$prefix-missing", encrypted).getValue("status").jsonPrimitive.int)
+            assertEquals(401, PeerWireTestApi.authenticatePeer(peer.id, "$prefix-missing", encrypted).getValue("status").jsonPrimitive.int)
         } finally {
             RustChannelStore.remove(channel.id)
             RustPeerStore.delete(peer.id)

@@ -18,7 +18,6 @@ import androidx.compose.ui.unit.dp
 import com.ismartcoding.plain.i18n.Res
 import com.ismartcoding.plain.ui.resources.check as ui_drawable_check
 import com.ismartcoding.plain.ui.resources.Res as UiRes
-import com.ismartcoding.plain.ui.resources.check as ui_drawable_check
 
 @Composable
 fun CheckCircle(

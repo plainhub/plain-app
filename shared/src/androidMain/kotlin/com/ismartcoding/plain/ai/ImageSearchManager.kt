@@ -1,168 +1,19 @@
 package com.ismartcoding.plain.ai
 
-import com.ismartcoding.plain.preferences.*
-import com.ismartcoding.plain.appContext
-import com.ismartcoding.plain.buildChannel
-import com.ismartcoding.plain.enums.AppChannelType
-
-import com.ismartcoding.plain.lib.withIO
-import com.ismartcoding.plain.lib.logcat.LogCat
-import com.ismartcoding.plain.lib.sendEvent
-import com.ismartcoding.plain.features.ImageEmbeddingHelper
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import java.io.File
-
+import com.ismartcoding.plain.lib.coIO
+import kotlinx.coroutines.flow.map
 
 object ImageSearchManager {
-    private const val MODEL_DIR_NAME = "ai_models"
-    private const val IMAGE_MODEL = "mobileclip_s2_image.tflite"
-    private const val TEXT_MODEL = "mobileclip_s2_text.tflite"
-    private const val TOKENIZER = "tokenizer.json"
-
-    private const val HF_BASE =
-        "https://huggingface.co/plainhub/mobileclip-s2-tflite/resolve/main"
-    private val MODEL_FILES = listOf(
-        ModelFile("$HF_BASE/$IMAGE_MODEL", IMAGE_MODEL, 144_120_668L),
-        ModelFile("$HF_BASE/$TEXT_MODEL", TEXT_MODEL, 253_874_828L),
-        ModelFile("$HF_BASE/$TOKENIZER", TOKENIZER, 1_708_304L),
-    )
-
-    private val _status = MutableStateFlow(ImageSearchStatusType.UNAVAILABLE)
-    val status = _status.asStateFlow()
-    private val _downloadProgress = MutableStateFlow(0)
-    val downloadProgress = _downloadProgress.asStateFlow()
-    private val _errorMessage = MutableStateFlow("")
-    val errorMessage = _errorMessage.asStateFlow()
-
-    private val modelsDir: File get() = File(appContext.filesDir, MODEL_DIR_NAME)
-
-    fun getModelDir(): String = modelsDir.absolutePath
-
-    fun isModelReady(): Boolean = _status.value == ImageSearchStatusType.READY
-
-    private fun isFdroid(): Boolean = buildChannel == AppChannelType.FDROID.name
-
-    fun isModelAvailable(): Boolean {
-        val dir = modelsDir
-        return File(dir, IMAGE_MODEL).exists() &&
-                File(dir, TEXT_MODEL).exists() &&
-                File(dir, TOKENIZER).exists()
-    }
-
-    fun totalModelSize(): Long = MODEL_FILES.sumOf { it.size }
-
-    suspend fun restoreIfEnabled() = withIO {
-        if (isFdroid()) return@withIO
-        val enabled = UserPrefs.aiImageSearchEnabled.value
-        if (enabled && isModelAvailable()) {
-            loadModels()
-            ImageIndexManager.startup()
-        }
-    }
-
-    suspend fun enableAsync() = withIO {
-        if (isFdroid()) return@withIO
-        if (_status.value == ImageSearchStatusType.DOWNLOADING ||
-            _status.value == ImageSearchStatusType.LOADING
-        ) {
-            return@withIO
-        }
-        if (!isModelAvailable()) {
-            downloadModels()
-            if (!isModelAvailable()) return@withIO
-        }
-        loadModels()
-        UserPrefs.aiImageSearchEnabled.value = true
-        ImageIndexManager.startup()
-    }
-
-    suspend fun disableAsync() = withIO {
-        ImageIndexManager.shutdown()
-        ImageEmbedHelper.close()
-        TextEmbedHelper.close()
-        DelegateHelper.closeAll()
-        modelsDir.deleteRecursively()
-        ImageEmbeddingHelper.deleteAll()
-        _status.value = ImageSearchStatusType.UNAVAILABLE
-        UserPrefs.aiImageSearchEnabled.value = false
-        emitStatus()
-    }
-
-    /**
-     * Free the resident model memory under system pressure (~400MB native).
-     * The helpers reload lazily from disk on the next search, so the feature
-     * stays transparent to the user. Skipped while indexing owns its workers.
-     */
-    fun releaseModels() {
-        if (_status.value != ImageSearchStatusType.READY) return
-        if (ImageSearchIndexer.isRunning) return
-        ImageEmbedHelper.release()
-        TextEmbedHelper.release()
-        LogCat.d("AI models released under memory pressure")
-    }
-
-    fun cancelDownload() {
-        ModelDownloader.cancel()
-        _status.value = ImageSearchStatusType.UNAVAILABLE
-        _downloadProgress.value = 0
-        emitStatus()
-    }
-
-    suspend fun search(query: String, limit: Int = 50): List<SemanticSearchResult> =
-        withIO {
-            val textEmb = TextEmbedHelper.embed(query) ?: error("Image search query inference failed")
-            ImageEmbeddingHelper.search(floatsToBytes(textEmb), limit)
-        }
-
-    private suspend fun downloadModels() {
-        _status.value = ImageSearchStatusType.DOWNLOADING
-        _downloadProgress.value = 0
-        emitStatus()
-        val success = ModelDownloader.download(
-            files = MODEL_FILES,
-            destDir = modelsDir,
-            onProgress = { progress ->
-                _downloadProgress.value = progress
-            },
-            onError = { e ->
-                _status.value = ImageSearchStatusType.ERROR
-                _errorMessage.value = e.message ?: "Download failed"
-                emitStatus()
-            },
-        )
-        if (success) {
-            _downloadProgress.value = 100
-            emitStatus()
-        }
-    }
-
-    private fun loadModels() {
-        try {
-            _status.value = ImageSearchStatusType.LOADING
-            emitStatus()
-            val dir = modelsDir
-            ImageEmbedHelper.init(File(dir, IMAGE_MODEL))
-            TextEmbedHelper.init(File(dir, TEXT_MODEL), File(dir, TOKENIZER))
-            _status.value = ImageSearchStatusType.READY
-            _errorMessage.value = ""
-            emitStatus()
-            LogCat.d("MobileCLIP-S2 loaded successfully")
-        } catch (e: Throwable) {
-            LogCat.e("Model load failed", e)
-            _status.value = ImageSearchStatusType.ERROR
-            _errorMessage.value = e.message ?: "Load failed"
-            emitStatus()
-        }
-    }
-
-    fun setIndexError(message: String) {
-        if (_errorMessage.value == message) return
-        _errorMessage.value = message
-        emitStatus()
-    }
-
-    private fun emitStatus() {
-        sendEvent(ImageSearchStatusChangedEvent(_status.value, _downloadProgress.value, _errorMessage.value))
-    }
+    val status = RustImageModels.snapshot.map { it.status }
+    val downloadProgress = RustImageModels.snapshot.map { it.downloadProgress }
+    val errorMessage = RustImageModels.snapshot.map { it.errorMessage }
+    fun getModelDir(): String = RustImageModels.snapshot.value.modelDir
+    fun imageModelPath(): String = RustImageModels.snapshot.value.imageModel
+    fun isModelReady(): Boolean = RustImageModels.snapshot.value.status == ImageSearchStatusType.READY
+    suspend fun restoreIfEnabled() { RustImageModels.call(ImageModelsCommand.Restore) }
+    suspend fun enableAsync() { RustImageModels.call(ImageModelsCommand.Enable) }
+    suspend fun disableAsync() { RustImageModels.call(ImageModelsCommand.Disable) }
+    fun cancelDownload() { coIO { RustImageModels.call(ImageModelsCommand.Cancel) } }
+    suspend fun search(query: String, limit: Int = 50): List<SemanticSearchResult> = RustImageModels.search(query,limit)
+    fun setIndexError(message: String) { coIO { RustImageModels.call(ImageModelsCommand.Error(message)) } }
 }

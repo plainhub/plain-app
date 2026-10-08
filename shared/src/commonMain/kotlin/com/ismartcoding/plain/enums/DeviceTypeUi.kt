@@ -15,11 +15,6 @@ import com.ismartcoding.plain.ui.resources.tablet as ui_drawable_tablet
 import com.ismartcoding.plain.ui.resources.tv as ui_drawable_tv
 import com.ismartcoding.plain.i18n.unpaired
 import com.ismartcoding.plain.ui.resources.Res as UiRes
-import com.ismartcoding.plain.ui.resources.devices as ui_drawable_devices
-import com.ismartcoding.plain.ui.resources.laptop as ui_drawable_laptop
-import com.ismartcoding.plain.ui.resources.smartphone as ui_drawable_smartphone
-import com.ismartcoding.plain.ui.resources.tablet as ui_drawable_tablet
-import com.ismartcoding.plain.ui.resources.tv as ui_drawable_tv
 import com.ismartcoding.plain.i18n.tablet
 import com.ismartcoding.plain.i18n.devices
 import com.ismartcoding.plain.i18n.tv

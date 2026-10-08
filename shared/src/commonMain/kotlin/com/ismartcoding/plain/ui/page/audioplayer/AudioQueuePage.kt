@@ -47,7 +47,6 @@ import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import com.ismartcoding.plain.ui.resources.Res as UiRes
-import com.ismartcoding.plain.ui.resources.delete_forever as ui_drawable_delete_forever
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

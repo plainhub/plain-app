@@ -39,7 +39,7 @@ class PeerGraphQLRustHttpTest {
             val content = document.toString()
             val timestamp = System.currentTimeMillis()
             val signature = Base64.encode(signEd25519(privateKey, "$timestamp$content".encodeToByteArray()))
-            return RustPeerWireStore.encrypt(key, "$signature|$timestamp|$content")
+            return PeerWireTestApi.encrypt(key, "$signature|$timestamp|$content")
         }
         fun decode(body: ByteArray): JsonObject = Json.parseToJsonElement(chaCha20Decrypt(key, body)!!.decodeToString()).jsonObject
         suspend fun ble(body: ByteArray): Pair<Int, ByteArray> = BleBinaryFixture.response(HttpServiceHandler().handleRequest(BleBinaryFixture.peer(id, body), "synthetic-mac"))
@@ -111,7 +111,7 @@ class PeerGraphQLRustHttpTest {
             }.toString()
             val timestamp = System.currentTimeMillis()
             val signature = Base64.encode(signEd25519(privateKey, "$timestamp$content".encodeToByteArray()))
-            val body = RustPeerWireStore.encrypt(key, "$signature|$timestamp|$content")
+            val body = PeerWireTestApi.encrypt(key, "$signature|$timestamp|$content")
             val response = BleBinaryFixture.response(HttpServiceHandler().handleRequest(BleBinaryFixture.peer(owner.id, body), "synthetic-mac"))
             assertEquals(200, response.first)
             val result = Json.parseToJsonElement(chaCha20Decrypt(key, response.second)!!.decodeToString()).jsonObject

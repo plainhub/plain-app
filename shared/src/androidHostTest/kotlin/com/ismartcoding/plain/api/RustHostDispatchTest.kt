@@ -16,7 +16,7 @@ class RustHostDispatchTest {
     @Test
     fun explicitHostMethodsReachTheirOwnHost() {
         val expectations = mapOf(
-            "httpExchange" to HostRoute.HttpExchange,
+            "fileResourceStream" to HostRoute.FileResourceStream,
             "thumbnailDecode" to HostRoute.Thumbnail,
             "chatPickedFacts" to HostRoute.ChatPicked,
             "sharedTransferSend" to HostRoute.SharedTransfer,
