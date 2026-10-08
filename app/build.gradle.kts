@@ -299,6 +299,4 @@ dependencies {
     debugImplementation(libs.androidx.work.multiprocess)
     implementation(kotlin("stdlib", libs.versions.kotlin.get()))
 
-    "githubImplementation"(libs.mediapipe.tasks.vision)
-    "googleImplementation"(libs.mediapipe.tasks.vision)
 }

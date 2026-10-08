@@ -58,12 +58,6 @@
 -keep class com.google.crypto.tink.** { *; }
 -dontwarn com.google.crypto.tink.**
 
-# ===== MediaPipe / LiteRT =====
--keep class com.google.mediapipe.** { *; }
--keep class com.google.ai.edge.litert.** { *; }
--dontwarn com.google.mediapipe.**
--dontwarn com.google.ai.edge.litert.**
-
 # ===== OkHttp / Okio =====
 -dontwarn okhttp3.internal.platform.**
 -dontwarn org.conscrypt.**
