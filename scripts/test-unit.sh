@@ -59,7 +59,7 @@ run_rust() {
   # checked out at the rev Cargo.lock pinned — the local plain-desktop tree may
   # be on any commit, and testing that would not test what ships.
   local rev
-  rev=$(awk '/name = "plain-rs"/{f=1} f&&/source = "git/{print; exit}' rust/plain-rust/Cargo.lock 2>/dev/null \
+  rev=$(awk '/name = "plain-rs"/{f=1} f&&/source = "git/{print; exit}' plain-rs/Cargo.lock 2>/dev/null \
         | sed -n 's/.*#\([0-9a-f]\{40\}\).*/\1/p')
   if [ -z "$rev" ]; then
     case_block "rust_plain_rs" "cannot resolve the pinned plain-rs rev from Cargo.lock"

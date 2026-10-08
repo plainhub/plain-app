@@ -123,7 +123,7 @@ AGENTS.md
 design/
 test-reports/
 rust/plain-prefs-mobile/target/
-rust/plain-rust/target/
+plain-rs/target/
 
 # wrangler local cache (account selection), never commit
 .wrangler/

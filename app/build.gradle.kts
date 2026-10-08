@@ -150,7 +150,7 @@ android {
     sourceSets.getByName("main").assets.srcDir("src/main/resources")
 }
 
-val rustCoreDir = rootProject.file("rust/plain-rust")
+val rustCoreDir = rootProject.file("plain-rs")
 val rustTargetDir = layout.buildDirectory.dir("rust-target")
 val rustAbi = providers.gradleProperty("abiFilters").orNull?.split(';')?.singleOrNull() ?: "arm64-v8a"
 val rustAndroidTarget = when (rustAbi) {

@@ -56,19 +56,19 @@ kotlin {
         }
         val buildPlainRust = tasks.register<Exec>("buildPlainRust${iosTarget.name.replaceFirstChar { it.uppercase() }}") {
             dependsOn(installRustTarget)
-            inputs.file(rootProject.file("rust/plain-rust/Cargo.toml"))
-            inputs.file(rootProject.file("rust/plain-rust/Cargo.lock"))
-            inputs.dir(rootProject.file("rust/plain-rust/src"))
+            inputs.file(rootProject.file("plain-rs/Cargo.toml"))
+            inputs.file(rootProject.file("plain-rs/Cargo.lock"))
+            inputs.dir(rootProject.file("plain-rs/src"))
             outputs.file(rustTargetDir.map { it.file("$rustTarget/release/libplain_rust.a") })
             environment("CARGO_TARGET_DIR", rustTargetDir.get().asFile.absolutePath)
-            commandLine("cargo", "build", "--locked", "--manifest-path", rootProject.file("rust/plain-rust/Cargo.toml"), "--release", "--target", rustTarget)
+            commandLine("cargo", "build", "--locked", "--manifest-path", rootProject.file("plain-rs/Cargo.toml"), "--release", "--target", rustTarget)
         }
         iosTarget.compilations.getByName("main").cinterops.create("plainPrefs") {
             defFile(rootProject.file("shared/src/nativeInterop/cinterop/plainPrefs.def"))
-            compilerOpts("-I${rootProject.file("rust/plain-rust/include").absolutePath}")
+            compilerOpts("-I${rootProject.file("plain-rs/include").absolutePath}")
         }
         tasks.matching { it.name == "cinteropPlainPrefs${iosTarget.name.replaceFirstChar { c -> c.uppercase() }}" }.configureEach {
-            inputs.file(rootProject.file("rust/plain-rust/include/plain_rust.h"))
+            inputs.file(rootProject.file("plain-rs/include/plain_rust.h"))
         }
         iosTarget.binaries.framework {
             baseName = "PlainShared"
