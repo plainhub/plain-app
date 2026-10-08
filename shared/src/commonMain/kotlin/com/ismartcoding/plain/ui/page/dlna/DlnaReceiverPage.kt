@@ -26,7 +26,6 @@ import androidx.navigation.NavHostController
 import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.enums.ButtonSize
 import com.ismartcoding.plain.features.dlna.DlnaRendererState
-import com.ismartcoding.plain.features.dlna.startDlnaRenderer
 import com.ismartcoding.plain.ui.base.AlertType
 import com.ismartcoding.plain.ui.base.BottomSpace
 import com.ismartcoding.plain.ui.base.PAlert
@@ -122,7 +121,7 @@ private fun DlnaReceiverDisabledScreen() {
                 onClick = {
                     scope.launchSafe {
                         UserPrefs.dlna.value = true
-                        startDlnaRenderer()
+                        DlnaRendererState.start()
                     }
                 },
             )

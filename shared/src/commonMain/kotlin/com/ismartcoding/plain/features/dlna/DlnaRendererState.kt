@@ -21,9 +21,6 @@ object DlnaRendererState {
     val mediaAlbumArtUri = MutableStateFlow("")
     val mediaType = MutableStateFlow(DlnaMediaType.UNKNOWN)
     val playbackState = MutableStateFlow(DlnaPlaybackState.NO_MEDIA_PRESENT)
-    val port = MutableStateFlow(7878)
-    val currentPositionMs = MutableStateFlow(0L)
-    val durationMs = MutableStateFlow(0L)
     /** Non-null signals the player to seek to this position (milliseconds). */
     val seekTargetMs = MutableStateFlow<Long?>(null)
     /** Non-null when a cast request is shown to the user for confirmation. */
@@ -39,8 +36,8 @@ object DlnaRendererState {
         apply(response.getValue("result").jsonObject)
     }
     suspend fun refresh() = command(ReceiverCommand.Snapshot)
-    suspend fun start() = command(ReceiverCommand.Start(UserPrefs.httpPort.value))
-    suspend fun stop() = command(ReceiverCommand.Stop)
+    fun start() { coIO { command(ReceiverCommand.Start(UserPrefs.httpPort.value)) } }
+    fun stop() { coIO { command(ReceiverCommand.Stop) } }
     fun retry() { coIO { command(ReceiverCommand.Retry(UserPrefs.httpPort.value)) } }
     fun acceptCastRequest(rememberChoice: Boolean) { coIO { command(ReceiverCommand.Accept(rememberChoice)) } }
     fun rejectCastRequest(rememberChoice: Boolean) { coIO { command(ReceiverCommand.Reject(rememberChoice)) } }
@@ -63,9 +60,6 @@ object DlnaRendererState {
             mediaAlbumArtUri.value = state.mediaAlbumArtUri
             mediaType.value = state.mediaType
             playbackState.value = state.playbackState
-            port.value = state.port
-            currentPositionMs.value = state.currentPositionMs
-            durationMs.value = state.durationMs
             seekTargetMs.value = state.seekTargetMs
             startError.value = state.startError
             val wasPending = pendingCastRequest.value != null

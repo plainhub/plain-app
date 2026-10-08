@@ -9,7 +9,7 @@ import com.ismartcoding.plain.events.StartNearbyServiceEvent
 import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.lib.sendEvent
 import com.ismartcoding.plain.platform.getDeviceName
-import com.ismartcoding.plain.features.dlna.startDlnaRenderer
+import com.ismartcoding.plain.features.dlna.DlnaRendererState
 import com.ismartcoding.plain.preferences.*
 
 /**
@@ -38,7 +38,7 @@ suspend fun initCommonPreferences() {
     ChatCacher.load()
     sendEvent(StartNearbyServiceEvent())
     if (TempData.canDLNAAccess()) {
-        startDlnaRenderer()
+        DlnaRendererState.start()
     }
     LogCat.d("initCommonPreferences: clientId=${TempData.clientId}, deviceName=${TempData.deviceName.value}")
 }

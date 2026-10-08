@@ -16,8 +16,7 @@ import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.i18n.Res
 import com.ismartcoding.plain.i18n.dlna_receiver
 import com.ismartcoding.plain.i18n.dlna_receiver_desc
-import com.ismartcoding.plain.features.dlna.startDlnaRenderer
-import com.ismartcoding.plain.features.dlna.stopDlnaRenderer
+import com.ismartcoding.plain.features.dlna.DlnaRendererState
 import com.ismartcoding.plain.ui.resources.cast as ui_drawable_cast
 import com.ismartcoding.plain.ui.base.HorizontalSpace
 import com.ismartcoding.plain.ui.base.PCard
@@ -47,7 +46,7 @@ fun DlnaReceiverSection(navController: NavHostController) {
             PSwitch(activated = dlnaReceiverEnabled) { enable ->
                 scope.launchSafe {
                     UserPrefs.dlna.value = enable
-                    if (enable) startDlnaRenderer() else stopDlnaRenderer()
+                    if (enable) DlnaRendererState.start() else DlnaRendererState.stop()
                 }
             }
             HorizontalSpace(8.dp)
