@@ -3,6 +3,9 @@ import java.io.FileInputStream
 import java.util.Properties
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+import org.gradle.api.file.DirectoryProperty
+import org.gradle.api.file.FileSystemOperations
+import javax.inject.Inject
 
 plugins {
     id("com.android.application")
@@ -210,14 +213,32 @@ val packagePlainRustAndroid by tasks.registering(Sync::class) {
     includeEmptyDirs = false
 }
 
-val packageOnnxRuntimeLicenses by tasks.registering(Sync::class) {
-    dependsOn(buildPlainRustAndroid)
-    from(onnxRuntimeDir) { include("LICENSE", "ThirdPartyNotices.txt") }
-    into(layout.buildDirectory.dir("generated/onnxLicenses/onnxruntime"))
+abstract class PackageOnnxRuntimeLicenses @Inject constructor(
+    private val fileSystem: FileSystemOperations,
+) : DefaultTask() {
+    @get:InputFiles
+    @get:PathSensitive(PathSensitivity.RELATIVE)
+    abstract val licenseFiles: ConfigurableFileCollection
+
+    @get:OutputDirectory
+    abstract val outputDirectory: DirectoryProperty
+
+    @TaskAction
+    fun packageLicenses() {
+        fileSystem.sync {
+            from(licenseFiles) { into("onnxruntime") }
+            into(outputDirectory)
+        }
+    }
 }
-android.sourceSets.getByName("main").assets.srcDir(layout.buildDirectory.dir("generated/onnxLicenses").get().asFile)
-tasks.matching { it.name.startsWith("merge") && it.name.endsWith("Assets") }.configureEach {
-    dependsOn(packageOnnxRuntimeLicenses)
+
+val packageOnnxRuntimeLicenses by tasks.registering(PackageOnnxRuntimeLicenses::class) {
+    dependsOn(buildPlainRustAndroid)
+    licenseFiles.from(onnxRuntimeDir.map { it.file("LICENSE") }, onnxRuntimeDir.map { it.file("ThirdPartyNotices.txt") })
+    outputDirectory.set(layout.buildDirectory.dir("generated/onnxLicenses"))
+}
+androidComponents.onVariants { variant ->
+    variant.sources.assets?.addGeneratedSourceDirectory(packageOnnxRuntimeLicenses, PackageOnnxRuntimeLicenses::outputDirectory)
 }
 
 tasks.matching { it.name.startsWith("merge") && it.name.endsWith("JniLibFolders") }.configureEach {
