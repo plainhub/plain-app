@@ -100,8 +100,15 @@ class LongFormatTest {
     @Test
     fun formatDuration_alwaysShowHour() {
         // With alwaysShowHour=true, even short durations include hour component.
+        assertEquals("00:00:00", 0L.formatDurationSec(alwaysShowHour = true))
         assertEquals("00:00:05", 5L.formatDurationSec(alwaysShowHour = true))
+        assertEquals("00:00:59", 59L.formatDurationSec(alwaysShowHour = true))
         assertEquals("00:05:00", 300L.formatDurationSec(alwaysShowHour = true))
+        assertEquals("00:01:00", 60L.formatDurationSec(alwaysShowHour = true))
+        assertEquals("00:01:05", 65L.formatDurationSec(alwaysShowHour = true))
+        assertEquals("01:00:00", 3600L.formatDurationSec(alwaysShowHour = true))
+        assertEquals("01:01:01", 3661L.formatDurationSec(alwaysShowHour = true))
+        assertEquals("10:30:45", ((10 * 3600 + 30 * 60 + 45).toLong()).formatDurationSec(alwaysShowHour = true))
     }
 
     @Test

@@ -25,7 +25,7 @@ import com.ismartcoding.plain.data.DMediaBucket
 import com.ismartcoding.plain.db.IData
 import com.ismartcoding.plain.enums.DataType
 import com.ismartcoding.plain.features.file.FileSortBy
-import com.ismartcoding.plain.features.media.CastPlayer
+import com.ismartcoding.plain.features.dlna.sender.RustDlnaSender
 import com.ismartcoding.plain.ui.base.dragselect.DragSelectState
 import com.ismartcoding.plain.ui.models.CastViewModel
 import com.ismartcoding.plain.ui.models.BaseMediaViewModel
@@ -82,7 +82,7 @@ fun <T : IData> MediaTopBar(
     val title = getMediaPageTitle(
         mediaType = mediaVM.dataType,
         isCastMode = castVM.castMode.value,
-        castDeviceName = CastPlayer.currentDevice?.name,
+        castDeviceName = RustDlnaSender.currentDevice?.name,
         bucket = bucketsMap[mediaVM.bucketId.value],
         dragSelectState = dragSelectState,
         tagName = mediaVM.tag.value?.name,

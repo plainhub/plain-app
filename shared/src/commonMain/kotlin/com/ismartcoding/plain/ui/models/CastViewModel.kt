@@ -5,7 +5,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ismartcoding.plain.db.IMedia
 import com.ismartcoding.plain.features.dlna.sender.*
-import com.ismartcoding.plain.features.media.CastPlayer
 import com.ismartcoding.plain.lib.extensions.getFilenameWithoutExtensionFromPath
 import com.ismartcoding.plain.ui.helpers.DialogHelper
 
@@ -13,12 +12,12 @@ class CastViewModel : ViewModel() {
     val castMode = mutableStateOf(false)
     val showCastDialog = mutableStateOf(false)
     val isLoading = mutableStateOf(false)
-    val currentDeviceName: String get() = CastPlayer.currentDevice?.name.orEmpty()
-    val hasCurrentDevice: Boolean get() = CastPlayer.currentDevice != null
+    val currentDeviceName: String get() = RustDlnaSender.currentDevice?.name.orEmpty()
+    val hasCurrentDevice: Boolean get() = RustDlnaSender.currentDevice != null
 
     fun enterCastMode() { castMode.value = true; showCastDialog.value = false }
     fun selectDevice(hostAddress: String) {
-        val device = DlnaDeviceScanner.devices.value.firstOrNull { it.hostAddress == hostAddress } ?: return
+        val device = RustDlnaSender.devices.value.firstOrNull { it.hostAddress == hostAddress } ?: return
         command(CastCommand.Select(device.id))
     }
     fun exitCastMode() { castMode.value = false; command(CastCommand.Exit) }

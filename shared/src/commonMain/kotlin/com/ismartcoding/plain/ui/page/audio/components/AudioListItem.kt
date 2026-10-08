@@ -19,7 +19,7 @@ import com.ismartcoding.plain.enums.AppFeatureType
 import com.ismartcoding.plain.enums.has
 import com.ismartcoding.plain.db.DTag
 import com.ismartcoding.plain.platform.checkNotificationPermission
-import com.ismartcoding.plain.features.media.CastPlayer
+import com.ismartcoding.plain.features.dlna.sender.RustDlnaSender
 import com.ismartcoding.plain.ui.base.HorizontalSpace
 import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.base.dragselect.DragSelectState
@@ -43,9 +43,9 @@ fun AudioListItem(
     isCurrentlyPlaying: Boolean = false, isInQueue: Boolean = false,
 ) {
     val scope = rememberCoroutineScope()
-    val castItems by CastPlayer.items.collectAsState()
-    val currentUri by CastPlayer.currentUri.collectAsState()
-    val castPlaying by CastPlayer.isPlaying.collectAsState()
+    val castItems by RustDlnaSender.items.collectAsState()
+    val currentUri by RustDlnaSender.currentUri.collectAsState()
+    val castPlaying by RustDlnaSender.isPlaying.collectAsState()
     val isCurrentlyPlayingByCast = currentUri == item.path && castPlaying
     val isCurrentItemLoading = castVM.isLoading.value && currentUri == item.path
 
@@ -114,7 +114,7 @@ fun AudioListItem(
                     item = item, castMode = castVM.castMode.value,
                     castItems = castItems, isInQueue = isInQueue,
                     onCastToggle = { audio, isInCastQueue ->
-                        if (isInCastQueue) CastPlayer.removeItem(audio) else CastPlayer.addItem(audio)
+                        if (isInCastQueue) RustDlnaSender.removeItem(audio) else RustDlnaSender.addItem(audio)
                     },
                     onQueueToggle = { audio, inQueue ->
                         if (inQueue) audioQueueVM.removeAsync(audio.path) else audioQueueVM.addAsync(listOf(audio))

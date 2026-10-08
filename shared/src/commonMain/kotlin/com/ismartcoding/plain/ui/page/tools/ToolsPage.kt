@@ -28,7 +28,7 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.ismartcoding.plain.enums.AppFeatureType
-import com.ismartcoding.plain.features.media.CastPlayer
+import com.ismartcoding.plain.features.dlna.sender.RustDlnaSender
 import com.ismartcoding.plain.i18n.Res
 import com.ismartcoding.plain.i18n.customize_home_features
 import com.ismartcoding.plain.ui.resources.grid_3x3 as ui_drawable_grid_3x3
@@ -62,7 +62,7 @@ fun ToolsPage(
     navController: NavHostController,
     onTabSelected: (Int) -> Unit,
 ) {
-    val currentUri by CastPlayer.currentUri.collectAsState()
+    val currentUri by RustDlnaSender.currentUri.collectAsState()
     val featuresStr =
         UserPrefs.homeFeatures.collectAsStateValue()
     val notesEnabled =
@@ -126,8 +126,8 @@ fun ToolsPage(
                         .fillMaxWidth()
                         .onSizeChanged { aboveGridHeightPx = it.height },
                 ) {
-                    if (currentUri.isNotEmpty() && CastPlayer.currentDevice != null) {
-                        val deviceName = CastPlayer.currentDevice?.getDeviceName() ?: ""
+                    if (currentUri.isNotEmpty() && RustDlnaSender.currentDevice != null) {
+                        val deviceName = RustDlnaSender.currentDevice?.getDeviceName() ?: ""
                         Box(
                             modifier = Modifier.fillMaxWidth(),
                             contentAlignment = Alignment.Center,

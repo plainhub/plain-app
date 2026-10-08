@@ -25,7 +25,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.unit.dp
-import com.ismartcoding.plain.features.dlna.sender.DlnaDeviceScanner
+import com.ismartcoding.plain.features.dlna.sender.RustDlnaSender
 import com.ismartcoding.plain.events.StartHttpServerEvent
 import com.ismartcoding.plain.lib.sendEvent
 import com.ismartcoding.plain.platform.audioPause
@@ -41,18 +41,18 @@ import kotlinx.coroutines.launch
 @Composable
 fun CastDialog(castVM: CastViewModel, onDeviceSelected: (() -> Unit)? = null) {
     if (!castVM.showCastDialog.value) return
-    val devices by DlnaDeviceScanner.devices.collectAsState()
+    val devices by RustDlnaSender.devices.collectAsState()
     val scope = rememberCoroutineScope()
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val hasDevices = devices.isNotEmpty()
     val onDismiss = { castVM.showCastDialog.value = false }
 
     LaunchedEffect(Unit) {
-        DlnaDeviceScanner.start()
+        RustDlnaSender.startScan()
         sheetState.expand()
     }
     DisposableEffect(Unit) {
-        onDispose { DlnaDeviceScanner.stop() }
+        onDispose { RustDlnaSender.stopScan() }
     }
 
     PModalBottomSheet(

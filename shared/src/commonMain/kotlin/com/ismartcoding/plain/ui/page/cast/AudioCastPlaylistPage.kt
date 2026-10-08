@@ -33,7 +33,7 @@ import androidx.compose.ui.draw.clip
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.unit.dp
-import com.ismartcoding.plain.features.media.CastPlayer
+import com.ismartcoding.plain.features.dlna.sender.RustDlnaSender
 import com.ismartcoding.plain.platform.LocaleHelper
 import com.ismartcoding.plain.platform.getAudioMetadata
 import com.ismartcoding.plain.ui.base.PBottomSheetTopAppBar
@@ -54,12 +54,12 @@ import com.ismartcoding.plain.ui.resources.delete_forever as ui_drawable_delete_
 fun AudioCastPlaylistPage(castVM: CastViewModel, onDismissRequest: () -> Unit) {
     val scope = rememberCoroutineScope()
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
-    val castItems by CastPlayer.items.collectAsState()
-    val currentUri by CastPlayer.currentUri.collectAsState()
-    val isPlaying by CastPlayer.isPlaying.collectAsState()
-    val progressMs by CastPlayer.progressMs.collectAsState()
-    val durationMs by CastPlayer.durationMs.collectAsState()
-    val supportsCallback by CastPlayer.supportsCallback.collectAsState()
+    val castItems by RustDlnaSender.items.collectAsState()
+    val currentUri by RustDlnaSender.currentUri.collectAsState()
+    val isPlaying by RustDlnaSender.isPlaying.collectAsState()
+    val progressMs by RustDlnaSender.progressMs.collectAsState()
+    val durationMs by RustDlnaSender.durationMs.collectAsState()
+    val supportsCallback by RustDlnaSender.supportsCallback.collectAsState()
     var nowPlayingTitle by remember { mutableStateOf("") }
     var nowPlayingArtist by remember { mutableStateOf("") }
     LaunchedEffect(currentUri) {
