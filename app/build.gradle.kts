@@ -181,8 +181,18 @@ val clangTarget = when (rustAndroidTarget) {
 val androidClang = File(ndkHost, "bin/${clangTarget}28-clang")
 val libcxxTarget = if (rustAbi == "armeabi-v7a") "arm-linux-androideabi" else rustAndroidTarget
 
+// The Gradle daemon inherits the PATH of whatever shell first started it, which
+// often lacks ~/.cargo/bin, and the daemon cannot fix that after startup. Call
+// rustup/cargo by absolute path so Exec can start them.
+val cargoBinDir = File(System.getenv("CARGO_HOME") ?: "${System.getProperty("user.home")}/.cargo", "bin")
+val rustupExe = cargoBinDir.resolve("rustup")
+val cargoExe = cargoBinDir.resolve("cargo")
+listOf(rustupExe, cargoExe).forEach {
+    require(it.canExecute()) { "Rust tool not found or not executable: ${it.absolutePath}" }
+}
+
 val installRustAndroidTarget by tasks.registering(Exec::class) {
-    commandLine("rustup", "target", "add", rustAndroidTarget)
+    commandLine(rustupExe.absolutePath, "target", "add", rustAndroidTarget)
 }
 
 val buildPlainRustAndroid by tasks.registering(Exec::class) {
@@ -200,7 +210,7 @@ val buildPlainRustAndroid by tasks.registering(Exec::class) {
     environment("CC_${rustAndroidTarget.replace('-', '_')}", androidClang.absolutePath)
     environment("AR_${rustAndroidTarget.replace('-', '_')}", File(ndkHost, "bin/llvm-ar").absolutePath)
     environment("CARGO_TARGET_${rustAndroidTarget.uppercase().replace('-', '_')}_AR", File(ndkHost, "bin/llvm-ar").absolutePath)
-    commandLine("cargo", "build", "--locked", "--manifest-path", File(rustCoreDir, "Cargo.toml"), "--release", "--target", rustAndroidTarget)
+    commandLine(cargoExe.absolutePath, "build", "--locked", "--manifest-path", File(rustCoreDir, "Cargo.toml"), "--release", "--target", rustAndroidTarget)
 }
 
 val packagePlainRustAndroid by tasks.registering(Sync::class) {
