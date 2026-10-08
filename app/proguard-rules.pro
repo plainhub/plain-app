@@ -36,16 +36,63 @@
     *** Companion;
 }
 
-# ===== Enum names (cross-process data contracts) =====
-# Enum class names and constant names ARE data contracts and cannot be fixed at
-# compile time:
-#  - GraphQL enum type names default to KClass.simpleName (EnumDSL)
-#  - GraphQL enum VALUE names are matched via runtime `it.name` (nameToValue),
-#    including introspection TypeKind/DirectiveLocation ("OBJECT", "SCALAR", ...)
-#  - `Enum.valueOf(str)` lookups on protocol/persisted keys:
-#    DeviceType (mDNS TXT), AppFeatureType (Preferences), iOS pick callbacks
--keepnames enum com.ismartcoding.plain.** { *; }
--keepclassmembers enum com.ismartcoding.plain.** { <fields>; }
+# ===== Enum constants used as external or persisted keys =====
+# Rust owns GraphQL schema names. Only constant fields need name/retention rules.
+# Class names, methods and private backing fields remain eligible for shrinking.
+
+# Persisted preferences, platform permissions and public API keys.
+-keepclassmembers,allowoptimization enum com.ismartcoding.plain.enums.AppFeatureType { public static final com.ismartcoding.plain.enums.AppFeatureType *; }
+-keepclassmembers,allowoptimization enum com.ismartcoding.plain.enums.AppChannelType { public static final com.ismartcoding.plain.enums.AppChannelType *; }
+-keepclassmembers,allowoptimization enum com.ismartcoding.plain.enums.DataType { public static final com.ismartcoding.plain.enums.DataType *; }
+-keepclassmembers,allowoptimization enum com.ismartcoding.plain.enums.MediaDataType { public static final com.ismartcoding.plain.enums.MediaDataType *; }
+-keepclassmembers,allowoptimization enum com.ismartcoding.plain.enums.MediaPlayMode { public static final com.ismartcoding.plain.enums.MediaPlayMode *; }
+-keepclassmembers,allowoptimization enum com.ismartcoding.plain.enums.PackageType { public static final com.ismartcoding.plain.enums.PackageType *; }
+-keepclassmembers,allowoptimization enum com.ismartcoding.plain.enums.WebSettingsFeature { public static final com.ismartcoding.plain.enums.WebSettingsFeature *; }
+-keepclassmembers,allowoptimization enum com.ismartcoding.plain.enums.TextFileType { public static final com.ismartcoding.plain.enums.TextFileType *; }
+-keepclassmembers,allowoptimization enum com.ismartcoding.plain.platform.Permission { public static final com.ismartcoding.plain.platform.Permission *; }
+-keepclassmembers,allowoptimization enum com.ismartcoding.plain.platform.Capability { public static final com.ismartcoding.plain.platform.Capability *; }
+
+# Room values and Rust chat/discovery projections.
+-keepclassmembers,allowoptimization enum com.ismartcoding.plain.enums.DeviceType { public static final com.ismartcoding.plain.enums.DeviceType *; }
+-keepclassmembers,allowoptimization enum com.ismartcoding.plain.enums.PeerStatus { public static final com.ismartcoding.plain.enums.PeerStatus *; }
+-keepclassmembers,allowoptimization enum com.ismartcoding.plain.enums.ChannelMemberStatus { public static final com.ismartcoding.plain.enums.ChannelMemberStatus *; }
+-keepclassmembers,allowoptimization enum com.ismartcoding.plain.enums.ChatChannelStatus { public static final com.ismartcoding.plain.enums.ChatChannelStatus *; }
+-keepclassmembers,allowoptimization enum com.ismartcoding.plain.enums.ChatStatus { public static final com.ismartcoding.plain.enums.ChatStatus *; }
+-keepclassmembers,allowoptimization enum com.ismartcoding.plain.enums.SessionType { public static final com.ismartcoding.plain.enums.SessionType *; }
+-keepclassmembers,allowoptimization enum com.ismartcoding.plain.enums.NearbyMessageType { public static final com.ismartcoding.plain.enums.NearbyMessageType *; }
+-keepclassmembers,allowoptimization enum com.ismartcoding.plain.enums.DiscoveryMethod { public static final com.ismartcoding.plain.enums.DiscoveryMethod *; }
+-keepclassmembers,allowoptimization enum com.ismartcoding.plain.db.MessageType { public static final com.ismartcoding.plain.db.MessageType *; }
+-keepclassmembers,allowoptimization enum com.ismartcoding.plain.chat.peer.transport.PeerTransportType { public static final com.ismartcoding.plain.chat.peer.transport.PeerTransportType *; }
+-keepclassmembers,allowoptimization enum com.ismartcoding.plain.ui.models.NearbyItemStatus { public static final com.ismartcoding.plain.ui.models.NearbyItemStatus *; }
+-keepclassmembers,allowoptimization enum com.ismartcoding.plain.lib.mdns.MdnsPacketDirection { public static final com.ismartcoding.plain.lib.mdns.MdnsPacketDirection *; }
+
+# Rust media, file, feed, download and timer contracts.
+-keepclassmembers,allowoptimization enum com.ismartcoding.plain.enums.AudioServiceAction { public static final com.ismartcoding.plain.enums.AudioServiceAction *; }
+-keepclassmembers,allowoptimization enum com.ismartcoding.plain.features.dlna.DlnaPlaybackState { public static final com.ismartcoding.plain.features.dlna.DlnaPlaybackState *; }
+-keepclassmembers,allowoptimization enum com.ismartcoding.plain.db.AudioPlaySource { public static final com.ismartcoding.plain.db.AudioPlaySource *; }
+-keepclassmembers,allowoptimization enum com.ismartcoding.plain.features.file.FileSortBy { public static final com.ismartcoding.plain.features.file.FileSortBy *; }
+-keepclassmembers,allowoptimization enum com.ismartcoding.plain.features.file.FileTaskType { public static final com.ismartcoding.plain.features.file.FileTaskType *; }
+-keepclassmembers,allowoptimization enum com.ismartcoding.plain.features.file.FileTaskStatus { public static final com.ismartcoding.plain.features.file.FileTaskStatus *; }
+-keepclassmembers,allowoptimization enum com.ismartcoding.plain.features.mediaactions.MediaAction { public static final com.ismartcoding.plain.features.mediaactions.MediaAction *; }
+-keepclassmembers,allowoptimization enum com.ismartcoding.plain.features.feed.FeedWorkerStatus { public static final com.ismartcoding.plain.features.feed.FeedWorkerStatus *; }
+-keepclassmembers,allowoptimization enum com.ismartcoding.plain.features.feed.FeedSyncErrorCode { public static final com.ismartcoding.plain.features.feed.FeedSyncErrorCode *; }
+-keepclassmembers,allowoptimization enum com.ismartcoding.plain.features.download.DownloadStatus { public static final com.ismartcoding.plain.features.download.DownloadStatus *; }
+-keepclassmembers,allowoptimization enum com.ismartcoding.plain.features.share.ShareBatchType { public static final com.ismartcoding.plain.features.share.ShareBatchType *; }
+-keepclassmembers,allowoptimization enum com.ismartcoding.plain.enums.ScreenMirrorMode { public static final com.ismartcoding.plain.enums.ScreenMirrorMode *; }
+-keepclassmembers,allowoptimization enum com.ismartcoding.plain.ui.page.pomodoro.PomodoroState { public static final com.ismartcoding.plain.ui.page.pomodoro.PomodoroState *; }
+
+# Enum names consumed by JSON serializers at platform/Rust boundaries.
+-keepclassmembers,allowoptimization enum com.ismartcoding.plain.ai.ImageSearchStatusType { public static final com.ismartcoding.plain.ai.ImageSearchStatusType *; }
+-keepclassmembers,allowoptimization enum com.ismartcoding.plain.data.DevicePlatform { public static final com.ismartcoding.plain.data.DevicePlatform *; }
+-keepclassmembers,allowoptimization enum com.ismartcoding.plain.enums.ScreenMirrorControlAction { public static final com.ismartcoding.plain.enums.ScreenMirrorControlAction *; }
+-keepclassmembers,allowoptimization enum com.ismartcoding.plain.enums.DriveType { public static final com.ismartcoding.plain.enums.DriveType *; }
+-keepclassmembers,allowoptimization enum com.ismartcoding.plain.enums.PhoneType { public static final com.ismartcoding.plain.enums.PhoneType *; }
+-keepclassmembers,allowoptimization enum com.ismartcoding.plain.enums.EmailType { public static final com.ismartcoding.plain.enums.EmailType *; }
+-keepclassmembers,allowoptimization enum com.ismartcoding.plain.enums.PostalType { public static final com.ismartcoding.plain.enums.PostalType *; }
+-keepclassmembers,allowoptimization enum com.ismartcoding.plain.enums.EventType { public static final com.ismartcoding.plain.enums.EventType *; }
+-keepclassmembers,allowoptimization enum com.ismartcoding.plain.enums.WebsiteType { public static final com.ismartcoding.plain.enums.WebsiteType *; }
+-keepclassmembers,allowoptimization enum com.ismartcoding.plain.enums.ImProtocol { public static final com.ismartcoding.plain.enums.ImProtocol *; }
+-keepclassmembers,allowoptimization enum com.ismartcoding.plain.lib.dlna.DlnaMediaType { public static final com.ismartcoding.plain.lib.dlna.DlnaMediaType *; }
 
 # ===== ASN.1 / X.509 self-signed certificate generation =====
 # Asn1DerEncoder/Asn1BerParser drive (de)serialization purely via the
