@@ -13,7 +13,7 @@ import kotlin.test.assertTrue
  * edge cases that matter for the pairing/feed code paths:
  *  - empty input (used when computing the rawId of a degenerate feed entry)
  *  - multi-block input (> 56 bytes, exercises the two-block padding path)
- *  - non-ASCII UTF-8 input (matches what `Extensions.toDFeedEntry` feeds in)
+ *  - non-ASCII UTF-8 input
  */
 class Sha256Test {
 
