@@ -129,7 +129,7 @@ fun PListItem(
         trailingContent = if (value != null || action != null || showMore || separatedActions) {
             {
                 Row(
-                    modifier = Modifier.fillMaxWidth(0.5f),
+                    modifier = if (value != null) Modifier.fillMaxWidth(0.5f) else Modifier,
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     if (separatedActions) {
