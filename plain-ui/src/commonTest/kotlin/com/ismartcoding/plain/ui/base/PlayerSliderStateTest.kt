@@ -167,4 +167,34 @@ class PlayerSliderStateTest {
         val state = PlayerSliderState(initialProgress = 0f)
         assertEquals(1500L, state.seekHoldDurationMs)
     }
+
+    @Test
+    fun `cancelling uses the latest external ratio and clears hold`() {
+        val state = PlayerSliderState(0.2f)
+        state.startDrag(0.8f)
+        state.cancelDrag(0.4f)
+        assertFalse(state.isDragging)
+        assertFalse(state.seekHoldActive)
+        assertEquals(0.4f, state.displayProgress)
+    }
+
+    @Test
+    fun `consecutive seeks restart the hold revision`() {
+        val state = PlayerSliderState()
+        state.tap(0.2f)
+        val revision = state.seekRevision
+        state.tap(0.8f)
+        assertEquals(revision + 1, state.seekRevision)
+        assertEquals(0.8f, state.displayProgress)
+    }
+
+    @Test
+    fun `invalid renderer ratios are bounded`() {
+        val state = PlayerSliderState(Float.NaN)
+        assertEquals(0f, state.displayProgress)
+        state.syncExternalProgress(2f)
+        assertEquals(1f, state.displayProgress)
+        state.cancelDrag(-1f)
+        assertEquals(0f, state.displayProgress)
+    }
 }

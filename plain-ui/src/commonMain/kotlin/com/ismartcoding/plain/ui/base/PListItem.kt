@@ -1,6 +1,5 @@
 package com.ismartcoding.plain.ui.base
 
-import org.jetbrains.compose.resources.DrawableResource
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
@@ -10,9 +9,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.ListItemDefaults
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
@@ -21,20 +20,20 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
-import org.jetbrains.compose.resources.painterResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import com.ismartcoding.plain.ui.resources.Res as UiRes
+import com.ismartcoding.plain.ui.resources.chevron_right as ui_drawable_chevron_right
 import com.ismartcoding.plain.ui.theme.listItemSubtitle
 import com.ismartcoding.plain.ui.theme.listItemTitle
 import com.ismartcoding.plain.ui.theme.listItemValue
-import com.ismartcoding.plain.ui.resources.Res as UiRes
-import com.ismartcoding.plain.ui.resources.chevron_right as ui_drawable_chevron_right
-
+import org.jetbrains.compose.resources.DrawableResource
+import org.jetbrains.compose.resources.painterResource
 
 @Composable
 fun PListItem(
     modifier: Modifier = Modifier,
-    enable: Boolean = true,
+    dimmed: Boolean = false,
     title: String,
     subtitle: String = "",
     value: String? = null,
@@ -47,8 +46,9 @@ fun PListItem(
     showMore: Boolean = false,
     action: (@Composable () -> Unit)? = null,
 ) {
+    require(titleTrailing == null || titleSuffix == null) { "Choose either titleTrailing or titleSuffix" }
     ListItem(
-        modifier = modifier.alpha(if (enable) 1f else 0.5f),
+        modifier = modifier.alpha(if (dimmed) 0.5f else 1f),
         colors = ListItemDefaults.colors(containerColor = Color.Transparent),
         headlineContent = {
             when {
@@ -103,7 +103,7 @@ fun PListItem(
                         modifier = Modifier.size(24.dp),
                         painter = painterResource(icon),
                         colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.primary),
-                        contentDescription = title,
+                        contentDescription = null,
                     )
                 }
             }
@@ -133,7 +133,7 @@ fun PListItem(
                         Icon(
                             painter = painterResource(UiRes.drawable.ui_drawable_chevron_right),
                             modifier = Modifier.size(16.dp),
-                            contentDescription = title,
+                            contentDescription = null,
                             tint = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
                     }

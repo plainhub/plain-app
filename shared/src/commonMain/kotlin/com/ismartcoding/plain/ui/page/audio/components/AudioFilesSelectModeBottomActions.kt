@@ -1,20 +1,20 @@
 package com.ismartcoding.plain.ui.page.audio.components
 
-import com.ismartcoding.plain.i18n.*
-
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
-import com.ismartcoding.plain.lib.withIO
 import com.ismartcoding.plain.db.DTag
 import com.ismartcoding.plain.enums.AppFeatureType
-import com.ismartcoding.plain.enums.has
 import com.ismartcoding.plain.enums.DataType
+import com.ismartcoding.plain.enums.has
+import com.ismartcoding.plain.i18n.*
+import com.ismartcoding.plain.lib.withIO
 import com.ismartcoding.plain.platform.getMediaItemUriString
 import com.ismartcoding.plain.platform.shareFiles
 import com.ismartcoding.plain.ui.base.BottomActionButtons
@@ -34,11 +34,10 @@ import com.ismartcoding.plain.ui.models.AudioQueueViewModel
 import com.ismartcoding.plain.ui.models.AudioViewModel
 import com.ismartcoding.plain.ui.models.TagsViewModel
 import com.ismartcoding.plain.ui.page.tags.BatchSelectTagsDialog
-import kotlinx.coroutines.launch
-import org.jetbrains.compose.resources.stringResource
-import androidx.compose.runtime.collectAsState
 import com.ismartcoding.plain.ui.resources.Res as UiRes
 import com.ismartcoding.plain.ui.resources.playlist_remove as ui_drawable_playlist_remove
+import kotlinx.coroutines.launch
+import org.jetbrains.compose.resources.stringResource
 
 @OptIn(ExperimentalLayoutApi::class, ExperimentalMaterial3Api::class)
 @Composable
@@ -68,7 +67,7 @@ fun AudioFilesSelectModeBottomActions(
     PBottomAppBar {
         BottomActionButtons {
             if (removeFromPlaylist != null) {
-                PIconTextSmallButton(UiRes.drawable.ui_drawable_playlist_remove, stringResource(Res.string.remove_from_playlist), click = removeFromPlaylist)
+                PIconTextSmallButton(UiRes.drawable.ui_drawable_playlist_remove, stringResource(Res.string.remove_from_playlist), onClick = removeFromPlaylist)
             }
             if (!audioVM.trash.value) {
                 IconTextSmallButtonLabel {

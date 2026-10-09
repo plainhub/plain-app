@@ -13,10 +13,11 @@ import androidx.compose.ui.unit.dp
 
 @Composable
 fun BottomActionButtons(
+    modifier: Modifier = Modifier,
     content: @Composable RowScope.() -> Unit
 ) {
     Row(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .padding(horizontal = 16.dp)
             .horizontalScroll(rememberScrollState()),

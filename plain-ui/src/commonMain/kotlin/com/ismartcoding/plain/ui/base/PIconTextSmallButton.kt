@@ -1,52 +1,39 @@
 package com.ismartcoding.plain.ui.base
 
-import org.jetbrains.compose.resources.DrawableResource
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
-import org.jetbrains.compose.resources.painterResource
-import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
+import org.jetbrains.compose.resources.DrawableResource
+import org.jetbrains.compose.resources.painterResource
 
 @Composable
 fun PIconTextSmallButton(
     icon: DrawableResource,
     text: String,
-    click: () -> Unit,
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true,
+    onClick: () -> Unit,
 ) {
-    Box(
-        modifier = Modifier
-            .clip(RoundedCornerShape(12.dp))
-            .clickable { click() }
+    IconLabelContent(
+        text = text,
+        style = MaterialTheme.typography.labelSmall,
+        modifier = modifier.defaultMinSize(minWidth = 64.dp, minHeight = 48.dp)
+            .clip(MaterialTheme.shapes.small)
+            .clickable(enabled = enabled, role = Role.Button, onClick = onClick)
+            .alpha(if (enabled) 1f else 0.38f)
+            .padding(vertical = 8.dp),
+        spacing = 8.dp,
     ) {
-        Column(
-            modifier = Modifier.defaultMinSize(minWidth = 64.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center,
-        ) {
-            PIcon(
-                icon = painterResource(icon),
-                contentDescription = text,
-                modifier = Modifier.size(20.dp),
-                tint = MaterialTheme.colorScheme.primary
-            )
-            Text(
-                text = text,
-                style = MaterialTheme.typography.labelSmall,
-                textAlign = TextAlign.Center,
-                modifier = Modifier.padding(start = 8.dp, end = 8.dp, top = 8.dp),
-            )
-        }
+            Icon(painterResource(icon), contentDescription = null, modifier = Modifier.size(20.dp),
+                tint = MaterialTheme.colorScheme.primary)
     }
 }

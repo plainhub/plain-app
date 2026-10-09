@@ -1,7 +1,7 @@
 package com.ismartcoding.plain.ui.scanner
 
-import android.net.Uri
 import android.graphics.ImageFormat
+import android.net.Uri
 import android.util.Size
 import androidx.camera.compose.CameraXViewfinder
 import androidx.camera.core.CameraSelector
@@ -16,8 +16,6 @@ import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.viewfinder.core.ImplementationMode
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.ui.graphics.ImageBitmap
-import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
@@ -27,6 +25,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.IntSize
@@ -34,15 +34,16 @@ import androidx.core.content.ContextCompat
 import com.google.zxing.MultiFormatReader
 import com.ismartcoding.plain.helpers.QrCodeBitmapHelper
 import com.ismartcoding.plain.lib.logcat.LogCat
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 import java.util.concurrent.Executor
 import java.util.concurrent.Executors
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 @Composable
 actual fun ScanCameraView(
     cameraDetecting: MutableState<Boolean>,
     freezeFrame: MutableState<ScannedFrame?>,
+    modifier: Modifier,
     onScanResult: (List<ScannedCode>) -> Unit,
 ) {
     val context = LocalContext.current
@@ -117,7 +118,7 @@ actual fun ScanCameraView(
 
     val request = surfaceRequest
     Box(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxSize()
             .onSizeChanged { viewSize = it }
     ) {

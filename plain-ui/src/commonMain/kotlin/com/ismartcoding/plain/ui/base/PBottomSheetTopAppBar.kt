@@ -18,12 +18,13 @@ import androidx.compose.ui.unit.sp
 @Composable
 fun PBottomSheetTopAppBar(
     title: String = "",
+    modifier: Modifier = Modifier,
     subtitle: String = "",
     navigationIcon: (@Composable () -> Unit)? = null,
     actions: @Composable RowScope.() -> Unit = {},
 ) {
     Row(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .padding(start = 16.dp, end = 24.dp, top = 8.dp)
             .heightIn(min = 72.dp),

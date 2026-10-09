@@ -24,17 +24,3 @@ fun Tips(
         )
     }
 }
-
-@Composable
-fun PDialogTips(
-    text: String,
-) {
-    SelectionContainer {
-        Text(
-            modifier = Modifier
-                .fillMaxWidth(),
-            text = text,
-            style = MaterialTheme.typography.tipsText(),
-        )
-    }
-}

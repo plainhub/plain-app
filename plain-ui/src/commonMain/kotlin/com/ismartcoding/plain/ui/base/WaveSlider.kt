@@ -7,33 +7,20 @@ import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.size
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Slider
-import androidx.compose.material3.SliderDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.drawscope.scale
+import androidx.compose.ui.unit.dp
 import com.ismartcoding.plain.ui.theme.waveInactiveColor
 
-data class WaveOptions(
-    val amplitude: Float = 6f,
-    val frequency: Float = 0.12f,
-    val lineWidth: Float = 3f,
-    val thumbRadius: Float = 5f,
-    val animationDurationMs: Int = 2000
-)
-
-data class WaveSliderColors(
-    val activeColor: Color,
-    val inactiveColor: Color,
-    val thumbColor: Color
-)
-
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun WaveSlider(
     value: Float,
@@ -50,46 +37,39 @@ fun WaveSlider(
     enabled: Boolean = true,
     isPlaying: Boolean = true
 ) {
-    var isDragging by remember { mutableStateOf(false) }
-
-    val infiniteTransition = rememberInfiniteTransition(label = "waveAnimation")
-    val animationOffset = infiniteTransition.animateFloat(
-        initialValue = 0f,
-        targetValue = 1f,
-        animationSpec = infiniteRepeatable(
-            animation = tween(waveOptions.animationDurationMs, easing = LinearEasing)
-        ),
-        label = "waveOffset"
-    )
-
-    Box(modifier = modifier) {
-        Canvas(modifier = Modifier.fillMaxSize()) {
-            val phaseShift = if (isPlaying) {
-                animationOffset.value * 2 * kotlin.math.PI.toFloat()
-            } else {
-                0f
-            }
-            drawWaveContent(value, valueRange, colors, waveOptions, isPlaying, phaseShift)
-        }
-
-        Slider(
-            value = value,
-            onValueChange = {
-                isDragging = true
-                onValueChange(it)
-            },
-            onValueChangeFinished = {
-                isDragging = false
-                onValueChangeFinished?.invoke()
-            },
-            valueRange = valueRange,
-            colors = SliderDefaults.colors(
-                thumbColor = Color.Transparent,
-                activeTrackColor = Color.Transparent,
-                inactiveTrackColor = Color.Transparent
-            ),
-            enabled = enabled,
-            modifier = Modifier.fillMaxSize()
+    require(valueRange.start.isFinite() && valueRange.endInclusive.isFinite() && valueRange.start <= valueRange.endInclusive)
+    require(waveOptions.animationDurationMs > 0)
+    val animated = isPlaying && enabled
+    val animationOffset = if (animated) {
+        rememberInfiniteTransition(label = "waveAnimation").animateFloat(
+            initialValue = 0f,
+            targetValue = 1f,
+            animationSpec = infiniteRepeatable(tween(waveOptions.animationDurationMs, easing = LinearEasing)),
+            label = "waveOffset",
         )
-    }
-} 
+    } else null
+    val path = remember { androidx.compose.ui.graphics.Path() }
+    Slider(
+        value = if (value.isFinite()) value.coerceIn(valueRange) else valueRange.start,
+        onValueChange = onValueChange,
+        onValueChangeFinished = onValueChangeFinished,
+        valueRange = valueRange,
+        enabled = enabled && valueRange.start < valueRange.endInclusive,
+        modifier = modifier,
+        thumb = { Box(Modifier.size(waveOptions.thumbRadius.dp * 2)) },
+        track = { slider ->
+            Canvas(Modifier.fillMaxWidth().height((waveOptions.amplitude * 2 + waveOptions.lineWidth).dp)) {
+                val phase = (animationOffset?.value ?: 0f) * 2 * kotlin.math.PI.toFloat()
+                val effectiveColors = if (enabled) colors else colors.copy(
+                    activeColor = colors.activeColor.copy(alpha = 0.38f),
+                    thumbColor = colors.thumbColor.copy(alpha = 0.38f),
+                )
+                if (layoutDirection == androidx.compose.ui.unit.LayoutDirection.Rtl) {
+                    scale(-1f, 1f) { drawWaveContent(slider.value, valueRange, effectiveColors, waveOptions, animated, phase, path) }
+                } else {
+                    drawWaveContent(slider.value, valueRange, effectiveColors, waveOptions, animated, phase, path)
+                }
+            }
+        },
+    )
+}

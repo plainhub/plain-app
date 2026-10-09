@@ -1,0 +1,21 @@
+name: UI component policy
+on:
+  pull_request:
+    paths: ['plain-ui/**', 'shared/src/**', 'app/src/**', 'ui-check/**', 'scripts/check-ui.sh', 'scripts/ui-component-baseline.tsv', '.github/workflows/ui-policy.yml', 'gradle/libs.versions.toml']
+  push:
+    branches: [main]
+    paths: ['plain-ui/**', 'shared/src/**', 'app/src/**', 'ui-check/**', 'scripts/check-ui.sh', 'scripts/ui-component-baseline.tsv', '.github/workflows/ui-policy.yml', 'gradle/libs.versions.toml']
+permissions:
+  contents: read
+jobs:
+  policy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: android-actions/setup-android@v3
+      - run: bash scripts/check-ui.sh
+      - run: ./gradlew :plain-ui:testAndroidHostTest

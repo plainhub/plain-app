@@ -1,23 +1,16 @@
 package com.ismartcoding.plain.ui.base
 
-import org.jetbrains.compose.resources.DrawableResource
 import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -25,11 +18,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import org.jetbrains.compose.resources.painterResource
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import org.jetbrains.compose.resources.DrawableResource
+import org.jetbrains.compose.resources.painterResource
 
 @Composable
 fun PBanner(
@@ -40,15 +33,15 @@ fun PBanner(
     contentColor: Color = MaterialTheme.colorScheme.onPrimaryContainer,
     icon: DrawableResource? = null,
     action: (@Composable () -> Unit)? = null,
-    onClick: () -> Unit = {},
+    onClick: (() -> Unit)? = null,
 ) {
     Row(
-        modifier = Modifier
-            .fillMaxSize()
+        modifier = modifier
+            .fillMaxWidth()
             .padding(horizontal = 16.dp)
-            .clip(RoundedCornerShape(24.dp))
+            .clip(MaterialTheme.shapes.large)
             .background(backgroundColor)
-            .clickable { onClick() }
+            .then(if (onClick != null) Modifier.clickable(onClick = onClick) else Modifier)
             .padding(16.dp, 20.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
@@ -62,8 +55,7 @@ fun PBanner(
         }
         Column(
             modifier = Modifier
-                .weight(1f)
-                .fillMaxHeight(),
+                .weight(1f),
             verticalArrangement = Arrangement.SpaceBetween,
         ) {
             Text(

@@ -15,6 +15,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
@@ -22,20 +23,21 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalWindowInfo
-import org.jetbrains.compose.resources.painterResource
-import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
-import androidx.compose.ui.platform.LocalClipboardManager
+import com.ismartcoding.plain.ui.platform.rememberClipboardReader
 import com.ismartcoding.plain.ui.resources.Res as UiRes
+import com.ismartcoding.plain.ui.resources.clear as ui_string_clear
 import com.ismartcoding.plain.ui.resources.content_paste as ui_drawable_content_paste
 import com.ismartcoding.plain.ui.resources.eye as ui_drawable_eye
 import com.ismartcoding.plain.ui.resources.eye_off as ui_drawable_eye_off
-import com.ismartcoding.plain.ui.resources.x as ui_drawable_x
-import com.ismartcoding.plain.ui.resources.clear as ui_string_clear
-import com.ismartcoding.plain.ui.resources.password as ui_string_password
+import com.ismartcoding.plain.ui.resources.hide_password as ui_string_hide_password
 import com.ismartcoding.plain.ui.resources.paste as ui_string_paste
-
+import com.ismartcoding.plain.ui.resources.show_password as ui_string_show_password
+import com.ismartcoding.plain.ui.resources.x as ui_drawable_x
+import kotlinx.coroutines.launch
+import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.compose.resources.stringResource
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -52,15 +54,18 @@ fun PTextField(
     requestFocus: Boolean = false,
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
     keyboardActions: KeyboardActions = KeyboardActions(),
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true,
 ) {
-    val clipboardManager = LocalClipboardManager.current
+    val readClipboard = rememberClipboardReader()
+    val scope = rememberCoroutineScope()
     val focusRequester = remember { FocusRequester() }
-    var showPassword by remember { mutableStateOf(false) }
+    var showPassword by remember(isPassword) { mutableStateOf(false) }
 
     val windowInfo = LocalWindowInfo.current
-    LaunchedEffect(windowInfo) {
+    LaunchedEffect(windowInfo, requestFocus, enabled) {
         snapshotFlow { windowInfo.isWindowFocused }.collect { isWindowFocused ->
-            if (isWindowFocused && requestFocus) {
+            if (isWindowFocused && requestFocus && enabled) {
                 focusRequester.requestFocus()
             }
         }
@@ -68,7 +73,7 @@ fun PTextField(
 
     TextField(
         modifier =
-            Modifier
+            modifier
                 .focusRequester(focusRequester)
                 .fillMaxWidth(),
         colors =
@@ -78,7 +83,8 @@ fun PTextField(
                 disabledContainerColor = Color.Transparent,
             ),
         maxLines = if (singleLine) 1 else Int.MAX_VALUE,
-        enabled = !readOnly,
+        enabled = enabled,
+        readOnly = readOnly,
         value = value,
         label =
             if (label.isEmpty()) {
@@ -98,10 +104,11 @@ fun PTextField(
             )
         },
         isError = errorMessage.isNotEmpty(),
+        supportingText = if (errorMessage.isEmpty()) null else { { Text(errorMessage) } },
         singleLine = singleLine,
         trailingIcon = {
-            if (value.isNotEmpty()) {
-                IconButton(onClick = {
+            if (value.isNotEmpty() && (isPassword || !readOnly)) {
+                IconButton(enabled = enabled, onClick = {
                     if (isPassword) {
                         showPassword = !showPassword
                     } else if (!readOnly) {
@@ -121,13 +128,13 @@ fun PTextField(
                                     UiRes.drawable.ui_drawable_x
                                 }
                             ),
-                        contentDescription = if (isPassword) stringResource(UiRes.string.ui_string_password) else stringResource(UiRes.string.ui_string_clear),
+                        contentDescription = if (isPassword) stringResource(if (showPassword) UiRes.string.ui_string_hide_password else UiRes.string.ui_string_show_password) else stringResource(UiRes.string.ui_string_clear),
                         tint = MaterialTheme.colorScheme.outline.copy(alpha = 0.5f),
                     )
                 }
-            } else {
-                IconButton(onClick = {
-                    onValueChange(clipboardManager.getText()?.text ?: "")
+            } else if (!readOnly && value.isEmpty()) {
+                IconButton(enabled = enabled, onClick = {
+                    scope.launch { readClipboard()?.let(onValueChange) }
                 }) {
                     Icon(
                         painter = painterResource(UiRes.drawable.ui_drawable_content_paste),

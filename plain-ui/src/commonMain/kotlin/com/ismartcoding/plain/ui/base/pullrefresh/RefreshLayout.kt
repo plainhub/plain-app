@@ -1,7 +1,6 @@
 package com.ismartcoding.plain.ui.base.pullrefresh
 
 import androidx.compose.foundation.*
-import androidx.compose.foundation.layout.Box
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -27,7 +26,7 @@ fun RefreshLayout(
 ) {
     val density = LocalDensity.current
     val coroutineScope = rememberCoroutineScope()
-    //更新状态
+    // Keep the active state and gesture policy in sync.
     val orientationIsHorizontal = remember(
         refreshLayoutState,
         composePosition,
@@ -42,7 +41,7 @@ fun RefreshLayout(
                 with(density) { refreshContentThreshold.toPx() }
         composePosition.isHorizontal()
     }
-    val nestedScrollState = remember(composePosition) {
+    val nestedScrollState = remember(composePosition, refreshLayoutState, dragEfficiency, refreshingCanScroll) {
         RefreshLayoutNestedScrollConnection(
             composePosition, refreshLayoutState, dragEfficiency, orientationIsHorizontal, refreshingCanScroll
         )
@@ -65,7 +64,7 @@ fun RefreshLayout(
     ) { measurableList, constraints ->
         val contentPlaceable =
             measurableList[0].measure(constraints.copy(minWidth = 0, minHeight = 0))
-        //宽或高不能超过content(根据方向来定)
+        // Bound the header across the scrolling axis.
         val refreshContentPlaceable = measurableList[1].measure(
             Constraints(
                 maxWidth = if (orientationIsHorizontal) Constraints.Infinity else contentPlaceable.width,

@@ -13,11 +13,12 @@ import androidx.compose.ui.unit.dp
 fun Subtitle(
     text: String,
     color: Color = MaterialTheme.colorScheme.primary,
+    modifier: Modifier = Modifier,
 ) {
     Text(
         text = text,
         modifier =
-        Modifier
+        modifier
             .fillMaxWidth()
             .padding(start = 32.dp, end = 32.dp, bottom = 8.dp),
         style = MaterialTheme.typography.titleMedium.copy(color = color),

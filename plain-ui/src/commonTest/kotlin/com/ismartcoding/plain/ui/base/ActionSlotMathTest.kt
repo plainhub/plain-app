@@ -1,7 +1,9 @@
 package com.ismartcoding.plain.ui.base
 
+import androidx.compose.runtime.getValue
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFailsWith
 import kotlin.test.assertTrue
 
 /**
@@ -34,8 +36,8 @@ class ActionSlotMathTest {
     }
 
     @Test
-    fun `five composed actions keep four-column slots`() {
-        assertEquals(1080 / 4, actionSlotWidthPx(1080, 5))
+    fun `five composed actions require secondary actions`() {
+        assertFailsWith<IllegalArgumentException> { actionSlotWidthPx(1080, 5) }
     }
 
     @Test
@@ -45,7 +47,7 @@ class ActionSlotMathTest {
 
     @Test
     fun `column count is at least one and at most four`() {
-        for (count in 0..12) {
+        for (count in 0..4) {
             val columns = actionSlotColumns(count)
             assertTrue(columns in 1..MAX_PSheetPrimaryActionsPerRow, "count=$count columns=$columns")
         }
@@ -54,7 +56,7 @@ class ActionSlotMathTest {
     @Test
     fun `every width and count keeps actions within the row`() {
         for (width in 1..64) {
-            for (count in 1..12) {
+            for (count in 1..4) {
                 val columns = actionSlotColumns(count)
                 val slot = actionSlotWidthPx(width, count)
                 assertTrue(columns * slot <= width, "count=$count width=$width slot=$slot overflows")

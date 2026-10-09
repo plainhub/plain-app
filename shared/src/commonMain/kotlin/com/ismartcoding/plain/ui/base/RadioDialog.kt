@@ -1,19 +1,18 @@
 package com.ismartcoding.plain.ui.base
 
-import com.ismartcoding.plain.i18n.*
-import com.ismartcoding.plain.enums.ButtonSize
-import com.ismartcoding.plain.ui.theme.dialogSheetBackground
-
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Immutable
 import androidx.compose.ui.Modifier
+import com.ismartcoding.plain.enums.ButtonSize
+import com.ismartcoding.plain.i18n.*
+import com.ismartcoding.plain.ui.theme.dialogSheetBackground
 import org.jetbrains.compose.resources.stringResource
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -35,7 +34,7 @@ fun RadioDialog(
             )
         },
         text = {
-            LazyColumn {
+            LazyColumn(Modifier.selectableGroup()) {
                 items(options) { option ->
                     PDialogRadioRow(selected = option.selected, onClick = {
                         option.onClick()
@@ -50,9 +49,3 @@ fun RadioDialog(
         dismissButton = {},
     )
 }
-
-data class RadioDialogOption(
-    val text: String = "",
-    val selected: Boolean = false,
-    val onClick: () -> Unit = {},
-)

@@ -19,4 +19,6 @@
 <string name="password">密码</string>
 <string name="clear">清空</string>
 <string name="copy_text">复制文本</string>
+    <string name="show_password">显示密码</string>
+    <string name="hide_password">隐藏密码</string>
 </resources>

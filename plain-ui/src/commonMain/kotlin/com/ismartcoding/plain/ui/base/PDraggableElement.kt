@@ -13,10 +13,10 @@ import androidx.compose.ui.unit.IntOffset
 import kotlin.math.roundToInt
 
 @Composable
-fun PDraggableElement(content: @Composable BoxScope.() -> Unit) {
+fun PDraggableElement(modifier: Modifier = Modifier, content: @Composable BoxScope.() -> Unit) {
     val offset = remember { mutableStateOf(IntOffset.Zero) }
     Box(
-        modifier = Modifier
+        modifier = modifier
             .offset { offset.value }
             .pointerInput(Unit) {
                 detectDragGestures { change, dragAmount ->
@@ -28,4 +28,3 @@ fun PDraggableElement(content: @Composable BoxScope.() -> Unit) {
         content = content
     )
 }
-

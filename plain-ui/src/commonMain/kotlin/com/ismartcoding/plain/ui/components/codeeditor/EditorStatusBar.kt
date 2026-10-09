@@ -14,10 +14,10 @@ import androidx.compose.ui.unit.sp
 
 /** Single-line status strip: caret position (edit mode), encoding, file size, dirty flag. */
 @Composable
-fun EditorStatusBar(controller: EditorController) {
+fun EditorStatusBar(controller: EditorController, modifier: Modifier = Modifier) {
     val color = MaterialTheme.colorScheme.onSurfaceVariant
     Row(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .background(MaterialTheme.colorScheme.surfaceContainerLowest)
             .padding(horizontal = 12.dp, vertical = 4.dp),

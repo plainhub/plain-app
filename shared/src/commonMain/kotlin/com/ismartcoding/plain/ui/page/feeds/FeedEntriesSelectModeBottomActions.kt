@@ -10,13 +10,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import com.ismartcoding.plain.db.DTag
 import com.ismartcoding.plain.i18n.*
-import org.jetbrains.compose.resources.stringResource
 import com.ismartcoding.plain.ui.base.BottomActionButtons
 import com.ismartcoding.plain.ui.base.IconTextSmallButtonDelete
-import com.ismartcoding.plain.ui.base.PIconTextSmallButton
 import com.ismartcoding.plain.ui.base.IconTextSmallButtonLabel
 import com.ismartcoding.plain.ui.base.IconTextSmallButtonLabelOff
 import com.ismartcoding.plain.ui.base.PBottomAppBar
+import com.ismartcoding.plain.ui.base.PIconTextSmallButton
 import com.ismartcoding.plain.ui.models.FeedEntriesViewModel
 import com.ismartcoding.plain.ui.models.TagsViewModel
 import com.ismartcoding.plain.ui.models.exitSelectMode
@@ -25,6 +24,7 @@ import com.ismartcoding.plain.ui.page.tags.BatchSelectTagsDialog
 import com.ismartcoding.plain.ui.resources.Res as UiRes
 import com.ismartcoding.plain.ui.resources.circle_check as ui_drawable_circle_check
 import com.ismartcoding.plain.ui.resources.circle_dot as ui_drawable_circle_dot
+import org.jetbrains.compose.resources.stringResource
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
@@ -64,7 +64,7 @@ fun FeedEntriesSelectModeBottomActions(
             PIconTextSmallButton(
                 icon = if (anyUnread) UiRes.drawable.ui_drawable_circle_check else UiRes.drawable.ui_drawable_circle_dot,
                 text = stringResource(if (anyUnread) Res.string.read else Res.string.unread),
-                click = {
+                onClick = {
                     feedEntriesVM.markRead(selectedIds, anyUnread)
                     feedEntriesVM.exitSelectMode()
                 },

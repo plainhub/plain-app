@@ -18,15 +18,14 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.ismartcoding.plain.ui.platform.rememberClipboardWriter
+import com.ismartcoding.plain.ui.resources.Res as UiRes
+import com.ismartcoding.plain.ui.resources.check as ui_drawable_check
+import com.ismartcoding.plain.ui.resources.copy as ui_drawable_copy
+import com.ismartcoding.plain.ui.resources.copy_text as ui_string_copy_text
 import kotlinx.coroutines.delay
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
-import com.ismartcoding.plain.ui.resources.Res as UiRes
-import com.ismartcoding.plain.ui.resources.copy as ui_drawable_copy
-import com.ismartcoding.plain.ui.resources.check as ui_drawable_check
-import com.ismartcoding.plain.ui.resources.copy_text as ui_string_copy_text
-
 
 // How long the button shows the check icon before switching back.
 private const val COPIED_ICON_DURATION_MS = 1500L
@@ -38,7 +37,6 @@ fun CopyIconButton(
     modifier: Modifier = Modifier,
     icon: DrawableResource = UiRes.drawable.ui_drawable_copy,
     contentDescription: String = stringResource(UiRes.string.ui_string_copy_text),
-    copiedMessage: String = text,
     onCopied: (() -> Unit)? = null,
 ) {
     // Incremented on every copy so the check icon shows for the full duration again.

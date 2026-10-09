@@ -19,9 +19,9 @@ import androidx.compose.ui.unit.dp
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun PageIndicator(pagerState: PagerState, color: Color = MaterialTheme.colorScheme.primary) {
+fun PageIndicator(pagerState: PagerState, color: Color = MaterialTheme.colorScheme.primary, modifier: Modifier = Modifier) {
     Row(
-        Modifier.fillMaxWidth(),
+        modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.Center
     ) {
         repeat(pagerState.pageCount) { index ->

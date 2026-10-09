@@ -118,3 +118,5 @@ internal fun Typography.applyTextDirection() = this.copy(
     labelMedium = labelMedium.applyTextDirection(),
     labelSmall = labelSmall.applyTextDirection(),
 )
+
+internal val ContentTypography = SystemTypography.applyTextDirection()

@@ -25,7 +25,7 @@ import com.ismartcoding.plain.ui.theme.dialogSheetBackground
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PModalBottomSheet(
-    onDismissRequest: () -> Unit = {},
+    onDismissRequest: () -> Unit,
     modifier: Modifier = Modifier.defaultMinSize(minHeight = 320.dp),
     // Full-height sheets extend to the very top of the screen behind the
     // status bar and open directly expanded: content must apply its own

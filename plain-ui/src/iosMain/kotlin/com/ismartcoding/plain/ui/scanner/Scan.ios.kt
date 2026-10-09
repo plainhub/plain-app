@@ -9,7 +9,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.toComposeImageBitmap
 import androidx.compose.ui.viewinterop.UIKitView
 import kotlinx.cinterop.CValue
 import kotlinx.cinterop.ExperimentalForeignApi
@@ -17,7 +16,6 @@ import kotlinx.cinterop.ObjCObjectVar
 import kotlinx.cinterop.alloc
 import kotlinx.cinterop.memScoped
 import kotlinx.cinterop.ptr
-import kotlinx.cinterop.readBytes
 import kotlinx.cinterop.useContents
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -27,13 +25,8 @@ import platform.AVFoundation.AVCaptureDeviceInput
 import platform.AVFoundation.AVCaptureMetadataOutput
 import platform.AVFoundation.AVCaptureMetadataOutputObjectsDelegateProtocol
 import platform.AVFoundation.AVCaptureOutput
-import platform.AVFoundation.AVCapturePhoto
-import platform.AVFoundation.AVCapturePhotoCaptureDelegateProtocol
-import platform.AVFoundation.AVCapturePhotoOutput
-import platform.AVFoundation.AVCapturePhotoSettings
 import platform.AVFoundation.AVCaptureSession
 import platform.AVFoundation.AVCaptureSessionPresetHigh
-import platform.AVFoundation.AVCaptureVideoOrientationPortrait
 import platform.AVFoundation.AVCaptureVideoPreviewLayer
 import platform.AVFoundation.AVLayerVideoGravityResizeAspectFill
 import platform.AVFoundation.AVMediaTypeVideo
@@ -63,7 +56,6 @@ import platform.UIKit.UIViewAutoresizingFlexibleHeight
 import platform.UIKit.UIViewAutoresizingFlexibleWidth
 import platform.darwin.NSObject
 import platform.darwin.dispatch_get_main_queue
-import platform.darwin.dispatch_queue_create
 
 private val SCAN_METADATA_TYPES = listOf(
     AVMetadataObjectTypeQRCode,
@@ -85,6 +77,7 @@ private class PreviewLayerHolder {
 actual fun ScanCameraView(
     cameraDetecting: MutableState<Boolean>,
     freezeFrame: MutableState<ScannedFrame?>,
+    modifier: Modifier,
     onScanResult: (List<ScannedCode>) -> Unit,
 ) {
     val session = remember { AVCaptureSession() }
@@ -141,7 +134,7 @@ actual fun ScanCameraView(
                 autoresizingMask = UIViewAutoresizingFlexibleWidth or UIViewAutoresizingFlexibleHeight
             }
         },
-        modifier = Modifier.fillMaxSize(),
+        modifier = modifier.fillMaxSize(),
         update = { view ->
             view.attachSession(session)
             layerHolder.layer = view.previewLayer

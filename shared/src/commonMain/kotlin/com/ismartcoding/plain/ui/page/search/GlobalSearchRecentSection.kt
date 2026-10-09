@@ -16,18 +16,18 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.ismartcoding.plain.i18n.*
 import com.ismartcoding.plain.enums.ButtonSize
+import com.ismartcoding.plain.i18n.*
 import com.ismartcoding.plain.ui.base.HorizontalSpace
 import com.ismartcoding.plain.ui.base.PFilledButton
 import com.ismartcoding.plain.ui.base.PIconButton
 import com.ismartcoding.plain.ui.base.PInputChip
 import com.ismartcoding.plain.ui.base.PTextButton
-import org.jetbrains.compose.resources.painterResource
-import org.jetbrains.compose.resources.stringResource
 import com.ismartcoding.plain.ui.resources.Res as UiRes
 import com.ismartcoding.plain.ui.resources.history as ui_drawable_history
 import com.ismartcoding.plain.ui.resources.trash_2 as ui_drawable_trash_2
+import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.compose.resources.stringResource
 
 /**
  * Recent search terms as Material input chips. The trash icon enters edit
@@ -85,10 +85,9 @@ fun GlobalSearchRecentSection(
             PInputChip(
                 text = term,
                 icon = painterResource(UiRes.drawable.ui_drawable_history),
-                closable = editing,
                 closeContentDescription = stringResource(Res.string.delete),
-                onClose = { onRemove(term) },
-                onClick = { if (!editing) onSearch(term) },
+                onClose = if (editing) { { onRemove(term) } } else null,
+                onClick = if (editing) null else { { onSearch(term) } },
             )
         }
     }

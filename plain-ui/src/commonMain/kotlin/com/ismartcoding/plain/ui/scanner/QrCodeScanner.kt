@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -29,13 +28,13 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.ismartcoding.plain.ui.resources.Res as UiRes
+import com.ismartcoding.plain.ui.resources.image as ui_drawable_image
 import com.ismartcoding.plain.ui.scanner.components.ScanCodeTags
 import com.ismartcoding.plain.ui.scanner.components.ScanImageCodePicker
 import com.ismartcoding.plain.ui.theme.darkMask
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.painterResource
-import com.ismartcoding.plain.ui.resources.Res as UiRes
-import com.ismartcoding.plain.ui.resources.image as ui_drawable_image
 
 @Composable
 fun QrCodeScanner(
@@ -184,7 +183,7 @@ fun QrCodeScanner(
                         textAlign = TextAlign.Center,
                         style = MaterialTheme.typography.labelLarge,
                         modifier = Modifier
-                            .clip(RoundedCornerShape(20.dp))
+                            .clip(MaterialTheme.shapes.medium)
                             .background(MaterialTheme.colorScheme.darkMask(0.6f))
                             .padding(horizontal = 16.dp, vertical = 8.dp),
                     )

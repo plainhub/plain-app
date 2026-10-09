@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
@@ -39,7 +38,7 @@ fun PFeatureBanner(
         modifier = modifier
             .fillMaxWidth()
             .padding(horizontal = 16.dp),
-        shape = RoundedCornerShape(24.dp),
+        shape = MaterialTheme.shapes.large,
         colors = CardDefaults.cardColors().copy(
             containerColor = MaterialTheme.colorScheme.primaryContainer,
         ),
@@ -66,7 +65,7 @@ private fun PFeatureBannerLabel(
     icon: DrawableResource,
 ) {
     Surface(
-        shape = RoundedCornerShape(20.dp),
+        shape = MaterialTheme.shapes.medium,
         color = MaterialTheme.colorScheme.primary.copy(alpha = 0.15f),
     ) {
         Row(

@@ -1,7 +1,5 @@
 package com.ismartcoding.plain.ui.scanner.components
 
-import com.ismartcoding.plain.ui.theme.PlainTheme
-
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -17,12 +15,14 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.withLink
 import androidx.compose.ui.unit.dp
 import com.ismartcoding.plain.ui.base.PCard
+import com.ismartcoding.plain.ui.theme.PlainTheme
 
 @Composable
 fun ScanResult(
     text: String,
+    modifier: Modifier = Modifier,
 ) {
-    PCard(modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN)) {
+    PCard(modifier = modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN)) {
         Row(
             modifier =
             Modifier

@@ -1,25 +1,24 @@
 package com.ismartcoding.plain.ui.base
 
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.unit.dp
 import com.ismartcoding.plain.enums.ButtonSize
 import com.ismartcoding.plain.enums.ButtonType
+import com.ismartcoding.plain.ui.resources.Res as UiRes
+import com.ismartcoding.plain.ui.resources.loading as ui_string_loading
+import org.jetbrains.compose.resources.stringResource
 
 @Composable
 fun POutlinedButton(
@@ -33,11 +32,8 @@ fun POutlinedButton(
     enabled: Boolean = true,
     contentColor: Color? = null,
 ) {
-    val resolvedColor = contentColor ?: when (type) {
-        ButtonType.PRIMARY -> MaterialTheme.colorScheme.primary
-        ButtonType.TERTIARY -> MaterialTheme.colorScheme.tertiary
-        ButtonType.DANGER -> MaterialTheme.colorScheme.error
-    }
+    val loadingDescription = stringResource(UiRes.string.ui_string_loading)
+    val resolvedColor = contentColor ?: type.containerColor()
     val borderColor = resolvedColor.copy(alpha = 0.5f)
     // Disabled follows the Material default graying so icon, text and border
     // mute together instead of a full-color icon beside washed-out text.
@@ -47,30 +43,18 @@ fun POutlinedButton(
     OutlinedButton(
         onClick = onClick,
         modifier = modifier
-            .height(buttonSize.height),
-        shape = RoundedCornerShape(buttonSize.cornerRadius),
+            .heightIn(min = buttonSize.height)
+            .semantics { if (isLoading) stateDescription = loadingDescription },
+        shape = CircleShape,
         colors = ButtonDefaults.outlinedButtonColors(
             contentColor = resolvedColor,
             disabledContainerColor = Color.Transparent,
             disabledContentColor = disabledContentColor,
         ),
-        border = BorderStroke(1.dp, if (enabled) borderColor else disabledBorderColor),
+        border = BorderStroke(1.dp, if (enabled && !isLoading) borderColor else disabledBorderColor),
         contentPadding = buttonSize.getPaddingValues(),
         enabled = enabled && !isLoading,
     ) {
-        Row(horizontalArrangement = Arrangement.Center, verticalAlignment = Alignment.CenterVertically) {
-            if (isLoading) {
-                CircularProgressIndicator(modifier = Modifier.size(if (buttonSize == ButtonSize.SMALL) 14.dp else 16.dp), strokeWidth = 2.dp, color = resolvedColor)
-                HorizontalSpace(8.dp)
-            } else if (icon != null) {
-                Icon(painter = icon, contentDescription = null, modifier = Modifier.size(if (buttonSize == ButtonSize.SMALL) 16.dp else 20.dp))
-                HorizontalSpace(8.dp)
-            }
-            Text(
-                text = text,
-                style = buttonSize.textStyle(),
-                fontWeight = buttonSize.fontWeight()
-            )
-        }
+        ButtonContent(text, icon, buttonSize, isLoading)
     }
-} 
+}

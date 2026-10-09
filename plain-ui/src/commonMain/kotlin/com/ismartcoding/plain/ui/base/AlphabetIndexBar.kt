@@ -1,5 +1,6 @@
 package com.ismartcoding.plain.ui.base
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectVerticalDragGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -11,6 +12,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.pointerInput
@@ -29,11 +31,13 @@ import androidx.compose.ui.unit.dp
 fun BoxScope.AlphabetIndexBar(
     letters: List<String>,
     onLetterSelect: (String) -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     if (letters.isEmpty()) return
+    val select = rememberUpdatedState(onLetterSelect)
 
     Column(
-        modifier = Modifier
+        modifier = modifier
             .align(Alignment.CenterEnd)
             .fillMaxHeight()
             .width(28.dp)
@@ -43,7 +47,7 @@ fun BoxScope.AlphabetIndexBar(
                     change.consume()
                     val index = (change.position.y / size.height * letters.size).toInt()
                         .coerceIn(0, letters.lastIndex)
-                    onLetterSelect(letters[index])
+                    select.value(letters[index])
                 }
             },
         verticalArrangement = Arrangement.Center,
@@ -56,6 +60,7 @@ fun BoxScope.AlphabetIndexBar(
                 color = MaterialTheme.colorScheme.primary,
                 textAlign = TextAlign.Center,
                 modifier = Modifier
+                    .clickable { select.value(letter) }
                     .padding(vertical = 1.dp)
                     .width(28.dp),
             )

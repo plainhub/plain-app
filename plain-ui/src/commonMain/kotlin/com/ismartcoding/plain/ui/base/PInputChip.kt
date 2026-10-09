@@ -14,33 +14,35 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
-import com.ismartcoding.plain.ui.theme.cardBackgroundNormal
-import org.jetbrains.compose.resources.painterResource
 import com.ismartcoding.plain.ui.resources.Res as UiRes
 import com.ismartcoding.plain.ui.resources.close as ui_drawable_close
+import com.ismartcoding.plain.ui.resources.delete as ui_string_delete
+import com.ismartcoding.plain.ui.theme.cardBackgroundNormal
+import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.compose.resources.stringResource
 
-/**
- * Material input chip with an optional leading icon and an optional close
- * action in the trailing slot. The close hit area is a 20dp circle inside the
- * chip; clicks on it do not fall through to [onClick].
- */
+/** A null primary action makes the whole chip a remove action. */
 @Composable
 fun PInputChip(
     text: String,
-    onClick: () -> Unit,
+    onClick: (() -> Unit)?,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
     icon: Painter? = null,
-    closable: Boolean = false,
-    closeContentDescription: String? = null,
-    onClose: () -> Unit = {},
+    closeContentDescription: String = "${stringResource(UiRes.string.ui_string_delete)} $text",
+    onClose: (() -> Unit)? = null,
 ) {
+    val action = requireNotNull(onClick ?: onClose) { "Input chips require a primary or remove action" }
+    val removeOnly = onClick == null
     InputChip(
         selected = false,
-        onClick = onClick,
+        onClick = action,
         label = { Text(text = text) },
-        modifier = modifier,
+        modifier = modifier.semantics { if (removeOnly) contentDescription = closeContentDescription },
         enabled = enabled,
         leadingIcon = if (icon != null) {
             {
@@ -51,18 +53,18 @@ fun PInputChip(
                 )
             }
         } else null,
-        trailingIcon = if (closable) {
+        trailingIcon = if (onClose != null) {
             {
                 Box(
-                    modifier = Modifier
-                        .size(20.dp)
+                    modifier = if (removeOnly) Modifier.size(20.dp) else Modifier
+                        .size(48.dp)
                         .clip(CircleShape)
-                        .clickable(onClick = onClose),
+                        .clickable(enabled = enabled, role = Role.Button, onClickLabel = closeContentDescription, onClick = onClose),
                     contentAlignment = Alignment.Center,
                 ) {
                     PIcon(
                         icon = painterResource(UiRes.drawable.ui_drawable_close),
-                        contentDescription = closeContentDescription,
+                        contentDescription = if (removeOnly) null else closeContentDescription,
                         modifier = Modifier.size(16.dp),
                     )
                 }

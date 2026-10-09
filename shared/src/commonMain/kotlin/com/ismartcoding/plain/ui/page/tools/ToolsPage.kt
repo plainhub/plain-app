@@ -1,7 +1,5 @@
 package com.ismartcoding.plain.ui.page.tools
 
-import com.ismartcoding.plain.preferences.*
-
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
@@ -30,13 +28,12 @@ import androidx.navigation.NavHostController
 import com.ismartcoding.plain.enums.AppFeatureType
 import com.ismartcoding.plain.features.dlna.sender.RustDlnaSender
 import com.ismartcoding.plain.i18n.Res
-import com.ismartcoding.plain.i18n.customize_home_features
-import com.ismartcoding.plain.ui.resources.grid_3x3 as ui_drawable_grid_3x3
-import com.ismartcoding.plain.i18n.launcher_shortcuts
 import com.ismartcoding.plain.i18n.casting
 import com.ismartcoding.plain.i18n.casting_to
-import com.ismartcoding.plain.ui.resources.layout_grid as ui_drawable_layout_grid
+import com.ismartcoding.plain.i18n.customize_home_features
+import com.ismartcoding.plain.i18n.launcher_shortcuts
 import com.ismartcoding.plain.i18n.tools
+import com.ismartcoding.plain.preferences.*
 import com.ismartcoding.plain.ui.base.ActionButtonAddWithMenu
 import com.ismartcoding.plain.ui.base.BottomSpace
 import com.ismartcoding.plain.ui.base.PDropdownMenuItem
@@ -49,12 +46,13 @@ import com.ismartcoding.plain.ui.extensions.collectAsStateValue
 import com.ismartcoding.plain.ui.nav.Routing
 import com.ismartcoding.plain.ui.page.MainNavScaffold
 import com.ismartcoding.plain.ui.page.home.HomeFeatureItemsGrid
+import com.ismartcoding.plain.ui.resources.Res as UiRes
+import com.ismartcoding.plain.ui.resources.grid_3x3 as ui_drawable_grid_3x3
+import com.ismartcoding.plain.ui.resources.layout_grid as ui_drawable_layout_grid
 import com.ismartcoding.plain.ui.theme.greenPill
 import com.ismartcoding.plain.ui.theme.greenText
-import kotlinx.coroutines.flow.map
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
-import com.ismartcoding.plain.ui.resources.Res as UiRes
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -138,7 +136,6 @@ fun ToolsPage(
                                 pillColor = MaterialTheme.colorScheme.greenPill,
                                 dotColor = MaterialTheme.colorScheme.greenText,
                                 textColor = MaterialTheme.colorScheme.greenText,
-                                cornerRadius = 24.dp,
                                 contentPaddingHorizontal = 16.dp,
                                 contentPaddingVertical = 8.dp,
                                 textStartPadding = 8.dp,

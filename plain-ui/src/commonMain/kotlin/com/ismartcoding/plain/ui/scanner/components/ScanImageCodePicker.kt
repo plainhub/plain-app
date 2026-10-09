@@ -60,10 +60,11 @@ object ScanImageLayout {
 fun ScanImageCodePicker(
     uri: String,
     image: ScannedImage,
+    modifier: Modifier = Modifier,
     onPick: (ScannedCode) -> Unit,
 ) {
     Box(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background)
     ) {

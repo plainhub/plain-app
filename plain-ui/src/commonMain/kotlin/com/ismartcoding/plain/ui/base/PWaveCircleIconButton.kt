@@ -36,43 +36,43 @@ fun PWaveCircleIconButton(
     waveEnabled: Boolean = true,
 ) {
     val maxScale = 2.1f
-    val transition = rememberInfiniteTransition(label = "wave-circle")
-    val wave1 = transition.animateFloat(
-        initialValue = 1f,
-        targetValue = maxScale,
-        animationSpec = infiniteRepeatable(
-            animation = tween(durationMillis = 2200, easing = LinearEasing),
-            repeatMode = RepeatMode.Restart,
-        ),
-        label = "wave-1",
-    )
-    val wave2 = transition.animateFloat(
-        initialValue = 1f,
-        targetValue = maxScale,
-        animationSpec = infiniteRepeatable(
-            animation = tween(durationMillis = 2200, delayMillis = 730, easing = LinearEasing),
-            repeatMode = RepeatMode.Restart,
-        ),
-        label = "wave-2",
-    )
-    val wave3 = transition.animateFloat(
-        initialValue = 1f,
-        targetValue = maxScale,
-        animationSpec = infiniteRepeatable(
-            animation = tween(durationMillis = 2200, delayMillis = 1460, easing = LinearEasing),
-            repeatMode = RepeatMode.Restart,
-        ),
-        label = "wave-3",
-    )
-
     Box(
         modifier = modifier.size(buttonSize * maxScale),
         contentAlignment = Alignment.Center,
     ) {
         if (waveEnabled) {
-            WaveLayer(size = buttonSize, color = waveColor, scale = wave1.value, maxScale = maxScale)
-            WaveLayer(size = buttonSize, color = waveColor, scale = wave2.value, maxScale = maxScale)
-            WaveLayer(size = buttonSize, color = waveColor, scale = wave3.value, maxScale = maxScale)
+            val transition = rememberInfiniteTransition(label = "wave-circle")
+            val wave1 = transition.animateFloat(
+                initialValue = 1f,
+                targetValue = maxScale,
+                animationSpec = infiniteRepeatable(
+                    animation = tween(durationMillis = 2200, easing = LinearEasing),
+                    repeatMode = RepeatMode.Restart,
+                ),
+                label = "wave-1",
+            )
+            val wave2 = transition.animateFloat(
+                initialValue = 1f,
+                targetValue = maxScale,
+                animationSpec = infiniteRepeatable(
+                    animation = tween(durationMillis = 2200, delayMillis = 730, easing = LinearEasing),
+                    repeatMode = RepeatMode.Restart,
+                ),
+                label = "wave-2",
+            )
+            val wave3 = transition.animateFloat(
+                initialValue = 1f,
+                targetValue = maxScale,
+                animationSpec = infiniteRepeatable(
+                    animation = tween(durationMillis = 2200, delayMillis = 1460, easing = LinearEasing),
+                    repeatMode = RepeatMode.Restart,
+                ),
+                label = "wave-3",
+            )
+
+            WaveLayer(size = buttonSize, color = waveColor, scale = wave1, maxScale = maxScale)
+            WaveLayer(size = buttonSize, color = waveColor, scale = wave2, maxScale = maxScale)
+            WaveLayer(size = buttonSize, color = waveColor, scale = wave3, maxScale = maxScale)
         }
         Button(
             onClick = onClick,
@@ -96,15 +96,15 @@ fun PWaveCircleIconButton(
 }
 
 @Composable
-private fun WaveLayer(size: Dp, color: Color, scale: Float, maxScale: Float) {
-    val progress = ((scale - 1f) / (maxScale - 1f)).coerceIn(0f, 1f)
+private fun WaveLayer(size: Dp, color: Color, scale: androidx.compose.runtime.State<Float>, maxScale: Float) {
     Box(
         modifier = Modifier
             .size(size)
             .graphicsLayer {
-                scaleX = scale
-                scaleY = scale
-                alpha = (1f - progress) * 0.35f
+                val value = scale.value
+                scaleX = value
+                scaleY = value
+                alpha = (1f - (value - 1f) / (maxScale - 1f)).coerceIn(0f, 1f) * 0.35f
             }
             .background(color = color, shape = CircleShape),
     )

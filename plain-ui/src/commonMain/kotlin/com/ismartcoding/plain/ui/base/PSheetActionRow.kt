@@ -1,37 +1,24 @@
 package com.ismartcoding.plain.ui.base
 
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ColumnScope
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.RowScope
-import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.unit.dp
-import com.ismartcoding.plain.ui.theme.PlainTheme
 import org.jetbrains.compose.resources.DrawableResource
-
-// Secondary bottom-sheet actions: full-width rows inside a card.
-
-@Composable
-fun PSheetActionCard(content: @Composable ColumnScope.() -> Unit) {
-    PCard(modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN)) {
-        Column(content = content)
-    }
-}
-
 @Composable
 fun PSheetActionRow(
     icon: DrawableResource? = null,
     title: String,
     start: (@Composable RowScope.() -> Unit)? = null,
     trailing: (@Composable () -> Unit)? = null,
-    click: () -> Unit,
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true,
+    onClick: () -> Unit,
 ) {
     PListItem(
-        modifier = Modifier.clip(RoundedCornerShape(12.dp)).clickable(onClick = click),
+        modifier = modifier.clip(MaterialTheme.shapes.small).clickable(enabled = enabled, role = androidx.compose.ui.semantics.Role.Button, onClick = onClick),
         icon = icon,
         start = start,
         title = title,

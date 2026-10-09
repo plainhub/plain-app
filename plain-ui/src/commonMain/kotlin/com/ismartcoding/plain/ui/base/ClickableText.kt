@@ -21,22 +21,23 @@ fun PClickableText(
     softWrap: Boolean = true,
     overflow: TextOverflow = TextOverflow.Clip,
     maxLines: Int = Int.MAX_VALUE,
-    onTextLayout: (TextLayoutResult) -> Unit = {},
-    onClick: (Int) -> Unit = {},
-    onDoubleClick: () -> Unit = {},
-    onLongClick: () -> Unit = {},
+    onTextLayout: ((TextLayoutResult) -> Unit)? = null,
+    onClick: ((Int) -> Unit)? = null,
+    onDoubleClick: (() -> Unit)? = null,
+    onLongClick: (() -> Unit)? = null,
 ) {
     val layoutResult = remember { mutableStateOf<TextLayoutResult?>(null) }
-    val pressIndicator =
-        Modifier.pointerInput(onClick) {
-            detectTapGestures(onDoubleTap = { onDoubleClick() }, onTap = {
-                val layout = layoutResult.value
-                if (layout != null) {
-                    val offset = layout.getOffsetForPosition(it)
-                    onClick(offset)
-                }
-            }, onLongPress = { onLongClick() })
+    val pressIndicator = if (onClick != null || onDoubleClick != null || onLongClick != null) {
+        Modifier.pointerInput(onClick, onDoubleClick, onLongClick) {
+            detectTapGestures(
+                onDoubleTap = onDoubleClick?.let { callback -> { _ -> callback() } },
+                onTap = onClick?.let { callback -> { position ->
+                    layoutResult.value?.let { callback(it.getOffsetForPosition(position)) }
+                } },
+                onLongPress = onLongClick?.let { callback -> { _ -> callback() } },
+            )
         }
+    } else Modifier
 
     BasicText(
         text = text,
@@ -47,11 +48,10 @@ fun PClickableText(
         maxLines = maxLines,
         onTextLayout = {
             layoutResult.value = it
-            onTextLayout(it)
+            onTextLayout?.invoke(it)
         },
     )
 }
-
 
 @Composable
 fun PClickableText(

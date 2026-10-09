@@ -1,16 +1,9 @@
 package com.ismartcoding.plain.ui.components.codeeditor
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
@@ -18,7 +11,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.SolidColor
@@ -27,35 +19,14 @@ import androidx.compose.ui.input.key.KeyEventType
 import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.onPreviewKeyEvent
 import androidx.compose.ui.input.key.type
-import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.ismartcoding.plain.ui.resources.Res as UiRes
-import com.ismartcoding.plain.ui.resources.chevron_down as ui_drawable_chevron_down
-import com.ismartcoding.plain.ui.resources.chevron_left as ui_drawable_chevron_left
-import com.ismartcoding.plain.ui.resources.chevron_right as ui_drawable_chevron_right
-import com.ismartcoding.plain.ui.resources.chevron_up as ui_drawable_chevron_up
-import com.ismartcoding.plain.ui.resources.copy as ui_drawable_copy
-import com.ismartcoding.plain.ui.resources.select_all as ui_drawable_select_all
-import com.ismartcoding.plain.ui.resources.delete_forever as ui_drawable_delete_forever
-import com.ismartcoding.plain.ui.resources.redo_2 as ui_drawable_redo_2
-import com.ismartcoding.plain.ui.resources.scissors as ui_drawable_scissors
-import com.ismartcoding.plain.ui.resources.undo_2 as ui_drawable_undo_2
-import com.ismartcoding.plain.ui.resources.x as ui_drawable_x
 
-/**
- * The single persistent input field (mdeditor-proven pattern: the IME session never moves
- * between fields). It floats over the active row and mirrors its text; all edits are
- * translated into document commands by the controller. Hardware/IME key events are
- * intercepted for cross-line caret movement and backspace joins at column 0; soft keyboards
- * get an assist toolbar for the same moves.
- */
 @Composable
-fun EditorInputSurface(controller: EditorController) {
+fun EditorInputSurface(controller: EditorController, modifier: Modifier = Modifier) {
     val fontSize = controller.fontSizeSp.value
     val style = TextStyle(
         fontFamily = FontFamily.Monospace,
@@ -77,7 +48,7 @@ fun EditorInputSurface(controller: EditorController) {
     val density = LocalDensity.current
     val gutterWidthPx = with(density) { ((controller.gutterDigits() * 9 + 16).dp).toPx() }
 
-    Box(modifier = Modifier.fillMaxWidth()) {
+    Box(modifier = modifier.fillMaxWidth()) {
         if (item != null) {
             val widthDp = if (controller.wrapContent.value) {
                 // Match the row Text's wrap width (cell minus RowTrailingPad) so the
@@ -124,83 +95,5 @@ fun EditorInputSurface(controller: EditorController) {
             )
         }
         EditAssistToolbar(controller, modifier = Modifier.align(Alignment.BottomEnd))
-    }
-}
-
-/** Cursor/undo keys for soft keyboards; also the fallback for backspace-joins. */
-@Composable
-fun EditAssistToolbar(controller: EditorController, modifier: Modifier = Modifier) {
-    if (controller.readOnly.value) return
-    val bg = MaterialTheme.colorScheme.surfaceContainerHigh
-    val tint = MaterialTheme.colorScheme.onSurfaceVariant
-    Row(
-        modifier = modifier
-            .padding(8.dp)
-            .clip(RoundedCornerShape(20.dp))
-            .background(bg.copy(alpha = 0.94f))
-            .padding(horizontal = 4.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(0.dp),
-    ) {
-        EditorIconButton(icon = UiRes.drawable.ui_drawable_chevron_up, tint = tint) { controller.moveCaretRelative(-1, 0) }
-        EditorIconButton(icon = UiRes.drawable.ui_drawable_chevron_down, tint = tint) { controller.moveCaretRelative(1, 0) }
-        EditorIconButton(icon = UiRes.drawable.ui_drawable_chevron_left, tint = tint) { controller.moveCaretRelative(0, -1) }
-        EditorIconButton(icon = UiRes.drawable.ui_drawable_chevron_right, tint = tint) { controller.moveCaretRelative(0, 1) }
-        EditorIconButton(icon = UiRes.drawable.ui_drawable_delete_forever, tint = tint) {
-            if (controller.selection.value != null) {
-                controller.deleteSelection()
-            } else if (controller.activeCol.value == 0) {
-                controller.joinWithPreviousLine()
-            }
-        }
-        EditorIconButton(
-            icon = UiRes.drawable.ui_drawable_undo_2,
-            enabled = controller.canUndo.value,
-            tint = if (controller.canUndo.value) MaterialTheme.colorScheme.onSurface else tint.copy(alpha = 0.4f),
-        ) { controller.undo() }
-        EditorIconButton(
-            icon = UiRes.drawable.ui_drawable_redo_2,
-            enabled = controller.canRedo.value,
-            tint = if (controller.canRedo.value) MaterialTheme.colorScheme.onSurface else tint.copy(alpha = 0.4f),
-        ) { controller.redo() }
-    }
-}
-
-/** Floating actions over an active selection (copy / cut / select all / clear). */
-@Composable
-fun SelectionToolbarOverlay(controller: EditorController) {
-    val selection = controller.selection.value?.normalized() ?: return
-    val clipboard = LocalClipboardManager.current
-    val bg = MaterialTheme.colorScheme.surfaceContainerHigh
-    val tint = MaterialTheme.colorScheme.onSurfaceVariant
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(top = 8.dp),
-        horizontalArrangement = Arrangement.Center,
-    ) {
-        Row(
-            modifier = Modifier
-                .clip(RoundedCornerShape(20.dp))
-                .background(bg.copy(alpha = 0.96f))
-                .padding(horizontal = 4.dp),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            EditorIconButton(icon = UiRes.drawable.ui_drawable_copy, tint = tint) {
-                controller.selectedText()?.let { clipboard.setText(AnnotatedString(it)) }
-            }
-            if (!controller.readOnly.value) {
-                EditorIconButton(icon = UiRes.drawable.ui_drawable_scissors, tint = tint) {
-                    controller.selectedText()?.let { clipboard.setText(AnnotatedString(it)) }
-                    controller.deleteSelection()
-                }
-            }
-            EditorIconButton(icon = UiRes.drawable.ui_drawable_select_all, tint = tint) {
-                controller.selectAll()
-            }
-            EditorIconButton(icon = UiRes.drawable.ui_drawable_x, tint = tint) {
-                controller.selection.value = null
-            }
-        }
     }
 }

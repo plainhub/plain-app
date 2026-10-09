@@ -15,6 +15,7 @@ internal fun DrawScope.drawWaveContent(
     waveOptions: WaveOptions,
     isPlaying: Boolean,
     phaseShift: Float,
+    activePath: Path,
 ) {
     val canvasWidth = size.width
     val canvasHeight = size.height
@@ -25,7 +26,7 @@ internal fun DrawScope.drawWaveContent(
     val thumbRadius = waveOptions.thumbRadius.dp.toPx()
 
     val range = valueRange.endInclusive - valueRange.start
-    val normalizedValue = (value - valueRange.start) / range
+    val normalizedValue = if (range > 0f) ((value - valueRange.start) / range).coerceIn(0f, 1f) else 0f
     val progressPosition = normalizedValue * canvasWidth
 
     drawLine(
@@ -36,7 +37,7 @@ internal fun DrawScope.drawWaveContent(
         cap = StrokeCap.Round,
     )
 
-    val activePath = Path()
+    activePath.reset()
     activePath.moveTo(0f, centerY)
 
     var x = 0f

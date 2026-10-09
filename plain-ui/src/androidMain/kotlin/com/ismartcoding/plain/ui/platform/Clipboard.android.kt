@@ -17,3 +17,14 @@ internal actual fun rememberClipboardWriter(): (String, String) -> Unit {
         { label, text -> manager.setPrimaryClip(ClipData.newPlainText(label, text)) }
     }
 }
+
+@Composable
+internal actual fun rememberClipboardReader(): suspend () -> String? {
+    val context = LocalContext.current
+    val manager = remember(context) {
+        context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+    }
+    return remember(manager, context) {
+        { manager.primaryClip?.getItemAt(0)?.coerceToText(context)?.toString() }
+    }
+}

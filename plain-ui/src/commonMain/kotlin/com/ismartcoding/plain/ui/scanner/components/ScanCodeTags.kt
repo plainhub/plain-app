@@ -1,6 +1,5 @@
 package com.ismartcoding.plain.ui.scanner.components
 
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.fillMaxSize
@@ -20,9 +19,10 @@ import kotlin.math.roundToInt
 @Composable
 fun BoxScope.ScanCodeTags(
     codes: List<ScannedCode>,
+    modifier: Modifier = Modifier,
     onPick: (ScannedCode) -> Unit,
 ) {
-    BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
+    BoxWithConstraints(modifier = modifier.fillMaxSize()) {
         val density = LocalDensity.current
         val containerW = with(density) { maxWidth.toPx() }
         val containerH = with(density) { maxHeight.toPx() }

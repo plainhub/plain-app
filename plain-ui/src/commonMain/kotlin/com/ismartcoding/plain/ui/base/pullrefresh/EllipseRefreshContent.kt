@@ -17,23 +17,24 @@ import kotlin.math.abs
 @Composable
 fun RefreshLayoutState.EllipseRefreshContent(
     min: Dp = minDp,
+    modifier: Modifier = Modifier,
     color: Color = Color.Black,
     content: @Composable (BoxScope.(RefreshLayoutState) -> Unit)? = null,
     innerContent: @Composable (BoxScope.(RefreshLayoutState) -> Unit)? = null,
 ) {
     val isHorizontal =
-        remember(getComposePositionState()) { getComposePositionState().value.isHorizontal() }
+        getComposePositionState().value.isHorizontal()
     val density = LocalDensity.current
     val min_2 = remember(min) { min / 2 }
     val min_4 = remember(min) { min / 4 }
     Box(
         modifier =
             if (isHorizontal) {
-                Modifier
+                modifier
                     .fillMaxHeight()
                     .padding(horizontal = min_4)
             } else {
-                Modifier
+                modifier
                     .fillMaxWidth()
                     .padding(vertical = min_4)
             },

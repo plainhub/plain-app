@@ -3,9 +3,7 @@ package com.ismartcoding.plain.ui.components.codeeditor
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -30,7 +28,7 @@ import com.ismartcoding.plain.ui.resources.x as ui_drawable_x
 
 /** Compact find bar: query, case toggle, prev/next and match counter. */
 @Composable
-fun EditorSearchBar(controller: EditorController) {
+fun EditorSearchBar(controller: EditorController, modifier: Modifier = Modifier) {
     val focusRequester = remember { FocusRequester() }
     LaunchedEffect(controller.searchVisible.value) {
         if (controller.searchVisible.value) {
@@ -42,10 +40,10 @@ fun EditorSearchBar(controller: EditorController) {
     val accent = MaterialTheme.colorScheme.primary
 
     Row(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .padding(horizontal = 8.dp, vertical = 4.dp)
-            .clip(RoundedCornerShape(12.dp))
+            .clip(MaterialTheme.shapes.small)
             .background(bg)
             .padding(start = 12.dp, end = 4.dp),
         verticalAlignment = Alignment.CenterVertically,

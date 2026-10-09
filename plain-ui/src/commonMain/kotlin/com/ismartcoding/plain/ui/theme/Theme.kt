@@ -18,7 +18,7 @@ fun AppTheme(useDarkTheme: Boolean, amoledDarkTheme: Boolean = false, content: @
     ) {
         MaterialTheme(
             colorScheme = if (useDarkTheme) plainDarkColorScheme() else plainLightColorScheme(),
-            typography = SystemTypography.applyTextDirection(),
+            typography = ContentTypography,
             shapes = Shapes,
             content = content,
         )
@@ -209,7 +209,6 @@ val ColorScheme.badgeBorderColor: Color
 val ColorScheme.searchHighlight: Color
     @Composable @ReadOnlyComposable
     get() = if (LocalDarkTheme.current) Color(0xFF5A512E) else Color(0xFFFFF1B8)
-
 
 @Composable
 fun ColorScheme.lightMask(): Color = Color.White.copy(alpha = 0.4f)

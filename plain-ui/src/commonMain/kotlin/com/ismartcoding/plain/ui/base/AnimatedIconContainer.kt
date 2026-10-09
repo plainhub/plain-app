@@ -1,6 +1,5 @@
 package com.ismartcoding.plain.ui.base
 
-import org.jetbrains.compose.resources.DrawableResource
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateFloat
@@ -16,38 +15,39 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.scale
-import org.jetbrains.compose.resources.painterResource
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.unit.dp
+import org.jetbrains.compose.resources.DrawableResource
+import org.jetbrains.compose.resources.painterResource
 
 @Composable
 fun AnimatedIconContainer(
-    iconRes: DrawableResource
+    iconRes: DrawableResource,
+    modifier: Modifier = Modifier,
+    animationEnabled: Boolean = true,
 ) {
     Box(
-        modifier = Modifier
+        modifier = modifier
             .padding(vertical = 12.dp)
             .size(110.dp),
         contentAlignment = Alignment.Center
     ) {
-        val infiniteTransition = rememberInfiniteTransition()
-        val scale by infiniteTransition.animateFloat(
+        val scale = if (animationEnabled) rememberInfiniteTransition(label = "iconPulse").animateFloat(
             initialValue = 1f,
             targetValue = 1.1f,
             animationSpec = infiniteRepeatable(
                 animation = tween(2000, easing = FastOutSlowInEasing),
                 repeatMode = RepeatMode.Reverse
             )
-        )
+        ) else null
 
         Surface(
             modifier = Modifier
                 .size(110.dp)
-                .scale(scale)
+                .graphicsLayer { scaleX = scale?.value ?: 1f; scaleY = scaleX }
                 .clip(CircleShape),
             color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.6f),
         ) {

@@ -1,19 +1,13 @@
 package com.ismartcoding.plain.ui.base
 
-import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardActionScope
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.foundation.text.selection.SelectionContainer
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusManager
 import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.unit.dp
 
 @Composable
 fun ClipboardTextField(
@@ -87,17 +81,6 @@ fun ClipboardTextField(
             ),
             keyboardOptions = keyboardOptions,
         )
-        if (errorText.isNotEmpty()) {
-            SelectionContainer {
-                Text(
-                    modifier =
-                    Modifier
-                        .padding(horizontal = 16.dp),
-                    text = errorText,
-                    color = MaterialTheme.colorScheme.error,
-                )
-            }
-        }
     }
 }
 

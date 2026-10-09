@@ -1,6 +1,5 @@
 package com.ismartcoding.plain.ui.page.apps
 
-import com.ismartcoding.plain.i18n.*
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -14,12 +13,13 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import coil3.compose.AsyncImage
 import com.ismartcoding.plain.enums.PackageType
+import com.ismartcoding.plain.i18n.*
+import com.ismartcoding.plain.i18n.settings
 import com.ismartcoding.plain.lib.coMain
 import com.ismartcoding.plain.lib.withIO
 import com.ismartcoding.plain.platform.DPackageInfo
@@ -39,7 +39,7 @@ import com.ismartcoding.plain.ui.resources.code as ui_drawable_code
 import com.ismartcoding.plain.ui.resources.delete_forever as ui_drawable_delete_forever
 import com.ismartcoding.plain.ui.resources.settings as ui_drawable_settings
 import com.ismartcoding.plain.ui.resources.square_arrow_out_up_right as ui_drawable_square_arrow_out_up_right
-import com.ismartcoding.plain.i18n.settings
+import org.jetbrains.compose.resources.stringResource
 
 @Composable
 fun AppPageHeader(
@@ -85,16 +85,16 @@ fun AppPageHeader(
                 modifier = Modifier.align(Alignment.CenterHorizontally),
                 horizontalArrangement = Arrangement.spacedBy(32.dp),
             ) {
-                PIconTextActionButton(icon = UiRes.drawable.ui_drawable_square_arrow_out_up_right, text = stringResource(Res.string.launch), click = {
+                PIconTextActionButton(icon = UiRes.drawable.ui_drawable_square_arrow_out_up_right, text = stringResource(Res.string.launch), onClick = {
                     try { launchPackage(item.id) } catch (ex: Exception) { DialogHelper.showMessage(ex) }
                 })
-                PIconTextActionButton(icon = UiRes.drawable.ui_drawable_delete_forever, text = stringResource(Res.string.uninstall), click = {
+                PIconTextActionButton(icon = UiRes.drawable.ui_drawable_delete_forever, text = stringResource(Res.string.uninstall), onClick = {
                     try { uninstallPackage(item.id) } catch (ex: Exception) { DialogHelper.showMessage(ex) }
                 })
-                PIconTextActionButton(icon = UiRes.drawable.ui_drawable_settings, text = stringResource(Res.string.settings), click = {
+                PIconTextActionButton(icon = UiRes.drawable.ui_drawable_settings, text = stringResource(Res.string.settings), onClick = {
                     try { viewPackageInSettings(item.id) } catch (ex: Exception) { DialogHelper.showMessage(ex) }
                 })
-                PIconTextActionButton(icon = UiRes.drawable.ui_drawable_code, text = "Manifest", click = {
+                PIconTextActionButton(icon = UiRes.drawable.ui_drawable_code, text = "Manifest", onClick = {
                     coMain {
                         try {
                             DialogHelper.showLoading()

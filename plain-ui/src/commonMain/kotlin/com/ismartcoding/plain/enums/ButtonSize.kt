@@ -8,10 +8,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 
-enum class ButtonSize(val height: Dp, val cornerRadius: Dp) {
-    SMALL(32.dp, 16.dp),
-    MEDIUM(40.dp, 20.dp),
-    LARGE(48.dp, 24.dp);
+enum class ButtonSize(val height: Dp) {
+    SMALL(32.dp),
+    MEDIUM(40.dp),
+    LARGE(48.dp);
 
     @Composable
     fun textStyle() = when (this) {
@@ -20,11 +20,7 @@ enum class ButtonSize(val height: Dp, val cornerRadius: Dp) {
         LARGE -> MaterialTheme.typography.titleMedium
     }
 
-    fun fontWeight() = when (this) {
-        SMALL -> FontWeight.SemiBold
-        MEDIUM -> FontWeight.SemiBold
-        LARGE -> FontWeight.SemiBold
-    }
+    fun fontWeight() = FontWeight.SemiBold
 
     fun getPaddingValues(): PaddingValues {
         return PaddingValues(horizontal = if (this == ButtonSize.SMALL) 12.dp else 16.dp)
