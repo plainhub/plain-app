@@ -140,4 +140,6 @@
     <string name="online_help_collapsed">Collapsed</string>
     <string name="background_online_failed">Could not keep running in the background. Try Stay Online below.</string>
     <string name="turn_off_keep_online_in_background">Turn off background mode</string>
+    <string name="enable_desktop_access">Enable Desktop Access</string>
+    <string name="disable_desktop_access">Disable Desktop Access</string>
 </resources>

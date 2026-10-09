@@ -38,7 +38,7 @@ class HttpServerService : LifecycleService() {
         try {
             val notification = NotificationHelper.createServiceNotification(
                 this,
-                AppIntents.ACTION_STOP_HTTP_SERVER,
+                AppIntents.ACTION_DISABLE_BACKGROUND_MODE,
                 LocaleHelper.getString(Res.string.keep_online_in_background),
                 HttpServerManager.getNotificationContent()
             )

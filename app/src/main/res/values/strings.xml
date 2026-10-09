@@ -13,4 +13,5 @@
     <string name="shortcut_videos">Videos</string>
     <string name="shortcut_audio">Audio</string>
     <string name="shortcut_files">Files</string>
+    <string name="desktop_access">Desktop Access</string>
 </resources>

@@ -56,18 +56,18 @@ fun WebDevPage(
                         text = adbToken
                     )
                     VerticalSpace(dp = 16.dp)
-                    Subtitle(text = stringResource(Res.string.start_service))
+                    Subtitle(text = stringResource(Res.string.enable_desktop_access))
                     CornerCopyCard(
                         label = stringResource(Res.string.adb_cmd_start),
                         modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN),
-                        text = "adb shell am broadcast -a $packageId.action.START_HTTP_SERVER -p $packageId --es token $adbToken",
+                        text = "adb shell am broadcast -a $packageId.action.ENABLE_DESKTOP_ACCESS -p $packageId --es token $adbToken",
                     )
                     VerticalSpace(dp = 16.dp)
-                    Subtitle(text = stringResource(Res.string.stop_service))
+                    Subtitle(text = stringResource(Res.string.disable_desktop_access))
                     CornerCopyCard(
                         label = stringResource(Res.string.adb_cmd_stop),
                         modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN),
-                        text = "adb shell am broadcast -a $packageId.action.STOP_HTTP_SERVER -p $packageId --es token $adbToken",
+                        text = "adb shell am broadcast -a $packageId.action.DISABLE_DESKTOP_ACCESS -p $packageId --es token $adbToken",
                     )
                     Tips(text = stringResource(Res.string.adb_token_desc))
                     VerticalSpace(dp = 16.dp)

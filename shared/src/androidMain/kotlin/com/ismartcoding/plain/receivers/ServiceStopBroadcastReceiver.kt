@@ -1,15 +1,11 @@
 package com.ismartcoding.plain.receivers
 
-import com.ismartcoding.plain.preferences.*
-
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import android.os.Binder
 import androidx.core.content.ContextCompat
-import com.ismartcoding.plain.lib.coIO
 import com.ismartcoding.plain.AppIntents
-import com.ismartcoding.plain.platform.stopHttpServiceAsync
+import com.ismartcoding.plain.platform.HttpServerManager
 import com.ismartcoding.plain.services.HttpServerService
 import com.ismartcoding.plain.services.ScreenMirrorService
 
@@ -19,25 +15,10 @@ class ServiceStopBroadcastReceiver : BroadcastReceiver() {
         intent: Intent,
     ) {
         when (intent.action) {
-            AppIntents.ACTION_START_HTTP_SERVER -> {
-                coIO {
-                    val storedToken = SystemPrefs.adbToken.value
-                    if (intent.getStringExtra("token") != storedToken) return@coIO
-                    UserPrefs.service.value = true
-                    ContextCompat.startForegroundService(context, Intent(context, HttpServerService::class.java))
-                }
-            }
-
-            AppIntents.ACTION_STOP_HTTP_SERVER -> coIO {
-                val callerUid = Binder.getCallingUid()
-                val appUid = context.applicationInfo.uid
-                if (callerUid != appUid) {
-                    // External caller (ADB, third-party app) — require token
-                    val storedToken = SystemPrefs.adbToken.value
-                    if (intent.getStringExtra("token") != storedToken) return@coIO
-                }
-                UserPrefs.service.value = false
-                stopHttpServiceAsync()
+            AppIntents.ACTION_DISABLE_BACKGROUND_MODE -> {
+                val pending = goAsync()
+                HttpServerManager.setBackgroundEnabled(false, fromUi = false)
+                    .invokeOnCompletion { pending.finish() }
             }
 
             AppIntents.ACTION_STOP_SCREEN_MIRROR -> {
@@ -45,7 +26,7 @@ class ServiceStopBroadcastReceiver : BroadcastReceiver() {
                 ScreenMirrorService.instance = null
             }
             // Android 14+ allows FGS notifications to be swiped. Re-post via onStartCommand.
-            AppIntents.ACTION_REPOST_HTTP_NOTIFICATION -> {
+            AppIntents.ACTION_REPOST_BACKGROUND_NOTIFICATION -> {
                 if (HttpServerService.isRunning()) {
                     ContextCompat.startForegroundService(context, Intent(context, HttpServerService::class.java))
                 }

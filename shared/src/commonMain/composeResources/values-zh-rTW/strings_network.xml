@@ -140,4 +140,6 @@
     <string name="online_help_collapsed">已摺疊</string>
     <string name="background_online_failed">無法保持背景執行，可以嘗試下方的 Stay Online。</string>
     <string name="turn_off_keep_online_in_background">關閉背景保持在線</string>
+    <string name="enable_desktop_access">開啟桌面存取</string>
+    <string name="disable_desktop_access">關閉桌面存取</string>
 </resources>

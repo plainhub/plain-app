@@ -92,7 +92,7 @@ fun HomePage(
                     systemAlertWindow = Permission.SYSTEM_ALERT_WINDOW.isGranted()
                     if (event.map.containsKey(Permission.POST_NOTIFICATIONS.toSysPermission())) {
                         if (Permission.POST_NOTIFICATIONS.isGranted()) HttpServerManager.ensureStarted()
-                        else HttpServerManager.setServiceEnabled(false)
+                        else HttpServerManager.setBackgroundEnabled(false)
                     }
                 }
 
@@ -163,7 +163,7 @@ fun HomePage(
                         backgroundState = backgroundState,
                         errorMessage = serverError.ifEmpty { backgroundError },
                         onRetry = {
-                            if (backgroundState == HttpServerState.ERROR) HttpServerManager.setServiceEnabled(true)
+                            if (backgroundState == HttpServerState.ERROR) HttpServerManager.setBackgroundEnabled(true)
                             else HttpServerManager.ensureStarted()
                         },
                         onStayOnline = { showStayOnlineOverlay = true },

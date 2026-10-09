@@ -31,7 +31,7 @@ fun PlainAppServiceSection(
                 Switch(
                     checked = backgroundEnabled,
                     enabled = !backgroundState.isProcessing(),
-                    onCheckedChange = HttpServerManager::setServiceEnabled,
+                    onCheckedChange = { HttpServerManager.setBackgroundEnabled(it) },
                 )
             }
         }

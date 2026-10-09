@@ -53,12 +53,7 @@ fun DesktopAccessSection(navController: NavHostController) {
         PListItem(icon = UiRes.drawable.ui_drawable_devices, title = stringResource(Res.string.desktop_access)) {
             Switch(checked = desktopAccessEnabled, onCheckedChange = { enable ->
                 scope.launchSafe {
-                    UserPrefs.desktopAccess.value = enable
-                    if (!enable) {
-                        // Desktop access disabled: actively close all live WebSocket
-                        // sessions so browsers stop talking to a disabled endpoint.
-                        com.ismartcoding.plain.features.session.closeAllWsSessions()
-                    }
+                    com.ismartcoding.plain.platform.setDesktopAccessEnabled(enable)
                 }
             })
         }

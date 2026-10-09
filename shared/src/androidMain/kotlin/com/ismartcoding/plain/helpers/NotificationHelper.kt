@@ -175,7 +175,7 @@ object NotificationHelper {
                 1,
                 Intent(context, ServiceStopBroadcastReceiver::class.java).apply {
                     `package` = context.packageName
-                    this.action = AppIntents.ACTION_REPOST_HTTP_NOTIFICATION
+                    this.action = AppIntents.ACTION_REPOST_BACKGROUND_NOTIFICATION
                 },
                 PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT,
             )
@@ -197,7 +197,7 @@ object NotificationHelper {
                 foregroundServiceBehavior = NotificationCompat.FOREGROUND_SERVICE_IMMEDIATE
             }
             setContentIntent(createContentIntent(context))
-            val stopLabel = if (action == AppIntents.ACTION_STOP_HTTP_SERVER) {
+            val stopLabel = if (action == AppIntents.ACTION_DISABLE_BACKGROUND_MODE) {
                 Res.string.turn_off_keep_online_in_background
             } else {
                 Res.string.stop_service

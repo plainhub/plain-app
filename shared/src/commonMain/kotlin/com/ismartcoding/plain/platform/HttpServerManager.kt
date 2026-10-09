@@ -59,11 +59,9 @@ object HttpServerManager {
     }
 
     /** The service preference controls background retention, not HTTP availability. */
-    fun setServiceEnabled(enable: Boolean) {
-        coIO {
-            UserPrefs.service.value = enable
-            if (enable) requestStart(fromUi = true) else stopHttpServiceAsync()
-        }
+    fun setBackgroundEnabled(enable: Boolean, fromUi: Boolean = true) = coIO {
+        UserPrefs.service.value = enable
+        if (enable) requestStart(fromUi = fromUi) else stopHttpServiceAsync()
     }
 
     fun ensureStarted() {
