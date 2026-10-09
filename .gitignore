@@ -97,7 +97,6 @@ ai_models/
 .harness/
 
 .trae
-/docs
 
 # Xcode
 DerivedData/
