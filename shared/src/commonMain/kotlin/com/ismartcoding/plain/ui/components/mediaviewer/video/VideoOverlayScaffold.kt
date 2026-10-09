@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -83,7 +82,7 @@ fun VideoOverlayScaffold(
                 horizontalArrangement = Arrangement.spacedBy(4.dp),
             ) {
                 Surface(
-                    shape = RoundedCornerShape(12.dp),
+                    shape = MaterialTheme.shapes.small,
                     color = Color.Black.copy(alpha = 0.3f),
                     modifier = Modifier.size(40.dp),
                 ) {
@@ -97,7 +96,7 @@ fun VideoOverlayScaffold(
                     }
                 }
                 Surface(
-                    shape = RoundedCornerShape(12.dp),
+                    shape = MaterialTheme.shapes.small,
                     color = Color.Black.copy(alpha = 0.3f),
                     modifier = Modifier.weight(1f).height(40.dp),
                 ) {
@@ -114,7 +113,7 @@ fun VideoOverlayScaffold(
                 }
                 if (trailing != null) {
                     Surface(
-                        shape = RoundedCornerShape(12.dp),
+                        shape = MaterialTheme.shapes.small,
                         color = Color.Black.copy(alpha = 0.3f),
                         modifier = Modifier.size(40.dp),
                     ) {
@@ -122,7 +121,7 @@ fun VideoOverlayScaffold(
                     }
                 } else if (onMore != null) {
                     Surface(
-                        shape = RoundedCornerShape(12.dp),
+                        shape = MaterialTheme.shapes.small,
                         color = Color.Black.copy(alpha = 0.3f),
                         modifier = Modifier.size(40.dp),
                     ) {
@@ -165,7 +164,7 @@ fun VideoOverlayScaffold(
                 }
                 // Progress slider
                 Surface(
-                    shape = RoundedCornerShape(16.dp),
+                    shape = MaterialTheme.shapes.medium,
                     color = Color.Black.copy(alpha = 0.3f),
                     modifier = Modifier.fillMaxWidth().height(32.dp),
                 ) {

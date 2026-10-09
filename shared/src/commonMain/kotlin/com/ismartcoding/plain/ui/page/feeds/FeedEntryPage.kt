@@ -22,7 +22,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -239,7 +238,7 @@ private fun FeedEntryArticle(
                 state = scrollState,
             ) {
                 item {
-                    Box(modifier = Modifier.padding(horizontal = 8.dp).clip(RoundedCornerShape(PlainTheme.CARD_RADIUS)).combinedClickable(onDoubleClick = { navController.navigateText("JSON", jsonEncode(m, pretty = true), "json") }, onClick = { WebHelper.open(m.url) })) {
+                    Box(modifier = Modifier.padding(horizontal = 8.dp).clip(MaterialTheme.shapes.medium).combinedClickable(onDoubleClick = { navController.navigateText("JSON", jsonEncode(m, pretty = true), "json") }, onClick = { WebHelper.open(m.url) })) {
                         Text(text = m.title, modifier = Modifier.padding(8.dp), style = MaterialTheme.typography.titleLarge.copy(color = MaterialTheme.colorScheme.onSurface, fontWeight = FontWeight.SemiBold))
                     }
                 }

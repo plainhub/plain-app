@@ -3,7 +3,7 @@ package com.ismartcoding.plain.ui.theme
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Typography
 import androidx.compose.runtime.Composable
@@ -17,18 +17,17 @@ import androidx.compose.ui.unit.sp
 object PlainTheme {
     val PAGE_HORIZONTAL_MARGIN = 16.dp
     val PAGE_TOP_MARGIN = 8.dp
-    val CARD_RADIUS = 12.dp
 
     @Composable
     fun getCardModifier(index: Int = 0, size: Int = 1, selected: Boolean = false): Modifier {
         val shape = if (index == 0) {
             if (size == 1) {
-                RoundedCornerShape(CARD_RADIUS)
+                MaterialTheme.shapes.medium
             } else {
-                RoundedCornerShape(topStart = CARD_RADIUS, topEnd = CARD_RADIUS)
+                MaterialTheme.shapes.medium.copy(bottomStart = CornerSize(0.dp), bottomEnd = CornerSize(0.dp))
             }
         } else if (index == size - 1) {
-            RoundedCornerShape(bottomStart = CARD_RADIUS, bottomEnd = CARD_RADIUS)
+            MaterialTheme.shapes.medium.copy(topStart = CornerSize(0.dp), topEnd = CornerSize(0.dp))
         } else {
             RectangleShape
         }

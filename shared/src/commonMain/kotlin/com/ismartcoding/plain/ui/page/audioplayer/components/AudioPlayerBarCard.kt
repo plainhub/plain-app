@@ -19,7 +19,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.Icon
@@ -38,7 +37,6 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.ismartcoding.plain.ui.base.HorizontalSpace
 import com.ismartcoding.plain.ui.base.VerticalSpace
-import com.ismartcoding.plain.ui.theme.PlainTheme
 import com.ismartcoding.plain.ui.theme.listItemSubtitle
 import com.ismartcoding.plain.ui.theme.listItemTitle
 import com.ismartcoding.plain.ui.resources.Res as UiRes
@@ -68,7 +66,7 @@ fun AudioPlayerBarCard(
             .navigationBarsPadding()
             .padding(start = 12.dp, end = 12.dp, bottom = 8.dp)
             .fillMaxWidth(),
-        shape = RoundedCornerShape(PlainTheme.CARD_RADIUS),
+        shape = MaterialTheme.shapes.medium,
         elevation = CardDefaults.elevatedCardElevation(defaultElevation = 6.dp),
         colors = CardDefaults.elevatedCardColors(containerColor = containerColor)
     ) {
@@ -83,7 +81,7 @@ fun AudioPlayerBarCard(
                 modifier = Modifier.fillMaxWidth().padding(start = 12.dp, end = 12.dp, top = 4.dp, bottom = 8.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Column(modifier = Modifier.clip(RoundedCornerShape(12.dp)).weight(1f).clickable { onClickContent() }.padding(horizontal = 12.dp, vertical = 8.dp)) {
+                Column(modifier = Modifier.clip(MaterialTheme.shapes.small).weight(1f).clickable { onClickContent() }.padding(horizontal = 12.dp, vertical = 8.dp)) {
                     Text(text = title, style = MaterialTheme.typography.listItemTitle(), maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.basicMarquee(iterations = Int.MAX_VALUE))
                     VerticalSpace(4.dp)
                     Text(text = artist, style = MaterialTheme.typography.listItemSubtitle(), maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.basicMarquee(iterations = Int.MAX_VALUE))

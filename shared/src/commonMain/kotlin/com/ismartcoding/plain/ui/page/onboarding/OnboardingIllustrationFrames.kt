@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -59,7 +58,7 @@ internal fun DeviceLink(modifier: Modifier = Modifier) {
     Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = modifier) {
         Row(
             modifier = Modifier
-                .clip(RoundedCornerShape(50))
+                .clip(CircleShape)
                 .background(MaterialTheme.colorScheme.primaryContainer)
                 .padding(horizontal = 10.dp, vertical = 5.dp),
             verticalAlignment = Alignment.CenterVertically,
@@ -101,8 +100,8 @@ internal fun PhoneFrame(
 ) {
     Column(
         modifier = modifier
-            .clip(RoundedCornerShape(16.dp))
-            .border(3.dp, bezelColor(), RoundedCornerShape(16.dp))
+            .clip(MaterialTheme.shapes.large)
+            .border(3.dp, bezelColor(), MaterialTheme.shapes.large)
             .background(if (isDarkTheme()) MaterialTheme.colorScheme.surfaceContainerLowest else MaterialTheme.colorScheme.background),
     ) {
         content()
@@ -119,8 +118,8 @@ internal fun BrowserFrame(
     Column(
         modifier = modifier
             .height(height)
-            .clip(RoundedCornerShape(14.dp))
-            .border(2.dp, bezelColor(), RoundedCornerShape(14.dp))
+            .clip(MaterialTheme.shapes.medium)
+            .border(2.dp, bezelColor(), MaterialTheme.shapes.medium)
             .background(MaterialTheme.colorScheme.surface),
     ) {
         // Titlebar as an overlay: lights pinned start, URL pill absolutely
@@ -145,7 +144,7 @@ internal fun BrowserFrame(
             Row(
                 modifier = Modifier
                     .align(Alignment.Center)
-                    .clip(RoundedCornerShape(50))
+                    .clip(CircleShape)
                     .background(if (isDarkTheme()) MaterialTheme.colorScheme.background else MaterialTheme.colorScheme.surfaceContainerHighest)
                     .padding(start = 8.dp, end = 8.dp, top = 2.dp, bottom = 2.dp),
                 verticalAlignment = Alignment.CenterVertically,

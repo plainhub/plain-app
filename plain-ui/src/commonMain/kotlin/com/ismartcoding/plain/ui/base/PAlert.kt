@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -68,7 +67,7 @@ fun PAlert(
         AlertType.ERROR -> UiRes.drawable.ui_drawable_circle_alert
         AlertType.INFO -> UiRes.drawable.ui_drawable_info
     }
-    val shape = RoundedCornerShape(16.dp)
+    val shape = MaterialTheme.shapes.medium
 
     Surface(
         modifier = modifier

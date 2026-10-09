@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.MaterialTheme
@@ -48,7 +47,6 @@ import com.ismartcoding.plain.ui.base.PCard
 import com.ismartcoding.plain.ui.base.PIconButton
 import com.ismartcoding.plain.ui.base.ToastManager
 import com.ismartcoding.plain.ui.base.ToastType
-import com.ismartcoding.plain.ui.theme.PlainTheme
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.drop
@@ -132,7 +130,7 @@ fun QuickNoteCard(
                                 Color.Transparent
                             },
                     ),
-                shape = RoundedCornerShape(PlainTheme.CARD_RADIUS),
+                shape = MaterialTheme.shapes.medium,
             )
     ) {
         Column(
