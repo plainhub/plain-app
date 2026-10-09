@@ -84,7 +84,7 @@ import com.ismartcoding.plain.ui.page.feeds.FeedEntryPage
 import com.ismartcoding.plain.ui.page.feeds.FeedSettingsPage
 import com.ismartcoding.plain.ui.page.files.FilesPage
 import com.ismartcoding.plain.ui.page.files.ZipFilePage
-import com.ismartcoding.plain.ui.page.home.HomeFeaturesSelectionPage
+import com.ismartcoding.plain.ui.page.tools.HomeFeaturesSelectionPage
 import com.ismartcoding.plain.ui.page.home.HomePage
 import com.ismartcoding.plain.ui.page.imageeditor.ImageEditorListPage
 import com.ismartcoding.plain.ui.page.share.ShareImagePage

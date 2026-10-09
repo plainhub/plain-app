@@ -42,7 +42,8 @@ class PeerStatusRustHttpTest {
             stopHttpEngineAsync()
             UserPrefs.httpPort.value = 0
             UserPrefs.httpsPort.value = 0
-            assertTrue(startHttpEngineAsync())
+            startHttpEngineAsync()
+            assertTrue(com.ismartcoding.plain.platform.checkHttpServerAsync())
             assertTrue(snapshot().getValue("outgoing").jsonObject.getValue("started").jsonPrimitive.boolean)
             val url = "wss://127.0.0.1:${UserPrefs.httpsPort.value}/status?cid=$id"
             suspend fun connect(release: CompletableDeferred<Unit>) {

@@ -85,7 +85,8 @@ class DownloadQueueRustHttpTest {
             com.ismartcoding.plain.platform.stopHttpEngineAsync()
             com.ismartcoding.plain.preferences.UserPrefs.httpPort.value = 0
             com.ismartcoding.plain.preferences.UserPrefs.httpsPort.value = 0
-            assertTrue(com.ismartcoding.plain.platform.startHttpEngineAsync())
+            com.ismartcoding.plain.platform.startHttpEngineAsync()
+            assertTrue(com.ismartcoding.plain.platform.checkHttpServerAsync())
             val source = File(root, "source.bin").apply { writeBytes(payload) }
             val peer = DPeer(id = id, name = id, ip = "127.0.0.1", port = com.ismartcoding.plain.preferences.UserPrefs.httpsPort.value)
             val file = DMessageFile(id = fileId, uri = "fsid:${com.ismartcoding.plain.helpers.UrlHelper.encrypt(source.absolutePath)}", size = payload.size.toLong(), fileName = "fixture.bin")

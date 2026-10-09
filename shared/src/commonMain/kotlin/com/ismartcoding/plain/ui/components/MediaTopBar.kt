@@ -32,7 +32,7 @@ import com.ismartcoding.plain.ui.models.BaseMediaViewModel
 import com.ismartcoding.plain.ui.models.MediaFoldersViewModel
 import com.ismartcoding.plain.ui.models.TagsViewModel
 import com.ismartcoding.plain.ui.models.enterSearchMode
-import com.ismartcoding.plain.ui.page.home.MediaSidebarDrawer
+import com.ismartcoding.plain.ui.page.media.MediaSidebarDrawer
 import kotlinx.coroutines.launch
 import com.ismartcoding.plain.ui.resources.Res as UiRes
 import com.ismartcoding.plain.ui.resources.cast as ui_drawable_cast

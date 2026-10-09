@@ -1,24 +1,22 @@
 package com.ismartcoding.plain.platform
 
-import com.ismartcoding.plain.preferences.*
-
-import com.ismartcoding.plain.TempData
+import com.ismartcoding.plain.api.RustContentApi
 import com.ismartcoding.plain.enums.HttpServerState
-import com.ismartcoding.plain.lib.TimeHelper
-import com.ismartcoding.plain.helpers.UrlHelper
+import com.ismartcoding.plain.i18n.Res
+import com.ismartcoding.plain.i18n.http_server_failed
+import com.ismartcoding.plain.lib.JsonHelper
 import com.ismartcoding.plain.lib.coIO
 import com.ismartcoding.plain.lib.withIO
-import com.ismartcoding.plain.i18n.*
 import com.ismartcoding.plain.lib.logcat.LogCat
-import kotlinx.coroutines.withTimeout
-import com.ismartcoding.plain.platform.HttpServerManager
-import com.ismartcoding.plain.platform.httpPorts
-import com.ismartcoding.plain.platform.httpsPorts
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.NonCancellable
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
+import kotlinx.coroutines.withTimeout
+import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.boolean
+import kotlinx.serialization.json.jsonPrimitive
 
 expect suspend fun getSSLSignature(password: String): ByteArray
 
@@ -60,283 +58,97 @@ expect suspend fun replaceSSLKeyStoreAsync(
  */
 suspend fun resetPasswordAsync(): String = com.ismartcoding.plain.features.session.RustWebLogin.resetPassword()
 
-// ----------------------------------------------------------------------------------
-// Platform-lowest-level engine lifecycle hooks.
-//
-// Business logic (state transitions, retries, health probing, error formatting,
-// event emission) lives in the commonMain functions below; each `actual` only
-// drives the Rust server engine (plain-rs `http_transport`) and
-// the Android-only side effects (mDNS, notification-listener, foreground
-// service). iOS actuals for the side-effect hooks are no-ops.
-// ----------------------------------------------------------------------------------
+suspend fun startHttpEngineAsync() = RustHttpEngine.start()
+suspend fun stopHttpEngineAsync() = RustHttpEngine.stop()
 
-/**
- * Start the native HTTP/HTTPS server engine and bind the configured ports.
- * @return `true` when the engine is accepting connections, `false` on failure
- *         (the actual records the failure reason in [HttpServerManager.httpServerError])
- */
-expect suspend fun startHttpEngineAsync(): Boolean
-
-/**
- * Stop/dispose the native HTTP server engine immediately. Safe to call when no
- * engine is running. Used by the stop orchestrator and the `/shutdown` route.
- */
-expect suspend fun stopHttpEngineAsync()
-
-/**
- * Side effects to run once the server is healthy and reachable: register mDNS,
- * start the peer-status manager, and enable the notification listener
- * (Android). No-op on iOS.
- */
 expect suspend fun onHttpServerStarted()
-
-/** Platform hook invoked after an authenticated WebSocket session is active. */
 expect suspend fun onWebSocketSessionStarted()
-
-/**
- * Side effects to run when the server stops or fails to start: unregister mDNS,
- * stop the peer-status manager, and disable the notification listener
- * (Android). No-op on iOS. Does NOT stop the Android foreground service — that
- * is handled by [stopHttpServiceAsync] so start-failure does not tear down the
- * still-running service.
- */
 expect suspend fun onHttpServerStopped()
-
-/**
- * Start the embedded HTTP server. Android starts a foreground service which
- * then runs the shared [startHttpServerAsync] orchestrator; iOS launches a
- * coroutine directly. Retained as `expect` because the Android entry MUST go
- * through `startForegroundService` for platform lifecycle compliance.
- */
 expect fun startHttpServerService()
-
-/**
- * Stop the embedded HTTP server from commonMain. Runs the shared
- * [stopHttpServerCoreAsync] body, then on Android additionally stops the
- * foreground service.
- */
 expect suspend fun stopHttpServiceAsync()
 
-// ----------------------------------------------------------------------------------
-// Shared commonMain business logic.
-// ----------------------------------------------------------------------------------
-
-/**
- * Single `/health` probe against the embedded server: HTTP 200 with our own
- * package name in the body.
- */
-private suspend fun PlainHttpClient.probeHealthOnce(): Boolean = try {
-    get(UrlHelper.getHealthCheckUrl()).use { it.isOk() && it.bodyAsText() == getOwnPackageName() }
-} catch (_: Exception) {
-    false
-}
-
-/**
- * Probe the embedded HTTP server's `/health` endpoint until it answers, with a
- * bounded retry loop. A final probe after the deadline covers a server that
- * came up right as the deadline expired.
- *
- * @return `true` if the server responds with HTTP 200 within [timeoutMs].
- */
-suspend fun checkHttpServerAsync(timeoutMs: Long = 8_500): Boolean = withIO {
-    createHttpClient().use { client ->
-        val deadline = TimeHelper.nowMillis() + timeoutMs
-        while (TimeHelper.nowMillis() < deadline) {
-            if (client.probeHealthOnce()) return@withIO true
-            delay(300)
-        }
-        client.probeHealthOnce()
+suspend fun checkHttpServerAsync(): Boolean = withIO {
+    try {
+        val request = JsonHelper.jsonDecode<JsonObject>(JsonHelper.jsonEncode(emptyMap<String, String>()))
+        RustContentApi.postJsonOrThrow("system/http-server/health", request)
+            .getValue("healthy").jsonPrimitive.boolean
+    } catch (cancelled: CancellationException) {
+        throw cancelled
+    } catch (error: Exception) {
+        LogCat.e("Rust HTTP server diagnostic failed: ${error.message}")
+        false
     }
 }
 
-/**
- * Serializes the whole engine lifecycle (start orchestrator, stop teardown).
- * Stops used to run unserialized next to a mutex-guarded start, so a quick
- * disable→enable could interleave engine stop/start calls and write terminal
- * states out of order (stop's OFF landing after start's ON). With one lock,
- * engine operations and state writes are totally ordered; the pre-lock
- * STARTING/STOPPING markers record intent immediately and the last lock owner
- * decides the final state.
- */
 private val lifecycleMutex = Mutex()
+private const val STOP_HOOK_TIMEOUT_MS = 2_000L
 
-/**
- * The configured port when it is free, otherwise the next free port from the
- * standard candidate list (deterministic insertion order). `null` when every
- * candidate is occupied. The predicate is injectable for tests.
- */
-internal fun nextFreePort(
-    current: Int,
-    candidates: Set<Int>,
-    isInUse: (Int) -> Boolean = ::isPortInUse,
-): Int? {
-    if (!isInUse(current)) return current
-    return (candidates - current).firstOrNull { !isInUse(it) }
-}
-
-/**
- * Shared start orchestration: records state transitions in
- * [HttpServerManager.serverState] (the single source of truth — collectors
- * read the flow, no event copies), clears stale state, stops any previous
- * engine, falls back to free ports when the configured ones are occupied,
- * starts the engine, probes health, and invokes platform side-effect hooks.
- *
- * On Android this is invoked from the foreground service's coroutine; on iOS
- * it is invoked directly by [startHttpServerService].
- */
 suspend fun startHttpServerAsync() = withIO {
     lifecycleMutex.withLock {
+        HttpServerManager.serverState.value = HttpServerState.STARTING
+        HttpServerManager.httpServerError.value = ""
         try {
-            startHttpServerAsyncLocked()
-        } catch (ex: kotlinx.coroutines.CancellationException) {
-            throw ex
-        } catch (ex: Throwable) {
-            // The orchestrator owns its terminal state: an unexpected failure
-            // (engine create crash, keystore fatal, …) must land in ERROR,
-            // never strand callers — and the UI loading spinner — in STARTING.
-            // The Android service used to catch this; iOS had no backstop.
-            // Throwable rather than Exception: a native bridge whose class
-            // initializer failed raises NoClassDefFoundError, which is an
-            // Error, and that is exactly the "engine create crash" this
-            // backstop exists for.
-            LogCat.e("startHttpServerAsync failed unexpectedly: ${ex.message}")
-            HttpServerManager.httpServerError.value = ex.message ?: (ex::class.simpleName ?: "error")
-            HttpServerManager.serverState.value = HttpServerState.ERROR
+            RustHttpEngine.start()
+            onHttpServerStarted()
+            HttpServerManager.serverState.value = HttpServerState.ON
+        } catch (error: Throwable) {
+            withContext(NonCancellable) {
+                stopEngineAndHooks()
+                if (error is CancellationException) {
+                    HttpServerManager.serverState.value = HttpServerState.OFF
+                } else {
+                    recordServerFailure(error.message ?: error::class.simpleName.orEmpty())
+                }
+            }
+            if (error is CancellationException) throw error
         }
     }
 }
 
-private suspend fun startHttpServerAsyncLocked() = withIO {
-    val t0 = TimeHelper.nowMillis()
-    LogCat.d("startHttpServer")
-    HttpServerManager.serverState.value = HttpServerState.STARTING
-    HttpServerManager.portsInUse.value = emptySet()
-    HttpServerManager.httpServerError.value = ""
+private suspend fun stopHooks() {
+    runCatching { withTimeout(STOP_HOOK_TIMEOUT_MS) { onHttpServerStopped() } }
+        .onFailure { LogCat.e("HTTP server stop hook failed: ${it.message}") }
+}
 
-    // Stop any previous instance. Engine stop closes its listen sockets
-    // synchronously, so a port still occupied afterwards is held by a foreign
-    // process — waiting for it never helps; fall back to another port instead.
-    stopHttpEngineAsync()
+private suspend fun stopEngineAndHooks() {
+    runCatching { RustHttpEngine.stop() }
+        .onFailure { LogCat.e("HTTP server engine stop failed: ${it.message}") }
+    stopHooks()
+}
 
-    var started = false
-    while (!started) {
-        val httpPort = nextFreePort(UserPrefs.httpPort.value, httpPorts)
-        val httpsPort = nextFreePort(UserPrefs.httpsPort.value, httpsPorts)
-        if (httpPort == null || httpsPort == null) {
-            HttpServerManager.portsInUse.value =
-                listOf(UserPrefs.httpPort.value, UserPrefs.httpsPort.value).filter { isPortInUse(it) }.toSet()
-            break
-        }
-        if (httpPort != UserPrefs.httpPort.value) {
-            LogCat.d("HTTP port ${UserPrefs.httpPort.value} in use, falling back to $httpPort")
-            UserPrefs.httpPort.value = httpPort
-        }
-        if (httpsPort != UserPrefs.httpsPort.value) {
-            LogCat.d("HTTPS port ${UserPrefs.httpsPort.value} in use, falling back to $httpsPort")
-            UserPrefs.httpsPort.value = httpsPort
-        }
-        started = startHttpEngineAsync()
-        // A failed bind with both ports free is not a port conflict (keystore,
-        // engine error…): retrying other ports cannot fix it.
-        if (!started && !isPortInUse(UserPrefs.httpPort.value) && !isPortInUse(UserPrefs.httpsPort.value)) {
-            break
-        }
-    }
-
-    val tHealth = TimeHelper.nowMillis()
-    val healthy = started && checkHttpServerAsync()
-    LogCat.d("health check took ${TimeHelper.nowMillis() - tHealth}ms: $healthy")
-    if (healthy) {
-        HttpServerManager.httpServerError.value = ""
-        HttpServerManager.portsInUse.value = emptySet()
-        val tHooks = TimeHelper.nowMillis()
-        onHttpServerStarted()
-        LogCat.d("onHttpServerStarted took ${TimeHelper.nowMillis() - tHooks}ms")
-        HttpServerManager.serverState.value = HttpServerState.ON
-        LogCat.d("HTTP server started on ports ${UserPrefs.httpPort.value}/${UserPrefs.httpsPort.value}, total ${TimeHelper.nowMillis() - t0}ms")
-        return@withIO
-    }
-
-    // Failure: stop whatever engine may have started. A port conflict that
-    // survived the fallback loop above has already been recorded in portsInUse.
-    if (started) {
-        stopHttpEngineAsync()
-    }
-    val portsInUse = HttpServerManager.portsInUse.value
-    val engineError = HttpServerManager.httpServerError.value
-    HttpServerManager.httpServerError.value = when {
-        portsInUse.isNotEmpty() -> LocaleHelper.getStringFAsync(
-            if (portsInUse.size > 1) Res.string.http_port_conflict_errors
-            else Res.string.http_port_conflict_error,
-            portsInUse.joinToString(", "),
-        )
-        started -> LocaleHelper.getStringAsync(Res.string.http_server_health_check_failed)
-        engineError.isNotEmpty() ->
-            LocaleHelper.getStringAsync(Res.string.http_server_failed) + " ($engineError)"
-        else -> LocaleHelper.getStringAsync(Res.string.http_server_failed)
-    }
-    onHttpServerStopped()
+private suspend fun recordServerFailure(detail: String) {
+    LogCat.e("HTTP server failed: $detail")
+    val message = runCatching { LocaleHelper.getStringAsync(Res.string.http_server_failed) }
+        .getOrDefault("HTTP server failed")
+    HttpServerManager.httpServerError.value = if (detail.isEmpty()) message else "$message ($detail)"
     HttpServerManager.serverState.value = HttpServerState.ERROR
 }
 
-/**
- * Engine teardown shared by the stop orchestrator and the `/shutdown` route:
- * stop the engine, run stop side-effect hooks, clear error/port state, and
- * record the terminal OFF state. Safe to call repeatedly (the stop
- * orchestrator's own `/shutdown` GET triggers this once from the route and
- * once directly).
- *
- * Runs under [lifecycleMutex] inside [NonCancellable]: once a stop has begun
- * it must run to completion — a cancelled caller (ViewModel cleared, QS tile
- * service destroyed) must not strand the state in STOPPING with a half-torn
- * engine.
- */
-internal suspend fun finishHttpServerStopAsync() = withIO {
+internal suspend fun onRustHttpServerFailed(generation: Long, message: String) = withIO {
     withContext(NonCancellable) {
         lifecycleMutex.withLock {
-            val t0 = TimeHelper.nowMillis()
-            // Both steps are isolated from the terminal state below. The
-            // contract here is that a started stop always reaches OFF, so a
-            // hook that throws — or waits on a subsystem that is not answering
-            // — must not strand the state in STOPPING. The wait is bounded for
-            // the same reason: the mDNS unpublish is a side effect of stopping,
-            // not a precondition for it, and a wedged runtime used to make the
-            // server impossible to turn off.
-            runCatching { stopHttpEngineAsync() }
-                .onFailure { LogCat.e("HTTP server engine stop failed: ${it.message}") }
-            val tEngine = TimeHelper.nowMillis()
-            runCatching { withTimeout(STOP_HOOK_TIMEOUT_MS) { onHttpServerStopped() } }
-                .onFailure { LogCat.e("HTTP server stop hook failed: ${it.message}") }
-            val tHooks = TimeHelper.nowMillis()
-            HttpServerManager.httpServerError.value = ""
-            HttpServerManager.portsInUse.value = emptySet()
-            HttpServerManager.serverState.value = HttpServerState.OFF
-            LogCat.d("finishStop: engine=${tEngine - t0}ms hooks=${tHooks - tEngine}ms total=${tHooks - t0}ms")
+            if (RustHttpEngine.failed(generation)) {
+                stopHooks()
+                recordServerFailure(message)
+            }
         }
     }
 }
 
-/** Upper bound for the stop side-effect hooks, so a wedged one cannot hang teardown. */
-private const val STOP_HOOK_TIMEOUT_MS = 2_000L
+internal suspend fun finishHttpServerStopAsync() = withIO {
+    withContext(NonCancellable) {
+        lifecycleMutex.withLock {
+            stopEngineAndHooks()
+            HttpServerManager.httpServerError.value = ""
+            HttpServerManager.serverState.value = HttpServerState.OFF
+        }
+    }
+}
 
-/**
- * Shared stop body: records STOPPING (intent marker, before the lock so the
- * UI reacts immediately), then tears the Rust engine
- * down via [finishHttpServerStopAsync] (which serializes on [lifecycleMutex]
- * and records OFF). Called by the platform [stopHttpServiceAsync] actuals and
- * by the Android service's own lifecycle stop. Does NOT stop the Android
- * foreground service.
- *
- * Beyond cancellation for its whole body: a stop whose caller's scope dies
- * mid-way (ViewModel cleared, QS tile destroyed) must not strand the state in
- * STOPPING with a half-torn engine.
- */
 suspend fun stopHttpServerCoreAsync() = withIO {
     withContext(NonCancellable) {
-        val t0 = TimeHelper.nowMillis()
         HttpServerManager.serverState.value = HttpServerState.STOPPING
         finishHttpServerStopAsync()
-        LogCat.d("stopHttpServerCore total ${TimeHelper.nowMillis() - t0}ms")
     }
 }
 
@@ -346,7 +158,6 @@ fun restartServer() {
         startHttpServerService()
     }
 }
-
 
 expect fun isHttpServerRunning(): Boolean
 expect fun isMdnsRunning(): Boolean

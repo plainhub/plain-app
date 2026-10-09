@@ -2,7 +2,7 @@ package com.ismartcoding.plain.ui.nav
 
 import com.ismartcoding.plain.enums.AppFeatureType
 import com.ismartcoding.plain.i18n.*
-import com.ismartcoding.plain.ui.page.home.FeatureItem
+import com.ismartcoding.plain.ui.page.tools.FeatureItem
 import com.ismartcoding.plain.ui.resources.Res as UiRes
 import com.ismartcoding.plain.ui.resources.file_text as ui_drawable_file_text
 import com.ismartcoding.plain.ui.resources.folder as ui_drawable_folder
@@ -13,9 +13,6 @@ import com.ismartcoding.plain.ui.resources.notebook_pen as ui_drawable_notebook_
 import com.ismartcoding.plain.ui.resources.rss as ui_drawable_rss
 import com.ismartcoding.plain.ui.resources.timer as ui_drawable_timer
 import com.ismartcoding.plain.ui.resources.video as ui_drawable_video
-import com.ismartcoding.plain.i18n.folder
-import com.ismartcoding.plain.i18n.video
-import com.ismartcoding.plain.i18n.image
 
 /** Candidate tools for the launcher long-press shortcuts (published as dynamic shortcuts). */
 object LauncherShortcutTools {

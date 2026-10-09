@@ -32,13 +32,9 @@ import com.ismartcoding.plain.ui.base.reorderable.rememberReorderableLazyListSta
 import com.ismartcoding.plain.ui.extensions.collectAsStateValue
 import com.ismartcoding.plain.ui.helpers.DialogHelper
 import com.ismartcoding.plain.ui.nav.LauncherShortcutTools
-import com.ismartcoding.plain.ui.page.home.DisabledFeatureCard
-import com.ismartcoding.plain.ui.page.home.EnabledFeatureCard
-import com.ismartcoding.plain.ui.page.home.FeatureItem
 import com.ismartcoding.plain.platform.publishLauncherShortcuts
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
 

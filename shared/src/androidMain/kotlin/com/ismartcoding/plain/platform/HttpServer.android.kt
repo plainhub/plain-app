@@ -54,13 +54,6 @@ private fun readUriBytes(uriStr: String): ByteArray {
 
 private fun readUriText(uriStr: String): String = readUriBytes(uriStr).toString(Charsets.UTF_8)
 
-actual suspend fun startHttpEngineAsync(): Boolean =
-    com.ismartcoding.plain.platform.RustHttpEngine.start()
-
-actual suspend fun stopHttpEngineAsync(): Unit = withIO {
-    com.ismartcoding.plain.platform.RustHttpEngine.stop()
-}
-
 // The SMS/MMS hooks below serve the web desktop bridge, whose only clients are
 // connected web sessions — so they live exactly as long as the server:
 // - SmsProviderObserver pushes a debounced WS event when the phone's SMS

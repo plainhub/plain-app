@@ -10,7 +10,7 @@ import kotlinx.cinterop.*
 internal actual object RustCoreBridge {
     actual fun startPublic(configJson: String): String = memScoped {
         val result = checkNotNull(plain_http_start(configJson.cstr.ptr))
-        try { val value = result.toKString(); check(!value.startsWith("ERROR:")) { value.removePrefix("ERROR:") }; value }
+        try { result.toKString() }
         finally { plain_prefs_string_free(result) }
     }
     actual fun stopPublic() {

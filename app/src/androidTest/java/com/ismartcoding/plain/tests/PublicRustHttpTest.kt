@@ -31,7 +31,8 @@ class PublicRustHttpTest {
             UserPrefs.service.value = true
             UserPrefs.desktopAccess.value = true
             stopHttpEngineAsync()
-            assertTrue(startHttpEngineAsync())
+            startHttpEngineAsync()
+            assertTrue(com.ismartcoding.plain.platform.checkHttpServerAsync())
             val port = UserPrefs.httpPort.value
             val tlsPort = UserPrefs.httpsPort.value
             val trust = object : javax.net.ssl.X509TrustManager {

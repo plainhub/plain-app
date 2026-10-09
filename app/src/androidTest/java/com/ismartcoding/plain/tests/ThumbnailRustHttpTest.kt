@@ -80,7 +80,8 @@ class ThumbnailRustHttpTest {
             com.ismartcoding.plain.platform.stopHttpEngineAsync()
             prefs.httpPort.value = 0
             prefs.httpsPort.value = 0
-            assertTrue(com.ismartcoding.plain.platform.startHttpEngineAsync())
+            com.ismartcoding.plain.platform.startHttpEngineAsync()
+            assertTrue(com.ismartcoding.plain.platform.checkHttpServerAsync())
             val encoded = com.ismartcoding.plain.helpers.UrlHelper.encrypt("fid:${file.realPath.substringAfterLast('/')}")
             val url = "http://127.0.0.1:${prefs.httpPort.value}/fs?id=${android.net.Uri.encode(encoded)}&w=16&h=16"
             val first = java.net.URL(url).openConnection() as java.net.HttpURLConnection

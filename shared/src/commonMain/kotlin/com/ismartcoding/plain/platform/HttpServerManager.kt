@@ -35,16 +35,6 @@ object HttpServerManager {
     /** Last server start error message, empty when the server is healthy. */
     val httpServerError = MutableStateFlow("")
 
-    /**
-     * Ports that failed to bind on the last start attempt.
-     *
-     * MutableStateFlow (not Compose snapshot state) so HomePage can read it during
-     * composition even when the singleton is first initialized there — a lazily
-     * created SnapshotStateSet crashes with "Reading a state that was created after
-     * the snapshot was taken or in a snapshot that has not yet been applied".
-     */
-    val portsInUse = MutableStateFlow<Set<Int>>(emptySet())
-
     /** Stable notification id used for the foreground service and server-status notifications. */
     val notificationId: Int by lazy { generateNotificationId() }
 

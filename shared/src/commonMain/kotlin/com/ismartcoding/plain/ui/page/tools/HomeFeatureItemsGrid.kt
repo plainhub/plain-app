@@ -1,8 +1,7 @@
-package com.ismartcoding.plain.ui.page.home
+package com.ismartcoding.plain.ui.page.tools
 import com.ismartcoding.plain.preferences.*
 
 import org.jetbrains.compose.resources.DrawableResource
-import com.ismartcoding.plain.i18n.*
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
@@ -41,7 +40,6 @@ import com.ismartcoding.plain.ui.base.reorderable.rememberReorderableLazyGridSta
 import com.ismartcoding.plain.ui.extensions.collectAsStateValue
 import com.ismartcoding.plain.ui.theme.cardBackgroundNormal
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
 @Composable

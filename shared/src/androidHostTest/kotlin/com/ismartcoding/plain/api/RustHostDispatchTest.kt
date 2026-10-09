@@ -22,6 +22,7 @@ class RustHostDispatchTest {
             "sharedTransferSend" to HostRoute.SharedTransfer,
             "blePairConnect" to HostRoute.BlePairing,
             "mainGraphql" to HostRoute.MainGraphql,
+            "mainGraphqlServerFailed" to HostRoute.MainGraphql,
             "mdnsMulticast" to HostRoute.MdnsMulticast,
             "discoveryFacts" to HostRoute.DiscoveryAdvertisement,
             "nearbyScanFacts" to HostRoute.NearbyScan,

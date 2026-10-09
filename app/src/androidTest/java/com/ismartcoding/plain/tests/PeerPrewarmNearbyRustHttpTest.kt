@@ -47,7 +47,8 @@ class PeerPrewarmNearbyRustHttpTest {
             stopHttpEngineAsync()
             UserPrefs.httpPort.value = 0
             UserPrefs.httpsPort.value = 0
-            assertTrue(startHttpEngineAsync())
+            startHttpEngineAsync()
+            assertTrue(com.ismartcoding.plain.platform.checkHttpServerAsync())
             val port = UserPrefs.httpsPort.value
             assertTrue(NearbyHttpClient.probe("127.0.0.1", port))
             assertTrue(PairingMessenger.sendCancel(DPairingCancel(fromId = id, toId = "$id-other"), "127.0.0.1", port))

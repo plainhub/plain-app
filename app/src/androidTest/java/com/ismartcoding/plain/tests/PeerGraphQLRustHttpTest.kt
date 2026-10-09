@@ -50,7 +50,8 @@ class PeerGraphQLRustHttpTest {
             stopHttpEngineAsync()
             UserPrefs.httpPort.value = 0
             UserPrefs.httpsPort.value = 0
-            assertTrue(startHttpEngineAsync())
+            startHttpEngineAsync()
+            assertTrue(com.ismartcoding.plain.platform.checkHttpServerAsync())
             val url = "https://127.0.0.1:${UserPrefs.httpsPort.value}/peer_graphql"
             val document = buildJsonObject {
                 put("query", "mutation Incoming(\$content:String!) { received:createChatItem(content:\$content) { id fromId channelId content createdAt updatedAt status } }")

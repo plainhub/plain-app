@@ -43,7 +43,8 @@ class SharedClientRustHttpTest {
             stopHttpEngineAsync()
             UserPrefs.httpPort.value = 0
             UserPrefs.httpsPort.value = 0
-            assertTrue(startHttpEngineAsync())
+            startHttpEngineAsync()
+            assertTrue(com.ismartcoding.plain.platform.checkHttpServerAsync())
             val share = ShareManager.createShare(marker, listOf(folder.absolutePath), ShareCrypto.newUrlToken(), true, null)
             shareId = share.id
             val old = DMessageShare(shareId = share.id, urlToken = ShareManager.sharedToken(share.id), peerInfo = DSharePeerInfo(SystemPrefs.clientId.value, "bad,127.0.0.1", 1), name = "old", itemCount = 1, totalSize = file.length(), expiresAt = Instant.parse("2030-01-01T00:00:00Z"))

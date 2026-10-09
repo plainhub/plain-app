@@ -1,5 +1,6 @@
 package com.ismartcoding.plain.ui.page.home
 
+import com.ismartcoding.plain.ui.page.media.OnceOnOpenLoader
 import kotlin.test.Test
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue

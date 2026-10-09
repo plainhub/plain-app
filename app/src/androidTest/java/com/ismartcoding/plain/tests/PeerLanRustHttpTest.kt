@@ -34,7 +34,8 @@ class PeerLanRustHttpTest {
             stopHttpEngineAsync()
             UserPrefs.httpPort.value = 0
             UserPrefs.httpsPort.value = 0
-            assertTrue(startHttpEngineAsync())
+            startHttpEngineAsync()
+            assertTrue(com.ismartcoding.plain.platform.checkHttpServerAsync())
             val incoming = DPeer(id = actor, name = "synthetic actor", key = Base64.encode(key), publicKey = publicKey, status = PeerStatus.PAIRED)
             if (originalActor == null) RustPeerStore.insert(incoming) else RustPeerStore.update(incoming)
             RustPeerStore.insert(DPeer(id = id, name = id, ip = "bad,127.0.0.1", port = UserPrefs.httpsPort.value, key = Base64.encode(key), publicKey = publicKey, status = PeerStatus.PAIRED))

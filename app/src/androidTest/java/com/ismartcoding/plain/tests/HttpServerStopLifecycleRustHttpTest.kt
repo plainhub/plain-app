@@ -49,7 +49,8 @@ class HttpServerStopLifecycleRustHttpTest {
             UserPrefs.service.value = true
             UserPrefs.desktopAccess.value = true
             stopHttpEngineAsync()
-            assertTrue(startHttpEngineAsync())
+            startHttpEngineAsync()
+            assertTrue(com.ismartcoding.plain.platform.checkHttpServerAsync())
             val port = UserPrefs.httpPort.value
             HttpServerManager.serverState.value = HttpServerState.ON
 

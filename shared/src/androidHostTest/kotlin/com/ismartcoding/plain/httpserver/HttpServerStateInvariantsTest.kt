@@ -6,6 +6,7 @@ import com.ismartcoding.plain.preferences.*
 import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.enums.HttpServerState
 import com.ismartcoding.plain.platform.startHttpServerAsync
+import com.ismartcoding.plain.platform.onRustHttpServerFailed
 import com.ismartcoding.plain.platform.stopHttpServerCoreAsync
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
@@ -38,15 +39,12 @@ class HttpServerStateInvariantsTest {
     @AfterTest
     fun reset() {
         HttpServerManager.httpServerError.value = ""
-        HttpServerManager.portsInUse.value = emptySet()
         HttpServerManager.serverState.value = HttpServerState.OFF
     }
 
     @Test
     fun startOrchestratorRecordsTerminalStateWhenEngineCreateFails() = runBlocking {
-        // Free ephemeral ports so the port fallback does not run (it would hit
-        // preferences, unavailable in host tests) — the failure must come from
-        // the engine create itself.
+        // Native initialization is unavailable in the host environment.
         val ports = freePorts(2)
         UserPrefs.httpPort.value = ports[0]
         UserPrefs.httpsPort.value = ports[1]
@@ -78,6 +76,14 @@ class HttpServerStateInvariantsTest {
             async { stopHttpServerCoreAsync() },
         ).awaitAll()
         assertEquals(HttpServerState.OFF, HttpServerManager.serverState.value)
+    }
+
+    @Test
+    fun lateNativeFailureDoesNotChangeStoppedState() = runBlocking {
+        HttpServerManager.serverState.value = HttpServerState.OFF
+        onRustHttpServerFailed(1L, "late failure")
+        assertEquals(HttpServerState.OFF, HttpServerManager.serverState.value)
+        assertEquals("", HttpServerManager.httpServerError.value)
     }
 
     /** Ephemeral ports verified free right now (bind, read, close). */

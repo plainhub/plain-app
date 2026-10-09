@@ -71,16 +71,6 @@ import org.jetbrains.compose.resources.stringResource
 
 enum class HttpServiceState { OFF, ERROR, ON }
 
-/**
- * Whether the home service card shows the loading spinner. Pure so the exact
- * semantics can be regression-tested:
- * - a processing state (STARTING/STOPPING) — owned by a running orchestration
- *   since 2026-09, so it always resolves;
- * - service preference on + OFF: the auto-restore window between the tap and
- *   the service spawning — but only when a start is actually possible
- *   (notifications blocked ⇒ the wizard owns the start and spinning would
- *   never end).
- */
 internal fun httpServerShowLoading(
     state: HttpServerState,
     serviceEnabled: Boolean,
@@ -108,7 +98,6 @@ fun HomePage(
     val scope = rememberCoroutineScope()
     val state = HttpServerManager.serverState.collectAsStateValue()
     val serverError = HttpServerManager.httpServerError.collectAsStateValue()
-    val portsInUse = HttpServerManager.portsInUse.collectAsStateValue()
     var showStayOnlineOverlay by remember { mutableStateOf(false) }
 
     LaunchedEffect(serviceEnabled) {
@@ -117,7 +106,6 @@ fun HomePage(
         }
     }
 
-
     val showSuccess = serviceEnabled && state == HttpServerState.ON
     // Treat OFF as "restore in progress" only when a start is actually possible:
     // with notifications blocked the service intentionally stays OFF (the user
@@ -125,7 +113,7 @@ fun HomePage(
     val canAutoStart = !isAndroidOnly() || Permission.POST_NOTIFICATIONS.isGranted()
     val showLoading = httpServerShowLoading(state, serviceEnabled, canAutoStart)
     val showError = state == HttpServerState.ERROR
-    val errorMessage = buildHomeWebErrorMessage(serverError, portsInUse)
+    val errorMessage = serverError.ifEmpty { LocaleHelper.getString(Res.string.http_server_failed) }
 
     // Port conflicts are already resolved by the start orchestrator's free-port
     // fallback; relaunching only recovers from a genuinely wedged state.
@@ -254,16 +242,5 @@ fun HomePage(
                 }
             }
         }
-    }
-}
-
-private fun buildHomeWebErrorMessage(serverError: String, portsInUse: Set<Int>): String {
-    return if (portsInUse.isNotEmpty()) {
-        LocaleHelper.getStringF(
-            if (portsInUse.size > 1) Res.string.http_port_conflict_errors else Res.string.http_port_conflict_error,
-            portsInUse.joinToString(", "),
-        )
-    } else {
-        serverError.ifEmpty { LocaleHelper.getString(Res.string.http_server_failed) }
     }
 }

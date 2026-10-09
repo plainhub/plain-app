@@ -57,11 +57,6 @@ private fun readFileText(uriStr: String): String {
         ?: throw IllegalStateException("Failed to read the selected file")
 }
 
-actual suspend fun startHttpEngineAsync(): Boolean =
-    com.ismartcoding.plain.platform.RustHttpEngine.start()
-
-actual suspend fun stopHttpEngineAsync() = com.ismartcoding.plain.platform.RustHttpEngine.stop()
-
 /** No platform side effects on iOS once the server is healthy. */
 actual suspend fun onHttpServerStarted() {
     RustMdnsRuntime.control("publish")

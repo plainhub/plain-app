@@ -1,4 +1,4 @@
-package com.ismartcoding.plain.ui.page.home
+package com.ismartcoding.plain.ui.page.tools
 
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.StringResource

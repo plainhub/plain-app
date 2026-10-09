@@ -53,6 +53,9 @@ pub extern "C" fn plain_core_stop() {
     }
 }
 fn public_start(config: &str) -> Result<String, String> {
+    let core = CORE.lock().map_err(|e| e.to_string())?;
+    let core = core.as_ref().ok_or("Rust core is not initialized")?;
+    core.runtime.block_on(core.server.stop_public());
     let config: serde_json::Value = serde_json::from_str(config).map_err(|e| e.to_string())?;
     let port = |name: &str| {
         config[name]
@@ -63,9 +66,8 @@ fn public_start(config: &str) -> Result<String, String> {
     let prefs = super::prefs()?;
     let directory = prefs.path().parent().ok_or("Missing TLS directory")?;
     let (cert, key) = plain_rs::tls_identity::identity(&directory.join("tls-identity.json"))?;
-    let core = CORE.lock().map_err(|e| e.to_string())?;
-    let core = core.as_ref().ok_or("Rust core is not initialized")?;
-    core.server.set_build_debug(config["debug"].as_bool().unwrap_or(false));
+    core.server
+        .set_build_debug(config["debug"].as_bool().unwrap_or(false));
     core.server
         .set_web_root(config["webRoot"].as_str().unwrap_or_default());
     let (http, https) = core.runtime.block_on(core.server.start_public(
@@ -74,7 +76,7 @@ fn public_start(config: &str) -> Result<String, String> {
         cert,
         key,
     ))?;
-    Ok(serde_json::json!({"httpPort":http,"httpsPort":https}).to_string())
+    Ok(serde_json::json!({"httpPort":http,"httpsPort":https,"generation":core.runtime.block_on(core.server.public_generation()).ok_or("Public HTTP server stopped during startup")?}).to_string())
 }
 fn public_stop() -> Result<(), String> {
     let core = CORE.lock().map_err(|e| e.to_string())?;
@@ -88,9 +90,12 @@ pub extern "C" fn plain_http_start(config: *const c_char) -> *mut c_char {
     c_string(
         match input(config).and_then(|config| public_start(&config)) {
             Ok(value) => value,
-            Err(e) => format!("ERROR:{e}"),
+            Err(e) => public_error(e),
         },
     )
+}
+fn public_error(error: String) -> String {
+    serde_json::json!({"errorCode":"START_FAILED", "error":error}).to_string()
 }
 #[unsafe(no_mangle)]
 pub extern "C" fn plain_http_stop() -> *mut c_char {
@@ -134,7 +139,7 @@ mod android {
         env.with_env(|env| -> jni::errors::Result<_> {
             let value = match public_start(&config.to_string()) {
                 Ok(v) => v,
-                Err(e) => format!("ERROR:{e}"),
+                Err(e) => public_error(e),
             };
             env.new_string(value)
         })
