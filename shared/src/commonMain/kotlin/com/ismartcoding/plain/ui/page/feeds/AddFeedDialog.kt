@@ -86,7 +86,6 @@ fun AddFeedDialog(feedsVM: FeedsViewModel) {
                             ) {
                                 feedsVM.editFetchContent.value = it
                             }
-                            HorizontalSpace(8.dp)
                         }
                         PDialogTips(text = stringResource(Res.string.auto_fetch_full_content_tips))
                     }

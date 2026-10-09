@@ -60,7 +60,6 @@ internal fun DeveloperSettingsCard(
                     UserPrefs.developerMode.value = it
                 }
             }
-            HorizontalSpace(8.dp)
         }
         if (developerMode) {
             PListItem(
@@ -102,7 +101,6 @@ internal fun DeveloperSettingsCard(
                             restartServer()
                         }
                     }
-                    HorizontalSpace(8.dp)
                 }
                 PListItem(
                     modifier = Modifier.clickable { navController.navigate(Routing.ComponentShowcase) },

@@ -49,7 +49,6 @@ fun DlnaReceiverSection(navController: NavHostController) {
                     if (enable) DlnaRendererState.start() else DlnaRendererState.stop()
                 }
             }
-            HorizontalSpace(8.dp)
         }
         Text(
             text = stringResource(Res.string.dlna_receiver_desc),

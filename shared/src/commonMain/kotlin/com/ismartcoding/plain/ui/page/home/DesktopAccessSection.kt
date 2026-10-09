@@ -61,7 +61,6 @@ fun DesktopAccessSection(navController: NavHostController) {
                     }
                 }
             }
-            HorizontalSpace(8.dp)
         }
         if (desktopAccessEnabled && onlineCount > 0) {
             OnlineSessionsIndicator(

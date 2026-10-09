@@ -92,7 +92,6 @@ fun FeedSettingsPage(
                         ) {
                             feedSettingsVM.setAutoRefresh(it)
                         }
-                        HorizontalSpace(8.dp)
                     }
 
                     if (feedSettingsVM.autoRefresh.value) {

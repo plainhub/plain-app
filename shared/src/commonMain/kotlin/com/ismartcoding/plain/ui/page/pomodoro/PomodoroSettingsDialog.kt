@@ -79,12 +79,10 @@ fun PomodoroSettingsDialog(
                     VerticalSpace(dp = 16.dp)
                     PListItem(title = stringResource(Res.string.show_notification)) {
                         PSwitch(activated = showNotification) { showNotification = it }
-                        HorizontalSpace(8.dp)
                     }
                     VerticalSpace(dp = 8.dp)
                     PListItem(title = stringResource(Res.string.play_sound_on_complete)) {
                         PSwitch(activated = playSoundOnComplete) { playSoundOnComplete = it }
-                        HorizontalSpace(8.dp)
                     }
                     VerticalSpace(dp = 16.dp)
                 }
