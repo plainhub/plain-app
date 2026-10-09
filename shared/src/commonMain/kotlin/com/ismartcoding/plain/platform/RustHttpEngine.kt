@@ -15,8 +15,12 @@ internal object RustHttpEngine {
     suspend fun start(): Boolean = withIO {
         try {
             RustContentApi.start()
-            com.ismartcoding.plain.platform.RustWebAssets.ensure()
-            val config = PublicServerConfig(UserPrefs.httpPort.value, UserPrefs.httpsPort.value, isDebugBuild())
+            val config = PublicServerConfig(
+                UserPrefs.httpPort.value,
+                UserPrefs.httpsPort.value,
+                isDebugBuild(),
+                RustWebAssets.ensure(),
+            )
             val ports = JsonHelper.jsonDecode<PublicServerPorts>(RustCoreBridge.startPublic(JsonHelper.jsonEncode(config)))
             state.value = true
             UserPrefs.httpPort.value = ports.httpPort

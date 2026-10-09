@@ -66,6 +66,8 @@ fn public_start(config: &str) -> Result<String, String> {
     let core = CORE.lock().map_err(|e| e.to_string())?;
     let core = core.as_ref().ok_or("Rust core is not initialized")?;
     core.server.set_build_debug(config["debug"].as_bool().unwrap_or(false));
+    core.server
+        .set_web_root(config["webRoot"].as_str().unwrap_or_default());
     let (http, https) = core.runtime.block_on(core.server.start_public(
         port("httpPort")?,
         port("httpsPort")?,
