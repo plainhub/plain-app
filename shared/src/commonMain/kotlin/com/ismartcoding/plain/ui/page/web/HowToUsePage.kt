@@ -64,7 +64,6 @@ fun HowToUsePage(
     navController: NavHostController,
     onRunDiagnostics: () -> Unit,
 ) {
-    val serviceEnabled = UserPrefs.service.collectAsStateValue()
 
     PScaffold(
         topBar = {

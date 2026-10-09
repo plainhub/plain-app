@@ -47,8 +47,6 @@ import com.ismartcoding.plain.ui.resources.hash as ui_drawable_hash
 import com.ismartcoding.plain.i18n.local_chat
 import com.ismartcoding.plain.i18n.local_chat_desc
 import com.ismartcoding.plain.i18n.nearby_wifi_devices_required_for_chat
-import com.ismartcoding.plain.i18n.plainapp_service_required_for_chat
-import com.ismartcoding.plain.i18n.start_service
 import com.ismartcoding.plain.lib.Channel
 import com.ismartcoding.plain.lib.sendEvent
 import com.ismartcoding.plain.platform.isTPlus
@@ -87,7 +85,6 @@ fun ChatListPage(
 ) {
     val pairedPeers = PeerCacher.pairedPeers.collectAsStateValue()
     val unpairedPeers = PeerCacher.unpairedPeers.collectAsStateValue()
-    val serviceEnabled = UserPrefs.service.collectAsStateValue()
     val refreshState = rememberRefreshLayoutState {
         PeerStatusManager.reconnectNow("chat_list_pull_refresh")
         peerVM.load()
@@ -143,21 +140,6 @@ fun ChatListPage(
         ) {
             LazyColumn(modifier = Modifier.fillMaxSize()) {
                 item { TopSpace() }
-                item {
-                    if (!serviceEnabled) {
-                        PAlert(
-                            description = stringResource(Res.string.plainapp_service_required_for_chat),
-                            AlertType.WARNING
-                        ) {
-                            PTextButton(
-                                text = stringResource(Res.string.start_service),
-                                buttonSize = ButtonSize.SMALL,
-                                onClick = {
-                                    HttpServerManager.setServiceEnabled(true)
-                                })
-                        }
-                    }
-                }
                 item {
                     if (!bleReady || !awareReady) PAlert(
                         description = stringResource(Res.string.nearby_wifi_devices_required_for_chat),

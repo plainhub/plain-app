@@ -20,9 +20,8 @@ char *plain_prefs_remove_system(const char *key);
 char *plain_prefs_remove_user(const char *key);
 void plain_prefs_string_free(char *pointer);
 
-char *plain_core_start(const char *database_path, const char *token);
+char *plain_core_start(const char *database_path, const char *token, const char *config_json);
 void plain_core_stop(void);
-char *plain_http_start(const char *config_json);
 char *plain_http_stop(void);
 
 #endif

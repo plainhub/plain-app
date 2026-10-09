@@ -132,4 +132,11 @@
     <string name="select_private_key_file">選擇私鑰檔案</string>
     <string name="ssl_certificate_replaced">SSL 憑證已取代</string>
     <string name="try_more_addresses">無法連線？嘗試其他位址</string>
+    <string name="keep_online_in_background">背景保持在線</string>
+    <string name="keep_online_in_background_desc">離開 App 後仍保持連線。</string>
+    <string name="connection_keeps_dropping">連線總是中斷？</string>
+    <string name="connection_keeps_dropping_help">部分手機會暫停背景應用程式。可以讓 PlainApp 保持開啟，並將畫面變黑。</string>
+    <string name="online_help_expanded">已展開</string>
+    <string name="online_help_collapsed">已摺疊</string>
+    <string name="background_online_failed">無法保持背景執行，可以嘗試下方的 Stay Online。</string>
 </resources>

@@ -49,14 +49,14 @@ object TempData {
      */
 
     fun canDesktopAccess(): Boolean {
-        return UserPrefs.desktopAccess.value && UserPrefs.service.value
+        return UserPrefs.desktopAccess.value
     }
 
     fun canChatAccess(): Boolean {
-        return UserPrefs.service.value
+        return com.ismartcoding.plain.platform.HttpServerManager.serverState.value == com.ismartcoding.plain.enums.HttpServerState.ON
     }
 
     fun canDLNAAccess(): Boolean {
-        return UserPrefs.dlna.value && UserPrefs.service.value
+        return UserPrefs.dlna.value
     }
 }

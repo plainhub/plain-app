@@ -16,12 +16,13 @@ object RustHostApi {
     private val client by lazy { createPeerStatusHttpClient() }
     private var collector: Job? = null
 
-    fun start(session: ContentApiSession) {
+    fun start(sessionProvider: () -> ContentApiSession) {
         check(collector == null) { "Rust host already started" }
         collector = scope.launch {
             var retryMs = 500L
             while (currentCoroutineContext().isActive) {
                 try {
+                    val session = sessionProvider()
                     client.webSocket(session.baseUrl.replace("http://", "ws://") + "/host", session.headers()) { socket ->
                         retryMs = 500L
                         coroutineScope {
@@ -31,6 +32,7 @@ object RustHostApi {
                             try {
                                 for (frame in socket.incoming) {
                                     val text = frame.text ?: continue
+                                    val session = sessionProvider()
                                     val request = JsonHelper.jsonDecode<RustHostRequest>(text)
                                     val id = request.id
                                     val method = request.method

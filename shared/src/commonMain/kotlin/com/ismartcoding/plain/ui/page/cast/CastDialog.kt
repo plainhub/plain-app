@@ -89,9 +89,8 @@ fun CastDialog(castVM: CastViewModel, onDeviceSelected: (() -> Unit)? = null) {
                                 castVM.selectDevice(device.hostAddress)
                                 audioPause()
                                 scope.launch(Dispatchers.Default) {
-                                    if (!UserPrefs.service.value) {
-                                        UserPrefs.service.value = true
-                                        sendEvent(StartHttpServerEvent())
+                                    if (!com.ismartcoding.plain.platform.isHttpServerRunning()) {
+                                        com.ismartcoding.plain.platform.startHttpServerAsync()
                                     }
                                 }
                                 if (onDeviceSelected != null) {

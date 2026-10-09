@@ -8,35 +8,17 @@ import android.content.pm.ServiceInfo
 import androidx.core.app.ServiceCompat
 import androidx.lifecycle.LifecycleService
 import com.ismartcoding.plain.AppIntents
-import com.ismartcoding.plain.TempData
-import com.ismartcoding.plain.chat.peer.PeerStatusManager
 import com.ismartcoding.plain.enums.HttpServerState
-import com.ismartcoding.plain.features.sms.SmsProviderObserver
-import com.ismartcoding.plain.features.sms.SmsHelper
 import com.ismartcoding.plain.helpers.NotificationHelper
-import com.ismartcoding.plain.lib.coIO
 import com.ismartcoding.plain.i18n.Res
-import com.ismartcoding.plain.i18n.plainapp_service_is_running
+import com.ismartcoding.plain.i18n.keep_online_in_background
+import com.ismartcoding.plain.i18n.background_online_failed
 import com.ismartcoding.plain.lib.logcat.LogCat
-import com.ismartcoding.plain.mdns.MdnsRegister
-import com.ismartcoding.plain.mdns.NsdHelper
 import com.ismartcoding.plain.platform.LocaleHelper
-import com.ismartcoding.plain.features.sms.RustMmsRuntime
-import com.ismartcoding.plain.platform.startHttpServerAsync
-import com.ismartcoding.plain.platform.stopHttpServerCoreAsync
 import com.ismartcoding.plain.platform.HttpServerManager
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
 
 class HttpServerService : LifecycleService() {
-    // Server lifecycle state lives in HttpServerManager.serverState (single
-    // source of truth); this service keeps no local copy.
-    var mdnsRegister: MdnsRegister? = null
-    private var serverJob: Job? = null
     private var lockManager: HttpServerLockManager? = null
-
-    // true when this instance was created by START_STICKY (system restart), not by user
-    private var isStickyRestart: Boolean = false
 
     override fun onCreate() {
         super.onCreate()
@@ -44,22 +26,20 @@ class HttpServerService : LifecycleService() {
         NotificationHelper.ensureDefaultChannel()
 
         lockManager = HttpServerLockManager(this).also { it.start() }
-        mdnsRegister = MdnsRegister(this).also { it.start() }
     }
 
     @SuppressLint("InlinedApi")
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         val t0 = System.currentTimeMillis()
-        // intent == null means the system restarted this service via START_STICKY after killing it.
         // In that case we flag it so the startup coroutine can delay before binding ports.
-        if (intent == null) isStickyRestart = true
+        if (!UserPrefs.service.value) { stopSelf(); return START_NOT_STICKY }
         super.onStartCommand(intent, flags, startId)
 
         try {
             val notification = NotificationHelper.createServiceNotification(
                 this,
                 AppIntents.ACTION_STOP_HTTP_SERVER,
-                LocaleHelper.getString(Res.string.plainapp_service_is_running),
+                LocaleHelper.getString(Res.string.keep_online_in_background),
                 HttpServerManager.getNotificationContent()
             )
 
@@ -86,76 +66,28 @@ class HttpServerService : LifecycleService() {
             }
         } catch (e: Exception) {
             LogCat.e("Failed to start foreground service: ${e.message}")
-            e.printStackTrace()
+            HttpServerManager.backgroundError.value = LocaleHelper.getString(Res.string.background_online_failed)
+            HttpServerManager.backgroundState.value = HttpServerState.ERROR
             stopSelf()
             return START_NOT_STICKY
         }
 
-        ensureServerRunning()
+        HttpServerManager.backgroundState.value = HttpServerState.ON
+        HttpServerManager.ensureStarted()
         LogCat.d("HttpServerService.onStartCommand: foreground ready ${System.currentTimeMillis() - t0}ms")
 
         return START_STICKY
     }
 
-    /**
-     * Single idempotent entry point for "ensure the server is running".
-     * onStartCommand is delivered for every start request (first start, user
-     * retry, QS tile, ADB, state sync, START_STICKY restart), unlike the
-     * ON_START lifecycle event which fires only once per service instance —
-     * relying on ON_START made later requests dead letters and left the UI
-     * stuck in STARTING after a failed start.
-     */
-    private fun ensureServerRunning() {
-        if (HttpServerManager.serverState.value == HttpServerState.ON || serverJob?.isActive == true) return
-        serverJob = coIO {
-            if (isStickyRestart) {
-                // Give previous Ktor instance time to release its TCP ports
-                // before we try to bind again. Without this, the rapid
-                // START_STICKY kill/restart cycle on OnePlus/ColorOS causes
-                // a port-in-use loop that overwhelms the system.
-                LogCat.d("START_STICKY restart — waiting 5s for port release")
-                delay(5_000)
-                isStickyRestart = false
-            }
-            // The orchestrator records its own terminal state (ERROR on
-            // unexpected failure); a cancelled job is cancelled — the destroy
-            // path lands OFF.
-            startHttpServerAsync()
-        }
-    }
-
-    override fun onTaskRemoved(rootIntent: Intent?) {
-        super.onTaskRemoved(rootIntent)
-        // User swiped away the app from recents; stop server immediately to release ports.
-        NsdHelper.unregisterService()
-        PeerStatusManager.stop()
-        SmsProviderObserver.stop()
-        SmsHelper.stopSmsSendTracking()
-        com.ismartcoding.plain.features.sms.RustMmsRuntime.cancelAll()
-        stopSelf()
-    }
-
     override fun onDestroy() {
         instance = null
-        serverJob?.cancel()
-        serverJob = null
         super.onDestroy()
         lockManager?.stop()
         lockManager = null
-        mdnsRegister?.stop()
-        mdnsRegister = null
-        // Ensure mDNS responder is stopped
-        NsdHelper.unregisterService()
-        PeerStatusManager.stop()
-        SmsProviderObserver.stop()
-        SmsHelper.stopSmsSendTracking()
-        com.ismartcoding.plain.features.sms.RustMmsRuntime.cancelAll()
         stopForeground(STOP_FOREGROUND_REMOVE)
-        // Run the shared stop body (stop side-effect hooks — clipboard watcher,
-        // notification listener — engine teardown again, terminal OFF) on the
-        // global scope so it completes even though this service object dies;
-        // every step is idempotent with the direct cleanup above.
-        coIO { stopHttpServerCoreAsync() }
+        if (HttpServerManager.backgroundState.value != HttpServerState.ERROR) {
+            HttpServerManager.backgroundState.value = HttpServerState.OFF
+        }
     }
 
     companion object {

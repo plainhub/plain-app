@@ -85,6 +85,7 @@ private const val STOP_HOOK_TIMEOUT_MS = 2_000L
 
 suspend fun startHttpServerAsync() = withIO {
     lifecycleMutex.withLock {
+        if (HttpServerManager.serverState.value == HttpServerState.ON) return@withLock
         HttpServerManager.serverState.value = HttpServerState.STARTING
         HttpServerManager.httpServerError.value = ""
         try {
@@ -154,8 +155,8 @@ suspend fun stopHttpServerCoreAsync() = withIO {
 
 fun restartServer() {
     coIO {
-        stopHttpServiceAsync()
-        startHttpServerService()
+        stopHttpServerCoreAsync()
+        startHttpServerAsync()
     }
 }
 

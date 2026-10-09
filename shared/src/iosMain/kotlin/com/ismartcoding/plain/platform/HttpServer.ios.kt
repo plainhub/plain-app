@@ -82,9 +82,9 @@ actual fun startHttpServerService() {
     }
 }
 
-/** iOS external stop: run the shared stop body (no foreground service to tear down). */
+/** iOS has no foreground service; HTTP lifetime belongs to the app. */
 actual suspend fun stopHttpServiceAsync(): Unit = withIO {
-    stopHttpServerCoreAsync()
+    HttpServerManager.backgroundState.value = com.ismartcoding.plain.enums.HttpServerState.OFF
 }
 
 

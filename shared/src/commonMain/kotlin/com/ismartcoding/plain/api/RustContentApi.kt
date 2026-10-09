@@ -33,27 +33,56 @@ object RustContentApi {
     internal fun startedSession(): ContentApiSession? = localSession
 
     internal suspend fun transportSession(): ContentApiSession {
-        start()
-        return checkNotNull(localSession)
+        return checkNotNull(localSession) { "Rust HTTP server is not initialized" }
     }
 
     val directory: String get() = "${prefsFilePath().substringBeforeLast('/')}/rust-content"
 
+    @Volatile internal var httpGeneration: Long = 0L
+        private set
+    private var sessionToken: String? = null
+    private var collectorsStarted = false
+
     fun start() = lock.withLock {
-        if (localSession != null) return@withLock
+        if (httpGeneration != 0L) return@withLock
         com.ismartcoding.plain.preferences.SystemPrefs.ensureMasterSecret()
-        val sessionToken = generateChaCha20Key()
-        val port = RustCoreBridge.start("$directory/plain-content.db", sessionToken)
-        localSession = ContentApiSession("http://127.0.0.1:$port", "local", sessionToken)
-        RustHostApi.start(checkNotNull(localSession))
-        scope.launch { collectEvents() }
+        com.ismartcoding.plain.preferences.SystemPrefs.ensureClientId()
+        com.ismartcoding.plain.preferences.SystemPrefs.ensureMdnsHostname()
+        val token = sessionToken ?: generateChaCha20Key().also { sessionToken = it }
+        val config = RustHttpServerConfig(
+            com.ismartcoding.plain.preferences.UserPrefs.httpPort.value,
+            com.ismartcoding.plain.preferences.UserPrefs.httpsPort.value,
+            isDebugBuild(), RustWebAssets.ensure(),
+        )
+        val ports = JsonHelper.jsonDecode<RustHttpServerResult>(RustCoreBridge.start(
+            "$directory/plain-content.db", token, JsonHelper.jsonEncode(config)))
+        check(ports.errorCode.isEmpty()) { ports.error }
+        localSession = ContentApiSession("http://127.0.0.1:${ports.httpPort}", "local", token)
+        httpGeneration = ports.generation
+        com.ismartcoding.plain.preferences.UserPrefs.httpPort.value = ports.httpPort
+        com.ismartcoding.plain.preferences.UserPrefs.httpsPort.value = ports.httpsPort
+        if (!collectorsStarted) {
+            RustHostApi.start { checkNotNull(localSession) }
+            scope.launch { collectEvents() }
+            collectorsStarted = true
+        }
+    }
+
+    internal fun stopHttp() = lock.withLock {
+        RustCoreBridge.stop()
+        httpGeneration = 0L
+    }
+
+    internal fun httpFailed(generation: Long): Boolean = lock.withLock {
+        if (httpGeneration == 0L || httpGeneration != generation) return@withLock false
+        httpGeneration = 0L
+        true
     }
 
     suspend fun query(selection: String, session: ContentApiSession? = null): JsonObject = execute("query { $selection }", session)
     suspend fun mutate(selection: String, session: ContentApiSession? = null, longRunning: Boolean = false): JsonObject = execute("mutation { $selection }", session, longRunning)
 
     private suspend fun execute(document: String, session: ContentApiSession?, longRunning: Boolean = false): JsonObject {
-        if (session == null) start()
         val target = session ?: checkNotNull(localSession)
         val body = JsonHelper.jsonEncode(ContentQueryRequest(document))
         val response = (if (longRunning) transferClient else client).postText("${target.baseUrl}/graphql", body, "application/json", target.headers())
@@ -76,7 +105,6 @@ object RustContentApi {
      * already expect a refusal should unwrap with a message.
      */
     suspend fun postJson(path: String, body: JsonObject, longRunning: Boolean = false, session: ContentApiSession? = null): Result<JsonObject> {
-        if (session == null) start()
         val target = session ?: checkNotNull(localSession)
         return (if (longRunning) transferClient else client).postText("${target.baseUrl}/$path", body.toString(), "application/json", target.headers()).use {
             val result = runCatching { JsonHelper.jsonDecode<JsonElement>(it.bodyAsText()).jsonObject }
@@ -98,7 +126,6 @@ object RustContentApi {
         postJson(path, body, longRunning).getOrThrow()
 
     suspend fun postStream(path: String, body: JsonObject): PlainResponse {
-        start()
         val target = checkNotNull(localSession)
         return transferClient.postText("${target.baseUrl}/$path", body.toString(), "application/json", target.headers())
     }
@@ -131,7 +158,6 @@ object RustContentApi {
     }
 
     suspend fun publish(event: WebSocketEvent): Int {
-        start()
         return eventSendLock.withLock {
             val socket = withTimeoutOrNull(5_000) { eventSocket.filterNotNull().first() } ?: return@withLock 0
             try {

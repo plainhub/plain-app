@@ -79,7 +79,7 @@ actual fun relaunchApp() {
     // iOS apps cannot restart their own process, so instead restart the embedded HTTP
     // server. This picks up newly chosen ports after a conflict fix and retries startup.
     coIO {
-        stopHttpServiceAsync()
-        startHttpServerService()
+        stopHttpServerCoreAsync()
+        startHttpServerAsync()
     }
 }

@@ -46,6 +46,7 @@ fun initIosApp() {
 
     // Global event collectors (MediaDurationFixQueue, sleep timer, etc.)
     AppEvents.register()
+    com.ismartcoding.plain.platform.HttpServerManager.ensureStarted()
 
     // iOS permission request handler (bridges RequestPermissionsEvent → Swift)
     com.ismartcoding.plain.platform.IosPermissionEvents.register()

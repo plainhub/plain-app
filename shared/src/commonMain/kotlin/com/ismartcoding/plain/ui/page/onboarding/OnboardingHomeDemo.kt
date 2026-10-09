@@ -107,7 +107,7 @@ internal fun AppHomeScreen() {
         ) {
             Column(modifier = Modifier.padding(start = 7.dp, end = 7.dp, top = 5.dp, bottom = 6.dp)) {
                 Text(
-                    text = stringResource(Res.string.plainapp_service_on),
+                    text = stringResource(Res.string.keep_online_in_background),
                     fontSize = 7.5.sp,
                     lineHeight = 8.5.sp,
                     fontWeight = FontWeight.SemiBold,
@@ -116,10 +116,11 @@ internal fun AppHomeScreen() {
                     overflow = TextOverflow.Ellipsis,
                 )
                 VerticalSpace(dp = 4.dp)
-                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-                    MiniOutlinedButton(stringResource(Res.string.stay_online), MaterialTheme.colorScheme.primary, Modifier.weight(1f))
-                    MiniOutlinedButton(stringResource(Res.string.stop_service), MaterialTheme.colorScheme.error, Modifier.weight(1f))
-                }
+                Text(
+                    text = stringResource(Res.string.connection_keeps_dropping),
+                    fontSize = 6.sp,
+                    color = MaterialTheme.colorScheme.primary,
+                )
             }
         }
         VerticalSpace(dp = 4.dp)

@@ -5,6 +5,7 @@ import com.ismartcoding.plain.preferences.*
 import android.content.Intent
 import android.net.Uri
 import androidx.core.content.ContextCompat
+import com.ismartcoding.plain.i18n.background_online_failed
 import com.ismartcoding.plain.Constants
 import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.appContext
@@ -63,8 +64,8 @@ private fun readUriText(uriStr: String): String = readUriBytes(uriStr).toString(
 //   receipts are persisted in SmsSendResultTracker and replayed to a browser
 //   on reconnect (see onWebSocketSessionStarted).
 actual suspend fun onHttpServerStarted() {
-    val service = HttpServerService.instance ?: return
-    NsdHelper.registerServices()
+    val service = appContext
+    HttpServerResources.start()
     PNotificationListenerService.toggle(service, Permission.NOTIFICATION_LISTENER.isEnabledAsync())
     SmsProviderObserver.start(service)
     ClipboardWatcher.start()
@@ -77,26 +78,21 @@ actual suspend fun onWebSocketSessionStarted() {
 }
 
 actual suspend fun onHttpServerStopped() {
-    RustMdnsRuntime.control("unpublish")
+    HttpServerResources.stop()
     PeerStatusManager.stop()
     SmsProviderObserver.stop()
     ClipboardWatcher.stop()
     SmsHelper.stopSmsSendTracking()
-    HttpServerService.instance?.let { PNotificationListenerService.toggle(it, false) }
+    PNotificationListenerService.toggle(appContext, false)
 }
 
-/**
- * Android entry: start the foreground service, which runs the shared
- * [startHttpServerAsync] orchestrator from its lifecycle coroutine. Retried a
- * few times in case the service can't be started immediately. If every retry
- * fails (e.g. an OEM background restriction hit while the app had just gone
- * to background), the STARTING state recorded by the dispatcher has no writer
- * left — record ERROR so the UI shows the failure instead of spinning forever.
- */
+/** Starts optional background retention independently of the HTTP server. */
 actual fun startHttpServerService() {
+    if (!com.ismartcoding.plain.preferences.UserPrefs.service.value) return
+    HttpServerManager.backgroundState.value = HttpServerState.STARTING
+    HttpServerManager.backgroundError.value = ""
     coIO {
         var retry = 3
-        var lastError: Exception? = null
         val context = appContext
         while (retry > 0) {
             try {
@@ -106,33 +102,27 @@ actual fun startHttpServerService() {
                 )
                 return@coIO
             } catch (ex: Exception) {
-                lastError = ex
                 LogCat.e(ex.toString())
                 delay(500.milliseconds)
                 retry--
             }
         }
-        HttpServerManager.httpServerError.value = "startForegroundService failed: ${lastError?.message}"
-        HttpServerManager.serverState.value = HttpServerState.ERROR
+        HttpServerManager.backgroundError.value = LocaleHelper.getString(com.ismartcoding.plain.i18n.Res.string.background_online_failed)
+        HttpServerManager.backgroundState.value = HttpServerState.ERROR
     }
 }
 
-/**
- * Android external stop: run the shared stop body, then tear down the
- * foreground service. The service's own lifecycle stop calls
- * [stopHttpServerCoreAsync] directly (without stopping itself again).
- * Beyond cancellation: a stop whose caller's scope dies midway (ViewModel
- * cleared, QS tile destroyed) must not leave the service alive with the
- * engine already stopped.
- */
+/** Stops background retention while the app-owned HTTP server keeps running. */
 actual suspend fun stopHttpServiceAsync(): Unit = withIO {
     withContext(NonCancellable) {
-        stopHttpServerCoreAsync()
+        if (HttpServerService.isRunning()) HttpServerManager.backgroundState.value = HttpServerState.STOPPING
         appContext.stopService(Intent(appContext, HttpServerService::class.java))
+        if (!HttpServerService.isRunning()) HttpServerManager.backgroundState.value = HttpServerState.OFF
+        HttpServerManager.backgroundError.value = ""
     }
 }
 
-actual fun isHttpServerRunning(): Boolean = HttpServerService.isRunning()
+actual fun isHttpServerRunning(): Boolean = RustHttpEngine.isRunning
 
 actual fun isMdnsRunning(): Boolean = RustMdnsRuntime.running
 

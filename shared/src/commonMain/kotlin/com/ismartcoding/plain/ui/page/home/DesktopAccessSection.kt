@@ -73,7 +73,7 @@ fun DesktopAccessSection(navController: NavHostController) {
                 modifier = Modifier.padding(horizontal = 16.dp),
             )
         }
-        WebAddressPager()
+        if (desktopAccessEnabled) WebAddressPager()
         VerticalSpace(16.dp)
         PDivider(modifier = Modifier.padding(start = 16.dp))
         PListItem(modifier = Modifier.clickable {

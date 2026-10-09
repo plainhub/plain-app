@@ -132,4 +132,11 @@
     <string name="select_certificate_file">选择证书文件</string>
     <string name="select_private_key_file">选择私钥文件</string>
     <string name="ssl_certificate_replaced">SSL 证书已替换</string>
+    <string name="keep_online_in_background">后台保持在线</string>
+    <string name="keep_online_in_background_desc">离开 App 后仍保持连接。</string>
+    <string name="connection_keeps_dropping">连接总是中断？</string>
+    <string name="connection_keeps_dropping_help">部分手机会暂停后台应用。可以让 PlainApp 保持打开，并将画面变黑。</string>
+    <string name="online_help_expanded">已展开</string>
+    <string name="online_help_collapsed">已折叠</string>
+    <string name="background_online_failed">无法保持后台运行，可以尝试下方的 Stay Online。</string>
 </resources>

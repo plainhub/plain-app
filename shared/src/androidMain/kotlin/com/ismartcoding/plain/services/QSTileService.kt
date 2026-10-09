@@ -56,7 +56,7 @@ class QSTileService : TileService() {
         // and delivers every subsequent transition.
         stateEventJob?.cancel()
         stateEventJob = serviceScope.launch {
-            HttpServerManager.serverState.collect { state ->
+            HttpServerManager.backgroundState.collect { state ->
                 val tileState = when (state) {
                     HttpServerState.ON -> Tile.STATE_ACTIVE
                     else -> Tile.STATE_INACTIVE

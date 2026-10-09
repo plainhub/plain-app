@@ -132,4 +132,11 @@
     <string name="enable_adb_token">Enable ADB token</string>
     <string name="try_more_addresses">Can't connect? Try more addresses</string>
     <string name="collapse_backup_addresses">Collapse backup addresses</string>
+    <string name="keep_online_in_background">Keep online in background</string>
+    <string name="keep_online_in_background_desc">Stay connected when you leave the app.</string>
+    <string name="connection_keeps_dropping">Connection keeps dropping?</string>
+    <string name="connection_keeps_dropping_help">Some phones pause apps in the background. Try keeping PlainApp open with a dark screen.</string>
+    <string name="online_help_expanded">Expanded</string>
+    <string name="online_help_collapsed">Collapsed</string>
+    <string name="background_online_failed">Could not keep running in the background. Try Stay Online below.</string>
 </resources>

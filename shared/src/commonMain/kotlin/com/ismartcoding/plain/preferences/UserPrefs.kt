@@ -33,6 +33,7 @@ object UserPrefs {
     val pdfFollowDarkTheme = flow("pdf_follow_dark_theme", false)
     val keepAwake = flow("keep_awake", true)
     val locale = flow("locale", "")
+    // Background retention is independent of HTTP server availability.
     val service = flow("service", false)
     val desktopAccess = flow("desktop_access", true)
     val dlna = flow("dlna", false)

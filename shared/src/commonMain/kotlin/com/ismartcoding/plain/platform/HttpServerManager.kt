@@ -4,8 +4,6 @@ import com.ismartcoding.plain.preferences.*
 
 import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.enums.HttpServerState
-import com.ismartcoding.plain.events.ConfirmToAcceptLoginEvent
-import com.ismartcoding.plain.events.ShowPermissionWizardEvent
 import com.ismartcoding.plain.events.StartHttpServerEvent
 import com.ismartcoding.plain.helpers.UrlHelper
 import com.ismartcoding.plain.lib.coIO
@@ -20,17 +18,9 @@ import kotlinx.coroutines.flow.MutableStateFlow
 
 /** Platform service intent, UI lifecycle state . */
 object HttpServerManager {
-    /**
-     * Single source of truth for the embedded server's lifecycle state.
-     *
-     * Written only by the start/stop orchestrators in `platform/HttpServer.kt`
-     * (plus the start-command dispatch and health-sync reconciliation in
-     * MainViewModel). Everyone else — UI, Android service, QS tile — collects
-     * this flow and never keeps a local copy: a StateFlow replays the current
-     * value to every new collector, so late subscribers (Activity recreation,
-     * process restart of the UI layer) can never miss a transition.
-     */
     val serverState = MutableStateFlow(HttpServerState.OFF)
+    val backgroundState = MutableStateFlow(HttpServerState.OFF)
+    val backgroundError = MutableStateFlow("")
 
     /** Last server start error message, empty when the server is healthy. */
     val httpServerError = MutableStateFlow("")
@@ -52,22 +42,23 @@ object HttpServerManager {
 
     /**
      * Start gated on the notification permission: dispatch directly when a
-     * foreground-service start is allowed; a UI-initiated start opens the
-     * first-run permission wizard instead, auto paths stay silent (a
+     * foreground-service start is allowed; a UI-initiated start requests the
+     * system permission in place, auto paths stay silent (a
      * foreground service without its notification is invisible and easily
      * killed).
      */
     fun requestStart(fromUi: Boolean) {
+        if (!UserPrefs.service.value || backgroundState.value == HttpServerState.ON || backgroundState.value.isProcessing()) return
         if (!isAndroidOnly() || Permission.POST_NOTIFICATIONS.isGranted()) {
             dispatchStart()
             return
         }
         if (fromUi) {
-            sendEvent(ShowPermissionWizardEvent())
+            sendEvent(com.ismartcoding.plain.events.RequestPermissionsEvent(Permission.POST_NOTIFICATIONS))
         }
     }
 
-    /** User intent: persist the service preference and dispatch start/stop. */
+    /** The service preference controls background retention, not HTTP availability. */
     fun setServiceEnabled(enable: Boolean) {
         coIO {
             UserPrefs.service.value = enable
@@ -75,17 +66,11 @@ object HttpServerManager {
         }
     }
 
-    /**
-     * Auto-restore / reconcile: start when the preference is on but the server
-     * is OFF. No health probing — serverState is written only by the running
-     * orchestrations in this process, so OFF already means the engine is down
-     * (process death kills engine and state together and a fresh process
-     * restores through here).
-     */
     fun ensureStarted() {
         coIO {
             runCatching {
-                if (UserPrefs.service.value && serverState.value == HttpServerState.OFF) {
+                startHttpServerAsync()
+                if (UserPrefs.service.value && backgroundState.value == HttpServerState.OFF) {
                     requestStart(fromUi = false)
                 }
             }.onFailure { LogCat.e("ensureStarted failed: ${it.message}") }

@@ -14,7 +14,8 @@ internal object HttpServerHost {
         "mainGraphqlShutdown" -> {
             com.ismartcoding.plain.lib.coIO {
                 kotlinx.coroutines.delay(100)
-                com.ismartcoding.plain.platform.finishHttpServerStopAsync()
+                com.ismartcoding.plain.preferences.UserPrefs.desktopAccess.value = false
+                com.ismartcoding.plain.features.session.closeAllWsSessions()
             }
             JsonNull
         }

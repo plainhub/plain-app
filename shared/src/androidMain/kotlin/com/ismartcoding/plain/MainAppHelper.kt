@@ -40,6 +40,7 @@ object MainAppHelper {
         initDiskLogging()
 
         AppEvents.register()
+        com.ismartcoding.plain.platform.HttpServerManager.ensureStarted()
         NetworkMonitor.init(app)
         if (isQPlus()) {
             try {

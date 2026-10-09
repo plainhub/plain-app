@@ -2,12 +2,6 @@ package com.ismartcoding.plain.ui.page.home
 
 import com.ismartcoding.plain.preferences.*
 
-import androidx.compose.animation.AnimatedContent
-import androidx.compose.animation.SizeTransform
-import androidx.compose.animation.core.tween
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -18,7 +12,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -34,20 +27,15 @@ import com.ismartcoding.plain.events.RequestPermissionsEvent
 import com.ismartcoding.plain.events.WindowFocusChangedEvent
 import com.ismartcoding.plain.i18n.Res
 import com.ismartcoding.plain.i18n.grant_permission
-import com.ismartcoding.plain.i18n.http_port_conflict_error
-import com.ismartcoding.plain.i18n.http_port_conflict_errors
-import com.ismartcoding.plain.i18n.http_server_failed
 import com.ismartcoding.plain.i18n.system_alert_window_warning
 import com.ismartcoding.plain.i18n.vpn_web_conflict_warning
 import com.ismartcoding.plain.lib.Channel
 import com.ismartcoding.plain.lib.sendEvent
-import com.ismartcoding.plain.platform.LocaleHelper
 import com.ismartcoding.plain.platform.Permission
 import com.ismartcoding.plain.platform.getDeviceIP4s
 import com.ismartcoding.plain.platform.isAndroidOnly
 import com.ismartcoding.plain.platform.isGranted
 import com.ismartcoding.plain.platform.isVPNConnected
-import com.ismartcoding.plain.platform.relaunchApp
 import com.ismartcoding.plain.ui.base.AlertType
 import com.ismartcoding.plain.ui.base.BottomSpace
 import com.ismartcoding.plain.ui.base.PAlert
@@ -66,16 +54,7 @@ import com.ismartcoding.plain.ui.models.UpdateViewModel
 import com.ismartcoding.plain.ui.page.MainNavScaffold
 import com.ismartcoding.plain.ui.page.settings.UpdateDialog
 import com.ismartcoding.plain.platform.HttpServerManager
-import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
-
-enum class HttpServiceState { OFF, ERROR, ON }
-
-internal fun httpServerShowLoading(
-    state: HttpServerState,
-    serviceEnabled: Boolean,
-    canAutoStart: Boolean,
-): Boolean = state.isProcessing() || (serviceEnabled && state == HttpServerState.OFF && canAutoStart)
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -95,37 +74,12 @@ fun HomePage(
         channelVM.load()
         setRefreshState(RefreshContentState.Finished)
     }
-    val scope = rememberCoroutineScope()
-    val state = HttpServerManager.serverState.collectAsStateValue()
     val serverError = HttpServerManager.httpServerError.collectAsStateValue()
     var showStayOnlineOverlay by remember { mutableStateOf(false) }
 
-    LaunchedEffect(serviceEnabled) {
-        if (serviceEnabled) {
-            HttpServerManager.ensureStarted()
-        }
-    }
-
-    val showSuccess = serviceEnabled && state == HttpServerState.ON
-    // Treat OFF as "restore in progress" only when a start is actually possible:
-    // with notifications blocked the service intentionally stays OFF (the user
-    // must finish the permission wizard first), so spinning here would never end.
-    val canAutoStart = !isAndroidOnly() || Permission.POST_NOTIFICATIONS.isGranted()
-    val showLoading = httpServerShowLoading(state, serviceEnabled, canAutoStart)
-    val showError = state == HttpServerState.ERROR
-    val errorMessage = serverError.ifEmpty { LocaleHelper.getString(Res.string.http_server_failed) }
-
-    // Port conflicts are already resolved by the start orchestrator's free-port
-    // fallback; relaunching only recovers from a genuinely wedged state.
-    val onRestartFix: () -> Unit = {
-        scope.launch { relaunchApp() }
-    }
-
-    val httpServiceState = when {
-        showSuccess -> HttpServiceState.ON
-        showError -> HttpServiceState.ERROR
-        else -> HttpServiceState.OFF
-    }
+    val backgroundState = HttpServerManager.backgroundState.collectAsStateValue()
+    val backgroundError = HttpServerManager.backgroundError.collectAsStateValue()
+    LaunchedEffect(Unit) { HttpServerManager.ensureStarted() }
 
     LaunchedEffect(Channel.sharedFlow) {
         Channel.sharedFlow.collect { event ->
@@ -136,6 +90,10 @@ fun HomePage(
             when (event) {
                 is PermissionsResultEvent -> {
                     systemAlertWindow = Permission.SYSTEM_ALERT_WINDOW.isGranted()
+                    if (event.map.containsKey(Permission.POST_NOTIFICATIONS.toSysPermission())) {
+                        if (Permission.POST_NOTIFICATIONS.isGranted()) HttpServerManager.ensureStarted()
+                        else HttpServerManager.setServiceEnabled(false)
+                    }
                 }
 
                 is WindowFocusChangedEvent -> {
@@ -143,12 +101,7 @@ fun HomePage(
                     val ips = getDeviceIP4s().filter { it.isNotEmpty() }
                     TempData.ip4s.value = ips
                     systemAlertWindow = Permission.SYSTEM_ALERT_WINDOW.isGranted()
-                    // Regaining focus is the only reliable "user came back"
-                    // signal when the activity survived in the background
-                    // (LaunchedEffect(serviceEnabled) won't refire) — restart
-                    // the server if the preference is on but it went down
-                    // while away.
-                    if (event.hasFocus && UserPrefs.service.value) {
+                    if (event.hasFocus) {
                         HttpServerManager.ensureStarted()
                     }
                 }
@@ -205,36 +158,20 @@ fun HomePage(
                     }
                 }
                 item {
-                    AnimatedContent(
-                        targetState = httpServiceState,
-                        transitionSpec = {
-                            fadeIn(tween(300)) togetherWith fadeOut(tween(200)) using
-                                    SizeTransform(clip = false, sizeAnimationSpec = { _, _ -> tween(300) })
+                    PlainAppServiceSection(
+                        backgroundEnabled = backgroundState == HttpServerState.ON || backgroundState == HttpServerState.STARTING,
+                        backgroundState = backgroundState,
+                        errorMessage = serverError.ifEmpty { backgroundError },
+                        onRetry = {
+                            if (backgroundState == HttpServerState.ERROR) HttpServerManager.setServiceEnabled(true)
+                            else HttpServerManager.ensureStarted()
                         },
-                        label = "web_state",
-                    ) { target ->
-                        Column {
-                            PlainAppServiceSection(
-                                navController = navController,
-                                httpServiceState = target,
-                                isLoading = showLoading,
-                                onRun = {
-                                    if (!state.isProcessing() && state != HttpServerState.ON) {
-                                        HttpServerManager.setServiceEnabled(true)
-                                    }
-                                },
-                                errorMessage = errorMessage,
-                                onRestartFix = onRestartFix,
-                                onStayOnline = { showStayOnlineOverlay = true },
-                            )
-                            if (httpServiceState == HttpServiceState.ON) {
-                                VerticalSpace(16.dp)
-                                DesktopAccessSection(navController)
-                                VerticalSpace(dp = 16.dp)
-                                DlnaReceiverSection(navController)
-                            }
-                        }
-                    }
+                        onStayOnline = { showStayOnlineOverlay = true },
+                    )
+                    VerticalSpace(16.dp)
+                    DesktopAccessSection(navController)
+                    VerticalSpace(16.dp)
+                    DlnaReceiverSection(navController)
                     VerticalSpace(dp = 16.dp)
                 }
                 item {

@@ -45,7 +45,7 @@ import com.ismartcoding.plain.i18n.devices
 /**
  * Compose-drawn "video" demo for the Stay Online FAQ, mirroring the real
  * home screen and StayOnlineModeOverlay rendering: tap Stay Online on the
- * service card → keep-running overlay → go dark (screen turns fully black
+ * expanded connection help → keep-running overlay → go dark (screen turns fully black
  * while PlainApp keeps running).
  * Steps: 0 home screen + tap ring on Stay Online, 1 overlay + tap ring on
  * Go dark now, 2 pure black screen. Played by the shared scrubbable DemoPlayer.
@@ -107,7 +107,7 @@ private fun DemoHomeScreen(ring: Boolean, url: String) {
                 .padding(12.dp),
         ) {
             Text(
-                text = stringResource(Res.string.plainapp_service_on),
+                text = stringResource(Res.string.connection_keeps_dropping),
                 style = MaterialTheme.typography.titleSmall,
                 fontWeight = FontWeight.SemiBold,
                 color = MaterialTheme.colorScheme.onSurface,
@@ -139,26 +139,7 @@ private fun DemoHomeScreen(ring: Boolean, url: String) {
                         )
                     }
                 }
-                Box(
-                    modifier = Modifier.weight(1f),
-                    contentAlignment = Alignment.Center,
-                ) {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .clip(DemoPillShape)
-                            .border(1.dp, MaterialTheme.colorScheme.error.copy(alpha = 0.5f), DemoPillShape)
-                            .padding(vertical = 7.dp),
-                        horizontalArrangement = Arrangement.Center,
-                    ) {
-                        Text(
-                            text = stringResource(Res.string.stop_service),
-                            style = MaterialTheme.typography.labelSmall,
-                            fontWeight = FontWeight.SemiBold,
-                            color = MaterialTheme.colorScheme.error,
-                        )
-                    }
-                }
+
             }
         }
         Spacer(Modifier.height(8.dp))
