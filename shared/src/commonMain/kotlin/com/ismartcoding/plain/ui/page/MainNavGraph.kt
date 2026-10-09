@@ -44,6 +44,7 @@ import com.ismartcoding.plain.ui.models.TagsViewModel
 import com.ismartcoding.plain.ui.models.UpdateViewModel
 import com.ismartcoding.plain.ui.models.DesktopAccessSettingsViewModel
 import com.ismartcoding.plain.ui.nav.Routing
+import com.ismartcoding.plain.ui.nav.PRESENTED_ROUTES
 import com.ismartcoding.plain.ui.nav.navEnterTransition
 import com.ismartcoding.plain.ui.nav.navExitTransition
 import com.ismartcoding.plain.ui.nav.navPopEnterTransition
@@ -162,10 +163,10 @@ fun MainNavGraph(
             modifier = Modifier.background(MaterialTheme.colorScheme.surface),
             navController = navController,
             startDestination = Routing.Home,
-            enterTransition = { navEnterTransition() },
-            exitTransition = { navExitTransition() },
-            popEnterTransition = { navPopEnterTransition() },
-            popExitTransition = { navPopExitTransition() },
+            enterTransition = { navEnterTransition(PRESENTED_ROUTES) },
+            exitTransition = { navExitTransition(PRESENTED_ROUTES) },
+            popEnterTransition = { navPopEnterTransition(PRESENTED_ROUTES) },
+            popExitTransition = { navPopExitTransition(PRESENTED_ROUTES) },
         ) {
         composable<Routing.Home> {
             val selectedTab by mainVM.currentRootTab
