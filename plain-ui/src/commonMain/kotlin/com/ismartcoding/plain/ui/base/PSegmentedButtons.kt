@@ -21,6 +21,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -42,8 +43,8 @@ fun <T> PSegmentedButtons(
 ) {
     require(selectedIndex == -1 || selectedIndex in options.indices) { "selectedIndex must be -1 or a valid option index" }
     val textStyle = when (buttonSize) {
-        ButtonSize.SMALL -> MaterialTheme.typography.labelMedium
-        ButtonSize.MEDIUM -> MaterialTheme.typography.labelLarge
+        ButtonSize.SMALL -> MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.SemiBold)
+        ButtonSize.MEDIUM -> MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.SemiBold)
         ButtonSize.LARGE -> MaterialTheme.typography.titleMedium
     }
     Row(

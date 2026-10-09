@@ -20,6 +20,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.ismartcoding.plain.ui.resources.Res as UiRes
@@ -141,11 +142,12 @@ fun PListItem(
                     }
                     action?.invoke()
                     value?.let {
-                        SelectionContainer {
+                        SelectionContainer(modifier = Modifier.weight(1f)) {
                             Text(
                                 text = it,
                                 style = MaterialTheme.typography.listItemValue(),
-                                modifier = Modifier.weight(1f),
+                                modifier = Modifier.fillMaxWidth(),
+                                textAlign = TextAlign.End,
                             )
                         }
                     }
