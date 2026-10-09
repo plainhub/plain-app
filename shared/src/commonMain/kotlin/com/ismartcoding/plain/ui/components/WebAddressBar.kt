@@ -1,23 +1,16 @@
 package com.ismartcoding.plain.ui.components
 
-import com.ismartcoding.plain.preferences.*
-
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -27,21 +20,26 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.unit.dp
 import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.helpers.UrlHelper
-import com.ismartcoding.plain.i18n.*
+import com.ismartcoding.plain.i18n.Res
+import com.ismartcoding.plain.i18n.collapse_backup_addresses
+import com.ismartcoding.plain.i18n.collapsed
+import com.ismartcoding.plain.i18n.expanded
+import com.ismartcoding.plain.i18n.try_more_addresses
 import com.ismartcoding.plain.platform.isLanAddress
 import com.ismartcoding.plain.platform.restartServer
-import com.ismartcoding.plain.ui.base.HorizontalSpace
+import com.ismartcoding.plain.preferences.UserPrefs
+import com.ismartcoding.plain.ui.base.PTextButton
 import com.ismartcoding.plain.ui.theme.cardBackgroundNormal
-import com.ismartcoding.plain.ui.theme.tipsText
-import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import com.ismartcoding.plain.ui.resources.Res as UiRes
+import com.ismartcoding.plain.ui.resources.chevron_down as ui_drawable_chevron_down
 import com.ismartcoding.plain.ui.resources.chevron_up as ui_drawable_chevron_up
-import com.ismartcoding.plain.ui.resources.expand_more as ui_drawable_expand_more
 
 @Composable
 fun WebAddressBar(
@@ -106,8 +104,18 @@ fun WebAddressBar(
                 }
             }
         }
-        ExpandCollapseBar(
-            expanded = expanded.value,
+        val expansion = stringResource(if (expanded.value) Res.string.expanded else Res.string.collapsed)
+        PTextButton(
+            modifier = Modifier.padding(horizontal = 8.dp).semantics {
+                stateDescription = expansion
+            },
+            text = stringResource(if (expanded.value) Res.string.collapse_backup_addresses else Res.string.try_more_addresses),
+            icon = painterResource(
+                if (expanded.value)
+                    UiRes.drawable.ui_drawable_chevron_up
+                else
+                    UiRes.drawable.ui_drawable_chevron_down
+            ),
             onClick = {
                 UserPrefs.webAddressBarExpanded.value = !expanded.value
             },
@@ -176,31 +184,6 @@ private fun AddressRow(
             isHostnameRow = isHostnameRow,
             onEditClick = onEditClick,
             onQrClick = onQrClick,
-        )
-    }
-}
-
-@Composable
-private fun ExpandCollapseBar(expanded: Boolean, onClick: () -> Unit) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable { onClick() }
-            .height(40.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.Center,
-    ) {
-        Text(
-            text = stringResource(if (expanded) Res.string.collapse_backup_addresses else Res.string.try_more_addresses),
-            style = MaterialTheme.typography.tipsText(),
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-        )
-        HorizontalSpace(dp = 4.dp)
-        Icon(
-            painter = painterResource(if (expanded) UiRes.drawable.ui_drawable_chevron_up else UiRes.drawable.ui_drawable_expand_more),
-            contentDescription = null,
-            modifier = Modifier.size(16.dp),
-            tint = MaterialTheme.colorScheme.onSurfaceVariant,
         )
     }
 }
