@@ -5,7 +5,7 @@ Deduplicate import blocks in lib/ Kotlin sources.
 Context: a bulk merge dropped identical blocks of `import` lines into the
 same file, so a line like
 
-    import com.ismartcoding.plain.lib.kgraphql.schema.model.ast.ASTNode
+    import com.ismartcoding.plain.lib.JsonHelper
 
 ends up appearing 2+ times. Kotlin fails to compile with a "Conflicting
 imports" error. This script removes the duplicates.
@@ -20,7 +20,7 @@ Strategy (conservative, deterministic, order-preserving):
      bodies) is emitted verbatim.
 
 Non-goals:
-  - We do NOT reorder imports across blocks (kgraphql split by `kotlin.*`
+  - We do NOT reorder imports across blocks (imports split by `kotlin.*`
     etc. must stay where they are).
   - We do NOT collapse two non-identical blocks that share lines (those are
     legit different imports).

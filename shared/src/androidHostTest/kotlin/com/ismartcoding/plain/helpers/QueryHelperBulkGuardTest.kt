@@ -1,6 +1,5 @@
 package com.ismartcoding.plain.helpers
 
-import com.ismartcoding.plain.lib.kgraphql.GraphQLError
 import kotlin.test.Test
 import kotlin.test.assertFailsWith
 import kotlin.test.assertTrue
@@ -10,7 +9,7 @@ class QueryHelperBulkGuardTest {
     @Test
     fun blankQueriesAreRejected() {
         listOf("", "  ", "\t", " \n ").forEach { q ->
-            val error = assertFailsWith<GraphQLError> { QueryHelper.requireExplicitBulkQuery(q) }
+            val error = assertFailsWith<IllegalArgumentException> { QueryHelper.requireExplicitBulkQuery(q) }
             assertTrue(
                 error.message!!.contains("all:true"),
                 "Guard error must point at the all:true sentinel, got: ${error.message}",

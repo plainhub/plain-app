@@ -3,7 +3,6 @@ package com.ismartcoding.plain.platform
 import com.ismartcoding.plain.appContext
 import com.ismartcoding.plain.data.ScreenMirrorControlInput
 import com.ismartcoding.plain.enums.ScreenMirrorMode
-import com.ismartcoding.plain.lib.kgraphql.GraphQLError
 import com.ismartcoding.plain.services.PlainAccessibilityService
 import com.ismartcoding.plain.services.ScreenMirrorService
 import com.ismartcoding.plain.data.ScreenMirrorVideoCodec

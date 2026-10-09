@@ -1,7 +1,6 @@
 package com.ismartcoding.plain.helpers
 
 import com.ismartcoding.plain.features.TagHelper
-import com.ismartcoding.plain.lib.kgraphql.GraphQLError
 
 object QueryHelper {
     /** Sentinel field name for explicitly targeting the whole table: `all:true` (API_SPEC §5). */
@@ -14,7 +13,7 @@ object QueryHelper {
      */
     fun requireExplicitBulkQuery(query: String) {
         if (query.isBlank()) {
-            throw GraphQLError(
+            throw IllegalArgumentException(
                 "query is required for bulk mutations — pass 'all:true' to explicitly target everything (API_SPEC §5)",
             )
         }

@@ -3,7 +3,7 @@
 Reusable Kotlin Multiplatform code extracted from PlainApp. Source packages are
 kept unchanged under `com.ismartcoding.plain`.
 
-The module includes common helpers, crypto, extensions, logcat, KDataLoader,
+The module includes common helpers, crypto, extensions, logcat,
 mDNS, and XML/RSS support. Supporting sources are included here so this module
 has no dependency on `shared-lib`.
 
