@@ -21,7 +21,6 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.ismartcoding.plain.enums.DarkTheme
 import com.ismartcoding.plain.ui.base.BottomSpace
-import com.ismartcoding.plain.ui.base.HorizontalSpace
 import com.ismartcoding.plain.ui.base.PCard
 import com.ismartcoding.plain.ui.base.PListItem
 import com.ismartcoding.plain.ui.base.PScaffold
@@ -88,7 +87,6 @@ fun DarkThemePage(navController: NavHostController) {
                                     UserPrefs.amoledDarkTheme.value = !amoledDarkTheme
                                 }
                             }
-                            HorizontalSpace(8.dp)
                         }
                     }
                     VerticalSpace(dp = 16.dp)
@@ -107,7 +105,6 @@ fun DarkThemePage(navController: NavHostController) {
                                     UserPrefs.pdfFollowDarkTheme.value = !pdfFollowDarkTheme
                                 }
                             }
-                            HorizontalSpace(8.dp)
                         }
                     }
                     BottomSpace(paddingValues)

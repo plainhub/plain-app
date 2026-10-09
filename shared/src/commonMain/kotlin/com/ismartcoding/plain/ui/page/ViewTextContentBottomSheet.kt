@@ -13,7 +13,6 @@ import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.unit.dp
 import com.ismartcoding.plain.platform.shareText
 import com.ismartcoding.plain.ui.base.BottomSpace
-import com.ismartcoding.plain.ui.base.HorizontalSpace
 import com.ismartcoding.plain.ui.base.PCard
 import com.ismartcoding.plain.ui.base.PSheetPrimaryAction
 import com.ismartcoding.plain.ui.base.PSheetPrimaryActionsCard
@@ -71,7 +70,6 @@ fun ViewTextContentBottomSheet(
                         ) {
                             textFileVM.toggleWrapContent()
                         }
-                        HorizontalSpace(8.dp)
                     })
                 }
             }

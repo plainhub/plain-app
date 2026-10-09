@@ -25,7 +25,6 @@ import com.ismartcoding.plain.platform.formatDateTime
 import com.ismartcoding.plain.platform.launchUrl
 import com.ismartcoding.plain.ui.base.BottomSpace
 import com.ismartcoding.plain.ui.base.CopyIconButton
-import com.ismartcoding.plain.ui.base.HorizontalSpace
 import com.ismartcoding.plain.ui.base.PCard
 import com.ismartcoding.plain.ui.base.PListItem
 import com.ismartcoding.plain.ui.base.PModalBottomSheet
@@ -144,7 +143,6 @@ fun ViewFeedBottomSheet(
                     m.fetchContent = it
                     feedsVM.updateFetchContent(m.id, it)
                 }
-                HorizontalSpace(8.dp)
             })
         }
         Tips(text = stringResource(Res.string.auto_fetch_full_content_tips))

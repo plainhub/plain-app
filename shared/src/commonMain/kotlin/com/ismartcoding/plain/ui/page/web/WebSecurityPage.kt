@@ -115,7 +115,6 @@ fun WebSecurityPage(navController: NavHostController) {
                             PSwitch(activated = authTwoFactor) {
                                 scope.launch(Dispatchers.Default) { SystemPrefs.authTwoFactor.value = it }
                             }
-                            HorizontalSpace(8.dp)
                         }
                     }
                     Tips(text = stringResource(Res.string.two_factor_auth_tips)); VerticalSpace(dp = 24.dp)
@@ -168,7 +167,6 @@ fun WebSecurityPage(navController: NavHostController) {
                             PSwitch(activated = rotateUrlTokenOnRestart) {
                                 scope.launch(Dispatchers.Default) { SystemPrefs.rotateUrlTokenOnRestart.value = it }
                             }
-                            HorizontalSpace(8.dp)
                         }
                     }
                     Tips(text = stringResource(Res.string.rotate_url_token_on_restart_tips)); VerticalSpace(dp = 16.dp)

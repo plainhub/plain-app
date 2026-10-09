@@ -68,17 +68,17 @@ fun DlnaReceiverWaitingScreen() {
             PListItem(
                 title = stringResource(Res.string.dlna_receiver_step1_title),
                 subtitle = stringResource(Res.string.dlna_receiver_step1_desc),
-                start = { Box(Modifier.align(Alignment.Top).padding(top = 8.dp)) { StepNumber(1) } },
+                start = { StepNumber(1, modifier = Modifier) },
             )
             PListItem(
                 title = stringResource(Res.string.dlna_receiver_step2_title),
                 subtitle = stringResource(Res.string.dlna_receiver_step2_desc),
-                start = { Box(Modifier.align(Alignment.Top).padding(top = 8.dp)) { StepNumber(2) } },
+                start = { StepNumber(2, modifier = Modifier) },
             )
             PListItem(
                 title = stringResource(Res.string.dlna_receiver_step3_title),
                 subtitle = stringResource(Res.string.dlna_receiver_step3_desc, deviceName),
-                start = { Box(Modifier.align(Alignment.Top).padding(top = 8.dp)) { StepNumber(3) } },
+                start = { StepNumber(3, modifier = Modifier) },
             )
         }
         Tips(text = stringResource(Res.string.dlna_receiver_protocol_note))

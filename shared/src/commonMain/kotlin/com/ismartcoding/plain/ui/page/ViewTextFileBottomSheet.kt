@@ -22,7 +22,6 @@ import com.ismartcoding.plain.platform.shareFiles
 import com.ismartcoding.plain.features.file.DFile
 import com.ismartcoding.plain.ui.base.BottomSpace
 import com.ismartcoding.plain.ui.base.CopyIconButton
-import com.ismartcoding.plain.ui.base.HorizontalSpace
 import com.ismartcoding.plain.ui.base.PCard
 import com.ismartcoding.plain.ui.base.PListItem
 import com.ismartcoding.plain.ui.base.PModalBottomSheet
@@ -124,7 +123,6 @@ fun ViewTextFileBottomSheet(
                     ) {
                         textFileVM.toggleWrapContent()
                     }
-                    HorizontalSpace(8.dp)
                 })
             }
         }
@@ -164,7 +162,6 @@ private fun EditorDisplayActionsCard(textFileVM: TextFileViewModel, scope: kotli
                 controller.statusBarVisible.value = !controller.statusBarVisible.value
                 scope.launchSafe { com.ismartcoding.plain.preferences.UserPrefs.editorStatusBar.value = controller.statusBarVisible.value }
             }
-            HorizontalSpace(8.dp)
         })
     }
 

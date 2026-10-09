@@ -46,7 +46,6 @@ import com.ismartcoding.plain.platform.isGranted
 import com.ismartcoding.plain.platform.isIgnoringBatteryOptimizations
 import com.ismartcoding.plain.platform.openBatteryOptimizationSettings
 import com.ismartcoding.plain.ui.base.BottomSpace
-import com.ismartcoding.plain.ui.base.HorizontalSpace
 import com.ismartcoding.plain.ui.base.PCard
 import com.ismartcoding.plain.ui.base.PListItem
 import com.ismartcoding.plain.ui.base.PScaffold
@@ -180,7 +179,6 @@ fun DesktopAccessSettingsPage(navController: NavHostController, webVM: DesktopAc
                             togglePermission(scope, m, enable)
                         }
                     }
-                    HorizontalSpace(8.dp)
                 }
             }
             if (notificationsCard) {
@@ -201,7 +199,6 @@ fun DesktopAccessSettingsPage(navController: NavHostController, webVM: DesktopAc
                             Box(Modifier.onGloballyPositioned { switches[WebSettingsFeature.NOTIFICATIONS] = it.boundsInRoot() }) {
                                 PSwitch(activated = enabled) { enable -> togglePermission(scope, m, enable) }
                             }
-                            HorizontalSpace(8.dp)
                         }
                     }
                 }
@@ -221,7 +218,6 @@ fun DesktopAccessSettingsPage(navController: NavHostController, webVM: DesktopAc
                         Box(Modifier.onGloballyPositioned { switches[WebSettingsFeature.CLIPBOARD] = it.boundsInRoot() }) {
                             PSwitch(activated = clipboardEnabled) { enable -> togglePermission(scope, m, enable) }
                         }
-                        HorizontalSpace(8.dp)
                     }
                 }
                 if (clipboardEnabled) {
@@ -239,7 +235,6 @@ fun DesktopAccessSettingsPage(navController: NavHostController, webVM: DesktopAc
                 PCard(modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN)) {
                     PListItem(modifier = Modifier.clickable { webVM.enableKeepAwake(!keepAwake) }, title = stringResource(Res.string.keep_awake)) {
                         PSwitch(activated = keepAwake) { enable -> webVM.enableKeepAwake(enable) }
-                        HorizontalSpace(8.dp)
                     }
                 }
                 Tips(stringResource(Res.string.keep_awake_tips))

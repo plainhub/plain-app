@@ -19,7 +19,6 @@ import com.ismartcoding.plain.ui.base.PSwitch
 import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.nav.Routing
 import androidx.navigation.NavHostController
-import com.ismartcoding.plain.ui.base.HorizontalSpace
 import kotlinx.coroutines.launch
 import com.ismartcoding.plain.ui.resources.Res as UiRes
 import com.ismartcoding.plain.ui.resources.database_backup as ui_drawable_database_backup
@@ -48,7 +47,6 @@ internal fun SettingsCardItems(navController: NavHostController) {
                     UserPrefs.setDarkThemeValue(if (it) DarkTheme.ON.value else DarkTheme.OFF.value)
                 }
             }
-            HorizontalSpace(8.dp)
         }
     }
     VerticalSpace(dp = 16.dp)

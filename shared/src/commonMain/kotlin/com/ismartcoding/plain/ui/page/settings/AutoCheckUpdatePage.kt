@@ -17,7 +17,6 @@ import com.ismartcoding.plain.i18n.Res
 import com.ismartcoding.plain.i18n.auto_check_update
 import com.ismartcoding.plain.i18n.auto_check_update_desc
 import com.ismartcoding.plain.ui.base.BottomSpace
-import com.ismartcoding.plain.ui.base.HorizontalSpace
 import com.ismartcoding.plain.ui.base.PCard
 import com.ismartcoding.plain.ui.base.PListItem
 import com.ismartcoding.plain.ui.base.PScaffold
@@ -56,7 +55,6 @@ fun AutoCheckUpdatePage(navController: NavHostController, updateViewModel: Updat
                             PSwitch(activated = autoCheckUpdate) { newValue -> scope.launch(Dispatchers.Default) {
                                 SystemPrefs.updateInfo { it.copy(autoCheckUpdate = newValue) } }
                             }
-                            HorizontalSpace(8.dp)
                         }
                     }
                     BottomSpace(paddingValues)

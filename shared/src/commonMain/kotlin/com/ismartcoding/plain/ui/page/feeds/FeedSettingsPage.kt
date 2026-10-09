@@ -115,7 +115,6 @@ fun FeedSettingsPage(
                             ) {
                                 feedSettingsVM.setAutoRefreshOnlyWifi(it)
                             }
-                            HorizontalSpace(8.dp)
                         }
                     }
                 }

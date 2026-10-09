@@ -14,13 +14,11 @@ import androidx.compose.ui.unit.dp
 
 
 @Composable
-fun StepNumber(num: Int) {
+fun StepNumber(num: Int, modifier: Modifier = Modifier.padding(horizontal = 16.dp)) {
     val primaryColor = MaterialTheme.colorScheme.primary
     val onPrimaryColor = MaterialTheme.colorScheme.onPrimary
     Box(
-        modifier = Modifier
-            .padding(horizontal = 16.dp)
-            .size(28.dp),
+        modifier = modifier.size(28.dp),
         contentAlignment = Alignment.Center
     ) {
         Canvas(modifier = Modifier.size(28.dp)) {

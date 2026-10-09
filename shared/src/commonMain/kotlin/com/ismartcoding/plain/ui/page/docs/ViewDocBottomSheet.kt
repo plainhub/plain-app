@@ -35,7 +35,6 @@ import com.ismartcoding.plain.enums.AppFeatureType
 import com.ismartcoding.plain.enums.has
 import com.ismartcoding.plain.lib.extensions.getFilenameExtension
 import com.ismartcoding.plain.ui.base.CopyIconButton
-import com.ismartcoding.plain.ui.base.HorizontalSpace
 import com.ismartcoding.plain.ui.base.PCard
 import com.ismartcoding.plain.ui.base.PListItem
 import com.ismartcoding.plain.ui.base.PModalBottomSheet
@@ -176,11 +175,10 @@ fun ViewDocBottomSheet(
                             PSheetActionRow(
                                 title = stringResource(Res.string.add_to_home),
                                 start = {
-                                    HorizontalSpace(16.dp)
                                     AsyncImage(
                                         model = getFileIconPath(m.extension),
                                         contentDescription = null,
-                                        modifier = Modifier.padding(end = 16.dp).size(24.dp),
+                                        modifier = Modifier.size(24.dp),
                                     )
                                 },
                                 trailing = { AddToHomeHelpAction() },
