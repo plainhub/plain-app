@@ -81,6 +81,10 @@ fun PListItem(
                 else -> Text(
                     text = title,
                     style = MaterialTheme.typography.listItemTitle(),
+                    // Keep a single-word key on one line so it never breaks mid-word next to the value.
+                    maxLines = if (value != null) 1 else Int.MAX_VALUE,
+                    softWrap = value == null,
+                    overflow = TextOverflow.Ellipsis,
                 )
             }
         },
