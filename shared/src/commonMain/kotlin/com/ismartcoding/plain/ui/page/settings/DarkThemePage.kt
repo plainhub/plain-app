@@ -8,6 +8,8 @@ import com.ismartcoding.plain.preferences.*
 import com.ismartcoding.plain.i18n.*
 
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.selection.selectable
+import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -16,6 +18,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.semantics.Role
 import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
@@ -52,21 +55,21 @@ fun DarkThemePage(navController: NavHostController) {
                     TopSpace()
                 }
                 item {
-                    PCard(modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN)) {
+                    PCard(modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN).selectableGroup()) {
                         DarkTheme.entries.forEach {
                             PListItem(
-                                modifier = Modifier.clickable {
-                                    scope.launch {
-                                        UserPrefs.setDarkThemeValue(it.value)
-                                    }
-                                },
+                                modifier = Modifier.selectable(
+                                    selected = it.value == darkTheme,
+                                    role = Role.RadioButton,
+                                    onClick = {
+                                        scope.launch {
+                                            UserPrefs.setDarkThemeValue(it.value)
+                                        }
+                                    },
+                                ),
                                 title = it.getText(),
                             ) {
-                                RadioButton(selected = it.value == darkTheme, onClick = {
-                                    scope.launch {
-                                        UserPrefs.setDarkThemeValue(it.value)
-                                    }
-                                })
+                                RadioButton(selected = it.value == darkTheme, onClick = null)
                             }
                         }
                     }

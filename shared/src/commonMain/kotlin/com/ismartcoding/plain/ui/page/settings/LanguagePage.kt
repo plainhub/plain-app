@@ -5,7 +5,8 @@ import com.ismartcoding.plain.preferences.*
 
 import com.ismartcoding.plain.i18n.*
 
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.selection.selectable
+import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
@@ -14,6 +15,7 @@ import androidx.compose.material3.RadioButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.semantics.Role
 import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
@@ -43,26 +45,24 @@ fun LanguagePage(navController: NavHostController) {
             PTopAppBar(onNavigateBack = { navController.navigateUp() }, title = stringResource(Res.string.language))
         },
         content = { paddingValues ->
-            LazyColumn(modifier = Modifier.padding(top = paddingValues.calculateTopPadding())) {
+            LazyColumn(modifier = Modifier.padding(top = paddingValues.calculateTopPadding()).selectableGroup()) {
                 item {
                     TopSpace()
                 }
                 itemsIndexed(list) { index, item ->
+                    val selected = (item == null && language == null) ||
+                        (item?.language == language?.language && item?.country == language?.country)
                     PListItem(
                         modifier = PlainTheme
                             .getCardModifier(index = if (index > 0) index - 1 else 0, size = if (index > 0) list.size - 1 else 1)
-                            .clickable {
+                            .selectable(selected = selected, role = Role.RadioButton, onClick = {
                                 scope.launch(Dispatchers.Default) {
                                     UserPrefs.setLocale(item)
                                 }
-                            },
+                            }),
                         title = item?.getElegantDisplayName() ?: stringResource(Res.string.use_device_language),
                     ) {
-                        RadioButton(selected = (item == null && language == null) || (item?.language == language?.language && item?.country == language?.country), onClick = {
-                            scope.launch(Dispatchers.Default) {
-                                UserPrefs.setLocale(item)
-                            }
-                        })
+                        RadioButton(selected = selected, onClick = null)
                     }
                     if (index == 0) {
                         VerticalSpace(16.dp)
