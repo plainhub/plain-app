@@ -44,6 +44,7 @@ kotlin {
             api(libs.foundation)
             api(libs.material3)
             api(libs.compose.components.resources)
+            api(libs.navigation.compose)
             api(libs.coil.compose)
             api(libs.kotlinx.coroutines.core)
             api(libs.atomicfu)
