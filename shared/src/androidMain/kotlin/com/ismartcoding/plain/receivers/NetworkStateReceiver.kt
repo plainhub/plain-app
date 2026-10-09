@@ -31,7 +31,7 @@ class NetworkStateReceiver : BroadcastReceiver() {
                             notificationId, NotificationHelper.createServiceNotification(
                                 context,
                                 AppIntents.ACTION_STOP_HTTP_SERVER,
-                                LocaleHelper.getString(Res.string.plainapp_service_is_running),
+                                LocaleHelper.getString(Res.string.keep_online_in_background),
                                 HttpServerManager.getNotificationContent()
                             )
                         )

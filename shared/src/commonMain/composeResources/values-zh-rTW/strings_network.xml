@@ -139,4 +139,5 @@
     <string name="online_help_expanded">已展開</string>
     <string name="online_help_collapsed">已摺疊</string>
     <string name="background_online_failed">無法保持背景執行，可以嘗試下方的 Stay Online。</string>
+    <string name="turn_off_keep_online_in_background">關閉背景保持在線</string>
 </resources>

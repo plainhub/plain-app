@@ -139,4 +139,5 @@
     <string name="online_help_expanded">Expanded</string>
     <string name="online_help_collapsed">Collapsed</string>
     <string name="background_online_failed">Could not keep running in the background. Try Stay Online below.</string>
+    <string name="turn_off_keep_online_in_background">Turn off background mode</string>
 </resources>

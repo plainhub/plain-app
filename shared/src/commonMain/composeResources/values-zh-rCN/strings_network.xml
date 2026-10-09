@@ -139,4 +139,5 @@
     <string name="online_help_expanded">已展开</string>
     <string name="online_help_collapsed">已折叠</string>
     <string name="background_online_failed">无法保持后台运行，可以尝试下方的 Stay Online。</string>
+    <string name="turn_off_keep_online_in_background">关闭后台保持在线</string>
 </resources>

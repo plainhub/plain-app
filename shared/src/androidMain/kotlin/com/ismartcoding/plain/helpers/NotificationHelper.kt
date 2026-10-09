@@ -197,7 +197,12 @@ object NotificationHelper {
                 foregroundServiceBehavior = NotificationCompat.FOREGROUND_SERVICE_IMMEDIATE
             }
             setContentIntent(createContentIntent(context))
-            addAction(-1, LocaleHelper.getString(Res.string.stop_service), stopPendingIntent)
+            val stopLabel = if (action == AppIntents.ACTION_STOP_HTTP_SERVER) {
+                Res.string.turn_off_keep_online_in_background
+            } else {
+                Res.string.stop_service
+            }
+            addAction(-1, LocaleHelper.getString(stopLabel), stopPendingIntent)
             setStyle(NotificationCompat.DecoratedCustomViewStyle())
         }.build()
     }
