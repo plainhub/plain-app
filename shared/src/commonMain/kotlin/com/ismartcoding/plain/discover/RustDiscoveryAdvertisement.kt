@@ -3,7 +3,6 @@ package com.ismartcoding.plain.discover
 import com.ismartcoding.plain.api.RustContentApi
 import com.ismartcoding.plain.helpers.Base64Lenient
 import com.ismartcoding.plain.lib.JsonHelper
-import com.ismartcoding.plain.lib.mdns.MdnsServiceInfo
 import kotlinx.serialization.json.*
 
 object RustDiscoveryAdvertisement {

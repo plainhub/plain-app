@@ -4,7 +4,7 @@ Reusable Kotlin Multiplatform code extracted from PlainApp. Source packages are
 kept unchanged under `com.ismartcoding.plain`.
 
 The module includes common helpers, crypto, extensions, logcat,
-mDNS, and XML/RSS support. Supporting sources are included here so this module
+and XML/RSS support. Supporting sources are included here so this module
 has no dependency on `shared-lib`.
 
 BLE protocol and native codec adapters belong to [plain-rs features](../../plain-desktop/plain-rs/README.md). Platform GATT adapters stay in the host shared module. This Kotlin library contains no BLE source.

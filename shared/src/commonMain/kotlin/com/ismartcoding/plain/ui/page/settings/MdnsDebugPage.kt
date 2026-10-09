@@ -34,9 +34,9 @@ import com.ismartcoding.plain.i18n.mdns_service_type
 import com.ismartcoding.plain.i18n.mdns_txt
 import com.ismartcoding.plain.i18n.not_available
 import com.ismartcoding.plain.discover.RustMdnsRuntime
-import com.ismartcoding.plain.lib.mdns.MdnsPacketDirection
-import com.ismartcoding.plain.lib.mdns.MdnsPacketLog
-import com.ismartcoding.plain.lib.mdns.MdnsServiceSnapshot
+import com.ismartcoding.plain.discover.MdnsPacketDirection
+import com.ismartcoding.plain.discover.MdnsPacketLog
+import com.ismartcoding.plain.discover.MdnsServiceSnapshot
 import com.ismartcoding.plain.ui.base.BottomSpace
 import com.ismartcoding.plain.ui.base.PCard
 import com.ismartcoding.plain.ui.base.PListItem

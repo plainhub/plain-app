@@ -64,7 +64,7 @@
 -keepclassmembers,allowoptimization enum com.ismartcoding.plain.db.MessageType { public static final com.ismartcoding.plain.db.MessageType *; }
 -keepclassmembers,allowoptimization enum com.ismartcoding.plain.chat.peer.transport.PeerTransportType { public static final com.ismartcoding.plain.chat.peer.transport.PeerTransportType *; }
 -keepclassmembers,allowoptimization enum com.ismartcoding.plain.ui.models.NearbyItemStatus { public static final com.ismartcoding.plain.ui.models.NearbyItemStatus *; }
--keepclassmembers,allowoptimization enum com.ismartcoding.plain.lib.mdns.MdnsPacketDirection { public static final com.ismartcoding.plain.lib.mdns.MdnsPacketDirection *; }
+-keepclassmembers,allowoptimization enum com.ismartcoding.plain.discover.MdnsPacketDirection { public static final com.ismartcoding.plain.discover.MdnsPacketDirection *; }
 
 # Rust media, file, feed, download and timer contracts.
 -keepclassmembers,allowoptimization enum com.ismartcoding.plain.enums.AudioServiceAction { public static final com.ismartcoding.plain.enums.AudioServiceAction *; }

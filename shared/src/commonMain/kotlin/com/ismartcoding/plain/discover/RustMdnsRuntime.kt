@@ -6,9 +6,6 @@ import com.ismartcoding.plain.events.EventType
 import com.ismartcoding.plain.events.WebSocketEvent
 import com.ismartcoding.plain.lib.coIO
 import com.ismartcoding.plain.lib.logcat.LogCat
-import com.ismartcoding.plain.lib.mdns.MdnsPacketDirection
-import com.ismartcoding.plain.lib.mdns.MdnsPacketLog
-import com.ismartcoding.plain.lib.mdns.MdnsServiceSnapshot
 import com.ismartcoding.plain.lib.sendEvent
 import com.ismartcoding.plain.ui.models.NearbyViewModel
 import kotlinx.coroutines.*
