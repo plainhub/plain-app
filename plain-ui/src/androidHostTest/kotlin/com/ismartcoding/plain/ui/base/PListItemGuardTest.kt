@@ -6,15 +6,23 @@ import kotlin.test.assertTrue
 
 class PListItemGuardTest {
     @Test
-    fun keyWithValueNeverBreaksMidWord() {
+    fun keyWithValueStaysOnOneLineWithoutEllipsis() {
         val source = source()
-        val plainTitle = source.substringAfter("else -> Text(").substringBefore("\n                }")
-        assertTrue(
-            plainTitle.contains("maxLines = if (value != null) 1 else Int.MAX_VALUE"),
-            "Plain title must stay on one line when a value is shown: $plainTitle",
-        )
-        assertTrue(plainTitle.contains("softWrap = value == null"), "Title must not soft-wrap when a value is shown")
-        assertTrue(plainTitle.contains("TextOverflow.Ellipsis"), "Title must ellipsize instead of breaking mid-word")
+        val keyRow = source.substringAfter("else -> if (value != null) {").substringBefore("\n                } else {")
+        assertTrue(keyRow.contains("maxLines = 1"), "Key must stay on one line when a value is shown")
+        assertTrue(keyRow.contains("softWrap = false"), "Key must not break mid-word")
+        assertTrue(keyRow.contains("TextOverflow.Clip"), "Key must not be ellipsized")
+        assertTrue(!keyRow.contains("TextOverflow.Ellipsis"), "Key must not be ellipsized")
+        assertTrue(keyRow.contains("Modifier.weight(1f)"), "Key must take only the space the value leaves")
+    }
+
+    @Test
+    fun valueStaysWithinHalfTheRowAndWraps() {
+        val source = source()
+        val trailing = source.substringAfter("trailingContent = if (value != null").substringBefore("if (showMore)")
+        assertTrue(trailing.contains("Modifier.fillMaxWidth(0.5f)"), "Value column must not exceed half the row")
+        assertTrue(trailing.contains("Modifier.weight(1f)"), "Value must wrap inside its own column")
+        assertTrue(!trailing.contains("maxLines"), "Value must be allowed to wrap onto multiple lines")
     }
 
     private fun source(): String {

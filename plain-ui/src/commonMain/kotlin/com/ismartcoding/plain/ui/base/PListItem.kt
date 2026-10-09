@@ -78,14 +78,27 @@ fun PListItem(
                         titleSuffix()
                     }
                 }
-                else -> Text(
-                    text = title,
-                    style = MaterialTheme.typography.listItemTitle(),
-                    // Keep a single-word key on one line so it never breaks mid-word next to the value.
-                    maxLines = if (value != null) 1 else Int.MAX_VALUE,
-                    softWrap = value == null,
-                    overflow = TextOverflow.Ellipsis,
-                )
+                else -> if (value != null) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        Text(
+                            text = title,
+                            style = MaterialTheme.typography.listItemTitle(),
+                            // The key keeps its own line and is never broken or ellipsized mid-word.
+                            maxLines = 1,
+                            softWrap = false,
+                            overflow = TextOverflow.Clip,
+                            modifier = Modifier.weight(1f),
+                        )
+                    }
+                } else {
+                    Text(
+                        text = title,
+                        style = MaterialTheme.typography.listItemTitle(),
+                    )
+                }
             }
         },
         supportingContent = if (subtitle.isNotEmpty()) {
@@ -115,7 +128,10 @@ fun PListItem(
         },
         trailingContent = if (value != null || action != null || showMore || separatedActions) {
             {
-                Row(verticalAlignment = Alignment.CenterVertically) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(0.5f),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
                     if (separatedActions) {
                         VerticalDivider(
                             modifier = Modifier.height(24.dp),
@@ -129,6 +145,7 @@ fun PListItem(
                             Text(
                                 text = it,
                                 style = MaterialTheme.typography.listItemValue(),
+                                modifier = Modifier.weight(1f),
                             )
                         }
                     }
