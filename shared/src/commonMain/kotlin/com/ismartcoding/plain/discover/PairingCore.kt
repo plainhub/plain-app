@@ -5,13 +5,9 @@ import com.ismartcoding.plain.data.DNearbyDevice
 import com.ismartcoding.plain.data.DPairingCancel
 import com.ismartcoding.plain.data.DPairingRequest
 import com.ismartcoding.plain.data.DPairingResponse
-import com.ismartcoding.plain.data.DPairingResult
 import com.ismartcoding.plain.enums.NearbyMessageType
 import com.ismartcoding.plain.enums.DiscoveryMethod
-import com.ismartcoding.plain.events.EventType
 import com.ismartcoding.plain.events.PairingSuccessEvent
-import com.ismartcoding.plain.events.WebSocketEvent
-import com.ismartcoding.plain.lib.JsonHelper
 import com.ismartcoding.plain.lib.TimeHelper
 import com.ismartcoding.plain.lib.sendEvent
 import com.ismartcoding.plain.ui.models.NearbyViewModel
@@ -56,17 +52,6 @@ object PairingCore {
         com.ismartcoding.plain.chat.peer.PeerManager.load()
         NearbyViewModel.handlePairingSuccess(id)
         sendEvent(PairingSuccessEvent(id, name, ip, key))
-        sendEvent(WebSocketEvent(EventType.PAIRING_SUCCESS, JsonHelper.jsonEncode(DPairingResult(deviceId = id, deviceName = name))))
-    }
-
-    fun notifyFailed(deviceId: String, deviceName: String, reason: String) {
-        NearbyViewModel.itemStatus.remove(deviceId)
-        sendEvent(
-            WebSocketEvent(
-                EventType.PAIRING_FAILED,
-                JsonHelper.jsonEncode(DPairingResult(deviceId = deviceId, deviceName = deviceName, error = reason)),
-            )
-        )
     }
 
 }

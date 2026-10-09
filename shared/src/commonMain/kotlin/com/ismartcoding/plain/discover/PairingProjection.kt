@@ -4,6 +4,7 @@ import com.ismartcoding.plain.ui.models.NearbyItemStatus
 import com.ismartcoding.plain.ui.models.NearbyViewModel
 import kotlinx.serialization.json.*
 
+// Rust broadcasts pairing events to both mobile and web clients; projections must not republish them.
 object PairingProjection {
     suspend fun reconcile() {
         val states = RustPairingRuntime.states().map { it.jsonObject }
@@ -21,16 +22,12 @@ object PairingProjection {
         val id = value.getValue("deviceId").jsonPrimitive.content
         if (RustPairingStore.tickets().none { it.deviceId == id && it.generation == value.getValue("generation").jsonPrimitive.content }) return
         NearbyViewModel.itemStatus[id] = NearbyItemStatus.PAIRING
-        com.ismartcoding.plain.lib.sendEvent(com.ismartcoding.plain.events.WebSocketEvent(
-            com.ismartcoding.plain.events.EventType.PAIRING_STARTED, com.ismartcoding.plain.lib.JsonHelper.jsonEncode(
-                com.ismartcoding.plain.data.DPairingResult(id, value.getValue("deviceName").jsonPrimitive.content))))
     }
 
     suspend fun request(payload: String) {
         val request = com.ismartcoding.plain.lib.JsonHelper.jsonDecode<com.ismartcoding.plain.data.DPairingRequest>(payload)
         if (!RustPairingRuntime.currentRequest(request.fromId, request.signature)) return
         com.ismartcoding.plain.lib.sendEvent(com.ismartcoding.plain.events.PairingRequestReceivedEvent(request))
-        com.ismartcoding.plain.lib.sendEvent(com.ismartcoding.plain.events.WebSocketEvent(com.ismartcoding.plain.events.EventType.PAIRING_REQUEST_RECEIVED, payload))
     }
 
     suspend fun canceled(payload: String) {
@@ -39,8 +36,6 @@ object PairingProjection {
         if (RustPairingStore.tickets().any { it.deviceId == id }) return
         NearbyViewModel.itemStatus.remove(id)
         com.ismartcoding.plain.lib.sendEvent(com.ismartcoding.plain.events.PairingCanceledEvent(id))
-        com.ismartcoding.plain.lib.sendEvent(com.ismartcoding.plain.events.WebSocketEvent(com.ismartcoding.plain.events.EventType.PAIRING_CANCELED,
-            com.ismartcoding.plain.lib.JsonHelper.jsonEncode(com.ismartcoding.plain.data.DPairingResult(id, value.getValue("deviceName").jsonPrimitive.content))))
     }
 
     suspend fun success(payload: String) {
@@ -54,7 +49,6 @@ object PairingProjection {
         val value = Json.parseToJsonElement(payload).jsonObject
         val id = value.getValue("deviceId").jsonPrimitive.content
         if (value["generation"] != null && RustPairingStore.tickets().any { it.deviceId == id }) return
-        PairingCore.notifyFailed(id, value.getValue("deviceName").jsonPrimitive.content,
-            value.getValue("error").jsonPrimitive.content)
+        NearbyViewModel.itemStatus.remove(id)
     }
 }
