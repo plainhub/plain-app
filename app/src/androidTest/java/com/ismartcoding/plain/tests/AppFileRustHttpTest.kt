@@ -4,7 +4,6 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.ismartcoding.plain.extensions.getFinalPath
 import com.ismartcoding.plain.helpers.AppFileStore
-import com.ismartcoding.plain.platform.AppDatabase
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.*
 import org.junit.Test
@@ -23,7 +22,6 @@ class AppFileRustHttpTest {
         try {
             val first = AppFileStore.importBytes(data,"text/plain")
             ids += first.id
-            assertNull(AppDatabase.instance.appFileDao().getById(first.id))
             assertEquals(1,first.refCount)
             val canonical = File(AppFileStore.toFidUri(first).getFinalPath())
             assertArrayEquals(data,canonical.readBytes())

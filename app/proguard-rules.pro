@@ -52,7 +52,7 @@
 -keepclassmembers,allowoptimization enum com.ismartcoding.plain.platform.Permission { public static final com.ismartcoding.plain.platform.Permission *; }
 -keepclassmembers,allowoptimization enum com.ismartcoding.plain.platform.Capability { public static final com.ismartcoding.plain.platform.Capability *; }
 
-# Room values and Rust chat/discovery projections.
+# Rust chat/discovery projections.
 -keepclassmembers,allowoptimization enum com.ismartcoding.plain.enums.DeviceType { public static final com.ismartcoding.plain.enums.DeviceType *; }
 -keepclassmembers,allowoptimization enum com.ismartcoding.plain.enums.PeerStatus { public static final com.ismartcoding.plain.enums.PeerStatus *; }
 -keepclassmembers,allowoptimization enum com.ismartcoding.plain.enums.ChannelMemberStatus { public static final com.ismartcoding.plain.enums.ChannelMemberStatus *; }

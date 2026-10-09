@@ -23,14 +23,13 @@ import kotlin.test.fail
  * sort criterion name ("TITLE"/"DATE"...), not an order index. Same for the
  * audio_queue_source.current_index cursor.
  *
- * Source of truth is the Room-exported schema JSON, so any entity added to
- * @Database is covered automatically.
+ * These frozen Room schema snapshots are retained for the future legacy-data importer.
  */
 class SortOrderNamingGuardTest {
 
-    private val schemaDirName = "room-db/schemas/com.ismartcoding.plain.platform.AppDatabase"
+    private val schemaDirName = "shared/apitest/legacy-room-schemas/com.ismartcoding.plain.platform.AppDatabase"
 
-    /** Resolve the room-db schema dir from whatever the test working dir is. */
+    /** Resolve the legacy schema dir from whatever the test working dir is. */
     private fun schemaFile(version: Int): File {
         var dir = File(System.getProperty("user.dir")).absoluteFile
         repeat(4) {

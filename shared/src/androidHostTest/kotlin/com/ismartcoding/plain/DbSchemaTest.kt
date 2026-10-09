@@ -5,8 +5,8 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 
 /**
- * Locks `apitest/DATABASE.sql` against the Room schema JSON: the committed DDL
- * must equal the freshly generated output byte for byte, so any DB change
+ * Locks `apitest/DATABASE.sql` against the frozen legacy schema JSON: the committed DDL
+ * must equal the freshly generated output byte for byte, so any legacy snapshot change
  * without regenerating the file fails this test.
  *
  * After an intentional change: run

@@ -87,10 +87,6 @@ kotlin {
         commonMain.dependencies {
             api(project(":shared-lib"))
             api(project(":plain-ui"))
-            // Room database module. Exposes AppDatabase, DAOs, entities and the
-            // Room runtime so the rest of :shared can reference them without
-            // triggering the Room KSP here.
-            api(project(":room-db"))
             implementation(libs.runtime)
             implementation(libs.foundation)
             implementation(libs.material3)
@@ -100,7 +96,6 @@ kotlin {
             implementation(libs.jetbrains.lifecycle.viewmodel.compose)
             implementation(libs.compose.lifecycle.runtime)
             implementation(libs.kotlinx.datetime)
-            api(libs.room.runtime)
             // ktor-io only (ByteReadChannel streaming) — no HTTP client dependency from ktor
             implementation(libs.ktor.io)
             implementation(libs.coil.compose)
@@ -181,8 +176,6 @@ kotlin {
 dependencies {
     add("androidHostTestImplementation", kotlin("test"))
     add("androidHostTestImplementation", libs.junit)
-    // Test-only: Migration30to31Test drives the raw SQLite connection
-    add("androidHostTestImplementation", libs.sqlite.bundled)
 }
 
 compose.resources {

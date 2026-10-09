@@ -2,8 +2,6 @@ package com.ismartcoding.plain.features
 
 import com.ismartcoding.plain.api.*
 import com.ismartcoding.plain.db.DNote
-import com.ismartcoding.plain.helpers.ContentWhere
-import com.ismartcoding.plain.helpers.FilterField
 import kotlinx.serialization.json.*
 
 object NoteHelper {
@@ -27,5 +25,4 @@ object NoteHelper {
     suspend fun trashAsync(ids: Set<String>) { if (ids.isNotEmpty()) RustContentApi.mutate("trashNotes(query: ${gql(selectionQuery(ids))}) { affectedCount }") }
     suspend fun restoreAsync(ids: Set<String>) { if (ids.isNotEmpty()) RustContentApi.mutate("restoreNotes(query: ${gql(selectionQuery(ids))}) { affectedCount }") }
     suspend fun deleteAsync(ids: Set<String>) { if (ids.isNotEmpty()) RustContentApi.mutate("deleteNotes(query: ${gql(selectionQuery(ids))}) { affectedCount }") }
-    internal fun applyNotesFilterFields(where: ContentWhere, fields: List<FilterField>) = LegacyNoteHelper.applyNotesFilterFields(where, fields)
 }

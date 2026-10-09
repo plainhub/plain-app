@@ -2,7 +2,6 @@ package com.ismartcoding.plain.tests
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.ismartcoding.plain.features.ImageEditorProjectHelper
-import com.ismartcoding.plain.platform.AppDatabase
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.*
 import org.junit.Test
@@ -22,7 +21,6 @@ class ImageEditorRustHttpTest {
                 canvasHeight = 200
                 layerCount = 2
             }
-            assertNull(AppDatabase.instance.imageEditorProjectDao().getById(id))
             val summary = ImageEditorProjectHelper.listAsync(50).first { it.id.value == id }
             assertEquals(saved.thumbnail, summary.thumbnail)
             assertEquals(100, summary.canvasWidth)

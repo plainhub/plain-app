@@ -5,7 +5,6 @@ import com.ismartcoding.plain.data.TagRelationStub
 import com.ismartcoding.plain.db.DTagRelation
 import com.ismartcoding.plain.enums.DataType
 import com.ismartcoding.plain.features.TagHelper
-import com.ismartcoding.plain.platform.AppDatabase
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.*
 import org.junit.Test
@@ -23,13 +22,11 @@ class TagsRustHttpTest {
             for (type in DataType.entries.filter { it != DataType.DEFAULT }) {
                 val id = TagHelper.addOrUpdate("") { name = "$prefix-${type.name}"; this.type = type.value }
                 tags[type] = id
-                assertNull(AppDatabase.instance.tagDao().getById(id))
                 TagHelper.addTagRelations(listOf(DTagRelation(tagId=id,key=key,type=type.value,title="original",size=5_000_000_001L)))
                 val first = TagHelper.getTagRelationsByKey(key,type).single()
                 assertEquals(5_000_000_001L,first.size)
                 assertEquals("original",first.title)
                 assertEquals(1,checkNotNull(TagHelper.get(id)).count)
-                assertTrue(AppDatabase.instance.tagRelationDao().getAllByKey(key,type.value).isEmpty())
                 TagHelper.editTagRelations(type,TagRelationStub(key,"updated",6_000_000_001L),listOf(id),emptyList())
                 val second = TagHelper.getTagRelationsByKey(key,type).single()
                 assertEquals(first.createdAt,second.createdAt)

@@ -2,7 +2,6 @@ package com.ismartcoding.plain.tests
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.ismartcoding.plain.features.BookmarkHelper
-import com.ismartcoding.plain.platform.AppDatabase
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
@@ -22,8 +21,6 @@ class BookmarkRustHttpTest {
         try {
             val bookmark = BookmarkHelper.addBookmarks(listOf("https://example.invalid/$marker", " "), group.id).single()
             ids += bookmark.id
-            assertNull(AppDatabase.instance.bookmarkDao().getById(bookmark.id))
-            assertNull(AppDatabase.instance.bookmarkGroupDao().getById(group.id))
             coroutineScope { (0 until 12).map { async { BookmarkHelper.recordClick(bookmark.id) } }.awaitAll() }
             val updated = checkNotNull(BookmarkHelper.updateBookmark(bookmark.id) { title = marker; pinned = true; sortOrder = 7 })
             assertEquals(12, updated.clickCount)

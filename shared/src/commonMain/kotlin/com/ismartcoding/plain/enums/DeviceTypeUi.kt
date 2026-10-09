@@ -22,7 +22,7 @@ import com.ismartcoding.plain.i18n.tv
 /**
  * UI presentation helpers for [DeviceType]. Kept as extension functions (instead of
  * members on the enum) so the enum stays a pure data type and can live in the
- * `:room-db` module without pulling Compose resources into it.
+ * client model package without pulling Compose resources into it.
  */
 @Composable
 fun DeviceType.getText(): String {

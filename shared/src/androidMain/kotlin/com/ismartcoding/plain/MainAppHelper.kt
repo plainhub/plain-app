@@ -6,14 +6,8 @@ import android.app.Application
 import android.media.AudioAttributes
 import android.view.textclassifier.TextClassificationManager
 import android.view.textclassifier.TextClassifier
-import androidx.room3.RoomDatabase
-import androidx.sqlite.SQLiteConnection
 import coil3.SingletonImageLoader
 import com.ismartcoding.plain.ai.ImageSearchManager
-import com.ismartcoding.plain.platform.AppDatabase
-import com.ismartcoding.plain.db.DataInitializer
-import com.ismartcoding.plain.platform.buildAppDatabase
-import com.ismartcoding.plain.platform.initDatabase
 import com.ismartcoding.plain.enums.AppFeatureType
 import com.ismartcoding.plain.enums.DarkTheme
 import com.ismartcoding.plain.enums.has
@@ -38,19 +32,6 @@ object MainAppHelper {
         com.ismartcoding.plain.thumbnail.ThumbnailProvider.instance = com.ismartcoding.plain.thumbnail.ThumbnailGenerator
         Prefs.load()
         com.ismartcoding.plain.api.RustContentApi.start()
-        initDatabase(
-            buildAppDatabase(Constants.DATABASE_NAME)
-                .addCallback(object : RoomDatabase.Callback() {
-                    override suspend fun onCreate(connection: SQLiteConnection) {
-                        DataInitializer(connection).apply {
-                            insertWelcome()
-                            insertTags(includeContent = false)
-                        }
-                    }
-                })
-                .build()
-        )
-
         CrashHandler.install(app)
 
         SingletonImageLoader.setSafe { context -> newImageLoader(context) }

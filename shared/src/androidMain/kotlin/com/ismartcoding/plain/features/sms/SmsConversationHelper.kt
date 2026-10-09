@@ -18,7 +18,6 @@ import com.ismartcoding.plain.lib.extensions.getTimeValue
 import com.ismartcoding.plain.lib.extensions.map
 import com.ismartcoding.plain.lib.extensions.queryCursor
 import com.ismartcoding.plain.lib.withIO
-import com.ismartcoding.plain.platform.AppDatabase
 import com.ismartcoding.plain.platform.getSims
 import com.ismartcoding.plain.helpers.QueryHelper
 import kotlin.time.Instant

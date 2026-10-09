@@ -4,7 +4,6 @@ plugins {
 rootProject.name = "PlainApp"
 include(":app")
 include(":shared")
-include(":room-db")
 include(":shared-lib")
 include(":plain-common")
 include(":plain-ui")

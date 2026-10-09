@@ -16,7 +16,7 @@ import kotlin.test.fail
  * play themselves (enqueueAndPlayAsync, or two mutations in one document from
  * the desktop). The `playAudio` half of this now lives in Rust, where the
  * resolver is, and is guarded there; the client-side wiring below has no
- * host-testable seam (platform AppDatabase) so it stays a source scan.
+ * host-testable seam (Rust HTTP runtime) so it stays a source scan.
  */
 class PlayAudioQueueOrderGuardTest {
 

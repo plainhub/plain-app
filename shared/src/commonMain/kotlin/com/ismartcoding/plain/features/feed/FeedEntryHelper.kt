@@ -2,8 +2,6 @@ package com.ismartcoding.plain.features.feed
 
 import com.ismartcoding.plain.api.*
 import com.ismartcoding.plain.db.DFeedEntry
-import com.ismartcoding.plain.helpers.ContentWhere
-import com.ismartcoding.plain.helpers.FilterField
 import kotlinx.serialization.json.*
 
 object FeedEntryHelper {
@@ -16,5 +14,4 @@ object FeedEntryHelper {
     suspend fun deleteAsync(ids: Set<String>) { if (ids.isNotEmpty()) RustContentApi.mutate("deleteFeedEntries(query: ${gql(selectionQuery(ids))}) { affectedCount }") }
     suspend fun deleteAllAsync() { RustContentApi.mutate("deleteFeedEntries(query: \"all:true\") { affectedCount }") }
     suspend fun deleteByFeedIdsAsync(ids: Set<String>) { ids.forEach { RustContentApi.mutate("deleteFeedEntries(query: ${gql("feed_id:$it")}) { affectedCount }") } }
-    internal fun applyFeedEntryFilterFields(where: ContentWhere, fields: List<FilterField>) = LegacyFeedEntryHelper.applyFeedEntryFilterFields(where, fields)
 }

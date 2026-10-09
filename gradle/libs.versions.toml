@@ -37,13 +37,10 @@ libphonenumberVersion = "9.0.40"
 libphonenumberGeocoderVersion = "3.40"
 libphonenumberCarrierVersion = "2.40"
 shizukuVersion = "13.1.5"
-room = "3.0.3"
 runtimeVersion="1.12.1"
-sqlite = "2.7.1"
 transitionVersion="1.7.2"
 uiVersion="1.12.1"
 workRuntimeKtxVersion = "2.12.0"
-devtoolsKspVersion = "2.3.12"
 tinkAndroidVersion = "1.23.0"
 playPublisherVersion = "4.1.1"
 pdfiumAndroidVersion = "1.9.5-beta01"
@@ -147,12 +144,6 @@ latex-base = { module = "io.github.huarangmeng:latex-base", version.ref = "latex
 latex-parser = { module = "io.github.huarangmeng:latex-parser", version.ref = "latex" }
 latex-renderer = { module = "io.github.huarangmeng:latex-renderer", version.ref = "latex" }
 
-# room
-room-gradle = { module = "androidx.room3:room3-gradle-plugin", version.ref = "room" }
-room-runtime = { module = "androidx.room3:room3-runtime", version.ref = "room" }
-room-compiler = { module = "androidx.room3:room3-compiler", version.ref = "room" }
-sqlite-bundled = { module = "androidx.sqlite:sqlite-bundled", version.ref = "sqlite" }
-
 okhttp = { module = "com.squareup.okhttp3:okhttp", version.ref = "okhttpVersion" }
 libphonenumber = { module = "com.googlecode.libphonenumber:libphonenumber", version.ref = "libphonenumberVersion" }
 libphonenumber-geocoder = { module = "com.googlecode.libphonenumber:geocoder", version.ref = "libphonenumberGeocoderVersion" }
@@ -166,7 +157,6 @@ pdfium-android = { module = "io.github.oothp:pdfium-android", version.ref = "pdf
 
 
 [plugins]
-devtools-ksp = { id = "com.google.devtools.ksp", version.ref = "devtoolsKspVersion" }
 compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 compose-multiplatform = { id = "org.jetbrains.compose", version.ref = "composeMultiplatform" }
 kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }

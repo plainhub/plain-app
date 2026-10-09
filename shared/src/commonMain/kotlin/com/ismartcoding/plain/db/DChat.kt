@@ -1,0 +1,287 @@
+package com.ismartcoding.plain.db
+
+import com.ismartcoding.plain.enums.ChatStatus
+import com.ismartcoding.plain.lib.TimeHelper
+import com.ismartcoding.plain.lib.generateId
+import kotlin.time.Instant
+import kotlinx.serialization.DeserializationStrategy
+import kotlinx.serialization.KSerializer
+import kotlinx.serialization.descriptors.SerialDescriptor
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.encoding.Decoder
+import kotlinx.serialization.encoding.Encoder
+import kotlinx.serialization.json.JsonNames
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonNull
+import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.buildJsonObject
+import kotlinx.serialization.json.jsonObject
+import kotlinx.serialization.json.jsonPrimitive
+import kotlinx.serialization.json.put
+
+private val chatJson = Json { ignoreUnknownKeys = true }
+
+fun DMessageContent.toJSONString(): String {
+    val valueElement = if (value != null) {
+        when (type) {
+            MessageType.TEXT -> chatJson.encodeToJsonElement(DMessageText.serializer(), value as DMessageText)
+            MessageType.IMAGES -> chatJson.encodeToJsonElement(DMessageImages.serializer(), value as DMessageImages)
+            MessageType.FILES -> chatJson.encodeToJsonElement(DMessageFiles.serializer(), value as DMessageFiles)
+            MessageType.SHARE -> chatJson.encodeToJsonElement(DMessageShare.serializer(), value as DMessageShare)
+        }
+    } else {
+        JsonObject(emptyMap())
+    }
+    return buildJsonObject {
+        put("type", type.name)
+        put("value", valueElement)
+    }.toString()
+}
+
+class DMessageContent(val type: MessageType, var value: Any? = null)
+
+enum class MessageType {
+    TEXT,
+    IMAGES,
+    FILES,
+    SHARE,
+}
+
+@Serializable
+class DMessageText(val text: String, val linkPreviews: List<DLinkPreview> = emptyList())
+
+/**
+ * Chat message file with media duration in milliseconds. Legacy rows stored
+ * seconds under `duration`; [DMessageFileSerializer] converts those once at
+ * the decode boundary so no other call site multiplies.
+ */
+@Serializable(with = DMessageFileSerializer::class)
+data class DMessageFile(
+    override var id: String = generateId(),
+    val uri: String,
+    val size: Long,
+    val durationMs: Long = 0,
+    val width: Int = 0,
+    val height: Int = 0,
+    val summary: String = "",
+    val fileName: String = "",
+) : IData {
+    /** True when this file must be downloaded from a remote peer (fsid: scheme). */
+    fun isRemoteFile(): Boolean = uri.startsWith("fsid:")
+
+    /**
+     * True when this file is stored in the local content-addressable store.
+     * The [uri] has the form  fid:{sha256hex}.
+     */
+    fun isFidFile(): Boolean = uri.startsWith("fid:")
+
+    /**
+     * Returns the SHA-256 fileId for fid: URIs.
+     * Returns an empty string for other URI schemes.
+     */
+    fun localFileId(): String = if (isFidFile()) uri.removePrefix("fid:") else ""
+
+    /** Remote fileId extracted from a fsid: URI (used as query param for /fs endpoint). */
+    fun parseFileId(): String = uri.replace("fsid:", "")
+}
+
+@Serializable
+private data class DMessageFileSurrogate(
+    val id: String = generateId(),
+    val uri: String,
+    val size: Long,
+    @JsonNames( "duration")
+    val legacyDurationSec: Long? = null,
+    val durationMs: Long? = null,
+    val width: Int = 0,
+    val height: Int = 0,
+    val summary: String = "",
+    val fileName: String = "",
+)
+
+object DMessageFileSerializer : KSerializer<DMessageFile> {
+    private val surrogateSerializer = DMessageFileSurrogate.serializer()
+    override val descriptor: SerialDescriptor = surrogateSerializer.descriptor
+
+    override fun serialize(encoder: Encoder, value: DMessageFile) {
+        encoder.encodeSerializableValue(
+            surrogateSerializer,
+            DMessageFileSurrogate(
+                id = value.id,
+                uri = value.uri,
+                size = value.size,
+                durationMs = value.durationMs,
+                width = value.width,
+                height = value.height,
+                summary = value.summary,
+                fileName = value.fileName,
+            ),
+        )
+    }
+
+    override fun deserialize(decoder: Decoder): DMessageFile {
+        val raw = decoder.decodeSerializableValue(surrogateSerializer)
+        return DMessageFile(
+            id = raw.id,
+            uri = raw.uri,
+            size = raw.size,
+            durationMs = raw.durationMs ?: (raw.legacyDurationSec ?: 0L) * 1000,
+            width = raw.width,
+            height = raw.height,
+            summary = raw.summary,
+            fileName = raw.fileName,
+        )
+    }
+}
+
+@Serializable
+class DMessageImages(val items: List<DMessageFile>)
+
+@Serializable
+class DMessageFiles(val items: List<DMessageFile>)
+
+/** Sender endpoint of a share card, so the card stays reachable when forwarded. */
+@Serializable
+class DSharePeerInfo(
+    val id: String,
+    val ip: String,
+    val port: Int,
+)
+
+/**
+ * A shared-folder/link card message. Carries the guest secret (`urlToken`)
+ * plus the sender endpoint instead of a baked URL, so receivers (and further
+ * forwards) can reconstruct `/s/<shareId>#<urlToken>` and re-resolve the IP
+ * via mDNS when it changes.
+ */
+@Serializable
+class DMessageShare(
+    val shareId: String,
+    val urlToken: String,
+    val peerInfo: DSharePeerInfo,
+    val name: String,
+    val itemCount: Int = 0,
+    val totalSize: Long = 0,
+    /** Null = never expires. */
+    val expiresAt: Instant? = null,
+)
+
+/**
+ * Per-member delivery result for a single recipient.
+ * [error] is null when the message was delivered successfully.
+ */
+@Serializable
+data class DMessageDeliveryResult(
+    val peerId: String,
+    val peerName: String,
+    val error: String? = null,
+)
+
+/**
+ * Aggregated delivery status for a channel broadcast.
+ * Stored as JSON in the [DChat.statusData] column.
+ */
+@Serializable
+data class DMessageStatusData(
+    val results: List<DMessageDeliveryResult> = emptyList(),
+) {
+    val total: Int get() = results.size
+    val deliveredCount: Int get() = results.count { it.error == null }
+    val failedCount: Int get() = results.count { it.error != null }
+    val failedResults: List<DMessageDeliveryResult> get() = results.filter { it.error != null }
+    val deliveredResults: List<DMessageDeliveryResult> get() = results.filter { it.error == null }
+    val allDelivered: Boolean get() = total > 0 && failedCount == 0
+    val allFailed: Boolean get() = total > 0 && deliveredCount == 0
+    fun deliveryLabel(): String = "$deliveredCount/$total"
+
+    /**
+     * Roll this delivery result up into the coarse-grained status string
+     * stored on [DChat.status]. Empty / all-delivered -> "sent"; all-failed
+     * -> "failed"; mixed -> "partial".
+     */
+    fun aggregateStatus(): ChatStatus = when {
+        total == 0 || allDelivered -> ChatStatus.SENT
+        allFailed -> ChatStatus.FAILED
+        else -> ChatStatus.PARTIAL
+    }
+
+    companion object {
+        fun fromJson(json: String): DMessageStatusData? {
+            if (json.isEmpty()) return null
+            return try {
+                chatJson.decodeFromString<DMessageStatusData>(json)
+            } catch (e: Exception) {
+                null
+            }
+        }
+    }
+}
+
+@Serializable
+data class DLinkPreview(
+    val url: String,
+    val title: String? = null,
+    val description: String? = null,
+    val imageUrl: String? = null,
+    val imageLocalPath: String? = null,
+    val imageWidth: Int = 0,
+    val imageHeight: Int = 0,
+    val siteName: String? = null,
+    val domain: String? = null,
+    @kotlinx.serialization.Transient val hasError: Boolean = false,
+    val createdAt: Instant = TimeHelper.now()
+)
+
+data class DChat(
+    var id: String = generateId(),
+
+    var fromId: String = "", // me|local|peer_id
+
+    var toId: String = "", // me|local|peer_id
+
+    var channelId: String = "", // chat channel id, empty if not a channel chat
+
+    var status: ChatStatus = ChatStatus.PENDING,
+
+    /**
+     * JSON-encoded [DMessageStatusData], populated for channel broadcast messages.
+     * Empty string means no per-member data is available.
+     */
+    var statusData: String = "",
+
+    var content: DMessageContent = DMessageContent(MessageType.TEXT),
+
+    var createdAt: Instant = TimeHelper.now(),
+
+    var updatedAt: Instant = TimeHelper.now(),
+) {
+    fun parseStatusData(): DMessageStatusData? = DMessageStatusData.fromJson(statusData)
+
+    companion object {
+        fun parseContent(content: String): DMessageContent {
+            return try {
+                val obj = chatJson.parseToJsonElement(content).jsonObject
+                val typeStr = obj["type"]?.jsonPrimitive?.content ?: ""
+                val message = DMessageContent(MessageType.entries.firstOrNull { it.name == typeStr } ?: MessageType.TEXT)
+                val valueJson = obj["value"]?.takeIf { it !is JsonNull }?.toString() ?: ""
+                when (message.type) {
+                    MessageType.TEXT -> message.value = chatJson.decodeFromString<DMessageText>(valueJson)
+                    MessageType.IMAGES -> message.value = chatJson.decodeFromString<DMessageImages>(valueJson)
+                    MessageType.FILES -> message.value = chatJson.decodeFromString<DMessageFiles>(valueJson)
+                    MessageType.SHARE -> message.value = chatJson.decodeFromString<DMessageShare>(valueJson)
+                }
+                message
+            } catch (_: Exception) {
+                // Legacy or unknown payload shapes: keep the type consistent
+                // with the fallback value and render the raw content as text.
+                DMessageContent(MessageType.TEXT, DMessageText(content))
+            }
+        }
+    }
+}
+
+data class ChatItemDataUpdate(
+    var id: String,
+    var content: DMessageContent,
+    val updatedAt: Instant = TimeHelper.now(),
+)

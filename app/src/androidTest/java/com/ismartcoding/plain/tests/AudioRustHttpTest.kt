@@ -5,7 +5,6 @@ import com.ismartcoding.plain.audio.DPlaylistAudio
 import com.ismartcoding.plain.db.AudioPlaySource
 import com.ismartcoding.plain.features.audio.*
 import com.ismartcoding.plain.features.file.FileSortBy
-import com.ismartcoding.plain.platform.AppDatabase
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.*
 import org.junit.Test
@@ -32,7 +31,6 @@ class AudioRustHttpTest {
         try {
             val list = AudioPlaylistManager.createPlaylist(prefix)
             playlistId = list.id
-            assertNull(AppDatabase.instance.audioPlaylistDao().getById(list.id))
             assertEquals(2, AudioPlaylistManager.addPlaylistItems(list.id,listOf(track(1),track(2),track(1))))
             val items = AudioPlaylistManager.playlistItemsPage(list.id,0,20)
             assertEquals(listOf("42","42"), items.map { it.albumId })
@@ -54,8 +52,6 @@ class AudioRustHttpTest {
             AudioQueueManager.enqueue(listOf(track(9002)),true)
             assertEquals(track(9002).path,checkNotNull(AudioQueueManager.resolveNext(true,false)).path)
             touched += track(9002).path
-            assertTrue(AppDatabase.instance.audioQueueDao().allItems().none { it.path.startsWith(prefix) })
-            assertNull(AppDatabase.instance.audioPlayHistoryDao().getByPath(track(1).path))
             AudioQueueManager.removePaths(listOf(track(1).path))
             assertEquals(1,AudioPlaylistManager.playlistItemCount(list.id))
         } finally {

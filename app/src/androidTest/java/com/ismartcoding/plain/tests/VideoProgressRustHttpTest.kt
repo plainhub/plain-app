@@ -2,7 +2,6 @@ package com.ismartcoding.plain.tests
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.ismartcoding.plain.features.VideoProgressHelper
-import com.ismartcoding.plain.platform.AppDatabase
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.*
 import org.junit.Test
@@ -20,7 +19,6 @@ class VideoProgressRustHttpTest {
             val row = VideoProgressHelper.saveAsync(id, 3_000_000_123)
             assertEquals(3_000_000_123, checkNotNull(VideoProgressHelper.getAsync(id)).positionMs)
             assertTrue(VideoProgressHelper.recentAsync(Clock.System.now() - 1.days).any { it.mediaId == id && it.updatedAt == row.updatedAt })
-            assertFalse(AppDatabase.instance.videoPlayProgressDao().getRecentProgress((Clock.System.now() - 1.days).toString()).any { it.mediaId == id })
             assertTrue(runCatching { VideoProgressHelper.saveAsync(id, -1) }.isFailure)
             assertEquals(3_000_000_123, checkNotNull(VideoProgressHelper.getAsync(id)).positionMs)
             VideoProgressHelper.saveAsync(id, 0)

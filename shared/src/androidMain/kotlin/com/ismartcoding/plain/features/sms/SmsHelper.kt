@@ -19,7 +19,6 @@ import com.ismartcoding.plain.lib.extensions.getTimeSecondsValue
 import com.ismartcoding.plain.lib.extensions.getTimeValue
 import com.ismartcoding.plain.lib.extensions.map
 import com.ismartcoding.plain.lib.extensions.queryCursor
-import com.ismartcoding.plain.platform.AppDatabase
 import com.ismartcoding.plain.platform.getSims
 import com.ismartcoding.plain.db.DArchivedConversation
 import com.ismartcoding.plain.lib.withIO

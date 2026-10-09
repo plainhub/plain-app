@@ -22,7 +22,7 @@ import kotlin.test.fail
  * "text/%") is exempt — the arg is code, not user input.
  *
  * Scan scope: plain-common/src, plain-ui/src, shared/src, shared-lib/src,
- * room-db/src, app/src — production source sets only (test sources are
+ * app/src — production source sets only (test sources are
  * excluded; the guard itself contains the patterns it forbids).
  */
 class LikeEscapeGuardTest {
@@ -41,10 +41,10 @@ class LikeEscapeGuardTest {
     private fun repoRoot(): File {
         var dir = File(System.getProperty("user.dir")).absoluteFile
         repeat(6) {
-            if (File(dir, "shared/src").isDirectory && File(dir, "room-db/src").isDirectory) return dir
+            if (File(dir, "shared/src").isDirectory && File(dir, "app/src").isDirectory) return dir
             dir = dir.parentFile ?: return@repeat
         }
-        fail("repo root with shared/src and room-db/src not found (cwd=${System.getProperty("user.dir")})")
+        fail("repo root with shared/src and app/src not found (cwd=${System.getProperty("user.dir")})")
     }
 
     private fun productionSources(): List<File> {
@@ -54,7 +54,6 @@ class LikeEscapeGuardTest {
             File(root, "plain-ui/src"),
             File(root, "shared/src"),
             File(root, "shared-lib/src"),
-            File(root, "room-db/src"),
             File(root, "app/src"),
         ).filter { it.isDirectory }
         val testDirs = setOf("commonTest", "androidHostTest", "test", "androidTest", "iosTest")

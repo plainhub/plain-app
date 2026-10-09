@@ -8,8 +8,8 @@ import kotlinx.serialization.json.jsonPrimitive
 import java.io.File
 
 /**
- * Builds the plain SQLite DDL (`apitest/DATABASE.sql`) from the Room schema
- * JSON (`room-db/schemas/.../<N>.json`, highest version): every entity's
+ * Builds the plain SQLite DDL (`apitest/DATABASE.sql`) from the frozen legacy schema
+ * JSON (`shared/apitest/legacy-room-schemas/.../<N>.json`, highest version): every entity's
  * `createSql` plus its index `createSql`, with `${TABLE_NAME}` substituted.
  *
  * The file is generated, never hand-edited: `DbSchemaTest` fails when it goes
@@ -18,7 +18,7 @@ import java.io.File
  */
 object DbSchemaSql {
     fun build(): String {
-        val dir = File("../room-db/schemas/com.ismartcoding.plain.platform.AppDatabase")
+        val dir = File("apitest/legacy-room-schemas/com.ismartcoding.plain.platform.AppDatabase")
         val file =
             dir.listFiles { f -> f.isFile && f.name.endsWith(".json") }
                 ?.maxBy { it.nameWithoutExtension.toInt() }
@@ -31,7 +31,7 @@ object DbSchemaSql {
 
         val sb = StringBuilder()
         sb.appendLine("-- plain-app Room 数据库 DDL（Room version $version，${entities.size} 张表）")
-        sb.appendLine("-- 自动生成，禁止手改。源：room-db/schemas/com.ismartcoding.plain.platform.AppDatabase/${file.name}")
+        sb.appendLine("-- 自动生成，禁止手改。源：shared/apitest/legacy-room-schemas/com.ismartcoding.plain.platform.AppDatabase/${file.name}")
         sb.appendLine("-- 再生：./gradlew :shared:testAndroidHostTest --tests \"com.ismartcoding.plain.DbSchemaPrintTest\"")
         sb.appendLine("-- 过期锁：DbSchemaTest")
         for (e in entities) {

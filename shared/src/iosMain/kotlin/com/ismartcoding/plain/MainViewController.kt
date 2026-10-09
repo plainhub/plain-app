@@ -11,14 +11,9 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import androidx.navigation.NavHostController
-import androidx.room3.RoomDatabase
-import androidx.sqlite.SQLiteConnection
-import com.ismartcoding.plain.db.DataInitializer
 import com.ismartcoding.plain.enums.DarkTheme
 import com.ismartcoding.plain.events.AppEvents
 import com.ismartcoding.plain.lib.coIO
-import com.ismartcoding.plain.platform.buildAppDatabase
-import com.ismartcoding.plain.platform.initDatabase
 import com.ismartcoding.plain.platform.initDiskLogging
 import com.ismartcoding.plain.ui.models.AudioQueueViewModel
 import com.ismartcoding.plain.ui.models.ChannelViewModel
@@ -35,7 +30,7 @@ import platform.UIKit.UIViewController
 private var initialized = false
 
 /**
- * One-time iOS app initialization: Rust preferences, Room database, log adapters,
+ * One-time iOS app initialization: Rust preferences, log adapters,
  * and event collectors. Idempotent — safe to call multiple times.
  */
 @OptIn(kotlinx.cinterop.ExperimentalForeignApi::class)
@@ -45,20 +40,6 @@ fun initIosApp() {
 
     Prefs.load()
     com.ismartcoding.plain.api.RustContentApi.start()
-
-    // Room database with the same onCreate seed data as Android
-    initDatabase(
-        buildAppDatabase(Constants.DATABASE_NAME)
-            .addCallback(object : RoomDatabase.Callback() {
-                override suspend fun onCreate(connection: SQLiteConnection) {
-                    DataInitializer(connection).apply {
-                        insertWelcome()
-                        insertTags(includeContent = false)
-                    }
-                }
-            })
-            .build(),
-    )
 
     // Disk logging + HTTP request logging (debug=VERBOSE, release=WARN)
     initDiskLogging()

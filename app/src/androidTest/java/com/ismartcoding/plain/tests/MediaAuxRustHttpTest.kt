@@ -6,7 +6,6 @@ import com.ismartcoding.plain.db.DImageEmbedding
 import com.ismartcoding.plain.enums.DataType
 import com.ismartcoding.plain.features.ImageEmbeddingHelper
 import com.ismartcoding.plain.features.MediaDurationHelper
-import com.ismartcoding.plain.platform.AppDatabase
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.*
 import org.junit.Test
@@ -34,13 +33,11 @@ class MediaAuxRustHttpTest {
             MediaDurationHelper.restore()
             assertEquals(5_000_000_001L,TempData.mediaDurationMap["audio:$audioId"])
             assertEquals(6_000_000_001L,TempData.mediaDurationMap["video:$videoId"])
-            assertTrue(AppDatabase.instance.mediaItemDao().getAll().none { it.mediaId.startsWith(prefix) })
             ImageEmbeddingHelper.insertAll(listOf(
                 DImageEmbedding(bestId,"/synthetic/$bestId",vector(10f)),
                 DImageEmbedding(nextId,"/synthetic/$nextId",vector(9f)),
             ))
             assertTrue(ImageEmbeddingHelper.getAllIds().containsAll(listOf(bestId,nextId)))
-            assertTrue(AppDatabase.instance.imageEmbeddingDao().getAllIds().none { it.startsWith(prefix) })
             val results = ImageEmbeddingHelper.search(vector(1f),2)
             assertEquals(listOf(bestId,nextId),results.map { it.imageId })
             assertEquals(10f,results.first().score,0f)

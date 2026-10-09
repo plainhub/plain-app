@@ -7,12 +7,10 @@ buildscript {
     dependencies {
         classpath(libs.gradle)
         classpath(libs.kotlin.gradle.plugin)
-        classpath(libs.room.gradle)
     }
 }
 
 plugins {
-    alias(libs.plugins.devtools.ksp) apply false
     alias(libs.plugins.compose.compiler) apply false
     alias(libs.plugins.compose.multiplatform) apply false
 }

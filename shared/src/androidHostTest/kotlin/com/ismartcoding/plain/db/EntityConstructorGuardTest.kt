@@ -13,14 +13,14 @@ import kotlin.test.fail
  * Guards against the "stale StateFlow list" bug class (2026-09-07):
  *
  * `data class` equals/hashCode only cover PRIMARY CONSTRUCTOR parameters. Any
- * Room column declared as a mutable body property (or inherited from a base
+ * Client state declared as a mutable body property (or inherited from a base
  * class) is invisible to equals, so `MutableStateFlow<List<Entity>>` treats a
  * reloaded list as equal to the old one and silently drops the emission — the
  * UI then shows stale data until process restart.
  *
- * Rule: every @Entity must declare ALL of its state as primary constructor
+ * Rule: every client model must declare ALL of its state as primary constructor
  * parameters (computed `val x get() = ...` without a backing field are fine).
- * When adding a new @Entity, add it to [entities].
+ * When adding a new client model, add it to [entities].
  */
 class EntityConstructorGuardTest {
 
