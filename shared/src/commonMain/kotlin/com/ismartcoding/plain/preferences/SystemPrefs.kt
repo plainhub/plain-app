@@ -35,8 +35,6 @@ object SystemPrefs {
     val mdnsHostname = flow("mdns_hostname", "plainapp.local")
     val appFileRealPathMigrated = flow("app_file_real_path_migrated", false)
     val signatureKey = flow("signature_key_pair", "")
-    val webAssetRoot = flow("web_asset_root", "")
-    val webAssetVersion = flow("web_asset_version", "")
 
     internal fun initialize() = Unit
 

@@ -8,8 +8,6 @@ import platform.Foundation.NSSearchPathForDirectoriesInDomains
 import platform.Foundation.NSURL
 import platform.Foundation.NSUserDomainMask
 
-internal actual fun appVersionName(): String = getAppVersion()
-
 /**
  * iOS keeps the Vue bundle in the app bundle, so it is copied into the caches
  * directory once per app version. Rust then serves it like any other file.

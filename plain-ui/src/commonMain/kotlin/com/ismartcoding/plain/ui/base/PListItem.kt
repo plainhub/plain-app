@@ -78,10 +78,27 @@ fun PListItem(
                         titleSuffix()
                     }
                 }
-                else -> Text(
-                    text = title,
-                    style = MaterialTheme.typography.listItemTitle(),
-                )
+                else -> if (value != null) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        Text(
+                            text = title,
+                            style = MaterialTheme.typography.listItemTitle(),
+                            // The key keeps its own line and is never broken or ellipsized mid-word.
+                            maxLines = 1,
+                            softWrap = false,
+                            overflow = TextOverflow.Clip,
+                            modifier = Modifier.weight(1f),
+                        )
+                    }
+                } else {
+                    Text(
+                        text = title,
+                        style = MaterialTheme.typography.listItemTitle(),
+                    )
+                }
             }
         },
         supportingContent = if (subtitle.isNotEmpty()) {
@@ -111,7 +128,10 @@ fun PListItem(
         },
         trailingContent = if (value != null || action != null || showMore || separatedActions) {
             {
-                Row(verticalAlignment = Alignment.CenterVertically) {
+                Row(
+                    modifier = if (value != null) Modifier.fillMaxWidth(0.5f) else Modifier,
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
                     if (separatedActions) {
                         VerticalDivider(
                             modifier = Modifier.height(24.dp),
@@ -125,6 +145,7 @@ fun PListItem(
                             Text(
                                 text = it,
                                 style = MaterialTheme.typography.listItemValue(),
+                                modifier = Modifier.weight(1f),
                             )
                         }
                     }

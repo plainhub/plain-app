@@ -3,8 +3,6 @@ package com.ismartcoding.plain.platform
 import com.ismartcoding.plain.appContext
 import java.io.File
 
-internal actual fun appVersionName(): String = getAppVersion()
-
 /**
  * The bundle ships as APK assets, which are not a filesystem path, so the web
  * UI is unpacked once per app version. 11 MB / 1000+ files — the copy is
