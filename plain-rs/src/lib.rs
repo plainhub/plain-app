@@ -6,7 +6,7 @@
 #![recursion_limit = "512"]
 
 mod core;
-mod ble;
+pub use plain_rs::ble::ffi as ble;
 use plain_rs::prefs::Prefs;
 use serde_json::{Map, Value};
 use std::ffi::{CStr, CString, c_char};

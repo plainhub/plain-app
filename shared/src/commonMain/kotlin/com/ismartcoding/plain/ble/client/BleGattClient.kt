@@ -4,14 +4,7 @@ import com.ismartcoding.plain.ble.BleService
 import kotlinx.coroutines.flow.Flow
 
 interface BleGattClient {
-    // Stable peer match key parsed from the BLE scan response serviceData.
-    // This is the 8-byte truncated SHA256 of the peer's full clientId
-    // (TempData.clientId), rendered as a 16-char lowercase hex string — see
-    // [com.ismartcoding.plain.ble.BleServiceData.shortIdOf]. The full clientId
-    // is NOT broadcast; it is recovered later via the GATT DISCOVER reply.
-    // Android's BLE MAC randomizes every ~15 minutes so it must NOT be used
-    // as the peer id. The underlying BLE MAC (on Android) is exposed separately
-    // via the platform-specific client.
+    // Rust discovery supplies the stable short ID; Bluetooth MACs can rotate.
     val id: String
     val name: String?
     var rssi: Int

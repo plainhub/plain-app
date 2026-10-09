@@ -1,7 +1,7 @@
 package com.ismartcoding.plain.tests
 
+import com.ismartcoding.plain.discover.RustBleServiceData
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.ismartcoding.plain.ble.BleServiceData
 import com.ismartcoding.plain.discover.PairingProjection
 import com.ismartcoding.plain.discover.RustNearbyWire
 import com.ismartcoding.plain.discover.RustPairingStore
@@ -32,9 +32,9 @@ class NearbyWirePairingRuntimeRustHttpTest {
             put("id", id); put("name", id); put("port", 1234); put("deviceType", "PHONE")
             put("version", "fixture"); put("platform", "fixture")
         }.toString()
-        assertEquals(id, RustNearbyWire.discoverReply(reply, BleServiceData.shortIdOf(id)).id)
+        assertEquals(id, RustNearbyWire.discoverReply(reply, RustBleServiceData.shortIdOf(id)).id)
         var rejected = false
-        try { RustNearbyWire.discoverReply(reply, BleServiceData.shortIdOf("$id-other")) }
+        try { RustNearbyWire.discoverReply(reply, RustBleServiceData.shortIdOf("$id-other")) }
         catch (_: IllegalStateException) { rejected = true }
         assertTrue(rejected)
     }

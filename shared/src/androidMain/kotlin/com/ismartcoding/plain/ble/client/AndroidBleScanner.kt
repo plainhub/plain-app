@@ -12,7 +12,7 @@ import android.content.Context
 import android.os.ParcelUuid
 import androidx.compose.runtime.mutableStateListOf
 import com.ismartcoding.plain.appContext
-import com.ismartcoding.plain.ble.BleServiceData
+import com.ismartcoding.plain.discover.BleAdvertisement
 import com.ismartcoding.plain.ble.BleUuids
 import com.ismartcoding.plain.discover.RustBleServiceData
 import kotlinx.coroutines.currentCoroutineContext
@@ -178,7 +178,7 @@ object AndroidBleScanner : BleScanner {
     private fun addDevice(
         device: android.bluetooth.BluetoothDevice,
         rssi: Int,
-        parts: BleServiceData.Parts?,
+        parts: BleAdvertisement?,
     ): AndroidBleGattClient {
         // Match by shortId (the stable peer match key parsed from serviceData).
         // Falls back to the BLE MAC only when the peer hasn't started

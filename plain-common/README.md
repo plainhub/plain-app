@@ -7,10 +7,12 @@ The module includes common helpers, crypto, extensions, logcat, KDataLoader,
 mDNS, and XML/RSS support. Supporting sources are included here so this module
 has no dependency on `shared-lib`.
 
+BLE protocol and native codec adapters belong to [plain-rs features](../../plain-desktop/plain-rs/README.md). Platform GATT adapters stay in the host shared module. This Kotlin library contains no BLE source.
+
 ## Maven coordinates
 
 ```kotlin
-implementation("com.ismartcoding:plain-common:0.1.0-SNAPSHOT")
+implementation("com.ismartcoding:plain-common:0.1.7")
 ```
 
 Add the public GitHub Pages Maven repository to the consuming project's

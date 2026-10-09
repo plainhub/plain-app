@@ -172,7 +172,7 @@ class AndroidBleGattClient(
                         // result so ensureConnected() only observes success once
                         // isConnected() is true (avoids a race where the channel
                         // handoff resumes ahead of the field assignment).
-                        this@AndroidBleGattClient.bluetoothGatt = gatt
+                        bluetoothGatt = gatt
                         Handler(Looper.getMainLooper()).post {
                             gatt.discoverServices()
                         }

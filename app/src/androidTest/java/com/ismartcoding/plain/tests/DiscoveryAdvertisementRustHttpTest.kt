@@ -2,7 +2,6 @@ package com.ismartcoding.plain.tests
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.ismartcoding.plain.TempData
-import com.ismartcoding.plain.ble.BleServiceData
 import com.ismartcoding.plain.discover.RustDiscoveryAdvertisement
 import com.ismartcoding.plain.discover.RustBleServiceData
 import com.ismartcoding.plain.platform.*
@@ -46,6 +45,6 @@ class DiscoveryAdvertisementRustHttpTest {
         assertEquals(parts, RustBleServiceData.decode(bytes + byteArrayOf(42)))
         assertNull(RustBleServiceData.decode(null))
         for (size in 0 until 9) assertNull(RustBleServiceData.decode(bytes.copyOf(size)))
-        assertEquals(BleServiceData.shortIdOf("fixture"), RustBleServiceData.shortIdOf("fixture"))
+        assertEquals("f16d05ec6b29248d", RustBleServiceData.shortIdOf("fixture"))
     }
 }

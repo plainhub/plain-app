@@ -10,7 +10,7 @@ crate-type = ["cdylib", "staticlib"]
 [dependencies]
 # Tracks plain-desktop's main branch so the two repos never drift; Cargo.lock
 # pins the exact commit that was built.
-plain-rs = { git = "https://github.com/plainhub/plain-desktop.git", branch = "main", features = ["content_api", "http_transport"] }
+plain-rs = { git = "https://github.com/plainhub/plain-desktop.git", branch = "main", features = ["content_api", "http_transport", "ble-native"] }
 serde_json = "1"
 tokio = { version = "1", features = ["rt-multi-thread", "sync"] }
 
