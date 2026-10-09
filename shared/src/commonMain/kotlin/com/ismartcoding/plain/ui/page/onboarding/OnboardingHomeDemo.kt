@@ -284,7 +284,7 @@ private fun MiniOutlinedButton(text: String, color: Color, modifier: Modifier = 
     }
 }
 
-/** Mini switch mirroring PSwitch (checked: primary track, onPrimary knob). */
+/** Mini switch for the onboarding mockup. */
 @Composable
 private fun MiniSwitch(activated: Boolean) {
     Box(

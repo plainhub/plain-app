@@ -1,5 +1,7 @@
 package com.ismartcoding.plain.ui.page.web
 
+import androidx.compose.material3.Switch
+
 import com.ismartcoding.plain.ui.extensions.collectAsStateValue
 
 import com.ismartcoding.plain.ui.theme.PlainTheme
@@ -84,13 +86,13 @@ fun WebSecurityPage(navController: NavHostController) {
                                 )
                             }
                         }, title = stringResource(Res.string.require_password)) {
-                            PSwitch(activated = passwordType != PasswordType.NONE.value) {
+                            Switch(checked = passwordType != PasswordType.NONE.value, onCheckedChange = {
                                 scope.launch(Dispatchers.Default) {
                                     SystemPrefs.setPasswordType(
                                         if (passwordType == PasswordType.NONE.value) PasswordType.FIXED else PasswordType.NONE
                                     )
                                 }
-                            }
+                            })
                             HorizontalSpace(8.dp)
                         }
                         if (passwordType != PasswordType.NONE.value) {
@@ -112,9 +114,9 @@ fun WebSecurityPage(navController: NavHostController) {
                             modifier = Modifier.clickable { scope.launch(Dispatchers.Default) { SystemPrefs.authTwoFactor.value = !authTwoFactor } },
                             title = stringResource(Res.string.require_confirmation)
                         ) {
-                            PSwitch(activated = authTwoFactor) {
+                            Switch(checked = authTwoFactor, onCheckedChange = {
                                 scope.launch(Dispatchers.Default) { SystemPrefs.authTwoFactor.value = it }
-                            }
+                            })
                         }
                     }
                     Tips(text = stringResource(Res.string.two_factor_auth_tips)); VerticalSpace(dp = 24.dp)
@@ -164,9 +166,9 @@ fun WebSecurityPage(navController: NavHostController) {
                         PListItem(modifier = Modifier.clickable {
                             scope.launch(Dispatchers.Default) { SystemPrefs.rotateUrlTokenOnRestart.value = !rotateUrlTokenOnRestart }
                         }, title = stringResource(Res.string.rotate_url_token_on_restart)) {
-                            PSwitch(activated = rotateUrlTokenOnRestart) {
+                            Switch(checked = rotateUrlTokenOnRestart, onCheckedChange = {
                                 scope.launch(Dispatchers.Default) { SystemPrefs.rotateUrlTokenOnRestart.value = it }
-                            }
+                            })
                         }
                     }
                     Tips(text = stringResource(Res.string.rotate_url_token_on_restart_tips)); VerticalSpace(dp = 16.dp)

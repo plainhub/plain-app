@@ -29,7 +29,7 @@ import com.ismartcoding.plain.ui.base.HorizontalSpace
 import com.ismartcoding.plain.ui.base.PCard
 import com.ismartcoding.plain.ui.base.PDivider
 import com.ismartcoding.plain.ui.base.PListItem
-import com.ismartcoding.plain.ui.base.PSwitch
+import androidx.compose.material3.Switch
 import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.components.WebAddressPager
 import com.ismartcoding.plain.ui.extensions.collectAsStateValue
@@ -51,7 +51,7 @@ fun DesktopAccessSection(navController: NavHostController) {
 
     PCard(modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN)) {
         PListItem(icon = UiRes.drawable.ui_drawable_devices, title = stringResource(Res.string.desktop_access)) {
-            PSwitch(activated = desktopAccessEnabled) { enable ->
+            Switch(checked = desktopAccessEnabled, onCheckedChange = { enable ->
                 scope.launchSafe {
                     UserPrefs.desktopAccess.value = enable
                     if (!enable) {
@@ -60,7 +60,7 @@ fun DesktopAccessSection(navController: NavHostController) {
                         com.ismartcoding.plain.features.session.closeAllWsSessions()
                     }
                 }
-            }
+            })
         }
         if (desktopAccessEnabled && onlineCount > 0) {
             OnlineSessionsIndicator(

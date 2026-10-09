@@ -24,7 +24,7 @@ import com.ismartcoding.plain.ui.base.PListItem
 import com.ismartcoding.plain.ui.base.PModalBottomSheet
 import com.ismartcoding.plain.ui.base.PSheetActionCard
 import com.ismartcoding.plain.ui.base.PSheetActionRow
-import com.ismartcoding.plain.ui.base.PSwitch
+import androidx.compose.material3.Switch
 import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.models.FilesViewModel
 import com.ismartcoding.plain.ui.models.enterSelectMode
@@ -77,7 +77,7 @@ fun FilesMoreActionsSheet(filesVM: FilesViewModel, onDismiss: () -> Unit) {
                     icon = if (showHiddenFiles) UiRes.drawable.ui_drawable_eye else UiRes.drawable.ui_drawable_eye_off,
                     title = stringResource(Res.string.show_hidden_files),
                     action = {
-                        PSwitch(activated = showHiddenFiles, onClick = {
+                        Switch(checked = showHiddenFiles, onCheckedChange = {
                             onDismiss()
                             scope.launch(Dispatchers.Default) {
                                 UserPrefs.showHiddenFiles.value = !showHiddenFiles

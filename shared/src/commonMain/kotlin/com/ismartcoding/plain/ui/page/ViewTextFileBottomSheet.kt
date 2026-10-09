@@ -28,7 +28,7 @@ import com.ismartcoding.plain.ui.base.PModalBottomSheet
 import com.ismartcoding.plain.ui.base.PSheetPrimaryAction
 import com.ismartcoding.plain.ui.base.PSheetPrimaryDeleteAction
 import com.ismartcoding.plain.ui.base.PSheetPrimaryActionsCard
-import com.ismartcoding.plain.ui.base.PSwitch
+import androidx.compose.material3.Switch
 import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.helpers.confirmActionAsync
 import com.ismartcoding.plain.ui.models.TextFileViewModel
@@ -118,11 +118,12 @@ fun ViewTextFileBottomSheet(
             VerticalSpace(dp = 16.dp)
             PCard(modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN)) {
                 PListItem(title = stringResource(Res.string.wrap_content), action = {
-                    PSwitch(
-                        activated = textFileVM.controller.wrapContent.value,
-                    ) {
-                        textFileVM.toggleWrapContent()
-                    }
+                    Switch(
+                        checked = textFileVM.controller.wrapContent.value,
+                        onCheckedChange = {
+                            textFileVM.toggleWrapContent()
+                        },
+                    )
                 })
             }
         }
@@ -158,10 +159,10 @@ private fun EditorDisplayActionsCard(textFileVM: TextFileViewModel, scope: kotli
             scope.launchSafe { com.ismartcoding.plain.preferences.UserPrefs.editorFontSize.value = next }
         }
         PListItem(title = stringResource(Res.string.status_bar), action = {
-            PSwitch(activated = controller.statusBarVisible.value) {
+            Switch(checked = controller.statusBarVisible.value, onCheckedChange = {
                 controller.statusBarVisible.value = !controller.statusBarVisible.value
                 scope.launchSafe { com.ismartcoding.plain.preferences.UserPrefs.editorStatusBar.value = controller.statusBarVisible.value }
-            }
+            })
         })
     }
 

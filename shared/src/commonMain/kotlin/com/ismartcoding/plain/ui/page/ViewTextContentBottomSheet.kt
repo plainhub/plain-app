@@ -18,7 +18,7 @@ import com.ismartcoding.plain.ui.base.PSheetPrimaryAction
 import com.ismartcoding.plain.ui.base.PSheetPrimaryActionsCard
 import com.ismartcoding.plain.ui.base.PListItem
 import com.ismartcoding.plain.ui.base.PModalBottomSheet
-import com.ismartcoding.plain.ui.base.PSwitch
+import androidx.compose.material3.Switch
 import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.models.TextFileViewModel
 import com.ismartcoding.plain.ui.resources.Res as UiRes
@@ -65,11 +65,12 @@ fun ViewTextContentBottomSheet(
                 VerticalSpace(dp = 24.dp)
                 PCard(modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN)) {
                     PListItem(title = stringResource(Res.string.wrap_content), action = {
-                        PSwitch(
-                            activated = textFileVM.controller.wrapContent.value,
-                        ) {
-                            textFileVM.toggleWrapContent()
-                        }
+                        Switch(
+                            checked = textFileVM.controller.wrapContent.value,
+                            onCheckedChange = {
+                                textFileVM.toggleWrapContent()
+                            },
+                        )
                     })
                 }
             }

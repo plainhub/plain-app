@@ -28,7 +28,7 @@ import com.ismartcoding.plain.ui.base.PCard
 import com.ismartcoding.plain.ui.base.PListItem
 import com.ismartcoding.plain.ui.base.POutlinedButton
 import com.ismartcoding.plain.ui.base.PScaffold
-import com.ismartcoding.plain.ui.base.PSwitch
+import androidx.compose.material3.Switch
 import com.ismartcoding.plain.ui.base.PTopAppBar
 import com.ismartcoding.plain.ui.base.RadioDialog
 import com.ismartcoding.plain.ui.base.RadioDialogOption
@@ -87,11 +87,12 @@ fun FeedSettingsPage(
                         },
                         title = stringResource(Res.string.auto_refresh_feeds),
                     ) {
-                        PSwitch(
-                            activated = feedSettingsVM.autoRefresh.value,
-                        ) {
-                            feedSettingsVM.setAutoRefresh(it)
-                        }
+                        Switch(
+                            checked = feedSettingsVM.autoRefresh.value,
+                            onCheckedChange = {
+                                feedSettingsVM.setAutoRefresh(it)
+                            },
+                        )
                     }
 
                     if (feedSettingsVM.autoRefresh.value) {
@@ -109,11 +110,12 @@ fun FeedSettingsPage(
                             },
                             title = stringResource(Res.string.auto_refresh_only_over_wifi),
                         ) {
-                            PSwitch(
-                                activated = feedSettingsVM.autoRefreshOnlyWifi.value,
-                            ) {
-                                feedSettingsVM.setAutoRefreshOnlyWifi(it)
-                            }
+                            Switch(
+                                checked = feedSettingsVM.autoRefreshOnlyWifi.value,
+                                onCheckedChange = {
+                                    feedSettingsVM.setAutoRefreshOnlyWifi(it)
+                                },
+                            )
                         }
                     }
                 }

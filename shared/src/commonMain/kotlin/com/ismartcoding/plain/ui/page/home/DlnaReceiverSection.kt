@@ -21,7 +21,7 @@ import com.ismartcoding.plain.ui.resources.cast as ui_drawable_cast
 import com.ismartcoding.plain.ui.base.HorizontalSpace
 import com.ismartcoding.plain.ui.base.PCard
 import com.ismartcoding.plain.ui.base.PListItem
-import com.ismartcoding.plain.ui.base.PSwitch
+import androidx.compose.material3.Switch
 import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.extensions.collectAsStateValue
 import com.ismartcoding.plain.ui.models.launchSafe
@@ -43,12 +43,12 @@ fun DlnaReceiverSection(navController: NavHostController) {
             separatedActions = true,
             title = stringResource(Res.string.dlna_receiver),
         ) {
-            PSwitch(activated = dlnaReceiverEnabled) { enable ->
+            Switch(checked = dlnaReceiverEnabled, onCheckedChange = { enable ->
                 scope.launchSafe {
                     UserPrefs.dlna.value = enable
                     if (enable) DlnaRendererState.start() else DlnaRendererState.stop()
                 }
-            }
+            })
         }
         Text(
             text = stringResource(Res.string.dlna_receiver_desc),

@@ -15,7 +15,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import com.ismartcoding.plain.enums.DarkTheme
 import com.ismartcoding.plain.ui.base.PCard
 import com.ismartcoding.plain.ui.base.PListItem
-import com.ismartcoding.plain.ui.base.PSwitch
+import androidx.compose.material3.Switch
 import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.nav.Routing
 import androidx.navigation.NavHostController
@@ -40,13 +40,14 @@ internal fun SettingsCardItems(navController: NavHostController) {
             subtitle = DarkTheme.entries.find { it.value == darkTheme }?.getText() ?: "",
             separatedActions = true,
         ) {
-            PSwitch(
-                activated = DarkTheme.isDarkTheme(darkTheme),
-            ) {
-                scope.launch {
-                    UserPrefs.setDarkThemeValue(if (it) DarkTheme.ON.value else DarkTheme.OFF.value)
-                }
-            }
+            Switch(
+                checked = DarkTheme.isDarkTheme(darkTheme),
+                onCheckedChange = {
+                    scope.launch {
+                        UserPrefs.setDarkThemeValue(if (it) DarkTheme.ON.value else DarkTheme.OFF.value)
+                    }
+                },
+            )
         }
     }
     VerticalSpace(dp = 16.dp)

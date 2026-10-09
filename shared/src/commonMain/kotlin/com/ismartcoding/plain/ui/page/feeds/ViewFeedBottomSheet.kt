@@ -33,7 +33,7 @@ import com.ismartcoding.plain.ui.base.PSheetPrimaryAction
 import com.ismartcoding.plain.ui.base.PSheetPrimaryDeleteAction
 import com.ismartcoding.plain.ui.base.PSheetPrimaryActionsCard
 import com.ismartcoding.plain.ui.base.POutlinedButton
-import com.ismartcoding.plain.ui.base.PSwitch
+import androidx.compose.material3.Switch
 import com.ismartcoding.plain.ui.base.Subtitle
 import com.ismartcoding.plain.ui.base.Tips
 import com.ismartcoding.plain.ui.base.VerticalSpace
@@ -136,13 +136,14 @@ fun ViewFeedBottomSheet(
                 m.fetchContent = feedsVM.editFetchContent.value
                 feedsVM.updateFetchContent(m.id, feedsVM.editFetchContent.value)
             }, title = stringResource(Res.string.auto_fetch_full_content), action = {
-                PSwitch(
-                    activated = feedsVM.editFetchContent.value,
-                ) {
-                    feedsVM.editFetchContent.value = it
-                    m.fetchContent = it
-                    feedsVM.updateFetchContent(m.id, it)
-                }
+                Switch(
+                    checked = feedsVM.editFetchContent.value,
+                    onCheckedChange = {
+                        feedsVM.editFetchContent.value = it
+                        m.fetchContent = it
+                        feedsVM.updateFetchContent(m.id, it)
+                    },
+                )
             })
         }
         Tips(text = stringResource(Res.string.auto_fetch_full_content_tips))

@@ -20,7 +20,7 @@ import com.ismartcoding.plain.ui.base.BottomSpace
 import com.ismartcoding.plain.ui.base.PCard
 import com.ismartcoding.plain.ui.base.PListItem
 import com.ismartcoding.plain.ui.base.PScaffold
-import com.ismartcoding.plain.ui.base.PSwitch
+import androidx.compose.material3.Switch
 import com.ismartcoding.plain.ui.base.PTopAppBar
 import com.ismartcoding.plain.ui.base.TopSpace
 import com.ismartcoding.plain.ui.base.VerticalSpace
@@ -52,9 +52,9 @@ fun AutoCheckUpdatePage(navController: NavHostController, updateViewModel: Updat
                 item {
                     PCard(modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN)) {
                         PListItem(title = stringResource(Res.string.auto_check_update), subtitle = stringResource(Res.string.auto_check_update_desc)) {
-                            PSwitch(activated = autoCheckUpdate) { newValue -> scope.launch(Dispatchers.Default) {
+                            Switch(checked = autoCheckUpdate, onCheckedChange = { newValue -> scope.launch(Dispatchers.Default) {
                                 SystemPrefs.updateInfo { it.copy(autoCheckUpdate = newValue) } }
-                            }
+                            })
                         }
                     }
                     BottomSpace(paddingValues)

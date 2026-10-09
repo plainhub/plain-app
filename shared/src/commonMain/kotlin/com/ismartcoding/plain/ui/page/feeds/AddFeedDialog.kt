@@ -19,7 +19,7 @@ import com.ismartcoding.plain.ui.base.ClipboardTextField
 import com.ismartcoding.plain.ui.base.HorizontalSpace
 import com.ismartcoding.plain.ui.base.PDialogTips
 import com.ismartcoding.plain.ui.base.PFilledButton
-import com.ismartcoding.plain.ui.base.PSwitch
+import androidx.compose.material3.Switch
 import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.models.FeedsViewModel
 import com.ismartcoding.plain.ui.theme.dialogSheetBackground
@@ -81,11 +81,12 @@ fun AddFeedDialog(feedsVM: FeedsViewModel) {
                         PListItem(
                             title = stringResource(Res.string.auto_fetch_full_content),
                         ) {
-                            PSwitch(
-                                activated = feedsVM.editFetchContent.value,
-                            ) {
-                                feedsVM.editFetchContent.value = it
-                            }
+                            Switch(
+                                checked = feedsVM.editFetchContent.value,
+                                onCheckedChange = {
+                                    feedsVM.editFetchContent.value = it
+                                },
+                            )
                         }
                         PDialogTips(text = stringResource(Res.string.auto_fetch_full_content_tips))
                     }

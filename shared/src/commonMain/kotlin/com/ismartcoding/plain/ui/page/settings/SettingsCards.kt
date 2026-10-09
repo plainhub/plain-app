@@ -37,7 +37,7 @@ import com.ismartcoding.plain.platform.restartServer
 import com.ismartcoding.plain.ui.base.HorizontalSpace
 import com.ismartcoding.plain.ui.base.PCard
 import com.ismartcoding.plain.ui.base.PListItem
-import com.ismartcoding.plain.ui.base.PSwitch
+import androidx.compose.material3.Switch
 import com.ismartcoding.plain.ui.nav.Routing
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -55,11 +55,11 @@ internal fun DeveloperSettingsCard(
     PCard(modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN)) {
         PListItem(title = stringResource(Res.string.client_id), value = TempData.clientId)
         PListItem(title = stringResource(Res.string.developer_mode)) {
-            PSwitch(activated = developerMode) {
+            Switch(checked = developerMode, onCheckedChange = {
                 scope.launch(Dispatchers.Default) {
                     UserPrefs.developerMode.value = it
                 }
-            }
+            })
         }
         if (developerMode) {
             PListItem(
@@ -95,12 +95,12 @@ internal fun DeveloperSettingsCard(
                     title = stringResource(Res.string.allow_any_host),
                     subtitle = stringResource(Res.string.allow_any_host_desc),
                 ) {
-                    PSwitch(activated = allowAnyHost) {
+                    Switch(checked = allowAnyHost, onCheckedChange = {
                         scope.launch(Dispatchers.Default) {
                             UserPrefs.allowAnyHost.value = it
                             restartServer()
                         }
-                    }
+                    })
                 }
                 PListItem(
                     modifier = Modifier.clickable { navController.navigate(Routing.ComponentShowcase) },

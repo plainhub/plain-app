@@ -21,7 +21,7 @@ import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.unit.dp
 import com.ismartcoding.plain.ui.base.HorizontalSpace
 import com.ismartcoding.plain.ui.base.PIcon
-import com.ismartcoding.plain.ui.base.PSwitch
+import androidx.compose.material3.Switch
 import com.ismartcoding.plain.ui.base.reorderable.ReorderableCollectionItemScope
 import com.ismartcoding.plain.ui.theme.cardBackgroundNormal
 import com.ismartcoding.plain.ui.theme.circleBackground
@@ -74,7 +74,7 @@ internal fun ReorderableCollectionItemScope.EnabledFeatureCard(
                 modifier = Modifier.weight(1f),
             )
             HorizontalSpace(8.dp)
-            PSwitch(activated = true, onClick = { onDisable() })
+            Switch(checked = true, onCheckedChange = { onDisable() })
         }
     }
 }
@@ -125,7 +125,7 @@ internal fun DisabledFeatureCard(
                 color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
             )
             HorizontalSpace(8.dp)
-            PSwitch(activated = false, onClick = { onEnable() })
+            Switch(checked = false, onCheckedChange = { onEnable() })
         }
     }
 }

@@ -31,7 +31,7 @@ import com.ismartcoding.plain.ui.base.PListItem
 import com.ismartcoding.plain.ui.base.POutlinedButton
 import com.ismartcoding.plain.ui.base.PTextButton
 import com.ismartcoding.plain.ui.base.PScaffold
-import com.ismartcoding.plain.ui.base.PSwitch
+import androidx.compose.material3.Switch
 import com.ismartcoding.plain.ui.base.PTopAppBar
 import com.ismartcoding.plain.ui.base.Subtitle
 import com.ismartcoding.plain.ui.base.Tips
@@ -98,7 +98,7 @@ private fun ShowcaseCards() {
         PListItem(title = "List item with value", value = "Value")
         PListItem(title = "List item with switch", separatedActions = true) {
             val checked = remember { mutableStateOf(true) }
-            PSwitch(activated = checked.value) { checked.value = it }
+            Switch(checked = checked.value, onCheckedChange = { checked.value = it })
         }
     }
     VerticalSpace(16.dp)
@@ -132,8 +132,8 @@ private fun ShowcaseChipsAndSwitches() {
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(24.dp)) {
             val s1 = remember { mutableStateOf(false) }
             val s2 = remember { mutableStateOf(true) }
-            PSwitch(activated = s1.value) { s1.value = it }
-            PSwitch(activated = s2.value) { s2.value = it }
+            Switch(checked = s1.value, onCheckedChange = { s1.value = it })
+            Switch(checked = s2.value, onCheckedChange = { s2.value = it })
         }
     }
     VerticalSpace(16.dp)

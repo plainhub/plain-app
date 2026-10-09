@@ -49,7 +49,7 @@ import com.ismartcoding.plain.ui.base.BottomSpace
 import com.ismartcoding.plain.ui.base.PCard
 import com.ismartcoding.plain.ui.base.PListItem
 import com.ismartcoding.plain.ui.base.PScaffold
-import com.ismartcoding.plain.ui.base.PSwitch
+import androidx.compose.material3.Switch
 import com.ismartcoding.plain.ui.base.PTopAppBar
 import com.ismartcoding.plain.ui.base.Subtitle
 import com.ismartcoding.plain.ui.base.Tips
@@ -170,14 +170,14 @@ fun DesktopAccessSettingsPage(navController: NavHostController, webVM: DesktopAc
                 ) {
                     if (af != null) {
                         Box(Modifier.onGloballyPositioned { switches[af] = it.boundsInRoot() }) {
-                            PSwitch(activated = enabledPermissions.contains(permission.name)) { enable ->
+                            Switch(checked = enabledPermissions.contains(permission.name), onCheckedChange = { enable ->
                                 togglePermission(scope, m, enable)
-                            }
+                            })
                         }
                     } else {
-                        PSwitch(activated = enabledPermissions.contains(permission.name)) { enable ->
+                        Switch(checked = enabledPermissions.contains(permission.name), onCheckedChange = { enable ->
                             togglePermission(scope, m, enable)
-                        }
+                        })
                     }
                 }
             }
@@ -197,7 +197,7 @@ fun DesktopAccessSettingsPage(navController: NavHostController, webVM: DesktopAc
                             separatedActions = true
                         ) {
                             Box(Modifier.onGloballyPositioned { switches[WebSettingsFeature.NOTIFICATIONS] = it.boundsInRoot() }) {
-                                PSwitch(activated = enabled) { enable -> togglePermission(scope, m, enable) }
+                                Switch(checked = enabled, onCheckedChange = { enable -> togglePermission(scope, m, enable) })
                             }
                         }
                     }
@@ -216,7 +216,7 @@ fun DesktopAccessSettingsPage(navController: NavHostController, webVM: DesktopAc
                         separatedActions = true
                     ) {
                         Box(Modifier.onGloballyPositioned { switches[WebSettingsFeature.CLIPBOARD] = it.boundsInRoot() }) {
-                            PSwitch(activated = clipboardEnabled) { enable -> togglePermission(scope, m, enable) }
+                            Switch(checked = clipboardEnabled, onCheckedChange = { enable -> togglePermission(scope, m, enable) })
                         }
                     }
                 }
@@ -234,7 +234,7 @@ fun DesktopAccessSettingsPage(navController: NavHostController, webVM: DesktopAc
                 VerticalSpace(dp = 16.dp); Subtitle(text = stringResource(Res.string.performance))
                 PCard(modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN)) {
                     PListItem(modifier = Modifier.clickable { webVM.enableKeepAwake(!keepAwake) }, title = stringResource(Res.string.keep_awake)) {
-                        PSwitch(activated = keepAwake) { enable -> webVM.enableKeepAwake(enable) }
+                        Switch(checked = keepAwake, onCheckedChange = { enable -> webVM.enableKeepAwake(enable) })
                     }
                 }
                 Tips(stringResource(Res.string.keep_awake_tips))

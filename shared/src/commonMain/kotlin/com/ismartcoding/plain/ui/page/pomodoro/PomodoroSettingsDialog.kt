@@ -18,7 +18,7 @@ import com.ismartcoding.plain.events.PickFileResultEvent
 import com.ismartcoding.plain.platform.copyPickedFileToAppStorage
 import com.ismartcoding.plain.ui.base.HorizontalSpace
 import com.ismartcoding.plain.ui.base.PFilledButton
-import com.ismartcoding.plain.ui.base.PSwitch
+import androidx.compose.material3.Switch
 import com.ismartcoding.plain.ui.base.PTextButton
 import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.theme.dialogSheetBackground
@@ -78,11 +78,11 @@ fun PomodoroSettingsDialog(
                         label = { Text(stringResource(Res.string.pomodoros_before_long_break)) }, modifier = Modifier.fillMaxWidth())
                     VerticalSpace(dp = 16.dp)
                     PListItem(title = stringResource(Res.string.show_notification)) {
-                        PSwitch(activated = showNotification) { showNotification = it }
+                        Switch(checked = showNotification, onCheckedChange = { showNotification = it })
                     }
                     VerticalSpace(dp = 8.dp)
                     PListItem(title = stringResource(Res.string.play_sound_on_complete)) {
-                        PSwitch(activated = playSoundOnComplete) { playSoundOnComplete = it }
+                        Switch(checked = playSoundOnComplete, onCheckedChange = { playSoundOnComplete = it })
                     }
                     VerticalSpace(dp = 16.dp)
                 }

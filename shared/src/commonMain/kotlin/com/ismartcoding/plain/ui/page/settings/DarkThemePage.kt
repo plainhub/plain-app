@@ -27,7 +27,7 @@ import com.ismartcoding.plain.ui.base.BottomSpace
 import com.ismartcoding.plain.ui.base.PCard
 import com.ismartcoding.plain.ui.base.PListItem
 import com.ismartcoding.plain.ui.base.PScaffold
-import com.ismartcoding.plain.ui.base.PSwitch
+import androidx.compose.material3.Switch
 import com.ismartcoding.plain.ui.base.PTopAppBar
 import com.ismartcoding.plain.ui.base.Subtitle
 import com.ismartcoding.plain.ui.base.TopSpace
@@ -85,11 +85,11 @@ fun DarkThemePage(navController: NavHostController) {
                             },
                             title = stringResource(Res.string.amoled_dark_theme),
                         ) {
-                            PSwitch(activated = amoledDarkTheme) {
+                            Switch(checked = amoledDarkTheme, onCheckedChange = {
                                 scope.launch {
                                     UserPrefs.amoledDarkTheme.value = !amoledDarkTheme
                                 }
-                            }
+                            })
                         }
                     }
                     VerticalSpace(dp = 16.dp)
@@ -103,11 +103,11 @@ fun DarkThemePage(navController: NavHostController) {
                             title = stringResource(Res.string.pdf_follow_dark_theme),
                             subtitle = stringResource(Res.string.pdf_follow_dark_theme_desc),
                         ) {
-                            PSwitch(activated = pdfFollowDarkTheme) {
+                            Switch(checked = pdfFollowDarkTheme, onCheckedChange = {
                                 scope.launch {
                                     UserPrefs.pdfFollowDarkTheme.value = !pdfFollowDarkTheme
                                 }
-                            }
+                            })
                         }
                     }
                     BottomSpace(paddingValues)
