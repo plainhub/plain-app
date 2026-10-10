@@ -1,33 +1,24 @@
 package com.ismartcoding.plain.ui.page.images
 
-import com.ismartcoding.plain.preferences.*
-
-import com.ismartcoding.plain.i18n.*
-import com.ismartcoding.plain.platform.PBackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
-import androidx.compose.foundation.pager.HorizontalPager
-import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
@@ -39,20 +30,20 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.ismartcoding.plain.enums.AppFeatureType
-import com.ismartcoding.plain.enums.has
 import com.ismartcoding.plain.enums.hasPermission
 import com.ismartcoding.plain.events.PermissionsResultEvent
 import com.ismartcoding.plain.features.file.FileSortBy
-import com.ismartcoding.plain.platform.LocaleHelper
-import com.ismartcoding.plain.platform.isGestureInteractionMode
 import com.ismartcoding.plain.lib.Channel
+import com.ismartcoding.plain.platform.MediaPreviewer
+import com.ismartcoding.plain.platform.PBackHandler
+import com.ismartcoding.plain.platform.getMediaItemUriString
+import com.ismartcoding.plain.platform.isGestureInteractionMode
+import com.ismartcoding.plain.preferences.UserPrefs
 import com.ismartcoding.plain.ui.base.AnimatedBottomAction
 import com.ismartcoding.plain.ui.base.BottomSpace
-import com.ismartcoding.plain.ui.components.MediaTopBar
 import com.ismartcoding.plain.ui.base.NeedPermissionColumn
 import com.ismartcoding.plain.ui.base.NoDataColumn
-import com.ismartcoding.plain.ui.base.PFilterChip
-import com.ismartcoding.plain.ui.base.PScrollableTabRow
+import com.ismartcoding.plain.ui.base.StoragePermissionResumeEffect
 import com.ismartcoding.plain.ui.base.dragselect.gridDragSelect
 import com.ismartcoding.plain.ui.base.dragselect.rememberDragSelectState
 import com.ismartcoding.plain.ui.base.fastscroll.LazyVerticalGridScrollbar
@@ -60,15 +51,14 @@ import com.ismartcoding.plain.ui.base.pinchZoomGrid
 import com.ismartcoding.plain.ui.base.pullrefresh.LoadMoreRefreshContent
 import com.ismartcoding.plain.ui.base.pullrefresh.PullToRefresh
 import com.ismartcoding.plain.ui.base.pullrefresh.RefreshContentState
-import com.ismartcoding.plain.ui.base.pullrefresh.setRefreshState
 import com.ismartcoding.plain.ui.base.pullrefresh.rememberRefreshLayoutState
-import com.ismartcoding.plain.ui.base.rememberBoostFlingBehavior
-import com.ismartcoding.plain.ui.base.StoragePermissionResumeEffect
+import com.ismartcoding.plain.ui.base.pullrefresh.setRefreshState
 import com.ismartcoding.plain.ui.base.refreshStoragePermission
+import com.ismartcoding.plain.ui.base.rememberBoostFlingBehavior
 import com.ismartcoding.plain.ui.components.ImageGridItem
 import com.ismartcoding.plain.ui.components.MediaDateGroupHeader
 import com.ismartcoding.plain.ui.components.MediaFilesSelectModeBottomActions
-import com.ismartcoding.plain.platform.MediaPreviewer
+import com.ismartcoding.plain.ui.components.MediaTopBar
 import com.ismartcoding.plain.ui.components.mediaviewer.previewer.rememberPreviewerState
 import com.ismartcoding.plain.ui.extensions.collectAsStateValue
 import com.ismartcoding.plain.ui.extensions.reset
@@ -81,12 +71,10 @@ import com.ismartcoding.plain.ui.models.exitSearchMode
 import com.ismartcoding.plain.ui.nav.NavLoadGate
 import com.ismartcoding.plain.ui.page.cast.CastDialog
 import com.ismartcoding.plain.ui.page.tags.TagsBottomSheet
-import com.ismartcoding.plain.platform.getMediaItemUriString
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import com.ismartcoding.plain.ui.resources.Res as UiRes
 import com.ismartcoding.plain.ui.resources.image as ui_drawable_image
-import com.ismartcoding.plain.i18n.image
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
