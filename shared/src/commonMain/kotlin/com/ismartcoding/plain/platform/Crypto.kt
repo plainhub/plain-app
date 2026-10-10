@@ -1,7 +1,6 @@
 package com.ismartcoding.plain.platform
 
 import com.ismartcoding.plain.lib.crypto.ECDHKeyPair
-import com.ismartcoding.plain.lib.crypto.sha1 as sha1Bytes
 import com.ismartcoding.plain.lib.crypto.sha512 as sha512Bytes
 import com.ismartcoding.plain.lib.extensions.toHexString
 import kotlin.random.Random
@@ -49,9 +48,6 @@ expect fun signEd25519(rawPrivateKey: ByteArray, data: ByteArray): ByteArray
 
 /** Verify an Ed25519 [signature] over [data] with a raw 32-byte [rawPublicKey]. */
 expect fun verifyEd25519(rawPublicKey: ByteArray, data: ByteArray, signature: ByteArray): Boolean
-
-/** SHA-1 of [input] as a lowercase hex string. Use only for non-security-critical hashing. */
-fun sha1(input: ByteArray): String = sha1Bytes(input).toHexString()
 
 /** SHA-512 of [input] as a lowercase hex string. */
 fun sha512(input: ByteArray): String = sha512Bytes(input).toHexString()

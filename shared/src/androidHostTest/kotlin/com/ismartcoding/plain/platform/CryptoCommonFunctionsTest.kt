@@ -6,23 +6,15 @@ import kotlin.test.assertNotEquals
 import kotlin.test.assertTrue
 
 /**
- * Unit tests for the commonMain [sha1], [sha512] and [randomPassword] helpers.
+ * Unit tests for the commonMain [sha512] and [randomPassword] helpers.
  *
  * These functions were previously `expect` declarations with platform-specific
  * implementations (Android used `java.security.MessageDigest`, iOS returned
  * empty strings). They now live in `commonMain` and delegate to the pure-Kotlin
- * `crypto.sha1` / `crypto.sha512` implementations, so the contract is identical
+ * `crypto.sha512` implementations, so the contract is identical
  * on every platform and worth pinning down with regression tests.
  */
 class CryptoCommonFunctionsTest {
-
-    @Test
-    fun sha1ReturnsLowercaseHexDigest() {
-        assertEquals(
-            "a9993e364706816aba3e25717850c26c9cd0d89d",
-            sha1("abc".encodeToByteArray()),
-        )
-    }
 
     @Test
     fun sha512ReturnsLowercaseHexDigest() {
@@ -30,14 +22,6 @@ class CryptoCommonFunctionsTest {
             "ddaf35a193617abacc417349ae20413112e6fa4e89a97ea20a9eeee64b55d39a" +
                 "2192992a274fc1a836ba3c23a3feebbd454d4423643ce80e2a9ac94fa54ca49f",
             sha512("abc".encodeToByteArray()),
-        )
-    }
-
-    @Test
-    fun sha1OfEmptyInputMatchesKnownConstant() {
-        assertEquals(
-            "da39a3ee5e6b4b0d3255bfef95601890afd80709",
-            sha1(ByteArray(0)),
         )
     }
 
