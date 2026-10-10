@@ -69,7 +69,7 @@ fun PlainAppServiceSection(
             onClick = { expanded = !expanded },
         )
         AnimatedVisibility(expanded) {
-            Column(Modifier.padding(start = 16.dp, end = 16.dp, bottom = 8.dp)) {
+            Column(Modifier.fillMaxWidth().padding(start = 16.dp, end = 16.dp, bottom = 8.dp)) {
                 Text(
                     text = stringResource(Res.string.connection_keeps_dropping_help),
                     style = MaterialTheme.typography.tipsText(),

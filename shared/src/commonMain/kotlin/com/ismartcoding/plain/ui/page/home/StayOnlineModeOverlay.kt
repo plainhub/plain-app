@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Text
@@ -87,6 +88,7 @@ fun StayOnlineModeOverlay(onExit: () -> Unit) {
                     )
                     Spacer(modifier = Modifier.height(40.dp))
                     POutlinedButton(
+                        modifier = Modifier.fillMaxWidth(),
                         text = stringResource(Res.string.stay_online_go_dark_now),
                         onClick = { sleeping = true },
                         contentColor = softWhite,
