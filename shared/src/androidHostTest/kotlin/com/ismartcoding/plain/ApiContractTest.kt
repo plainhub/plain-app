@@ -9,7 +9,7 @@ import kotlin.test.fail
  *
  * The schema itself is built by Rust (`plain-rs/src/content_api/public_schema.rs`),
  * which prints its own SDL snapshot and guards it there. This test enforces the
- * structural conventions from `shared/apitest/API_SPEC.md` on the committed
+ * structural conventions on the committed
  * snapshot `shared/apitest/schema.graphqls`, so new fields/operations cannot
  * drift from the spec regardless of which side implements them.
  *
@@ -21,9 +21,9 @@ class ApiContractTest {
     private val sdl: String = java.io.File("apitest/schema.graphqls").readText()
 
     // Fields that keep a raw String id although the naming rule says ID.
-    // Each entry must be justified in API_SPEC.md ("deliberate exceptions").
+    // Each entry must be justified in the API contract ("deliberate exceptions").
     private val stringIdAllowlist = setOf(
-        // Each entry must be justified in API_SPEC.md ("deliberate exceptions").
+        // Each entry must be justified in the API contract ("deliberate exceptions").
         "photoId", // Android RawContact photo row id (Contact/Call, Android-only feature)
         "thumbnailId",
         "clientId", // App.clientId — public client identity string, not an addressable entity id
