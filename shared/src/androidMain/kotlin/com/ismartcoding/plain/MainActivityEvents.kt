@@ -11,17 +11,17 @@ import androidx.navigation.NavDestination.Companion.hasRoute
 import com.ismartcoding.plain.lib.Channel
 import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.chat.peer.PeerStatusManager
-import com.ismartcoding.plain.events.ChannelInviteCanceledEvent
-import com.ismartcoding.plain.events.ChannelInviteReceivedEvent
-import com.ismartcoding.plain.events.ConfirmToAcceptLoginEvent
+import com.ismartcoding.plain.events.HChannelInviteCanceledEvent
+import com.ismartcoding.plain.events.HChannelInviteReceivedEvent
+import com.ismartcoding.plain.events.HConfirmToAcceptLoginEvent
 import com.ismartcoding.plain.features.Permissions
-import com.ismartcoding.plain.features.dlna.DlnaCastRequestEvent
+import com.ismartcoding.plain.features.dlna.HDlnaCastRequestEvent
 import com.ismartcoding.plain.events.ExportFileEvent
 import com.ismartcoding.plain.events.IgnoreBatteryOptimizationEvent
 import com.ismartcoding.plain.events.OpenNotificationSettingsEvent
-import com.ismartcoding.plain.events.PairingCanceledEvent
-import com.ismartcoding.plain.events.PairingRequestReceivedEvent
-import com.ismartcoding.plain.events.PairingSuccessEvent
+import com.ismartcoding.plain.events.HPairingCanceledEvent
+import com.ismartcoding.plain.events.HPairingRequestReceivedEvent
+import com.ismartcoding.plain.events.HPairingSuccessEvent
 import com.ismartcoding.plain.events.PermissionsResultEvent
 import com.ismartcoding.plain.events.PickFileEvent
 import com.ismartcoding.plain.events.RequestNotificationPermissionEvent
@@ -135,11 +135,11 @@ internal fun MainActivity.initEvents() {
 
                 is PickFileEvent -> handlePickFileEvent(event)
                 is ExportFileEvent -> handleExportFileEvent(event)
-                is ConfirmToAcceptLoginEvent -> {
+                is HConfirmToAcceptLoginEvent -> {
                     openNew()
                 }
 
-                is DlnaCastRequestEvent -> {
+                is HDlnaCastRequestEvent -> {
                     // A DLNA cast is being handled — bring the app to the foreground
                     // when it is in the background so the request dialog / player
                     // appears and playback starts immediately (same as login requests).
@@ -148,7 +148,7 @@ internal fun MainActivity.initEvents() {
                     }
                 }
 
-                is PairingRequestReceivedEvent -> {
+                is HPairingRequestReceivedEvent -> {
                     mainVM.pendingPairingRequest.value = event.request
                     val nav = navControllerState.value
                     if (nav?.currentBackStackEntry?.destination?.hasRoute<Routing.PairingRequest>() != true) {
@@ -159,7 +159,7 @@ internal fun MainActivity.initEvents() {
                     }
                 }
 
-                is ChannelInviteReceivedEvent -> {
+                is HChannelInviteReceivedEvent -> {
                     val nav = navControllerState.value
                     if (nav?.currentBackStackEntry?.destination?.hasRoute<Routing.ChannelInviteRequest>() != true) {
                         nav?.navigate(
@@ -174,7 +174,7 @@ internal fun MainActivity.initEvents() {
                     openNew()
                 }
 
-                is PairingCanceledEvent -> {
+                is HPairingCanceledEvent -> {
                     val nav = navControllerState.value
                     val current = nav?.currentBackStackEntry
                     if (current != null && current.destination.hasRoute<Routing.PairingRequest>() &&
@@ -184,7 +184,7 @@ internal fun MainActivity.initEvents() {
                     }
                 }
 
-                is ChannelInviteCanceledEvent -> {
+                is HChannelInviteCanceledEvent -> {
                     val nav = navControllerState.value
                     val current = nav?.currentBackStackEntry
                     if (current != null && current.destination.hasRoute<Routing.ChannelInviteRequest>() &&
@@ -194,7 +194,7 @@ internal fun MainActivity.initEvents() {
                     }
                 }
 
-                is PairingSuccessEvent -> {
+                is HPairingSuccessEvent -> {
                     PeerStatusManager.reconnectNow("post_pairing")
                 }
             }

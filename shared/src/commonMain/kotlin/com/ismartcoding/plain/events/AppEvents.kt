@@ -1,7 +1,7 @@
 package com.ismartcoding.plain.events
 
-import com.ismartcoding.plain.ai.ImageIndexProgressEvent
-import com.ismartcoding.plain.ai.ImageSearchStatusChangedEvent
+import com.ismartcoding.plain.ai.HImageIndexProgressEvent
+import com.ismartcoding.plain.ai.HImageSearchStatusChangedEvent
 import com.ismartcoding.plain.ble.PairingTransport
 import com.ismartcoding.plain.data.DPairingRequest
 import com.ismartcoding.plain.discover.MdnsDiscoverManager
@@ -42,17 +42,17 @@ import kotlinx.coroutines.delay
 import kotlin.time.Duration.Companion.milliseconds
 
 /** Native confirmation UI for a Rust-owned pending login. */
-class ConfirmToAcceptLoginEvent(
+class HConfirmToAcceptLoginEvent(
     val clientId: String,
     val request: AuthRequest,
     val requestId: String,
     val clientIp: String,
-) : ChannelEvent()
+) : HEvent()
 
 // Pairing events
-data class PairingRequestReceivedEvent(val request: DPairingRequest) : ChannelEvent()
-data class PairingSuccessEvent(val deviceId: String, val deviceName: String, val deviceIp: String, val key: String) : ChannelEvent()
-data class PairingCanceledEvent(val fromId: String) : ChannelEvent()
+data class HPairingRequestReceivedEvent(val request: DPairingRequest) : HEvent()
+data class HPairingSuccessEvent(val deviceId: String, val deviceName: String, val deviceIp: String, val key: String) : HEvent()
+data class HPairingCanceledEvent(val fromId: String) : HEvent()
 
 class FolderKanbanSelectEvent(val data: FolderOption) : ChannelEvent()
 
@@ -65,7 +65,7 @@ class ShowPermissionWizardEvent : ChannelEvent()
 class RestartAppEvent : ChannelEvent()
 
 
-class PomodoroChangedEvent(val today: com.ismartcoding.plain.ui.page.pomodoro.PomodoroToday) : ChannelEvent()
+class HPomodoroChangedEvent(val today: com.ismartcoding.plain.ui.page.pomodoro.PomodoroToday) : HEvent()
 
 class FetchBookmarkMetadataEvent(val bookmarkId: String, val url: String) : ChannelEvent()
 
@@ -73,20 +73,20 @@ class WindowFocusChangedEvent(val hasFocus: Boolean) : ChannelEvent()
 
 
 /** Fired when a channel invite is received from a remote peer. UI shows accept/decline dialog. */
-data class ChannelInviteReceivedEvent(
+data class HChannelInviteReceivedEvent(
     val channelId: String,
     val channelName: String,
     val ownerPeerId: String,
     val ownerPeerName: String,
-) : ChannelEvent()
+) : HEvent()
 
 /** Fired when the channel owner cancels a pending invite (i.e. removes us before we accept).
  *  The auto-opened [com.ismartcoding.plain.ui.nav.Routing.ChannelInviteRequest] page pops
  *  itself when it sees this event for the matching channel. */
-data class ChannelInviteCanceledEvent(
+data class HChannelInviteCanceledEvent(
     val channelId: String,
     val ownerPeerId: String,
-) : ChannelEvent()
+) : HEvent()
 
 class ExportFileEvent(val type: ExportFileType, val fileName: String) : ChannelEvent()
 
@@ -96,7 +96,7 @@ class PickFileEvent(val tag: PickFileTag, val type: PickFileType, val multiple: 
 
 class PickFileResultEvent(val tag: PickFileTag, val type: PickFileType, val uris: Set<String>) : ChannelEvent()
 
-class FeedStatusEvent(val feedId: String, val status: FeedWorkerStatus) : ChannelEvent()
+class HFeedStatusEvent(val feedId: String, val status: FeedWorkerStatus) : HEvent()
 
 class ActionEvent(val source: ActionSourceType, val action: ActionType, val ids: Set<String>, val extra: Any? = null) : ChannelEvent()
 
@@ -105,7 +105,7 @@ class AudioActionEvent(val action: AudioAction) : ChannelEvent()
 class IgnoreBatteryOptimizationEvent : ChannelEvent()
 class PowerConnectedEvent : ChannelEvent()
 class PowerDisconnectedEvent : ChannelEvent()
-class WebRequestReceivedEvent : ChannelEvent()
+class HWebRequestReceivedEvent : HEvent()
 data class KeepAwakeChangedEvent(val enabled: Boolean) : ChannelEvent()
 
 data class ClipboardSyncChangedEvent(val enabled: Boolean) : ChannelEvent()

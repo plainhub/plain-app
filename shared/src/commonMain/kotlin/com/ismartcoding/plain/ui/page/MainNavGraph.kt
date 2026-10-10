@@ -27,7 +27,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.toRoute
 import com.ismartcoding.plain.chat.data.ChatTargetType
 import com.ismartcoding.plain.chat.ChatDbHelper
-import com.ismartcoding.plain.events.ChannelInviteReceivedEvent
+import com.ismartcoding.plain.events.HChannelInviteReceivedEvent
 import com.ismartcoding.plain.ui.models.AudioHomeViewModel
 import com.ismartcoding.plain.ui.models.CastViewModel
 import com.ismartcoding.plain.ui.models.AudioViewModel
@@ -396,7 +396,7 @@ fun MainNavGraph(
             val r = backStackEntry.toRoute<Routing.ChannelInviteRequest>()
 
             DisposableEffect(r.channelId) {
-                mainVM.pendingChannelInvite.value = ChannelInviteReceivedEvent(
+                mainVM.pendingChannelInvite.value = HChannelInviteReceivedEvent(
                     channelId = r.channelId,
                     channelName = r.channelName,
                     ownerPeerId = r.ownerPeerId,

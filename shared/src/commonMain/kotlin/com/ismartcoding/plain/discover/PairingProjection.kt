@@ -27,7 +27,7 @@ object PairingProjection {
     suspend fun request(payload: String) {
         val request = com.ismartcoding.plain.lib.JsonHelper.jsonDecode<com.ismartcoding.plain.data.DPairingRequest>(payload)
         if (!RustPairingRuntime.currentRequest(request.fromId, request.signature)) return
-        com.ismartcoding.plain.lib.sendEvent(com.ismartcoding.plain.events.PairingRequestReceivedEvent(request))
+        com.ismartcoding.plain.lib.sendEvent(com.ismartcoding.plain.events.HPairingRequestReceivedEvent(request))
     }
 
     suspend fun canceled(payload: String) {
@@ -35,7 +35,7 @@ object PairingProjection {
         val id = value.getValue("deviceId").jsonPrimitive.content
         if (RustPairingStore.tickets().any { it.deviceId == id }) return
         NearbyViewModel.itemStatus.remove(id)
-        com.ismartcoding.plain.lib.sendEvent(com.ismartcoding.plain.events.PairingCanceledEvent(id))
+        com.ismartcoding.plain.lib.sendEvent(com.ismartcoding.plain.events.HPairingCanceledEvent(id))
     }
 
     suspend fun success(payload: String) {

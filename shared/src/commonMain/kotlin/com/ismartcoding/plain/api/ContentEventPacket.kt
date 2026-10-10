@@ -3,4 +3,8 @@ package com.ismartcoding.plain.api
 import kotlinx.serialization.Serializable
 
 @Serializable
-internal data class ContentEventPacket(val type: Int, val payload: String)
+internal data class ContentEventPacket(
+    val type: String,
+    val payload: String,
+    val hostCapabilities: HostEventCapabilities? = null,
+)

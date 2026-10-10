@@ -1,7 +1,7 @@
 package com.ismartcoding.plain.features.session
 
 import com.ismartcoding.plain.api.RustContentApi
-import com.ismartcoding.plain.events.ConfirmToAcceptLoginEvent
+import com.ismartcoding.plain.events.HConfirmToAcceptLoginEvent
 import com.ismartcoding.plain.lib.JsonHelper
 import com.ismartcoding.plain.preferences.Prefs
 import kotlinx.serialization.json.jsonObject
@@ -14,5 +14,5 @@ object RustWebLogin {
         Prefs.refresh()
         return JsonHelper.jsonDecodeFromElement<String>(result.getValue("password"))
     }
-    suspend fun complete(event: ConfirmToAcceptLoginEvent) { call(WebLoginCommand.Complete(event.requestId)) }
+    suspend fun complete(event: HConfirmToAcceptLoginEvent) { call(WebLoginCommand.Complete(event.requestId)) }
 }

@@ -2,11 +2,8 @@ package com.ismartcoding.plain.discover
 
 import com.ismartcoding.plain.api.RustContentApi
 import com.ismartcoding.plain.chat.peer.PeerCacher
-import com.ismartcoding.plain.events.EventType
-import com.ismartcoding.plain.events.WebSocketEvent
 import com.ismartcoding.plain.lib.coIO
 import com.ismartcoding.plain.lib.logcat.LogCat
-import com.ismartcoding.plain.lib.sendEvent
 import com.ismartcoding.plain.ui.models.NearbyViewModel
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel
@@ -16,7 +13,6 @@ import kotlinx.serialization.json.*
 import kotlin.concurrent.Volatile
 
 object RustMdnsRuntime {
-    const val EVENT_UPDATED = 10001
     private class Command(val body: JsonObject, val reply: CompletableDeferred<JsonObject>)
     private val commands = Channel<Command>(64)
     private val projection = Mutex()
@@ -76,12 +72,8 @@ object RustMdnsRuntime {
     private suspend fun apply(row: JsonObject) = projection.withLock {
         val revision = row.getValue("revision").jsonPrimitive.long
         if (row["runtimeId"] == current["runtimeId"] && revision < (current["revision"]?.jsonPrimitive?.long ?: -1)) return@withLock
-        val previous = scanning
         current = row
         NearbyViewModel.isDiscovering.value = scanning
-        if (previous != scanning) {
-            sendEvent(WebSocketEvent(if (scanning) EventType.NEARBY_DISCOVERY_STARTED else EventType.NEARBY_DISCOVERY_STOPPED, "{}"))
-        }
     }
     suspend fun refresh(payload: String? = null) {
         val row = snapshot()

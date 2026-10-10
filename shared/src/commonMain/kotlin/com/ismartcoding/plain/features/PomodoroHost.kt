@@ -1,6 +1,6 @@
 package com.ismartcoding.plain.features
 
-import com.ismartcoding.plain.events.PomodoroChangedEvent
+import com.ismartcoding.plain.events.HPomodoroChangedEvent
 import com.ismartcoding.plain.lib.sendEvent
 import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.platform.showPomodoroNotification
@@ -17,7 +17,7 @@ object PomodoroHost {
 
     suspend fun refresh(): Unit = lock.withLock {
         val today = PomodoroHelper.today()
-        sendEvent(PomodoroChangedEvent(today))
+        sendEvent(HPomodoroChangedEvent(today))
         if (today.isRunning && timer?.isActive != true) {
             timer = scope.launch { runTimer() }
         }
@@ -29,7 +29,7 @@ object PomodoroHost {
                 delay(1000)
                 try {
                     val (state, completed) = PomodoroHelper.tick()
-                    sendEvent(PomodoroChangedEvent(state))
+                    sendEvent(HPomodoroChangedEvent(state))
                     if (completed != null) {
                         val settings = UserPrefs.pomodoroSettingsValue()
                         showPomodoroNotification(completed, state.state)

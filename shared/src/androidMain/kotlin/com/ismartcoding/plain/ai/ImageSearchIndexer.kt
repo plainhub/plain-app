@@ -32,6 +32,6 @@ object ImageSearchIndexer {
         isRunning = status.getValue("isRunning").jsonPrimitive.boolean
         totalImages = status.getValue("totalImages").jsonPrimitive.int
         indexedImages = status.getValue("indexedImages").jsonPrimitive.int
-        sendEvent(ImageIndexProgressEvent(totalImages,indexedImages,isRunning))
+        sendEvent(HImageIndexProgressEvent(totalImages,indexedImages,isRunning))
     }
 }

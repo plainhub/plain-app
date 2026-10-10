@@ -6,9 +6,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import com.ismartcoding.plain.lib.withIO
 import com.ismartcoding.plain.data.NotificationFilterData
-import com.ismartcoding.plain.events.EventType
-import com.ismartcoding.plain.events.WebSocketEvent
-import com.ismartcoding.plain.lib.sendEvent
 import com.ismartcoding.plain.platform.DNotificationApp
 import com.ismartcoding.plain.platform.getAllNotificationApps
 import com.ismartcoding.plain.platform.getNotificationApp
@@ -66,26 +63,16 @@ class NotificationSettingsViewModel : ViewModel() {
         }
     }
 
-    fun refreshNotifications() {
-        sendEvent(
-            WebSocketEvent(
-                EventType.NOTIFICATION_REFRESHED, ""
-            )
-        )
-    }
-
     suspend fun toggleModeAsync() {
         val newMode = if (filterData.value.mode == "allowlist") "blacklist" else "allowlist"
         UserPrefs.setNotificationMode(newMode)
         filterData.value = filterData.value.copy(mode = newMode)
-        refreshNotifications()
     }
 
     suspend fun removeAppAsync(packageName: String) {
         UserPrefs.toggleNotificationApp(packageName)
         filterData.value = UserPrefs.notificationFilterValue()
         loadSelectedApps()
-        refreshNotifications()
     }
 
     suspend fun addAppsAsync(packageNames: List<String>) {
@@ -94,14 +81,12 @@ class NotificationSettingsViewModel : ViewModel() {
         }
         filterData.value = UserPrefs.notificationFilterValue()
         loadSelectedApps()
-        refreshNotifications()
     }
 
     suspend fun clearAllAsync() {
         UserPrefs.setNotificationFilter(filterData.value.copy(apps = emptySet()))
         filterData.value = UserPrefs.notificationFilterValue()
         _selectedAppsFlow.value = emptyList()
-        refreshNotifications()
     }
 
     private suspend fun loadSelectedApps() = withIO {

@@ -1,7 +1,6 @@
 package com.ismartcoding.plain.events
 
 import com.ismartcoding.plain.lib.ChannelEvent
-import com.ismartcoding.plain.ui.page.pomodoro.PomodoroState
 import kotlinx.serialization.Serializable
 
 sealed class WebSocketData {
@@ -22,66 +21,71 @@ sealed class WebSocketData {
     }
 }
 
-// The events sent to the web client via WebSocket
+// Platform facts uploaded to Rust for delivery to public clients.
 class WebSocketEvent(
     val type: EventType,
     val data: WebSocketData,
-) : ChannelEvent() // Event will be sent to web client
+) : ChannelEvent()
 {
     constructor(type: EventType, data: String) : this(type, WebSocketData.Text(data))
     constructor(type: EventType, data: ByteArray) : this(type, WebSocketData.Binary(data))
 }
 
-enum class EventType(val value: Int) {
-    MESSAGE_CREATED(1),
-    MESSAGE_DELETED(2),
-    MESSAGE_UPDATED(3),
-    FEEDS_FETCHED(4),
-    CONTENT_CHANGED(47),
-    SCREEN_MIRRORING(5),
-    NOTIFICATION_CREATED(7),
-    SCREEN_MIRROR_VIDEO(31),
-    SCREEN_MIRROR_VIDEO_CODEC(32),
-    SCREEN_MIRROR_AUDIO(33),
-    NOTIFICATION_UPDATED(8),
-    NOTIFICATION_DELETED(9),
-    NOTIFICATION_REFRESHED(10),
-    POMODORO_ACTION(11),
-    POMODORO_SETTINGS_UPDATE(12),
-    SCREEN_MIRROR_AUDIO_GRANTED(14),
-    BOOKMARK_UPDATED(15),
-    DOWNLOAD_PROGRESS(16),
-    MMS_SENT(17),
-    CHANNELS_UPDATED(18),
-    IMAGE_SEARCH_UPDATED(19),
-    PEER_STATUS_UPDATED(20),
-    DEVICE_NAME_UPDATED(21),
-    PAIRING_REQUEST_RECEIVED(22),
-    PAIRING_SUCCESS(23),
-    PAIRING_FAILED(24),
-    PAIRING_CANCELED(25),
-    PAIRING_STARTED(26),
-    NEARBY_DEVICE_FOUND(27),
-    NEARBY_DISCOVERY_STARTED(29),
-    NEARBY_DISCOVERY_STOPPED(30),
-    IMAGE_EDITOR_UPDATE(34),
-    SMS_PROVIDER_CHANGED(35),
-    SMS_SEND_RESULT(36),
-    MMS_SEND_RESULT(37),
-    UPLOAD_MERGE_RESULT(38),
-    CLIPBOARD_CHANGED(39),
+enum class EventType {
+    MESSAGE_CREATED,
+    MESSAGE_DELETED,
+    MESSAGE_UPDATED,
+    FEEDS_FETCHED,
+    CONTENT_CHANGED,
+    SCREEN_MIRRORING,
+    NOTIFICATION_CREATED,
+    SCREEN_MIRROR_VIDEO,
+    SCREEN_MIRROR_VIDEO_CODEC,
+    SCREEN_MIRROR_AUDIO,
+    NOTIFICATION_UPDATED,
+    NOTIFICATION_DELETED,
+    NOTIFICATION_REFRESHED,
+    POMODORO_ACTION,
+    POMODORO_SETTINGS_UPDATE,
+    SCREEN_MIRROR_AUDIO_GRANTED,
+    BOOKMARK_UPDATED,
+    DOWNLOAD_PROGRESS,
+    MMS_SENT,
+    CHANNELS_UPDATED,
+    IMAGE_SEARCH_UPDATED,
+    PEER_STATUS_UPDATED,
+    DEVICE_NAME_UPDATED,
+    PAIRING_REQUEST_RECEIVED,
+    PAIRING_SUCCESS,
+    PAIRING_FAILED,
+    PAIRING_CANCELED,
+    PAIRING_STARTED,
+    NEARBY_DEVICE_FOUND,
+    NEARBY_DISCOVERY_STARTED,
+    NEARBY_DISCOVERY_STOPPED,
+    IMAGE_EDITOR_UPDATE,
+    SMS_PROVIDER_CHANGED,
+    SMS_SEND_RESULT,
+    MMS_SEND_RESULT,
+    UPLOAD_MERGE_RESULT,
+    CLIPBOARD_CHANGED,
     // Payload: JSON array of granted permission names — a state snapshot
     // identical to the `app.permissions` GraphQL field (not a change set).
-    PERMISSIONS_UPDATED(40),
+    PERMISSIONS_UPDATED,
+    MDNS_UPDATED,
+    PEER_CONNECTIONS_UPDATED,
+    PEER_TRANSPORT_UPDATED,
+    SHARED_FOLDER_DOWNLOAD_UPDATED,
+    DLNA_RENDERER_UPDATED,
+    ONLINE_CLIENTS_UPDATED,
+    WEB_REQUEST_RECEIVED,
+    DLNA_SENDER_UPDATED,
+    IMAGE_MODELS_UPDATED,
+    PREFS_UPDATED,
+    NEARBY_DEVICES_UPDATED,
+
 }
 
-
-@Serializable
-data class PomodoroActionData(
-    val action: String, val timeLeftSec: Int,
-    val totalTimeSec: Int, val completedCount: Int,
-    val round: Int, val state: PomodoroState
-) // action: "start", "pause",  "stop"
 
 @Serializable
 data class PeerStatusData(

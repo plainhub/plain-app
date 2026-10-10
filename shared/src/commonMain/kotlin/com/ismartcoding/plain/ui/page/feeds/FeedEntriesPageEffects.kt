@@ -4,7 +4,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import com.ismartcoding.plain.lib.Channel
-import com.ismartcoding.plain.events.FeedStatusEvent
+import com.ismartcoding.plain.events.HFeedStatusEvent
 import com.ismartcoding.plain.events.WebSocketEvent
 import com.ismartcoding.plain.events.EventType
 import com.ismartcoding.plain.features.feed.FeedWorkerStatus
@@ -46,7 +46,7 @@ internal fun FeedEntriesPageEffects(
                 feedsVM.refreshSelectedItemAsync()
                 scope.launch(IODispatcher) { feedEntriesVM.loadAsync(tagsVM) }
             }
-            if (event is FeedStatusEvent) {
+            if (event is HFeedStatusEvent) {
                 if (event.status == FeedWorkerStatus.COMPLETED || event.status == FeedWorkerStatus.ERROR) {
                     topRefreshLayoutState.setRefreshState(
                         if (event.status == FeedWorkerStatus.ERROR) RefreshContentState.Failed else RefreshContentState.Finished,

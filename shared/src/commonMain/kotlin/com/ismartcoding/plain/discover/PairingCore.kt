@@ -7,7 +7,7 @@ import com.ismartcoding.plain.data.DPairingRequest
 import com.ismartcoding.plain.data.DPairingResponse
 import com.ismartcoding.plain.enums.NearbyMessageType
 import com.ismartcoding.plain.enums.DiscoveryMethod
-import com.ismartcoding.plain.events.PairingSuccessEvent
+import com.ismartcoding.plain.events.HPairingSuccessEvent
 import com.ismartcoding.plain.lib.TimeHelper
 import com.ismartcoding.plain.lib.sendEvent
 import com.ismartcoding.plain.ui.models.NearbyViewModel
@@ -51,7 +51,7 @@ object PairingCore {
     internal suspend fun publishSuccess(id: String, name: String, ip: String, key: String) {
         com.ismartcoding.plain.chat.peer.PeerManager.load()
         NearbyViewModel.handlePairingSuccess(id)
-        sendEvent(PairingSuccessEvent(id, name, ip, key))
+        sendEvent(HPairingSuccessEvent(id, name, ip, key))
     }
 
 }

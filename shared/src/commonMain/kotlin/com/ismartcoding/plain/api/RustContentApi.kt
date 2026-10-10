@@ -7,7 +7,6 @@ import com.ismartcoding.plain.features.feed.FeedWorkerState
 import com.ismartcoding.plain.features.feed.FeedWorkerStatus
 import com.ismartcoding.plain.lib.sendEvent
 import com.ismartcoding.plain.platform.*
-import com.ismartcoding.plain.ui.models.NotesViewModel
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.sync.Mutex
@@ -26,7 +25,7 @@ object RustContentApi {
     private val eventClient by lazy { createPeerStatusHttpClient() }
     private val statusLock = Mutex()
     private val eventSendLock = Mutex()
-    private val eventSocket = MutableStateFlow<PlainWebSocketSession?>(null)
+    private val eventSocket = MutableStateFlow<Pair<PlainWebSocketSession, HostEventCapabilities>?>(null)
     @Volatile private var localSession: ContentApiSession? = null
     private val syncStates = MutableStateFlow<Map<String, Pair<String, String>>>(emptyMap())
 
@@ -140,7 +139,7 @@ object RustContentApi {
         check(completed.first == "COMPLETED") { completed.second.ifEmpty { "Feed sync failed" } }
     }
 
-    private suspend fun refreshSyncStates() = statusLock.withLock {
+    internal suspend fun refreshSyncStates() = statusLock.withLock {
         val values = query("feedSyncStates { feedId status error }")["feedSyncStates"]!!.jsonArray
         val states = values.associate { value ->
             val row = value.jsonObject
@@ -152,21 +151,23 @@ object RustContentApi {
                 val status = FeedWorkerStatus.valueOf(state.first)
                 FeedWorkerState.statusMap[id] = status
                 if (state.second.isEmpty()) FeedWorkerState.errorMap.remove(id) else FeedWorkerState.errorMap[id] = state.second
-                sendEvent(FeedStatusEvent(id, status))
+                sendEvent(HFeedStatusEvent(id, status))
             }
         }
     }
 
     suspend fun publish(event: WebSocketEvent): Int {
         return eventSendLock.withLock {
-            val socket = withTimeoutOrNull(5_000) { eventSocket.filterNotNull().first() } ?: return@withLock 0
+            val (socket, capabilities) = withTimeoutOrNull(5_000) { eventSocket.filterNotNull().first() } ?: return@withLock 0
+            require(capabilities.accepts(event.type, event.data)) { "${event.type} is not a host-produced event" }
             try {
                 when (val data = event.data) {
-                    is WebSocketData.Text -> socket.sendText(JsonHelper.jsonEncode(ContentEventPacket(event.type.value, data.value)))
+                    is WebSocketData.Text -> socket.sendText(JsonHelper.jsonEncode(HostEventPacket(event.type.name, data.value)))
                     is WebSocketData.Binary -> {
-                        val bytes = ByteArray(4 + data.value.size)
-                        repeat(4) { index -> bytes[index] = (event.type.value shr (index * 8)).toByte() }
-                        data.value.copyInto(bytes, 4)
+                        val name = event.type.name.encodeToByteArray()
+                        val bytes = ByteArray(name.size + 1 + data.value.size)
+                        name.copyInto(bytes)
+                        data.value.copyInto(bytes, name.size + 1)
                         socket.sendBinary(bytes)
                     }
                 }
@@ -182,103 +183,15 @@ object RustContentApi {
             try {
                 eventClient.webSocket(localSession!!.baseUrl.replace("http://", "ws://") + "/events", localSession!!.headers()) { socket ->
                     retryMs = 500L
-                    eventSocket.value = socket
-                    com.ismartcoding.plain.preferences.Prefs.refresh()
-                    com.ismartcoding.plain.features.session.refreshOnlineClientIds()
-                    runCatching { postJson("files/mutate", JsonHelper.jsonEncodeToElement(RecoverDeletionsRequest()).jsonObject) }
-                    com.ismartcoding.plain.chat.download.DownloadQueue.refresh()
-                    com.ismartcoding.plain.features.share.SharedFolderDownloadEngine.refresh()
-                    com.ismartcoding.plain.discover.PairingProjection.reconcile()
-                    com.ismartcoding.plain.discover.RustNearbyDevices.refresh()
-                    com.ismartcoding.plain.discover.RustMdnsRuntime.refresh()
-                    com.ismartcoding.plain.features.dlna.DlnaRendererState.refresh()
-                    com.ismartcoding.plain.features.dlna.sender.RustDlnaSender.refresh()
-                    com.ismartcoding.plain.ai.RustImageModels.refresh()
-                    com.ismartcoding.plain.chat.peer.PeerTransportProjection.refresh()
-                    com.ismartcoding.plain.chat.peer.PeerStatusProjection.refresh()
-                    com.ismartcoding.plain.chat.peer.PeerCacher.load()
-                    com.ismartcoding.plain.chat.channel.ChannelCacher.load()
-                    com.ismartcoding.plain.chat.ChatCacher.load()
+                    val greeting = socket.incoming.receive().text ?: error("Missing event handshake")
+                    val initial = JsonHelper.jsonDecode<ContentEventPacket>(greeting)
+                    val capabilities = checkNotNull(initial.hostCapabilities) { "Missing host event capabilities" }
+                    eventSocket.value = socket to capabilities
+                    HttpEventProjection.reconcile()
+                    HttpEventProjection.apply(initial)
                     for (frame in socket.incoming) {
                         val text = frame.text ?: continue
-                        val message = JsonHelper.jsonDecode<ContentEventPacket>(text)
-                        val type = message.type
-                        val payload = message.payload
-                        when (type) {
-                            EventType.PEER_STATUS_UPDATED.value -> {
-                                com.ismartcoding.plain.chat.peer.PeerStatusProjection.refresh()
-                                com.ismartcoding.plain.chat.peer.PeerCacher.load()
-                                com.ismartcoding.plain.chat.ChatCacher.load()
-                            }
-                            com.ismartcoding.plain.chat.peer.PeerTransportProjection.EVENT_UPDATED -> com.ismartcoding.plain.chat.peer.PeerTransportProjection.refresh()
-                            com.ismartcoding.plain.chat.peer.PeerStatusProjection.EVENT_UPDATED -> com.ismartcoding.plain.chat.peer.PeerStatusProjection.refresh(payload)
-                            com.ismartcoding.plain.discover.RustMdnsRuntime.EVENT_UPDATED, EventType.NEARBY_DISCOVERY_STARTED.value, EventType.NEARBY_DISCOVERY_STOPPED.value -> com.ismartcoding.plain.discover.RustMdnsRuntime.refresh(if (type == com.ismartcoding.plain.discover.RustMdnsRuntime.EVENT_UPDATED) payload else null)
-                            com.ismartcoding.plain.features.dlna.DlnaRendererState.EVENT_UPDATED -> com.ismartcoding.plain.features.dlna.DlnaRendererState.refresh()
-                            EventType.NEARBY_DEVICE_FOUND.value -> com.ismartcoding.plain.discover.RustNearbyDevices.refresh(payload)
-                            EventType.PAIRING_REQUEST_RECEIVED.value -> com.ismartcoding.plain.discover.PairingProjection.request(payload)
-                            EventType.PAIRING_STARTED.value -> com.ismartcoding.plain.discover.PairingProjection.started(payload)
-                            EventType.PAIRING_CANCELED.value -> com.ismartcoding.plain.discover.PairingProjection.canceled(payload)
-                            EventType.PAIRING_SUCCESS.value -> com.ismartcoding.plain.discover.PairingProjection.success(payload)
-                            EventType.PAIRING_FAILED.value -> com.ismartcoding.plain.discover.PairingProjection.timeout(payload)
-                            EventType.MESSAGE_CREATED.value -> {
-                                JsonHelper.jsonDecode<JsonElement>(payload).jsonArray.forEach { value ->
-                                    com.ismartcoding.plain.chat.RustChatStore.getById(value.jsonObject.getValue("id").jsonPrimitive.content)?.let { item ->
-                                        if (item.fromId == "me") {
-                                            val target = if (item.channelId.isEmpty()) com.ismartcoding.plain.chat.data.ChatTarget.parseId("peer:" + item.toId)
-                                                else com.ismartcoding.plain.chat.data.ChatTarget.parseId("channel:" + item.channelId)
-                                            com.ismartcoding.plain.chat.ChatViewModel.onMessagesCreated(target, listOf(item), scroll = true)
-                                            com.ismartcoding.plain.chat.ChatCacher.load()
-                                        } else com.ismartcoding.plain.chat.peer.RustPeerStore.getById(item.fromId)?.let { peer ->
-                                            val channel = item.channelId.takeIf { it.isNotEmpty() }?.let { com.ismartcoding.plain.chat.channel.RustChannelStore.getById(it) }
-                                            com.ismartcoding.plain.chat.ChatMessageReceiver.applyCommitted(item, peer, channel)
-                                        }
-                                    }
-                                }
-                            }
-                            EventType.MESSAGE_DELETED.value -> {
-                                val target = JsonHelper.jsonDecode<JsonElement>(payload).jsonPrimitive.content
-                                if (target.startsWith("ids=")) com.ismartcoding.plain.chat.ChatViewModel.onMessagesDeleted(target.removePrefix("ids=").split(',').filter { it.isNotEmpty() }.toSet())
-                                else com.ismartcoding.plain.chat.ChatViewModel.onConversationCleared(target)
-                                com.ismartcoding.plain.chat.ChatCacher.load()
-                            }
-                            EventType.CHANNELS_UPDATED.value -> {
-                                val result = JsonHelper.jsonDecode<JsonElement>(payload).jsonObject
-                                com.ismartcoding.plain.chat.channel.ChannelSystemMessageReceiver.applyCommitted(result)
-                            }
-                            EventType.MESSAGE_UPDATED.value -> {
-                                val items = JsonHelper.jsonDecode<JsonElement>(payload).jsonArray.mapNotNull { value ->
-                                    com.ismartcoding.plain.chat.RustChatStore.getById(value.jsonObject.getValue("id").jsonPrimitive.content)
-                                }
-                                items.forEach { com.ismartcoding.plain.chat.ChatViewModel.update(it) }
-                                com.ismartcoding.plain.chat.ChatCacher.load()
-                            }
-                            EventType.DOWNLOAD_PROGRESS.value -> {
-                                com.ismartcoding.plain.chat.download.DownloadQueue.refresh()
-                            }
-                            10006 -> com.ismartcoding.plain.features.session.setOnlineClientIds(
-                                JsonHelper.jsonDecode<JsonElement>(payload).jsonArray.map { it.jsonPrimitive.content }.toSet())
-                            10010 -> com.ismartcoding.plain.preferences.Prefs.refresh()
-                            10009 -> com.ismartcoding.plain.ai.RustImageModels.apply(JsonHelper.jsonDecode<JsonObject>(payload))
-                            10008 -> com.ismartcoding.plain.features.dlna.sender.RustDlnaSender.apply(JsonHelper.jsonDecode<JsonObject>(payload))
-                            10007 -> {
-                                sendEvent(WebRequestReceivedEvent())
-                            }
-                            10004 -> com.ismartcoding.plain.features.share.SharedFolderDownloadEngine.refresh()
-                            EventType.CONTENT_CHANGED.value -> {
-                                com.ismartcoding.plain.preferences.Prefs.refresh()
-                                val channels = com.ismartcoding.plain.chat.channel.RustChannelRuntime.call(com.ismartcoding.plain.chat.channel.ChannelCommand.Snapshot)
-                                com.ismartcoding.plain.chat.channel.ChannelSystemMessageReceiver.applyCommitted(channels)
-                                try { com.ismartcoding.plain.features.FavoriteFolderHelper.refresh() }
-                                catch (cancelled: CancellationException) { throw cancelled }
-                                catch (error: Exception) { com.ismartcoding.plain.lib.logcat.LogCat.e("Favorite folders refresh",error) }
-                                refreshSyncStates()
-                                NotesViewModel.reloadAsync()
-                                com.ismartcoding.plain.features.PomodoroHost.refresh()
-                            }
-                            EventType.POMODORO_ACTION.value -> {
-                                com.ismartcoding.plain.features.PomodoroHost.refresh()
-                            }
-                        }
+                        HttpEventProjection.apply(JsonHelper.jsonDecode<ContentEventPacket>(text))
                     }
                 }
             } catch (cancelled: CancellationException) { throw cancelled }

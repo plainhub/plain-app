@@ -31,7 +31,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.ismartcoding.plain.enums.ButtonSize
 import com.ismartcoding.plain.enums.ButtonType
-import com.ismartcoding.plain.events.ConfirmToAcceptLoginEvent
+import com.ismartcoding.plain.events.HConfirmToAcceptLoginEvent
 import com.ismartcoding.plain.lib.extensions.capitalize
 import com.ismartcoding.plain.ui.base.PCard
 import com.ismartcoding.plain.ui.base.PFilledButton
@@ -45,7 +45,7 @@ import com.ismartcoding.plain.ui.resources.laptop as ui_drawable_laptop
 
 @Composable
 fun LoginRequestPage(
-    event: ConfirmToAcceptLoginEvent,
+    event: HConfirmToAcceptLoginEvent,
     clientIp: String,
     navController: NavHostController,
 ) {

@@ -13,7 +13,7 @@ import kotlinx.serialization.json.jsonObject
 /**
  * The one Kotlin mirror of the Rust cast runtime: it owns the projected state
  * and is the only caller of `POST /system/dlna-sender`. State arrives on
- * websocket event 10008, commands go out over the same endpoint.
+ * websocket event DLNA_SENDER_UPDATED, commands go out over the same endpoint.
  */
 internal object RustDlnaSender {
     private val projectionLock = PlatformLock()

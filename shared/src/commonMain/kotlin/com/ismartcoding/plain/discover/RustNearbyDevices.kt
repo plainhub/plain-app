@@ -3,10 +3,7 @@ package com.ismartcoding.plain.discover
 import com.ismartcoding.plain.api.RustContentApi
 import com.ismartcoding.plain.ble.client.BleGattClient
 import com.ismartcoding.plain.data.DNearbyDevice
-import com.ismartcoding.plain.events.EventType
-import com.ismartcoding.plain.events.WebSocketEvent
 import com.ismartcoding.plain.lib.JsonHelper
-import com.ismartcoding.plain.lib.sendEvent
 import com.ismartcoding.plain.ui.models.NearbyViewModel
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
@@ -35,12 +32,8 @@ object RustNearbyDevices {
         true
     }
 
-    suspend fun refresh(payload: String? = null) = mutex.withLock {
+    suspend fun refresh() = mutex.withLock {
         apply(call(buildJsonObject { put("action", "snapshot") }))
-        val id = payload?.let { Json.parseToJsonElement(it).jsonObject["eventId"]?.jsonPrimitive?.contentOrNull }
-        NearbyViewModel.nearbyDevices.value.firstOrNull { it.id == id }?.let {
-            sendEvent(WebSocketEvent(EventType.NEARBY_DEVICE_FOUND, JsonHelper.jsonEncode(it)))
-        }
     }
 
     private suspend fun call(body: JsonObject) = RustContentApi.postJsonOrThrow("chat/nearby-devices", body).getValue("result").jsonObject

@@ -28,8 +28,8 @@ internal object RustImageModels {
             if (next.version < version) return@withLock
             version = next.version
             state.value = next
-            sendEvent(ImageSearchStatusChangedEvent(next.status,next.downloadProgress,next.errorMessage))
-            sendEvent(ImageIndexProgressEvent(next.totalImages,next.indexedImages,next.isIndexing))
+            sendEvent(HImageSearchStatusChangedEvent(next.status,next.downloadProgress,next.errorMessage))
+            sendEvent(HImageIndexProgressEvent(next.totalImages,next.indexedImages,next.isIndexing))
         }
     }
 }

@@ -12,7 +12,6 @@ import kotlinx.serialization.json.*
 
 object DlnaRendererState {
     /** Broadcast by the engine whenever the renderer state changes. */
-    const val EVENT_UPDATED = 10005
 
     val isRunning = MutableStateFlow(false)
     val isRetrying = MutableStateFlow(false)
@@ -64,7 +63,7 @@ object DlnaRendererState {
             startError.value = state.startError
             val wasPending = pendingCastRequest.value != null
             pendingCastRequest.value = state.pendingCastRequest
-            if (!wasPending && state.pendingCastRequest != null) sendEvent(DlnaCastRequestEvent())
+            if (!wasPending && state.pendingCastRequest != null) sendEvent(HDlnaCastRequestEvent())
         }
     }
 }

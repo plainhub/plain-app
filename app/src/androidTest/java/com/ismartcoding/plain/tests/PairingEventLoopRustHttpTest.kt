@@ -6,8 +6,8 @@ import com.ismartcoding.plain.data.DPairingCancel
 import com.ismartcoding.plain.data.DPairingRequest
 import com.ismartcoding.plain.discover.RustPairingRuntime
 import com.ismartcoding.plain.enums.DeviceType
-import com.ismartcoding.plain.events.PairingCanceledEvent
-import com.ismartcoding.plain.events.PairingRequestReceivedEvent
+import com.ismartcoding.plain.events.HPairingCanceledEvent
+import com.ismartcoding.plain.events.HPairingRequestReceivedEvent
 import com.ismartcoding.plain.events.WebSocketData
 import com.ismartcoding.plain.events.WebSocketEvent
 import com.ismartcoding.plain.lib.Channel
@@ -37,8 +37,8 @@ class PairingEventLoopRustHttpTest {
         val observer = launch(start = CoroutineStart.UNDISPATCHED) {
             Channel.sharedFlow.collect { event ->
                 when (event) {
-                    is PairingRequestReceivedEvent -> if (event.request.fromId == id) requests.incrementAndGet()
-                    is PairingCanceledEvent -> if (event.fromId == id) cancels.incrementAndGet()
+                    is HPairingRequestReceivedEvent -> if (event.request.fromId == id) requests.incrementAndGet()
+                    is HPairingCanceledEvent -> if (event.fromId == id) cancels.incrementAndGet()
                     is WebSocketEvent -> if ((event.data as? WebSocketData.Text)?.value?.contains(id) == true) republished.incrementAndGet()
                 }
             }

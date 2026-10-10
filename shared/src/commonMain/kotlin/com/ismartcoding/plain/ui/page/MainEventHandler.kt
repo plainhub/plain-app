@@ -11,12 +11,9 @@ import androidx.navigation.NavHostController
 import androidx.navigation.NavDestination.Companion.hasRoute
 import com.ismartcoding.plain.events.AudioActionEvent
 import com.ismartcoding.plain.events.ConfirmDialogEvent
-import com.ismartcoding.plain.events.ConfirmToAcceptLoginEvent
+import com.ismartcoding.plain.events.HConfirmToAcceptLoginEvent
 import com.ismartcoding.plain.events.LoadingDialogEvent
 import com.ismartcoding.plain.events.HDownloadTaskDoneEvent
-import com.ismartcoding.plain.events.HPomodoroPauseEvent
-import com.ismartcoding.plain.events.HPomodoroStartEvent
-import com.ismartcoding.plain.events.HPomodoroStopEvent
 import com.ismartcoding.plain.ui.base.ToastEvent
 import com.ismartcoding.plain.ui.models.AudioQueueViewModel
 import com.ismartcoding.plain.chat.ChatViewModel
@@ -64,14 +61,7 @@ fun MainEventCollector(
                     }
                 }
 
-                is com.ismartcoding.plain.events.PomodoroChangedEvent -> pomodoroVM.applySnapshot(event.today)
-
-                is HPomodoroStartEvent -> {
-                    pomodoroVM.timeLeft.intValue = event.timeLeft
-                    pomodoroVM.startSession()
-                }
-                is HPomodoroPauseEvent -> pomodoroVM.pauseSession()
-                is HPomodoroStopEvent -> pomodoroVM.resetTimer()
+                is com.ismartcoding.plain.events.HPomodoroChangedEvent -> pomodoroVM.applySnapshot(event.today)
 
                 is HDownloadTaskDoneEvent -> {
                     scope.launch(Dispatchers.Default) {
@@ -83,7 +73,7 @@ fun MainEventCollector(
                 }
 
 
-                is ConfirmToAcceptLoginEvent -> {
+                is HConfirmToAcceptLoginEvent -> {
                     mainVM.pendingLoginEvent.value = event
                     if (navController.currentBackStackEntry?.destination?.hasRoute<Routing.LoginRequest>() != true) {
                         navController.navigate(Routing.LoginRequest)

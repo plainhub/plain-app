@@ -2,27 +2,19 @@ package com.ismartcoding.plain.events
 
 import com.ismartcoding.plain.chat.download.DownloadTask
 import com.ismartcoding.plain.enums.WebSettingsFeature
-import com.ismartcoding.plain.lib.ChannelEvent
 
-// Pomodoro events
-class HPomodoroStartEvent(val timeLeft: Int) : ChannelEvent()
+class HStartScreenMirrorEvent(val audio: Boolean) : HEvent()
 
-class HPomodoroPauseEvent : ChannelEvent()
+class HRequestScreenMirrorAudioEvent : HEvent()
 
-class HPomodoroStopEvent : ChannelEvent()
+class HOpenAccessibilitySettingsEvent : HEvent()
 
-class HStartScreenMirrorEvent(val audio: Boolean) : ChannelEvent()
+class HOpenWebSettingsEvent(val feature: WebSettingsFeature? = null) : HEvent()
 
-class HRequestScreenMirrorAudioEvent : ChannelEvent()
+class HEnableImageSearchEvent : HEvent()
+class HDisableImageSearchEvent : HEvent()
+class HCancelImageModelDownloadEvent : HEvent()
 
-class HOpenAccessibilitySettingsEvent : ChannelEvent()
+class HCancelNotificationsEvent(val ids: Set<String>) : HEvent()
 
-class HOpenWebSettingsEvent(val feature: WebSettingsFeature? = null) : ChannelEvent()
-
-class HEnableImageSearchEvent : ChannelEvent()
-class HDisableImageSearchEvent : ChannelEvent()
-class HCancelImageModelDownloadEvent : ChannelEvent()
-
-class HCancelNotificationsEvent(val ids: Set<String>) : ChannelEvent()
-
-data class HDownloadTaskDoneEvent(val downloadTask: DownloadTask) : ChannelEvent()
+data class HDownloadTaskDoneEvent(val downloadTask: DownloadTask) : HEvent()

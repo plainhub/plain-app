@@ -8,6 +8,6 @@ import kotlinx.serialization.json.jsonObject
 
 internal object RustNotificationEvents {
     suspend fun publish(type: EventType, notification: DNotification) {
-        RustContentApi.postJsonOrThrow("system/notification-event", JsonHelper.jsonEncodeToElement(NotificationEventFacts(type.value, notification)).jsonObject)
+        RustContentApi.postJsonOrThrow("system/notification-event", JsonHelper.jsonEncodeToElement(NotificationEventFacts(type.name, notification)).jsonObject)
     }
 }

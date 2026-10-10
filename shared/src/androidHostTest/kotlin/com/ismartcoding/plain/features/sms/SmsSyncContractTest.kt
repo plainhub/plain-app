@@ -12,11 +12,11 @@ import org.junit.Test
 
 class SmsSyncContractTest {
     @Test
-    fun `SMS synchronization event IDs are additive and unique`() {
-        assertEquals(35, EventType.SMS_PROVIDER_CHANGED.value)
-        assertEquals(36, EventType.SMS_SEND_RESULT.value)
-        assertEquals(37, EventType.MMS_SEND_RESULT.value)
-        assertEquals(EventType.entries.size, EventType.entries.map { it.value }.toSet().size)
+    fun `SMS synchronization event names are explicit and unique`() {
+        assertEquals("SMS_PROVIDER_CHANGED", EventType.SMS_PROVIDER_CHANGED.name)
+        assertEquals("SMS_SEND_RESULT", EventType.SMS_SEND_RESULT.name)
+        assertEquals("MMS_SEND_RESULT", EventType.MMS_SEND_RESULT.name)
+        assertEquals(EventType.entries.size, EventType.entries.map { it.name }.toSet().size)
     }
 
     @Test

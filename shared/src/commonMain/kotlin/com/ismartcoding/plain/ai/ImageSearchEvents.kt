@@ -1,19 +1,19 @@
 package com.ismartcoding.plain.ai
 
-import com.ismartcoding.plain.lib.ChannelEvent
+import com.ismartcoding.plain.events.HEvent
 import kotlinx.serialization.Serializable
 
-data class ImageSearchStatusChangedEvent(
+data class HImageSearchStatusChangedEvent(
     val status: ImageSearchStatusType,
     val downloadProgress: Int = 0,
     val errorMessage: String = "",
-) : ChannelEvent()
+) : HEvent()
 
-data class ImageIndexProgressEvent(
+data class HImageIndexProgressEvent(
     val total: Int,
     val indexed: Int,
     val isRunning: Boolean,
-) : ChannelEvent()
+) : HEvent()
 
 @Serializable
 enum class ImageSearchStatusType {

@@ -11,7 +11,7 @@ import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.events.KeepAwakeChangedEvent
 import com.ismartcoding.plain.events.PowerConnectedEvent
 import com.ismartcoding.plain.events.PowerDisconnectedEvent
-import com.ismartcoding.plain.events.WebRequestReceivedEvent
+import com.ismartcoding.plain.events.HWebRequestReceivedEvent
 import com.ismartcoding.plain.events.WindowFocusChangedEvent
 import com.ismartcoding.plain.powerManager
 import com.ismartcoding.plain.receivers.PlugInControlReceiver
@@ -57,7 +57,7 @@ internal class HttpServerLockManager(private val context: Context) {
             scheduleInactivityTimer()
             Channel.sharedFlow.collect { event ->
                 when (event) {
-                    is WebRequestReceivedEvent -> lastActivityMs = System.currentTimeMillis()
+                    is HWebRequestReceivedEvent -> lastActivityMs = System.currentTimeMillis()
                     is WindowFocusChangedEvent -> if (event.hasFocus) {
                         lastActivityMs = System.currentTimeMillis()
                         acquireLocks()

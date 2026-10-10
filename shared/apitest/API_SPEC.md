@@ -176,50 +176,52 @@ term       := [field ":"] value op?
 
 - `audioLyrics`（2026-09-22 用户定）：NAS 返回 `String!`（无歌词=空串），与手机的 nullable `String`（无歌词=null）**刻意分歧**；客户端对两端都兼容（空串与 null 同义处理）。
 
-## 11. WebSocket 事件协议（旁路实时契约，2026-09-20 冻结记录）
+## 11. WebSocket 事件协议（旁路实时契约，2026-10-10 命名协议）
 
-GraphQL schema 没有 Subscription；实时变更走专用 WS 旁路。**事件名/编号/payload 一旦多平台消费即冻结**，改动视同 breaking（新增事件/字段为增量安全；重命名/复用编号禁止）。权威源码：`shared/src/commonMain/kotlin/com/ismartcoding/plain/events/WebSocketEvents.kt`（EventType 枚举 + payload data class）与各 `sendEvent(WebSocketEvent(...))` 调用点。
+GraphQL schema 没有 Subscription；实时变更使用既有 WebSocket。事件标识直接使用大写下划线名称（例如 `PAIRING_REQUEST_RECEIVED`），不再分配或接受数字编号。App、共享 Rust、Desktop / NAS web 必须同时更新；不保留数字协议兼容路径。
 
-**帧格式**（SJCL 加密通道解密后）：`[4 字节大端 int32 事件编号][payload 字节]`。payload 除下列 raw-binary 事件外均为 UTF-8 JSON。
+**帧格式**：公开二进制事件帧为 `[UTF-8 事件名][0x00][payload 字节]`。事件名只允许 `A`–`Z` 和 `_`；首次 `0x00` 分隔名称与 payload，payload 中的零字节保留。普通 payload 是 XChaCha20-Poly1305 加密的 UTF-8 JSON，raw-binary payload 保持原始字节；握手与上行控制见 §12。共享 codec 为 plain-desktop `plain-rs/src/ws_frame.rs`，web 解码为 `src/lib/api/sjcl-arraybuffer.ts`。
 
-**Raw-binary 事件**（payload 不是 JSON）：`SCREEN_MIRROR_VIDEO(31)`、`SCREEN_MIRROR_AUDIO(33)`、`IMAGE_EDITOR_UPDATE(34)`（编辑器增量帧）。
+私有 HTTP `/events` 文本帧使用 `{"type":"EVENT_NAME","payload":"…"}`；二进制平台上报使用同一命名帧头。事件方向及宿主能力策略见 [事件数据流](../../../plain-desktop/.ai/docs/EVENT_DATA_FLOW.md)。
 
-**事件注册表**（编号冻结；payload 类型标注 Kotlin data class 或字面形状）：
+**Raw-binary 事件**（payload 不是 JSON）：`SCREEN_MIRROR_VIDEO`、`SCREEN_MIRROR_AUDIO`、`IMAGE_EDITOR_UPDATE`（编辑器增量帧）。
 
-| 编号 | 事件 | payload |
-|---|---|---|
-| 1 | MESSAGE_CREATED | JSON `[ChatItem…]` |
-| 2 | MESSAGE_DELETED | JSON 字符串，两种形态：query DSL `"ids=a,b,c"` 或单 id（消费端两种都要兼容） |
-| 3 | MESSAGE_UPDATED | JSON `[ChatItem…]` |
-| 4 | FEEDS_FETCHED | `{feedId, error}`（feedId="all" 表示全量同步） |
-| 5 | SCREEN_MIRRORING | `{"running": bool}` |
-| 7/8/9 | NOTIFICATION_CREATED / UPDATED / DELETED | model 列表或 id 列表（见 PNotificationListenerService） |
-| 10 | NOTIFICATION_REFRESHED | 空（触发客户端重新拉取 `notifications`） |
-| 11 | POMODORO_ACTION | `PomodoroActionData{action:"start"|"pause"|"stop", timeLeftSec, totalTimeSec, completedCount, round, state}`（秒；2026-09-20 字段改名加 Sec 后缀，多平台同周期生效） |
-| 12 | POMODORO_SETTINGS_UPDATE | DPomodoroSettings JSON |
-| 14 | SCREEN_MIRROR_AUDIO_GRANTED | JSON bool |
-| 15 | BOOKMARK_UPDATED | 空（重新拉取 `bookmarks`/`bookmarkGroups`） |
-| 16 | DOWNLOAD_PROGRESS | `[DownloadProgressItem{id, messageId, downloadedSize, size, downloadSpeed, status}]` |
-| 17 | MMS_SENT | 见 MMS_SEND_RESULT 流程 |
-| 18 | CHANNELS_UPDATED | 空（重新拉取 `chatChannels`） |
-| 19 | IMAGE_SEARCH_UPDATED | ImageSearchStatus JSON（同 GraphQL `imageSearchStatus`） |
-| 20 | PEER_STATUS_UPDATED | `PeerStatusData{id, online}` |
-| 21 | DEVICE_NAME_UPDATED | JSON 字符串（新设备名） |
-| 22 | PAIRING_REQUEST_RECEIVED | DPairingRequest JSON |
-| 23/24/25/26 | PAIRING_SUCCESS / FAILED / CANCELED / STARTED | `DPairingResult{deviceId, deviceName, error?}` |
-| 27 | NEARBY_DEVICE_FOUND | DNearbyDevice JSON（含 status） |
-| 29/30 | NEARBY_DISCOVERY_STARTED / STOPPED | `"{}"` |
-| 31/32/33 | SCREEN_MIRROR_VIDEO / VIDEO_CODEC / AUDIO | 31/33 为裸媒体流；32 为 `ScreenMirrorVideoCodec` JSON |
-| 34 | IMAGE_EDITOR_UPDATE | 编辑器增量二进制帧 |
-| 35 | SMS_PROVIDER_CHANGED | `{uris: [...]}` |
-| 36 | SMS_SEND_RESULT | `SmsSendResultData{requestId?, success, resultCode}`（-1000=超时，-1001=取消） |
-| 37 | MMS_SEND_RESULT | `MmsSendResultData{pendingId, success, resultCode}`（sendMms 返回的 pendingId 在此回结） |
-| 38 | UPLOAD_MERGE_RESULT | `UploadMergeResultData{fileId, ok, value?, mergedSize?, error?}` |
-| 39 | CLIPBOARD_CHANGED | `ClipboardChangedData{text, sensitive, time}`（time=epoch millis 例外，见 docs/clipboard-sync.md） |
-| 47 | CONTENT_CHANGED | `{}`（Notes/Feeds/标签变更后重新查询；本机服务重连时也触发刷新） |
-| 40 | PERMISSIONS_UPDATED | JSON 字符串数组（已授权权限名快照，同 `app.permissions`） |
+**事件注册表**（payload 类型标注 Kotlin data class 或字面形状）：
 
-编号 6/13/28 已跳过不存在，**禁止回收复用**。新增事件顺次取下一个空闲编号。
+| 事件 | payload |
+|---|---|
+| MESSAGE_CREATED | JSON `[ChatItem…]` |
+| MESSAGE_DELETED | JSON 字符串，两种形态：query DSL `"ids=a,b,c"` 或单 id（消费端两种都要兼容） |
+| MESSAGE_UPDATED | JSON `[ChatItem…]` |
+| FEEDS_FETCHED | `{feedId, error}`（feedId="all" 表示全量同步） |
+| SCREEN_MIRRORING | `{"running": bool}` |
+| NOTIFICATION_CREATED / NOTIFICATION_UPDATED / NOTIFICATION_DELETED | model 列表或 id 列表（见 PNotificationListenerService） |
+| NOTIFICATION_REFRESHED | 空（触发客户端重新拉取 `notifications`） |
+| POMODORO_ACTION | `{action:"start"|"pause"|"stop", timeLeftSec, totalTimeSec, completedCount, round, state}`（秒；2026-09-20 字段改名加 Sec 后缀，多平台同周期生效） |
+| POMODORO_SETTINGS_UPDATE | DPomodoroSettings JSON |
+| SCREEN_MIRROR_AUDIO_GRANTED | JSON bool |
+| BOOKMARK_UPDATED | 空（重新拉取 `bookmarks`/`bookmarkGroups`） |
+| DOWNLOAD_PROGRESS | `[DownloadProgressItem{id, messageId, downloadedSize, size, downloadSpeed, status}]` |
+| MMS_SENT | 见 MMS_SEND_RESULT 流程 |
+| CHANNELS_UPDATED | 空（重新拉取 `chatChannels`） |
+| IMAGE_SEARCH_UPDATED | ImageSearchStatus JSON（同 GraphQL `imageSearchStatus`） |
+| PEER_STATUS_UPDATED | `PeerStatusData{id, online}` |
+| DEVICE_NAME_UPDATED | JSON 字符串（新设备名） |
+| PAIRING_REQUEST_RECEIVED | DPairingRequest JSON |
+| PAIRING_SUCCESS / PAIRING_FAILED / PAIRING_CANCELED / PAIRING_STARTED | `DPairingResult{deviceId, deviceName, error?}` |
+| NEARBY_DEVICE_FOUND | DNearbyDevice JSON（含 status） |
+| NEARBY_DISCOVERY_STARTED / NEARBY_DISCOVERY_STOPPED | `"{}"` |
+| SCREEN_MIRROR_VIDEO / SCREEN_MIRROR_VIDEO_CODEC / SCREEN_MIRROR_AUDIO | VIDEO / AUDIO 为裸媒体流；VIDEO_CODEC 为 `ScreenMirrorVideoCodec` JSON |
+| IMAGE_EDITOR_UPDATE | 编辑器增量二进制帧 |
+| SMS_PROVIDER_CHANGED | `{uris: [...]}` |
+| SMS_SEND_RESULT | `SmsSendResultData{requestId?, success, resultCode}`（-1000=超时，-1001=取消） |
+| MMS_SEND_RESULT | `MmsSendResultData{pendingId, success, resultCode}`（sendMms 返回的 pendingId 在此回结） |
+| UPLOAD_MERGE_RESULT | `UploadMergeResultData{fileId, ok, value?, mergedSize?, error?}` |
+| CLIPBOARD_CHANGED | `ClipboardChangedData{text, sensitive, time}`（time=epoch millis 例外，见 docs/clipboard-sync.md） |
+| CONTENT_CHANGED | `{}`（Notes/Feeds/标签变更后重新查询；本机服务重连时也触发刷新） |
+| PERMISSIONS_UPDATED | JSON 字符串数组（已授权权限名快照，同 `app.permissions`） |
+
+新增事件使用语义名称，禁止复用或重载已有名称。
 
 上行（客户端→手机）控制通道见 §12。
 
@@ -253,7 +255,7 @@ GraphQL 之外的客户端→手机实时控制旁路，协议与 plain-cast 同
 
 **JSON 上行一律走类型信封**：`{"type":"<注册名>", …}`（kotlinx 多态判别字段，服务端 `UpstreamMessage` sealed interface）。**裸 `ScreenMirrorControlInput` 不被接受**（防 `ignoreUnknownKeys` 误路由：不相关事件碰巧带 `action` 字段不得注入触控）。当前注册：`screenMirrorControl`（字段 `input: ScreenMirrorControlInput`）。未知 `type` / 畸形 JSON / 非法枚举：kotlinx 判别查找在读 payload 前即抛出，服务端 log 后丢弃（发送端无回执）。
 
-**双注册表（新增上行协议的唯一入口）**：二进制 magic 字节与 JSON type 名均在此登记，禁止复用/重载已有值——新二进制协议取新 magic 字节（`0x54` 已占用），新 JSON 事件加新 type 名 + sealed 子类 + 服务端 when 分支。对齐 §11 下行事件编号的管理纪律。
+**双注册表（新增上行协议的唯一入口）**：二进制 magic 字节与 JSON type 名均在此登记，禁止复用/重载已有值——新二进制协议取新 magic 字节（`0x54` 已占用），新 JSON 事件加新 type 名 + sealed 子类 + 服务端 when 分支。对齐 §11 下行事件名称的管理纪律。
 
 | 注册名 / magic | 协议 | 载荷 |
 |---|---|---|

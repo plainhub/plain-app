@@ -7,7 +7,6 @@ import kotlinx.coroutines.sync.withLock
 import kotlinx.serialization.json.*
 
 object PeerStatusProjection {
-    const val EVENT_UPDATED = 10002
     private val lock = Mutex()
 
     suspend fun refresh(payload: String? = null) = lock.withLock {
