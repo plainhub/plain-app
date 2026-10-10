@@ -58,6 +58,7 @@ fun ComponentShowcasePage(navController: NavHostController) {
             item { ShowcaseCards() }
             item { ShowcaseButtons() }
             item { ShowcaseSegmentedButtons() }
+            item { ShowcaseRangeDots() }
             item { ShowcaseComponentStates() }
             item { ShowcaseChipsAndSwitches() }
             item { ShowcaseTips() }
