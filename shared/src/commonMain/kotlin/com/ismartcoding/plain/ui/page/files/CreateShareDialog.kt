@@ -19,7 +19,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.ismartcoding.plain.db.DShare
 import com.ismartcoding.plain.enums.ButtonSize
-import com.ismartcoding.plain.features.share.ShareCrypto
 import com.ismartcoding.plain.features.share.ShareExpiry
 import com.ismartcoding.plain.features.share.ShareManager
 import com.ismartcoding.plain.i18n.Res
@@ -184,7 +183,6 @@ fun CreateShareDialog(
                             val s = ShareManager.createShare(
                                 name = name.ifBlank { defaultName },
                                 realPaths = paths,
-                                urlToken = ShareCrypto.newUrlToken(),
                                 readOnly = true,
                                 expiresAt = expiry.expiresAt(TimeHelper.now()),
                             )

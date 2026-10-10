@@ -2,7 +2,6 @@ package com.ismartcoding.plain.tests
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
-import com.ismartcoding.plain.features.share.ShareCrypto
 import com.ismartcoding.plain.features.share.ShareManager
 import com.ismartcoding.plain.helpers.UrlHelper
 import com.ismartcoding.plain.platform.streamZipToSink
@@ -33,9 +32,8 @@ class ShareRustHttpTest {
         var id: String? = null
         try {
             UserPrefs.service.value = true
-            val share = ShareManager.createShare(marker,listOf(folder.absolutePath),ShareCrypto.newUrlToken(),true,null)
+            val share = ShareManager.createShare(marker,listOf(folder.absolutePath),true,null)
             id = share.id
-            assertArrayEquals(ShareCrypto.deriveSharedToken(share.id),Base64.UrlSafe.decode(ShareManager.sharedToken(share.id)))
             assertTrue(ShareManager.buildLink(share, "127.0.0.1").contains("/s/${share.id}#"))
             assertNotNull(ShareManager.loadAuth(share.id))
             val encrypted = UrlHelper.encrypt("{\"sharedId\":\"${share.id}\",\"virtualPath\":\"photos/a.txt\"}",Base64.decode(share.urlToken))

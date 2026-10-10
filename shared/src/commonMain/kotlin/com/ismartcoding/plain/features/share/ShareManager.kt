@@ -10,8 +10,8 @@ import kotlin.time.Instant
 object ShareManager {
     private const val FIELDS = "id name password urlToken readOnly expiresAt createdAt updatedAt roots { virtualPath realPath isDir }"
 
-    suspend fun createShare(name: String, realPaths: List<String>, urlToken: String, readOnly: Boolean, expiresAt: Instant?): DShare =
-        RustContentApi.mutate("createShare(name: ${gql(name)}, realPaths: ${gqlIds(realPaths)}, urlToken: ${gql(urlToken)}, readOnly: $readOnly, expiresAt: ${expiry(expiresAt)}) { $FIELDS }")
+    suspend fun createShare(name: String, realPaths: List<String>, readOnly: Boolean, expiresAt: Instant?): DShare =
+        RustContentApi.mutate("createShare(name: ${gql(name)}, realPaths: ${gqlIds(realPaths)}, readOnly: $readOnly, expiresAt: ${expiry(expiresAt)}) { $FIELDS }")
             .getValue("createShare").share()
 
     suspend fun updateShare(id: String, name: String, expiresAt: Instant?, realPaths: List<String>? = null): DShare =
