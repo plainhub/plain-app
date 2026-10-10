@@ -5,11 +5,14 @@
 // crate instantiates the schema, which for the mobile build is this one.
 #![recursion_limit = "512"]
 
-mod core;
-pub use plain_rs::ble::ffi as ble;
+mod bootstrap;
+mod ffi;
+use crate::ffi::values::c_string;
+use crate::ffi::values::input;
+pub use plain_rs::ffi::ble;
 use plain_rs::prefs::Prefs;
 use serde_json::{Map, Value};
-use std::ffi::{CStr, CString, c_char};
+use std::ffi::{CString, c_char};
 use std::path::Path;
 use std::sync::{Arc, Mutex};
 
@@ -69,21 +72,6 @@ fn remove(is_user_pref: bool, key: &str) -> Result<(), String> {
         prefs.remove(key).map_err(|e| e.to_string())?;
     }
     Ok(())
-}
-
-fn c_string(value: String) -> *mut c_char {
-    CString::new(value).expect("string contains NUL").into_raw()
-}
-
-fn input(pointer: *const c_char) -> Result<String, String> {
-    if pointer.is_null() {
-        return Err("null string passed to Rust preferences".to_string());
-    }
-    // SAFETY: callers pass a null-terminated string valid for this call.
-    Ok(unsafe { CStr::from_ptr(pointer) }
-        .to_str()
-        .map_err(|e| e.to_string())?
-        .to_owned())
 }
 
 #[unsafe(no_mangle)]
