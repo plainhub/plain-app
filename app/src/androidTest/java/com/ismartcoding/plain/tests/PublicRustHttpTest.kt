@@ -28,8 +28,8 @@ class PublicRustHttpTest {
         val root = File(appContext.cacheDir, fixtureName).apply { mkdirs() }
         val payload = ByteArray(512 * 1024 + 17) { (it % 251).toByte() }
         try {
-            UserPrefs.service.value = true
-            UserPrefs.desktopAccess.value = true
+            UserPrefs.service.set(true)
+            UserPrefs.desktopAccess.set(true)
             stopHttpEngineAsync()
             startHttpEngineAsync()
             assertTrue(com.ismartcoding.plain.platform.checkHttpServerAsync())
@@ -44,7 +44,7 @@ class PublicRustHttpTest {
             (tls.socketFactory.createSocket("127.0.0.1", tlsPort) as javax.net.ssl.SSLSocket).use {
                 it.startHandshake()
                 val certificate = it.session.peerCertificates.first() as java.security.cert.X509Certificate
-                assertArrayEquals(getSSLSignature(SystemPrefs.keyStorePassword.value), certificate.signature)
+                assertArrayEquals(getSSLSignature(), certificate.signature)
             }
             createUnsafeHttpClient().use { client ->
                 client.get("http://127.0.0.1:$port/health").use { assertEquals(200, it.status.value); assertEquals(getOwnPackageName(), it.bodyAsText()) }
@@ -90,7 +90,7 @@ class PublicRustHttpTest {
                     assertEquals(206, it.status.value)
                     assertArrayEquals(payload.copyOfRange(19, 40), it.bodyAsBytes())
                 }
-                UserPrefs.desktopAccess.value = false
+                UserPrefs.desktopAccess.set(false)
                 client.get("http://127.0.0.1:$port/health").use { assertEquals(200, it.status.value) }
                 client.post("http://127.0.0.1:$port/graphql", "{}".encodeToByteArray(), "application/json").use { assertEquals(404, it.status.value) }
             }
@@ -102,10 +102,10 @@ class PublicRustHttpTest {
             stopHttpEngineAsync()
             if (clientId.isNotEmpty()) com.ismartcoding.plain.features.session.RustSessionStore.delete(clientId)
             root.deleteRecursively()
-            UserPrefs.service.value = oldService
-            UserPrefs.desktopAccess.value = oldDesktop
-            UserPrefs.httpPort.value = oldHttp
-            UserPrefs.httpsPort.value = oldHttps
+            UserPrefs.service.set(oldService)
+            UserPrefs.desktopAccess.set(oldDesktop)
+            UserPrefs.httpPort.set(oldHttp)
+            UserPrefs.httpsPort.set(oldHttps)
         }
     }
 }

@@ -32,7 +32,7 @@ class ChatServiceRustHttpTest {
         val oldService = com.ismartcoding.plain.preferences.UserPrefs.service.value
         suspend fun created(): List<DChat> = RustChatStore.getByPeerId("local").filter { it.content.toJSONString().contains(marker) }.also { rows -> ids += rows.map { it.id } }
         try {
-            com.ismartcoding.plain.preferences.UserPrefs.service.value = true
+            com.ismartcoding.plain.preferences.UserPrefs.service.set(true)
             val longText = marker + "😀".repeat(1100)
             val text = ChatManager.sendText(local, longText).also { ids += it.id }
             assertEquals(ChatStatus.SENT, text.status)
@@ -88,7 +88,7 @@ class ChatServiceRustHttpTest {
             shares.forEach { ShareManager.deleteShare(it) }
             files.forEach { assertNull(AppFileStore.getById(it)) }
             root.deleteRecursively()
-            com.ismartcoding.plain.preferences.UserPrefs.service.value = oldService
+            com.ismartcoding.plain.preferences.UserPrefs.service.set(oldService)
             com.ismartcoding.plain.chat.ChatCacher.load()
         }
     }

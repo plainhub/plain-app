@@ -20,15 +20,15 @@ class SessionMigrationRustHttpTest {
     fun encryptedLoginConfirmationSessionUiAndRevocationUseRust() = runBlocking {
         val oldService = UserPrefs.service.value
         val oldDesktop = UserPrefs.desktopAccess.value
-        val oldTwoFactor = SystemPrefs.authTwoFactor.value
+        val oldTwoFactor = RustSystemState.state.value.authTwoFactor
         val id = "session-fixture-${UUID.randomUUID()}"
         var pendingId = ""
         try {
-            UserPrefs.service.value = true
-            UserPrefs.desktopAccess.value = true
-            SystemPrefs.authTwoFactor.value = true
+            UserPrefs.service.set(true)
+            UserPrefs.desktopAccess.set(true)
+            RustSystemState.setTwoFactor(true)
             val client = generateECDHKeyPair()
-            val digest = sha512(SystemPrefs.password.value.encodeToByteArray())
+            val digest = sha512(RustSystemState.state.value.password.encodeToByteArray())
             val passwordKey = digest.take(32).encodeToByteArray()
             val request = buildJsonObject {
                 put("password", digest)
@@ -70,9 +70,9 @@ class SessionMigrationRustHttpTest {
         } finally {
             if (pendingId.isNotEmpty()) RustWebLogin.cancel(pendingId)
             RustSessionStore.delete(id)
-            SystemPrefs.authTwoFactor.value = oldTwoFactor
-            UserPrefs.desktopAccess.value = oldDesktop
-            UserPrefs.service.value = oldService
+            RustSystemState.setTwoFactor(oldTwoFactor)
+            UserPrefs.desktopAccess.set(oldDesktop)
+            UserPrefs.service.set(oldService)
         }
     }
 }

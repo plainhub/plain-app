@@ -51,21 +51,19 @@ import kotlinx.coroutines.launch
 @Composable
 fun WebSecurityPage(navController: NavHostController) {
     val scope = rememberCoroutineScope()
-    val passwordType = SystemPrefs.passwordType.collectAsStateValue()
-    val password = SystemPrefs.password.collectAsStateValue()
-    val authTwoFactor = SystemPrefs.authTwoFactor.collectAsStateValue()
-    val rotateUrlTokenOnRestart = SystemPrefs.rotateUrlTokenOnRestart.collectAsStateValue()
+    val passwordType = RustSystemState.state.collectAsStateValue().passwordType
+    val password = RustSystemState.state.collectAsStateValue().password
+    val authTwoFactor = RustSystemState.state.collectAsStateValue().authTwoFactor
+    val rotateUrlTokenOnRestart = RustSystemState.state.collectAsStateValue().rotateUrlTokenOnRestart
     var urlToken by remember { mutableStateOf(Base64.encode(TempData.urlToken)) }
-    var keyStorePassword by remember { mutableStateOf("") }
     var sslSignature by remember { mutableStateOf("") }
     val editPassword = remember { mutableStateOf("") }
 
     LaunchedEffect(password) {
         if (editPassword.value != password) editPassword.value = password
         scope.launch(Dispatchers.Default) {
-            keyStorePassword = SystemPrefs.keyStorePassword.value
             try {
-                sslSignature = getSSLSignature(keyStorePassword).toSignature()
+                sslSignature = getSSLSignature().toSignature()
             } catch (ex: Exception) {
                 LogCat.e("Failed to get SSL signature: ${ex.message}"); ex.printStackTrace()
             }
@@ -81,14 +79,14 @@ fun WebSecurityPage(navController: NavHostController) {
                     PCard(modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN)) {
                         PListItem(modifier = Modifier.clickable {
                             scope.launch(Dispatchers.Default) {
-                                SystemPrefs.setPasswordType(
+                                RustSystemState.setPasswordType(
                                     if (passwordType == PasswordType.NONE.value) PasswordType.FIXED else PasswordType.NONE
                                 )
                             }
                         }, title = stringResource(Res.string.require_password)) {
                             Switch(checked = passwordType != PasswordType.NONE.value, onCheckedChange = {
                                 scope.launch(Dispatchers.Default) {
-                                    SystemPrefs.setPasswordType(
+                                    RustSystemState.setPasswordType(
                                         if (passwordType == PasswordType.NONE.value) PasswordType.FIXED else PasswordType.NONE
                                     )
                                 }
@@ -98,7 +96,7 @@ fun WebSecurityPage(navController: NavHostController) {
                         if (passwordType != PasswordType.NONE.value) {
                             PasswordTextField(
                                 value = editPassword.value, isChanged = { editPassword.value != password },
-                                onValueChange = { editPassword.value = it }, onConfirm = { scope.launch(Dispatchers.Default) { SystemPrefs.password.value = it } })
+                                onValueChange = { editPassword.value = it }, onConfirm = { scope.launch(Dispatchers.Default) { RustSystemState.setPassword(it )} })
                             PFilledButton(
                                 modifier = Modifier.padding(start = 16.dp, top = 8.dp, bottom = 16.dp),
                                 text = stringResource(Res.string.generate_password),
@@ -111,11 +109,11 @@ fun WebSecurityPage(navController: NavHostController) {
                     VerticalSpace(dp = 16.dp)
                     PCard(modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN)) {
                         PListItem(
-                            modifier = Modifier.clickable { scope.launch(Dispatchers.Default) { SystemPrefs.authTwoFactor.value = !authTwoFactor } },
+                            modifier = Modifier.clickable { scope.launch(Dispatchers.Default) { RustSystemState.setTwoFactor(!authTwoFactor )} },
                             title = stringResource(Res.string.require_confirmation)
                         ) {
                             Switch(checked = authTwoFactor, onCheckedChange = {
-                                scope.launch(Dispatchers.Default) { SystemPrefs.authTwoFactor.value = it }
+                                scope.launch(Dispatchers.Default) { RustSystemState.setTwoFactor(it )}
                             })
                         }
                     }
@@ -137,10 +135,9 @@ fun WebSecurityPage(navController: NavHostController) {
                         type = ButtonType.DANGER, onClick = {
                             scope.launch(Dispatchers.Default) {
                                 DialogHelper.showLoading()
-                                SystemPrefs.resetKeyStorePassword()
-                                keyStorePassword = SystemPrefs.keyStorePassword.value
-                                generateSSLKeyStore(keyStorePassword)
-                                sslSignature = getSSLSignature(keyStorePassword).toSignature()
+
+                                generateSSLKeyStore()
+                                sslSignature = getSSLSignature().toSignature()
                                 restartServer()
                                 DialogHelper.hideLoading()
                                 DialogHelper.showConfirmDialog("", LocaleHelper.getStringAsync(Res.string.ssl_certificate_reset))
@@ -164,10 +161,10 @@ fun WebSecurityPage(navController: NavHostController) {
                     VerticalSpace(dp = 16.dp)
                     PCard(modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN)) {
                         PListItem(modifier = Modifier.clickable {
-                            scope.launch(Dispatchers.Default) { SystemPrefs.rotateUrlTokenOnRestart.value = !rotateUrlTokenOnRestart }
+                            scope.launch(Dispatchers.Default) { RustSystemState.setRotateUrlToken(!rotateUrlTokenOnRestart )}
                         }, title = stringResource(Res.string.rotate_url_token_on_restart)) {
                             Switch(checked = rotateUrlTokenOnRestart, onCheckedChange = {
-                                scope.launch(Dispatchers.Default) { SystemPrefs.rotateUrlTokenOnRestart.value = it }
+                                scope.launch(Dispatchers.Default) { RustSystemState.setRotateUrlToken(it )}
                             })
                         }
                     }
@@ -180,7 +177,7 @@ fun WebSecurityPage(navController: NavHostController) {
                         type = ButtonType.DANGER,
                         onClick = {
                             scope.launch(Dispatchers.Default) {
-                                SystemPrefs.resetUrlToken()
+                                RustSystemState.resetUrlToken()
                                 urlToken = Base64.encode(TempData.urlToken)
                                 DialogHelper.showMessage(Res.string.the_token_is_reset)
                             }

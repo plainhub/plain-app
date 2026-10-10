@@ -5,7 +5,6 @@ import com.ismartcoding.plain.api.RustContentApi
 import com.ismartcoding.plain.chat.peer.*
 import com.ismartcoding.plain.db.DPeer
 import com.ismartcoding.plain.enums.PeerStatus
-import com.ismartcoding.plain.helpers.SignatureHelper
 import com.ismartcoding.plain.platform.*
 import com.ismartcoding.plain.preferences.*
 import kotlinx.coroutines.runBlocking
@@ -21,19 +20,20 @@ class PeerLanRustHttpTest {
     @Test
     fun rustSendsEncryptedPeerQueryThroughActualTls() = runBlocking {
         RustContentApi.start()
-        val actor = SystemPrefs.clientId.value
+        val actor = RustSystemState.state.value.clientId
         val originalActor = RustPeerStore.getById(actor)
         val id = "synthetic-lan-${UUID.randomUUID()}"
         val key = ByteArray(32) { 7 }
-        val publicKey = SignatureHelper.getRawPublicKeyBase64Async()
+        val signingKey = com.ismartcoding.plain.platform.generateEd25519KeyPair()
+        val publicKey = Base64.encode(signingKey.second)
         val service = UserPrefs.service.value
         val http = UserPrefs.httpPort.value
         val https = UserPrefs.httpsPort.value
         try {
-            UserPrefs.service.value = true
+            UserPrefs.service.set(true)
             stopHttpEngineAsync()
-            UserPrefs.httpPort.value = 0
-            UserPrefs.httpsPort.value = 0
+            UserPrefs.httpPort.set(0)
+            UserPrefs.httpsPort.set(0)
             startHttpEngineAsync()
             assertTrue(com.ismartcoding.plain.platform.checkHttpServerAsync())
             val incoming = DPeer(id = actor, name = "synthetic actor", key = Base64.encode(key), publicKey = publicKey, status = PeerStatus.PAIRED)
@@ -41,7 +41,7 @@ class PeerLanRustHttpTest {
             RustPeerStore.insert(DPeer(id = id, name = id, ip = "bad,127.0.0.1", port = UserPrefs.httpsPort.value, key = Base64.encode(key), publicKey = publicKey, status = PeerStatus.PAIRED))
             val timestamp = System.currentTimeMillis()
             val document = """{"query":"query { __typename }","variables":{}}"""
-            val signature = Base64.encode(SignatureHelper.signDataAsync("$timestamp$document".encodeToByteArray()))
+            val signature = Base64.encode(com.ismartcoding.plain.platform.signEd25519(signingKey.first, "$timestamp$document".encodeToByteArray()))
             val result = RustContentApi.postJsonOrThrow("chat/transport", buildJsonObject {
                 put("action", "send"); put("id", id); put("channel_id", "")
                 put("key", Base64.encode(key)); put("body", "$signature|$timestamp|$document")
@@ -52,9 +52,9 @@ class PeerLanRustHttpTest {
             stopHttpEngineAsync()
             RustPeerStore.delete(id)
             if (originalActor == null) RustPeerStore.delete(actor) else RustPeerStore.update(originalActor)
-            UserPrefs.httpPort.value = http
-            UserPrefs.httpsPort.value = https
-            UserPrefs.service.value = service
+            UserPrefs.httpPort.set(http)
+            UserPrefs.httpsPort.set(https)
+            UserPrefs.service.set(service)
             PeerCacher.load()
         }
     }

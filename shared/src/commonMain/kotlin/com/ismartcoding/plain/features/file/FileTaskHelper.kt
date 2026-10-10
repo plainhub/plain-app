@@ -1,14 +1,14 @@
 package com.ismartcoding.plain.features.file
 
 import com.ismartcoding.plain.api.*
-import com.ismartcoding.plain.preferences.SystemPrefs
+import com.ismartcoding.plain.preferences.RustSystemState
 import kotlinx.coroutines.*
 import kotlinx.serialization.json.*
 import kotlin.time.Instant
 
 object FileTaskHelper {
     private const val fields = "id type status title error totalBytes doneBytes totalItems doneItems createdAt updatedAt completedOps { src dst }"
-    private val clientId: String get() = SystemPrefs.clientId.value.also { check(it.isNotEmpty()) { "File task identity unavailable" } }
+    private val clientId: String get() = RustSystemState.state.value.clientId.also { check(it.isNotEmpty()) { "File task identity unavailable" } }
     suspend fun create(type: FileTaskType, ops: List<FileTaskOp>, title: String = type.name): DFileTask {
         val inputs = ops.joinToString(",") { "{ src: ${gql(it.src)}, dst: ${gql(it.dst)}, overwrite: ${it.overwrite} }" }
         return parse(RustContentApi.mutate("createFileHostTask(clientId: ${gql(clientId)}, type: ${type.name}, title: ${gql(title)}, ops: [$inputs]) { $fields }").getValue("createFileHostTask"))

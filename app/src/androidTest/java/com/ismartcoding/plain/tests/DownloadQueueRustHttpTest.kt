@@ -81,10 +81,10 @@ class DownloadQueueRustHttpTest {
         var hash: String? = null
         val fileId = "$id-file"
         try {
-            com.ismartcoding.plain.preferences.UserPrefs.service.value = true
+            com.ismartcoding.plain.preferences.UserPrefs.service.set(true)
             com.ismartcoding.plain.platform.stopHttpEngineAsync()
-            com.ismartcoding.plain.preferences.UserPrefs.httpPort.value = 0
-            com.ismartcoding.plain.preferences.UserPrefs.httpsPort.value = 0
+            com.ismartcoding.plain.preferences.UserPrefs.httpPort.set(0)
+            com.ismartcoding.plain.preferences.UserPrefs.httpsPort.set(0)
             com.ismartcoding.plain.platform.startHttpEngineAsync()
             assertTrue(com.ismartcoding.plain.platform.checkHttpServerAsync())
             val source = File(root, "source.bin").apply { writeBytes(payload) }
@@ -118,9 +118,9 @@ class DownloadQueueRustHttpTest {
             RustPeerStore.delete(id)
             root.deleteRecursively()
             com.ismartcoding.plain.platform.stopHttpEngineAsync()
-            com.ismartcoding.plain.preferences.UserPrefs.httpPort.value = oldHttp
-            com.ismartcoding.plain.preferences.UserPrefs.httpsPort.value = oldHttps
-            com.ismartcoding.plain.preferences.UserPrefs.service.value = oldService
+            com.ismartcoding.plain.preferences.UserPrefs.httpPort.set(oldHttp)
+            com.ismartcoding.plain.preferences.UserPrefs.httpsPort.set(oldHttps)
+            com.ismartcoding.plain.preferences.UserPrefs.service.set(oldService)
             if (oldService) com.ismartcoding.plain.platform.startHttpEngineAsync()
             com.ismartcoding.plain.chat.ChatCacher.load()
             com.ismartcoding.plain.chat.peer.PeerCacher.load()

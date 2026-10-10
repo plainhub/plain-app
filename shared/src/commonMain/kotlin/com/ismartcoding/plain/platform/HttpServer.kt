@@ -18,9 +18,9 @@ import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.boolean
 import kotlinx.serialization.json.jsonPrimitive
 
-expect suspend fun getSSLSignature(password: String): ByteArray
+expect suspend fun getSSLSignature(): ByteArray
 
-expect suspend fun generateSSLKeyStore(password: String)
+expect suspend fun generateSSLKeyStore()
 
 /**
  * Source format of a user-provided SSL certificate for [replaceSSLKeyStoreAsync].

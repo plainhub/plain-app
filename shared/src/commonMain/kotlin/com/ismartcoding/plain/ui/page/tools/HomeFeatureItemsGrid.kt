@@ -53,7 +53,7 @@ fun HomeFeatureItemsGrid(
     val featuresStr = UserPrefs.homeFeatures.collectAsStateValue()
 
     var enabledIds by remember(featuresStr) {
-        mutableStateOf(UserPrefs.parseFeatures(featuresStr.ifEmpty { UserPrefs.homeFeatures.default }))
+        mutableStateOf(UserPrefs.parseFeatures(featuresStr))
     }
 
     fun persist(newList: List<String>) {

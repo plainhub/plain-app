@@ -32,7 +32,7 @@ import org.jetbrains.compose.resources.stringResource
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AutoCheckUpdatePage(navController: NavHostController, updateViewModel: UpdateViewModel) {
-    val autoCheckUpdate = SystemPrefs.parseUpdateInfo(SystemPrefs.updateInfo.collectAsStateValue()).autoCheckUpdate
+    val autoCheckUpdate = RustSystemState.state.collectAsStateValue().updateInfo.autoCheckUpdate
     val scope = rememberCoroutineScope()
 
     UpdateDialog(updateViewModel)
@@ -53,7 +53,7 @@ fun AutoCheckUpdatePage(navController: NavHostController, updateViewModel: Updat
                     PCard(modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN)) {
                         PListItem(title = stringResource(Res.string.auto_check_update), subtitle = stringResource(Res.string.auto_check_update_desc)) {
                             Switch(checked = autoCheckUpdate, onCheckedChange = { newValue -> scope.launch(Dispatchers.Default) {
-                                SystemPrefs.updateInfo { it.copy(autoCheckUpdate = newValue) } }
+                                RustSystemState.patchUpdate(UpdateInfoPatch(autoCheckUpdate = newValue)) }
                             })
                         }
                     }

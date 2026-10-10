@@ -143,7 +143,7 @@ fun ZipFilePage(
                                 dismiss()
                                 scope.launch(Dispatchers.Default) {
                                     val nv = !showHiddenFiles
-                                    UserPrefs.showHiddenFiles.value = nv
+                                    UserPrefs.showHiddenFiles.set(nv)
                                     showHiddenFiles = nv; filesVM.loadAsync()
                                 }
                             })

@@ -46,10 +46,10 @@ class PeerGraphQLRustHttpTest {
         try {
             TempData.activeToId = "peer:$id"
             RustPeerStore.insert(peer)
-            UserPrefs.service.value = true
+            UserPrefs.service.set(true)
             stopHttpEngineAsync()
-            UserPrefs.httpPort.value = 0
-            UserPrefs.httpsPort.value = 0
+            UserPrefs.httpPort.set(0)
+            UserPrefs.httpsPort.set(0)
             startHttpEngineAsync()
             assertTrue(com.ismartcoding.plain.platform.checkHttpServerAsync())
             val url = "https://127.0.0.1:${UserPrefs.httpsPort.value}/peer_graphql"
@@ -74,7 +74,7 @@ class PeerGraphQLRustHttpTest {
             val invalid = ble(wire(buildJsonObject { put("query", "mutation { createChatItem { id } }") }))
             assertEquals(200, invalid.first)
             assertTrue(decode(invalid.second).getValue("errors").jsonArray.isNotEmpty())
-            UserPrefs.service.value = false
+            UserPrefs.service.set(false)
             assertEquals(403, ble(encrypted).first)
             client.post(url, encrypted, "application/octet-stream", mapOf("c-id" to id)).use { assertEquals(403, it.status.value) }
         } finally {
@@ -85,9 +85,9 @@ class PeerGraphQLRustHttpTest {
             com.ismartcoding.plain.chat.ChatCacher.load()
             TempData.activeToId = active
             stopHttpEngineAsync()
-            UserPrefs.httpPort.value = http
-            UserPrefs.httpsPort.value = https
-            UserPrefs.service.value = service
+            UserPrefs.httpPort.set(http)
+            UserPrefs.httpsPort.set(https)
+            UserPrefs.service.set(service)
             if (service) startHttpEngineAsync()
         }
     }
@@ -121,7 +121,7 @@ class PeerGraphQLRustHttpTest {
         }
         try {
             RustPeerStore.insert(owner)
-            UserPrefs.service.value = true
+            UserPrefs.service.set(true)
             assertFalse(deliver(invite.copy(signature = "")))
             assertNull(RustChannelStore.getById(channelId))
             assertTrue(deliver(invite))
@@ -134,7 +134,7 @@ class PeerGraphQLRustHttpTest {
             RustPeerStore.delete(owner.id)
             ChannelCacher.load()
             PeerCacher.load()
-            UserPrefs.service.value = service
+            UserPrefs.service.set(service)
         }
     }
 }

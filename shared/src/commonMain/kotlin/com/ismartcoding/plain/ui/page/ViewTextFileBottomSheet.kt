@@ -156,12 +156,12 @@ private fun EditorDisplayActionsCard(textFileVM: TextFileViewModel, scope: kotli
         ) {
             val next = when (controller.fontSizeSp.value) { 12 -> 14; 14 -> 16; else -> 12 }
             controller.fontSizeSp.value = next
-            scope.launchSafe { com.ismartcoding.plain.preferences.UserPrefs.editorFontSize.value = next }
+            scope.launchSafe { com.ismartcoding.plain.preferences.UserPrefs.editorFontSize.set(next) }
         }
         PListItem(title = stringResource(Res.string.status_bar), action = {
             Switch(checked = controller.statusBarVisible.value, onCheckedChange = {
                 controller.statusBarVisible.value = !controller.statusBarVisible.value
-                scope.launchSafe { com.ismartcoding.plain.preferences.UserPrefs.editorStatusBar.value = controller.statusBarVisible.value }
+                scope.launchSafe { com.ismartcoding.plain.preferences.UserPrefs.editorStatusBar.set(controller.statusBarVisible.value) }
             })
         })
     }

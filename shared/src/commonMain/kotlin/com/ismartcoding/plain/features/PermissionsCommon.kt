@@ -54,7 +54,7 @@ fun getWebList(): List<PermissionItem> {
  * snapshot.
  */
 suspend fun getGrantedWebPermissionsAsync(): List<Permission> {
-    val apiPermissions = SystemPrefs.apiPermissions.value
+    val apiPermissions = RustSystemState.state.value.apiPermissions
     val granted = Permission.entries.filter { apiPermissions.contains(it.name) && it.isGranted() }.toMutableList()
     if (Permission.RECORD_AUDIO.isGranted() && !granted.contains(Permission.RECORD_AUDIO)) {
         granted.add(Permission.RECORD_AUDIO)

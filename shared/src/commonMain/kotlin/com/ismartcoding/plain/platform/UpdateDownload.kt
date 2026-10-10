@@ -1,7 +1,7 @@
 package com.ismartcoding.plain.platform
 
 /**
- * Download the latest app update from the URL stored in `SystemPrefs.updateInfo`
+ * Download the latest app update from the URL stored in `RustSystemState.updateInfo`
  * to the platform's cache directory. Reports progress via `UpdateDownloadProgressEvent`,
  * completion via `UpdateDownloadCompleteEvent`, and failures via
  * `UpdateDownloadFailedEvent`. Updates the saved update info's downloadedApkPath.

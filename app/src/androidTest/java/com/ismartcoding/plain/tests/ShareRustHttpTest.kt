@@ -31,7 +31,7 @@ class ShareRustHttpTest {
         val service = UserPrefs.service.value
         var id: String? = null
         try {
-            UserPrefs.service.value = true
+            UserPrefs.service.set(true)
             val share = ShareManager.createShare(marker,listOf(folder.absolutePath),true,null)
             id = share.id
             assertTrue(ShareManager.buildLink(share, "127.0.0.1").contains("/s/${share.id}#"))
@@ -56,10 +56,10 @@ class ShareRustHttpTest {
             }
             assertEquals(listOf("a.txt", "empty/"), names)
             assertNull(ShareManager.resolveVirtualPath(share,"photos/../other"))
-            UserPrefs.service.value = false
+            UserPrefs.service.set(false)
             assertNull(ShareManager.loadAuth(share.id))
             assertNull(ShareManager.resolveSharedPath(share.id,encrypted))
-            UserPrefs.service.value = true
+            UserPrefs.service.set(true)
             ShareManager.updateShare(share.id,marker,null,listOf(other.absolutePath))
             assertNull(ShareManager.resolveSharedPath(share.id,encrypted))
             ShareManager.updateShare(share.id,marker,Instant.parse("2000-01-01T00:00:00Z"))
@@ -71,7 +71,7 @@ class ShareRustHttpTest {
             assertNull(ShareManager.getShare(share.id))
         } finally {
             id?.let { ShareManager.deleteShare(it) }
-            UserPrefs.service.value = service
+            UserPrefs.service.set(service)
             root.deleteRecursively()
         }
     }

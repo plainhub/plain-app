@@ -8,7 +8,7 @@ import com.ismartcoding.plain.platform.createDirectory
 import com.ismartcoding.plain.platform.createFile
 import com.ismartcoding.plain.platform.writeFileText
 import com.ismartcoding.plain.platform.scanFileTaskPaths
-import com.ismartcoding.plain.preferences.SystemPrefs
+import com.ismartcoding.plain.preferences.RustSystemState
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.json.*
 import org.junit.Assert.*
@@ -23,7 +23,7 @@ class FileWritesRustHttpTest {
     fun sharedAndPublicFileWritesUseRustAndPreserveExistingContent() = runBlocking {
         val root = File(InstrumentationRegistry.getInstrumentation().targetContext.cacheDir, "file-writes-${UUID.randomUUID()}")
         val external = File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), "file-writes-${UUID.randomUUID()}")
-        val originalPermissions = SystemPrefs.apiPermissions.value
+        val originalPermissions = RustSystemState.state.value.apiPermissions
         try {
             val dir = createDirectory(File(root, "nested/child").path)
             assertTrue(dir.isDir)
@@ -46,7 +46,7 @@ class FileWritesRustHttpTest {
             assertTrue(runCatching { createFile(File(root, "missing/never.txt").path) }.isFailure)
             assertFalse(File(root, "missing/never.txt").exists())
             assertTrue(runCatching { createDirectory("/system/plain-synthetic-${UUID.randomUUID()}") }.isFailure)
-            SystemPrefs.apiPermissions.value = originalPermissions + "WRITE_EXTERNAL_STORAGE"
+            RustSystemState.setApiPermissions(originalPermissions + "WRITE_EXTERNAL_STORAGE")
             val publicDir = File(root, "public")
             RustContentApi.mutate("""createDir(path: "${publicDir.path}")""")
             assertTrue(publicDir.isDirectory)
@@ -60,7 +60,7 @@ class FileWritesRustHttpTest {
             writeFileText(externalFile.path, content, false)
             assertEquals(content, externalFile.readText())
         } finally {
-            SystemPrefs.apiPermissions.value = originalPermissions
+            RustSystemState.setApiPermissions(originalPermissions)
             root.deleteRecursively()
             external.deleteRecursively()
             scanFileTaskPaths(listOf(File(external, "synthetic.txt").path, external.path))

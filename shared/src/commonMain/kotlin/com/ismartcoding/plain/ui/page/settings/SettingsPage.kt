@@ -121,7 +121,7 @@ fun SettingsPage(navController: NavHostController, updateViewModel: UpdateViewMo
                                 PFilledButton(text = stringResource(Res.string.check_update), buttonSize = ButtonSize.SMALL, onClick = {
                                     scope.launch {
                                         DialogHelper.showMessage(Res.string.checking_updates)
-                                        SystemPrefs.updateInfo { it.copy(skipVersion = "") }
+                                        RustSystemState.patchUpdate(UpdateInfoPatch(skipVersion = ""))
                                         val r = withIO { checkUpdateAsync(true) }
                                         if (r != null) {
                                             if (r) updateViewModel.showDialog()

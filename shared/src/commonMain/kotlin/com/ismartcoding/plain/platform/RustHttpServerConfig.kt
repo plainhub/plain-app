@@ -4,8 +4,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 internal data class RustHttpServerConfig(
-    val httpPort: Int,
-    val httpsPort: Int,
     val debug: Boolean,
+    val deviceName: String,
     val webRoot: String,
 )

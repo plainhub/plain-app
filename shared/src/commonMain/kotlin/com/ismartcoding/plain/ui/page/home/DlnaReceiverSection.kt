@@ -45,8 +45,7 @@ fun DlnaReceiverSection(navController: NavHostController) {
         ) {
             Switch(checked = dlnaReceiverEnabled, onCheckedChange = { enable ->
                 scope.launchSafe {
-                    UserPrefs.dlna.value = enable
-                    if (enable) DlnaRendererState.start() else DlnaRendererState.stop()
+                    UserPrefs.dlna.set(enable)
                 }
             })
         }

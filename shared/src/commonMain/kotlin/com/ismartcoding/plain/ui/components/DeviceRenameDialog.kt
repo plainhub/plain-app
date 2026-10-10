@@ -35,9 +35,7 @@ fun DeviceRenameDialog(name: String, onDismiss: () -> Unit, onDone: (String) -> 
         confirmText = stringResource(Res.string.save),
         onConfirm = {
             scope.launch {
-                UserPrefs.deviceName.value = newName.value
-                TempData.deviceName.value = newName.value
-                MdnsDiscoverManager.updateAdvertisedService()
+                UserPrefs.deviceName.set(newName.value)
                 onDone(newName.value)
                 onDismiss()
             }

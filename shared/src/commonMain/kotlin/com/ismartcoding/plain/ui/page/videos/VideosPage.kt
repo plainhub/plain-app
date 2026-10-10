@@ -106,7 +106,7 @@ fun VideosPage(
     val previewerState = rememberPreviewerState()
     val tagsMapState by tagsVM.tagsMapFlow.collectAsState()
     val bucketsMap by mediaFoldersVM.bucketsMapFlow.collectAsState()
-    val cellsPerRow = remember { mutableIntStateOf(UserPrefs.videoGridCellsPerRow.default) }
+    val cellsPerRow = remember { mutableIntStateOf(UserPrefs.videoGridCellsPerRow.value) }
     val windowInfo = LocalWindowInfo.current
     val imageWidthPx = remember(cellsPerRow.value, windowInfo.containerSize.width) {
         with(density) {
@@ -232,7 +232,7 @@ fun VideosPage(
                                     .nestedScroll(scrollBehavior.nestedScrollConnection)
                                     .gridDragSelect(items = itemsState, state = dragSelectState)
                                     .pinchZoomGrid(cellsPerRow = cellsPerRow, hapticFeedback = hapticFeedback, scope = scope) {
-                                        UserPrefs.videoGridCellsPerRow.value = it
+                                        UserPrefs.videoGridCellsPerRow.set(it)
                                     },
                                 horizontalArrangement = Arrangement.spacedBy(2.dp),
                                 verticalArrangement = Arrangement.spacedBy(2.dp),

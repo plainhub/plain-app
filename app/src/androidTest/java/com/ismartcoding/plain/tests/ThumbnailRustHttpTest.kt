@@ -76,10 +76,10 @@ class ThumbnailRustHttpTest {
             bitmap.recycle()
             val file = com.ismartcoding.plain.helpers.AppFileStore.importBytes(bytes.toByteArray(), "image/png")
             id = file.id
-            prefs.service.value = true
+            prefs.service.set(true)
             com.ismartcoding.plain.platform.stopHttpEngineAsync()
-            prefs.httpPort.value = 0
-            prefs.httpsPort.value = 0
+            prefs.httpPort.set(0)
+            prefs.httpsPort.set(0)
             com.ismartcoding.plain.platform.startHttpEngineAsync()
             assertTrue(com.ismartcoding.plain.platform.checkHttpServerAsync())
             val encoded = com.ismartcoding.plain.helpers.UrlHelper.encrypt("fid:${file.realPath.substringAfterLast('/')}")
@@ -105,9 +105,9 @@ class ThumbnailRustHttpTest {
         } finally {
             com.ismartcoding.plain.platform.stopHttpEngineAsync()
             id?.let { com.ismartcoding.plain.helpers.AppFileStore.release(it) }
-            prefs.httpPort.value = oldHttp
-            prefs.httpsPort.value = oldHttps
-            prefs.service.value = oldService
+            prefs.httpPort.set(oldHttp)
+            prefs.httpsPort.set(oldHttps)
+            prefs.service.set(oldService)
             cache.listFiles().orEmpty().filter { it.name !in existing }.forEach { it.delete() }
         }
     }

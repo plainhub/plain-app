@@ -4,13 +4,13 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class DUpdateInfo(
-    val newVersion: String = "",
-    val checkUpdateTime: Long = 0L,
-    val skipVersion: String = "",
-    val publishDate: String = "",
-    val log: String = "",
-    val downloadUrl: String = "",
-    val size: Long = 0L,
-    val downloadedApkPath: String = "",
-    val autoCheckUpdate: Boolean = true,
+    val newVersion: String,
+    val checkUpdateTime: Long,
+    val skipVersion: String,
+    val publishDate: String,
+    val log: String,
+    val downloadUrl: String,
+    val size: Long,
+    val downloadedApkPath: String,
+    val autoCheckUpdate: Boolean,
 )

@@ -67,7 +67,7 @@ internal fun WebSettingsEffects(
 
 internal fun togglePermission(scope: CoroutineScope, m: PermissionItem, enable: Boolean) {
     scope.launch {
-        SystemPrefs.setApiPermission(m.permission, enable)
+        RustSystemState.setApiPermission(m.permission, enable)
         // The web `permissions` list is backed by this preference and toggling
         // a switch never produces a PermissionsResultEvent — push the fresh
         // snapshot so web clients refetch.

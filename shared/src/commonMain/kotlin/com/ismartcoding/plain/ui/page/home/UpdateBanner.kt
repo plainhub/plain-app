@@ -48,7 +48,7 @@ private const val GITHUB_RELEASES_URL = "https://github.com/plainhub/plain-app/r
 
 @Composable
 fun UpdateBanner(updateVM: UpdateViewModel) {
-    val updateInfo = SystemPrefs.parseUpdateInfo(SystemPrefs.updateInfo.collectAsStateValue())
+    val updateInfo = RustSystemState.state.collectAsStateValue().updateInfo
     val newVersion = updateInfo.newVersion.toVersion()
     val skipVersion = updateInfo.skipVersion.toVersion()
     val currentVersion = Version(getAppVersionName())
@@ -62,7 +62,7 @@ fun UpdateBanner(updateVM: UpdateViewModel) {
     val needsUpdate = newVersion.whetherNeedUpdate(currentVersion, skipVersion)
 
     LaunchedEffect(Unit) {
-        val info = SystemPrefs.updateInfoValue()
+        val info = RustSystemState.state.value.updateInfo
         val path = info.downloadedApkPath
         if (path.isNotEmpty()) {
             val downloadedVersionNeedsUpdate =
@@ -72,7 +72,7 @@ fun UpdateBanner(updateVM: UpdateViewModel) {
             ) {
                 updateVM.onDownloadComplete(path)
             } else {
-                SystemPrefs.updateInfo { it.copy(downloadedApkPath = "") }
+                RustSystemState.patchUpdate(UpdateInfoPatch(downloadedApkPath = ""))
             }
         }
     }
@@ -97,7 +97,7 @@ fun UpdateBanner(updateVM: UpdateViewModel) {
                     exitApp()
                 },
                 onDismiss = {
-                    scope.launch { SystemPrefs.updateInfo { it.copy(downloadedApkPath = "") } }
+                    scope.launch { RustSystemState.patchUpdate(UpdateInfoPatch(downloadedApkPath = "")) }
                     updateVM.resetDownload()
                 },
             )

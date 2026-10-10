@@ -10,9 +10,7 @@ object RustWebLogin {
     private suspend fun call(command: WebLoginCommand) = RustContentApi.postJsonOrThrow("system/ws-login", JsonHelper.jsonEncodeToElement<WebLoginCommand>(command).jsonObject)
     suspend fun cancel(requestId: String) { call(WebLoginCommand.Cancel(requestId)) }
     suspend fun resetPassword(): String {
-        val result = call(WebLoginCommand.ResetPassword)
-        Prefs.refresh()
-        return JsonHelper.jsonDecodeFromElement<String>(result.getValue("password"))
+        return com.ismartcoding.plain.preferences.RustSystemState.resetPassword()
     }
     suspend fun complete(event: HConfirmToAcceptLoginEvent) { call(WebLoginCommand.Complete(event.requestId)) }
 }

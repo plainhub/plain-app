@@ -8,7 +8,7 @@ import com.ismartcoding.plain.enums.PathKind
 import com.ismartcoding.plain.platform.listFilesInDir
 import com.ismartcoding.plain.platform.searchFilesInDir
 import com.ismartcoding.plain.platform.searchFilesByName
-import com.ismartcoding.plain.preferences.SystemPrefs
+import com.ismartcoding.plain.preferences.RustSystemState
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.json.*
 import org.junit.Assert.*
@@ -24,7 +24,7 @@ class FileBrowseRustHttpTest {
     @Test
     fun sharedBrowserAndPublicQueriesUseRustFiltersPagesCountsAndZipAdapter() = runBlocking {
         val root = File(InstrumentationRegistry.getInstrumentation().targetContext.cacheDir, "file-browse-${UUID.randomUUID()}").apply { mkdirs() }
-        val permissions = SystemPrefs.apiPermissions.value
+        val permissions = RustSystemState.state.value.apiPermissions
         try {
             val dir = File(root, "NeedleDir").apply { mkdirs() }
             File(dir, "NEEDLE 中文.txt").writeText("four")
@@ -49,7 +49,7 @@ class FileBrowseRustHttpTest {
             val zipped = searchFilesInDir("file_size:>4", "${archive.path}!zip!/", FileSortBy.NAME_ASC)
             assertEquals(listOf("large.txt"), zipped.map { it.name })
             assertEquals("folder", searchFilesInDir("", "${archive.path}!zip!/", FileSortBy.NAME_ASC).first().name)
-            SystemPrefs.apiPermissions.value = permissions + "WRITE_EXTERNAL_STORAGE"
+            RustSystemState.setApiPermissions(permissions + "WRITE_EXTERNAL_STORAGE")
             suspend fun field(selection: String): JsonElement =
                 RustContentApi.query(selection)["data"]!!.jsonObject.values.first()
             assertEquals(true, field("""pathExists(path: "${root.path}")""").jsonPrimitive.boolean)
@@ -65,7 +65,7 @@ class FileBrowseRustHttpTest {
             assertEquals(2, field("""fileCount(root: "${root.path}", query: "text:needle")""").jsonPrimitive.int)
             assertEquals(0, field("""fileCount(root: "${File(root, "missing").path}", query: "")""").jsonPrimitive.int)
         } finally {
-            SystemPrefs.apiPermissions.value = permissions
+            RustSystemState.setApiPermissions(permissions)
             root.deleteRecursively()
         }
     }

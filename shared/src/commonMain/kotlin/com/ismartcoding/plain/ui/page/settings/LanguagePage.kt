@@ -34,7 +34,7 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LanguagePage(navController: NavHostController) {
-    val language = Prefs.parseLocale(UserPrefs.locale.collectAsStateValue())
+    val language = UserPrefs.parseLocale(UserPrefs.locale.collectAsStateValue())
     val scope = rememberCoroutineScope()
     val list = mutableListOf<Locale?>()
     list.add(null)

@@ -2,7 +2,7 @@ package com.ismartcoding.plain.api
 
 import com.ismartcoding.plain.db.*
 import com.ismartcoding.plain.platform.chaCha20Decrypt
-import com.ismartcoding.plain.preferences.SystemPrefs
+import com.ismartcoding.plain.preferences.RustSystemState
 import kotlin.io.encoding.Base64
 import kotlinx.serialization.json.*
 import kotlin.time.Instant
@@ -27,5 +27,5 @@ internal fun JsonElement.tag(): DTag = jsonObject.let { DTag(id=it.string("id"),
 
 private fun decodeImage(value: String): String {
     if (value.isEmpty() || value.startsWith("http://") || value.startsWith("https://")) return value
-    return chaCha20Decrypt(Base64.decode(SystemPrefs.urlToken.value), Base64.decode(value))?.decodeToString() ?: error("Invalid feed image identifier")
+    return chaCha20Decrypt(Base64.decode(RustSystemState.state.value.urlToken), Base64.decode(value))?.decodeToString() ?: error("Invalid feed image identifier")
 }

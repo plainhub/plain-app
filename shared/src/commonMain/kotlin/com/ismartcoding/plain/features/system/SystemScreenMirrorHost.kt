@@ -47,7 +47,7 @@ internal object SystemScreenMirrorHost {
             JsonHelper.jsonEncodeToElement(true)
         }
         "systemUpdateScreenMirrorQuality" -> {
-            com.ismartcoding.plain.preferences.Prefs.refresh()
+            com.ismartcoding.plain.preferences.PreferencesClient.local.refresh()
             val mode = com.ismartcoding.plain.enums.ScreenMirrorMode.valueOf(params.getValue("mode").jsonPrimitive.content)
             com.ismartcoding.plain.platform.onScreenMirrorQualityChanged(mode)
             JsonHelper.jsonEncodeToElement(true)

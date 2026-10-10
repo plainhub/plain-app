@@ -44,7 +44,7 @@ class DesktopAccessSettingsViewModel : ViewModel() {
 
     fun enableKeepAwake(enable: Boolean) {
         viewModelScope.launchSafe {
-            UserPrefs.keepAwake.value = enable
+            UserPrefs.keepAwake.set(enable)
             sendEvent(KeepAwakeChangedEvent(enable))
         }
     }

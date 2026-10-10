@@ -10,7 +10,7 @@ import kotlinx.serialization.json.*
 
 internal object HttpEventProjection {
     suspend fun reconcile() {
-        com.ismartcoding.plain.preferences.Prefs.refresh()
+        com.ismartcoding.plain.preferences.PreferencesClient.local.refresh()
         com.ismartcoding.plain.features.session.refreshOnlineClientIds()
         runCatching { RustContentApi.postJson("files/mutate", JsonHelper.jsonEncodeToElement(RecoverDeletionsRequest()).jsonObject) }
         com.ismartcoding.plain.chat.download.DownloadQueue.refresh()
@@ -84,7 +84,7 @@ internal object HttpEventProjection {
             }
             EventType.ONLINE_CLIENTS_UPDATED.name -> com.ismartcoding.plain.features.session.setOnlineClientIds(
                 JsonHelper.jsonDecode<JsonElement>(payload).jsonArray.map { it.jsonPrimitive.content }.toSet())
-            EventType.PREFS_UPDATED.name -> com.ismartcoding.plain.preferences.Prefs.refresh()
+            EventType.PREFS_UPDATED.name -> com.ismartcoding.plain.preferences.PreferencesClient.local.refresh()
             EventType.IMAGE_MODELS_UPDATED.name -> com.ismartcoding.plain.ai.RustImageModels.apply(JsonHelper.jsonDecode<JsonObject>(payload))
             EventType.DLNA_SENDER_UPDATED.name -> com.ismartcoding.plain.features.dlna.sender.RustDlnaSender.apply(JsonHelper.jsonDecode<JsonObject>(payload))
             EventType.WEB_REQUEST_RECEIVED.name -> {
@@ -92,7 +92,7 @@ internal object HttpEventProjection {
             }
             EventType.SHARED_FOLDER_DOWNLOAD_UPDATED.name -> com.ismartcoding.plain.features.share.SharedFolderDownloadEngine.refresh()
             EventType.CONTENT_CHANGED.name -> {
-                com.ismartcoding.plain.preferences.Prefs.refresh()
+                com.ismartcoding.plain.preferences.PreferencesClient.local.refresh()
                 val channels = com.ismartcoding.plain.chat.channel.RustChannelRuntime.call(com.ismartcoding.plain.chat.channel.ChannelCommand.Snapshot)
                 com.ismartcoding.plain.chat.channel.ChannelSystemMessageReceiver.applyCommitted(channels)
                 try { com.ismartcoding.plain.features.FavoriteFolderHelper.refresh() }

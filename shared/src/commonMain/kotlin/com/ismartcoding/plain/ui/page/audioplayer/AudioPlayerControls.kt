@@ -66,7 +66,7 @@ fun AudioPlayerControls(
                         MediaPlayMode.REPEAT_ONE -> MediaPlayMode.SHUFFLE
                         MediaPlayMode.SHUFFLE -> MediaPlayMode.REPEAT
                     }
-                    UserPrefs.audioPlayMode.value = nextMode
+                    UserPrefs.audioPlayMode.set(nextMode)
                     onPlayModeChange(nextMode)
                 }
             },
@@ -139,7 +139,7 @@ fun AudioPlayerControls(
 private fun SpeedButton(speed: Float, scope: CoroutineScope) {
     fun applySpeed(s: Float) {
         audioSetPlaybackSpeed(s)
-        scope.launch { UserPrefs.audioPlaybackSpeed.value = s }
+        scope.launch { UserPrefs.audioPlaybackSpeed.set(s) }
     }
     PlaybackSpeedButton(
         speed = speed,

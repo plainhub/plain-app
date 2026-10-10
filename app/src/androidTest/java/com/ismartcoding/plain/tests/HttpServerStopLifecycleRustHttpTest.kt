@@ -46,8 +46,8 @@ class HttpServerStopLifecycleRustHttpTest {
         val oldService = UserPrefs.service.value
         val oldDesktop = UserPrefs.desktopAccess.value
         try {
-            UserPrefs.service.value = true
-            UserPrefs.desktopAccess.value = true
+            UserPrefs.service.set(true)
+            UserPrefs.desktopAccess.set(true)
             stopHttpEngineAsync()
             startHttpEngineAsync()
             assertTrue(com.ismartcoding.plain.platform.checkHttpServerAsync())
@@ -67,8 +67,8 @@ class HttpServerStopLifecycleRustHttpTest {
         } finally {
             stopHttpEngineAsync()
             HttpServerManager.serverState.value = HttpServerState.OFF
-            UserPrefs.service.value = oldService
-            UserPrefs.desktopAccess.value = oldDesktop
+            UserPrefs.service.set(oldService)
+            UserPrefs.desktopAccess.set(oldDesktop)
         }
     }
 

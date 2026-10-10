@@ -1,13 +1,8 @@
 package com.ismartcoding.plain.platform
 
-import com.ismartcoding.plain.features.session.closeAllWsSessions
-import com.ismartcoding.plain.preferences.UserPrefs
-import kotlinx.coroutines.sync.Mutex
-import kotlinx.coroutines.sync.withLock
+import com.ismartcoding.plain.preferences.PreferencesClient
+import com.ismartcoding.plain.preferences.UserSettingsPatch
 
-private val desktopAccessMutex = Mutex()
-
-suspend fun setDesktopAccessEnabled(enabled: Boolean) = desktopAccessMutex.withLock {
-    UserPrefs.desktopAccess.value = enabled
-    if (!enabled) closeAllWsSessions()
+suspend fun setDesktopAccessEnabled(enabled: Boolean) {
+    PreferencesClient.local.patchUser(UserSettingsPatch(desktopAccess = enabled))
 }

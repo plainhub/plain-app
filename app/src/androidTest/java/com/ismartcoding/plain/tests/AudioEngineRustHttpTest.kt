@@ -46,7 +46,7 @@ class AudioEngineRustHttpTest {
             AudioCommands.command("PLAY")
             assertEquals(3_000_000_123, engine.progress)
             assertEquals(1, engine.loads)
-            UserPrefs.audioPlayMode.value = MediaPlayMode.REPEAT_ONE
+            UserPrefs.audioPlayMode.set(MediaPlayMode.REPEAT_ONE)
             AudioCommands.command("COMPLETED")
             assertEquals(track(0).path, engine.currentPath)
             assertEquals(0, engine.progress)
@@ -64,7 +64,7 @@ class AudioEngineRustHttpTest {
                 AudioCommands.command("CLEAR")
                 AudioQueueManager.clearQueue()
                 AudioQueueManager.removePaths(listOf(track(0).path,track(1).path))
-                UserPrefs.audioPlayMode.value = oldMode
+                UserPrefs.audioPlayMode.set(oldMode)
             } finally {
                 AudioEngineHost.install(oldEngine)
                 AudioLibraryHost.install(oldProvider)

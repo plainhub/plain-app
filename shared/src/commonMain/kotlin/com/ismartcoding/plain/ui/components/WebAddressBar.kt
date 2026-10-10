@@ -1,5 +1,6 @@
 package com.ismartcoding.plain.ui.components
 
+import kotlinx.coroutines.launch
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.shrinkVertically
@@ -117,7 +118,7 @@ fun WebAddressBar(
                     UiRes.drawable.ui_drawable_chevron_down
             ),
             onClick = {
-                UserPrefs.webAddressBarExpanded.value = !expanded.value
+                scope.launch { UserPrefs.webAddressBarExpanded.set(!expanded.value) }
             },
         )
     }
@@ -131,17 +132,18 @@ fun WebAddressBar(
             onSave = { newHostname, newPort ->
                 val hostnameChanged = newHostname != hostname
                 val portChanged = newPort != port.value
-                if (hostnameChanged) {
-                    hostname = newHostname
-                    TempData.mdnsHostname = newHostname
-                    persistMdnsHostname(scope, newHostname)
-                }
-                if (portChanged) {
-                    persistPort(scope, isHttps, newPort)
-                }
                 mdnsEditDialogVisible = false
-                if (hostnameChanged || portChanged) {
-                    restartServer()
+                scope.launch {
+                    if (hostnameChanged) {
+                        com.ismartcoding.plain.preferences.RustSystemState.setMdnsHostname(newHostname)
+                        hostname = newHostname
+                    }
+                    if (portChanged) {
+                        val patch = if (isHttps) com.ismartcoding.plain.preferences.UserSettingsPatch(httpsPort = newPort)
+                            else com.ismartcoding.plain.preferences.UserSettingsPatch(httpPort = newPort)
+                        com.ismartcoding.plain.preferences.PreferencesClient.local.patchUser(patch)
+                    }
+                    if (hostnameChanged || portChanged) restartServer()
                 }
             },
         )

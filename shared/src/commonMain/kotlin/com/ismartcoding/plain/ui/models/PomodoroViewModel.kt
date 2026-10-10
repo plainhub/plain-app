@@ -17,25 +17,20 @@ import kotlinx.datetime.toLocalDateTime
 
 class PomodoroViewModel : ViewModel() {
 
-    // Constants
-    companion object {
-        private const val DEFAULT_WORK_DURATION_SEC = 25 * 60 // 25 minutes in seconds
-    }
-
     // State variables
     var currentState = mutableStateOf(PomodoroState.WORK)
     var isRunning = mutableStateOf(false)
     var adjustJob = mutableStateOf<Job?>(null)
     var isPaused = mutableStateOf(false)
-    var timeLeft = mutableIntStateOf(DEFAULT_WORK_DURATION_SEC)
+    var timeLeft = mutableIntStateOf(UserPrefs.pomodoroSettingsValue().workDurationMin * 60)
     var completedCount = mutableIntStateOf(0)
     var currentRound = mutableIntStateOf(1)
-    var settings = mutableStateOf(DPomodoroSettings())
+    var settings = mutableStateOf(UserPrefs.pomodoroSettingsValue())
 
     val showSettings = mutableStateOf(false)
     var todayRecord = mutableStateOf<DPomodoroItem?>(null)
 
-    private var totalSeconds = DEFAULT_WORK_DURATION_SEC
+    private var totalSeconds = UserPrefs.pomodoroSettingsValue().workDurationMin * 60
 
     suspend fun loadAsync() {
         settings.value = UserPrefs.pomodoroSettingsValue()

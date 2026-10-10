@@ -9,16 +9,15 @@ import kotlinx.coroutines.flow.MutableStateFlow
 object TempData {
 
     var ip4s = mutableStateOf(emptyList<String>())
-    var clientId = ""
+    val clientId: String get() = RustSystemState.state.value.clientId
     val deviceName = MutableStateFlow("")
-    var urlToken = ByteArray(0) // use to encrypt or decrypt params in url (kept as raw bytes to avoid base64 decode on every encrypt/decrypt)
-    var mdnsHostname = "plainapp.local" // mDNS hostname for local network discovery
+    val urlToken: ByteArray get() = kotlin.io.encoding.Base64.decode(RustSystemState.state.value.urlToken)
+    val mdnsHostname: String get() = RustSystemState.state.value.mdnsHostname
 
     val audioPlayerVisible = MutableStateFlow(false)
     /** Media path requested by a home-screen shortcut; null = no preview open. */
     val shortcutMediaPath = MutableStateFlow<String?>(null)
 
-    var adbToken = "" // in-memory cache of the ADB automation token
 
 
 

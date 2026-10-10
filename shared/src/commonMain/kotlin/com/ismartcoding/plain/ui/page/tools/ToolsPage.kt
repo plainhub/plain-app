@@ -63,7 +63,7 @@ fun ToolsPage(
     val featuresStr =
         UserPrefs.homeFeatures.collectAsStateValue()
     val notesEnabled =
-        UserPrefs.parseFeatures(featuresStr.ifEmpty { UserPrefs.homeFeatures.default })
+        UserPrefs.parseFeatures(featuresStr)
             .contains(AppFeatureType.NOTES.name)
 
     MainNavScaffold(

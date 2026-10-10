@@ -5,7 +5,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.ismartcoding.plain.api.*
 import com.ismartcoding.plain.features.file.*
-import com.ismartcoding.plain.preferences.SystemPrefs
+import com.ismartcoding.plain.preferences.RustSystemState
 import kotlinx.coroutines.*
 import kotlinx.serialization.json.*
 import org.junit.Assert.*
@@ -21,7 +21,7 @@ class FileTaskRustHttpTest {
         val root = File(InstrumentationRegistry.getInstrumentation().targetContext.cacheDir,"file-task-${UUID.randomUUID()}").apply { mkdirs() }
         val external = File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS),"file-task-${UUID.randomUUID()}")
         val ids = mutableListOf<String>()
-        val originalPermissions = SystemPrefs.apiPermissions.value
+        val originalPermissions = RustSystemState.state.value.apiPermissions
         try {
             val source = File(root,"source.txt").apply { writeText("synthetic") }
             val target = File(root,"target.txt").apply { writeText("existing") }
@@ -66,7 +66,7 @@ class FileTaskRustHttpTest {
             assertTrue(rejected)
             val foreign = RustContentApi.query("fileHostTaskRecord(clientId: ${JsonPrimitive("foreign-${UUID.randomUUID()}")}, id: ${JsonPrimitive(done.id)}) { id }")
             assertEquals(JsonNull,foreign.getValue("fileHostTaskRecord"))
-            SystemPrefs.apiPermissions.value = originalPermissions + "WRITE_EXTERNAL_STORAGE"
+            RustSystemState.setApiPermissions(originalPermissions + "WRITE_EXTERNAL_STORAGE")
             assertEquals(true, RustContentApi.mutate("""copyFile(src: "${source.path}", dst: "${File(root,"public-copy.txt").path}", overwrite: false)""")["data"]!!.jsonObject["copyFile"]!!.jsonPrimitive.boolean)
             assertEquals("synthetic",File(root,"public-copy.txt").readText())
             var publicFailed = false
@@ -74,7 +74,7 @@ class FileTaskRustHttpTest {
             catch (_: Exception) { publicFailed = true }
             assertTrue(publicFailed)
         } finally {
-            SystemPrefs.apiPermissions.value = originalPermissions
+            RustSystemState.setApiPermissions(originalPermissions)
             FileTaskHelper.list(0,1000,"").filter { task -> task.completedOps.any { it.src.startsWith(root.path+"/") } || task.id in ids }.forEach { FileTaskHelper.remove(it.id) }
             root.deleteRecursively()
             external.deleteRecursively()

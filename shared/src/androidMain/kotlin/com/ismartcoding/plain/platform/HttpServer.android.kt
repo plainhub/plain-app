@@ -29,9 +29,9 @@ import kotlinx.coroutines.withContext
 import java.io.File
 import kotlin.time.Duration.Companion.milliseconds
 
-actual suspend fun getSSLSignature(password: String): ByteArray = RustTlsCertificate.signature()
+actual suspend fun getSSLSignature(): ByteArray = RustTlsCertificate.signature()
 
-actual suspend fun generateSSLKeyStore(password: String) {
+actual suspend fun generateSSLKeyStore() {
     RustTlsCertificate.regenerate()
 }
 

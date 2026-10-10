@@ -35,8 +35,8 @@ internal object SystemAudioHost {
         "systemAudioPlayMode" -> when (val mode = params["mode"]) {
             null -> JsonHelper.jsonEncodeToElement(UserPrefs.audioPlayMode.value.name)
             else -> {
-                UserPrefs.audioPlayMode.value = com.ismartcoding.plain.enums.MediaPlayMode
-                    .valueOf(mode.jsonPrimitive.content)
+                UserPrefs.audioPlayMode.set(com.ismartcoding.plain.enums.MediaPlayMode
+                    .valueOf(mode.jsonPrimitive.content))
                 JsonHelper.jsonEncodeToElement(UserPrefs.audioPlayMode.value.name)
             }
         }

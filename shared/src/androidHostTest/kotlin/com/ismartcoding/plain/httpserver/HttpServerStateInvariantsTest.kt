@@ -1,9 +1,7 @@
 package com.ismartcoding.plain.httpserver
 
 import com.ismartcoding.plain.platform.HttpServerManager
-import com.ismartcoding.plain.preferences.*
 
-import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.enums.HttpServerState
 import com.ismartcoding.plain.platform.startHttpServerAsync
 import com.ismartcoding.plain.platform.onRustHttpServerFailed
@@ -11,7 +9,6 @@ import com.ismartcoding.plain.platform.stopHttpServerCoreAsync
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.runBlocking
-import java.net.ServerSocket
 import kotlin.test.AfterTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -45,10 +42,6 @@ class HttpServerStateInvariantsTest {
     @Test
     fun startOrchestratorRecordsTerminalStateWhenEngineCreateFails() = runBlocking {
         // Native initialization is unavailable in the host environment.
-        val ports = freePorts(2)
-        UserPrefs.httpPort.value = ports[0]
-        UserPrefs.httpsPort.value = ports[1]
-
         startHttpServerAsync()
 
         assertEquals(
@@ -84,13 +77,5 @@ class HttpServerStateInvariantsTest {
         onRustHttpServerFailed(1L, "late failure")
         assertEquals(HttpServerState.OFF, HttpServerManager.serverState.value)
         assertEquals("", HttpServerManager.httpServerError.value)
-    }
-
-    /** Ephemeral ports verified free right now (bind, read, close). */
-    private fun freePorts(n: Int): List<Int> {
-        val sockets = (1..n).map { ServerSocket(0) }
-        val ports = sockets.map { it.localPort }
-        sockets.forEach { it.close() }
-        return ports
     }
 }

@@ -20,7 +20,6 @@ import com.ismartcoding.plain.platform.isUPlus
 import com.ismartcoding.plain.lib.sendEvent
 import com.ismartcoding.plain.platform.initDiskLogging
 import com.ismartcoding.plain.preferences.setDarkMode
-import com.ismartcoding.plain.preferences.ensureAdbToken
 import com.ismartcoding.plain.receivers.PlugInControlReceiver
 import com.ismartcoding.plain.platform.newImageLoader
 import com.ismartcoding.plain.workers.FeedFetchWorker
@@ -61,13 +60,7 @@ object MainAppHelper {
 
         coIO {
             initCommonPreferences()
-            // Must run after initCommonPreferences: the keystore warm-up loads
-            // keystore.bks with the stored password, which only exists once
-            // SystemPrefs.ensureKeyStorePassword has run — warming up
-            // earlier creates the file with an empty password and forces a
-            // regenerate cycle on the first server start.
-            SystemPrefs.setDarkMode(DarkTheme.parse(UserPrefs.darkTheme.value))
-            SystemPrefs.ensureAdbToken()
+            setDarkMode(DarkTheme.parse(UserPrefs.darkTheme.value))
             if (UserPrefs.service.value && PlugInControlReceiver.isUSBConnected(app)) {
                 sendEvent(PowerConnectedEvent())
             }
@@ -77,7 +70,7 @@ object MainAppHelper {
             }
             ImageSearchManager.restoreIfEnabled()
 
-            val updateInfo = SystemPrefs.updateInfoValue()
+            val updateInfo = RustSystemState.state.value.updateInfo
             val checkUpdateTime = updateInfo.checkUpdateTime
             val autoCheckUpdate = updateInfo.autoCheckUpdate
             if (AppFeatureType.CHECK_UPDATES.has() && autoCheckUpdate && checkUpdateTime < System.currentTimeMillis() - Constants.ONE_DAY_MS) {

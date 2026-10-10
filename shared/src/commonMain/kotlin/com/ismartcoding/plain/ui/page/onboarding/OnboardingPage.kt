@@ -72,7 +72,7 @@ fun OnboardingPage(navController: NavHostController) {
 
     fun complete(navigateToHowToUse: Boolean) {
         scope.launch {
-            SystemPrefs.onboarding.value = true
+            RustSystemState.completeOnboarding()
             if (navigateToHowToUse) {
                 navController.navigate(Routing.HowToUse) {
                     popUpTo(Routing.Onboarding) { inclusive = true }

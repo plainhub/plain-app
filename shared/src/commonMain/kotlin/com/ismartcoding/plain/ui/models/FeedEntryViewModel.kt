@@ -19,7 +19,7 @@ class FeedEntryViewModel : ViewModel() {
     val fetchingContent = mutableStateOf(false)
 
     // Article text scale: index into FeedFontScale.values, persisted.
-    val fontScaleIndex = mutableIntStateOf(UserPrefs.feedFontScale.default)
+    val fontScaleIndex = mutableIntStateOf(UserPrefs.feedFontScale.value)
 
     init {
         viewModelScope.launch {
@@ -30,7 +30,7 @@ class FeedEntryViewModel : ViewModel() {
     fun setFontScaleIndex(index: Int) {
         fontScaleIndex.intValue = index
         viewModelScope.launch {
-            UserPrefs.feedFontScale.value = index
+            UserPrefs.feedFontScale.set(index)
         }
     }
 }

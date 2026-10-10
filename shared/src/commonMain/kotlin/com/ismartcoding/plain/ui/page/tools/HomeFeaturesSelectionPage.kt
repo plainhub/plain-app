@@ -44,7 +44,7 @@ fun HomeFeaturesSelectionPage(navController: NavHostController) {
 
     var enabledIds by remember(featuresStr) {
         mutableStateOf(
-            UserPrefs.parseFeatures(featuresStr.ifEmpty { UserPrefs.homeFeatures.default })
+            UserPrefs.parseFeatures(featuresStr)
         )
     }
 

@@ -4,6 +4,6 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class NotificationFilterData(
-    val mode: String = "blacklist",
-    val apps: Set<String> = emptySet()
+    val mode: String,
+    val apps: Set<String>
 )

@@ -1,5 +1,8 @@
 """Query object"""
 type Query {
+    systemSettings: SystemSettings!
+    userSettings: UserSettings!
+    verifyAdbToken(token: String!): Boolean!
   appFiles(offset: Int!, limit: Int!, query: String!): [AppFile!]!
   appFileCount(query: String!): Int!
   chatChannels: [ChatChannel!]!
@@ -105,6 +108,18 @@ type Query {
 
 """Mutation object"""
 type Mutation {
+    setSystemPref(key: String!, value: JSON!): ActionResult!
+    removeSystemPref(key: String!): ActionResult!
+    updateSystemSettings(input: SystemSettingsInput!): SettingsUpdate!
+    updateUserSettings(input: UserSettingsInput!): SettingsUpdate!
+    recordRecentSearch(query: String!): ActionResult!
+    removeRecentSearch(query: String!): ActionResult!
+    clearRecentSearches: ActionResult!
+    recordRecentSaveDirectory(path: String!): ActionResult!
+    toggleNotificationApp(packageName: String!): ActionResult!
+    setNotificationFilterMode(mode: String!): ActionResult!
+    clearNotificationFilterApps: ActionResult!
+    deletePlaylistVideos(paths: [String!]!): ActionResult!
   createChatChannel(name: String!): ChatChannel!
   updateChatChannel(id: ID!, name: String!): ChatChannel!
   deleteChatChannel(id: ID!): Boolean!
@@ -1428,4 +1443,153 @@ enum __TypeKind {
   INPUT_OBJECT
   LIST
   NON_NULL
+}
+
+type SettingsUpdate {
+	result: ActionResult!
+	systemSettings: SystemSettings!
+	userSettings: UserSettings!
+}
+
+type SystemSettings {
+	password: String!
+	passwordType: Int!
+	authTwoFactor: Boolean!
+	rotateUrlTokenOnRestart: Boolean!
+	adbToken: String!
+	updateInfo: JSON!
+	urlToken: String!
+	apiPermissions: [String!]!
+	onboardingCompleted: Boolean!
+	clientId: ID!
+	mdnsHostname: String!
+	signaturePublicKey: String!
+}
+
+enum SystemSettingsAction {
+	SET_PASSWORD
+	SET_PASSWORD_TYPE
+	SET_TWO_FACTOR
+	SET_ROTATE_URL_TOKEN
+	RESET_PASSWORD
+	RESET_URL_TOKEN
+	RESET_ADB_TOKEN
+	SET_API_PERMISSION
+	SET_API_PERMISSIONS
+	COMPLETE_ONBOARDING
+	SET_MDNS_HOSTNAME
+	PATCH_UPDATE
+}
+
+input SystemSettingsInput {
+	action: SystemSettingsAction!
+	password: String
+	value: Int
+	enabled: Boolean
+	permission: String
+	permissions: [String!]
+	hostname: String
+	patch: JSON
+}
+
+type UserSettings {
+	httpPort: Int!
+	httpsPort: Int!
+	darkTheme: Int!
+	amoledDarkTheme: Boolean!
+	pdfFollowDarkTheme: Boolean!
+	keepAwake: Boolean!
+	locale: String!
+	service: Boolean!
+	desktopAccess: Boolean!
+	dlna: Boolean!
+	developerMode: Boolean!
+	allowAnyHost: Boolean!
+	deviceName: String!
+	https: Boolean!
+	webAddressBarExpanded: Boolean!
+	screenMirrorQuality: JSON!
+	audioPlayMode: Int!
+	audioPlaybackSpeed: Float!
+	imageGridCellsPerRow: Int!
+	videoGridCellsPerRow: Int!
+	showHiddenFiles: Boolean!
+	feedAutoRefresh: Boolean!
+	feedAutoRefreshIntervalSec: Int!
+	feedAutoRefreshOnlyWifi: Boolean!
+	feedFontScale: Int!
+	editorWrapContent: Boolean!
+	editorFontSize: Int!
+	editorStatusBar: Boolean!
+	lastFilePath: JSON!
+	scanHistory: JSON!
+	audioPlaylist: JSON!
+	chatInputText: String!
+	nearbyDiscoverable: Boolean!
+	aiImageSearchEnabled: Boolean!
+	notificationFilter: JSON!
+	pomodoroSettings: JSON!
+	videoPlaylist: JSON!
+	homeFeatures: String!
+	quickNoteDraft: String!
+	launcherShortcuts: String!
+	recentSearches: JSON!
+	recentSaveDirs: JSON!
+	audioSortBy: Int!
+	videoSortBy: Int!
+	imageSortBy: Int!
+	docSortBy: Int!
+	fileSortBy: Int!
+	packageSortBy: Int!
+}
+
+input UserSettingsInput {
+	httpPort: Int
+	httpsPort: Int
+	darkTheme: Int
+	amoledDarkTheme: Boolean
+	pdfFollowDarkTheme: Boolean
+	keepAwake: Boolean
+	locale: String
+	service: Boolean
+	desktopAccess: Boolean
+	dlna: Boolean
+	developerMode: Boolean
+	allowAnyHost: Boolean
+	deviceName: String
+	https: Boolean
+	webAddressBarExpanded: Boolean
+	screenMirrorQuality: JSON
+	audioPlayMode: Int
+	audioPlaybackSpeed: Float
+	imageGridCellsPerRow: Int
+	videoGridCellsPerRow: Int
+	showHiddenFiles: Boolean
+	feedAutoRefresh: Boolean
+	feedAutoRefreshIntervalSec: Int
+	feedAutoRefreshOnlyWifi: Boolean
+	feedFontScale: Int
+	editorWrapContent: Boolean
+	editorFontSize: Int
+	editorStatusBar: Boolean
+	lastFilePath: JSON
+	scanHistory: JSON
+	audioPlaylist: JSON
+	chatInputText: String
+	nearbyDiscoverable: Boolean
+	aiImageSearchEnabled: Boolean
+	notificationFilter: JSON
+	pomodoroSettings: JSON
+	videoPlaylist: JSON
+	homeFeatures: String
+	quickNoteDraft: String
+	launcherShortcuts: String
+	recentSearches: JSON
+	recentSaveDirs: JSON
+	audioSortBy: Int
+	videoSortBy: Int
+	imageSortBy: Int
+	docSortBy: Int
+	fileSortBy: Int
+	packageSortBy: Int
 }

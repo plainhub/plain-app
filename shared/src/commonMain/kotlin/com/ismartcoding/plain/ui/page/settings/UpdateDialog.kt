@@ -41,7 +41,7 @@ import com.ismartcoding.plain.ui.resources.rocket as ui_drawable_rocket
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun UpdateDialog(updateVM: UpdateViewModel) {
-    val updateInfo = SystemPrefs.parseUpdateInfo(SystemPrefs.updateInfo.collectAsStateValue())
+    val updateInfo = RustSystemState.state.collectAsStateValue().updateInfo
     val newVersion = updateInfo.newVersion.toVersion()
     val newVersionPublishDate = updateInfo.publishDate
     val newVersionLog = updateInfo.log
@@ -97,7 +97,7 @@ fun UpdateDialog(updateVM: UpdateViewModel) {
                     text = stringResource(Res.string.skip_this_version),
                     onClick = {
                         scope.launch {
-                            SystemPrefs.updateInfo { it.copy(skipVersion = newVersion.toString()) }
+                            RustSystemState.patchUpdate(UpdateInfoPatch(skipVersion = newVersion.toString()))
                             updateVM.hideDialog()
                         }
                     },

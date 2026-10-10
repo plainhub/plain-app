@@ -80,14 +80,14 @@ fun DarkThemePage(navController: NavHostController) {
                         PListItem(
                             modifier = Modifier.clickable {
                                 scope.launch {
-                                    UserPrefs.amoledDarkTheme.value = !amoledDarkTheme
+                                    UserPrefs.amoledDarkTheme.set(!amoledDarkTheme)
                                 }
                             },
                             title = stringResource(Res.string.amoled_dark_theme),
                         ) {
                             Switch(checked = amoledDarkTheme, onCheckedChange = {
                                 scope.launch {
-                                    UserPrefs.amoledDarkTheme.value = !amoledDarkTheme
+                                    UserPrefs.amoledDarkTheme.set(!amoledDarkTheme)
                                 }
                             })
                         }
@@ -97,7 +97,7 @@ fun DarkThemePage(navController: NavHostController) {
                         PListItem(
                             modifier = Modifier.clickable {
                                 scope.launch {
-                                    UserPrefs.pdfFollowDarkTheme.value = !pdfFollowDarkTheme
+                                    UserPrefs.pdfFollowDarkTheme.set(!pdfFollowDarkTheme)
                                 }
                             },
                             title = stringResource(Res.string.pdf_follow_dark_theme),
@@ -105,7 +105,7 @@ fun DarkThemePage(navController: NavHostController) {
                         ) {
                             Switch(checked = pdfFollowDarkTheme, onCheckedChange = {
                                 scope.launch {
-                                    UserPrefs.pdfFollowDarkTheme.value = !pdfFollowDarkTheme
+                                    UserPrefs.pdfFollowDarkTheme.set(!pdfFollowDarkTheme)
                                 }
                             })
                         }

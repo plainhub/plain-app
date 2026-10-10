@@ -101,8 +101,7 @@ object SystemProviderHost {
         "systemAppLogFacts",
         "systemClearAppLogs",
         "systemSetTempValue",
-        "systemRelaunchApp",
-        "systemUpdateDeviceName" -> SystemAppHost.handle(method, params)
+        "systemRelaunchApp" -> SystemAppHost.handle(method, params)
         else -> error("Unsupported provider operation")
     }
 }

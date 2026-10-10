@@ -2277,7 +2277,7 @@ checksum = "f6b464fbc74e149a392436b17d523f769e057cb6877f6a5c4618bc6f11800548"
 [[package]]
 name = "plain-inference"
 version = "0.1.0"
-source = "git+https://github.com/plainhub/plain-desktop.git?branch=main#dba67555b42f19690189ef7125341f32bee0c81f"
+source = "git+https://github.com/plainhub/plain-desktop.git?branch=main#9b9e766c9311ff6a0fe5ea816ea227f4f350a3c0"
 dependencies = [
  "cc",
  "image",
@@ -2291,7 +2291,7 @@ dependencies = [
 [[package]]
 name = "plain-rs"
 version = "0.1.0"
-source = "git+https://github.com/plainhub/plain-desktop.git?branch=main#dba67555b42f19690189ef7125341f32bee0c81f"
+source = "git+https://github.com/plainhub/plain-desktop.git?branch=main#9b9e766c9311ff6a0fe5ea816ea227f4f350a3c0"
 dependencies = [
  "anyhow",
  "async-graphql",
@@ -2334,7 +2334,7 @@ dependencies = [
 [[package]]
 name = "plain-server"
 version = "0.1.0"
-source = "git+https://github.com/plainhub/plain-desktop.git?branch=main#dba67555b42f19690189ef7125341f32bee0c81f"
+source = "git+https://github.com/plainhub/plain-desktop.git?branch=main#9b9e766c9311ff6a0fe5ea816ea227f4f350a3c0"
 dependencies = [
  "anyhow",
  "async-graphql",

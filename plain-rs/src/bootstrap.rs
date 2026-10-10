@@ -4,12 +4,6 @@ use std::path::PathBuf;
 pub(crate) fn start(path: &str, token: &str, config: &str) -> Result<String, String> {
     let mut guard = crate::ffi::server::CORE.lock().map_err(|e| e.to_string())?;
     let config: serde_json::Value = serde_json::from_str(config).map_err(|e| e.to_string())?;
-    let port = |name: &str| {
-        config[name]
-            .as_u64()
-            .and_then(|v| u16::try_from(v).ok())
-            .ok_or_else(|| format!("Invalid {name}"))
-    };
     let prefs = crate::prefs()?;
     let directory = prefs.path().parent().ok_or("Missing TLS directory")?;
     let (cert, key) =
@@ -28,14 +22,19 @@ pub(crate) fn start(path: &str, token: &str, config: &str) -> Result<String, Str
             core.server
                 .set_web_root(config["webRoot"].as_str().unwrap_or_default());
             let (http, _) = core.runtime.block_on(core.server.start_public(
-                port("httpPort")?,
-                port("httpsPort")?,
+                plain_rs::prefs::user::snapshot(&prefs).map_err(|e|e.to_string())?.http_port as u16,
+                plain_rs::prefs::user::snapshot(&prefs).map_err(|e|e.to_string())?.https_port as u16,
                 cert,
                 key,
             ))?;
             core.server.port = http;
         }
     } else {
+        plain_rs::prefs::system::bootstrap(&prefs).map_err(|e| e.to_string())?;
+        if plain_rs::prefs::user::snapshot(&prefs).map_err(|e|e.to_string())?.device_name.is_empty() {
+            let name=config["deviceName"].as_str().ok_or("Missing device name")?;
+            plain_rs::prefs::user::patch(&prefs,plain_rs::prefs::user::UserSettingsPatch{device_name:Some(name.into()),..Default::default()}).map_err(|e|e.to_string())?;
+        }
         let runtime = tokio::runtime::Builder::new_multi_thread()
             .worker_threads(2)
             .enable_all()
@@ -45,8 +44,8 @@ pub(crate) fn start(path: &str, token: &str, config: &str) -> Result<String, Str
             std::path::Path::new(path),
             token,
             prefs.clone(),
-            port("httpPort")?,
-            port("httpsPort")?,
+            plain_rs::prefs::user::snapshot(&prefs).map_err(|e|e.to_string())?.http_port as u16,
+            plain_rs::prefs::user::snapshot(&prefs).map_err(|e|e.to_string())?.https_port as u16,
             cert,
             key,
             config["debug"].as_bool().unwrap_or(false),
@@ -64,6 +63,7 @@ pub(crate) fn start(path: &str, token: &str, config: &str) -> Result<String, Str
         .runtime
         .block_on(core.server.http_ports())
         .ok_or("HTTP server stopped during startup")?;
+    plain_rs::prefs::user::patch(&prefs, plain_rs::prefs::user::UserSettingsPatch { http_port:Some(http as i32), https_port:Some(https as i32), ..Default::default() }).map_err(|e|e.to_string())?;
     Ok(serde_json::json!({"httpPort":http, "httpsPort":https,
         "generation":core.runtime.block_on(core.server.public_generation()).ok_or("HTTP server stopped during startup")?}).to_string())
 }

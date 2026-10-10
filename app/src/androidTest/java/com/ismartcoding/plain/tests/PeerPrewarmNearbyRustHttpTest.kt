@@ -43,10 +43,10 @@ class PeerPrewarmNearbyRustHttpTest {
         val http = UserPrefs.httpPort.value
         val https = UserPrefs.httpsPort.value
         try {
-            UserPrefs.service.value = true
+            UserPrefs.service.set(true)
             stopHttpEngineAsync()
-            UserPrefs.httpPort.value = 0
-            UserPrefs.httpsPort.value = 0
+            UserPrefs.httpPort.set(0)
+            UserPrefs.httpsPort.set(0)
             startHttpEngineAsync()
             assertTrue(com.ismartcoding.plain.platform.checkHttpServerAsync())
             val port = UserPrefs.httpsPort.value
@@ -57,9 +57,9 @@ class PeerPrewarmNearbyRustHttpTest {
             assertFalse(NearbyHttpClient.probe("127.0.0.1", 0))
         } finally {
             stopHttpEngineAsync()
-            UserPrefs.httpPort.value = http
-            UserPrefs.httpsPort.value = https
-            UserPrefs.service.value = service
+            UserPrefs.httpPort.set(http)
+            UserPrefs.httpsPort.set(https)
+            UserPrefs.service.set(service)
             if (service) startHttpEngineAsync()
         }
     }

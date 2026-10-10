@@ -17,7 +17,7 @@ class DiscoveryAdvertisementRustHttpTest {
     fun currentRootPreferencesAndActualOsFactsProduceAllAdvertisingFormats() = runBlocking {
         val reply = RustDiscoveryAdvertisement.reply()
         assertEquals(TempData.clientId, reply.id)
-        assertEquals(UserPrefs.deviceName.value.ifEmpty { getDeviceName() }, reply.name)
+        assertEquals(UserPrefs.deviceName.value, reply.name)
         assertEquals(UserPrefs.httpsPort.value, reply.port)
         assertEquals(getDeviceType(), reply.deviceType)
         assertEquals(getAppVersion(), reply.version)

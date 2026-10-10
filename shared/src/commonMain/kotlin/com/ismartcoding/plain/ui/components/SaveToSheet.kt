@@ -45,7 +45,7 @@ import com.ismartcoding.plain.i18n.folder
 /**
  * Reusable "save to this device" bottom sheet for any feature that writes
  * files locally. Offers the public Downloads dir, up to five recently used
- * custom folders (LRU via SystemPrefs, recorded here), the
+ * custom folders (recent folders via Rust, recorded here), the
  * folder picker, and — when [onZip] is set — a ZIP download. Pages only
  * supply the entry [title] and destination callbacks; the transfer itself
  * stays page-side.

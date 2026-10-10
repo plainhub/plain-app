@@ -101,7 +101,7 @@ fun ImagesPage(
     val previewerState = rememberPreviewerState()
     val tagsMapState by tagsVM.tagsMapFlow.collectAsState()
     val bucketsMap by mediaFoldersVM.bucketsMapFlow.collectAsState()
-    val cellsPerRow = remember { mutableIntStateOf(UserPrefs.imageGridCellsPerRow.default) }
+    val cellsPerRow = remember { mutableIntStateOf(UserPrefs.imageGridCellsPerRow.value) }
     val density = LocalDensity.current
     val windowInfo = LocalWindowInfo.current
     val imageWidthPx = remember(cellsPerRow.value, windowInfo.containerSize.width) {
@@ -244,7 +244,7 @@ fun ImagesPage(
                                     .nestedScroll(scrollBehavior.nestedScrollConnection)
                                     .gridDragSelect(items = itemsState, state = dragSelectState)
                                     .pinchZoomGrid(cellsPerRow = cellsPerRow, hapticFeedback = hapticFeedback, scope = scope) {
-                                        UserPrefs.imageGridCellsPerRow.value = it
+                                        UserPrefs.imageGridCellsPerRow.set(it)
                                     },
                                 horizontalArrangement = Arrangement.spacedBy(2.dp),
                                 verticalArrangement = Arrangement.spacedBy(2.dp)

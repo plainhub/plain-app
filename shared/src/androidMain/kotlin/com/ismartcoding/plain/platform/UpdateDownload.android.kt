@@ -22,7 +22,7 @@ actual fun downloadUpdateAsync() {
     downloadJob?.cancel()
     downloadJob = coIO {
         val context = appContext
-        val url = SystemPrefs.updateInfoValue().downloadUrl
+        val url = RustSystemState.state.value.updateInfo.downloadUrl
         if (url.isEmpty()) {
             sendEvent(UpdateDownloadFailedEvent())
             return@coIO
@@ -50,7 +50,7 @@ actual fun downloadUpdateAsync() {
                     }
                 }
             }
-            SystemPrefs.updateInfo { it.copy(downloadedApkPath = outputFile.absolutePath) }
+            RustSystemState.patchUpdate(UpdateInfoPatch(downloadedApkPath = outputFile.absolutePath))
             sendEvent(UpdateDownloadCompleteEvent(outputFile.absolutePath))
         } catch (e: CancellationException) {
             call.cancel()
@@ -68,5 +68,5 @@ actual fun downloadUpdateAsync() {
 actual fun cancelUpdateDownloadAsync() {
     downloadJob?.cancel()
     downloadJob = null
-    coIO { SystemPrefs.updateInfo { it.copy(downloadedApkPath = "") } }
+    coIO { RustSystemState.patchUpdate(UpdateInfoPatch(downloadedApkPath = "")) }
 }

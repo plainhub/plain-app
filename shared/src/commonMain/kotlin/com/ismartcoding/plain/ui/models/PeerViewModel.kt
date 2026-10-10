@@ -10,7 +10,7 @@ import com.ismartcoding.plain.chat.peer.PeerManager
 class PeerViewModel : ViewModel() {
     fun updateDiscoverable(discoverable: Boolean) {
         viewModelScope.launchSafe {
-            UserPrefs.nearbyDiscoverable.value = discoverable
+            UserPrefs.nearbyDiscoverable.set(discoverable)
         }
     }
 

@@ -178,7 +178,7 @@ object AudioPlayer {
 
     fun setPlaybackSpeed(speed: Float) {
         coMain {
-            UserPrefs.audioPlaybackSpeed.value = speed
+            UserPrefs.audioPlaybackSpeed.set(speed)
             player?.setPlaybackSpeed(speed)
         }
     }

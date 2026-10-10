@@ -59,13 +59,6 @@ internal object SystemAppHost {
             com.ismartcoding.plain.lib.sendEvent(com.ismartcoding.plain.events.RestartAppEvent())
             JsonHelper.jsonEncodeToElement(true)
         }
-        "systemUpdateDeviceName" -> {
-            val name = params.getValue("name").jsonPrimitive.content
-            com.ismartcoding.plain.preferences.UserPrefs.deviceName.value = name
-            com.ismartcoding.plain.TempData.deviceName.value = name
-            com.ismartcoding.plain.discover.MdnsDiscoverManager.updateAdvertisedService()
-            JsonHelper.jsonEncodeToElement(true)
-        }
         else -> error("Unsupported provider operation")
     }
 

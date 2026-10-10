@@ -57,7 +57,7 @@ internal fun SettingsCardItems(navController: NavHostController) {
                 navController.navigate(Routing.Language)
             },
             title = stringResource(Res.string.language),
-            subtitle = Prefs.parseLocale(UserPrefs.locale.collectAsStateValue())?.getElegantDisplayName() ?: stringResource(Res.string.use_device_language),
+            subtitle = UserPrefs.parseLocale(UserPrefs.locale.collectAsStateValue())?.getElegantDisplayName() ?: stringResource(Res.string.use_device_language),
             icon = UiRes.drawable.ui_drawable_languages,
             showMore = true,
         )

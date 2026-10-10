@@ -8,7 +8,6 @@ import com.ismartcoding.plain.chat.peer.PeerCacher
 import com.ismartcoding.plain.events.StartNearbyServiceEvent
 import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.lib.sendEvent
-import com.ismartcoding.plain.platform.getDeviceName
 import com.ismartcoding.plain.features.dlna.DlnaRendererState
 import com.ismartcoding.plain.preferences.*
 
@@ -21,18 +20,10 @@ import com.ismartcoding.plain.preferences.*
  * or after this function as needed.
  */
 suspend fun initCommonPreferences() {
-    SystemPrefs.ensureSignatureKeyPair()
     com.ismartcoding.plain.features.MediaDurationHelper.restore()
     com.ismartcoding.plain.features.VideoProgressHost.restore()
     com.ismartcoding.plain.features.audio.AudioEngineHost.start()
-    SystemPrefs.ensureClientId()
-    TempData.deviceName.value = UserPrefs.deviceName.value.ifEmpty { getDeviceName() }
-    SystemPrefs.ensureKeyStorePassword()
-    SystemPrefs.ensureUrlToken()
-    SystemPrefs.ensureMdnsHostname()
-    if (SystemPrefs.password.value.isEmpty()) {
-        com.ismartcoding.plain.platform.resetPasswordAsync()
-    }
+    TempData.deviceName.value = UserPrefs.deviceName.value
     PeerCacher.load()
     ChannelCacher.load()
     ChatCacher.load()

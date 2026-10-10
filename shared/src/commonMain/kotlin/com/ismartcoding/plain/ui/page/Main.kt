@@ -92,7 +92,7 @@ fun Main(
     }
 
     LaunchedEffect(Unit) {
-        if (!SystemPrefs.onboarding.value) {
+        if (!RustSystemState.state.value.onboardingCompleted) {
             // singleTop: this effect re-runs on activity recreation while the
             // onboarding is still showing and the pref is not yet written
             navController.navigate(Routing.Onboarding) {

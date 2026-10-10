@@ -43,7 +43,7 @@ object AppHelper {
         return try {
             val r = createHttpClient().get(Constants.LATEST_RELEASE_URL)
             r.use {
-                SystemPrefs.updateInfo { it.copy(checkUpdateTime = System.currentTimeMillis()) }
+                RustSystemState.patchUpdate(UpdateInfoPatch(checkUpdateTime = System.currentTimeMillis()))
                 if (it.status == HttpStatusCode.Forbidden) {
                     if (showToast) {
                         DialogHelper.showMessage(Res.string.rate_limit)
@@ -60,7 +60,7 @@ object AppHelper {
                 }
 
                 val latest = jsonDecode<LatestRelease>(latestJSON)
-                val current = SystemPrefs.updateInfoValue()
+                val current = RustSystemState.state.value.updateInfo
                 val skipVersion = Version(current.skipVersion)
                 val currentVersion = Version(getAppVersionName())
                 val latestVersion = Version(latest.tagName.substring(1))
@@ -75,15 +75,13 @@ object AppHelper {
                             it.name.contains("Recommended")
                         }
                     }
-                    SystemPrefs.updateInfo {
-                        it.copy(
+                    RustSystemState.patchUpdate(UpdateInfoPatch(
                             newVersion = latestVersion.toString(),
                             log = latest.body,
                             publishDate = latest.publishedAt.ifEmpty { latest.createdAt },
                             size = apk?.size ?: 0,
                             downloadUrl = apk?.browserDownloadUrl ?: "",
-                        )
-                    }
+                        ))
                     true
                 } else {
                     false

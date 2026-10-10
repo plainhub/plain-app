@@ -23,9 +23,6 @@ object LauncherShortcutTools {
         AppFeatureType.IMAGES, AppFeatureType.VIDEOS, AppFeatureType.AUDIO, AppFeatureType.FILES,
     )
     const val MAX_SELECTED = 4
-    val DEFAULT = listOf(
-        AppFeatureType.NOTES, AppFeatureType.DOCS, AppFeatureType.FEEDS, AppFeatureType.POMODORO_TIMER,
-    )
 
     fun featureItem(type: AppFeatureType): FeatureItem = when (type) {
         AppFeatureType.NOTES -> FeatureItem(type, Res.string.notes, UiRes.drawable.ui_drawable_notebook_pen) {}
