@@ -1,5 +1,5 @@
 use super::{c_string, input};
-use plain_server::content_api::ContentServer;
+use plain_server::adapters::mobile::ContentServer;
 use std::ffi::c_char;
 use std::{path::PathBuf, sync::Mutex};
 use tokio::runtime::Runtime;
@@ -21,7 +21,8 @@ fn start(path: &str, token: &str, config: &str) -> Result<String, String> {
     };
     let prefs = super::prefs()?;
     let directory = prefs.path().parent().ok_or("Missing TLS directory")?;
-    let (cert, key) = plain_server::tls_identity::identity(&directory.join("tls-identity.json"))?;
+    let (cert, key) =
+        plain_server::http::tls_identity::identity(&directory.join("tls-identity.json"))?;
     if let Some(core) = guard.as_mut() {
         if core.path != PathBuf::from(path) || core.token != token {
             return Err("Rust core already initialized with another session".into());
