@@ -32,7 +32,7 @@ pub(crate) fn install(
 pub(crate) fn clear() {
     BRIDGE.lock().unwrap().take();
 }
-fn bridge() -> Result<(Handle, Arc<HostEvents>), String> {
+pub(crate) fn bridge() -> Result<(Handle, Arc<HostEvents>), String> {
     BRIDGE
         .lock()
         .map_err(|e| e.to_string())?
