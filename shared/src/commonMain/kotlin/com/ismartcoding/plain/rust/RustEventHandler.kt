@@ -58,7 +58,9 @@ suspend fun sendEventToRust(event: HostEvent) {
             is HostEventData.Binary -> RustNativeApi.send("binary", event.type.name, data.value)
         }
     }
-    require(error.isEmpty()) { error }
+    // Host events are best-effort: a core that is stopped or reconnecting drops
+    // them, and that must not take the caller (often a background coroutine) down.
+    if (error.isNotEmpty()) LogCat.e("Send host event ${event.type.name}: $error")
 }
 
 object RustEventHandler {
@@ -75,18 +77,26 @@ object RustEventHandler {
             }
         }
         scope.launch {
-            readRustStream(
-                next = { RustNativeApi.next("events") },
-                consume = { value ->
-                    try {
-                        incoming.emit(JsonHelper.jsonDecode<RustEvent>(value))
-                    } catch (error: SerializationException) {
-                        // Skip unknown or malformed frames without closing the event stream.
-                        LogCat.e("Decode Rust event", error)
-                    }
-                },
-                closed = {},
-            )
+            try {
+                readRustStream(
+                    next = { RustNativeApi.next("events") },
+                    consume = { value ->
+                        try {
+                            incoming.emit(JsonHelper.jsonDecode<RustEvent>(value))
+                        } catch (error: SerializationException) {
+                            // Skip unknown or malformed frames without closing the event stream.
+                            LogCat.e("Decode Rust event", error)
+                        }
+                    },
+                    closed = {},
+                )
+            } catch (cancelled: CancellationException) {
+                throw cancelled
+            } catch (error: Exception) {
+                // The core closes the stream when its host connection stops; end this
+                // poller instead of letting the failure take the process down.
+                LogCat.e("Rust event stream ended", error)
+            }
         }
     }
 

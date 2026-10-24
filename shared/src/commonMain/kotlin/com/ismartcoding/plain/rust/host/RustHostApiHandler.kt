@@ -114,11 +114,19 @@ internal object RustHostApiHandler {
             }
         }
         scope.launch {
-            readRustStream(
-                next = { RustNativeApi.next("host") },
-                consume = { requests.send(it) },
-                closed = { requests.cancel() },
-            )
+            try {
+                readRustStream(
+                    next = { RustNativeApi.next("host") },
+                    consume = { requests.send(it) },
+                    closed = { requests.cancel() },
+                )
+            } catch (cancelled: CancellationException) {
+                throw cancelled
+            } catch (error: Exception) {
+                // The core closes the stream when its host connection stops; end this
+                // poller instead of letting the failure take the process down.
+                LogCat.e("Rust host stream ended", error)
+            }
         }
     }
 
