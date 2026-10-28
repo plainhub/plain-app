@@ -15,7 +15,6 @@ import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 
 @Composable
 fun ChatLinkPreviewLoading(url: String, modifier: Modifier = Modifier) {
@@ -33,7 +32,7 @@ fun ChatLinkPreviewLoading(url: String, modifier: Modifier = Modifier) {
                     color = MaterialTheme.colorScheme.onSurfaceVariant, fontWeight = FontWeight.SemiBold)
                 Spacer(modifier = Modifier.height(2.dp))
                 Text(text = url, style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    maxLines = 1, overflow = TextOverflow.Ellipsis, fontSize = 12.sp)
+                    maxLines = 1, overflow = TextOverflow.Ellipsis)
             }
         }
     }
@@ -54,7 +53,7 @@ fun ChatLinkPreviewError(url: String, modifier: Modifier = Modifier) {
                 Surface(modifier = Modifier.wrapContentSize(), color = MaterialTheme.colorScheme.error.copy(alpha = 0.15f), shape = RoundedCornerShape(4.dp)) {
                     Text(text = "ERROR", modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
                         style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.error,
-                        fontWeight = FontWeight.SemiBold, fontSize = 10.sp)
+                        fontWeight = FontWeight.SemiBold)
                 }
             }
             Spacer(modifier = Modifier.height(8.dp))
@@ -62,7 +61,7 @@ fun ChatLinkPreviewError(url: String, modifier: Modifier = Modifier) {
                 color = MaterialTheme.colorScheme.onErrorContainer, fontWeight = FontWeight.SemiBold)
             Spacer(modifier = Modifier.height(4.dp))
             Text(text = url, style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant,
-                maxLines = 1, overflow = TextOverflow.Ellipsis, fontSize = 12.sp)
+                maxLines = 1, overflow = TextOverflow.Ellipsis)
         }
     }
 }

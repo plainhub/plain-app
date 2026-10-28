@@ -3,6 +3,9 @@ package com.ismartcoding.plain.ui.chat.components
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -39,9 +42,16 @@ fun PeerListItem(
     val deleteWarningText = stringResource(Res.string.delete_peer_warning)
     val cancelText = stringResource(Res.string.cancel)
 
+    val onlineDescription = when (online) {
+        true -> stringResource(Res.string.online)
+        false -> stringResource(Res.string.offline)
+        null -> null
+    }
     Box {
         PListItem(
-            modifier = modifier.combinedClickable(
+            modifier = modifier.heightIn(min = 80.dp).semantics {
+                onlineDescription?.let { stateDescription = it }
+            }.combinedClickable(
                 onClick = onClick,
                 onLongClick = {
                     if (peerId != null && onDelete != null) {
@@ -51,7 +61,7 @@ fun PeerListItem(
             ),
             title = title,
             subtitle = latestChat?.getMessagePreview() ?: desc,
-            start = { PeerIconWithStatus(icon = icon, title = title, online = online) },
+            start = { PeerIconWithStatus(icon = icon, online = online) },
             titleTrailing = latestChat?.let { chat ->
                 {
                     Text(

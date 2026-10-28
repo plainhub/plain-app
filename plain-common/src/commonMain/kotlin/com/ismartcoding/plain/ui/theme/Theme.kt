@@ -32,19 +32,27 @@ val BrandPrimary = Color(0xFF4F5F9E)
 
 val ColorScheme.green: Color
     @Composable @ReadOnlyComposable
-    get() = if (LocalDarkTheme.current) Color(0xFF81C784) else Color(0xFF43A047)
+    get() = greenText
+
+val ColorScheme.onGreen: Color
+    @Composable @ReadOnlyComposable
+    get() = if (LocalDarkTheme.current) Color(0xFF153A24) else Color.White
 
 val ColorScheme.grey: Color
     @Composable @ReadOnlyComposable
-    get() = if (LocalDarkTheme.current) Color(0xFF636366) else Color(0xFF8E8E93)
+    get() = when {
+        !LocalDarkTheme.current -> Color(0xFF8A909C)
+        LocalAmoledDarkTheme.current -> Color(0xFF6D7483)
+        else -> Color(0xFF747B8A)
+    }
 
 val ColorScheme.yellow: Color
     @Composable @ReadOnlyComposable
-    get() = if (LocalDarkTheme.current) Color(0xFFFFD60A) else Color(0xFFFFCC00)
+    get() = warning
 
 val ColorScheme.orange: Color
     @Composable @ReadOnlyComposable
-    get() = if (LocalDarkTheme.current) Color(0xFFFF9F0A) else Color(0xFFFF9500)
+    get() = if (LocalDarkTheme.current) Color(0xFFC9A685) else Color(0xFF92542F)
 
 val LocalFloatingHostColor: ProvidableCompositionLocal<Color?> = staticCompositionLocalOf { null }
 
@@ -71,7 +79,7 @@ val ColorScheme.circleBackground: Color
 
 val ColorScheme.warning: Color
     @Composable @ReadOnlyComposable
-    get() = if (LocalDarkTheme.current) Color(0xFFE7C678) else Color(0xFF805600)
+    get() = if (LocalDarkTheme.current) Color(0xFFC8B17A) else Color(0xFF805600)
 
 val ColorScheme.warningContainer: Color
     @Composable @ReadOnlyComposable
@@ -79,7 +87,7 @@ val ColorScheme.warningContainer: Color
 
 val ColorScheme.onWarningContainer: Color
     @Composable @ReadOnlyComposable
-    get() = if (LocalDarkTheme.current) Color(0xFFF4E2AE) else Color(0xFF614711)
+    get() = if (LocalDarkTheme.current) Color(0xFFD7C69B) else Color(0xFF614711)
 
 val ColorScheme.greenDot: Color
     @Composable @ReadOnlyComposable
@@ -87,7 +95,7 @@ val ColorScheme.greenDot: Color
 
 val ColorScheme.greenText: Color
     @Composable @ReadOnlyComposable
-    get() = if (LocalDarkTheme.current) Color(0xFF9CCEAC) else Color(0xFF356B4D)
+    get() = if (LocalDarkTheme.current) Color(0xFF9EBDA7) else Color(0xFF356B4D)
 
 val ColorScheme.greenPill: Color
     @Composable @ReadOnlyComposable

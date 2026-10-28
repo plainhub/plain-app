@@ -1,13 +1,11 @@
 package com.ismartcoding.plain.ui.notes.components
 
-
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.BasicTextField
@@ -37,10 +35,7 @@ import com.ismartcoding.plain.i18n.edit
 import com.ismartcoding.plain.ui.resources.maximize_2 as ui_drawable_maximize_2
 import com.ismartcoding.plain.i18n.note_saved
 import com.ismartcoding.plain.i18n.quick_note_hint
-import com.ismartcoding.plain.ui.resources.save as ui_drawable_save
-import com.ismartcoding.plain.ui.resources.undo as ui_drawable_undo
 import com.ismartcoding.plain.lib.coIO
-import com.ismartcoding.plain.lib.extensions.getMarkdownTitle
 import com.ismartcoding.plain.lib.withIO
 import com.ismartcoding.plain.ui.base.PCard
 import com.ismartcoding.plain.ui.components.PIconButton
@@ -98,8 +93,6 @@ fun QuickNoteCard(
     val savedText = stringResource(Res.string.note_saved)
     val undoText = stringResource(Res.string.undo)
     val canSave = text.isNotBlank()
-    // Compact when idle and empty; grow to reveal the action row on focus or with content.
-    val showActions = isFocused || canSave
 
     fun saveAsync(onSaved: (String) -> Unit) {
         scope.launch {
@@ -114,87 +107,68 @@ fun QuickNoteCard(
     }
 
     PCard(
-        modifier =
-            modifier.border(
-                border =
-                    BorderStroke(
-                        width = 1.dp,
-                        color =
-                            if (isFocused) {
-                                MaterialTheme.colorScheme.primary
-                            } else {
-                                Color.Transparent
-                            },
-                    ),
-                shape = MaterialTheme.shapes.medium,
-            )
+        modifier = modifier.border(
+            BorderStroke(1.dp, if (isFocused) MaterialTheme.colorScheme.primary else Color.Transparent),
+            MaterialTheme.shapes.medium,
+        ),
     ) {
         Column(
-            modifier =
-                Modifier.padding(start = 16.dp, end = 4.dp, top = 8.dp, bottom = 8.dp)
-                    .animateContentSize()
+            modifier = Modifier.padding(start = 16.dp, end = 4.dp, top = 4.dp, bottom = 4.dp).animateContentSize(),
         ) {
-            BasicTextField(
-                value = text,
-                onValueChange = { text = it },
-                modifier =
-                    Modifier.fillMaxWidth()
-                        .heightIn(min = 48.dp, max = 108.dp)
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                BasicTextField(
+                    value = text,
+                    onValueChange = { text = it },
+                    modifier = Modifier.weight(1f)
+                        .heightIn(min = 48.dp, max = 112.dp)
                         .onFocusChanged { isFocused = it.isFocused },
-                textStyle =
-                    MaterialTheme.typography.bodyLarge.copy(color = MaterialTheme.colorScheme.onSurface),
-                cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
-                keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Sentences),
-                decorationBox = { innerField ->
-                    Box(modifier = Modifier.padding(vertical = 12.dp)) {
-                        if (text.isEmpty()) {
-                            Text(
-                                text = stringResource(Res.string.quick_note_hint),
-                                style = MaterialTheme.typography.bodyLarge,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            )
+                    textStyle = MaterialTheme.typography.bodyLarge.copy(color = MaterialTheme.colorScheme.onSurface),
+                    cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
+                    keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Sentences),
+                    decorationBox = { innerField ->
+                        Box(modifier = Modifier.padding(vertical = 8.dp)) {
+                            if (text.isEmpty()) {
+                                Text(
+                                    text = stringResource(Res.string.quick_note_hint),
+                                    style = MaterialTheme.typography.bodyLarge,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                )
+                            }
+                            innerField()
                         }
-                        innerField()
-                    }
-                },
-            )
-            if (showActions) {
+                    },
+                )
+                PIconButton(
+                    icon = UiRes.drawable.ui_drawable_maximize_2,
+                    iconSize = 20.dp,
+                    contentDescription = stringResource(Res.string.edit),
+                    click = {
+                        if (canSave) saveAsync(onSaved = onOpenNote)
+                        else onEmptyExpand()
+                    },
+                )
+            }
+            if (canSave) {
                 Row(modifier = Modifier.align(Alignment.End)) {
                     PIconButton(
-                        icon = UiRes.drawable.ui_drawable_maximize_2,
-                        iconSize = 20.dp,
-                        contentDescription = stringResource(Res.string.edit),
+                        icon = UiRes.drawable.ui_drawable_check,
+                        contentDescription = stringResource(Res.string.save),
+                        tint = MaterialTheme.colorScheme.primary,
                         click = {
-                            if (canSave) {
-                                saveAsync(onSaved = { id -> onOpenNote(id) })
-                            } else {
-                                onEmptyExpand()
+                            val draft = text
+                            saveAsync { id ->
+                                ToastManager.showToast(
+                                    savedText,
+                                    type = ToastType.SUCCESS,
+                                    durationMs = 4000L,
+                                    actionLabel = undoText,
+                                ) {
+                                    coIO { NotesClient.trashAsync(setOf(id)) }
+                                    text = draft
+                                }
                             }
                         },
                     )
-                    if (canSave) {
-                        PIconButton(
-                            icon = UiRes.drawable.ui_drawable_check,
-                            contentDescription = stringResource(Res.string.save),
-                            tint = MaterialTheme.colorScheme.primary,
-                            click = {
-                                val draft = text
-                                saveAsync(
-                                    onSaved = { id ->
-                                        ToastManager.showToast(
-                                            savedText,
-                                            type = ToastType.SUCCESS,
-                                            durationMs = 4000L,
-                                            actionLabel = undoText,
-                                        ) {
-                                            coIO { NotesClient.trashAsync(setOf(id)) }
-                                            text = draft
-                                        }
-                                    },
-                                )
-                            },
-                        )
-                    }
                 }
             }
         }

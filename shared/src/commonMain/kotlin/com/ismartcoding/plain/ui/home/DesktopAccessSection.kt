@@ -37,6 +37,9 @@ import com.ismartcoding.plain.ui.web.components.WebAddressPager
 import kotlinx.coroutines.flow.map
 import com.ismartcoding.plain.ui.theme.plainColors
 import org.jetbrains.compose.resources.stringResource
+import org.jetbrains.compose.resources.painterResource
+import com.ismartcoding.plain.ui.resources.Res as UiRes
+import com.ismartcoding.plain.ui.resources.chevron_right as ui_drawable_chevron_right
 
 @Composable
 fun DesktopAccessSection(navController: NavHostController) {
@@ -63,7 +66,6 @@ fun DesktopAccessSection(navController: NavHostController) {
                 WebAddressPager(
                     lanIpv4Addresses = it,
                     modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
-                    compact = true,
                 )
             }
         }
@@ -81,6 +83,7 @@ fun DesktopAccessSection(navController: NavHostController) {
             }
             PTextButton(
                 text = stringResource(Res.string.access_settings),
+                trailingIcon = painterResource(UiRes.drawable.ui_drawable_chevron_right),
                 onClick = { navController.navigate(Routing.DesktopAccessSettings) },
             )
         }

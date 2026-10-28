@@ -17,10 +17,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -40,8 +37,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import com.ismartcoding.plain.ui.i18n.LocaleHelper
@@ -95,7 +93,7 @@ fun MdEditorBottomAppBar(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(50.dp)
+                    .heightIn(min = 56.dp)
                     .horizontalScroll(rememberScrollState()),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
@@ -108,25 +106,24 @@ fun MdEditorBottomAppBar(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(54.dp),
+                .heightIn(min = 64.dp),
+            verticalAlignment = Alignment.CenterVertically,
         ) {
             mdToolbarCategories.forEach { category ->
                 CategoryButton(
                     category = category,
                     active = category.key == activeKey,
                     modifier = Modifier
-                        .weight(1f)
-                        .fillMaxHeight(),
+                        .weight(1f),
                 ) {
                     activeKey = if (activeKey == category.key) null else category.key
                 }
             }
-                CategoryButton(
-                    category = MdToolbarCategory("help", Res.string.help, icon = UiRes.drawable.ui_drawable_circle_help, items = emptyList()),
+            CategoryButton(
+                category = MdToolbarCategory("help", Res.string.help, icon = UiRes.drawable.ui_drawable_circle_help, items = emptyList()),
                 active = false,
                 modifier = Modifier
-                    .weight(1f)
-                    .fillMaxHeight(),
+                    .weight(1f),
             ) {
                 WebHelper.open("https://plainapp.app/docs/markdown")
             }
@@ -158,14 +155,12 @@ private fun CategoryButton(
                     color = bgColor
                 ), onClick = onClick
             )
-            .padding(vertical = 6.dp),
+            .heightIn(min = 64.dp)
+            .padding(vertical = 4.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Box(
-            modifier = Modifier
-                .weight(1f)
-                .fillMaxSize()
-                .padding(horizontal = 12.dp),
+            modifier = Modifier.size(24.dp),
             contentAlignment = Alignment.Center,
         ) {
             Icon(
@@ -174,10 +169,11 @@ private fun CategoryButton(
                 tint = contentColor,
             )
         }
+        VerticalSpace(4.dp)
         Text(
             stringResource(category.tip),
-            fontSize = 9.sp,
-            lineHeight = 10.sp,
+            style = MaterialTheme.typography.labelLarge,
+            textAlign = TextAlign.Center,
             color = contentColor,
         )
     }
@@ -192,7 +188,7 @@ private fun SubToolbarButton(
     Column(
         modifier = Modifier
             .padding(start = 4.dp)
-            .height(50.dp)
+            .heightIn(min = 56.dp)
             .clip(RoundedCornerShape(10.dp))
             .clickable(onClick = onClick)
             .padding(horizontal = 8.dp),
@@ -208,8 +204,7 @@ private fun SubToolbarButton(
         if (item.caption != null) {
             Text(
                 stringResource(item.caption),
-                fontSize = 9.sp,
-                lineHeight = 11.sp,
+                style = MaterialTheme.typography.labelLarge,
                 color = contentColor,
             )
         }

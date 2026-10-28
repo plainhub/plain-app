@@ -3,35 +3,39 @@ package com.ismartcoding.plain.ui.web.components
 import com.ismartcoding.plain.preferences.*
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.selection.selectable
+import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
-import androidx.compose.material3.MaterialTheme
+import androidx.compose.ui.Alignment
 import androidx.compose.material3.Text
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.rememberTextMeasurer
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.snapshotFlow
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.ismartcoding.plain.Prefs
-import com.ismartcoding.plain.ui.base.PSegmentedButtons
-import com.ismartcoding.plain.ui.base.PRangeDots
-import com.ismartcoding.plain.ui.base.PSegmentedButtonsDefaults
-import com.ismartcoding.plain.ui.components.ButtonSize
 import kotlinx.coroutines.launch
 
 @Composable
 fun WebAddressPager(
     lanIpv4Addresses: List<String>,
     modifier: Modifier = Modifier,
-    compact: Boolean = false,
 ) {
     val isHttps = Prefs.https.collectAsState()
     val pagerState = rememberPagerState(
@@ -45,40 +49,40 @@ fun WebAddressPager(
         }
     }
     Column(
-        modifier = modifier.fillMaxWidth().then(
-            if (compact) Modifier.background(MaterialTheme.colorScheme.surfaceContainer, MaterialTheme.shapes.large).padding(8.dp)
-            else Modifier.padding(horizontal = 8.dp),
-        ),
+        modifier = modifier.fillMaxWidth()
+            .clip(MaterialTheme.shapes.large)
+            .background(MaterialTheme.colorScheme.surfaceContainer)
+            .padding(top = 8.dp),
     ) {
-        if (compact) {
-            PSegmentedButtons(
-                options = listOf("HTTP", "HTTPS"),
-                selectedIndex = pagerState.currentPage,
-                onSelect = { page -> scope.launch { pagerState.animateScrollToPage(page) } },
-                label = { it },
-                modifier = Modifier.width(IntrinsicSize.Max),
-                buttonSize = ButtonSize.LARGE,
-                content = { option, _ -> Text(option, style = MaterialTheme.typography.labelMedium) },
-                colors = PSegmentedButtonsDefaults.colors(
-                    containerColor = Color.Transparent,
-                    selectedContainerColor = MaterialTheme.colorScheme.surface,
-                    selectedContentColor = MaterialTheme.colorScheme.primary,
-                ),
-            )
+        val labelStyle = MaterialTheme.typography.labelLarge
+        val textMeasurer = rememberTextMeasurer()
+        val optionWidth = with(LocalDensity.current) {
+            textMeasurer.measure("HTTPS", labelStyle.copy(fontWeight = FontWeight.Bold)).size.width.toDp() + 16.dp
+        }.coerceAtLeast(48.dp)
+        Row(Modifier.selectableGroup().padding(start = 16.dp)) {
+            listOf("HTTP", "HTTPS").forEachIndexed { page, label ->
+                val selected = pagerState.currentPage == page
+                Box(
+                    modifier = Modifier.width(optionWidth).heightIn(min = 48.dp).selectable(
+                        selected = selected,
+                        role = Role.Tab,
+                        interactionSource = null,
+                        indication = null,
+                        onClick = { scope.launch { pagerState.animateScrollToPage(page) } },
+                    ),
+                    contentAlignment = Alignment.CenterStart,
+                ) {
+                    Text(
+                        text = label,
+                        style = labelStyle,
+                        fontWeight = if (selected) FontWeight.Bold else FontWeight.Normal,
+                        color = if (selected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
+            }
         }
-        HorizontalPager(
-            state = pagerState,
-            modifier = Modifier.fillMaxWidth(),
-        ) { page ->
-            WebAddressBar(isHttps = page == 1, lanIpv4Addresses = lanIpv4Addresses, compact = compact)
-        }
-        if (!compact) {
-            PRangeDots(
-                items = listOf(0, 1),
-                selected = pagerState.currentPage,
-                onSelect = { page -> scope.launch { pagerState.animateScrollToPage(page) } },
-                modifier = Modifier.fillMaxWidth(),
-            )
+        HorizontalPager(state = pagerState, modifier = Modifier.fillMaxWidth()) { page ->
+            WebAddressBar(isHttps = page == 1, lanIpv4Addresses = lanIpv4Addresses)
         }
     }
 }

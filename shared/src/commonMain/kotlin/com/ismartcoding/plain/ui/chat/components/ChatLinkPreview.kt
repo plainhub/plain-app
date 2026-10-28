@@ -15,7 +15,6 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
 import com.ismartcoding.plain.features.chat.models.LinkPreview
 import com.ismartcoding.plain.ui.extensions.rememberFilePath
@@ -51,18 +50,18 @@ fun ChatLinkPreview(linkPreview: LinkPreview, modifier: Modifier = Modifier) {
                     Surface(modifier = Modifier.wrapContentSize(), color = MaterialTheme.colorScheme.primary.copy(alpha = 0.1f), shape = RoundedCornerShape(4.dp)) {
                         Text(text = domain.uppercase(), modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
                             style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.primary,
-                            fontWeight = FontWeight.SemiBold, fontSize = 10.sp)
+                            fontWeight = FontWeight.SemiBold)
                     }
                     Spacer(modifier = Modifier.height(8.dp))
                 }
                 if (!title.isNullOrEmpty()) {
                     Text(text = title, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold,
-                        color = MaterialTheme.colorScheme.onSurface, maxLines = 2, overflow = TextOverflow.Ellipsis, lineHeight = 20.sp)
+                        color = MaterialTheme.colorScheme.onSurface, maxLines = 2, overflow = TextOverflow.Ellipsis)
                     Spacer(modifier = Modifier.height(4.dp))
                 }
                 if (!description.isNullOrEmpty()) {
                     Text(text = description, style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant, maxLines = 2, overflow = TextOverflow.Ellipsis, lineHeight = 18.sp)
+                        color = MaterialTheme.colorScheme.onSurfaceVariant, maxLines = 2, overflow = TextOverflow.Ellipsis)
                     Spacer(modifier = Modifier.height(8.dp))
                 }
                 Row(verticalAlignment = Alignment.CenterVertically) {
@@ -80,7 +79,7 @@ fun ChatLinkPreview(linkPreview: LinkPreview, modifier: Modifier = Modifier) {
                     }
                     Text(text = linkPreview.siteName?.takeIf { it.isNotEmpty() } ?: linkPreview.url,
                         style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        maxLines = 1, overflow = TextOverflow.Ellipsis, fontSize = 12.sp)
+                        maxLines = 1, overflow = TextOverflow.Ellipsis)
                 }
             }
         }

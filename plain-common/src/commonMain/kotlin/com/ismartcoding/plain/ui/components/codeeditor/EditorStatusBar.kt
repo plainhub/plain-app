@@ -34,7 +34,7 @@ fun EditorStatusBar(controller: EditorController, modifier: Modifier = Modifier)
         }
         Text(
             text = parts.joinToString("   "),
-            fontSize = 11.sp,
+            fontSize = 14.sp,
             fontFamily = FontFamily.Monospace,
             color = color,
             maxLines = 1,

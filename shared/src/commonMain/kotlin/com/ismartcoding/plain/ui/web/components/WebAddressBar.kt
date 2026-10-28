@@ -4,18 +4,13 @@ import com.ismartcoding.plain.HttpServerManager
 import com.ismartcoding.plain.preferences.PrefKeys
 
 import kotlinx.coroutines.launch
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.expandVertically
-import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.selection.SelectionContainer
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.MaterialTheme
@@ -29,15 +24,12 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.unit.dp
 import com.ismartcoding.plain.lib.UrlHelper
 import com.ismartcoding.plain.i18n.Res
 import com.ismartcoding.plain.i18n.collapse_backup_addresses
 import com.ismartcoding.plain.i18n.collapsed
 import com.ismartcoding.plain.i18n.expanded
-import com.ismartcoding.plain.i18n.try_more_addresses
 import com.ismartcoding.plain.i18n.home_try_other_addresses
 import com.ismartcoding.plain.i18n.change_port
 import com.ismartcoding.plain.i18n.mdns_hostname
@@ -46,13 +38,8 @@ import com.ismartcoding.plain.platform.setClipboardText
 import com.ismartcoding.plain.ui.components.PIconButton
 import com.ismartcoding.plain.Prefs
 import com.ismartcoding.plain.ui.base.PExpandableSection
-import com.ismartcoding.plain.ui.base.PTextButton
-import com.ismartcoding.plain.ui.theme.cardBackgroundNormal
-import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import com.ismartcoding.plain.ui.resources.Res as UiRes
-import com.ismartcoding.plain.ui.resources.chevron_down as ui_drawable_chevron_down
-import com.ismartcoding.plain.ui.resources.chevron_up as ui_drawable_chevron_up
 import com.ismartcoding.plain.ui.resources.pen as ui_drawable_pen
 import com.ismartcoding.plain.ui.resources.qr_code as ui_drawable_qr_code
 
@@ -61,7 +48,6 @@ fun WebAddressBar(
     isHttps: Boolean,
     lanIpv4Addresses: List<String>,
     modifier: Modifier = Modifier,
-    compact: Boolean = false,
 ) {
     val port = if (isHttps) Prefs.httpsPort.collectAsState() else Prefs.httpPort.collectAsState()
     // Shared persisted state so the HTTP/HTTPS pager pages stay in sync.
@@ -76,17 +62,9 @@ fun WebAddressBar(
     val primaryAddress = lanIpv4Addresses.firstOrNull() ?: hostname
     val backupAddresses = (listOf(hostname) + lanIpv4Addresses.drop(1)).filter { it != primaryAddress }
 
-    val containerModifier = if (compact) modifier.fillMaxWidth() else modifier.fillMaxWidth().background(
-        color = MaterialTheme.colorScheme.cardBackgroundNormal,
-        shape = MaterialTheme.shapes.small,
-    ).padding(top = 8.dp)
-    val addressRow: @Composable (String, Boolean, () -> Unit, () -> Unit) -> Unit = { url, hostname, edit, qr ->
-        if (compact) CompactAddressRow(url, hostname, edit, qr)
-        else AddressRow(url, hostname, edit, qr)
-    }
-    Column(containerModifier) {
+    Column(modifier.fillMaxWidth()) {
         val primaryUrl = UrlHelper.buildUrl(scheme, primaryAddress, port.value)
-        addressRow(
+        AddressRow(
             primaryUrl,
             primaryAddress == hostname,
             {
@@ -102,8 +80,7 @@ fun WebAddressBar(
             val expansion = stringResource(if (expanded.value) Res.string.expanded else Res.string.collapsed)
             val text = stringResource(
                 if (expanded.value) Res.string.collapse_backup_addresses
-                else if (compact) Res.string.home_try_other_addresses
-                else Res.string.try_more_addresses,
+                else Res.string.home_try_other_addresses,
             )
             val toggle: () -> Unit = {
                 scope.launch { Prefs.set(PrefKeys.WEB_ADDRESS_BAR_EXPANDED, !expanded.value) }
@@ -112,7 +89,7 @@ fun WebAddressBar(
                 Column {
                     backupAddresses.forEach { address ->
                         val url = UrlHelper.buildUrl(scheme, address, port.value)
-                        addressRow(
+                        AddressRow(
                             url,
                             address == hostname,
                             {
@@ -130,31 +107,14 @@ fun WebAddressBar(
                     }
                 }
             }
-            if (compact) {
-                PExpandableSection(
-                    text = text,
-                    expanded = expanded.value,
-                    stateDescription = expansion,
-                    onClick = toggle,
-                    content = backupRows,
-                )
-            } else {
-                AnimatedVisibility(
-                    visible = expanded.value,
-                    enter = expandVertically(),
-                    exit = shrinkVertically(),
-                ) {
-                    backupRows()
-                }
-                PTextButton(
-                    modifier = Modifier.padding(horizontal = 8.dp).semantics {
-                        stateDescription = expansion
-                    },
-                    text = text,
-                    icon = painterResource(if (expanded.value) UiRes.drawable.ui_drawable_chevron_up else UiRes.drawable.ui_drawable_chevron_down),
-                    onClick = toggle,
-                )
-            }
+            PExpandableSection(
+                toggleModifier = Modifier.padding(start = 16.dp, end = 8.dp),
+                text = text,
+                expanded = expanded.value,
+                stateDescription = expansion,
+                onClick = toggle,
+                content = backupRows,
+            )
         }
     }
 
@@ -204,32 +164,12 @@ fun WebAddressBar(
 @Composable
 private fun AddressRow(
     url: String,
-    isHostnameRow: Boolean,
-    onEditClick: () -> Unit,
-    onQrClick: () -> Unit,
-) {
-    Row(
-        modifier = Modifier.height(40.dp),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        WebAddressBarRow(
-            url = url,
-            isHostnameRow = isHostnameRow,
-            onEditClick = onEditClick,
-            onQrClick = onQrClick,
-        )
-    }
-}
-
-@Composable
-private fun CompactAddressRow(
-    url: String,
     isHostname: Boolean,
     onEdit: () -> Unit,
     onQr: () -> Unit,
 ) {
     Row(
-        modifier = Modifier.fillMaxWidth().padding(start = 8.dp),
+        modifier = Modifier.fillMaxWidth().padding(start = 16.dp, end = 8.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         SelectionContainer(Modifier.weight(1f)) {

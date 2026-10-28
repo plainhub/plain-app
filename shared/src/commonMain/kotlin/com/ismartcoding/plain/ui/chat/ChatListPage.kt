@@ -3,7 +3,7 @@ package com.ismartcoding.plain.ui.chat
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.items
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -13,7 +13,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.ismartcoding.plain.features.chat.models.getBestIp
 import com.ismartcoding.plain.features.chat.peer.PeerStatusClient
@@ -42,7 +41,6 @@ import com.ismartcoding.plain.ui.base.BottomSpace
 import com.ismartcoding.plain.ui.base.PAlert
 import com.ismartcoding.plain.ui.base.PTextButton
 import com.ismartcoding.plain.ui.base.TopSpace
-import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.base.pullrefresh.PullToRefresh
 import com.ismartcoding.plain.ui.base.pullrefresh.RefreshContentState
 import com.ismartcoding.plain.ui.base.pullrefresh.rememberRefreshLayoutState
@@ -55,7 +53,8 @@ import com.ismartcoding.plain.ui.chat.components.PeerListItem
 import com.ismartcoding.plain.ui.resources.Res as UiRes
 import com.ismartcoding.plain.ui.resources.bot as ui_drawable_bot
 import com.ismartcoding.plain.ui.resources.hash as ui_drawable_hash
-import com.ismartcoding.plain.ui.theme.PlainTheme
+import androidx.compose.material3.MaterialTheme
+import com.ismartcoding.plain.ui.theme.onWarningContainer
 import com.ismartcoding.plain.ui.state.launchSafe
 import org.jetbrains.compose.resources.stringResource
 
@@ -122,6 +121,7 @@ fun ChatListPage(
                         PTextButton(
                             text = stringResource(Res.string.grant_permission),
                             buttonSize = ButtonSize.SMALL,
+                            contentColor = MaterialTheme.colorScheme.onWarningContainer,
                             onClick = {
                                 when {
                                     !bleReady -> {
@@ -146,14 +146,10 @@ fun ChatListPage(
                         desc = stringResource(Res.string.local_chat_desc),
                         icon = UiRes.drawable.ui_drawable_bot,
                         latestChat = latestChats["local"],
-                        modifier = PlainTheme.getCardModifier(),
                         onClick = { navController.navigate(Routing.Chat("peer:local")) })
                 }
                 if (channels.isNotEmpty()) {
-                    item {
-                        VerticalSpace(16.dp)
-                    }
-                    itemsIndexed(items = channels.toList(), key = { _, i -> i.id }) { index, channel ->
+                    items(items = channels, key = { it.id }) { channel ->
                         PeerListItem(
                             title = channel.name,
                             desc = "",
@@ -162,16 +158,12 @@ fun ChatListPage(
                             onClick = {
                                 navController.navigate(Routing.Chat("channel:${channel.id}"))
                             },
-                            modifier = PlainTheme.getCardModifier(index, channels.size)
                         )
                     }
                 }
                 val allPeers = pairedPeers + unpairedPeers
                 if (allPeers.isNotEmpty()) {
-                    item {
-                        VerticalSpace(16.dp)
-                    }
-                    itemsIndexed(items = allPeers, key = { _, i -> i.id }) { index, peer ->
+                    items(items = allPeers, key = { it.id }) { peer ->
                         PeerListItem(
                             title = peer.name,
                             desc = if (peer.isPaired()) peer.getBestIp() else peer.ip,
@@ -181,7 +173,6 @@ fun ChatListPage(
                             peerId = peer.id,
                             onDelete = { peerVM.removePeer(it) },
                             onClick = { navController.navigate(Routing.Chat("peer:${peer.id}")) },
-                            modifier = PlainTheme.getCardModifier(index, allPeers.size)
                         )
                     }
                 }

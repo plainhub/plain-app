@@ -96,7 +96,7 @@ fun EditorSearchBar(controller: EditorController, modifier: Modifier = Modifier)
         if (countText.isNotEmpty()) {
             Text(
                 text = countText,
-                fontSize = 12.sp,
+                fontSize = 14.sp,
                 fontFamily = FontFamily.Monospace,
                 color = tint,
                 modifier = Modifier.padding(horizontal = 6.dp),

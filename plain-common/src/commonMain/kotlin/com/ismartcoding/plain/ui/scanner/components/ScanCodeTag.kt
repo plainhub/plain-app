@@ -12,9 +12,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.ismartcoding.plain.ui.theme.green
+import com.ismartcoding.plain.ui.theme.onGreen
 import org.jetbrains.compose.resources.painterResource
 import com.ismartcoding.plain.ui.resources.Res as UiRes
 import com.ismartcoding.plain.ui.resources.arrow_right as ui_drawable_arrow_right
@@ -35,14 +35,14 @@ fun ScanCodeTag(
             .size(TagSize)
             .clip(CircleShape)
             .background(MaterialTheme.colorScheme.green)
-            .border(2.dp, Color.White, CircleShape)
+            .border(2.dp, MaterialTheme.colorScheme.onGreen, CircleShape)
             .clickable { onPick() },
         contentAlignment = Alignment.Center,
     ) {
         Icon(
             painter = painterResource(UiRes.drawable.ui_drawable_arrow_right),
             contentDescription = (index + 1).toString(),
-            tint = Color.White,
+            tint = MaterialTheme.colorScheme.onGreen,
             modifier = Modifier.size(TagIconSize),
         )
     }

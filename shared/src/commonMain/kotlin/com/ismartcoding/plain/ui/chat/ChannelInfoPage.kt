@@ -186,7 +186,6 @@ fun ChannelInfoPage(
                                     start = {
                                         PeerIconWithStatus(
                                             icon = peer.deviceType.getIcon(),
-                                            title = peer.getName(),
                                             online = null
                                         )
                                     },

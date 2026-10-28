@@ -1,14 +1,10 @@
 package com.ismartcoding.plain.ui.tools
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -16,13 +12,8 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.layout.onSizeChanged
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.ismartcoding.plain.Prefs
@@ -38,11 +29,9 @@ import com.ismartcoding.plain.i18n.customize_home_features
 import com.ismartcoding.plain.i18n.launcher_shortcuts
 import com.ismartcoding.plain.i18n.tools
 import com.ismartcoding.plain.ui.components.ActionButtonAddWithMenu
-import com.ismartcoding.plain.ui.base.BottomSpace
 import com.ismartcoding.plain.ui.base.PDropdownMenuItem
 import com.ismartcoding.plain.ui.base.PTopAppBar
 import com.ismartcoding.plain.ui.base.StatusIndicator
-import com.ismartcoding.plain.ui.base.TopSpace
 import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.notes.components.QuickNoteCard
 import com.ismartcoding.plain.ui.media.extensions.collectAsStateValue
@@ -51,7 +40,6 @@ import com.ismartcoding.plain.ui.navigation.MainNavScaffold
 import com.ismartcoding.plain.ui.resources.Res as UiRes
 import com.ismartcoding.plain.ui.resources.grid_3x3 as ui_drawable_grid_3x3
 import com.ismartcoding.plain.ui.resources.layout_grid as ui_drawable_layout_grid
-import com.ismartcoding.plain.ui.theme.greenPill
 import com.ismartcoding.plain.ui.theme.greenText
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
@@ -110,66 +98,34 @@ fun ToolsPage(
             )
         },
     ) { paddingValues ->
-        BoxWithConstraints(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(top = paddingValues.calculateTopPadding()),
-        ) {
-            val density = LocalDensity.current
-            val viewportHeight = maxHeight
-            var aboveGridHeightPx by remember { mutableStateOf(0) }
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .verticalScroll(rememberScrollState()),
-            ) {
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .onSizeChanged { aboveGridHeightPx = it.height },
-                ) {
+        HomeFeatureItemsGrid(
+            navController = navController,
+            modifier = Modifier.fillMaxSize().padding(top = paddingValues.calculateTopPadding()),
+            contentPadding = PaddingValues(top = 8.dp, bottom = 40.dp + paddingValues.calculateBottomPadding()),
+            header = {
+                Column(Modifier.fillMaxWidth().padding(start = 16.dp, end = 16.dp, bottom = 16.dp)) {
                     if (currentUri.isNotEmpty() && RustDlnaSender.currentDevice != null) {
                         val deviceName = RustDlnaSender.currentDevice?.getDeviceName() ?: ""
-                        Box(
-                            modifier = Modifier.fillMaxWidth(),
-                            contentAlignment = Alignment.Center,
-                        ) {
-                            StatusIndicator(
-                                text = if (deviceName.isNotEmpty()) stringResource(Res.string.casting_to, deviceName) else stringResource(Res.string.casting),
-                                onClick = { navController.navigate(Routing.CastSession) },
-                                pillColor = MaterialTheme.colorScheme.greenPill,
-                                dotColor = MaterialTheme.colorScheme.greenText,
-                                textColor = MaterialTheme.colorScheme.greenText,
-                                contentPaddingHorizontal = 16.dp,
-                                contentPaddingVertical = 8.dp,
-                                textStartPadding = 8.dp,
-                            )
-                        }
+                        StatusIndicator(
+                            text = if (deviceName.isNotEmpty()) stringResource(Res.string.casting_to, deviceName) else stringResource(Res.string.casting),
+                            onClick = { navController.navigate(Routing.CastSession) },
+                            pillColor = Color.Transparent,
+                            dotColor = MaterialTheme.colorScheme.greenText,
+                            textColor = MaterialTheme.colorScheme.greenText,
+                            contentPaddingHorizontal = 0.dp,
+                            contentPaddingVertical = 8.dp,
+                            textStartPadding = 8.dp,
+                        )
                         VerticalSpace(8.dp)
                     }
-                    TopSpace()
-                    Column(
-                        modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
-                        verticalArrangement = Arrangement.spacedBy(12.dp),
-                    ) {
-                        if (notesEnabled) {
-                            QuickNoteCard(
-                                onOpenNote = { id -> navController.navigate(Routing.NoteDetail(id)) },
-                                onEmptyExpand = { navController.navigate(Routing.NotesCreate("")) },
-                            )
-                        }
+                    if (notesEnabled) {
+                        QuickNoteCard(
+                            onOpenNote = { id -> navController.navigate(Routing.NoteDetail(id)) },
+                            onEmptyExpand = { navController.navigate(Routing.NotesCreate("")) },
+                        )
                     }
                 }
-                VerticalSpace(12.dp)
-                HomeFeatureItemsGrid(
-                    navController,
-                    modifier = Modifier.padding(horizontal = 16.dp),
-                    minHeight = (viewportHeight - with(density) { aboveGridHeightPx.toDp() } - 12.dp - 16.dp - 40.dp - paddingValues.calculateBottomPadding())
-                        .coerceAtLeast(0.dp),
-                )
-                VerticalSpace(dp = 16.dp)
-                BottomSpace(paddingValues)
-            }
-        }
+            },
+        )
     }
 }

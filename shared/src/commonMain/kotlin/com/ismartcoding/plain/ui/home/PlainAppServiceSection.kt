@@ -30,8 +30,6 @@ import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.theme.tipsText
 import com.ismartcoding.plain.ui.theme.plainColors
 import org.jetbrains.compose.resources.stringResource
-import com.ismartcoding.plain.ui.resources.Res as UiRes
-import com.ismartcoding.plain.ui.resources.dark_mode as ui_drawable_dark_mode
 
 @Composable
 fun PlainAppServiceSection(
@@ -45,7 +43,6 @@ fun PlainAppServiceSection(
     Column {
         if (supportsBackgroundService) {
             PListItem(
-                icon = UiRes.drawable.ui_drawable_dark_mode,
                 title = stringResource(Res.string.keep_online_in_background),
                 subtitle = stringResource(Res.string.keep_online_in_background_desc),
             ) {
@@ -69,7 +66,7 @@ fun PlainAppServiceSection(
             }
         }
         val stayOnlineContent: @Composable () -> Unit = {
-            Column(Modifier.fillMaxWidth().padding(start = if (supportsBackgroundService) 56.dp else 16.dp, end = 16.dp, bottom = 8.dp)) {
+            Column(Modifier.fillMaxWidth().padding(start = 16.dp, end = 16.dp, bottom = 8.dp)) {
                 Text(
                     text = stringResource(if (supportsBackgroundService) Res.string.connection_keeps_dropping_help else Res.string.stay_online_foreground_desc),
                     style = MaterialTheme.typography.tipsText(),
@@ -86,7 +83,7 @@ fun PlainAppServiceSection(
         if (supportsBackgroundService) {
             var expanded by rememberSaveable { mutableStateOf(false) }
             PExpandableSection(
-                toggleModifier = Modifier.padding(start = 40.dp, end = 8.dp),
+                toggleModifier = Modifier.padding(horizontal = 16.dp),
                 text = stringResource(Res.string.connection_keeps_dropping),
                 expanded = expanded,
                 stateDescription = stringResource(if (expanded) Res.string.expanded else Res.string.collapsed),

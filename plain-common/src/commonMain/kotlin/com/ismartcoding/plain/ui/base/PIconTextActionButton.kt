@@ -1,12 +1,10 @@
 package com.ismartcoding.plain.ui.base
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
@@ -16,7 +14,6 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
-import com.ismartcoding.plain.ui.theme.cardBackgroundNormal
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.painterResource
 
@@ -39,7 +36,7 @@ fun PIconTextActionButton(
         spacing = 8.dp,
     ) {
         Box(
-            Modifier.size(48.dp).background(MaterialTheme.colorScheme.cardBackgroundNormal, CircleShape),
+            Modifier.size(48.dp),
             contentAlignment = Alignment.Center,
         ) {
             Icon(painterResource(icon), contentDescription = null, modifier = Modifier.size(24.dp),

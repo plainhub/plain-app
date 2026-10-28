@@ -34,7 +34,7 @@ fun ChannelMemberListItem(
         start = {
             PeerIconWithStatus(
                 icon = member.deviceType.getIcon(),
-                title = member.displayName(), online = null
+                online = null
             )
         },
         titleSuffix = if (member.isOwner) {

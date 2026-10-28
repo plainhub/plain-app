@@ -1,15 +1,17 @@
 package com.ismartcoding.plain.ui.base
 
-import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.stateDescription
 import com.ismartcoding.plain.ui.components.ButtonSize
@@ -27,6 +29,7 @@ fun PTextButton(
     isLoading: Boolean = false,
     enabled: Boolean = true,
     contentColor: Color = MaterialTheme.colorScheme.primary,
+    trailingIcon: Painter? = null,
 ) {
     val loadingDescription = stringResource(UiRes.string.ui_string_loading)
     TextButton(
@@ -40,5 +43,9 @@ fun PTextButton(
         enabled = enabled && !isLoading,
     ) {
         ButtonContent(text, icon, buttonSize, isLoading)
+        if (trailingIcon != null) {
+            HorizontalSpace(8.dp)
+            Icon(painter = trailingIcon, contentDescription = null, modifier = Modifier.size(16.dp))
+        }
     }
 }

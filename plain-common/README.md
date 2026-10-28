@@ -46,6 +46,8 @@ For a local Maven cache, run `./gradlew :plain-common:publishToMavenLocal`.
 
 Shared Compose Multiplatform components in `com.ismartcoding.plain.ui`.
 This is the component selection entry point for PlainApp and PlainNet (plain-router-app).
+
+Readable UI text has a minimum size of 14sp, including supporting text, timestamps, navigation labels and button labels. Use the shared `MaterialTheme.typography` styles; do not shrink text to fit. Let labels wrap or adjust layout, and preserve system font scaling. Compact controls retain a 48dp touch target. Keep page calls to state, events and layout modifiers; shared visual defaults belong to components and the theme.
 Before editing UI, choose the scene below, open its compiled example, and read the actual component signature. Pages compose existing components and connect state and events.
 
 | Scene | Use | Compiled example |

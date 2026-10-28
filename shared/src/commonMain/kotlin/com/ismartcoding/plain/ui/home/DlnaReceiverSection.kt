@@ -18,8 +18,6 @@ import com.ismartcoding.plain.ui.navigation.Routing
 import com.ismartcoding.plain.ui.state.launchSafe
 import com.ismartcoding.plain.ui.theme.plainColors
 import org.jetbrains.compose.resources.stringResource
-import com.ismartcoding.plain.ui.resources.Res as UiRes
-import com.ismartcoding.plain.ui.resources.cast as ui_drawable_cast
 
 @Composable
 fun DlnaReceiverSection(navController: NavHostController) {
@@ -28,7 +26,6 @@ fun DlnaReceiverSection(navController: NavHostController) {
 
     PListItem(
         modifier = Modifier.clickable { navController.navigate(Routing.DlnaReceiver) },
-        icon = UiRes.drawable.ui_drawable_cast,
         title = stringResource(Res.string.dlna_receiver),
         subtitle = stringResource(Res.string.dlna_receiver_desc),
     ) {

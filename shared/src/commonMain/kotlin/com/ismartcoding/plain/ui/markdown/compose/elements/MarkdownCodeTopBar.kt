@@ -49,7 +49,7 @@ internal fun MarkdownCodeTopBar(
             text = languageLabel,
             modifier = Modifier.semantics { contentDescription = a11yLabels.codeLanguage(languageAnnouncement) },
             style = TextStyle(
-                fontSize = 10.sp,
+                fontSize = 14.sp,
                 fontFamily = FontFamily.Monospace,
                 color = textColor.copy(alpha = 0.6f)
             )

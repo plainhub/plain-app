@@ -77,7 +77,7 @@ internal fun ImageAltTooltip(alt: String?, content: @Composable () -> Unit) {
                     ) {
                         BasicText(
                             text = alt,
-                            style = TextStyle(color = Color.White, fontSize = 12.sp),
+                            style = TextStyle(color = Color.White, fontSize = 14.sp),
                         )
                     }
                 }

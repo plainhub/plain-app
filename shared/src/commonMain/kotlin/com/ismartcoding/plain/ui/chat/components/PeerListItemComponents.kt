@@ -4,7 +4,6 @@ import org.jetbrains.compose.resources.DrawableResource
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentSize
@@ -23,34 +22,32 @@ import com.ismartcoding.plain.ui.base.PDropdownMenu
 import com.ismartcoding.plain.ui.base.PDropdownMenuItem
 import com.ismartcoding.plain.ui.components.DialogHelper
 import com.ismartcoding.plain.ui.theme.green
-import com.ismartcoding.plain.ui.theme.grey
 
 @Composable
 internal fun PeerIconWithStatus(
     icon: DrawableResource,
-    title: String,
     online: Boolean?,
 ) {
     Box(
         modifier = Modifier
-            .size(24.dp),
+            .size(48.dp)
+            .background(MaterialTheme.colorScheme.surfaceContainer, CircleShape),
         contentAlignment = Alignment.Center
     ) {
         Icon(
             painter = painterResource(icon),
-            contentDescription = title,
+            contentDescription = null,
             modifier = Modifier.size(24.dp),
             tint = MaterialTheme.colorScheme.primary
         )
         if (online == true) {
             Box(
                 modifier = Modifier
-                    .size(10.dp)
+                    .size(16.dp)
                     .align(Alignment.BottomEnd)
-                    .offset(x = 4.dp, y = 4.dp)
                     .clip(CircleShape)
                     .background(MaterialTheme.colorScheme.surface)
-                    .padding(1.dp)
+                    .padding(4.dp)
                     .clip(CircleShape)
                     .background(
                         MaterialTheme.colorScheme.green
