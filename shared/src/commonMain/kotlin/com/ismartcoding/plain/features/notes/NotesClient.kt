@@ -5,7 +5,7 @@ import com.ismartcoding.plain.graphql.Mutation
 import com.ismartcoding.plain.graphql.Query
 import com.ismartcoding.plain.models.Note
 import com.ismartcoding.plain.rust.graphql.GraphqlClient
-import com.ismartcoding.plain.rust.graphql.RustGraphqlApi
+import com.ismartcoding.plain.rust.graphql.GraphqlApi
 import com.ismartcoding.plain.rust.graphql.selectionQuery
 
 object NotesClient : NotesApi() {
@@ -15,7 +15,7 @@ object NotesClient : NotesApi() {
     suspend fun writeDraft(value: String) = SavedValuesClient.set("quick_note_draft", value)
 }
 open class NotesApi internal constructor(
-    private val api: GraphqlClient = RustGraphqlApi,
+    private val api: GraphqlClient = GraphqlApi,
 ) {
 
     suspend fun count(query: String): Int =

@@ -18,6 +18,9 @@ char *plain_core_start(const char *data_dir, const char *token, const char *conf
 void plain_core_stop(void);
 char *plain_http_stop(void);
 char *plain_graphql(const char *request);
+char *plain_encrypt_http_request(const char *token, const char *payload);
+char *plain_encrypt_resource_reference(const char *token, const char *payload);
+char *plain_decrypt_http_response(const char *token, const char *endpoint, const char *request, const char *response);
 char *plain_graphql_subscription_open(void);
 char *plain_graphql_subscription_send(uint64_t handle, const char *message);
 char *plain_graphql_subscription_read(uint64_t handle);

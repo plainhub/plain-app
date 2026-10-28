@@ -45,6 +45,9 @@ import com.ismartcoding.plain.rustprefs.plain_export_app_backup
 import com.ismartcoding.plain.rustprefs.plain_file_icon
 import com.ismartcoding.plain.rustprefs.plain_file_paths
 import com.ismartcoding.plain.rustprefs.plain_graphql
+import com.ismartcoding.plain.rustprefs.plain_encrypt_http_request
+import com.ismartcoding.plain.rustprefs.plain_encrypt_resource_reference
+import com.ismartcoding.plain.rustprefs.plain_decrypt_http_response
 import com.ismartcoding.plain.rustprefs.plain_grant_background_execution
 import com.ismartcoding.plain.rustprefs.plain_revoke_background_execution
 import com.ismartcoding.plain.rustprefs.plain_execution_state_changed
@@ -101,6 +104,15 @@ internal actual object RustNativeBindings {
 
     actual fun graphql(request: String): String = memScoped {
         readString(plain_graphql(request.cstr.ptr))
+    }
+    actual fun encryptHttpRequest(token: String, payload: String): String = memScoped {
+        readString(plain_encrypt_http_request(token.cstr.ptr, payload.cstr.ptr))
+    }
+    actual fun encryptResourceReference(token: String, payload: String): String = memScoped {
+        readString(plain_encrypt_resource_reference(token.cstr.ptr, payload.cstr.ptr))
+    }
+    actual fun decryptHttpResponse(token: String, endpoint: String, request: String, response: String): String = memScoped {
+        readString(plain_decrypt_http_response(token.cstr.ptr, endpoint.cstr.ptr, request.cstr.ptr, response.cstr.ptr))
     }
     actual fun graphqlSubscriptionOpen(): Long {
         val reply = JsonHelper.jsonDecode<NativeSubscriptionReply>(readString(plain_graphql_subscription_open()))

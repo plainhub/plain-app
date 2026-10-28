@@ -1,7 +1,7 @@
 package com.ismartcoding.plain
 
 import com.ismartcoding.plain.graphql.Mutation
-import com.ismartcoding.plain.rust.graphql.RustGraphqlApi
+import com.ismartcoding.plain.rust.graphql.GraphqlApi
 import com.ismartcoding.plain.app.AppIntents
 import com.ismartcoding.plain.app.IntentExtras
 import com.ismartcoding.plain.rust.RustRuntime
@@ -209,7 +209,7 @@ class ShareActivity : ComponentActivity() {
         lifecycleScope.launch(Dispatchers.IO) {
             try {
                 val f = shareOpenFile("shared_text_${System.currentTimeMillis()}.txt")
-                RustGraphqlApi.execute(
+                GraphqlApi.execute(
                     Mutation.saveSharedText(checkNotNull(f.parent), f.path, text),
                 )
                 withContext(Dispatchers.Main) { openInMain(Uri.fromFile(f), "text/plain") }

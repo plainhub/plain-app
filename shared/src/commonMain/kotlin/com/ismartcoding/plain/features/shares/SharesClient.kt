@@ -3,7 +3,7 @@ package com.ismartcoding.plain.features.shares
 import com.ismartcoding.plain.graphql.Mutation
 import com.ismartcoding.plain.graphql.Query
 import com.ismartcoding.plain.models.ShareRecord
-import com.ismartcoding.plain.rust.graphql.RustGraphqlApi
+import com.ismartcoding.plain.rust.graphql.GraphqlApi
 import kotlin.time.Instant
 
 object SharesClient {
@@ -13,7 +13,7 @@ object SharesClient {
         readOnly: Boolean,
         expiresAt: Instant?,
     ): ShareRecord =
-        RustGraphqlApi.execute(Mutation.createShare(name, realPaths, readOnly, expiresAt))
+        GraphqlApi.execute(Mutation.createShare(name, realPaths, readOnly, expiresAt))
 
     suspend fun updateShare(
         id: String,
@@ -21,17 +21,17 @@ object SharesClient {
         expiresAt: Instant?,
         realPaths: List<String>? = null,
     ): ShareRecord =
-        RustGraphqlApi.execute(Mutation.updateShare(id, name, expiresAt, realPaths))
+        GraphqlApi.execute(Mutation.updateShare(id, name, expiresAt, realPaths))
 
     suspend fun deleteShare(id: String) {
-        RustGraphqlApi.execute(Mutation.deleteShare(id))
+        GraphqlApi.execute(Mutation.deleteShare(id))
     }
 
     suspend fun listShares(): List<ShareRecord> =
-        RustGraphqlApi.execute(Query.shareRecords())
+        GraphqlApi.execute(Query.shareRecords())
 
     suspend fun getShare(id: String): ShareRecord? =
-        RustGraphqlApi.execute(Query.shareRecord(id))
+        GraphqlApi.execute(Query.shareRecord(id))
 
     suspend fun buildLink(
         share: ShareRecord,

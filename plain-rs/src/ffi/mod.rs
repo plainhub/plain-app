@@ -17,5 +17,6 @@ pub(crate) mod uploads;
 pub(crate) mod values;
 
 mod subscriptions;
+mod http_crypto;
 
 mod host_reports;

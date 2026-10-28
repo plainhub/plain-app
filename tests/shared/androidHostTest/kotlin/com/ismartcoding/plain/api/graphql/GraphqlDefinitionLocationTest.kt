@@ -10,7 +10,7 @@ class GraphqlDefinitionLocationTest {
     fun featureCallersDoNotDefineGraphqlExpressionsOrVariableNames() {
         val src = generateSequence(File(System.getProperty("user.dir"))) { it.parentFile }
             .map { File(it, "shared/src") }.first { it.isDirectory }
-        val forbidden = Regex("""\b(?:gql|gqlIds)\(|::gql\b|\bFragments\.|RustGraphqlApi\.(?:query|mutate|graphql)\(\s*"|(?:Query|Mutation)\.\w+\([^\n]*,\s*mapOf\(""")
+        val forbidden = Regex("""\b(?:gql|gqlIds)\(|::gql\b|\bFragments\.|GraphqlApi\.(?:query|mutate|graphql)\(\s*"|(?:Query|Mutation)\.\w+\([^\n]*,\s*mapOf\(""")
         val violations = listOf("commonMain", "androidMain", "iosMain").flatMap { sourceSet ->
             val root = File(src, "$sourceSet/kotlin/com/ismartcoding/plain")
             root.walkTopDown().filter { it.extension == "kt" }

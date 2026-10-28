@@ -161,6 +161,18 @@ android {
         sourceSets.getByName("androidTest").manifest.srcFile("../../plainapp-test/android/src/androidTest/AndroidManifest.xml")
         sourceSets.getByName("androidTest").java.srcDir("../../plainapp-test/android/src/androidTest/java")
     }
+    if (providers.gradleProperty("plainRemoteManagementTest").orNull == "true") {
+        val generatedTests = layout.buildDirectory.dir("generated/remote-management-tests")
+        val prepareTests = tasks.register<Sync>("prepareRemoteManagementTestSource") {
+            from(rootProject.file("tests/app/androidTest/kotlin")) {
+                include("**/ManagedDeviceUiAcceptanceTest.kt")
+            }
+            into(generatedTests)
+        }
+        sourceSets.getByName("androidTest").java.setSrcDirs(emptyList<String>())
+        sourceSets.getByName("androidTest").kotlin.setSrcDirs(listOf(generatedTests.get().asFile))
+        tasks.matching { it.name.contains("AndroidTest") }.configureEach { dependsOn(prepareTests) }
+    }
     namespace = "com.ismartcoding.plain"
 }
 

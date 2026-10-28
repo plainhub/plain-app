@@ -123,6 +123,7 @@ fun MainNavGraph(
         ) {
             platformPages?.invoke(this, navController)
             addMainFilePages(navController, audioQueueVM)
+            addManagedDevicePages(navController)
             addMainSettingsPages(navController, updateVM, peerVM, batterySettings)
             composable<Routing.Home> {
                 val selectedTab by MainViewModel.currentRootTab

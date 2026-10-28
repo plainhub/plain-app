@@ -10,7 +10,7 @@ import com.ismartcoding.plain.features.chat.models.toJSONString
 import com.ismartcoding.plain.graphql.Mutation
 import com.ismartcoding.plain.lib.withIO
 import com.ismartcoding.plain.models.ChatItem
-import com.ismartcoding.plain.rust.graphql.RustGraphqlApi
+import com.ismartcoding.plain.rust.graphql.GraphqlApi
 import com.ismartcoding.plain.rust.graphql.selectionQuery
 
 object ChatClient {
@@ -23,22 +23,22 @@ object ChatClient {
     suspend fun getChatItem(id: String): ChatItem? = ChatQueries.getChatItem(id)
 
     suspend fun sendContent(target: ChatTarget, content: MessageContent): ChatItem =
-        RustGraphqlApi.execute(Mutation.sendChatItem(target.encodedToId, content.toJSONString())).single()
+        GraphqlApi.execute(Mutation.sendChatItem(target.encodedToId, content.toJSONString())).single()
 
     suspend fun sendText(target: ChatTarget, text: String): ChatItem =
         sendContent(target, MessageContent(MessageType.TEXT, MessageText(text)))
 
     suspend fun forward(id: String, targets: List<ChatTarget>): List<ChatItem> =
-        RustGraphqlApi.execute(Mutation.forwardChatItems(id, targets.map { it.encodedToId }))
+        GraphqlApi.execute(Mutation.forwardChatItems(id, targets.map { it.encodedToId }))
 
     suspend fun deleteQuery(query: String): Int =
-        RustGraphqlApi.execute(Mutation.deleteChatItems(query)).affectedCount
+        GraphqlApi.execute(Mutation.deleteChatItems(query)).affectedCount
 
     suspend fun deliver(id: String, recipients: List<String>? = null): ChatItem =
-        RustGraphqlApi.execute(Mutation.deliverChatItem(id, recipients))
+        GraphqlApi.execute(Mutation.deliverChatItem(id, recipients))
 
     suspend fun deleteOne(id: String) {
-        RustGraphqlApi.execute(Mutation.deleteChatItem(id))
+        GraphqlApi.execute(Mutation.deleteChatItem(id))
     }
 
     suspend fun deleteByIds(ids: Set<String>) {

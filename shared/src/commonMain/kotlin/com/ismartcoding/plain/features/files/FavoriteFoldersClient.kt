@@ -4,7 +4,7 @@ import com.ismartcoding.plain.graphql.Mutation
 import com.ismartcoding.plain.graphql.Query
 import com.ismartcoding.plain.models.FavoriteFolder
 import com.ismartcoding.plain.rust.graphql.GraphqlRequest
-import com.ismartcoding.plain.rust.graphql.RustGraphqlApi
+import com.ismartcoding.plain.rust.graphql.GraphqlApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.sync.Mutex
@@ -27,6 +27,6 @@ object FavoriteFoldersClient {
         update(Mutation.setFavoriteFolderAlias(fullPath, alias))
 
     private suspend fun update(request: GraphqlRequest<List<FavoriteFolder>>): List<FavoriteFolder> = lock.withLock {
-        RustGraphqlApi.execute(request).also { state.value = it }
+        GraphqlApi.execute(request).also { state.value = it }
     }
 }

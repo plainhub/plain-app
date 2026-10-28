@@ -2,10 +2,10 @@ package com.ismartcoding.plain.platform.system
 
 import com.ismartcoding.plain.graphql.Mutation
 import com.ismartcoding.plain.graphql.Query
-import com.ismartcoding.plain.rust.graphql.RustGraphqlApi
+import com.ismartcoding.plain.rust.graphql.GraphqlApi
 
-suspend fun getCacheSize(): Long = RustGraphqlApi.execute(Query.appCacheSize())
+suspend fun getCacheSize(): Long = GraphqlApi.execute(Query.appCacheSize())
 
 suspend fun clearCacheAsync() {
-    check(RustGraphqlApi.execute(Mutation.clearAppCache()))
+    check(GraphqlApi.execute(Mutation.clearAppCache()))
 }

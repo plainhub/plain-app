@@ -2,7 +2,7 @@ package com.ismartcoding.plain.features.media.actions
 
 import com.ismartcoding.plain.graphql.Mutation
 import com.ismartcoding.plain.platform.system.DataType
-import com.ismartcoding.plain.rust.graphql.RustGraphqlApi
+import com.ismartcoding.plain.rust.graphql.GraphqlApi
 import com.ismartcoding.plain.rust.graphql.selectionQuery
 
 object MediaActionClient {
@@ -17,7 +17,7 @@ object MediaActionClient {
         if (ids.isEmpty()) return 0
         val query = mediaActionSelection(ids, fromTrash || action == MediaAction.RESTORE)
         val request = Mutation.mediaAction(action, type, query, destDir)
-        return RustGraphqlApi.execute(request).affectedCount
+        return GraphqlApi.execute(request).affectedCount
     }
 }
 internal fun mediaActionSelection(ids: Collection<String>, fromTrash: Boolean): String {

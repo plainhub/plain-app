@@ -76,6 +76,30 @@ class Routing {
     data class ChatInfo(val chatId: String)
 
     @Serializable
+    data class ManagedTools(val peerId: String, val publicKey: String)
+
+    @Serializable
+    data class ManagedContent(
+        val peerId: String,
+        val publicKey: String,
+        val feature: String,
+        val path: String = "",
+        val feedId: String = "",
+    )
+
+    @Serializable
+    data class ManagedDocument(
+        val peerId: String,
+        val publicKey: String,
+        val feature: String,
+        val id: String = "",
+        val path: String = "",
+    )
+
+    @Serializable
+    data class ManagedImage(val peerId: String, val publicKey: String, val path: String, val name: String)
+
+    @Serializable
     data class ChatText(val content: String)
 
     @Serializable

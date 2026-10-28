@@ -2,7 +2,7 @@ package com.ismartcoding.plain.tests
 
 import kotlinx.serialization.json.JsonObject
 import com.ismartcoding.plain.rust.graphql.GraphqlRequest
-import com.ismartcoding.plain.rust.graphql.RustGraphqlApi
+import com.ismartcoding.plain.rust.graphql.GraphqlApi
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import kotlinx.serialization.json.jsonObject
@@ -27,13 +27,13 @@ class FavoriteFoldersRustHttpTest {
             assertEquals(listOf(second,first),updated.map { it.fullPath })
             assertEquals("旅行",updated.last().alias)
             assertEquals(first,updated.last().rootPath)
-            assertFalse(RustGraphqlApi.execute(GraphqlRequest<JsonObject>("query { prefs }")).getValue("prefs").jsonObject["favorite_folders"]?.toString().orEmpty().contains(root))
+            assertFalse(GraphqlApi.execute(GraphqlRequest<JsonObject>("query { prefs }")).getValue("prefs").jsonObject["favorite_folders"]?.toString().orEmpty().contains(root))
             var failed = false
             try { FavoriteFoldersClient.add(root,"$root-outside/folder") }
             catch (_: Exception) { failed = true }
             assertTrue(failed)
             assertEquals(2,FavoriteFoldersClient.refresh().count { it.fullPath.startsWith(root) })
-            RustGraphqlApi.execute(GraphqlRequest<JsonObject>("mutation { " + "setFavoriteFolderAlias(fullPath: ${JsonPrimitive(first)}, alias: ${JsonPrimitive("External change")}) { fullPath alias }" + " }"))
+            GraphqlApi.execute(GraphqlRequest<JsonObject>("mutation { " + "setFavoriteFolderAlias(fullPath: ${JsonPrimitive(first)}, alias: ${JsonPrimitive("External change")}) { fullPath alias }" + " }"))
             withTimeout(5_000) {
                 while (FavoriteFoldersClient.items.value.none { it.fullPath == first && it.alias == "External change" }) delay(50)
             }

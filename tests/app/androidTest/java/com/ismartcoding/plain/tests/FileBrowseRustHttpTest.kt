@@ -1,7 +1,7 @@
 package com.ismartcoding.plain.tests
 
 import com.ismartcoding.plain.rust.graphql.GraphqlRequest
-import com.ismartcoding.plain.rust.graphql.RustGraphqlApi
+import com.ismartcoding.plain.rust.graphql.GraphqlApi
 
 import com.ismartcoding.plain.features.files.FilesClient
 
@@ -50,7 +50,7 @@ class FileBrowseRustHttpTest {
             assertEquals("folder", FilesClient.search("", "${archive.path}!zip!/", FileSortBy.NAME_ASC).first().name)
             Prefs.setApiPermissions(permissions + "WRITE_EXTERNAL_STORAGE")
             suspend fun field(selection: String): JsonElement =
-                RustGraphqlApi.execute(GraphqlRequest<JsonObject>("query { $selection }")).values.first()
+                GraphqlApi.execute(GraphqlRequest<JsonObject>("query { $selection }")).values.first()
             assertEquals(true, field("""pathExists(path: "${root.path}")""").jsonPrimitive.boolean)
             assertEquals("DIR", field("""pathKind(path: "${root.path}")""").jsonPrimitive.content)
             assertEquals("FILE", field("""pathKind(path: "${File(root, "a.txt").path}")""").jsonPrimitive.content)

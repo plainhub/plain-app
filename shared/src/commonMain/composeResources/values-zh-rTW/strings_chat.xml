@@ -179,4 +179,11 @@
     <string name="saved_to_x">已儲存到 %1$s</string>
     <string name="pair_chat_only">僅聊天</string>
     <string name="peer_manage_access">可管理</string>
+    <string name="remote_management">遠端管理</string>
+    <string name="managed_content">內容</string>
+    <string name="managed_delete_confirm">從 %2$s 刪除「%1$s」？</string>
+    <string name="managed_trash_confirm">將「%1$s」移至 %2$s 的資源回收筒？</string>
+    <string name="managed_loading">正在讀取遠端內容…</string>
+    <string name="managed_authorization_changed">管理授權或裝置身分已變更，請從該裝置的聊天頁重新進入遠端管理。</string>
+    <string name="managed_permission_denied">目前不允許存取，請檢查目標裝置的遠端存取開關和權限。</string>
 </resources>

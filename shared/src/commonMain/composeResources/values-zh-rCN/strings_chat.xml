@@ -180,4 +180,11 @@
     <string name="pair_manage_device">管理设备</string>
     <string name="pair_chat_only">仅聊天</string>
     <string name="peer_manage_access">可管理</string>
+    <string name="remote_management">远程管理</string>
+    <string name="managed_content">内容</string>
+    <string name="managed_delete_confirm">从 %2$s 删除“%1$s”？</string>
+    <string name="managed_trash_confirm">将“%1$s”移入 %2$s 的回收站？</string>
+    <string name="managed_loading">正在读取远程内容…</string>
+    <string name="managed_authorization_changed">管理授权或设备身份已变化，请从该设备的聊天页重新进入远程管理。</string>
+    <string name="managed_permission_denied">当前不允许访问，请检查目标设备的远程访问开关和权限。</string>
 </resources>

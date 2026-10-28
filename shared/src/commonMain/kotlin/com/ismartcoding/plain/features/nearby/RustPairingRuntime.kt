@@ -5,17 +5,17 @@ import com.ismartcoding.plain.graphql.Query
 import com.ismartcoding.plain.models.NearbyDevice
 import com.ismartcoding.plain.models.PairingDeviceInput
 import com.ismartcoding.plain.models.PairingRequestInput
-import com.ismartcoding.plain.rust.graphql.RustGraphqlApi
+import com.ismartcoding.plain.rust.graphql.GraphqlApi
 import com.ismartcoding.plain.rust.native.RustHostReports
 import com.ismartcoding.plain.rust.native.RustNativeApi
 
 object RustPairingRuntime {
-    suspend fun states(): List<PairingState> = RustGraphqlApi.execute(Query.pairingStates())
+    suspend fun states(): List<PairingState> = GraphqlApi.execute(Query.pairingStates())
 
     suspend fun start(device: NearbyDevice, mode: PairingMode = PairingMode.CHAT): PairingState {
         val ip = if (DiscoveryMethod.QR in device.discoveryMethods) device.bestIp.takeIf { it.isNotBlank() } ?: device.ips.firstOrNull() else null
         val host = ip?.let { "${if (':' in it) "[$it]" else it}:${device.port}" }
-        val state = RustGraphqlApi.execute(
+        val state = GraphqlApi.execute(
             Mutation.pairDevice(PairingDeviceInput(id = device.id, host = host, mode = mode)),
         )
         PairingProjection.reconcile()
@@ -26,10 +26,10 @@ object RustPairingRuntime {
         generation: String,
         password: String,
     ): PairingState =
-        RustGraphqlApi.execute(Mutation.pairDevice(PairingDeviceInput(generation = generation, password = password)))
+        GraphqlApi.execute(Mutation.pairDevice(PairingDeviceInput(generation = generation, password = password)))
 
     suspend fun cancelGeneration(generation: String): Boolean =
-        RustGraphqlApi.execute(Mutation.cancelPairing(generation))
+        GraphqlApi.execute(Mutation.cancelPairing(generation))
 
     suspend fun cancel(id: String): Boolean {
         val attempt = states().lastOrNull {
@@ -46,5 +46,5 @@ object RustPairingRuntime {
     }
 
     suspend fun respond(request: PairingRequestInput, accepted: Boolean): Boolean =
-        RustGraphqlApi.execute(Mutation.respondToPairing(request, accepted))
+        GraphqlApi.execute(Mutation.respondToPairing(request, accepted))
 }

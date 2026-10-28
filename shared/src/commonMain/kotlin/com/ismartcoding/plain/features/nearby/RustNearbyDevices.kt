@@ -3,7 +3,7 @@ package com.ismartcoding.plain.features.nearby
 import com.ismartcoding.plain.graphql.Mutation
 import com.ismartcoding.plain.graphql.Query
 import com.ismartcoding.plain.models.NearbyDevice
-import com.ismartcoding.plain.rust.graphql.RustGraphqlApi
+import com.ismartcoding.plain.rust.graphql.GraphqlApi
 import com.ismartcoding.plain.ui.nearby.NearbyViewModel
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
@@ -15,11 +15,11 @@ object RustNearbyDevices {
         val token = Uuid.random().toString()
         discoverySession(token,
             acquire = {
-                RustGraphqlApi.execute(Mutation.acquireDiscovery(it))
+                GraphqlApi.execute(Mutation.acquireDiscovery(it))
                 apply(snapshot())
                 RustMdnsRuntime.refresh()
             },
-            release = { RustGraphqlApi.execute(Mutation.releaseDiscovery(it)) },
+            release = { GraphqlApi.execute(Mutation.releaseDiscovery(it)) },
         )
     }
     /**
@@ -28,7 +28,7 @@ object RustNearbyDevices {
      */
 
     suspend fun snapshot(): List<NearbyDevice> =
-        RustGraphqlApi.execute(Query.nearbyDevices())
+        GraphqlApi.execute(Query.nearbyDevices())
 
     fun apply(devices: List<NearbyDevice>) {
         NearbyViewModel.nearbyDevices.value = devices

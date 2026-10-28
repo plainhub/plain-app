@@ -6,6 +6,9 @@ internal actual object RustNativeBindings {
     actual external fun fileIcon(extension: String): String
     actual external fun startCore(dataDir: String, token: String, configJson: String): String
     actual external fun graphql(request: String): String
+    actual external fun encryptHttpRequest(token: String, payload: String): String
+    actual external fun encryptResourceReference(token: String, payload: String): String
+    actual external fun decryptHttpResponse(token: String, endpoint: String, request: String, response: String): String
     actual external fun graphqlSubscriptionOpen(): Long
     actual external fun graphqlSubscriptionSend(handle: Long, message: String)
     actual external fun graphqlSubscriptionRead(handle: Long): String

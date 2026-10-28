@@ -5,7 +5,7 @@ import com.ismartcoding.plain.graphql.Query
 import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.models.MergeTaskStatus
 import com.ismartcoding.plain.rust.graphql.GraphqlClient
-import com.ismartcoding.plain.rust.graphql.RustGraphqlApi
+import com.ismartcoding.plain.rust.graphql.GraphqlApi
 import com.ismartcoding.plain.rust.native.RustNativeBindings
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
@@ -20,7 +20,7 @@ internal object RustUploadChunks {
 }
 internal class UploadChunksClient(
     private val sendChunk: suspend (String, Long, ByteArray) -> String,
-    private val api: GraphqlClient = RustGraphqlApi,
+    private val api: GraphqlClient = GraphqlApi,
 ) {
     private val maxChunkBytes = 1024 * 1024
     @OptIn(ExperimentalUuidApi::class)

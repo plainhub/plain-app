@@ -5,7 +5,7 @@ import com.ismartcoding.plain.graphql.Mutation
 import com.ismartcoding.plain.lib.JsonHelper
 import com.ismartcoding.plain.lib.coIO
 import com.ismartcoding.plain.platform.system.PlatformLock
-import com.ismartcoding.plain.rust.graphql.RustGraphqlApi
+import com.ismartcoding.plain.rust.graphql.GraphqlApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.serialization.json.JsonObject
@@ -28,7 +28,7 @@ internal object RustDlnaSender {
 
     suspend fun call(command: CastCommand) {
         val request = Mutation.dlna(command)
-        apply(RustGraphqlApi.execute(request))
+        apply(GraphqlApi.execute(request))
     }
 
     fun addItem(item: IMedia) { coIO { call(CastCommand.Add(CastItem.from(item))) } }

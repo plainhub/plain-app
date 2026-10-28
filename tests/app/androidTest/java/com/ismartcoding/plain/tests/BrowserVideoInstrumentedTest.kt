@@ -4,7 +4,7 @@ import com.ismartcoding.plain.rust.graphql.GraphqlRequest
 import com.ismartcoding.plain.lib.withIO
 import com.ismartcoding.plain.rust.RustRuntime
 
-import com.ismartcoding.plain.rust.graphql.RustGraphqlApi
+import com.ismartcoding.plain.rust.graphql.GraphqlApi
 
 import com.ismartcoding.plain.features.media.MediaClient
 
@@ -27,7 +27,7 @@ class BrowserVideoInstrumentedTest {
     fun publicResourceTranscodesHevcWithTheRustOwnedPipeline() = runBlocking {
         val source = File("/data/local/tmp/hevc_probe.mp4")
         assumeTrue("HEVC fixture is missing", source.isFile)
-        val capabilities = RustGraphqlApi.execute(GraphqlRequest<JsonObject>("query { app { capabilities } }")).getValue("app").jsonObject
+        val capabilities = GraphqlApi.execute(GraphqlRequest<JsonObject>("query { app { capabilities } }")).getValue("app").jsonObject
             .getValue("capabilities").jsonArray.map { it.jsonPrimitive.content }
         assumeTrue("HEVC transcoding is unavailable", "VIDEO_TRANSCODE" in capabilities)
         val service = Prefs.backgroundServiceEnabled.value

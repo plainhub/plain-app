@@ -4,7 +4,7 @@ import com.ismartcoding.plain.features.downloads.*
 import com.ismartcoding.plain.graphql.Mutation
 import com.ismartcoding.plain.graphql.Query
 import com.ismartcoding.plain.lib.logcat.LogCat
-import com.ismartcoding.plain.rust.graphql.RustGraphqlApi
+import com.ismartcoding.plain.rust.graphql.GraphqlApi
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.sync.Mutex
@@ -73,7 +73,7 @@ object SharedFolderDownloadEngine {
     }
 
     suspend fun refresh() = stateLock.withLock {
-        val snapshot = RustGraphqlApi.execute(Query.sharedDownloadQueue())
+        val snapshot = GraphqlApi.execute(Query.sharedDownloadQueue())
         if (!version.accept(snapshot.runtimeId, snapshot.revision)) return@withLock
         val tasks = snapshot.tasks.map { row ->
             SharedFolderBatchTask(
@@ -101,7 +101,7 @@ object SharedFolderDownloadEngine {
             is Request.Enqueue -> Mutation.enqueueSharedDownload(request.input)
             is Request.Control -> Mutation.sharedDownloadControl(request.command, request.id)
         }
-        RustGraphqlApi.execute(operation)
+        GraphqlApi.execute(operation)
     }
 
     private sealed interface Request {

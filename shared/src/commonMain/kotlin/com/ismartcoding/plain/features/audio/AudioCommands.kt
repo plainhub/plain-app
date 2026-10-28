@@ -4,7 +4,7 @@ import com.ismartcoding.plain.graphql.Mutation
 import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.models.AudioCommand
 import com.ismartcoding.plain.models.AudioItem
-import com.ismartcoding.plain.rust.graphql.RustGraphqlApi
+import com.ismartcoding.plain.rust.graphql.GraphqlApi
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel
 
@@ -27,7 +27,7 @@ object AudioCommands {
     }
 
     suspend fun command(action: AudioCommand, positionMs: Long = 0, speed: Float = 1f) {
-        RustGraphqlApi.execute(Mutation.audioCommand(action, positionMs, speed))
+        GraphqlApi.execute(Mutation.audioCommand(action, positionMs, speed))
     }
 
     fun submit(
@@ -40,18 +40,18 @@ object AudioCommands {
         val current = AudioQueueClient.playback().mode
         val modes = MediaPlayMode.entries
         val next = modes[(modes.indexOf(current) + 1) % modes.size]
-        RustGraphqlApi.execute(Mutation.updateAudioPlayMode(next))
+        GraphqlApi.execute(Mutation.updateAudioPlayMode(next))
     }
 
     fun playTrack(audio: AudioItem) = submit {
         if (!audio.mediaId.isNullOrEmpty()) {
-            RustGraphqlApi.execute(Mutation.audioPlayTrack(audio.mediaId!!))
+            GraphqlApi.execute(Mutation.audioPlayTrack(audio.mediaId!!))
         } else {
-            RustGraphqlApi.execute(Mutation.audioPlayPath(audio.path))
+            GraphqlApi.execute(Mutation.audioPlayPath(audio.path))
         }
     }
 
     fun playPath(path: String) = submit {
-        RustGraphqlApi.execute(Mutation.audioPlayPath(path))
+        GraphqlApi.execute(Mutation.audioPlayPath(path))
     }
 }

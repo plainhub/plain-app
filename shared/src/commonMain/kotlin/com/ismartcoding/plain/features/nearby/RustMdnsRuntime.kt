@@ -3,7 +3,7 @@ package com.ismartcoding.plain.features.nearby
 import com.ismartcoding.plain.graphql.Query
 import com.ismartcoding.plain.lib.coIO
 import com.ismartcoding.plain.lib.logcat.LogCat
-import com.ismartcoding.plain.rust.graphql.RustGraphqlApi
+import com.ismartcoding.plain.rust.graphql.GraphqlApi
 import com.ismartcoding.plain.rust.native.RustNativeApi
 import com.ismartcoding.plain.ui.nearby.NearbyViewModel
 import kotlin.concurrent.Volatile
@@ -56,7 +56,7 @@ object RustMdnsRuntime {
     fun debugStop(token: String) = enqueue(Request.DebugStop(token))
 
     suspend fun snapshot(): MdnsSnapshot =
-        RustGraphqlApi.execute(Query.mdnsState()).also { apply(it) }
+        GraphqlApi.execute(Query.mdnsState()).also { apply(it) }
 
     private suspend fun call(request: Request): MdnsSnapshot = when (request) {
         is Request.DebugStart -> RustNativeApi.acquireMdnsDebugSession(request.token)

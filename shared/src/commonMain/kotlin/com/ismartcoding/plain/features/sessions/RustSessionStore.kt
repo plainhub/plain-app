@@ -2,13 +2,13 @@ package com.ismartcoding.plain.features.sessions
 
 import com.ismartcoding.plain.graphql.Mutation
 import com.ismartcoding.plain.graphql.Query
-import com.ismartcoding.plain.rust.graphql.RustGraphqlApi
+import com.ismartcoding.plain.rust.graphql.GraphqlApi
 import com.ismartcoding.plain.rust.native.RustNativeApi
 import com.ismartcoding.plain.ui.sessions.VSession
 import kotlin.time.Instant
 
 object RustSessionStore {
-    suspend fun list(): List<VSession> = RustGraphqlApi.execute(Query.sessions()).map {
+    suspend fun list(): List<VSession> = GraphqlApi.execute(Query.sessions()).map {
         VSession(
             it.clientId,
             it.name,
@@ -28,9 +28,9 @@ object RustSessionStore {
     suspend fun create(name: String): CreatedSession = RustNativeApi.createSession(name)
 
     suspend fun rename(clientId: String, name: String): Boolean =
-        RustGraphqlApi.execute(Mutation.renameSession(clientId, name))
+        GraphqlApi.execute(Mutation.renameSession(clientId, name))
 
     suspend fun delete(clientId: String) {
-        RustGraphqlApi.execute(Mutation.revokeSession(clientId))
+        GraphqlApi.execute(Mutation.revokeSession(clientId))
     }
 }

@@ -1,7 +1,7 @@
 package com.ismartcoding.plain.tests
 
 import com.ismartcoding.plain.rust.graphql.GraphqlRequest
-import com.ismartcoding.plain.rust.graphql.RustGraphqlApi
+import com.ismartcoding.plain.rust.graphql.GraphqlApi
 
 import android.os.Environment
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -72,13 +72,13 @@ class FileTaskRustHttpTest {
             try { TestFileTaskClient.create(FileTaskType.COPY,listOf(FileTaskOp("/system/test",File(root,"forbidden").path))) }
             catch (_: Exception) { rejected = true }
             assertTrue(rejected)
-            val spoofedCaller = runCatching { RustGraphqlApi.execute(GraphqlRequest<JsonObject>("query { " + "fileTasks(clientId: ${JsonPrimitive("foreign-${UUID.randomUUID()}")}, query: \"\", offset: 0, limit: 1) { id }" + " }")) }
+            val spoofedCaller = runCatching { GraphqlApi.execute(GraphqlRequest<JsonObject>("query { " + "fileTasks(clientId: ${JsonPrimitive("foreign-${UUID.randomUUID()}")}, query: \"\", offset: 0, limit: 1) { id }" + " }")) }
             assertTrue(spoofedCaller.isFailure)
             Prefs.setApiPermissions(originalPermissions + "WRITE_EXTERNAL_STORAGE")
-            assertEquals(true, RustGraphqlApi.execute(GraphqlRequest<JsonObject>("mutation { " + """copyFile(src: "${source.path}", dst: "${File(root,"public-copy.txt").path}", overwrite: false)""" + " }")).getValue("copyFile").jsonPrimitive.boolean)
+            assertEquals(true, GraphqlApi.execute(GraphqlRequest<JsonObject>("mutation { " + """copyFile(src: "${source.path}", dst: "${File(root,"public-copy.txt").path}", overwrite: false)""" + " }")).getValue("copyFile").jsonPrimitive.boolean)
             assertEquals("synthetic",File(root,"public-copy.txt").readText())
             var publicFailed = false
-            try { RustGraphqlApi.execute(GraphqlRequest<JsonObject>("mutation { " + """copyFile(src: "/system/test", dst: "${File(root,"public-never").path}", overwrite: false)""" + " }")) }
+            try { GraphqlApi.execute(GraphqlRequest<JsonObject>("mutation { " + """copyFile(src: "/system/test", dst: "${File(root,"public-never").path}", overwrite: false)""" + " }")) }
             catch (_: Exception) { publicFailed = true }
             assertTrue(publicFailed)
         } finally {

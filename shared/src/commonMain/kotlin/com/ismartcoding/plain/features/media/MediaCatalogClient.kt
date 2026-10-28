@@ -10,7 +10,7 @@ import com.ismartcoding.plain.models.MediaBucket
 import com.ismartcoding.plain.platform.media.getMediaItemUriString
 import com.ismartcoding.plain.platform.system.DataType
 import com.ismartcoding.plain.rust.graphql.GraphqlClient
-import com.ismartcoding.plain.rust.graphql.RustGraphqlApi
+import com.ismartcoding.plain.rust.graphql.GraphqlApi
 import com.ismartcoding.plain.rust.graphql.selectionQuery
 
 object MediaCatalogClient {
@@ -21,7 +21,7 @@ object MediaCatalogClient {
             DataType.SMS -> return RustSmsQuery.search(query, limit, offset)
             else -> Unit
         }
-        return RustGraphqlApi.execute(Query.mediaRows(type, query, limit, offset, sortBy))
+        return GraphqlApi.execute(Query.mediaRows(type, query, limit, offset, sortBy))
     }
 
     suspend fun shareUris(type: DataType, ids: Collection<String>): List<String> =
@@ -35,20 +35,20 @@ object MediaCatalogClient {
             DataType.SMS -> return RustSmsQuery.count(query)
             else -> Unit
         }
-        return RustGraphqlApi.execute(Query.mediaCount(type, query))
+        return GraphqlApi.execute(Query.mediaCount(type, query))
     }
 
     suspend fun docExtGroups(query: String): List<Pair<String, Int>> =
-        RustGraphqlApi.execute(Query.docExtGroups(query)).map { it.ext to it.count }
+        GraphqlApi.execute(Query.docExtGroups(query)).map { it.ext to it.count }
 
     suspend fun buckets(dataType: DataType): List<MediaBucket> =
-        RustGraphqlApi.execute(Query.mediaBuckets(dataType))
+        GraphqlApi.execute(Query.mediaBuckets(dataType))
 }
 
 internal suspend fun readSelectedMediaPaths(
     root: String,
     ids: Collection<String>,
-    api: GraphqlClient = RustGraphqlApi,
+    api: GraphqlClient = GraphqlApi,
 ): List<Pair<String, String>> {
     if (ids.isEmpty()) return emptyList()
     val selected = ids.distinct()

@@ -4,7 +4,7 @@ import com.ismartcoding.plain.rust.graphql.GraphqlRequest
 import com.ismartcoding.plain.lib.withIO
 import com.ismartcoding.plain.rust.RustRuntime
 
-import com.ismartcoding.plain.rust.graphql.RustGraphqlApi
+import com.ismartcoding.plain.rust.graphql.GraphqlApi
 
 import com.ismartcoding.plain.features.sessions.RustSessionStore
 import android.content.Context
@@ -77,10 +77,10 @@ class ApiFixtureRustHttpTest {
             } finally {
                 registrationLog.delete()
             }
-            check(RustGraphqlApi.execute(GraphqlRequest<JsonObject>("query { peers { id } }")).getValue("peers").jsonArray.count { it.jsonObject.getValue("id").jsonPrimitive.content == peerId } == 1)
-            channelId = RustGraphqlApi.execute(GraphqlRequest<JsonObject>("mutation { createChatChannel(name: \"API fixture channel\") { id } }")).getValue("createChatChannel").jsonObject.getValue("id").jsonPrimitive.content
-            val channelKey = RustGraphqlApi.execute(GraphqlRequest<JsonObject>("query { chatChannels { id key } }")).getValue("chatChannels").jsonArray.single { it.jsonObject.getValue("id").jsonPrimitive.content == channelId }.jsonObject.getValue("key")
-            val app = RustGraphqlApi.execute(GraphqlRequest<JsonObject>("query { app { httpPort capabilities } }")).getValue("app").jsonObject
+            check(GraphqlApi.execute(GraphqlRequest<JsonObject>("query { peers { id } }")).getValue("peers").jsonArray.count { it.jsonObject.getValue("id").jsonPrimitive.content == peerId } == 1)
+            channelId = GraphqlApi.execute(GraphqlRequest<JsonObject>("mutation { createChatChannel(name: \"API fixture channel\") { id } }")).getValue("createChatChannel").jsonObject.getValue("id").jsonPrimitive.content
+            val channelKey = GraphqlApi.execute(GraphqlRequest<JsonObject>("query { chatChannels { id key } }")).getValue("chatChannels").jsonArray.single { it.jsonObject.getValue("id").jsonPrimitive.content == channelId }.jsonObject.getValue("key")
+            val app = GraphqlApi.execute(GraphqlRequest<JsonObject>("query { app { httpPort capabilities } }")).getValue("app").jsonObject
             val credentials = JsonHelper.jsonEncode(mapOf(
                 "clientId" to JsonPrimitive(clientId),
                 "token" to JsonPrimitive(session.token),
@@ -98,9 +98,9 @@ class ApiFixtureRustHttpTest {
         } finally {
             ready.delete()
             stop.delete()
-            if (clientId.isNotEmpty()) RustGraphqlApi.execute(GraphqlRequest<JsonObject>("mutation { revokeSession(clientId: ${JsonPrimitive(clientId)}) }"))
-            if (channelId.isNotEmpty()) RustGraphqlApi.execute(GraphqlRequest<JsonObject>("mutation { deleteChatChannel(id: ${JsonPrimitive(channelId)}) }"))
-            if (peerCreated) RustGraphqlApi.execute(GraphqlRequest<JsonObject>("mutation { deletePeer(id: ${JsonPrimitive(peerId)}) }"))
+            if (clientId.isNotEmpty()) GraphqlApi.execute(GraphqlRequest<JsonObject>("mutation { revokeSession(clientId: ${JsonPrimitive(clientId)}) }"))
+            if (channelId.isNotEmpty()) GraphqlApi.execute(GraphqlRequest<JsonObject>("mutation { deleteChatChannel(id: ${JsonPrimitive(channelId)}) }"))
+            if (peerCreated) GraphqlApi.execute(GraphqlRequest<JsonObject>("mutation { deletePeer(id: ${JsonPrimitive(peerId)}) }"))
             if (rootCreated) root.deleteRecursively()
             Prefs.setApiPermissions(oldPermissions)
             Prefs.desktopAccess.value = oldAccess

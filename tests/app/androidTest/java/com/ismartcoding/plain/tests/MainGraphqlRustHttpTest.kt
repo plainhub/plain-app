@@ -1,6 +1,6 @@
 package com.ismartcoding.plain.tests
 
-import com.ismartcoding.plain.rust.graphql.RustGraphqlApi
+import com.ismartcoding.plain.rust.graphql.GraphqlApi
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.ismartcoding.plain.features.sessions.RustSessionStore
@@ -35,7 +35,7 @@ class MainGraphqlRustHttpTest {
             id = clientId
             val token = created.token
             assertTrue(token.isNotEmpty())
-            val app = RustGraphqlApi.execute(GraphqlRequest<JsonObject>("query { app { httpPort urlToken capabilities } }")).getValue("app").jsonObject
+            val app = GraphqlApi.execute(GraphqlRequest<JsonObject>("query { app { httpPort urlToken capabilities } }")).getValue("app").jsonObject
             assertEquals(getDeviceCapabilities().map { it.name }.toSet(), app.getValue("capabilities").jsonArray.map { it.jsonPrimitive.content }.toSet())
             val baseUrl = "http://127.0.0.1:${app.getValue("httpPort").jsonPrimitive.int}"
             suspend fun httpGraphql(document: String, variables: Map<String, JsonElement> = emptyMap()): JsonObject {
@@ -51,13 +51,13 @@ class MainGraphqlRustHttpTest {
             }
             suspend fun httpQuery(selection: String): JsonObject = httpGraphql("query { $selection }")
             val schema = "__schema { queryType { name } mutationType { name } }"
-            assertEquals(RustGraphqlApi.execute(GraphqlRequest<JsonObject>("query { $schema }")), httpQuery(schema))
+            assertEquals(GraphqlApi.execute(GraphqlRequest<JsonObject>("query { $schema }")), httpQuery(schema))
             assertEquals(app.getValue("urlToken"), httpQuery("app { urlToken }").getValue("app").jsonObject.getValue("urlToken"))
             Prefs.load()
             assertEquals(app.getValue("urlToken").jsonPrimitive.content, Prefs.urlToken.value)
             for (selection in listOf("systemPrefs", "systemSettings { password }", "userSettings { service }")) {
                 for (useHttp in listOf(false, true)) {
-                    val failure = runCatching { if (useHttp) httpQuery(selection) else RustGraphqlApi.execute(GraphqlRequest<JsonObject>("query { $selection }")) }.exceptionOrNull()
+                    val failure = runCatching { if (useHttp) httpQuery(selection) else GraphqlApi.execute(GraphqlRequest<JsonObject>("query { $selection }")) }.exceptionOrNull()
                     assertNotNull(failure)
                     assertTrue(failure.toString().contains("Unknown field"))
                 }
@@ -76,7 +76,7 @@ class MainGraphqlRustHttpTest {
 
     @Test
     fun selectedDeviceFieldsReadActualSdkFactsThroughTheMainNativeExecutor() = runBlocking {
-        val data = RustGraphqlApi.execute(GraphqlRequest<JsonObject>("query { deviceInfo { name model appVersion appBuildNumber kernelVersion totalMemory display { width height density } } }")).getValue("deviceInfo").jsonObject
+        val data = GraphqlApi.execute(GraphqlRequest<JsonObject>("query { deviceInfo { name model appVersion appBuildNumber kernelVersion totalMemory display { width height density } } }")).getValue("deviceInfo").jsonObject
         assertTrue(data.getValue("model").jsonPrimitive.content.isNotEmpty())
         assertTrue(data.getValue("appVersion").jsonPrimitive.content.isNotEmpty())
         assertTrue(data.getValue("kernelVersion").jsonPrimitive.content.isNotEmpty())

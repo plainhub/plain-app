@@ -8,7 +8,7 @@ import com.ismartcoding.plain.graphql.Mutation
 import com.ismartcoding.plain.graphql.Query
 import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.models.Peer
-import com.ismartcoding.plain.rust.graphql.RustGraphqlApi
+import com.ismartcoding.plain.rust.graphql.GraphqlApi
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -54,7 +54,7 @@ object DownloadQueue {
     }
 
     suspend fun refresh() = stateLock.withLock {
-        val snapshot = RustGraphqlApi.execute(Query.chatDownloadQueue())
+        val snapshot = GraphqlApi.execute(Query.chatDownloadQueue())
         if (!version.accept(snapshot.runtimeId, snapshot.revision)) return@withLock
         val tasks = snapshot.tasks.map { row ->
             DownloadTask(
@@ -76,7 +76,7 @@ object DownloadQueue {
             is Request.Enqueue -> Mutation.enqueueChatDownload(request.messageId, request.fileId, request.peerId)
             is Request.Control -> Mutation.chatDownloadControl(request.command, request.id)
         }
-        RustGraphqlApi.execute(operation)
+        GraphqlApi.execute(operation)
     }
 
     private sealed interface Request {

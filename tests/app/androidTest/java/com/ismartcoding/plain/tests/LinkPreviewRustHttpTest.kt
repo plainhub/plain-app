@@ -20,7 +20,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import com.ismartcoding.plain.features.chat.ChatClient
 import com.ismartcoding.plain.lib.JsonHelper
-import com.ismartcoding.plain.rust.graphql.RustGraphqlApi
+import com.ismartcoding.plain.rust.graphql.GraphqlApi
 import kotlinx.serialization.json.JsonPrimitive
 
 @RunWith(AndroidJUnit4::class)
@@ -35,7 +35,7 @@ class LinkPreviewRustHttpTest {
             hash = image.id
             val content = MessageContent(MessageType.TEXT, MessageText(url,
                 listOf(LinkPreview(url = url, title = id, imageLocalPath = AppFileStore.toFidUri(image))))).toJSONString()
-            val value = RustGraphqlApi.execute(GraphqlRequest<JsonObject>("mutation(\$content:String!){sendChatItem(target: \"peer:local\", content: \$content) { id fromId toId channelId content status statusData createdAt updatedAt }}", mapOf("content" to JsonPrimitive(content)))).getValue("sendChatItem").jsonArray.single()
+            val value = GraphqlApi.execute(GraphqlRequest<JsonObject>("mutation(\$content:String!){sendChatItem(target: \"peer:local\", content: \$content) { id fromId toId channelId content status statusData createdAt updatedAt }}", mapOf("content" to JsonPrimitive(content)))).getValue("sendChatItem").jsonArray.single()
             val chat = JsonHelper.jsonDecodeFromElement<ChatItem>(value)
             id = chat.id
             val stale = ChatItem(id = id, toId = "stale", content = MessageContent(MessageType.TEXT, MessageText("stale")).toJSONString())

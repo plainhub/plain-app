@@ -2,7 +2,7 @@ package com.ismartcoding.plain.tests
 
 import kotlinx.serialization.json.JsonObject
 import com.ismartcoding.plain.rust.graphql.GraphqlRequest
-import com.ismartcoding.plain.rust.graphql.RustGraphqlApi
+import com.ismartcoding.plain.rust.graphql.GraphqlApi
 
 import com.ismartcoding.plain.features.files.FilesClient
 
@@ -48,12 +48,12 @@ class FileWritesRustHttpTest {
             assertTrue(runCatching { FilesClient.createDirectory("/system/plain-synthetic-${UUID.randomUUID()}") }.isFailure)
             Prefs.setApiPermissions(originalPermissions + "WRITE_EXTERNAL_STORAGE")
             val publicDir = File(root, "public")
-            RustGraphqlApi.execute(GraphqlRequest<JsonObject>("mutation { " + """createDir(path: "${publicDir.path}")""" + " }"))
+            GraphqlApi.execute(GraphqlRequest<JsonObject>("mutation { " + """createDir(path: "${publicDir.path}")""" + " }"))
             assertTrue(publicDir.isDirectory)
             val publicFile = File(publicDir, "public.txt")
-            RustGraphqlApi.execute(GraphqlRequest<JsonObject>("mutation { " + """writeTextFile(path: "${publicFile.path}", content: "$content", overwrite: false)""" + " }"))
+            GraphqlApi.execute(GraphqlRequest<JsonObject>("mutation { " + """writeTextFile(path: "${publicFile.path}", content: "$content", overwrite: false)""" + " }"))
             assertEquals(content, publicFile.readText())
-            assertTrue(runCatching { RustGraphqlApi.execute(GraphqlRequest<JsonObject>("mutation { " + """writeTextFile(path: "${publicFile.path}", content: "rejected", overwrite: false)""" + " }")) }.isFailure)
+            assertTrue(runCatching { GraphqlApi.execute(GraphqlRequest<JsonObject>("mutation { " + """writeTextFile(path: "${publicFile.path}", content: "rejected", overwrite: false)""" + " }")) }.isFailure)
             assertEquals(content, publicFile.readText())
             FilesClient.createDirectory(external.path)
             val externalFile = File(external, "synthetic.txt")

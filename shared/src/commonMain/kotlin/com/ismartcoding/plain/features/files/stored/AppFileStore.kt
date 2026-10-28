@@ -5,7 +5,7 @@ import com.ismartcoding.plain.graphql.Query
 import com.ismartcoding.plain.lib.withIO
 import com.ismartcoding.plain.models.AppFile
 import com.ismartcoding.plain.platform.files.queryPickedFileInfo
-import com.ismartcoding.plain.rust.graphql.RustGraphqlApi
+import com.ismartcoding.plain.rust.graphql.GraphqlApi
 import com.ismartcoding.plain.ui.files.stored.VAppFile
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.NonCancellable
@@ -31,7 +31,7 @@ object AppFileStore {
 
     private suspend fun importPath(path: String, name: String, mime: String, deleteSource: Boolean): AppFile {
         val file = withContext(NonCancellable) {
-            RustGraphqlApi.execute(Mutation.importAppFile(path, name, mime, deleteSource))
+            GraphqlApi.execute(Mutation.importAppFile(path, name, mime, deleteSource))
         }
         try {
             currentCoroutineContext().ensureActive()
@@ -43,16 +43,16 @@ object AppFileStore {
     }
 
     suspend fun page(offset: Int, limit: Int, query: String = ""): List<VAppFile> =
-        RustGraphqlApi.execute(Query.appFiles(offset, limit, query))
+        GraphqlApi.execute(Query.appFiles(offset, limit, query))
             .map { VAppFile(it, it.fileName) }
 
     suspend fun count(query: String = ""): Int =
-        RustGraphqlApi.execute(Query.appFileCount(query))
+        GraphqlApi.execute(Query.appFileCount(query))
 
     suspend fun displayName(id: String): String =
-        RustGraphqlApi.execute(Query.appFileName("text:$id")).firstOrNull()?.fileName.orEmpty()
+        GraphqlApi.execute(Query.appFileName("text:$id")).firstOrNull()?.fileName.orEmpty()
 
     suspend fun release(id: String) {
-        RustGraphqlApi.execute(Mutation.releaseAppFile(id.substringBefore('.')))
+        GraphqlApi.execute(Mutation.releaseAppFile(id.substringBefore('.')))
     }
 }

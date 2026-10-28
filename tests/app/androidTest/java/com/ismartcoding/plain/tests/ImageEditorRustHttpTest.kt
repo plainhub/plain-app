@@ -2,7 +2,7 @@ package com.ismartcoding.plain.tests
 
 import kotlinx.serialization.json.JsonObject
 import com.ismartcoding.plain.rust.graphql.GraphqlRequest
-import com.ismartcoding.plain.rust.graphql.RustGraphqlApi
+import com.ismartcoding.plain.rust.graphql.GraphqlApi
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.ismartcoding.plain.features.images.editor.ImageEditorProjectsClient
@@ -32,7 +32,7 @@ class ImageEditorRustHttpTest {
             assertEquals(saved.createdAt, updated.createdAt)
             assertEquals(saved.thumbnail, updated.thumbnail)
             assertEquals("BAU=", checkNotNull(ImageEditorProjectsClient.getByIdAsync(id)).stateB64)
-            RustGraphqlApi.execute(GraphqlRequest<JsonObject>("mutation(\$id: ID!, \$update: String!) { broadcastImageEditorUpdate(id: \$id, update: \$update) }", mapOf("id" to JsonPrimitive(id), "update" to JsonPrimitive("AQID"))))
+            GraphqlApi.execute(GraphqlRequest<JsonObject>("mutation(\$id: ID!, \$update: String!) { broadcastImageEditorUpdate(id: \$id, update: \$update) }", mapOf("id" to JsonPrimitive(id), "update" to JsonPrimitive("AQID"))))
             ImageEditorProjectsClient.deleteAsync(id)
             assertNull(ImageEditorProjectsClient.getByIdAsync(id))
         } finally {

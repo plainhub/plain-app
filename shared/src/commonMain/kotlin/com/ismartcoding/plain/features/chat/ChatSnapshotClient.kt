@@ -3,11 +3,11 @@ package com.ismartcoding.plain.features.chat
 import com.ismartcoding.plain.graphql.Query
 import com.ismartcoding.plain.models.ChatItem
 import com.ismartcoding.plain.rust.graphql.GraphqlClient
-import com.ismartcoding.plain.rust.graphql.RustGraphqlApi
+import com.ismartcoding.plain.rust.graphql.GraphqlApi
 
 internal suspend fun readChatSnapshot(
     ids: List<String>,
-    api: GraphqlClient = RustGraphqlApi,
+    api: GraphqlClient = GraphqlApi,
 ): Map<String, ChatItem?> {
     val result = linkedMapOf<String, ChatItem?>()
     for (batch in ids.distinct().chunked(128)) {

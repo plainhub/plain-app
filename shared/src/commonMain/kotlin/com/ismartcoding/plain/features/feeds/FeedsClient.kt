@@ -6,11 +6,11 @@ import com.ismartcoding.plain.models.Feed
 import com.ismartcoding.plain.models.FeedPreview
 import com.ismartcoding.plain.models.FeedSyncState
 import com.ismartcoding.plain.rust.graphql.GraphqlClient
-import com.ismartcoding.plain.rust.graphql.RustGraphqlApi
+import com.ismartcoding.plain.rust.graphql.GraphqlApi
 
 internal object FeedsClient : FeedsApi()
 internal open class FeedsApi(
-    private val api: GraphqlClient = RustGraphqlApi,
+    private val api: GraphqlClient = GraphqlApi,
 ) {
 
     suspend fun getAll(withCount: Boolean = false): List<Feed> {

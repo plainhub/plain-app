@@ -4,6 +4,9 @@ internal expect object RustNativeBindings {
     fun fileIcon(extension: String): String
     fun startCore(dataDir: String, token: String, configJson: String): String
     fun graphql(request: String): String
+    fun encryptHttpRequest(token: String, payload: String): String
+    fun encryptResourceReference(token: String, payload: String): String
+    fun decryptHttpResponse(token: String, endpoint: String, request: String, response: String): String
     fun graphqlSubscriptionOpen(): Long
     fun graphqlSubscriptionSend(handle: Long, message: String)
     fun graphqlSubscriptionRead(handle: Long): String

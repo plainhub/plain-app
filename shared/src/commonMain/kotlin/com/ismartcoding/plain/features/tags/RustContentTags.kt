@@ -6,11 +6,11 @@ import com.ismartcoding.plain.models.Tag
 import com.ismartcoding.plain.models.TagRelation
 import com.ismartcoding.plain.platform.system.DataType
 import com.ismartcoding.plain.rust.graphql.GraphqlClient
-import com.ismartcoding.plain.rust.graphql.RustGraphqlApi
+import com.ismartcoding.plain.rust.graphql.GraphqlApi
 
 internal object RustContentTags : TagsApi()
 internal open class TagsApi(
-    private val api: GraphqlClient = RustGraphqlApi,
+    private val api: GraphqlClient = GraphqlApi,
 ) {
 
     suspend fun all(type: DataType): List<Tag> =

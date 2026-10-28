@@ -6,7 +6,9 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
 import kotlinx.coroutines.withContext
 
-object RustGraphqlApi : GraphqlClient(::executeNativeGraphql)
+object GraphqlApi : GraphqlClient(::executeNativeGraphql) {
+    fun forPeer(peer: com.ismartcoding.plain.models.Peer): GraphqlClient = peerGraphqlClient(peer)
+}
 
 private suspend fun executeNativeGraphql(request: GraphqlOperation): GraphqlResponse =
     withContext(Dispatchers.IO) {
