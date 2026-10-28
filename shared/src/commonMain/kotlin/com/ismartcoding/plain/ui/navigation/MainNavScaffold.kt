@@ -32,7 +32,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.ismartcoding.plain.i18n.Res
 import com.ismartcoding.plain.i18n.chat
-import com.ismartcoding.plain.ui.resources.grid_3x3 as ui_drawable_grid_3x3
+import com.ismartcoding.plain.ui.resources.layout_grid as ui_drawable_layout_grid
 import com.ismartcoding.plain.i18n.home
 import com.ismartcoding.plain.ui.resources.house as ui_drawable_house
 import com.ismartcoding.plain.ui.resources.message_circle as ui_drawable_message_circle
@@ -60,7 +60,7 @@ internal val mainNavItems: List<MainNavItem>
         add(MainNavItem(0, UiRes.drawable.ui_drawable_house, Res.string.home))
         add(MainNavItem(1, UiRes.drawable.ui_drawable_message_circle, Res.string.chat))
         if (hasTools(getDeviceCapabilities())) {
-            add(MainNavItem(2, UiRes.drawable.ui_drawable_grid_3x3, Res.string.tools))
+            add(MainNavItem(2, UiRes.drawable.ui_drawable_layout_grid, Res.string.tools))
         }
         add(MainNavItem(3, UiRes.drawable.ui_drawable_search, Res.string.search))
     }
