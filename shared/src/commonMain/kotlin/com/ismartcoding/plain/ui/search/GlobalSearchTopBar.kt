@@ -20,7 +20,6 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.unit.dp
 import com.ismartcoding.plain.i18n.*
-import com.ismartcoding.plain.ui.base.PIcon
 import com.ismartcoding.plain.ui.components.PIconButton
 import com.ismartcoding.plain.ui.search.GlobalSearchDomain
 import com.ismartcoding.plain.ui.search.GlobalSearchViewModel
@@ -28,7 +27,6 @@ import com.ismartcoding.plain.ui.theme.cardBackgroundNormal
 import org.jetbrains.compose.resources.stringResource
 import com.ismartcoding.plain.ui.resources.Res as UiRes
 import com.ismartcoding.plain.ui.resources.close as ui_drawable_close
-import com.ismartcoding.plain.ui.resources.search as ui_drawable_search
 import com.ismartcoding.plain.i18n.search
 import com.ismartcoding.plain.i18n.close
 
@@ -61,21 +59,15 @@ internal fun GlobalSearchTopBar(
                 .focusRequester(focusRequester),
             inputField = {
                 SearchBarDefaults.InputField(
+                    modifier = Modifier.padding(start = 8.dp),
                     query = viewModel.queryText.value,
                     onQueryChange = viewModel::onQueryChange,
                     onSearch = { viewModel.submit() },
                     expanded = false,
                     onExpandedChange = { },
                     placeholder = { Text(hint) },
-                    leadingIcon = {
-                        PIcon(
-                            icon = UiRes.drawable.ui_drawable_search,
-                            contentDescription = null,
-                            tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                        )
-                    },
-                    trailingIcon = {
-                        if (viewModel.queryText.value.isNotEmpty()) {
+                    trailingIcon = if (viewModel.queryText.value.isEmpty()) null else {
+                        {
                             PIconButton(
                                 icon = UiRes.drawable.ui_drawable_close,
                                 contentDescription = stringResource(Res.string.clear_search_term),
