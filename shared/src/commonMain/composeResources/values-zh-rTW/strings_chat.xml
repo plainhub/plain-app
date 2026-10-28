@@ -177,4 +177,6 @@
     <string name="no_finished_downloads">暫無已完成的下載</string>
     <string name="saved_n_of_m">已儲存 %1$d/%2$d 項</string>
     <string name="saved_to_x">已儲存到 %1$s</string>
+    <string name="pair_chat_only">僅聊天</string>
+    <string name="peer_manage_access">可管理</string>
 </resources>

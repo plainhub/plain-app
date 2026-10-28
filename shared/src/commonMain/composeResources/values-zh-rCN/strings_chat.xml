@@ -179,4 +179,5 @@
     <string name="saved_to_x">已保存到 %1$s</string>
     <string name="pair_manage_device">管理设备</string>
     <string name="pair_chat_only">仅聊天</string>
+    <string name="peer_manage_access">可管理</string>
 </resources>

@@ -24,6 +24,9 @@ import com.ismartcoding.plain.i18n.Res
 import com.ismartcoding.plain.i18n.grant_permission
 import com.ismartcoding.plain.i18n.local_chat
 import com.ismartcoding.plain.i18n.local_chat_desc
+import com.ismartcoding.plain.i18n.pair_chat_only
+import com.ismartcoding.plain.i18n.peer_manage_access
+import com.ismartcoding.plain.i18n.unpaired
 import com.ismartcoding.plain.i18n.nearby_wifi_devices_required_for_chat
 import com.ismartcoding.plain.lib.Channel
 import com.ismartcoding.plain.lib.sendEvent
@@ -169,6 +172,11 @@ fun ChatListPage(
                             desc = if (peer.isPaired()) peer.getBestIp() else peer.ip,
                             icon = peer.deviceType.getIcon(),
                             online = peer.online,
+                            accessLabel = stringResource(when {
+                                !peer.isPaired() -> Res.string.unpaired
+                                peer.token.isNotEmpty() -> Res.string.peer_manage_access
+                                else -> Res.string.pair_chat_only
+                            }),
                             latestChat = latestChats[peer.id],
                             peerId = peer.id,
                             onDelete = { peerVM.removePeer(it) },

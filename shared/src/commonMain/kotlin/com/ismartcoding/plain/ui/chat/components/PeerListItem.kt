@@ -3,9 +3,8 @@ package com.ismartcoding.plain.ui.chat.components
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.heightIn
-import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.semantics.stateDescription
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -13,6 +12,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.unit.dp
 import com.ismartcoding.plain.features.chat.models.getMessagePreview
 import com.ismartcoding.plain.ui.extensions.timeAgo
@@ -31,6 +31,7 @@ fun PeerListItem(
     desc: String,
     icon: DrawableResource,
     online: Boolean? = null,
+    accessLabel: String? = null,
     latestChat: ChatItem? = null,
     peerId: String? = null,
     onDelete: ((String) -> Unit)? = null,
@@ -41,6 +42,7 @@ fun PeerListItem(
     val deleteText = stringResource(Res.string.delete)
     val deleteWarningText = stringResource(Res.string.delete_peer_warning)
     val cancelText = stringResource(Res.string.cancel)
+    val subtitle = latestChat?.getMessagePreview() ?: desc
 
     val onlineDescription = when (online) {
         true -> stringResource(Res.string.online)
@@ -49,9 +51,7 @@ fun PeerListItem(
     }
     Box {
         PListItem(
-            modifier = modifier.heightIn(min = 80.dp).semantics {
-                onlineDescription?.let { stateDescription = it }
-            }.combinedClickable(
+            modifier = modifier.combinedClickable(
                 onClick = onClick,
                 onLongClick = {
                     if (peerId != null && onDelete != null) {
@@ -59,18 +59,24 @@ fun PeerListItem(
                     }
                 },
             ),
-            title = title,
-            subtitle = latestChat?.getMessagePreview() ?: desc,
-            start = { PeerIconWithStatus(icon = icon, online = online) },
-            titleTrailing = latestChat?.let { chat ->
-                {
-                    Text(
-                        modifier = Modifier.padding(end = 8.dp),
-                        text = chat.createdAt.timeAgo(),
-                        style = MaterialTheme.typography.listItemSubtitle()
-                    )
+            minHeight = 80.dp,
+            title = {
+                Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+                    Text(text = title, modifier = Modifier.weight(1f))
+                    latestChat?.let { chat ->
+                        Text(
+                            modifier = Modifier.padding(start = 8.dp, end = 8.dp),
+                            text = chat.createdAt.timeAgo(),
+                            style = MaterialTheme.typography.listItemSubtitle(),
+                        )
+                    }
                 }
             },
+            subtitle = if (subtitle.isEmpty()) null else { { Text(subtitle) } },
+            description = accessLabel?.let { label ->
+                { Text(listOfNotNull(label, onlineDescription).joinToString(" · ")) }
+            },
+            start = { PeerIconWithStatus(icon = icon, online = online) },
         )
 
         if (peerId != null && onDelete != null) {
