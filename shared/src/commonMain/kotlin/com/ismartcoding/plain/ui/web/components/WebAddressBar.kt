@@ -229,7 +229,7 @@ private fun CompactAddressRow(
     onQr: () -> Unit,
 ) {
     Row(
-        modifier = Modifier.fillMaxWidth().padding(start = 16.dp, end = 8.dp),
+        modifier = Modifier.fillMaxWidth().padding(start = 8.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         SelectionContainer(Modifier.weight(1f)) {
@@ -249,15 +249,15 @@ private fun CompactAddressRow(
         }
         PIconButton(
             icon = UiRes.drawable.ui_drawable_pen,
-            modifier = Modifier.size(32.dp),
-            iconSize = 16.dp,
+            modifier = Modifier.size(48.dp),
+            iconSize = 20.dp,
             contentDescription = stringResource(if (isHostname) Res.string.mdns_hostname else Res.string.change_port),
             click = onEdit,
         )
         PIconButton(
             icon = UiRes.drawable.ui_drawable_qr_code,
-            modifier = Modifier.size(32.dp),
-            iconSize = 16.dp,
+            modifier = Modifier.size(48.dp),
+            iconSize = 20.dp,
             contentDescription = stringResource(Res.string.show_qr_code),
             click = onQr,
         )

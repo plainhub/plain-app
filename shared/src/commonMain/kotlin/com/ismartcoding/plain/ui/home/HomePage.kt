@@ -5,6 +5,7 @@ import com.ismartcoding.plain.platform.network.NetworkEvents
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -41,6 +42,7 @@ import com.ismartcoding.plain.ui.base.pullrefresh.RefreshContentState
 import com.ismartcoding.plain.ui.base.pullrefresh.rememberRefreshLayoutState
 import com.ismartcoding.plain.ui.base.pullrefresh.setRefreshState
 import com.ismartcoding.plain.ui.media.extensions.collectAsStateValue
+import com.ismartcoding.plain.ui.theme.onWarningContainer
 import com.ismartcoding.plain.ui.settings.UpdateViewModel
 import com.ismartcoding.plain.ui.navigation.MainNavScaffold
 import com.ismartcoding.plain.ui.settings.UpdateDialog
@@ -120,6 +122,7 @@ fun HomePage(
                                 PTextButton(
                                     text = stringResource(Res.string.grant_permission),
                                     buttonSize = ButtonSize.SMALL,
+                                    contentColor = MaterialTheme.colorScheme.onWarningContainer,
                                     onClick = {
                                         sendEvent(RequestPermissionsEvent(Permission.SYSTEM_ALERT_WINDOW))
                                     },

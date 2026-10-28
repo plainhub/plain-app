@@ -2,6 +2,7 @@ package com.ismartcoding.plain.ui.web.components
 
 import com.ismartcoding.plain.preferences.*
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -10,6 +11,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -42,19 +44,25 @@ fun WebAddressPager(
             Prefs.set(PrefKeys.HTTPS, page == 1)
         }
     }
-    Column(modifier = modifier.fillMaxWidth().padding(horizontal = 8.dp)) {
+    Column(
+        modifier = modifier.fillMaxWidth().then(
+            if (compact) Modifier.background(MaterialTheme.colorScheme.surfaceContainer, MaterialTheme.shapes.large).padding(8.dp)
+            else Modifier.padding(horizontal = 8.dp),
+        ),
+    ) {
         if (compact) {
             PSegmentedButtons(
                 options = listOf("HTTP", "HTTPS"),
                 selectedIndex = pagerState.currentPage,
                 onSelect = { page -> scope.launch { pagerState.animateScrollToPage(page) } },
                 label = { it },
-                modifier = Modifier.padding(end = 16.dp, top = 16.dp).width(IntrinsicSize.Max),
-                buttonSize = ButtonSize.SMALL,
+                modifier = Modifier.width(IntrinsicSize.Max),
+                buttonSize = ButtonSize.LARGE,
+                content = { option, _ -> Text(option, style = MaterialTheme.typography.labelMedium) },
                 colors = PSegmentedButtonsDefaults.colors(
                     containerColor = Color.Transparent,
-                    selectedContainerColor = MaterialTheme.colorScheme.primaryContainer,
-                    selectedContentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                    selectedContainerColor = MaterialTheme.colorScheme.surface,
+                    selectedContentColor = MaterialTheme.colorScheme.primary,
                 ),
             )
         }
