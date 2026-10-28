@@ -1,5 +1,6 @@
 package com.ismartcoding.plain.ui.chat.components
 
+import com.ismartcoding.plain.features.chat.ChatStatus
 import com.ismartcoding.plain.features.files.FilesClient
 
 import androidx.compose.material3.Text
@@ -51,23 +52,25 @@ fun ChatListItemContextMenu(
             showContextMenu.value = false
         },
     ) {
-        PDropdownMenuItem(
-            text = { Text(stringResource(Res.string.select)) },
-            onClick = {
-                onEnterSelectMode()
-                onSelect(m.id)
-                selectedItem.value = null
-                showContextMenu.value = false
-            },
-        )
-        PDropdownMenuItem(
-            text = { Text(stringResource(Res.string.forward)) },
-            onClick = {
-                selectedItem.value = null
-                showContextMenu.value = false
-                onForward(m)
-            },
-        )
+        if (!m.id.startsWith("pending_")) {
+            PDropdownMenuItem(
+                text = { Text(stringResource(Res.string.select)) },
+                onClick = {
+                    onEnterSelectMode()
+                    onSelect(m.id)
+                    selectedItem.value = null
+                    showContextMenu.value = false
+                },
+            )
+            PDropdownMenuItem(
+                text = { Text(stringResource(Res.string.forward)) },
+                onClick = {
+                    selectedItem.value = null
+                    showContextMenu.value = false
+                    onForward(m)
+                },
+            )
+        }
         if (m.type == MessageType.IMAGES) {
             PDropdownMenuItem(
                 text = { Text(stringResource(Res.string.save_as)) },
@@ -88,7 +91,7 @@ fun ChatListItemContextMenu(
                     setClipboardText(LocaleHelper.getString(Res.string.message), text)
                 },
             )
-            if (m.fromId == "me") {
+            if (m.fromId == "me" && !m.id.startsWith("pending_")) {
                 PDropdownMenuItem(
                     text = { Text(stringResource(Res.string.edit_text)) },
                     onClick = {
@@ -110,7 +113,7 @@ fun ChatListItemContextMenu(
                 },
             )
         }
-        PDropdownMenuItem(
+        if (!m.id.startsWith("pending_") || m.status != ChatStatus.PENDING) PDropdownMenuItem(
             text = { Text(stringResource(Res.string.delete)) },
             onClick = {
                 selectedItem.value = null

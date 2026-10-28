@@ -1,26 +1,28 @@
 package com.ismartcoding.plain.ui.chat
 
 import com.ismartcoding.plain.features.chat.ChatClient
-import com.ismartcoding.plain.features.chat.ChatMessageReceiver
 import com.ismartcoding.plain.features.chat.RustChatStore
 import com.ismartcoding.plain.features.chat.readChatSnapshot
-import com.ismartcoding.plain.features.chat.ShareSendClient
 
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import com.ismartcoding.plain.features.chat.data.ChatTarget
 import com.ismartcoding.plain.features.chat.data.ChatTargetType
+import com.ismartcoding.plain.features.chat.models.MessageText
+import com.ismartcoding.plain.features.chat.models.MessageType
+import com.ismartcoding.plain.lib.generateId
+import com.ismartcoding.plain.lib.TimeHelper
+import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.features.chat.models.MessageContent
 import com.ismartcoding.plain.features.chat.peer.transport.PeerTransportType
 import com.ismartcoding.plain.features.chat.ChatStatus
 import com.ismartcoding.plain.models.ChatItem
-import com.ismartcoding.plain.models.Root
 import com.ismartcoding.plain.i18n.Res
 import com.ismartcoding.plain.i18n.sent
 import com.ismartcoding.plain.lib.withIO
 import com.ismartcoding.plain.ui.components.DialogHelper
 import com.ismartcoding.plain.ui.state.ISelectableViewModel
-import com.ismartcoding.plain.ui.chat.VChat
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -121,7 +123,12 @@ object ChatViewModel : ISelectableViewModel<VChat> {
 
     fun resendMessage(messageId: String) {
         launchSafe {
-            update(ChatClient.deliver(messageId))
+            if (messageId.startsWith("pending_")) {
+                val item = itemsFlow.value.firstOrNull { it.id == messageId } ?: return@launchSafe
+                sendMessage(target.value, MessageContent(item.type, item.value), pendingId = messageId)
+            } else {
+                update(ChatClient.deliver(messageId))
+            }
         }
     }
 
@@ -142,28 +149,56 @@ object ChatViewModel : ISelectableViewModel<VChat> {
 
     fun delete(ids: Set<String>) {
         launchSafe {
-            ChatClient.deleteByIds(ids)
+            ChatClient.deleteByIds(ids.filterNot { it.startsWith("pending_") }.toSet())
             _itemsFlow.update { it.filterNot { m -> ids.contains(m.id) } }
         }
     }
 
-    private suspend fun doSendMessage(target: ChatTarget, content: MessageContent): Boolean = withIO {
-        val item = ChatClient.sendContent(target, content)
-        publishCreated(target, listOf(item), scroll = true)
-        item.status == ChatStatus.SENT
+    internal suspend fun sendMessage(
+        target: ChatTarget,
+        content: MessageContent,
+        pendingId: String = "pending_${generateId()}",
+        send: suspend (ChatTarget, MessageContent) -> ChatItem = ChatClient::sendContent,
+    ): Boolean {
+        val pending = VChat(pendingId, "me", TimeHelper.now(), content.type, ChatStatus.PENDING, value = content.value)
+        if (_target.value == target) {
+            val previousTopId = _itemsFlow.value.firstOrNull()?.id
+            _itemsFlow.update { listOf(pending) + it.filterNot { item -> item.id == pendingId } }
+            _scrollToLatest.trySend(previousTopId)
+        }
+        return try {
+            val item = send(target, content)
+            mutex.withLock {
+                if (_target.value == target) {
+                    _itemsFlow.update { current ->
+                        val remaining = current.filterNot { it.id == item.id }
+                        if (remaining.any { it.id == pendingId }) {
+                            remaining.map { if (it.id == pendingId) VChat.from(item) else it }
+                        } else listOf(VChat.from(item)) + remaining
+                    }
+                }
+            }
+            item.status == ChatStatus.SENT
+        } catch (cancelled: CancellationException) {
+            throw cancelled
+        } catch (error: Exception) {
+            _itemsFlow.update { current ->
+                current.map { if (it.id == pendingId) it.copy(status = ChatStatus.FAILED) else it }
+            }
+            LogCat.e("Send chat message", error)
+            false
+        }
     }
 
     fun sendContent(content: MessageContent, onResult: (Boolean) -> Unit = {}) {
+        val target = target.value
         launchSafe {
-            onResult(doSendMessage(target.value, content))
+            onResult(sendMessage(target, content))
         }
     }
 
-    fun sendTextMessage(text: String, onResult: (Boolean) -> Unit = {}) {
-        launchSafe {
-            onResult(ChatClient.sendText(target.value, text).status == ChatStatus.SENT)
-        }
-    }
+    fun sendTextMessage(text: String, onResult: (Boolean) -> Unit = {}) =
+        sendContent(MessageContent(MessageType.TEXT, MessageText(text)), onResult)
 
     /**
      * Entry point for non-UI writers delivering already-persisted messages
@@ -216,8 +251,5 @@ object ChatViewModel : ISelectableViewModel<VChat> {
     suspend fun onMessagesDeleted(ids: Set<String>) = mutex.withLock {
         removeIds(ids)
     }
-
-    private suspend fun publishCreated(target: ChatTarget, items: List<ChatItem>, scroll: Boolean = false) =
-        onMessagesCreated(target, items, scroll)
 
 }
