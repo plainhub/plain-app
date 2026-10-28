@@ -12,6 +12,10 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
@@ -20,16 +24,13 @@ import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.ismartcoding.plain.lib.coIO
-import com.ismartcoding.plain.ui.components.ButtonSize
 import com.ismartcoding.plain.ui.components.ButtonType
 import com.ismartcoding.plain.ui.base.CircularTimer
 import com.ismartcoding.plain.ui.base.PFilledButton
 import com.ismartcoding.plain.ui.base.VerticalSpace
-import com.ismartcoding.plain.ui.pomodoro.PomodoroViewModel
+import com.ismartcoding.plain.ui.state.launchSafe
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlin.math.PI
 import kotlin.math.atan2
@@ -41,39 +42,50 @@ internal fun PomodoroTimerSection(
     scope: CoroutineScope,
     onCheckNotificationPermission: (() -> Unit) -> Unit,
 ) {
+    var dragSeconds by remember { mutableStateOf<Int?>(null) }
+    var pendingSeconds by remember { mutableStateOf<Int?>(null) }
+    val displayedSeconds = dragSeconds ?: pendingSeconds ?: pomodoroVM.timeLeft.intValue
+
     Box(
         modifier = Modifier
             .size(250.dp)
             .pointerInput(Unit) {
-                detectDragGestures { change, _ ->
+                detectDragGestures(
+                    onDragCancel = { dragSeconds = null },
+                    onDragEnd = {
+                        val seconds = dragSeconds
+                        dragSeconds = null
+                        if (seconds != null) {
+                            onCheckNotificationPermission {
+                                scope.launchSafe(onDone = { pendingSeconds = null }) {
+                                    pendingSeconds = seconds
+                                    pomodoroVM.startSessionAsync(seconds)
+                                }
+                            }
+                        }
+                    },
+                ) { change, _ ->
                     val center = Offset(size.width / 2f, size.height / 2f)
                     val radius = size.width / 2f
                     val dragVector = change.position - center
                     val distance = sqrt(dragVector.x * dragVector.x + dragVector.y * dragVector.y)
-                    if (distance > radius - 50 && distance < radius + 50) {
+                    if (pendingSeconds == null && distance > radius - 50 && distance < radius + 50) {
                         val angle = atan2(dragVector.y, dragVector.x)
                         var normalizedAngle = (angle + PI / 2) / (2 * PI)
                         if (normalizedAngle < 0) normalizedAngle += 1
                         val totalDurationSec = pomodoroVM.getTotalSeconds()
-                        pomodoroVM.timeLeft.intValue = (totalDurationSec * (1 - normalizedAngle)).toInt().coerceIn(1, totalDurationSec)
-                        pomodoroVM.adjustJob.value?.cancel()
-                        pomodoroVM.adjustJob.value = coIO {
-                            delay(500)
-                            onCheckNotificationPermission {
-                                scope.launch(Dispatchers.Default) { pomodoroVM.startSession() }
-                            }
-                        }
+                        dragSeconds = (totalDurationSec * (1 - normalizedAngle)).toInt().coerceIn(1, totalDurationSec)
                     }
                 }
             },
         contentAlignment = Alignment.Center
     ) {
         val totalDurationSec = pomodoroVM.getTotalSeconds()
-        val progress = if (totalDurationSec > 0) 1f - (pomodoroVM.timeLeft.intValue.toFloat() / totalDurationSec.toFloat()) else 0f
+        val progress = if (totalDurationSec > 0) 1f - (displayedSeconds.toFloat() / totalDurationSec.toFloat()) else 0f
         CircularTimer(progress = progress)
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             Text(
-                text = pomodoroVM.formatTime(pomodoroVM.timeLeft.intValue),
+                text = pomodoroVM.formatTime(displayedSeconds),
                 style = MaterialTheme.typography.displayLarge.copy(fontSize = 56.sp, fontWeight = FontWeight.SemiBold),
                 color = MaterialTheme.colorScheme.onSurface
             )

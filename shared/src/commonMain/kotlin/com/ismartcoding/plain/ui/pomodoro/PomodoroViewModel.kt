@@ -13,13 +13,11 @@ import com.ismartcoding.plain.Prefs
 import com.ismartcoding.plain.features.pomodoro.PomodoroClient
 import com.ismartcoding.plain.models.PomodoroState
 import com.ismartcoding.plain.models.PomodoroToday
-import kotlinx.coroutines.Job
 
 class PomodoroViewModel : ViewModel() {
 
     var currentState = mutableStateOf(PomodoroState.WORK)
     var isRunning = mutableStateOf(false)
-    var adjustJob = mutableStateOf<Job?>(null)
     var isPaused = mutableStateOf(false)
     var timeLeft = mutableIntStateOf(Prefs.pomodoroSettings.value.workDurationMin * 60)
     var completedCount = mutableIntStateOf(0)
@@ -50,10 +48,10 @@ class PomodoroViewModel : ViewModel() {
         isRunning.value = today.isRunning
         isPaused.value = today.isPaused
     }
-    fun startSession() { viewModelScope.launchSafe { PomodoroProjection.today.value = PomodoroClient.start(timeLeft.intValue) } }
+    suspend fun startSessionAsync(seconds: Int) { PomodoroProjection.today.value = PomodoroClient.start(seconds) }
+    fun startSession() { viewModelScope.launchSafe { startSessionAsync(timeLeft.intValue) } }
     fun pauseSession() { viewModelScope.launchSafe { PomodoroProjection.today.value = PomodoroClient.pause() } }
     fun resetTimer() { viewModelScope.launchSafe { PomodoroProjection.today.value = PomodoroClient.stop() } }
-    fun adjustTime(seconds: Int) { viewModelScope.launchSafe { PomodoroProjection.today.value = PomodoroClient.adjust(seconds) } }
     fun updateTimeForCurrentState() { viewModelScope.launchSafe { loadAsync() } }
     fun formatTime(seconds: Int): String = "${(seconds / 60).toString().padStart(2, '0')}:${(seconds % 60).toString().padStart(2, '0')}"
     fun getTotalSeconds(): Int = totalSeconds
