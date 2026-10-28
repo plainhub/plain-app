@@ -131,6 +131,7 @@
     <string name="keep_online_in_background_desc">앱을 나가도 연결을 유지합니다.</string>
     <string name="connection_keeps_dropping">연결이 자꾸 끊기나요?</string>
     <string name="connection_keeps_dropping_help">일부 휴대전화는 백그라운드 앱을 일시 중지합니다. 화면을 어둡게 한 채 PlainApp을 열어 두세요.</string>
+    <string name="stay_online_foreground_desc">원격 액세스는 PlainApp이 전면에 있을 때만 작동합니다. 온라인 유지는 화면 자동 잠금을 방지하며 검은 화면으로 전환할 수 있습니다.</string>
     <string name="expanded">펼쳐짐</string>
     <string name="collapsed">접힘</string>
     <string name="background_online_failed">백그라운드에서 계속 실행할 수 없습니다. 아래의 “온라인 유지”를 시도하세요.</string>

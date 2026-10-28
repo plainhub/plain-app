@@ -131,6 +131,7 @@
     <string name="keep_online_in_background_desc">Blijf verbonden wanneer je de app verlaat.</string>
     <string name="connection_keeps_dropping">Valt de verbinding steeds weg?</string>
     <string name="connection_keeps_dropping_help">Sommige telefoons pauzeren apps op de achtergrond. Probeer PlainApp open te houden met een donker scherm.</string>
+    <string name="stay_online_foreground_desc">Toegang op afstand werkt alleen als PlainApp op de voorgrond staat. Online blijven houdt het scherm aan en kan een zwart scherm tonen.</string>
     <string name="expanded">Uitgevouwen</string>
     <string name="collapsed">Ingevouwen</string>
     <string name="background_online_failed">De app kon niet op de achtergrond blijven werken. Probeer hieronder ‘Online blijven’.</string>

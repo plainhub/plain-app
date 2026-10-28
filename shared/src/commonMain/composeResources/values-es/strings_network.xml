@@ -131,6 +131,7 @@
     <string name="keep_online_in_background_desc">Mantén la conexión al salir de la aplicación.</string>
     <string name="connection_keeps_dropping">¿La conexión se interrumpe?</string>
     <string name="connection_keeps_dropping_help">Algunos teléfonos pausan las aplicaciones en segundo plano. Prueba a dejar PlainApp abierta con la pantalla oscura.</string>
+    <string name="stay_online_foreground_desc">El acceso remoto solo funciona mientras PlainApp está en primer plano. Permanecer en línea mantiene la pantalla encendida y permite mostrarla en negro.</string>
     <string name="expanded">Expandido</string>
     <string name="collapsed">Contraído</string>
     <string name="background_online_failed">No se pudo seguir ejecutando en segundo plano. Prueba «Permanecer en línea» más abajo.</string>

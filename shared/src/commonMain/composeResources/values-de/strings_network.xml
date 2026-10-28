@@ -131,6 +131,7 @@
     <string name="keep_online_in_background_desc">Bleib verbunden, wenn du die App verlässt.</string>
     <string name="connection_keeps_dropping">Verbindung bricht immer wieder ab?</string>
     <string name="connection_keeps_dropping_help">Manche Smartphones pausieren Apps im Hintergrund. Lass PlainApp mit dunklem Bildschirm geöffnet.</string>
+    <string name="stay_online_foreground_desc">Fernzugriff funktioniert nur, solange PlainApp im Vordergrund ist. Online bleiben hält den Bildschirm wach und kann einen schwarzen Bildschirm anzeigen.</string>
     <string name="expanded">Ausgeklappt</string>
     <string name="collapsed">Eingeklappt</string>
     <string name="background_online_failed">Die App konnte nicht im Hintergrund weiterlaufen. Versuche unten „Online bleiben“.</string>

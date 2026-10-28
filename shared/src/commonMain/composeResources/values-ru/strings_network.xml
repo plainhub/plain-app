@@ -131,6 +131,7 @@
     <string name="keep_online_in_background_desc">Сохраняйте соединение после выхода из приложения.</string>
     <string name="connection_keeps_dropping">Соединение постоянно обрывается?</string>
     <string name="connection_keeps_dropping_help">Некоторые телефоны приостанавливают приложения в фоне. Попробуйте оставить PlainApp открытым с тёмным экраном.</string>
+    <string name="stay_online_foreground_desc">Удалённый доступ работает, только пока PlainApp на переднем плане. Режим «Оставаться онлайн» не даёт экрану выключиться и позволяет сделать его чёрным.</string>
     <string name="expanded">Развёрнуто</string>
     <string name="collapsed">Свёрнуто</string>
     <string name="background_online_failed">Не удалось продолжить работу в фоне. Попробуйте «Оставаться онлайн» ниже.</string>

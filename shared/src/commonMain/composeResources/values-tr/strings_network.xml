@@ -131,6 +131,7 @@
     <string name="keep_online_in_background_desc">Uygulamadan çıktığınızda bağlantıyı koruyun.</string>
     <string name="connection_keeps_dropping">Bağlantı sürekli kopuyor mu?</string>
     <string name="connection_keeps_dropping_help">Bazı telefonlar arka plandaki uygulamaları duraklatır. PlainApp’i karanlık ekranla açık tutmayı deneyin.</string>
+    <string name="stay_online_foreground_desc">Uzaktan erişim yalnızca PlainApp ön plandayken çalışır. Çevrimiçi kal ekranı açık tutar ve siyah ekran gösterebilir.</string>
     <string name="expanded">Genişletildi</string>
     <string name="collapsed">Daraltıldı</string>
     <string name="background_online_failed">Arka planda çalışmaya devam edilemedi. Aşağıdaki “Çevrimiçi kal” seçeneğini deneyin.</string>

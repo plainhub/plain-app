@@ -129,6 +129,7 @@
     <string name="keep_online_in_background_desc">Stay connected when you leave the app.</string>
     <string name="connection_keeps_dropping">Connection keeps dropping?</string>
     <string name="connection_keeps_dropping_help">Some phones pause apps in the background. Try keeping PlainApp open with a dark screen.</string>
+    <string name="stay_online_foreground_desc">Remote access only works while PlainApp is in the foreground. Stay Online keeps the screen awake and can show a black screen.</string>
     <string name="expanded">Expanded</string>
     <string name="collapsed">Collapsed</string>
     <string name="background_online_failed">Could not keep running in the background. Try Stay Online below.</string>

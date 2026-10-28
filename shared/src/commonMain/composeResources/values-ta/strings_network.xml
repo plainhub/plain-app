@@ -131,6 +131,7 @@
     <string name="keep_online_in_background_desc">செயலியிலிருந்து வெளியேறினாலும் இணைப்பைப் பேணுங்கள்.</string>
     <string name="connection_keeps_dropping">இணைப்பு அடிக்கடி துண்டிக்கப்படுகிறதா?</string>
     <string name="connection_keeps_dropping_help">சில கைப்பேசிகள் பின்னணிச் செயலிகளை இடைநிறுத்துகின்றன. திரையை இருட்டாக்கி PlainApp-ஐத் திறந்தபடியே வைத்திருக்க முயற்சிக்கவும்.</string>
+    <string name="stay_online_foreground_desc">PlainApp முன்புறத்தில் இருக்கும்போது மட்டுமே தொலைநிலை அணுகல் செயல்படும். ஆன்லைனில் இருக்க திரையை அணையாமல் வைத்திருக்கும்; கருப்புத் திரையாக மாற்றவும் முடியும்.</string>
     <string name="expanded">விரிக்கப்பட்டது</string>
     <string name="collapsed">சுருக்கப்பட்டது</string>
     <string name="background_online_failed">பின்னணியில் தொடர்ந்து இயங்க முடியவில்லை. கீழே உள்ள “ஆன்லைனில் இருக்க” என்பதை முயற்சிக்கவும்.</string>

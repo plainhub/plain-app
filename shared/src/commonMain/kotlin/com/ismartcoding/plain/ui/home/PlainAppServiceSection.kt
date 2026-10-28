@@ -36,11 +36,9 @@ fun PlainAppServiceSection(
     onRetry: (() -> Unit)?,
     onStayOnline: () -> Unit,
 ) {
-    var expanded by rememberSaveable { mutableStateOf(false) }
-    val label = stringResource(Res.string.connection_keeps_dropping)
-    val expansion = stringResource(if (expanded) Res.string.expanded else Res.string.collapsed)
+    val supportsBackgroundService = Capability.BACKGROUND_SERVICE in getDeviceCapabilities()
     PCard(modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN)) {
-        if (Capability.BACKGROUND_SERVICE in getDeviceCapabilities()) {
+        if (supportsBackgroundService) {
             PListItem(
                 icon = UiRes.drawable.ui_drawable_dark_mode,
                 title = {
@@ -75,17 +73,10 @@ fun PlainAppServiceSection(
                 }
             }
         }
-        PExpandableSection(
-            toggleModifier = Modifier.padding(horizontal = 8.dp),
-            text = label,
-            expanded = expanded,
-            stateDescription = expansion,
-            onClick = { expanded = !expanded },
-            fadeContent = true,
-        ) {
-            Column(Modifier.fillMaxWidth().padding(start = 16.dp, end = 16.dp, bottom = 8.dp)) {
+        val stayOnlineContent: @Composable () -> Unit = {
+            Column(Modifier.fillMaxWidth().padding(start = 16.dp, end = 16.dp, top = if (supportsBackgroundService) 0.dp else 16.dp, bottom = 8.dp)) {
                 Text(
-                    text = stringResource(Res.string.connection_keeps_dropping_help),
+                    text = stringResource(if (supportsBackgroundService) Res.string.connection_keeps_dropping_help else Res.string.stay_online_foreground_desc),
                     style = MaterialTheme.typography.tipsText(),
                 )
                 VerticalSpace(16.dp)
@@ -95,6 +86,20 @@ fun PlainAppServiceSection(
                     onClick = onStayOnline,
                 )
             }
+        }
+        if (supportsBackgroundService) {
+            var expanded by rememberSaveable { mutableStateOf(false) }
+            PExpandableSection(
+                toggleModifier = Modifier.padding(horizontal = 8.dp),
+                text = stringResource(Res.string.connection_keeps_dropping),
+                expanded = expanded,
+                stateDescription = stringResource(if (expanded) Res.string.expanded else Res.string.collapsed),
+                onClick = { expanded = !expanded },
+                fadeContent = true,
+                content = stayOnlineContent,
+            )
+        } else {
+            stayOnlineContent()
         }
         VerticalSpace(8.dp)
     }

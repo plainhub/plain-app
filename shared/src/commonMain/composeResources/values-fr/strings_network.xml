@@ -131,6 +131,7 @@
     <string name="keep_online_in_background_desc">Restez connecté lorsque vous quittez l’application.</string>
     <string name="connection_keeps_dropping">La connexion se coupe souvent ?</string>
     <string name="connection_keeps_dropping_help">Certains téléphones mettent les applications en pause en arrière-plan. Essayez de laisser PlainApp ouverte avec l’écran sombre.</string>
+    <string name="stay_online_foreground_desc">L’accès à distance fonctionne uniquement lorsque PlainApp est au premier plan. Rester en ligne maintient l’écran allumé et permet de le rendre noir.</string>
     <string name="expanded">Développé</string>
     <string name="collapsed">Réduit</string>
     <string name="background_online_failed">Impossible de continuer en arrière-plan. Essayez « Rester en ligne » ci-dessous.</string>

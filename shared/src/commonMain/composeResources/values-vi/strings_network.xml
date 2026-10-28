@@ -131,6 +131,7 @@
     <string name="keep_online_in_background_desc">Giữ kết nối khi bạn rời ứng dụng.</string>
     <string name="connection_keeps_dropping">Kết nối liên tục bị ngắt?</string>
     <string name="connection_keeps_dropping_help">Một số điện thoại tạm dừng ứng dụng chạy nền. Hãy thử giữ PlainApp mở với màn hình tối.</string>
+    <string name="stay_online_foreground_desc">Truy cập từ xa chỉ hoạt động khi PlainApp ở phía trước. Giữ trực tuyến giữ màn hình sáng và cho phép chuyển sang màn hình đen.</string>
     <string name="expanded">Đã mở rộng</string>
     <string name="collapsed">Đã thu gọn</string>
     <string name="background_online_failed">Không thể tiếp tục chạy trong nền. Hãy thử “Giữ trực tuyến” bên dưới.</string>

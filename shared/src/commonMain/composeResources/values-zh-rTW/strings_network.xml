@@ -129,6 +129,7 @@
     <string name="keep_online_in_background_desc">離開 App 後仍保持連線。</string>
     <string name="connection_keeps_dropping">連線總是中斷？</string>
     <string name="connection_keeps_dropping_help">部分手機會暫停背景應用程式。可以讓 PlainApp 保持開啟，並將畫面變黑。</string>
+    <string name="stay_online_foreground_desc">遠端存取僅在 PlainApp 處於前景時可用。「保持在線」可防止自動鎖定螢幕，並可切換為黑畫面。</string>
     <string name="expanded">已展開</string>
     <string name="collapsed">已摺疊</string>
     <string name="background_online_failed">無法保持背景執行，可以嘗試下方的 Stay Online。</string>

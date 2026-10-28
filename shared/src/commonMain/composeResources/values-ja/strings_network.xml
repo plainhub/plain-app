@@ -131,6 +131,7 @@
     <string name="keep_online_in_background_desc">アプリを離れても接続を維持します。</string>
     <string name="connection_keeps_dropping">接続が頻繁に切れますか？</string>
     <string name="connection_keeps_dropping_help">端末によってはバックグラウンドのアプリが一時停止されます。画面を暗くして PlainApp を開いたままにしてみてください。</string>
+    <string name="stay_online_foreground_desc">リモートアクセスは PlainApp が前面にある間のみ利用できます。「オンライン状態を維持」で画面の自動ロックを防ぎ、黒い画面に切り替えられます。</string>
     <string name="expanded">展開済み</string>
     <string name="collapsed">折りたたみ済み</string>
     <string name="background_online_failed">バックグラウンドでの実行を継続できませんでした。下の「オンライン状態を維持」をお試しください。</string>

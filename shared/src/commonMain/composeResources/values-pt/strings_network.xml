@@ -131,6 +131,7 @@
     <string name="keep_online_in_background_desc">Mantenha a ligação ao sair da aplicação.</string>
     <string name="connection_keeps_dropping">A ligação está sempre a cair?</string>
     <string name="connection_keeps_dropping_help">Alguns telemóveis suspendem as aplicações em segundo plano. Tente manter o PlainApp aberto com o ecrã escuro.</string>
+    <string name="stay_online_foreground_desc">O acesso remoto só funciona enquanto o PlainApp está em primeiro plano. Manter online mantém a tela ligada e permite exibir uma tela preta.</string>
     <string name="expanded">Expandido</string>
     <string name="collapsed">Recolhido</string>
     <string name="background_online_failed">Não foi possível continuar em segundo plano. Experimente «Manter online» abaixo.</string>
