@@ -13,6 +13,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.unit.dp
 import com.ismartcoding.plain.features.chat.models.getMessagePreview
 import com.ismartcoding.plain.ui.extensions.timeAgo
@@ -42,7 +44,8 @@ fun PeerListItem(
     val deleteText = stringResource(Res.string.delete)
     val deleteWarningText = stringResource(Res.string.delete_peer_warning)
     val cancelText = stringResource(Res.string.cancel)
-    val subtitle = latestChat?.getMessagePreview() ?: desc
+    val subtitle = listOfNotNull(accessLabel, (latestChat?.getMessagePreview() ?: desc).takeIf { it.isNotEmpty() })
+        .joinToString(" · ")
 
     val onlineDescription = when (online) {
         true -> stringResource(Res.string.online)
@@ -51,7 +54,9 @@ fun PeerListItem(
     }
     Box {
         PListItem(
-            modifier = modifier.combinedClickable(
+            modifier = modifier.semantics {
+                onlineDescription?.let { stateDescription = it }
+            }.combinedClickable(
                 onClick = onClick,
                 onLongClick = {
                     if (peerId != null && onDelete != null) {
@@ -73,9 +78,6 @@ fun PeerListItem(
                 }
             },
             subtitle = if (subtitle.isEmpty()) null else { { Text(subtitle) } },
-            description = accessLabel?.let { label ->
-                { Text(listOfNotNull(label, onlineDescription).joinToString(" · ")) }
-            },
             start = { PeerIconWithStatus(icon = icon, online = online) },
         )
 
