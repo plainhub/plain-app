@@ -1,5 +1,5 @@
 // GENERATED from plain-rs protocols/ble UUID constants. Do not edit by hand.
-// Regenerate: cargo test -p plain-rs --features ble ble::print::regenerate_kotlin_uuids -- --ignored --nocapture
+// Regenerate: cargo run -p plain-rs --features ble --example ble_uuids
 package com.ismartcoding.plain.platform.network.ble
 
 object BleUuids {
