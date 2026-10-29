@@ -50,6 +50,7 @@ internal fun GlobalSearchTopBar(
     }
     val hint = if (domainScope == null) stringResource(Res.string.global_search_hint)
     else stringResource(Res.string.search_in_domain, stringResource(domainScope.labelRes))
+    val colors = SearchBarDefaults.colors(containerColor = MaterialTheme.colorScheme.cardBackgroundNormal)
 
     Column(Modifier.fillMaxWidth()) {
         SearchBar(
@@ -60,6 +61,7 @@ internal fun GlobalSearchTopBar(
             inputField = {
                 SearchBarDefaults.InputField(
                     modifier = Modifier.padding(start = 8.dp),
+                    colors = colors.inputFieldColors,
                     query = viewModel.queryText.value,
                     onQueryChange = viewModel::onQueryChange,
                     onSearch = { viewModel.submit() },
@@ -81,7 +83,7 @@ internal fun GlobalSearchTopBar(
             },
             expanded = false,
             onExpandedChange = { },
-            colors = SearchBarDefaults.colors(containerColor = MaterialTheme.colorScheme.cardBackgroundNormal),
+            colors = colors,
         ) {
         }
     }
