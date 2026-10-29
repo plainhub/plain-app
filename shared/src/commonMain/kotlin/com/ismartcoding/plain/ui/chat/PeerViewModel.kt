@@ -31,16 +31,16 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlin.time.Instant
 
-class PeerViewModel : ViewModel() {
+class PeerViewModel internal constructor(
+    private val readPeers: suspend () -> List<Peer> = { RustPeerStore.getAll() },
+    private val readLatestChats: suspend () -> Map<String, ChatItem> = { RustChatStore.getLatestConversations() },
+) : ViewModel() {
     private val lock = Mutex()
     private val peers = MutableStateFlow<Map<String, Peer>>(emptyMap())
     val latestChats = MutableStateFlow<Map<String, ChatItem>>(emptyMap())
     val peersMap = peers.asStateFlow()
-    val pairedPeers = combine(peers, latestChats) { values, chats ->
-        sortPeers(values.values.filter { it.isPaired() }, chats)
-    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyList())
-    val unpairedPeers = combine(peers, latestChats) { values, chats ->
-        sortPeers(values.values.filter { it.status == PeerStatus.UNPAIRED }, chats)
+    val peerList = combine(peers, latestChats) { values, chats ->
+        sortPeers(values.values.filter { it.isPaired() || it.status == PeerStatus.UNPAIRED }, chats)
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyList())
 
     // The consuming page owns this coroutine; hidden pages do not reload peers.
@@ -59,8 +59,8 @@ class PeerViewModel : ViewModel() {
     }
 
     private suspend fun refresh() = lock.withLock {
-        peers.value = RustPeerStore.getAll().associateBy { it.id }
-        latestChats.value = RustChatStore.getLatestConversations()
+        peers.value = readPeers().associateBy { it.id }
+        latestChats.value = readLatestChats()
     }
 
     private suspend fun refreshSafely() {
@@ -86,7 +86,8 @@ class PeerViewModel : ViewModel() {
     }
 
     private fun sortPeers(peers: List<Peer>, chats: Map<String, ChatItem>): List<Peer> = peers.sortedWith(
-        compareByDescending<Peer> { chats[it.id]?.createdAt ?: Instant.DISTANT_PAST }
+        compareBy<Peer> { !it.isPaired() }
+            .thenByDescending { chats[it.id]?.createdAt ?: Instant.DISTANT_PAST }
             .thenByDescending { it.online }
             .thenByDescending { it.createdAt }
             .thenBy { it.name.lowercase() },

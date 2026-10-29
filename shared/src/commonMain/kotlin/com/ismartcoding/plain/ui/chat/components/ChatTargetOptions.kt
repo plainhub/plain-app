@@ -40,7 +40,7 @@ data class ChatTargetOption(
 fun chatTargetOptions(): List<ChatTargetOption> {
     val peerVM: PeerViewModel = viewModel(key = "chatTargetPeers") { PeerViewModel() }
     val channelVM: ChannelViewModel = viewModel(key = "chatTargetChannels") { ChannelViewModel() }
-    val pairedPeers = peerVM.pairedPeers.collectAsStateValue()
+    val peers = peerVM.peerList.collectAsStateValue()
     val latestChats by peerVM.latestChats.collectAsState()
     LaunchedEffect(peerVM) { peerVM.observe() }
     LaunchedEffect(channelVM) { channelVM.observe() }
@@ -60,7 +60,7 @@ fun chatTargetOptions(): List<ChatTargetOption> {
                 ),
             )
         }
-        pairedPeers.forEach { peer ->
+        peers.filter { it.isPaired() }.forEach { peer ->
             add(ChatTargetOption(ChatTarget(peer.id, ChatTargetType.PEER), peer.name, peer.ip, peer.deviceType.getIcon()))
         }
     }

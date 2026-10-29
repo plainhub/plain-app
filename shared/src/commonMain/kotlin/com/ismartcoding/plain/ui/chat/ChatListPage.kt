@@ -68,8 +68,7 @@ fun ChatListPage(
     channelVM: ChannelViewModel,
     onTabSelected: ((Int) -> Unit)? = null,
 ) {
-    val pairedPeers = peerVM.pairedPeers.collectAsStateValue()
-    val unpairedPeers = peerVM.unpairedPeers.collectAsStateValue()
+    val allPeers = peerVM.peerList.collectAsStateValue()
     val latestChats by peerVM.latestChats.collectAsState()
     LaunchedEffect(peerVM) { peerVM.observe() }
     LaunchedEffect(channelVM) { channelVM.observe() }
@@ -164,7 +163,6 @@ fun ChatListPage(
                         )
                     }
                 }
-                val allPeers = pairedPeers + unpairedPeers
                 if (allPeers.isNotEmpty()) {
                     items(items = allPeers, key = { it.id }) { peer ->
                         PeerListItem(

@@ -69,7 +69,7 @@ fun NearbyPage(
     val bleAvailability by bleAvailabilityFlow.collectAsState()
     val peerDiscoverySupported = Capability.PEER_DISCOVERY in getDeviceCapabilities()
     val isSearching = isDiscovering || isBleScanning
-    val pairedPeers by peerVM.pairedPeers.collectAsState()
+    val peers by peerVM.peerList.collectAsState()
     LaunchedEffect(peerVM) { peerVM.observe() }
 
     LaunchedEffect(peerDiscoverySupported) {
@@ -139,7 +139,7 @@ fun NearbyPage(
             // The list renders instantly from the discovery history cache;
             // the spinner only fills in for a genuinely empty first sweep.
             nearbySearchingItem(isSearching && nearbyDevices.isEmpty())
-            nearbyDeviceListItems(nearbyDevices, peerVM, pairedPeers)
+            nearbyDeviceListItems(nearbyDevices, peers)
             if (nearbyDevices.isEmpty() && !isSearching) {
                 item {
                     Box(
@@ -167,12 +167,11 @@ fun NearbyPage(
 
 internal fun LazyListScope.nearbyDeviceListItems(
     nearbyDevices: List<NearbyDevice>,
-    peerVM: PeerViewModel,
-    pairedPeers: List<Peer>,
+    peers: List<Peer>,
 ) {
     val sortedDevices = nearbyDevices.sortedBy { it.name.toSortName() }
     items(sortedDevices, key = { it.id }) { item ->
-        val isPaired = pairedPeers.any { it.id == item.id }
+        val isPaired = peers.any { it.id == item.id && it.isPaired() }
         val status = NearbyViewModel.getStatus(item.id, isPaired)
         NearbyDeviceItem(
             item = item,
