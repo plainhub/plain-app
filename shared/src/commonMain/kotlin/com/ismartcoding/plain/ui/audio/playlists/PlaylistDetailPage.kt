@@ -64,7 +64,6 @@ import com.ismartcoding.plain.ui.resources.Res as UiRes
 import com.ismartcoding.plain.ui.resources.cast as ui_drawable_cast
 import com.ismartcoding.plain.ui.resources.more_horiz as ui_drawable_more_horiz
 import com.ismartcoding.plain.ui.resources.sort as ui_drawable_sort
-import com.ismartcoding.plain.ui.state.launchSafe
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
 
@@ -275,10 +274,10 @@ fun PlaylistDetailPage(
                         if (contextActive) {
                             if (isPlaying) audioPause() else audioPlay()
                         } else {
-                            scope.launchSafe { audioQueueVM.playQueryAsync("playlist_id:$playlistId", audioVM.sortBy.value) }
+                            audioQueueVM.playQuery("playlist_id:$playlistId", audioVM.sortBy.value)
                         }
                     },
-                    onShuffle = { scope.launchSafe { audioQueueVM.playQueryAsync("playlist_id:$playlistId", audioVM.sortBy.value, shuffle = true) } },
+                    onShuffle = { audioQueueVM.playQuery("playlist_id:$playlistId", audioVM.sortBy.value, shuffle = true) },
                 )
             }
             AudioPlayerBar(

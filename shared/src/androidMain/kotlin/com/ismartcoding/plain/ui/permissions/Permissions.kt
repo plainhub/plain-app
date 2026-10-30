@@ -81,7 +81,6 @@ fun Permission.request(
         val activity = mainActivity
         if (activity != null && (ActivityCompat.shouldShowRequestPermissionRationale(activity, permission) || !isTPlus())) {
             val intent = getPermissionEnableNotificationIntent(context)
-            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
             if (intent.resolveActivity(packageManager) != null) {
                 intentLauncher?.launch(intent)
             } else {

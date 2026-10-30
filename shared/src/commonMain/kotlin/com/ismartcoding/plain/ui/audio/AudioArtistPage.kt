@@ -61,7 +61,6 @@ import com.ismartcoding.plain.ui.audio.components.AudioListItem
 import com.ismartcoding.plain.ui.audio.components.ViewAudioBottomSheet
 import com.ismartcoding.plain.ui.theme.listItemSubtitle
 import com.ismartcoding.plain.ui.theme.listItemTitle
-import com.ismartcoding.plain.ui.state.launchSafe
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.pluralStringResource
@@ -118,9 +117,7 @@ fun AudioArtistPage(
     val contextActive = audioOutput.source.key == audioVM.source.key && items.isNotEmpty() && audioQueueVM.queuedMediaIds.value == items.map { it.id }.toSet()
 
     val playAll: (Boolean) -> Unit = { shuffle ->
-        scope.launchSafe {
-            audioQueueVM.playQueryAsync(artistQuery(artistName), audioVM.sortBy.value, shuffle = shuffle)
-        }
+        audioQueueVM.playQuery(artistQuery(artistName), audioVM.sortBy.value, shuffle = shuffle)
     }
 
     PBackHandler(enabled = dragSelectState.selectMode || castVM.castMode.value) {
