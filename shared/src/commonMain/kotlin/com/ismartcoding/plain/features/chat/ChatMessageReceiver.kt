@@ -21,7 +21,7 @@ object ChatMessageReceiver {
     suspend fun applyCommitted(item: ChatItem, fromPeer: Peer, fromChannel: ChatChannel?) = withIO {
         val fromChannelId = item.channelId.orEmpty()
         val fromPeerId = item.fromId
-        ChatViewModel.onMessagesCreated(
+        ChatViewModel.local.onMessagesCreated(
             target = if (fromChannelId.isNotEmpty()) {
                 ChatTarget(fromChannelId, ChatTargetType.CHANNEL)
             } else {
@@ -51,7 +51,7 @@ object ChatMessageReceiver {
                 messageText = "${fromPeer.name}: $preview",
             )
         }
-        if (ChatViewModel.visibleConversationId.value == targetId) return
+        if (ChatViewModel.local.visibleConversationId.value == targetId) return
         withContext(Dispatchers.Main.immediate) {
             sendChatMessageNotification(targetId, targetName, messageText)
         }

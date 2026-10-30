@@ -24,7 +24,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.unit.dp
-import com.ismartcoding.plain.features.dlna.sender.RustDlnaSender
 import com.ismartcoding.plain.platform.media.audioPause
 import com.ismartcoding.plain.ui.base.BottomSpace
 import com.ismartcoding.plain.ui.base.PBottomSheetTopAppBar
@@ -36,17 +35,17 @@ import com.ismartcoding.plain.ui.casting.CastViewModel
 @Composable
 fun CastDialog(castVM: CastViewModel, onDeviceSelected: (() -> Unit)? = null) {
     if (!castVM.showCastDialog.value) return
-    val devices by RustDlnaSender.devices.collectAsState()
+    val devices by castVM.devices.collectAsState()
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val hasDevices = devices.isNotEmpty()
     val onDismiss = { castVM.showCastDialog.value = false }
 
     LaunchedEffect(Unit) {
-        RustDlnaSender.startScan()
+        castVM.startScan()
         sheetState.expand()
     }
     DisposableEffect(Unit) {
-        onDispose { RustDlnaSender.stopScan() }
+        onDispose { castVM.stopScan() }
     }
 
     PModalBottomSheet(

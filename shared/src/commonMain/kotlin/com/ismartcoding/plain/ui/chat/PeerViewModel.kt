@@ -26,6 +26,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
@@ -34,7 +35,10 @@ import kotlin.time.Instant
 class PeerViewModel internal constructor(
     private val readPeers: suspend () -> List<Peer> = { RustPeerStore.getAll() },
     private val readLatestChats: suspend () -> Map<String, ChatItem> = { RustChatStore.getLatestConversations() },
+    sourceChanges: kotlinx.coroutines.flow.Flow<Unit>? = null,
+    private val api: com.ismartcoding.plain.rust.graphql.GraphqlClient = com.ismartcoding.plain.rust.graphql.GraphqlApi,
 ) : ViewModel() {
+    internal val sourceUpdates = sourceChanges?.shareIn(viewModelScope, SharingStarted.WhileSubscribed())
     private val lock = Mutex()
     private val peers = MutableStateFlow<Map<String, Peer>>(emptyMap())
     val latestChats = MutableStateFlow<Map<String, ChatItem>>(emptyMap())
@@ -46,14 +50,14 @@ class PeerViewModel internal constructor(
     // The consuming page owns this coroutine; hidden pages do not reload peers.
     suspend fun observe() = coroutineScope {
         launch(start = CoroutineStart.UNDISPATCHED) {
-            merge(
+            (sourceUpdates ?: merge(
                 AppSubscriptions.contentChanged.changes(),
                 AppSubscriptions.messagesCreated.changes(),
                 AppSubscriptions.messagesUpdated.changes(),
                 AppSubscriptions.messagesDeleted.changes(),
                 AppSubscriptions.peersChanged.changes(),
                 AppSubscriptions.channelsChanged.changes(),
-            ).collect { refreshSafely() }
+            )).collect { refreshSafely() }
         }
         refreshSafely()
     }
@@ -77,7 +81,7 @@ class PeerViewModel internal constructor(
 
     fun removePeer(peerId: String) {
         viewModelScope.launchSafe {
-            PeerManager.deletePeer(peerId)
+            api.execute(com.ismartcoding.plain.graphql.Mutation.deletePeer(peerId))
         }
     }
 

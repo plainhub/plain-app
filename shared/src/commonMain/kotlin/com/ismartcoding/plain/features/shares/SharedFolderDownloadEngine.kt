@@ -7,12 +7,25 @@ import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.rust.graphql.GraphqlApi
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.serialization.Serializable
 
-object SharedFolderDownloadEngine {
-    private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
+object SharedFolderDownloadEngine : SharedFolderDownloadClient(
+    publish = { tasks -> DownloadCenter.replaceExternal(DOWNLOAD_KIND_SHARE, tasks.values.toList()) },
+)
+
+open class SharedFolderDownloadClient internal constructor(
+    private val api: com.ismartcoding.plain.rust.graphql.GraphqlClient = GraphqlApi,
+    scope: CoroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.Default),
+    private val publish: (Map<String, SharedFolderBatchTask>) -> Unit = {},
+) {
+    private val _progress = MutableStateFlow<Map<String, SharedFolderBatchTask>>(emptyMap())
+    val progress = _progress.asStateFlow()
+    private val _errors = MutableStateFlow<Exception?>(null)
+    val errors = _errors.asStateFlow()
     private val intents = Channel<Request>(128)
     private val stateLock = Mutex()
     private val version = DownloadQueueVersion()
@@ -22,9 +35,12 @@ object SharedFolderDownloadEngine {
             for (body in intents) {
                 try { call(body); refresh() }
                 catch (cancelled: CancellationException) { throw cancelled }
-                catch (error: Exception) { LogCat.e("Shared download request", error) }
+                catch (error: Exception) {
+                    _errors.value = error
+                    LogCat.e("Shared download request", error)
+                }
             }
-        }
+        }.invokeOnCompletion { intents.close() }
     }
 
     fun enqueueFile(messageId: String, link: SharedLink, urlToken: String, entry: SharedFileDto, targetDir: String) =
@@ -69,11 +85,15 @@ object SharedFolderDownloadEngine {
     fun control(id: String, command: SharedDownloadCommand): Boolean = submit(Request.Control(id, command))
 
     private fun submit(request: Request): Boolean = intents.trySend(request).isSuccess.also {
-        if (!it) LogCat.e("Shared download request capacity exceeded")
+        if (!it) {
+            val error = IllegalStateException("Shared download request queue unavailable")
+            _errors.value = error
+            LogCat.e(error.message.orEmpty())
+        }
     }
 
     suspend fun refresh() = stateLock.withLock {
-        val snapshot = GraphqlApi.execute(Query.sharedDownloadQueue())
+        val snapshot = api.execute(Query.sharedDownloadQueue())
         if (!version.accept(snapshot.runtimeId, snapshot.revision)) return@withLock
         val tasks = snapshot.tasks.map { row ->
             SharedFolderBatchTask(
@@ -93,7 +113,9 @@ object SharedFolderDownloadEngine {
                 failures = row.failures.map { DownloadFailure(it.path, it.error) }.toMutableList()
             }
         }
-        DownloadCenter.replaceExternal(DOWNLOAD_KIND_SHARE, tasks)
+        val next = tasks.associateBy { it.id }
+        _progress.value = next
+        publish(next)
     }
 
     private suspend fun call(request: Request) {
@@ -101,7 +123,7 @@ object SharedFolderDownloadEngine {
             is Request.Enqueue -> Mutation.enqueueSharedDownload(request.input)
             is Request.Control -> Mutation.sharedDownloadControl(request.command, request.id)
         }
-        GraphqlApi.execute(operation)
+        api.execute(operation)
     }
 
     private sealed interface Request {

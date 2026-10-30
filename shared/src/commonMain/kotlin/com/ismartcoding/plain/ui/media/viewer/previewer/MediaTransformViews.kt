@@ -7,7 +7,10 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.size
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.key
 import androidx.compose.runtime.rememberCoroutineScope
@@ -40,15 +43,21 @@ fun TransformImageViewWithUri(
     itemState: TransformItemState, previewerState: MediaPreviewerState,
     widthPx: Int, forceVideoDecoder: Boolean = false,
 ) {
+    val source = com.ismartcoding.plain.ui.navigation.LocalContentSource.current
+    val resource by com.ismartcoding.plain.ui.navigation.rememberContentResource(source, path, widthPx)
     TransformImageView(modifier = modifier, key = key, itemState = itemState, contentState = previewerState.transformState) { itemKey ->
         key(itemKey) {
             val painter = rememberAsyncImagePainter(
-                model = ImageRequest.Builder(LocalPlatformContext.current).data(uri ?: path).size(widthPx)
-                    .applyForceVideoDecoder(forceVideoDecoder).build(),
+                model = ImageRequest.Builder(LocalPlatformContext.current).data(if (source is com.ismartcoding.plain.rust.graphql.ContentSource.Local) uri ?: path else resource?.getOrNull()).size(widthPx)
+                    .applyForceVideoDecoder(forceVideoDecoder && source is com.ismartcoding.plain.rust.graphql.ContentSource.Local).build(),
                 filterQuality = FilterQuality.None
             )
+            val imageState by painter.state.collectAsState()
+            LaunchedEffect(imageState) {
+                if (imageState is AsyncImagePainter.State.Success) itemState.updateIntrinsicSize(painter.intrinsicSize)
+            }
             val imageModifier = Modifier.fillMaxSize()
-            if (painter.state.value is AsyncImagePainter.State.Error) {
+            if (resource?.isFailure == true || painter.state.value is AsyncImagePainter.State.Error) {
                 Image(
                     modifier = imageModifier,
                     painter = painterResource(if (fileName.isImageFast()) UiRes.drawable.ui_drawable_image else UiRes.drawable.ui_drawable_file_video),

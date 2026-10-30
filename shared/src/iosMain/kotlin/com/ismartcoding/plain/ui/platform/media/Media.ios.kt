@@ -4,6 +4,9 @@ package com.ismartcoding.plain.ui.platform.media
 
 
 import androidx.compose.ui.unit.IntSize
+import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.asSkiaBitmap
+import com.ismartcoding.plain.lib.toNSData
 import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.lib.toByteArray
 import kotlinx.cinterop.ExperimentalForeignApi
@@ -18,7 +21,22 @@ import platform.CoreImage.CIImage as CoreImageCIImage
 
 actual fun tryDecodeQrCode(path: String): String? = try {
     val image = UIImage.imageWithContentsOfFile(path) ?: return null
-    // file-backed UIImages have no CIImage; bridge through CGImage instead
+    decodeQrCode(image)
+} catch (e: Exception) {
+    LogCat.e("tryDecodeQrCode: ${e.message}")
+    null
+}
+
+internal actual fun tryDecodeQrCode(image: ImageBitmap): String? {
+    val raster = org.jetbrains.skia.Image.makeFromBitmap(image.asSkiaBitmap())
+    val bytes = try {
+        val encoded = raster.encodeToData() ?: return null
+        try { encoded.bytes } finally { encoded.close() }
+    } finally { raster.close() }
+    return UIImage.imageWithData(bytes.toNSData())?.let { decodeQrCode(it) }
+}
+
+private fun decodeQrCode(image: UIImage): String? {
     val ciImage = image.CIImage() ?: image.CGImage?.let { CoreImageCIImage.imageWithCGImage(it) } ?: return null
     val context = CIContext.context()
     val detector = CIDetector.detectorOfType(
@@ -30,10 +48,7 @@ actual fun tryDecodeQrCode(path: String): String? = try {
         val msg = feature.performSelector(sel_registerName("messageString")) as? String
         if (!msg.isNullOrEmpty()) return msg
     }
-    null
-} catch (e: Exception) {
-    LogCat.e("tryDecodeQrCode: ${e.message}")
-    null
+    return null
 }
 
 actual fun getSvgSize(path: String): IntSize = parseSvgSize(path) ?: IntSize(150, 150)

@@ -24,18 +24,6 @@ import com.ismartcoding.plain.ui.media.fileIconData
 import com.ismartcoding.plain.ui.media.viewer.previewer.MediaPreviewerState
 import com.ismartcoding.plain.ui.media.viewer.previewer.TransformItemState
 
-/**
- * Thumbnail block for a file-row entry, shared by local (FilesPage) and
- * remote (shared-folder) lists:
- *
- * - local media with [itemState]/[previewerState] renders via
- *   [TransformImageView] so taps zoom into the shared previewer;
- * - remote media resolves [remoteThumb] asynchronously to a locally cached
- *   thumbnail path (the caller downloads it through the app's own HTTP stack
- *   — LAN guest endpoints are self-signed, which Coil's network fetcher
- *   cannot load);
- * - everything else falls back to the extension type icon.
- */
 @Composable
 fun FileEntryThumb(
     name: String,
@@ -45,7 +33,7 @@ fun FileEntryThumb(
     itemState: TransformItemState? = null,
     previewerState: MediaPreviewerState? = null,
     widthPx: Int = 0,
-    remoteThumb: (suspend () -> String?)? = null,
+    remoteThumb: (suspend () -> Any?)? = null,
     modifier: Modifier = Modifier,
 ) {
     Box(modifier = modifier.size(40.dp), contentAlignment = Alignment.Center) {
@@ -70,19 +58,19 @@ fun FileEntryThumb(
 
 @Composable
 private fun RemoteThumbImage(
-    remoteThumb: suspend () -> String?,
+    remoteThumb: suspend () -> Any?,
     name: String,
     isDir: Boolean,
 ) {
-    var thumbPath by remember(remoteThumb) { mutableStateOf<String?>(null) }
+    var thumbModel by remember(remoteThumb) { mutableStateOf<Any?>(null) }
     var failed by remember(remoteThumb) { mutableStateOf(false) }
     LaunchedEffect(remoteThumb) {
-        thumbPath = remoteThumb()
-        if (thumbPath == null) failed = true
+        thumbModel = remoteThumb()
+        if (thumbModel == null) failed = true
     }
     when {
-        thumbPath != null -> AsyncImage(
-            model = thumbPath,
+        thumbModel != null -> AsyncImage(
+            model = thumbModel,
             contentDescription = name,
             contentScale = ContentScale.Crop,
             modifier = Modifier.fillMaxSize().clip(RoundedCornerShape(4.dp)),

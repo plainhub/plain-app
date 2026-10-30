@@ -21,23 +21,23 @@ import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.withContext
 
 internal object PickedAttachments {
-    suspend fun <T> withFiles(uris: List<String>, normalize: Boolean, send: suspend (List<MessageFile>) -> T): T = withIO {
+    suspend fun <T> withFiles(uris: List<String>, normalize: Boolean, source: com.ismartcoding.plain.rust.graphql.ContentSource = com.ismartcoding.plain.rust.graphql.ContentSource.Local, send: suspend (List<MessageFile>) -> T): T = withIO {
         val imports = mutableListOf<String>()
         try {
             val attachments = uris.distinct().mapNotNull { uri ->
                 try {
                     val info = queryPickedFileInfo(uri) ?: error("Unable to read selected file information")
                     val file = withContext(NonCancellable) {
-                        AppFileStore.importFile(uri, info.displayName, info.mimeType)
-                            .also { imports.add(it.id) }
+                        (if (source is com.ismartcoding.plain.rust.graphql.ContentSource.Remote) source.client.importAttachment(uri, info.displayName, info.mimeType)
+                        else AppFileStore.importFile(uri, info.displayName, info.mimeType)).also { imports.add(it.id) }
                     }
                     currentCoroutineContext().ensureActive()
                     val path = file.realPath
                     val isVideo = info.mimeType.startsWith("video/") || info.displayName.isVideoFast()
-                    val video = if (isVideo) MediaClient.videoInfo(path) else null
+                    val video = if (isVideo) source.media.videoInfo(path) else null
                     val size = when {
                         info.mimeType.startsWith("image/") || info.displayName.isImageFast() ->
-                            MediaClient.imageInfo(path)?.let { IntSize(it.width, it.height) } ?: IntSize.Zero
+                            source.media.imageInfo(path)?.let { IntSize(it.width, it.height) } ?: IntSize.Zero
                         video != null -> IntSize(video.displayWidth, video.displayHeight)
                         else -> IntSize.Zero
                     }
@@ -45,7 +45,7 @@ internal object PickedAttachments {
                     val name = if (normalize && extension.isNotEmpty()) "${info.displayName.substringBeforeLast('.', info.displayName)}.$extension" else info.displayName
                     val duration = when {
                         video != null -> video.durationMs
-                        isVideo || info.mimeType.startsWith("audio/") || info.displayName.isAudioFast() -> MediaClient.durationMs(path)
+                        isVideo || info.mimeType.startsWith("audio/") || info.displayName.isAudioFast() -> source.media.durationMs(path)
                         else -> 0L
                     }
                     MessageFile(uri = AppFileStore.toFidUri(file), size = file.size, fileName = name,
@@ -63,7 +63,7 @@ internal object PickedAttachments {
             withContext(NonCancellable) {
                 var failure: Exception? = null
                 imports.forEach { id ->
-                    try { AppFileStore.release(id) } catch (error: Exception) { failure = error }
+                    try { source.storedFiles.release(id) } catch (error: Exception) { failure = error }
                 }
                 failure?.let { throw it }
             }

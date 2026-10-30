@@ -1,7 +1,5 @@
 package com.ismartcoding.plain.ui.chat.components
 
-import androidx.compose.material3.CircularProgressIndicator
-
 import com.ismartcoding.plain.models.NearbyDevice
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Icon
@@ -9,20 +7,20 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.ismartcoding.plain.i18n.*
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
-import com.ismartcoding.plain.ui.components.BadgeType
 import com.ismartcoding.plain.ui.components.ButtonSize
 import com.ismartcoding.plain.ui.components.ButtonType
+import com.ismartcoding.plain.features.nearby.PairingPhase
 import com.ismartcoding.plain.features.nearby.DiscoveryMethod
 import com.ismartcoding.plain.ui.platform.system.getIcon
 import com.ismartcoding.plain.ui.base.HorizontalSpace
 import com.ismartcoding.plain.ui.base.PListItem
 import com.ismartcoding.plain.ui.base.POutlinedButton
-import com.ismartcoding.plain.ui.base.PStatusBadge
 import com.ismartcoding.plain.ui.nearby.NearbyItemStatus
 import com.ismartcoding.plain.ui.nearby.NearbyViewModel
 import com.ismartcoding.plain.ui.theme.PlainTheme
@@ -39,9 +37,12 @@ fun NearbyDeviceItem(
     bestIp: String,
 ) {
     var showPair by remember { mutableStateOf(false) }
+    val verificationCode = NearbyViewModel.pairingStates.values.firstOrNull {
+        it.deviceId == item.id && it.phase !in setOf(PairingPhase.SUCCEEDED, PairingPhase.FAILED, PairingPhase.CANCELLED)
+    }?.verificationCode
     if (showPair) PairPeerDialog(item) { showPair = false }
     Surface(
-        modifier = PlainTheme.getCardModifier(),
+        modifier = PlainTheme.getCardModifier().testTag("nearby-device:${item.id}"),
         color = Color.Unspecified,
     ) {
         PListItem(
@@ -64,12 +65,8 @@ fun NearbyDeviceItem(
                         tint = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                 }
-                if (status == NearbyItemStatus.PAIRING) {
-                    HorizontalSpace(4.dp)
-                    PStatusBadge(text = stringResource(Res.string.pending), type = BadgeType.WARN)
-                }
             },
-            subtitle = bestIp,
+            subtitle = verificationCode ?: bestIp,
             icon = item.deviceType.getIcon(),
             action = {
                 when (status) {

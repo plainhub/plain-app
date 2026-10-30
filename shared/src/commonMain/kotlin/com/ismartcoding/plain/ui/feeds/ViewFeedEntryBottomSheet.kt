@@ -13,7 +13,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
-import com.ismartcoding.plain.ui.extensions.rememberFilePath
+import com.ismartcoding.plain.ui.extensions.rememberImageResource
 import com.ismartcoding.plain.features.feeds.displayImage
 import com.ismartcoding.plain.models.Tag
 import com.ismartcoding.plain.models.TagRelation
@@ -77,7 +77,7 @@ fun ViewFeedEntryBottomSheet(
                     PSheetHeader(
                         thumbnail = {
                             PSheetHeaderThumb(
-                                model = rememberFilePath(m.displayImage).ifEmpty { feedLogo },
+                                model = (rememberImageResource(m.displayImage) ?: feedLogo),
                                 fallbackIcon = UiRes.drawable.ui_drawable_rss,
                                 contentScale = ContentScale.Crop,
                             )

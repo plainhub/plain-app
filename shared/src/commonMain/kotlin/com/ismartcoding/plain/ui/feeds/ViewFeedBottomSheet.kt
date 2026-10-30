@@ -15,7 +15,6 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.ismartcoding.plain.ui.extensions.timeAgo
-import com.ismartcoding.plain.features.feeds.FeedsClient
 import com.ismartcoding.plain.ui.feeds.FeedWorkerState
 import com.ismartcoding.plain.features.feeds.FeedWorkerStatus
 import com.ismartcoding.plain.models.Feed
@@ -97,7 +96,7 @@ fun ViewFeedBottomSheet(
         // Sync status card: state persisted by Rust on Feed, refreshed
         // in place when a sync finishes while the sheet is open.
         val reason = feedSyncErrorReason(m.lastError.code)
-        val syncBusy = FeedWorkerState.status(m.id) in setOf(FeedWorkerStatus.QUEUED, FeedWorkerStatus.RUNNING)
+        val syncBusy = feedsVM.syncState.status(m.id) in setOf(FeedWorkerStatus.QUEUED, FeedWorkerStatus.RUNNING)
         PCard(modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN)) {
             PListItem(title = stringResource(Res.string.feeds_sync_last_synced), value = m.lastSyncAt?.timeAgo() ?: "—")
             PListItem(title = stringResource(Res.string.feeds_sync_result),
@@ -119,7 +118,7 @@ fun ViewFeedBottomSheet(
                 .padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN),
             isLoading = syncBusy,
             enabled = !syncBusy,
-            onClick = { scope.launch { FeedsClient.sync(m.id) } },
+            onClick = { scope.launch { feedsVM.source.feeds.sync(m.id) } },
         )
         VerticalSpace(dp = 16.dp)
         PCard(modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN)) {

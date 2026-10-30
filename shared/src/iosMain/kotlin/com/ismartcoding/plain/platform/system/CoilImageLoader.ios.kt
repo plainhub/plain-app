@@ -10,6 +10,7 @@ import com.ismartcoding.plain.platform.media.IosPhotoFetcher
 internal actual fun platformImageLoaderBuilder(context: PlatformContext): ImageLoader.Builder =
     ImageLoader.Builder(context)
         .components {
+            add(ManagedImageFetcher())
             add(IosPhotoFetcher.Factory())
             add(SvgDecoder.Factory(true))
             add(NetworkFetcher.Factory(networkClient = { IosImageNetworkClient() }))

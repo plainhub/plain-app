@@ -69,7 +69,7 @@ internal fun ViewImageActionButtons(
 ) {
     val scope = rememberCoroutineScope()
     var showAddToHomeDialog by remember { mutableStateOf(false) }
-    val canAddToHome = Capability.LAUNCHER_SHORTCUTS in getDeviceCapabilities()
+    val canAddToHome = imagesVM.source is com.ismartcoding.plain.rust.graphql.ContentSource.Local && Capability.LAUNCHER_SHORTCUTS in getDeviceCapabilities()
     PCard(modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN)) {
         PSheetHeader(
             thumbnail = {
@@ -87,7 +87,7 @@ internal fun ViewImageActionButtons(
                 }
             }
             PSheetPrimaryAction(UiRes.drawable.ui_drawable_share_2, stringResource(Res.string.share)) {
-                shareFiles(listOf(getMediaItemUriString(DataType.IMAGE, m.id, m.path)))
+                imagesVM.share(listOf(m.id))
                 onDismiss()
             }
             if (!imagesVM.trash.value) {
@@ -95,19 +95,19 @@ internal fun ViewImageActionButtons(
                     imagesVM.showRenameDialog.value = true
                 }
             }
-            if (AppFeatureType.MEDIA_TRASH.has() && !imagesVM.trash.value) {
+            if (AppFeatureType.MEDIA_TRASH.has(imagesVM.source.capabilities) && !imagesVM.trash.value) {
                 PSheetPrimaryTrashAction(stringResource(Res.string.trash)) {
                     imagesVM.trash(tagsVM, setOf(m.id))
                     onDismiss()
                 }
             }
-            if (AppFeatureType.MEDIA_TRASH.has() && imagesVM.trash.value) {
+            if (AppFeatureType.MEDIA_TRASH.has(imagesVM.source.capabilities) && imagesVM.trash.value) {
                 PSheetPrimaryAction(UiRes.drawable.ui_drawable_archive_restore, stringResource(Res.string.restore)) {
                     imagesVM.restore(tagsVM, setOf(m.id))
                     onDismiss()
                 }
             }
-            if (!AppFeatureType.MEDIA_TRASH.has() || imagesVM.trash.value) {
+            if (!AppFeatureType.MEDIA_TRASH.has(imagesVM.source.capabilities) || imagesVM.trash.value) {
                 PSheetPrimaryDeleteAction(stringResource(Res.string.delete)) {
                     scope.launch {
                         confirmActionAsync(
@@ -143,7 +143,7 @@ internal fun ViewImageActionButtons(
                         }
                     }
                     PSheetActionRow(UiRes.drawable.ui_drawable_square_arrow_out_up_right, stringResource(Res.string.open_with)) {
-                        openFileExternal(m.path)
+                        imagesVM.openFile(m.path)
                     }
                 }
                 if (imagesVM.trash.value) {

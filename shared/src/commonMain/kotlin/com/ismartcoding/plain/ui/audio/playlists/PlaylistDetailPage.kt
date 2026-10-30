@@ -26,7 +26,6 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.ismartcoding.plain.IDData
 import com.ismartcoding.plain.Prefs
-import com.ismartcoding.plain.features.audio.AudioPlaylistsClient
 import com.ismartcoding.plain.models.AudioItem
 import com.ismartcoding.plain.i18n.*
 import com.ismartcoding.plain.i18n.sort
@@ -101,10 +100,10 @@ fun PlaylistDetailPage(
 
     val reload: suspend () -> Unit = {
         val (name, list) = withIO {
-            AudioPlaylistsClient.playlist(playlistId)?.name to AudioPlaylistsClient.playlistItemsPage(playlistId, 0, 1000)
+            audioVM.source.playlists.playlist(playlistId)?.name to audioVM.source.playlists.playlistItemsPage(playlistId, 0, 1000)
         }
         playlistName = name ?: ""
-        items = list.pruneTrashedRows(playlistId)
+        items = list.pruneTrashedRows(playlistId, audioVM.source)
     }
 
     LaunchedEffect(playlistId, version) {
@@ -119,7 +118,7 @@ fun PlaylistDetailPage(
     }
 
     LaunchedEffect(items) {
-        albumCovers = if (items.isEmpty()) emptyList() else AudioPlaylistsClient.covers(listOf(playlistId))[playlistId].orEmpty()
+        albumCovers = if (items.isEmpty()) emptyList() else audioVM.source.playlists.covers(listOf(playlistId))[playlistId].orEmpty()
     }
     PlaylistResumeEffect { version++ }
 
@@ -132,7 +131,8 @@ fun PlaylistDetailPage(
     val pathById = remember(library) { library.associateBy { it.id } }
     val density = LocalDensity.current
     var playerBarClearance by remember { mutableStateOf(0.dp) }
-    val contextActive = items.isNotEmpty() && audioQueueVM.queuedMediaIds.value == items.mapNotNull { it.mediaId }.toSet()
+    val audioOutput by com.ismartcoding.plain.features.audio.AudioCommands.output.collectAsState()
+    val contextActive = audioOutput.source.key == audioVM.source.key && items.isNotEmpty() && audioQueueVM.queuedMediaIds.value == items.mapNotNull { it.mediaId }.toSet()
     val isPlayingContext = contextActive && isPlaying
 
     PBackHandler(enabled = dragSelectState.selectMode || castVM.castMode.value) {
@@ -152,7 +152,7 @@ fun PlaylistDetailPage(
             onConfirm = { name ->
                 showRename = false
                 scope.launch {
-                    withIO { AudioPlaylistsClient.renamePlaylist(playlistId, name) }
+                    withIO { audioVM.source.playlists.renamePlaylist(playlistId, name) }
                     DialogHelper.showMessage(renamedMsg)
                     version++
                 }
@@ -169,7 +169,7 @@ fun PlaylistDetailPage(
             onAddItems = { navController.navigate(Routing.PlaylistAddItems(playlistId)) },
             onDelete = {
                 scope.launch {
-                    withIO { AudioPlaylistsClient.deletePlaylist(playlistId) }
+                    withIO { audioVM.source.playlists.deletePlaylist(playlistId) }
                     DialogHelper.showMessage(deletedMsg)
                     navController.popBackStack()
                 }
@@ -238,7 +238,7 @@ fun PlaylistDetailPage(
                         scope.launch {
                             val paths = dragSelectState.selectedIds.toList()
                             if (paths.isNotEmpty()) {
-                                withIO { AudioPlaylistsClient.removePlaylistItems(playlistId, paths) }
+                                withIO { audioVM.source.playlists.removePlaylistItems(playlistId, paths) }
                                 dragSelectState.exitSelectMode()
                                 DialogHelper.showMessage(Res.string.removed_from_playlist)
                                 version++

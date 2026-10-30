@@ -76,13 +76,17 @@ import android.media.AudioAttributes as AndroidAudioAttributes
 actual fun rememberVideoPlayerController(claimAudioSession: Boolean): VideoPlayerController {
     val context = LocalContext.current
     return remember {
-        ExoPlayerVideoController(buildExoPlayer(context), context, claimAudioSession)
+        val resource = java.util.concurrent.atomic.AtomicReference<com.ismartcoding.plain.models.ManagedResource?>(null)
+        ExoPlayerVideoController(buildExoPlayer(context, resource), context, claimAudioSession, resource)
     }
 }
 
 @OptIn(UnstableApi::class)
-private fun buildExoPlayer(context: Context): ExoPlayer {
-    val httpDataSourceFactory = DefaultHttpDataSource.Factory()
+private fun buildExoPlayer(context: Context, resource: java.util.concurrent.atomic.AtomicReference<com.ismartcoding.plain.models.ManagedResource?>): ExoPlayer {
+    val standard = DefaultHttpDataSource.Factory()
+    val httpDataSourceFactory = androidx.media3.datasource.DataSource.Factory {
+        resource.get()?.let { com.ismartcoding.plain.platform.media.PeerResourceDataSource(it) } ?: standard.createDataSource()
+    }
     return ExoPlayer.Builder(context)
         .setSeekBackIncrementMs(10000L)
         .setSeekForwardIncrementMs(10000L)
@@ -95,12 +99,9 @@ private fun buildExoPlayer(context: Context): ExoPlayer {
         )
         .apply {
             val cache = VideoPlayerCacheManager.getCache()
-            if (cache != null) {
-                val cacheDataSourceFactory = CacheDataSource.Factory()
-                    .setCache(cache)
-                    .setUpstreamDataSourceFactory(DefaultDataSource.Factory(context, httpDataSourceFactory))
-                setMediaSourceFactory(DefaultMediaSourceFactory(cacheDataSourceFactory))
-            }
+            val upstream = DefaultDataSource.Factory(context, httpDataSourceFactory)
+            val factory = if (cache == null) upstream else CacheDataSource.Factory().setCache(cache).setUpstreamDataSourceFactory(upstream)
+            setMediaSourceFactory(DefaultMediaSourceFactory(factory))
         }
         .build()
         .apply { videoScalingMode = C.VIDEO_SCALING_MODE_SCALE_TO_FIT }
@@ -296,6 +297,7 @@ class ExoPlayerVideoController(
     val exoPlayer: ExoPlayer,
     context: Context,
     private val claimAudioSession: Boolean,
+    private val resource: java.util.concurrent.atomic.AtomicReference<com.ismartcoding.plain.models.ManagedResource?>,
 ) : VideoPlayerController {
 
     private val focusManager = if (claimAudioSession) {
@@ -361,7 +363,8 @@ class ExoPlayerVideoController(
         exoPlayer.release()
     }
 
-    override fun setMediaItem(path: String) {
+    override fun setMediaItem(path: String, tlsCertificateSha256: String?) {
+        resource.set(tlsCertificateSha256?.let { com.ismartcoding.plain.models.ManagedResource(path, it) })
         exoPlayer.setMediaItem(MediaItem.fromUri(path.pathToUri()))
     }
 

@@ -29,8 +29,9 @@ fun ChatFiles(
     audioQueueVM: AudioQueueViewModel,
     previewerState: MediaPreviewerState,
 ) {
+    val downloads = com.ismartcoding.plain.ui.chat.LocalChatDownloads.current
     val fileItems = (m.value as MessageFiles).items
-    val downloadProgressMap by DownloadQueue.downloadProgress.collectAsState(mapOf())
+    val downloadProgressMap by downloads.downloadProgress.collectAsState(mapOf())
 
     Column(
         Modifier

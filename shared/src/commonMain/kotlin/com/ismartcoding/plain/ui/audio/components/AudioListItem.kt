@@ -17,7 +17,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import com.ismartcoding.plain.features.dlna.sender.RustDlnaSender
 import com.ismartcoding.plain.models.Audio
 import com.ismartcoding.plain.models.Tag
 import com.ismartcoding.plain.i18n.*
@@ -44,10 +43,12 @@ fun AudioListItem(
     dragSelectState: DragSelectState,
     isCurrentlyPlaying: Boolean = false, isInQueue: Boolean = false,
 ) {
+    val audioOutput by com.ismartcoding.plain.features.audio.AudioCommands.output.collectAsState()
+    val current = isCurrentlyPlaying && audioOutput.source.key == audioVM.source.key
     val scope = rememberCoroutineScope()
-    val castItems by RustDlnaSender.items.collectAsState()
-    val currentUri by RustDlnaSender.currentUri.collectAsState()
-    val castPlaying by RustDlnaSender.isPlaying.collectAsState()
+    val castItems by castVM.items.collectAsState()
+    val currentUri by castVM.currentUri.collectAsState()
+    val castPlaying by castVM.isPlaying.collectAsState()
     val isCurrentlyPlayingByCast = currentUri == item.path && castPlaying
     val isCurrentItemLoading = castVM.isLoading.value && currentUri == item.path
 
@@ -61,7 +62,7 @@ fun AudioListItem(
                 onClick = {
                     if (dragSelectState.selectMode) { dragSelectState.select(item.id) }
                     else if (castVM.castMode.value) { castVM.cast(item) }
-                    else if (isCurrentlyPlaying) { audioQueueVM.audioPlayerVisible.value = true }
+                    else if (current) { audioQueueVM.audioPlayerVisible.value = true }
                     else {
                         checkNotificationPermission(Res.string.audio_notification_prompt) {
                             scope.launch(Dispatchers.Default) { audioQueueVM.enqueueAndPlayAsync(item) }
@@ -79,7 +80,7 @@ fun AudioListItem(
             AudioListItemLeadingIcon(
                 item = item, dragSelectState = dragSelectState, castMode = castVM.castMode.value,
                 isCurrentItemLoading = isCurrentItemLoading, isCurrentlyPlayingByCast = isCurrentlyPlayingByCast,
-                isCurrentlyPlaying = isCurrentlyPlaying,
+                isCurrentlyPlaying = current,
                 coverContent = { AudioCoverOrIcon(path = item.path, modifier = Modifier.size(40.dp)) },
             )
             HorizontalSpace(dp = 12.dp)
@@ -116,7 +117,7 @@ fun AudioListItem(
                     item = item, castMode = castVM.castMode.value,
                     castItems = castItems, isInQueue = isInQueue,
                     onCastToggle = { audio, isInCastQueue ->
-                        if (isInCastQueue) RustDlnaSender.removeItem(audio) else RustDlnaSender.addItem(audio)
+                        if (isInCastQueue) castVM.removeCastItem(audio) else castVM.addCastItem(audio)
                     },
                     onQueueToggle = { audio, inQueue ->
                         if (inQueue) audioQueueVM.removeAsync(audio.id) else audioQueueVM.addAsync(listOf(audio))

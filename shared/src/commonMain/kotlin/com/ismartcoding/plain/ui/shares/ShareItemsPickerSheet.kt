@@ -2,7 +2,13 @@
 
 package com.ismartcoding.plain.ui.shares
 
-import com.ismartcoding.plain.features.files.FilesClient
+import com.ismartcoding.plain.rust.graphql.ContentSource
+import com.ismartcoding.plain.models.ManagedStorageRoot
+import com.ismartcoding.plain.ui.navigation.LocalContentSource
+import com.ismartcoding.plain.ui.state.launchSafe
+import com.ismartcoding.plain.ui.components.DialogHelper
+import com.ismartcoding.plain.ui.i18n.LocaleHelper
+import com.ismartcoding.plain.lib.logcat.LogCat
 
 import com.ismartcoding.plain.features.files.extension
 
@@ -39,7 +45,6 @@ import com.ismartcoding.plain.i18n.*
 import com.ismartcoding.plain.lib.extensions.formatBytes
 import com.ismartcoding.plain.lib.extensions.getFilenameFromPath
 import com.ismartcoding.plain.lib.withIO
-import com.ismartcoding.plain.platform.files.getInternalStoragePath
 import com.ismartcoding.plain.ui.base.BottomActionButtons
 import com.ismartcoding.plain.ui.base.PBottomSheetTopAppBar
 import com.ismartcoding.plain.ui.base.PFilledButton
@@ -54,16 +59,27 @@ fun ShareItemsPickerSheet(
     initialSelected: Map<String, Boolean>,
     onDismiss: () -> Unit,
     onConfirm: (Map<String, Boolean>) -> Unit,
+    source: ContentSource = LocalContentSource.current,
 ) {
-    val rootPath = remember { getInternalStoragePath() }
-    var currentPath by remember { mutableStateOf(rootPath) }
-    var entries by remember { mutableStateOf<List<FileEntry>>(emptyList()) }
-    val selected = remember { mutableStateMapOf<String, Boolean>().apply { putAll(initialSelected) } }
+    var rootPath by remember(source) { mutableStateOf(source.rootPath) }
+    var currentPath by remember(source) { mutableStateOf<String?>(rootPath) }
+    var roots by remember(source) { mutableStateOf<List<ManagedStorageRoot>>(emptyList()) }
+    val appDataTitle = stringResource(Res.string.app_data)
+    var entries by remember(source) { mutableStateOf<List<FileEntry>>(emptyList()) }
+    val selected = remember(source) { mutableStateMapOf<String, Boolean>().apply { putAll(initialSelected) } }
 
-    LaunchedEffect(currentPath) {
-        withIO {
-            entries = FilesClient.list(currentPath, showHidden = false, sortBy = FileSortBy.NAME_ASC)
-        }
+    LaunchedEffect(currentPath, source) {
+        launchSafe(onError = {
+            LogCat.e("Share picker directory", it)
+            DialogHelper.showErrorMessage(LocaleHelper.getString(Res.string.load_failed))
+        }) {
+            val path = currentPath
+            if (path == null && source is ContentSource.Remote) {
+                roots = withIO { source.client.roots() }
+            } else if (path != null) {
+                entries = withIO { source.files.list(path, showHidden = false, sortBy = FileSortBy.NAME_ASC) }
+            }
+        }.join()
     }
 
     fun toggle(entry: FileEntry) {
@@ -75,7 +91,7 @@ fun ShareItemsPickerSheet(
             title = stringResource(Res.string.add_items),
         )
         Text(
-            text = currentPath,
+            text = currentPath ?: stringResource(Res.string.folders),
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             maxLines = 1,
@@ -87,16 +103,28 @@ fun ShareItemsPickerSheet(
                 .fillMaxWidth()
                 .padding(horizontal = 8.dp),
         ) {
-            if (currentPath != rootPath) {
+            val path = currentPath
+            if (path != null && (path != rootPath || source is ContentSource.Remote)) {
                 item {
                     DirBrowserRow(
                         name = "..",
                         subtitle = stringResource(Res.string.back),
-                        onClick = { currentPath = currentPath.substringBeforeLast('/', missingDelimiterValue = rootPath).ifEmpty { rootPath } },
+                        onClick = {
+                            currentPath = if (path == rootPath) null else path.substringBeforeLast('/', missingDelimiterValue = rootPath).ifEmpty { rootPath }
+                        },
                     )
                 }
             }
-            items(entries, key = { it.path }) { entry ->
+            if (path == null) {
+                items((roots + ManagedStorageRoot(appDataTitle, source.appPath)).distinctBy { it.path }, key = { it.path }) { root ->
+                    DirBrowserRow(
+                        name = root.name.ifEmpty { root.path },
+                        subtitle = root.path,
+                        onClick = { rootPath = root.path; currentPath = root.path },
+                    )
+                }
+            }
+            items(if (path == null) emptyList() else entries, key = { it.path }) { entry ->
                 DirBrowserRow(
                     name = entry.name,
                     subtitle = if (entry.isDir) "" else entry.size.formatBytes(),

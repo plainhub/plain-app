@@ -1,7 +1,6 @@
 package com.ismartcoding.plain.rust.host.provider
 
 import com.ismartcoding.plain.ui.app.MainViewModel
-import com.ismartcoding.plain.ui.web.AccessFeatureHighlight
 import com.ismartcoding.plain.features.web.WebSettingsFeature
 import com.ismartcoding.plain.lib.JsonHelper
 import com.ismartcoding.plain.platform.network.getNetworkType
@@ -39,8 +38,7 @@ internal object SystemAppHost {
                 ?.let { name ->
                     WebSettingsFeature.entries.firstOrNull { it.name == name }
                 }
-            AccessFeatureHighlight.pending.value = feature
-            MainViewModel.desktopAccessSettingsRequested.value = true
+            MainViewModel.pendingWebAccessRequest.value = com.ismartcoding.plain.models.WebAccessRequest(feature)
             hostResult(true)
         }
         "systemNetworkType" -> hostResult(getNetworkType().name)

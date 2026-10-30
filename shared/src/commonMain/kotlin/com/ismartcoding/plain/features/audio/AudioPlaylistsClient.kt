@@ -5,13 +5,16 @@ import com.ismartcoding.plain.graphql.Query
 import com.ismartcoding.plain.models.AudioAlbumCover
 import com.ismartcoding.plain.models.AudioItem
 import com.ismartcoding.plain.models.AudioPlaylist
+import com.ismartcoding.plain.rust.graphql.GraphqlClient
 import com.ismartcoding.plain.rust.graphql.GraphqlApi
 import com.ismartcoding.plain.rust.graphql.selectionQuery
 
-object AudioPlaylistsClient {
+object AudioPlaylistsClient : AudioPlaylistsApi()
+
+open class AudioPlaylistsApi internal constructor(protected val api: GraphqlClient = GraphqlApi) {
     suspend fun covers(ids: List<String>): Map<String, List<AudioAlbumCover>> {
         if (ids.isEmpty()) return emptyMap()
-        return GraphqlApi.execute(Query.audioPlaylistCovers(ids))
+        return api.execute(Query.audioPlaylistCovers(ids))
             .associate { it.id to it.albums }
     }
 
@@ -19,24 +22,24 @@ object AudioPlaylistsClient {
         playlists().firstOrNull { it.first.id == id }?.first
 
     suspend fun playlists(): List<Pair<AudioPlaylist, Int>> =
-        GraphqlApi.execute(Query.audioPlaylists())
+        api.execute(Query.audioPlaylists())
             .map { it to it.itemCount }
 
     suspend fun createPlaylist(name: String): AudioPlaylist =
-        GraphqlApi.execute(Mutation.createAudioPlaylist(name))
+        api.execute(Mutation.createAudioPlaylist(name))
 
     suspend fun renamePlaylist(id: String, name: String) {
-        GraphqlApi.execute(Mutation.updateAudioPlaylist(id, name))
+        api.execute(Mutation.updateAudioPlaylist(id, name))
     }
 
     suspend fun deletePlaylist(id: String) {
-        GraphqlApi.execute(Mutation.deleteAudioPlaylist(id))
+        api.execute(Mutation.deleteAudioPlaylist(id))
     }
 
     suspend fun addPlaylistItems(playlistId: String, items: List<AudioItem>) {
         val ids = items.mapNotNull { it.mediaId }
         if (ids.isEmpty()) return
-        GraphqlApi.execute(Mutation.addAudioPlaylistItems(playlistId, selectionQuery(ids)))
+        api.execute(Mutation.addAudioPlaylistItems(playlistId, selectionQuery(ids)))
     }
 
     suspend fun removePlaylistItem(playlistId: String, mediaId: String) =
@@ -44,7 +47,7 @@ object AudioPlaylistsClient {
 
     suspend fun removePlaylistItems(playlistId: String, mediaIds: Collection<String>) {
         if (mediaIds.isNotEmpty()) {
-            GraphqlApi.execute(Mutation.removeAudioPlaylistItem(playlistId, selectionQuery(mediaIds)))
+            api.execute(Mutation.removeAudioPlaylistItem(playlistId, selectionQuery(mediaIds)))
         }
     }
 
@@ -57,5 +60,5 @@ object AudioPlaylistsClient {
         offset: Int,
         limit: Int,
     ): List<AudioItem> =
-        GraphqlApi.execute(Query.audioPlaylistItems(playlistId, offset, limit, text))
+        api.execute(Query.audioPlaylistItems(playlistId, offset, limit, text))
 }

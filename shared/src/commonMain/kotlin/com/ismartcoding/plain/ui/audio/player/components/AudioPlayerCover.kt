@@ -75,29 +75,31 @@ fun AudioPlayerCover(
     path: String,
     modifier: Modifier = Modifier.size(280.dp),
 ) {
+    val source = com.ismartcoding.plain.ui.navigation.LocalContentSource.current
+    val cacheKey = source.key + ":" + path
     if (path.isBlank()) {
         DefaultCoverArt(modifier)
         return
     }
 
-    var imageBitmap by remember(path) {
-        mutableStateOf<ImageBitmap?>(audioCoverCache[path])
+    var imageBitmap by remember(cacheKey) {
+        mutableStateOf<ImageBitmap?>(audioCoverCache[cacheKey])
     }
-    var isLoading by remember(path) {
-        mutableStateOf(!audioCoverCache.containsKey(path))
+    var isLoading by remember(cacheKey) {
+        mutableStateOf(!audioCoverCache.containsKey(cacheKey))
     }
 
-    LaunchedEffect(path) {
-        if (audioCoverCache.containsKey(path)) {
-            imageBitmap = audioCoverCache[path]
+    LaunchedEffect(cacheKey) {
+        if (audioCoverCache.containsKey(cacheKey)) {
+            imageBitmap = audioCoverCache[cacheKey]
             isLoading = false
             return@LaunchedEffect
         }
 
         isLoading = true
-        val bitmap = withIO { loadAudioCoverBitmap(path) }
+        val bitmap = withIO { loadAudioCoverBitmap(path, source) }
 
-        audioCoverCache[path] = bitmap
+        audioCoverCache[cacheKey] = bitmap
         imageBitmap = bitmap
         isLoading = false
     }

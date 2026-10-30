@@ -59,7 +59,7 @@ fun VideoGridItem(
                         dragSelectState.addSelected(m.id)
                     } else {
                         coMain {
-                            withIO { MediaPreviewData.setDataAsync(itemState, videosVM.itemsFlow.value, m) }
+                            withIO { MediaPreviewData.setDataAsync(itemState, videosVM.itemsFlow.value, m, videosVM.source) }
                             previewerState.openTransform(
                                 index = MediaPreviewData.items.indexOfFirst { it.id == m.id },
                                 itemState = itemState,

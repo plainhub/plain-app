@@ -103,7 +103,7 @@ private class AVPlayerVideoController : VideoPlayerController {
         eventListener = null
     }
 
-    override fun setMediaItem(path: String) {
+    override fun setMediaItem(path: String, tlsCertificateSha256: String?) {
         firstFrameReported = false
         val url = if (path.startsWith("http")) {
             NSURL.URLWithString(path)

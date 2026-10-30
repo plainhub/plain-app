@@ -5,6 +5,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
+import androidx.compose.foundation.lazy.grid.LazyGridState
+import androidx.compose.foundation.lazy.grid.LazyGridItemScope
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
@@ -49,22 +51,35 @@ fun HomeFeatureItemsGrid(
         }
     }
 
-    LazyVerticalGrid(
-        columns = GridCells.Adaptive(104.dp),
-        state = gridState,
-        modifier = modifier,
-        contentPadding = contentPadding,
-    ) {
-        item(key = "header", span = { GridItemSpan(maxLineSpan) }) { header() }
-        items(items, key = { it.type.name }) { item ->
-            ReorderableItem(state = reorderState, key = item.type.name) { _ ->
-                PIconTextActionButton(
-                    icon = item.iconRes,
-                    text = stringResource(item.titleRes),
-                    modifier = Modifier.fillMaxWidth().heightIn(min = 88.dp).longPressDraggableHandle(),
-                    onClick = item.click,
-                )
-            }
+    FeatureItemsGrid(items, modifier, contentPadding, gridState, header) { item ->
+        ReorderableItem(state = reorderState, key = item.type.name) { _ ->
+            FeatureItemAction(item, Modifier.longPressDraggableHandle())
         }
     }
+}
+
+@Composable
+internal fun FeatureItemsGrid(
+    features: List<FeatureItem>,
+    modifier: Modifier = Modifier,
+    contentPadding: PaddingValues = PaddingValues(0.dp),
+    gridState: LazyGridState = rememberLazyGridState(),
+    header: @Composable () -> Unit = {},
+    itemContent: @Composable LazyGridItemScope.(FeatureItem) -> Unit = { FeatureItemAction(it) },
+) {
+    LazyVerticalGrid(
+        columns = GridCells.Adaptive(104.dp), state = gridState,
+        modifier = modifier, contentPadding = contentPadding,
+    ) {
+        item(key = "header", span = { GridItemSpan(maxLineSpan) }) { header() }
+        items(features, key = { it.type.name }) { item -> itemContent(item) }
+    }
+}
+
+@Composable
+private fun FeatureItemAction(item: FeatureItem, modifier: Modifier = Modifier) {
+    PIconTextActionButton(
+        icon = item.iconRes, text = stringResource(item.titleRes),
+        modifier = modifier.fillMaxWidth().heightIn(min = 88.dp), onClick = item.click,
+    )
 }

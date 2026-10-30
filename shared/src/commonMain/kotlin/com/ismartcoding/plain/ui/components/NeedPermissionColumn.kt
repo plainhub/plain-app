@@ -23,6 +23,17 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.rememberCoroutineScope
+import com.ismartcoding.plain.rust.graphql.ContentSource
+import com.ismartcoding.plain.ui.navigation.LocalContentSource
+import com.ismartcoding.plain.ui.state.launchSafe
+import com.ismartcoding.plain.ui.web.accessFeatureOf
+import com.ismartcoding.plain.graphql.Mutation
+import kotlinx.coroutines.Job
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
@@ -40,6 +51,9 @@ fun NeedPermissionColumn(
     icon: DrawableResource,
     permission: FeaturePermission
 ) {
+    val source = LocalContentSource.current
+    val scope = rememberCoroutineScope()
+    var requestJob by remember(source) { mutableStateOf<Job?>(null) }
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -63,7 +77,7 @@ fun NeedPermissionColumn(
                 AnimatedIconContainer(icon)
 
                 Text(
-                    text = permission.permission.getGrantAccessText(),
+                    text = if (source is ContentSource.Remote) stringResource(Res.string.remote_permission_required) else permission.permission.getGrantAccessText(),
                     style = MaterialTheme.typography.titleLarge.copy(
                         fontWeight = FontWeight.SemiBold,
                         letterSpacing = 0.sp
@@ -75,7 +89,12 @@ fun NeedPermissionColumn(
 
                 Button(
                     onClick = {
-                        sendEvent(RequestPermissionsEvent(*permission.permissions.toTypedArray()))
+                        if (source is ContentSource.Remote) {
+                            requestJob?.cancel()
+                            requestJob = scope.launchSafe {
+                                source.api.execute(Mutation.openWebSettings(permission.permission.accessFeatureOf()))
+                            }
+                        } else sendEvent(RequestPermissionsEvent(*permission.permissions.toTypedArray()))
                     },
                     modifier = Modifier
                         .fillMaxWidth()
@@ -88,7 +107,7 @@ fun NeedPermissionColumn(
                     contentPadding = PaddingValues(vertical = 16.dp, horizontal = 16.dp)
                 ) {
                     Text(
-                        text = stringResource(Res.string.grant_access),
+                        text = stringResource(if (source is ContentSource.Remote) Res.string.request_permission else Res.string.grant_access),
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.SemiBold,
                     )

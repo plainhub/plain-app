@@ -19,5 +19,5 @@ object MainViewModel {
     val pendingLoginRequest = mutableStateOf<WebLoginRequestFacts?>(null)
     val pendingPairingRequest = mutableStateOf<PairingRequestInput?>(null)
     val pendingChannelInvite = mutableStateOf<Routing.ChannelInviteRequest?>(null)
-    val desktopAccessSettingsRequested = mutableStateOf(false)
+    val pendingWebAccessRequest = mutableStateOf<com.ismartcoding.plain.models.WebAccessRequest?>(null)
 }

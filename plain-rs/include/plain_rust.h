@@ -21,7 +21,7 @@ char *plain_graphql(const char *request);
 char *plain_encrypt_http_request(const char *token, const char *payload);
 char *plain_encrypt_resource_reference(const char *token, const char *payload);
 char *plain_decrypt_http_response(const char *token, const char *endpoint, const char *request, const char *response);
-char *plain_graphql_subscription_open(void);
+char *plain_graphql_subscription_open(const char *target);
 char *plain_graphql_subscription_send(uint64_t handle, const char *message);
 char *plain_graphql_subscription_read(uint64_t handle);
 char *plain_graphql_subscription_close(uint64_t handle);

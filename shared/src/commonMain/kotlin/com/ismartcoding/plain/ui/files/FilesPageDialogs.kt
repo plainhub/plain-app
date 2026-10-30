@@ -1,6 +1,5 @@
 package com.ismartcoding.plain.ui.files
 
-import com.ismartcoding.plain.features.files.FilesClient
 
 import com.ismartcoding.plain.preferences.*
 import com.ismartcoding.plain.i18n.*
@@ -38,7 +37,7 @@ internal fun FilesPageDialogs(
             onConfirm = { name ->
                 scope.launch {
                     DialogHelper.showLoading()
-                        val error = withIO { runCatching { FilesClient.createDirectory(filesVM.selectedPath + "/" + name) }.exceptionOrNull() }
+                        val error = withIO { runCatching { filesVM.source.files.createDirectory(filesVM.selectedPath + "/" + name) }.exceptionOrNull() }
                         DialogHelper.hideLoading()
                         if (error != null) { DialogHelper.showMessage(error); return@launch }
                         filesVM.loadAsync()
@@ -58,7 +57,7 @@ internal fun FilesPageDialogs(
             onConfirm = { name ->
                 scope.launch {
                     DialogHelper.showLoading()
-                        val error = withIO { runCatching { FilesClient.createFile(filesVM.selectedPath + "/" + name) }.exceptionOrNull() }
+                        val error = withIO { runCatching { filesVM.source.files.createFile(filesVM.selectedPath + "/" + name) }.exceptionOrNull() }
                         DialogHelper.hideLoading()
                         if (error != null) { DialogHelper.showMessage(error); return@launch }
                         filesVM.loadAsync()

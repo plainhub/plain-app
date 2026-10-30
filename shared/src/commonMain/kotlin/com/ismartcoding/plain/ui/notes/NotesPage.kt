@@ -80,32 +80,34 @@ import com.ismartcoding.plain.i18n.tags
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
-fun NotesPage(navController: NavHostController, tagsVM: TagsViewModel) {
-    val itemsState by NotesViewModel.itemsFlow.collectAsState()
+fun NotesPage(navController: NavHostController, tagsVM: TagsViewModel,
+    notesVM: NotesViewModel = NotesViewModel.local,
+) {
+    val itemsState by notesVM.itemsFlow.collectAsState()
     val tagsState by tagsVM.itemsFlow.collectAsState()
     val tagsMapState by tagsVM.tagsMapFlow.collectAsState()
     val scope = rememberCoroutineScope()
     val scrollState = rememberLazyListState()
     val drawerState = rememberDrawerState(DrawerValue.Closed)
-    val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(canScroll = { scrollState.firstVisibleItemIndex > 0 && !NotesViewModel.selectMode.value })
+    val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(canScroll = { scrollState.firstVisibleItemIndex > 0 && !notesVM.selectMode.value })
     val isFirstTime = remember { mutableStateOf(true) }
-    val topRefreshLayoutState = rememberRefreshLayoutState { scope.launch { NotesViewModel.loadAsync(tagsVM) }; setRefreshState(RefreshContentState.Finished) }
+    val topRefreshLayoutState = rememberRefreshLayoutState { scope.launch { notesVM.loadAsync(tagsVM) }; setRefreshState(RefreshContentState.Finished) }
 
-    tagsVM.dataType.value = NotesViewModel.dataType
-    NotesPageEffects(tagsVM, scrollBehavior, scrollState, scope, isFirstTime)
+    tagsVM.dataType.value = notesVM.dataType
+    NotesPageEffects(tagsVM, scrollBehavior, scrollState, scope, isFirstTime, notesVM)
 
-    val pageTitle = if (NotesViewModel.selectMode.value) LocaleHelper.getStringF(Res.string.x_selected, NotesViewModel.selectedIds.size)
-        else if (NotesViewModel.tag.value != null) NotesViewModel.tag.value!!.name
-        else if (NotesViewModel.trash.value) stringResource(Res.string.notes) + " - " + stringResource(Res.string.trash)
+    val pageTitle = if (notesVM.selectMode.value) LocaleHelper.getStringF(Res.string.x_selected, notesVM.selectedIds.size)
+        else if (notesVM.tag.value != null) notesVM.tag.value!!.name
+        else if (notesVM.trash.value) stringResource(Res.string.notes) + " - " + stringResource(Res.string.trash)
         else stringResource(Res.string.notes)
-    ViewNoteBottomSheet(tagsVM, tagsMapState, tagsState)
-    if (NotesViewModel.showTagsDialog.value) { TagsBottomSheet(tagsVM) { NotesViewModel.showTagsDialog.value = false } }
-    val onSearch: (String) -> Unit = { NotesViewModel.searchActive.value = false; NotesViewModel.showLoading.value = true; scope.launch { scrollState.scrollToItem(0) }; scope.launch(Dispatchers.IO) { NotesViewModel.loadAsync(tagsVM) } }
-    PBackHandler(enabled = NotesViewModel.selectMode.value || NotesViewModel.showSearchBar.value || drawerState.isOpen) {
+    ViewNoteBottomSheet(tagsVM, tagsMapState, tagsState, notesVM)
+    if (notesVM.showTagsDialog.value) { TagsBottomSheet(tagsVM) { notesVM.showTagsDialog.value = false } }
+    val onSearch: (String) -> Unit = { notesVM.searchActive.value = false; notesVM.showLoading.value = true; scope.launch { scrollState.scrollToItem(0) }; scope.launch(Dispatchers.IO) { notesVM.loadAsync(tagsVM) } }
+    PBackHandler(enabled = notesVM.selectMode.value || notesVM.showSearchBar.value || drawerState.isOpen) {
         when {
             drawerState.isOpen -> scope.launch { drawerState.close() }
-            NotesViewModel.selectMode.value -> NotesViewModel.exitSelectMode()
-            else -> if (NotesViewModel.showSearchBar.value) { if (!NotesViewModel.searchActive.value || NotesViewModel.queryText.value.isEmpty()) { NotesViewModel.exitSearchMode(); onSearch("") } }
+            notesVM.selectMode.value -> notesVM.exitSelectMode()
+            else -> if (notesVM.showSearchBar.value) { if (!notesVM.searchActive.value || notesVM.queryText.value.isEmpty()) { notesVM.exitSearchMode(); onSearch("") } }
         }
     }
 
@@ -113,16 +115,16 @@ fun NotesPage(navController: NavHostController, tagsVM: TagsViewModel) {
         drawerState = drawerState,
         drawerContent = {
             ModalDrawerSheet {
-                NotesSidebarDrawer(tagsVM, drawerState)
+                NotesSidebarDrawer(tagsVM, drawerState, notesVM)
             }
         },
     ) {
         PScaffold(
             topBar = {
-                if (NotesViewModel.showSearchBar.value) { ListSearchBar(viewModel = NotesViewModel, onSearch = onSearch); return@PScaffold }
+                if (notesVM.showSearchBar.value) { ListSearchBar(viewModel = notesVM, onSearch = onSearch); return@PScaffold }
                 PTopAppBar(modifier = Modifier.combinedClickable(onClick = {}, onDoubleClick = { scope.launch { scrollState.scrollToItem(0) } }),
                     onNavigateBack = { navController.navigateUp() }, navigationIcon = {
-                        if (NotesViewModel.selectMode.value) NavigationCloseIcon { NotesViewModel.exitSelectMode() }
+                        if (notesVM.selectMode.value) NavigationCloseIcon { notesVM.exitSelectMode() }
                         else PIconButton(
                             icon = UiRes.drawable.ui_drawable_left_panel_open,
                             contentDescription = null,
@@ -130,20 +132,20 @@ fun NotesPage(navController: NavHostController, tagsVM: TagsViewModel) {
                         )
                     },
                     title = pageTitle, scrollBehavior = scrollBehavior, actions = {
-                        if (NotesViewModel.selectMode.value) { PTopRightButton(label = stringResource(if (NotesViewModel.isAllSelected()) Res.string.unselect_all else Res.string.select_all), click = { NotesViewModel.toggleSelectAll() }); HorizontalSpace(dp = 8.dp) }
+                        if (notesVM.selectMode.value) { PTopRightButton(label = stringResource(if (notesVM.isAllSelected()) Res.string.unselect_all else Res.string.select_all), click = { notesVM.toggleSelectAll() }); HorizontalSpace(dp = 8.dp) }
                         else {
-                            ActionButtonSearch { NotesViewModel.enterSearchMode() }
+                            ActionButtonSearch { notesVM.enterSearchMode() }
                             PCapsuleMoreClose(onClose = { navController.navigateUp() }) { dismiss ->
                                 PSheetActionRow(UiRes.drawable.ui_drawable_tags, stringResource(Res.string.tags)) {
                                     dismiss()
-                                    NotesViewModel.showTagsDialog.value = true
+                                    notesVM.showTagsDialog.value = true
                                 }
                             }
                         }
                     })
             },
-            bottomBar = { AnimatedVisibility(visible = NotesViewModel.showBottomActions(), enter = slideInVertically { it }, exit = slideOutVertically { it }) { NotesSelectModeBottomActions(tagsVM, tagsState) } },
-            floatingActionButton = if (NotesViewModel.selectMode.value) null else { { PDraggableElement { FloatingActionButton(onClick = { navController.navigate(Routing.NotesCreate(NotesViewModel.tag.value?.id ?: "")) }) { Icon(painter = painterResource(UiRes.drawable.ui_drawable_plus), stringResource(Res.string.add)) } } } },
+            bottomBar = { AnimatedVisibility(visible = notesVM.showBottomActions(), enter = slideInVertically { it }, exit = slideOutVertically { it }) { NotesSelectModeBottomActions(tagsVM, tagsState, notesVM) } },
+            floatingActionButton = if (notesVM.selectMode.value) null else { { PDraggableElement { FloatingActionButton(onClick = { navController.navigate(Routing.NotesCreate(notesVM.tag.value?.id ?: "")) }) { Icon(painter = painterResource(UiRes.drawable.ui_drawable_plus), stringResource(Res.string.add)) } } } },
         ) { paddingValues ->
             Column(Modifier.padding(top = paddingValues.calculateTopPadding())) {
                 PullToRefresh(refreshLayoutState = topRefreshLayoutState) {
@@ -153,28 +155,28 @@ fun NotesPage(navController: NavHostController, tagsVM: TagsViewModel) {
                                 item { TopSpace() }
                                 items(itemsState, key = { it.id }) { m ->
                                     val tagIds = tagsMapState[m.id]?.map { it.tagId } ?: emptyList()
-                                    NoteListItem(m, tagsState.filter { tagIds.contains(it.id) },
-                                        onClick = { if (NotesViewModel.selectMode.value) NotesViewModel.select(m.id) else navController.navigate(Routing.NoteDetail(m.id)) },
-                                        onLongClick = { if (NotesViewModel.selectMode.value) return@NoteListItem; NotesViewModel.selectedItem.value = m },
+                                    NoteListItem(m, tagsState.filter { tagIds.contains(it.id) }, notesVM = notesVM,
+                                        onClick = { if (notesVM.selectMode.value) notesVM.select(m.id) else navController.navigate(Routing.NoteDetail(m.id)) },
+                                        onLongClick = { if (notesVM.selectMode.value) return@NoteListItem; notesVM.selectedItem.value = m },
                                         onClickTag = { tag ->
-                                            if (NotesViewModel.selectMode.value) return@NoteListItem
-                                            NotesViewModel.trash.value = false
-                                            NotesViewModel.tag.value = tag
+                                            if (notesVM.selectMode.value) return@NoteListItem
+                                            notesVM.trash.value = false
+                                            notesVM.tag.value = tag
                                         },
                                     )
                                     VerticalSpace(dp = 8.dp)
                                 }
                                 item {
-                                    if (itemsState.isNotEmpty() && !NotesViewModel.noMore.value) {
-                                        LaunchedEffect(Unit) { scope.launch(Dispatchers.IO) { NotesViewModel.moreAsync(tagsVM) } }
+                                    if (itemsState.isNotEmpty() && !notesVM.noMore.value) {
+                                        LaunchedEffect(Unit) { scope.launch(Dispatchers.IO) { notesVM.moreAsync(tagsVM) } }
                                     }
-                                    LoadMoreRefreshContent(NotesViewModel.noMore.value)
+                                    LoadMoreRefreshContent(notesVM.noMore.value)
                                 }
                                 item { VerticalSpace(dp = paddingValues.calculateBottomPadding()) }
                             }
                         }
                     } else {
-                        NoDataColumn(loading = NotesViewModel.showLoading.value, search = NotesViewModel.showSearchBar.value)
+                        NoDataColumn(loading = notesVM.showLoading.value, search = notesVM.showSearchBar.value)
                     }
                 }
             }

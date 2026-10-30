@@ -52,9 +52,9 @@ enum class GlobalSearchDomain(
     APPS(Res.string.apps, UiRes.drawable.ui_drawable_layout_grid);
 }
 
-fun globalSearchDomains(): List<GlobalSearchDomain> =
-    if (AppFeatureType.APPS.has()) GlobalSearchDomain.entries.toList()
-    else GlobalSearchDomain.entries.filter { it != GlobalSearchDomain.APPS }
+fun globalSearchDomains(): List<GlobalSearchDomain> = GlobalSearchDomain.entries.filter {
+    it.supportedBy(com.ismartcoding.plain.rust.graphql.ContentSource.Local)
+}
 
 /** What tapping a search result does. */
 sealed interface GlobalSearchAction {
@@ -83,14 +83,44 @@ data class GlobalSearchHit(
     val roundThumb: Boolean = false,
     val source: GlobalSearchSource? = null,
     val action: GlobalSearchAction,
+    val device: com.ismartcoding.plain.rust.graphql.ContentSource = com.ismartcoding.plain.rust.graphql.ContentSource.Local,
 )
 
-/** Per-domain counters and loaded rows for one search. */
-class GlobalSearchDomainState {
+internal class GlobalSearchDeviceState(val device: com.ismartcoding.plain.rust.graphql.ContentSource) {
     val total = mutableIntStateOf(0)
     val loaded = mutableIntStateOf(0)
     val hits = mutableStateOf<List<GlobalSearchHit>>(emptyList())
-    val loading = mutableStateOf(false)
+    val loading = mutableStateOf(true)
+    val error = mutableStateOf<String?>(null)
+}
+
+class GlobalSearchDomainState internal constructor(internal val devices: List<GlobalSearchDeviceState>) {
+    val total = androidx.compose.runtime.derivedStateOf { devices.sumOf { it.total.intValue } }
+    val loaded = androidx.compose.runtime.derivedStateOf { devices.sumOf { it.loaded.intValue } }
+    val hits = androidx.compose.runtime.derivedStateOf { devices.flatMap { it.hits.value } }
+    val loading = androidx.compose.runtime.derivedStateOf { devices.any { it.loading.value } }
+    internal val hasErrors = androidx.compose.runtime.derivedStateOf { devices.any { it.error.value != null } }
+}
+
+internal data class GlobalSearchDeviceError(val name: String, val message: String)
+internal data class GlobalSearchDevices(
+    val devices: List<com.ismartcoding.plain.rust.graphql.ContentSource>,
+    val errors: List<GlobalSearchDeviceError> = emptyList(),
+)
+
+internal fun GlobalSearchDomain.supportedBy(source: com.ismartcoding.plain.rust.graphql.ContentSource): Boolean {
+    val capability = when (this) {
+        GlobalSearchDomain.NOTES -> com.ismartcoding.plain.platform.system.Capability.NOTES
+        GlobalSearchDomain.AUDIO -> com.ismartcoding.plain.platform.system.Capability.AUDIO_LIBRARY
+        GlobalSearchDomain.IMAGES -> com.ismartcoding.plain.platform.system.Capability.IMAGE_LIBRARY
+        GlobalSearchDomain.VIDEOS -> com.ismartcoding.plain.platform.system.Capability.VIDEO_LIBRARY
+        GlobalSearchDomain.DOCS -> com.ismartcoding.plain.platform.system.Capability.DOCUMENT_LIBRARY
+        GlobalSearchDomain.FILES -> com.ismartcoding.plain.platform.system.Capability.FILE_BROWSER
+        GlobalSearchDomain.FEEDS -> com.ismartcoding.plain.platform.system.Capability.FEEDS
+        GlobalSearchDomain.CHAT -> return true
+        GlobalSearchDomain.APPS -> com.ismartcoding.plain.platform.system.Capability.PACKAGES
+    }
+    return capability in source.capabilities
 }
 
 /** Window of [this] around the first occurrence of [q] for a two-line snippet. */

@@ -7,7 +7,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ismartcoding.plain.IData
 import com.ismartcoding.plain.platform.system.DataType
-import com.ismartcoding.plain.features.tags.TagsClient
+import com.ismartcoding.plain.features.tags.TagsApi
+import com.ismartcoding.plain.features.tags.RustContentTags
 import com.ismartcoding.plain.models.Tag
 import com.ismartcoding.plain.models.TagRelation
 import com.ismartcoding.plain.lib.TimeHelper
@@ -18,7 +19,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 
-class TagsViewModel : ViewModel() {
+class TagsViewModel internal constructor(internal val api: TagsApi = RustContentTags) : ViewModel() {
     private val _itemsFlow = MutableStateFlow<List<Tag>>(emptyList())
     val itemsFlow: StateFlow<List<Tag>> = _itemsFlow
     private val _tagsMapFlow = MutableStateFlow(mutableMapOf<String, List<TagRelation>>())
@@ -35,7 +36,7 @@ class TagsViewModel : ViewModel() {
 
     suspend fun loadAsync(keys: Set<String> = emptySet()) = withIO {
         val startTime = TimeHelper.now().toEpochMilliseconds()
-        _itemsFlow.value = TagsClient.getAll(dataType.value)
+        _itemsFlow.value = api.all(dataType.value)
         if (keys.isNotEmpty()) {
             refreshRelations(keys)
         }
@@ -55,13 +56,13 @@ class TagsViewModel : ViewModel() {
     }
 
     suspend fun addTagAsync(name: String) = withIO {
-        val created = TagsClient.create(dataType.value, name)
+        val created = api.create(dataType.value, name)
         _itemsFlow.update { it + created }
         tagNameDialogVisible.value = false
     }
 
     suspend fun editTagAsync(name: String) = withIO {
-        val updated = TagsClient.rename(editItem.value!!.id, name)
+        val updated = api.rename(editItem.value!!.id, name)
         _itemsFlow.update { list ->
             list.map { if (it.id == updated.id) updated else it }
         }
@@ -70,7 +71,7 @@ class TagsViewModel : ViewModel() {
 
     fun deleteTag(id: String) {
         viewModelScope.launchSafe {
-            TagsClient.delete(id)
+            api.delete(id)
             _itemsFlow.update { it.filterNot { i -> i.id == id } }
             for (key in _tagsMapFlow.value.keys) {
                 _tagsMapFlow.value[key] = _tagsMapFlow.value[key]?.filter { it.tagId != id } ?: emptyList()
@@ -92,7 +93,7 @@ class TagsViewModel : ViewModel() {
 
     fun removeFromTags(ids: Set<String>, tagIds: Set<String>) {
         viewModelScope.launchSafe {
-            TagsClient.editTagRelations(dataType.value, ids, emptyList(), tagIds)
+            api.edit(dataType.value, ids, emptyList(), tagIds)
             for (id in ids) {
                 tagsMapFlow.value.toMutableMap().let { map ->
                     map[id] = map[id]?.filter { !tagIds.contains(it.tagId) } ?: emptyList()
@@ -105,7 +106,7 @@ class TagsViewModel : ViewModel() {
 
     fun addToTags(items: List<IData>, tagIds: Set<String>) {
         viewModelScope.launchSafe {
-            TagsClient.editTagRelations(dataType.value, items.map { it.id }, tagIds, emptyList())
+            api.edit(dataType.value, items.map { it.id }, tagIds, emptyList())
             refreshRelations(items.map { it.id }.toSet())
             loadAsync()
         }
@@ -114,9 +115,9 @@ class TagsViewModel : ViewModel() {
     suspend fun toggleTagAsync(data: IData, tagId: String) = withIO {
         val tagIds = tagsMapFlow.value[data.id]?.map { it.tagId } ?: emptyList()
         if (tagIds.contains(tagId)) {
-            TagsClient.editTagRelations(dataType.value, listOf(data.id), emptyList(), listOf(tagId))
+            api.edit(dataType.value, listOf(data.id), emptyList(), listOf(tagId))
         } else {
-            TagsClient.editTagRelations(dataType.value, listOf(data.id), listOf(tagId), emptyList())
+            api.edit(dataType.value, listOf(data.id), listOf(tagId), emptyList())
         }
         refreshRelations(setOf(data.id))
         loadAsync()
@@ -124,7 +125,7 @@ class TagsViewModel : ViewModel() {
 
     internal suspend fun refreshRelations(keys: Set<String>) {
         if (keys.isEmpty()) return
-        val fresh = TagsClient.getTagRelationsByKeysMap(keys, dataType.value)
+        val fresh = api.relations(keys, dataType.value).groupBy { it.key }
         _tagsMapFlow.update { current -> current.toMutableMap().apply {
             keys.forEach { this[it] = fresh[it].orEmpty() }
         } }

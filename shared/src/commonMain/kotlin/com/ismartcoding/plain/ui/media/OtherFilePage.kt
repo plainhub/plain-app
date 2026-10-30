@@ -1,5 +1,7 @@
 package com.ismartcoding.plain.ui.media
 
+import com.ismartcoding.plain.ui.state.launchSafe
+
 import com.ismartcoding.plain.i18n.*
 
 import androidx.compose.foundation.Image
@@ -46,15 +48,17 @@ import com.ismartcoding.plain.ui.resources.share_2 as ui_drawable_share_2
 fun OtherFilePage(
     navController: NavHostController,
     path: String,
-    title: String
+    title: String,
+    source: com.ismartcoding.plain.rust.graphql.ContentSource = com.ismartcoding.plain.ui.navigation.LocalContentSource.current,
 ) {
+    val scope = androidx.compose.runtime.rememberCoroutineScope()
     val fallbackName = path.substringAfterLast('/')
     var displayTitle by remember(path, title) { mutableStateOf(title.ifEmpty { fallbackName }) }
     var fileSize by remember(path) { mutableStateOf(0L) }
 
     LaunchedEffect(path, title) {
-        displayTitle = withIO { AppFileDisplayNameHelper.resolveDisplayNameByPath(path, title) }
-        fileSize = FilesClient.size(path)
+        displayTitle = withIO { title.ifEmpty { source.storedFiles.displayName(path.substringAfterLast('/').substringBeforeLast('.')).ifEmpty { fallbackName } } }
+        fileSize = source.files.size(path)
     }
 
     PScaffold(
@@ -68,7 +72,7 @@ fun OtherFilePage(
                         contentDescription = stringResource(Res.string.share),
                         tint = MaterialTheme.colorScheme.onSurface,
                     ) {
-                        shareFile(path)
+                        scope.launchSafe { shareFile(source.fileForOpen(path, displayTitle)) }
                     }
                 },
             )
@@ -126,7 +130,7 @@ fun OtherFilePage(
                             modifier = Modifier.padding(horizontal = 16.dp).fillMaxWidth(),
                             text = stringResource(Res.string.open_with_other_app),
                             onClick = {
-                                openFileExternal(path)
+                                scope.launchSafe { openFileExternal(source.fileForOpen(path, displayTitle)) }
                             })
                     }
                 }

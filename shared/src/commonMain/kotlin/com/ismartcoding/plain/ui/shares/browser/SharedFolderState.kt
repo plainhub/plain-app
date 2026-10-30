@@ -5,17 +5,12 @@ import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.navigation.NavHostController
-import com.ismartcoding.plain.features.chat.ChatClient
 import com.ismartcoding.plain.features.chat.models.MessageShare
-import com.ismartcoding.plain.features.downloads.DownloadCenter
 import com.ismartcoding.plain.features.downloads.isTerminalDownloadStatus
 import com.ismartcoding.plain.features.shares.SharedFileDto
-import com.ismartcoding.plain.features.shares.SharedFolderBatchTask
 import com.ismartcoding.plain.features.shares.SharedFolderDownloadEngine
 import com.ismartcoding.plain.features.shares.SharedInfoDto
 import com.ismartcoding.plain.features.shares.SharedLink
-import com.ismartcoding.plain.features.shares.SharedLinkClient
-import com.ismartcoding.plain.models.Root
 import com.ismartcoding.plain.i18n.*
 import com.ismartcoding.plain.lib.extensions.isAudioFast
 import com.ismartcoding.plain.lib.extensions.isImageFast
@@ -29,7 +24,9 @@ import com.ismartcoding.plain.ui.media.viewer.PreviewItem
 import com.ismartcoding.plain.ui.media.viewer.previewer.MediaPreviewerState
 import com.ismartcoding.plain.ui.components.DialogHelper
 import com.ismartcoding.plain.ui.media.MediaPreviewData
-import com.ismartcoding.plain.ui.files.components.openLocalFileByType
+import com.ismartcoding.plain.ui.files.components.openFileByType
+import com.ismartcoding.plain.rust.graphql.ContentSource
+import com.ismartcoding.plain.features.shares.SharedFolderDownloadClient
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -37,18 +34,14 @@ import kotlinx.coroutines.launch
 /** One visited level of the shared folder tree. Root level has an empty [Crumb.virtualPath]. */
 internal data class Crumb(val virtualPath: String, val name: String)
 
-/**
- * State holder for [SharedFolderPage]: owns the share/navigation state and
- * the in-page media preview. Download/sync transfers are enqueued into the
- * process-level [SharedFolderDownloadEngine] and survive page exit; progress
- * is read back from [DownloadCenter].
- */
 internal class SharedFolderState(
     private val messageId: String,
     private val navController: NavHostController,
     private val scope: CoroutineScope,
     private val previewerState: MediaPreviewerState,
+    val source: ContentSource,
 ) {
+    val downloads = if (source is ContentSource.Local) SharedFolderDownloadEngine else SharedFolderDownloadClient(source.api, scope)
     var shareMsg by mutableStateOf<MessageShare?>(null)
         private set
     var rootInfo by mutableStateOf<SharedInfoDto?>(null)
@@ -82,8 +75,11 @@ internal class SharedFolderState(
 
     fun loadMessage() {
         scope.launch {
-            val chat = withIO { ChatClient.getChatItem(messageId) }
-            shareMsg = chat?.messageContent?.value as? MessageShare
+            try {
+                val chat = withIO { source.chats.getChatItem(messageId) }
+                shareMsg = chat?.messageContent?.value as? MessageShare
+            } catch (cancelled: CancellationException) { throw cancelled }
+            catch (error: Exception) { DialogHelper.showMessage(error) }
         }
     }
 
@@ -99,7 +95,13 @@ internal class SharedFolderState(
         scope.launch {
             loadingPath = path
             errorPath = null
-            val result = fetchSharedInfoWithFallback(messageId, msg, path.takeIf { it.isNotEmpty() })
+            val result = try {
+                source.sharedLinks.browse(messageId, msg, path.takeIf { it.isNotEmpty() })
+            } catch (cancelled: CancellationException) { throw cancelled }
+            catch (error: Exception) {
+                DialogHelper.showMessage(error)
+                null
+            }
             // User navigated elsewhere meanwhile: drop the stale result.
             if (loadingPath != path) return@launch
             loadingPath = null
@@ -150,14 +152,9 @@ internal class SharedFolderState(
 
     fun isPreviewLoading(entry: SharedFileDto): Boolean = previewLoading.contains(entry.virtualPath)
 
-    /** Batch tasks belonging to this share, in insertion order. */
-    fun shareTasks(): List<SharedFolderBatchTask> = DownloadCenter.progress.value.values
-        .filterIsInstance<SharedFolderBatchTask>()
-        .filter { it.messageId == messageId }
-
     /** True while a batch covering [entry] is queued or downloading. */
-    fun isEntryBusy(entry: SharedFileDto): Boolean = DownloadCenter.progress.value.values.any {
-        it is SharedFolderBatchTask && it.messageId == messageId &&
+    fun isEntryBusy(entry: SharedFileDto): Boolean = downloads.progress.value.values.any {
+        it.messageId == messageId &&
             !it.status.isTerminalDownloadStatus() &&
             it.entries.any { e -> e.virtualPath == entry.virtualPath }
     }
@@ -166,41 +163,37 @@ internal class SharedFolderState(
         val msg = shareMsg ?: return
         scope.launch {
             try {
-                val link = activeLink ?: SharedLinkClient.initialLink(messageId, msg)
-                action(SharedLinkClient.pageUrl(link))
+                val link = activeLink ?: source.sharedLinks.initialLink(messageId, msg)
+                action(link.pageUrl)
             } catch (cancelled: CancellationException) { throw cancelled }
             catch (_: Exception) { DialogHelper.showErrorDialog(LocaleHelper.getString(Res.string.cannot_load_share)) }
         }
     }
 
-    /**
-     * Downloads an entry into a preview temp file, then opens it through the
-     * same dispatch as local FilesPage items: media in the shared
-     * MediaPreviewer (videos autoplay), audio in the player, text/PDF on
-     * their pages. Media preview temps are cleaned up on page exit; audio,
-     * text and PDF keep being consumed after it closes (player notification,
-     * nav stack), so like the zip preview cache those temps are left for the
-     * OS cache dir to reclaim.
-     */
     fun openEntryPreview(entry: SharedFileDto) {
         val (link, urlToken) = transferContext() ?: return
         if (previewLoading.contains(entry.virtualPath)) return
         previewLoading = previewLoading + entry.virtualPath
         scope.launch {
-            val path = SharedFolderTransfer.downloadPreviewFile(link, urlToken, entry)
-            previewLoading = previewLoading - entry.virtualPath
-            if (path == null) {
-                DialogHelper.showErrorDialog(LocaleHelper.getString(Res.string.cannot_load_share))
+            val path = try {
+                source.sharedLinks.cacheFile(link, urlToken, entry)
+            } catch (cancelled: CancellationException) { throw cancelled }
+            catch (error: Exception) {
+                DialogHelper.showMessage(error)
                 return@launch
+            } finally {
+                previewLoading = previewLoading - entry.virtualPath
             }
             val inPagePreview = !(path.isAudioFast() || path.isTextFile() || path.isPdfFile())
-            if (inPagePreview) previewHandles.add(path)
-            openLocalFileByType(
+            if (inPagePreview && source is ContentSource.Local) previewHandles.add(path)
+            openFileByType(
                 path = path,
                 navController = navController,
+                source = source,
+                name = entry.name,
                 mediaHint = entry.mimeType.startsWith("image/") || entry.mimeType.startsWith("video/"),
                 onPreviewMedia = {
-                    MediaPreviewData.items = listOf(PreviewItem(id = entry.virtualPath, path = path))
+                    MediaPreviewData.items = listOf(PreviewItem(id = entry.virtualPath, path = path, source = source, size = entry.size))
                     scope.launch { previewerState.open(0) }
                 },
             )
@@ -211,23 +204,23 @@ internal class SharedFolderState(
     fun enqueueEntry(target: SharedFileDto, targetDir: String) {
         val (link, urlToken) = transferContext() ?: return
         if (target.isDir) {
-            SharedFolderDownloadEngine.enqueueDirSync(messageId, link, urlToken, target, targetDir)
+            downloads.enqueueDirSync(messageId, link, urlToken, target, targetDir)
         } else {
-            SharedFolderDownloadEngine.enqueueFile(messageId, link, urlToken, target, targetDir)
+            downloads.enqueueFile(messageId, link, urlToken, target, targetDir)
         }
     }
 
     /** Enqueue one directory entry as a single zip archive. */
     fun enqueueEntryZip(target: SharedFileDto) {
         val (link, urlToken) = transferContext() ?: return
-        SharedFolderDownloadEngine.enqueueZip(messageId, link, urlToken, listOf(target), "${target.name}.zip")
+        downloads.enqueueZip(messageId, link, urlToken, listOf(target), "${target.name}.zip")
     }
 
     /** Enqueue the current multi-selection into [targetDir]; "" = public Downloads. */
     fun enqueueSelection(targetDir: String) {
         val (link, urlToken) = transferContext() ?: return
         if (selected.isEmpty()) return
-        SharedFolderDownloadEngine.enqueueMulti(messageId, link, urlToken, sortedSelection(), targetDir)
+        downloads.enqueueMulti(messageId, link, urlToken, sortedSelection(), targetDir)
         clearSelection()
     }
 
@@ -236,7 +229,7 @@ internal class SharedFolderState(
         val (link, urlToken) = transferContext() ?: return
         if (selected.isEmpty()) return
         val zipName = (rootInfo?.name ?: "shared") + "_selected.zip"
-        SharedFolderDownloadEngine.enqueueZip(messageId, link, urlToken, sortedSelection(), zipName)
+        downloads.enqueueZip(messageId, link, urlToken, sortedSelection(), zipName)
         clearSelection()
     }
 

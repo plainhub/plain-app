@@ -1,5 +1,7 @@
 package com.ismartcoding.plain.ui.media
 
+import com.ismartcoding.plain.ui.navigation.LocalContentSource
+import com.ismartcoding.plain.rust.graphql.ContentSource
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Box
@@ -43,7 +45,8 @@ fun TextFilePage(
     title: String,
     mediaId: String = "",
     type: String = TextFileType.DEFAULT.name,
-    textFileVM: TextFileViewModel = viewModel { TextFileViewModel() },
+    source: ContentSource = LocalContentSource.current,
+    textFileVM: TextFileViewModel = viewModel { TextFileViewModel(source) },
 ) {
     var isSaving by remember { mutableStateOf(false) }
     // Close affordances in edit mode (X / back) exit edit mode, not the page.

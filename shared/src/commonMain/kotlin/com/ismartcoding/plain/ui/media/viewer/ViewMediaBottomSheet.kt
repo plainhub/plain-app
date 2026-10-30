@@ -48,6 +48,7 @@ import com.ismartcoding.plain.ui.casting.CastDialog
 import com.ismartcoding.plain.ui.theme.PlainTheme
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import com.ismartcoding.plain.ui.state.launchSafe
 import org.jetbrains.compose.resources.stringResource
 import com.ismartcoding.plain.ui.casting.CastViewModel
 
@@ -85,8 +86,8 @@ fun ViewMediaBottomSheet(
     }
 
     if (showRenameDialog) {
-        FileRenameDialog(path = m.path, onDismiss = { showRenameDialog = false }, onRename = { p, name -> FilesClient.rename(p, name) }, onRenamed = {
-            m.path = m.path.substring(0, m.path.lastIndexOf("/") + 1) + it
+        FileRenameDialog(path = m.path, onDismiss = { showRenameDialog = false }, onRename = { p, name -> m.source.files.rename(p, name) }, onRenamed = {
+            m.path = it
             onRenamedAsync()
             onDismiss()
         })
@@ -95,8 +96,8 @@ fun ViewMediaBottomSheet(
     val scope = rememberCoroutineScope()
     LaunchedEffect(Unit) {
         if (m.data is MediaImage) {
-            scope.launch(Dispatchers.Default) {
-                qrScanResult = tryDecodeQrCode(m.path) ?: ""
+            scope.launchSafe {
+                qrScanResult = kotlinx.coroutines.withContext(Dispatchers.Default) { tryDecodeQrCode(m.path, m.source).orEmpty() }
             }
         }
         // `PreviewItem` rows built from raw markdown (`<img src="app://…">` or
@@ -108,7 +109,7 @@ fun ViewMediaBottomSheet(
         // byte count of an HTTP download, which the previewer doesn't surface.
         if (displaySize <= 0L && !m.path.isUrl()) {
             scope.launch(Dispatchers.Default) {
-                val stat = fileSize(m.path)
+                val stat = if (m.source is com.ismartcoding.plain.rust.graphql.ContentSource.Remote) m.source.files.size(m.path) else fileSize(m.path)
                 if (stat > 0L) displaySize = stat
             }
         }
@@ -151,16 +152,16 @@ fun ViewMediaBottomSheet(
                     if (m.data is MediaImage) {
                         PListItem(title = stringResource(Res.string.created_at), value = m.data.createdAt.formatDateTime())
                         PListItem(title = stringResource(Res.string.updated_at), value = m.data.updatedAt.formatDateTime())
-                        ImageMetaRows(path = m.path, loadMeta = { MediaClient.imageInfo(it) }, formatTexts = { mt -> formatImageMetaTexts(mt) })
+                        ImageMetaRows(path = m.path, loadMeta = { m.source.media.imageInfo(it) }, formatTexts = { mt -> formatImageMetaTexts(mt) })
                     } else if (m.data is MediaVideo) {
                         PListItem(title = stringResource(Res.string.created_at), value = m.data.createdAt.formatDateTime())
                         PListItem(title = stringResource(Res.string.updated_at), value = m.data.updatedAt.formatDateTime())
-                        VideoMetaRows(path = m.path, loadMeta = { MediaClient.videoInfo(it) })
+                        VideoMetaRows(path = m.path, loadMeta = { m.source.media.videoInfo(it) })
                     } else if (m.path.isUrl()) {
                     } else if (mimeType.startsWith("image/")) {
-                        ImageMetaRows(path = m.path, loadMeta = { MediaClient.imageInfo(it) }, formatTexts = { mt -> formatImageMetaTexts(mt) })
+                        ImageMetaRows(path = m.path, loadMeta = { m.source.media.imageInfo(it) }, formatTexts = { mt -> formatImageMetaTexts(mt) })
                     } else if (mimeType.startsWith("video/")) {
-                        VideoMetaRows(path = m.path, loadMeta = { MediaClient.videoInfo(it) })
+                        VideoMetaRows(path = m.path, loadMeta = { m.source.media.videoInfo(it) })
                     }
                 }
             }

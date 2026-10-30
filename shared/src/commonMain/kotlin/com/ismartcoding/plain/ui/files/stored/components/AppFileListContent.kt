@@ -39,6 +39,7 @@ fun AppFileListContent(
     onRefresh: () -> Unit,
     onLoadMore: () -> Unit,
 ) {
+    val source = com.ismartcoding.plain.ui.navigation.LocalContentSource.current
     var selectedFile by remember { mutableStateOf<VAppFile?>(null) }
 
     if (selectedFile != null) {
@@ -77,7 +78,7 @@ fun AppFileListContent(
                 previewerState = previewerState,
                 audioQueueVM = audioQueueVM,
                 onClick = {
-                    openAppFile(files, file, navController, previewerState, itemState, audioQueueVM)
+                    openAppFile(files, file, navController, previewerState, itemState, audioQueueVM, source)
                 },
                 onLongClick = {
                     selectedFile = file

@@ -1,14 +1,19 @@
 package com.ismartcoding.plain.ui.nearby
 
-
 import com.ismartcoding.plain.features.nearby.PairingPhase
 import com.ismartcoding.plain.features.nearby.PairingMode
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.RadioButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import com.ismartcoding.plain.ui.base.PTextButton
+import com.ismartcoding.plain.ui.base.PFilledButton
+import com.ismartcoding.plain.ui.base.PDialogRadioRow
+import com.ismartcoding.plain.ui.theme.dialogSheetBackground
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import androidx.compose.runtime.*
 import com.ismartcoding.plain.models.NearbyDevice
 import com.ismartcoding.plain.features.nearby.RustPairingRuntime
@@ -19,10 +24,12 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.jetbrains.compose.resources.stringResource
 import com.ismartcoding.plain.ui.components.TextFieldDialog
+import com.ismartcoding.plain.ui.components.ToastManager
 
 @Composable
 fun PairPeerDialog(device: NearbyDevice, onDismiss: () -> Unit) {
     val scope = rememberCoroutineScope()
+    val failureText = stringResource(Res.string.pairing_failed)
     var mode by remember { mutableStateOf(PairingMode.MANAGE) }
     var generation by remember { mutableStateOf<String?>(null) }
     var submitting by remember { mutableStateOf(false) }
@@ -30,7 +37,6 @@ fun PairPeerDialog(device: NearbyDevice, onDismiss: () -> Unit) {
     var error by remember { mutableStateOf<String?>(null) }
     val state = generation?.let { NearbyViewModel.pairingStates[it] }
     val phase = state?.phase
-    val terminal = phase in setOf(PairingPhase.SUCCEEDED, PairingPhase.FAILED, PairingPhase.CANCELLED)
     DisposableEffect(Unit) {
         onDispose {
             disposed = true
@@ -38,7 +44,14 @@ fun PairPeerDialog(device: NearbyDevice, onDismiss: () -> Unit) {
         }
     }
     LaunchedEffect(phase) {
-        if (phase == PairingPhase.SUCCEEDED) onDismiss()
+        when (phase) {
+            PairingPhase.SUCCEEDED, PairingPhase.CANCELLED -> onDismiss()
+            PairingPhase.FAILED -> {
+                ToastManager.showErrorToast(failureText)
+                onDismiss()
+            }
+            else -> Unit
+        }
     }
     if (phase == PairingPhase.PASSWORD_REQUIRED) {
         TextFieldDialog(
@@ -52,38 +65,41 @@ fun PairPeerDialog(device: NearbyDevice, onDismiss: () -> Unit) {
                 scope.launch {
                     try { RustPairingRuntime.submit(generation!!, value) }
                     catch (cancelled: CancellationException) { throw cancelled }
-                    catch (_: Exception) { error = "Pairing failed" }
+                    catch (_: Exception) { error = failureText }
                     finally { submitting = false }
                 }
             },
         )
         return
     }
+    if (generation != null) return
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text(stringResource(Res.string.pair_with_device, device.name)) },
+        containerColor = MaterialTheme.colorScheme.dialogSheetBackground,
+        title = { Text(stringResource(Res.string.pair_device)) },
         text = {
-            Column {
-                if (generation == null) {
-                    listOf(PairingMode.MANAGE to Res.string.pair_manage_device, PairingMode.CHAT to Res.string.pair_chat_only).forEach { (value, label) ->
-                        Row {
-                            RadioButton(selected = mode == value, onClick = { mode = value }, enabled = !submitting)
-                            Text(stringResource(label))
-                        }
+            Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+                Text(device.name, style = MaterialTheme.typography.bodyLarge, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                Column(Modifier.selectableGroup(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    listOf(
+                        PairingMode.MANAGE to Res.string.pair_manage_device,
+                        PairingMode.CHAT to Res.string.pair_chat_only,
+                    ).forEach { (value, label) ->
+                        PDialogRadioRow(
+                            selected = mode == value,
+                            onClick = { mode = value },
+                            text = stringResource(label),
+                            enabled = !submitting,
+                        )
                     }
                 }
-                if (generation != null && !terminal && phase != PairingPhase.PASSWORD_REQUIRED) Text(stringResource(Res.string.pending))
-                state?.verificationCode?.let { code ->
-                    Text(stringResource(Res.string.login_compare_code))
-                    Text(code)
-                }
-                (error ?: state?.error)?.let { Text(it) }
+                error?.let { Text(it, color = MaterialTheme.colorScheme.error) }
             }
         },
         confirmButton = {
-            if (generation == null) PTextButton(
+            PFilledButton(
                 text = stringResource(Res.string.pair),
-                enabled = !submitting,
+                isLoading = submitting,
                 onClick = {
                     submitting = true
                     error = null
@@ -98,7 +114,7 @@ fun PairPeerDialog(device: NearbyDevice, onDismiss: () -> Unit) {
                                 }
                             }
                         } catch (cancelled: CancellationException) { throw cancelled }
-                    catch (_: Exception) { error = "Pairing failed" }
+                        catch (_: Exception) { error = failureText }
                         finally { submitting = false }
                     }
                 },

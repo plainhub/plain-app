@@ -10,22 +10,22 @@ import com.ismartcoding.plain.ui.audio.AudioQueueViewModel
 
 internal suspend fun playPlaylistFrom(playlistId: String, startMediaId: String?, audioQueueVM: AudioQueueViewModel) {
     val start = withIO { run {
-        AudioQueueClient.clearQueue()
-        AudioQueueClient.add("playlist_id:$playlistId")
-        val items = AudioQueueClient.queuePage(0, Int.MAX_VALUE)
+        audioQueueVM.source.queue.clearQueue()
+        audioQueueVM.source.queue.add("playlist_id:$playlistId")
+        val items = audioQueueVM.source.queue.queuePage(0, Int.MAX_VALUE)
         items.firstOrNull { it.mediaId == startMediaId } ?: items.firstOrNull()
     } }
     if (start != null) {
-        audioJustPlayWithNotificationCheck(start)
+        audioJustPlayWithNotificationCheck(start, audioQueueVM.source)
         audioQueueVM.onStarted(start)
     }
 }
 
 internal suspend fun playPlaylistShuffled(playlistId: String, audioQueueVM: AudioQueueViewModel) {
-    withIO { AudioQueueClient.clearQueue(); AudioQueueClient.add("playlist_id:$playlistId") }
-    val next = withIO { AudioQueueClient.resolveNext(isNext = true, shuffle = true) }
+    withIO { audioQueueVM.source.queue.clearQueue(); audioQueueVM.source.queue.add("playlist_id:$playlistId") }
+    val next = withIO { audioQueueVM.source.queue.resolveNext(isNext = true, shuffle = true) }
     if (next != null) {
-        audioJustPlayWithNotificationCheck(next)
+        audioJustPlayWithNotificationCheck(next, audioQueueVM.source)
         audioQueueVM.onStarted(next)
     }
 }

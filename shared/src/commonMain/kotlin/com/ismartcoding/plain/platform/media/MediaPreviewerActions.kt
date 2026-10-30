@@ -6,7 +6,7 @@ import com.ismartcoding.plain.platform.files.deleteFileAt
 import com.ismartcoding.plain.platform.files.saveFileToDownloads
 import com.ismartcoding.plain.platform.system.Capability
 import com.ismartcoding.plain.ui.i18n.LocaleHelper
-import com.ismartcoding.plain.platform.system.getDeviceCapabilities
+import com.ismartcoding.plain.rust.graphql.ContentSource
 
 import com.ismartcoding.plain.features.chat.models.MessageFile
 import com.ismartcoding.plain.i18n.Res
@@ -20,12 +20,18 @@ import com.ismartcoding.plain.ui.media.viewer.PreviewItem
 import com.ismartcoding.plain.ui.components.DialogHelper
 import kotlinx.coroutines.CancellationException
 
-val canSavePreviewMedia: Boolean get() = Capability.FILE_EXPORT in getDeviceCapabilities()
+fun canSavePreviewMedia(source: ContentSource): Boolean = Capability.FILE_EXPORT in source.capabilities
 
 suspend fun savePreviewMedia(m: PreviewItem, dir: String?) {
-    check(canSavePreviewMedia) { "Unsupported capability FILE_EXPORT" }
+    check(canSavePreviewMedia(m.source)) { "Unsupported capability FILE_EXPORT" }
     val name = (m.data as? MessageFile)?.fileName?.takeIf { it.isNotEmpty() }
         ?: m.path.getFilenameFromPath()
+    if (m.source is ContentSource.Remote) {
+        val directory = dir ?: m.source.info.downloadsDir
+        val saved = m.source.files.copyToDirectory(m.path, directory, name)
+        showPreviewSaveResult(saved)
+        return
+    }
     if (!m.path.isUrl()) {
         savePreviewFile(m.path, name, dir)
         return
@@ -34,7 +40,7 @@ suspend fun savePreviewMedia(m: PreviewItem, dir: String?) {
     DialogHelper.showLoading()
     var temporary: String? = null
     try {
-        val path = RemoteFiles.cache(m.path, name)
+        val path = RemoteFiles.download(m.path, name)
         temporary = path
         savePreviewFile(path, name, dir)
     } catch (cancelled: CancellationException) {
@@ -49,6 +55,10 @@ suspend fun savePreviewMedia(m: PreviewItem, dir: String?) {
 
 private suspend fun savePreviewFile(path: String, name: String, directory: String?) {
     val saved = if (directory == null) saveFileToDownloads(path, name) else FilesClient.copyToDirectory(path, directory, name)
+    showPreviewSaveResult(saved)
+}
+
+private suspend fun showPreviewSaveResult(saved: String) {
     if (saved.isNotEmpty()) {
         DialogHelper.showMessage(LocaleHelper.getStringFAsync(Res.string.image_save_to, saved))
     } else {

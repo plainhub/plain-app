@@ -18,14 +18,24 @@ internal object RustUploadChunks {
 
     suspend fun replace(path: String, chunks: Iterator<ByteArray>): Boolean = client.replace(path, chunks)
 }
+@OptIn(ExperimentalUuidApi::class)
 internal class UploadChunksClient(
     private val sendChunk: suspend (String, Long, ByteArray) -> String,
     private val api: GraphqlClient = GraphqlApi,
 ) {
     private val maxChunkBytes = 1024 * 1024
-    @OptIn(ExperimentalUuidApi::class)
-
     suspend fun replace(path: String, chunks: Iterator<ByteArray>): Boolean {
+        upload({ sink -> while (chunks.hasNext()) sink.write(chunks.next()) }) { id, count, size -> Mutation.mergeChunks(id, count, path, size) }
+        return true
+    }
+
+    suspend fun create(path: String, produce: suspend (com.ismartcoding.plain.platform.files.StreamSink) -> Unit): String =
+        requireNotNull(upload(produce) { id, count, size -> Mutation.mergeChunks(id, count, path, size, replace = false) }.value) { "Uploaded file name missing" }
+
+    private suspend fun upload(
+        produce: suspend (com.ismartcoding.plain.platform.files.StreamSink) -> Unit,
+        merge: (String, Long, Long) -> com.ismartcoding.plain.rust.graphql.GraphqlRequest<com.ismartcoding.plain.models.MergeResult>,
+    ): com.ismartcoding.plain.models.MergeResult {
         val id = Uuid.random().toString()
         var index = 0L
         var size = 0L
@@ -39,21 +49,28 @@ internal class UploadChunksClient(
             }
             val buffer = ByteArray(maxChunkBytes)
             var buffered = 0
-            while (chunks.hasNext()) {
-                val bytes = chunks.next()
-                var offset = 0
-                while (offset < bytes.size) {
-                    currentCoroutineContext().ensureActive()
-                    val length = minOf(maxChunkBytes - buffered, bytes.size - offset)
-                    bytes.copyInto(buffer, buffered, offset, offset + length)
-                    offset += length
-                    buffered += length
-                    if (buffered == maxChunkBytes) { upload(buffer); buffered = 0 }
+            val sink = object : com.ismartcoding.plain.platform.files.StreamSink {
+                override suspend fun write(bytes: ByteArray) = write(bytes, 0, bytes.size)
+                override suspend fun write(bytes: ByteArray, offset: Int, length: Int) {
+                    var current = offset
+                    while (current < offset + length) {
+                        currentCoroutineContext().ensureActive()
+                        val count = minOf(maxChunkBytes - buffered, offset + length - current)
+                        bytes.copyInto(buffer, buffered, current, current + count)
+                        current += count
+                        buffered += count
+                        if (buffered == maxChunkBytes) { upload(buffer); buffered = 0 }
+                    }
                 }
+                override suspend fun flush() {
+                    if (buffered > 0) { upload(buffer.copyOf(buffered)); buffered = 0 }
+                }
+                override suspend fun close() = flush()
             }
-            if (buffered > 0) upload(buffer.copyOf(buffered))
+            produce(sink)
+            sink.flush()
             if (index == 0L) upload(ByteArray(0))
-            var status = api.execute(Mutation.mergeChunks(id, index, path, size))
+            var status = api.execute(merge(id, index, size))
             while (status.status in setOf(MergeTaskStatus.STARTED, MergeTaskStatus.MERGING)) {
                 delay(100)
                 status = api.execute(Query.mergeStatus(id))
@@ -61,7 +78,7 @@ internal class UploadChunksClient(
             check(status.status == MergeTaskStatus.DONE) {
                 status.error ?: "Upload merge did not complete"
             }
-            return true
+            return status
         } finally {
             withContext(NonCancellable) {
                 try { api.execute(Mutation.deleteChunks(id)) }

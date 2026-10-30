@@ -1,6 +1,8 @@
 package com.ismartcoding.plain.ui.search
 
 import com.ismartcoding.plain.i18n.*
+import com.ismartcoding.plain.ui.state.launchSafe
+import com.ismartcoding.plain.ui.web.accessFeatureOf
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -37,6 +39,7 @@ import com.ismartcoding.plain.ui.search.GlobalSearchViewModel
 import com.ismartcoding.plain.ui.media.viewer.previewer.TransformItemState
 import com.ismartcoding.plain.ui.theme.cardBackgroundNormal
 import org.jetbrains.compose.resources.stringResource
+import org.jetbrains.compose.resources.painterResource
 import com.ismartcoding.plain.ui.resources.Res as UiRes
 import com.ismartcoding.plain.ui.resources.search as ui_drawable_search
 import com.ismartcoding.plain.i18n.search
@@ -47,7 +50,7 @@ internal fun SearchResults(
     viewModel: GlobalSearchViewModel,
     domains: List<GlobalSearchDomain>,
     paddingValues: PaddingValues,
-    rowContext: GlobalSearchRowContext,
+    rowContexts: Map<com.ismartcoding.plain.rust.graphql.ContentSource, GlobalSearchRowContext>,
     onOpen: (GlobalSearchHit) -> Unit,
     onPreviewMedia: (GlobalSearchHit, TransformItemState) -> Unit,
 ) {
@@ -55,9 +58,9 @@ internal fun SearchResults(
     val domainScope = viewModel.domain.value
     val sectionDomains = domainScope?.let { listOf(it) } ?: domains
     val anyLoading = sectionDomains.any { viewModel.domainStates[it]?.loading?.value == true }
-    val totalAll = sectionDomains.sumOf { viewModel.domainStates[it]?.total?.intValue ?: 0 }
+    val totalAll = sectionDomains.sumOf { viewModel.domainStates[it]?.total?.value ?: 0 }
 
-    if (viewModel.searching.value && anyLoading && totalAll == 0) {
+    if (viewModel.searching.value && totalAll == 0) {
         NoDataColumn(loading = true)
         return
     }
@@ -71,7 +74,7 @@ internal fun SearchResults(
     // Other grouped sections show a more button that appends 8 rows per tap.
     val visibleSections = sectionDomains.filter {
         val s = viewModel.domainStates[it]
-        (s?.total?.intValue ?: 0) > 0 || s?.loading?.value == true
+        (s?.total?.value ?: 0) > 0 || s?.loading?.value == true || s?.hasErrors?.value == true
     }
     val lastSection = visibleSections.lastOrNull()
 
@@ -88,19 +91,47 @@ internal fun SearchResults(
         }
     }
 
+    val audioErrors = viewModel.domainStates[GlobalSearchDomain.AUDIO]?.devices.orEmpty().associate { device ->
+        device.device to if (device.hits.value.isNotEmpty()) rowContexts.getValue(device.device).audioQueueVM.error.value else null
+    }
     LazyColumn(Modifier.fillMaxSize(), state = listState) {
+        viewModel.deviceErrors.value.forEachIndexed { index, error ->
+            item(key = "device_error_$index") {
+                Column(Modifier.padding(16.dp)) {
+                    Text(error.name, style = MaterialTheme.typography.titleMedium)
+                    com.ismartcoding.plain.ui.tools.ManagedError(error.message)
+                    POutlinedButton(text = stringResource(Res.string.retry), onClick = viewModel::search)
+                }
+            }
+        }
         sectionDomains.forEach { d ->
             val state = viewModel.domainStates[d] ?: return@forEach
-            val total = state.total.intValue
-            if (total == 0 && !state.loading.value) return@forEach
+            val total = state.total.value
+            if (total == 0 && !state.loading.value && !state.hasErrors.value) return@forEach
 
             val isLast = d == lastSection
             item(key = "header_${d.name}") {
                 SectionHeader(d, total, state.loading.value)
             }
-            val shown = state.hits.value
-            items(shown, key = { it.key }) { hit ->
-                GlobalSearchRow(hit = hit, query = query, ctx = rowContext, onOpen = onOpen, onPreviewMedia = onPreviewMedia)
+            state.devices.forEach { device ->
+                val error = device.error.value ?: if (d == GlobalSearchDomain.AUDIO) audioErrors[device.device] else null
+                if (device.hits.value.isNotEmpty() || error != null) {
+                    if (state.devices.size > 1 || device.device is com.ismartcoding.plain.rust.graphql.ContentSource.Remote) {
+                        item(key = "device_${d.name}_${device.device.key}") {
+                            Text(
+                                text = if (device.device is com.ismartcoding.plain.rust.graphql.ContentSource.Remote) device.device.info.deviceName else stringResource(Res.string.this_device),
+                                style = MaterialTheme.typography.titleSmall,
+                                modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+                            )
+                        }
+                    }
+                    if (error == null) items(device.hits.value, key = { it.key }) { hit ->
+                        GlobalSearchRow(hit = hit, query = query, ctx = rowContexts.getValue(device.device), onOpen = onOpen, onPreviewMedia = onPreviewMedia)
+                    }
+                    error?.let { error ->
+                        item(key = "error_${d.name}_${device.device.key}") { SearchDeviceError(viewModel, d, device, error) }
+                    }
+                }
             }
             if (isLast) {
                 if (state.loading.value) {
@@ -118,10 +149,10 @@ internal fun SearchResults(
                         }
                     }
                 }
-            } else if (state.loaded.intValue < total) {
+            } else if (state.loaded.value < total) {
                 item(key = "more_${d.name}") {
                     SectionFooterButton(
-                        stringResource(Res.string.show_more_n, state.loaded.intValue, total),
+                        stringResource(Res.string.show_more_n, state.loaded.value, total),
                     ) {
                         viewModel.loadMore(d)
                     }
@@ -129,6 +160,35 @@ internal fun SearchResults(
             }
         }
         item(key = "bottomSpace") { BottomSpace(paddingValues) }
+    }
+}
+
+@Composable
+private fun SearchDeviceError(viewModel: GlobalSearchViewModel, domain: GlobalSearchDomain, state: GlobalSearchDeviceState, error: String) {
+    val permission = when (domain) {
+        GlobalSearchDomain.NOTES, GlobalSearchDomain.FEEDS, GlobalSearchDomain.CHAT -> null
+        GlobalSearchDomain.APPS -> com.ismartcoding.plain.platform.permissions.Permission.QUERY_ALL_PACKAGES
+        else -> com.ismartcoding.plain.platform.permissions.Permission.WRITE_EXTERNAL_STORAGE
+    }
+    val scope = androidx.compose.runtime.rememberCoroutineScope()
+    val requested = androidx.compose.runtime.remember(state) { androidx.compose.runtime.mutableStateOf(false) }
+    val granted = androidx.compose.runtime.remember(state) { androidx.compose.runtime.mutableStateOf(false) }
+    if (requested.value && permission != null && state.device is com.ismartcoding.plain.rust.graphql.ContentSource.Remote) {
+        com.ismartcoding.plain.ui.permissions.RemotePermissionEffects(state.device, permission, granted) { viewModel.search() }
+    }
+    Column(Modifier.padding(horizontal = 16.dp, vertical = 8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        if (error == "no_permission" && permission != null) {
+            Text(stringResource(Res.string.remote_permission_required), style = MaterialTheme.typography.bodyMedium)
+            POutlinedButton(text = stringResource(Res.string.request_permission), onClick = {
+                requested.value = true
+                if (state.device is com.ismartcoding.plain.rust.graphql.ContentSource.Remote) {
+                    scope.launchSafe { state.device.api.execute(com.ismartcoding.plain.graphql.Mutation.openWebSettings(permission.accessFeatureOf())) }
+                } else com.ismartcoding.plain.lib.sendEvent(com.ismartcoding.plain.events.RequestPermissionsEvent(permission))
+            })
+        } else {
+            com.ismartcoding.plain.ui.tools.ManagedError(error)
+            POutlinedButton(text = stringResource(Res.string.retry), onClick = viewModel::search)
+        }
     }
 }
 
@@ -141,7 +201,7 @@ private fun SectionHeader(domain: GlobalSearchDomain, total: Int, loading: Boole
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(8.dp),
     ) {
-        PIcon(icon = domain.iconRes, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
+        PIcon(icon = painterResource(domain.iconRes), contentDescription = null, tint = MaterialTheme.colorScheme.primary)
         Text(
             text = stringResource(domain.labelRes),
             style = MaterialTheme.typography.titleMedium,
@@ -186,7 +246,7 @@ private fun EmptyResults(
             contentAlignment = Alignment.Center,
         ) {
             PIcon(
-                icon = UiRes.drawable.ui_drawable_search,
+                icon = painterResource(UiRes.drawable.ui_drawable_search),
                 contentDescription = null,
                 tint = MaterialTheme.colorScheme.onSurfaceVariant,
             )

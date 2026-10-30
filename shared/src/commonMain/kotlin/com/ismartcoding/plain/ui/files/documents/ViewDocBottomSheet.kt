@@ -1,6 +1,5 @@
 package com.ismartcoding.plain.ui.files.documents
 
-import com.ismartcoding.plain.features.files.FilesClient
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
@@ -76,7 +75,7 @@ fun ViewDocBottomSheet(
 ) {
     val scope = rememberCoroutineScope()
     var showAddToHomeDialog by remember { mutableStateOf(false) }
-    val canAddToHome = Capability.LAUNCHER_SHORTCUTS in getDeviceCapabilities()
+    val canAddToHome = docsVM.source is com.ismartcoding.plain.rust.graphql.ContentSource.Local && Capability.LAUNCHER_SHORTCUTS in getDeviceCapabilities()
     val m = docsVM.selectedItem.value ?: return
     val onDismiss = {
         docsVM.selectedItem.value = null
@@ -95,7 +94,7 @@ fun ViewDocBottomSheet(
     if (docsVM.showRenameDialog.value) {
         FileRenameDialog(path = m.path, onDismiss = {
             docsVM.showRenameDialog.value = false
-        }, onRename = { p, name -> FilesClient.rename(p, name) }, onRenamed = {
+        }, onRename = { p, name -> docsVM.source.files.rename(p, name) }, onRenamed = {
             m.path = it
             m.title = it.getFilenameFromPath()
         })
@@ -138,20 +137,20 @@ fun ViewDocBottomSheet(
                             PSheetPrimaryAction(UiRes.drawable.ui_drawable_pen, stringResource(Res.string.rename)) {
                                 docsVM.showRenameDialog.value = true
                             }
-                            if (AppFeatureType.MEDIA_TRASH.has()) {
+                            if (AppFeatureType.MEDIA_TRASH.has(docsVM.source.capabilities)) {
                                 PSheetPrimaryTrashAction(stringResource(Res.string.trash)) {
                                     docsVM.trash(tagsVM, setOf(m.id))
                                     onDismiss()
                                 }
                             }
                         }
-                        if (AppFeatureType.MEDIA_TRASH.has() && docsVM.trash.value) {
+                        if (AppFeatureType.MEDIA_TRASH.has(docsVM.source.capabilities) && docsVM.trash.value) {
                             PSheetPrimaryAction(UiRes.drawable.ui_drawable_archive_restore, stringResource(Res.string.restore)) {
                                 docsVM.restore(tagsVM, setOf(m.id))
                                 onDismiss()
                             }
                         }
-                        if (!AppFeatureType.MEDIA_TRASH.has() || docsVM.trash.value) {
+                        if (!AppFeatureType.MEDIA_TRASH.has(docsVM.source.capabilities) || docsVM.trash.value) {
                             PSheetPrimaryDeleteAction(stringResource(Res.string.delete)) {
                                 scope.launch {
                                     confirmActionAsync(
@@ -188,7 +187,7 @@ fun ViewDocBottomSheet(
                                 }
                             }
                             PSheetActionRow(UiRes.drawable.ui_drawable_square_arrow_out_up_right, stringResource(Res.string.open_with)) {
-                                openFileExternal(m.path)
+                                docsVM.openFile(m.path)
                             }
                         }
                     }

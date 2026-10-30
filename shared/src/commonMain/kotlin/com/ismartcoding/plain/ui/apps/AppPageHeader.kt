@@ -20,18 +20,15 @@ import coil3.compose.AsyncImage
 import com.ismartcoding.plain.platform.system.PackageType
 import com.ismartcoding.plain.i18n.*
 import com.ismartcoding.plain.i18n.settings
-import com.ismartcoding.plain.lib.coMain
 import com.ismartcoding.plain.platform.system.PackageDetails
 import com.ismartcoding.plain.platform.system.canLaunchPackage
-import com.ismartcoding.plain.platform.system.getApplicationIcon
-import com.ismartcoding.plain.features.packages.PackagesClient
 import com.ismartcoding.plain.platform.system.launchPackage
-import com.ismartcoding.plain.platform.system.uninstallPackage
 import com.ismartcoding.plain.platform.system.viewPackageInSettings
 import com.ismartcoding.plain.ui.base.HorizontalSpace
 import com.ismartcoding.plain.ui.base.PIconTextActionButton
 import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.components.DialogHelper
+import com.ismartcoding.plain.ui.state.launchSafe
 import com.ismartcoding.plain.ui.navigation.navigateText
 import com.ismartcoding.plain.ui.resources.Res as UiRes
 import com.ismartcoding.plain.ui.resources.code as ui_drawable_code
@@ -43,14 +40,19 @@ import org.jetbrains.compose.resources.stringResource
 @Composable
 fun AppPageHeader(
     navController: NavHostController,
-    details: PackageDetails,
+    item: com.ismartcoding.plain.models.Package,
+    details: PackageDetails?,
+    source: com.ismartcoding.plain.rust.graphql.ContentSource,
 ) {
-    val item = details.item
+    val scope = androidx.compose.runtime.rememberCoroutineScope()
+    val localActions = source is com.ismartcoding.plain.rust.graphql.ContentSource.Local && canLaunchPackage(item.id)
     Column(
         modifier = Modifier.fillMaxWidth().padding(top = 24.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        val icon = getApplicationIcon(item.id)
+        val icon = if (source is com.ismartcoding.plain.rust.graphql.ContentSource.Remote) {
+            com.ismartcoding.plain.ui.navigation.rememberContentResource(source, "pkgicon://${item.id}").value?.getOrNull()
+        } else item
         AsyncImage(
             modifier = Modifier.padding(bottom = 16.dp).size(56.dp),
             model = icon,
@@ -67,43 +69,38 @@ fun AppPageHeader(
         VerticalSpace(dp = 8.dp)
         SelectionContainer {
             Text(
-                text = stringResource(Res.string.version_name_with_code, item.version, details.versionCode),
+                text = if (details != null) stringResource(Res.string.version_name_with_code, item.version, details.versionCode) else item.version,
                 textAlign = TextAlign.Center, modifier = Modifier.padding(horizontal = 32.dp),
                 style = MaterialTheme.typography.titleSmall, color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
         }
         Row(Modifier.padding(start = 32.dp, end = 32.dp, top = 8.dp), verticalAlignment = Alignment.CenterVertically) {
             SuggestionChip(onClick = {}, label = { Text(text = stringResource(if (item.type == PackageType.USER) Res.string.user_app else Res.string.system_app)) })
-            if (details.hasLargeHeap) {
+            if (details?.hasLargeHeap == true) {
                 HorizontalSpace(dp = 8.dp)
                 SuggestionChip(onClick = {}, label = { Text(text = stringResource(Res.string.large_heap)) })
             }
         }
         VerticalSpace(dp = 16.dp)
-        if (canLaunchPackage(item.id)) {
+        if (localActions || source is com.ismartcoding.plain.rust.graphql.ContentSource.Remote) {
             Row(
                 modifier = Modifier.align(Alignment.CenterHorizontally),
                 horizontalArrangement = Arrangement.spacedBy(32.dp),
             ) {
-                PIconTextActionButton(icon = UiRes.drawable.ui_drawable_square_arrow_out_up_right, text = stringResource(Res.string.launch), onClick = {
+                if (localActions) PIconTextActionButton(icon = UiRes.drawable.ui_drawable_square_arrow_out_up_right, text = stringResource(Res.string.launch), onClick = {
                     try { launchPackage(item.id) } catch (ex: Exception) { DialogHelper.showMessage(ex) }
                 })
-                PIconTextActionButton(icon = UiRes.drawable.ui_drawable_delete_forever, text = stringResource(Res.string.uninstall), onClick = {
-                    try { uninstallPackage(item.id) } catch (ex: Exception) { DialogHelper.showMessage(ex) }
+                if (localActions || item.type == PackageType.USER) PIconTextActionButton(icon = UiRes.drawable.ui_drawable_delete_forever, text = stringResource(Res.string.uninstall), onClick = {
+                    scope.launchSafe { source.packages.uninstall(listOf(item.id)) }
                 })
-                PIconTextActionButton(icon = UiRes.drawable.ui_drawable_settings, text = stringResource(Res.string.settings), onClick = {
+                if (localActions) PIconTextActionButton(icon = UiRes.drawable.ui_drawable_settings, text = stringResource(Res.string.settings), onClick = {
                     try { viewPackageInSettings(item.id) } catch (ex: Exception) { DialogHelper.showMessage(ex) }
                 })
                 PIconTextActionButton(icon = UiRes.drawable.ui_drawable_code, text = "Manifest", onClick = {
-                    coMain {
-                        try {
-                            DialogHelper.showLoading()
-                            val content = PackagesClient.manifest(item.id)
-                            DialogHelper.hideLoading()
-                            navController.navigateText("Manifest", content, "xml")
-                        } catch (ex: Exception) {
-                            ex.printStackTrace(); DialogHelper.hideLoading(); DialogHelper.showErrorDialog(ex.toString())
-                        }
+                    scope.launchSafe(onDone = { DialogHelper.hideLoading() }) {
+                        DialogHelper.showLoading()
+                        val content = source.packages.manifest(item.id)
+                        navController.navigateText("Manifest", content, "xml")
                     }
                 })
             }

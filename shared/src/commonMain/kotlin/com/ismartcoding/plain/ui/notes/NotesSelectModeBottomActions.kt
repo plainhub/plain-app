@@ -26,6 +26,7 @@ import com.ismartcoding.plain.ui.tags.BatchSelectTagsDialog
 fun NotesSelectModeBottomActions(
     tagsVM: TagsViewModel,
     tagsState: List<Tag>,
+    notesVM: NotesViewModel = NotesViewModel.local,
 ) {
     var showSelectTagsDialog by remember {
         mutableStateOf(false)
@@ -35,22 +36,22 @@ fun NotesSelectModeBottomActions(
     }
 
     if (showSelectTagsDialog) {
-        BatchSelectTagsDialog(tagsVM, tagsState, NotesViewModel.getSelectedItems(), removeFromTags) {
+        BatchSelectTagsDialog(tagsVM, tagsState, notesVM.getSelectedItems(), removeFromTags) {
             showSelectTagsDialog = false
-            NotesViewModel.exitSelectMode()
+            notesVM.exitSelectMode()
         }
     }
 
     PBottomAppBar {
         BottomActionButtons {
-            if (NotesViewModel.trash.value) {
+            if (notesVM.trash.value) {
                 IconTextSmallButtonRestore {
-                    NotesViewModel.restore(tagsVM, NotesViewModel.selectedIds.toSet())
-                    NotesViewModel.exitSelectMode()
+                    notesVM.restore(tagsVM, notesVM.selectedIds.toSet())
+                    notesVM.exitSelectMode()
                 }
                 IconTextSmallButtonDelete {
-                    NotesViewModel.delete(tagsVM, NotesViewModel.selectedIds.toSet())
-                    NotesViewModel.exitSelectMode()
+                    notesVM.delete(tagsVM, notesVM.selectedIds.toSet())
+                    notesVM.exitSelectMode()
                 }
             } else {
                 IconTextSmallButtonLabel {
@@ -62,8 +63,8 @@ fun NotesSelectModeBottomActions(
                     removeFromTags = true
                 }
                 IconTrashButton {
-                    NotesViewModel.trash(tagsVM, NotesViewModel.selectedIds.toSet())
-                    NotesViewModel.exitSelectMode()
+                    notesVM.trash(tagsVM, notesVM.selectedIds.toSet())
+                    notesVM.exitSelectMode()
                 }
             }
         }

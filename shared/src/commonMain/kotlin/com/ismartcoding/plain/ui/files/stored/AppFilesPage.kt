@@ -37,7 +37,8 @@ import com.ismartcoding.plain.ui.state.launchSafe
 fun AppFilesPage(
     navController: NavHostController,
     audioQueueVM: AudioQueueViewModel,
-    appFilesVM: AppFilesViewModel = viewModel { AppFilesViewModel() },
+    source: com.ismartcoding.plain.rust.graphql.ContentSource = com.ismartcoding.plain.ui.navigation.LocalContentSource.current,
+    appFilesVM: AppFilesViewModel = viewModel { AppFilesViewModel(source) },
 ) {
     val scope = rememberCoroutineScope()
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()

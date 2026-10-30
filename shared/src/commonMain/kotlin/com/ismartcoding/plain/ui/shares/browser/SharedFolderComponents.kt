@@ -16,6 +16,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -78,6 +79,7 @@ internal fun ErrorBanner(onRetry: () -> Unit) {
 @Composable
 internal fun EntryRow(
     entry: SharedFileDto,
+    source: com.ismartcoding.plain.rust.graphql.ContentSource,
     link: SharedLink,
     urlToken: String,
     selectMode: Boolean,
@@ -88,6 +90,9 @@ internal fun EntryRow(
     onLongClick: () -> Unit,
     onDownload: () -> Unit,
 ) {
+    val thumbnail: suspend () -> Any? = remember(source, link, urlToken, entry) {
+        { SharedThumbCache.thumbModel(source, link, urlToken, entry) }
+    }
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -117,7 +122,7 @@ internal fun EntryRow(
                 path = "",
                 isDir = entry.isDir,
                 isMedia = SharedThumbCache.isThumbable(entry),
-                remoteThumb = { SharedThumbCache.thumbPath(link, urlToken, entry) },
+                remoteThumb = thumbnail,
             )
             Column(
                 modifier = Modifier

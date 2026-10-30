@@ -70,16 +70,18 @@ fun ChannelInfoPage(
     val showRenameDialog = remember { mutableStateOf(false) }
     val selectedMemberPeerId = remember { mutableStateOf<String?>(null) }
 
-    val ownerPeerId: String? = remember(liveChannel?.ownerId) {
+    val remote = chatVM.source as? com.ismartcoding.plain.rust.graphql.ContentSource.Remote
+    val actorId = remote?.client?.peerId ?: Prefs.clientId.value
+    val ownerPeerId: String? = remember(liveChannel?.ownerId, actorId) {
         if (liveChannel?.ownerId.isNullOrEmpty()) null
-        else if (liveChannel.actions.isOwner) Prefs.clientId.value
+        else if (liveChannel.actions.isOwner) actorId
         else liveChannel.ownerId
     }
-    val deviceName by Prefs.deviceName.collectAsState()
+    val deviceName = remote?.info?.deviceName ?: Prefs.deviceName.collectAsState().value
     val memberPeers: List<PeerMember> = remember(liveChannel?.members, ownerPeerId, peers, deviceName) {
         liveChannel?.members?.mapNotNull { m ->
-            if (m.isMe()) {
-                PeerMember(m, deviceName, DeviceType.valueOf(rustStartupConfig.deviceType), isOwner = m.peerId == ownerPeerId)
+            if (m.peerId == actorId) {
+                PeerMember(m, deviceName, remote?.client?.deviceType ?: DeviceType.valueOf(rustStartupConfig.deviceType), isOwner = m.peerId == ownerPeerId)
             } else {
                 val peer = peers[m.peerId] ?: return@mapNotNull null
                 PeerMember(m, peer.getName(), peer.deviceType, peer, isOwner = m.peerId == ownerPeerId)

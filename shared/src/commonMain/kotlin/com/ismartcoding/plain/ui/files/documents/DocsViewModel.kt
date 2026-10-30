@@ -1,6 +1,9 @@
 package com.ismartcoding.plain.ui.files.documents
 
-import com.ismartcoding.plain.features.media.MediaCatalogClient
+import androidx.lifecycle.viewModelScope
+import com.ismartcoding.plain.ui.state.launchSafe
+import com.ismartcoding.plain.ui.components.DialogHelper
+import com.ismartcoding.plain.rust.graphql.ContentSource
 import com.ismartcoding.plain.ui.tags.TagsViewModel
 import com.ismartcoding.plain.ui.media.BaseMediaViewModel
 import com.ismartcoding.plain.ui.state.VTabData
@@ -16,12 +19,24 @@ import com.ismartcoding.plain.platform.system.AppFeatureType
 import com.ismartcoding.plain.platform.system.DataType
 import com.ismartcoding.plain.platform.system.has
 
-class DocsViewModel : BaseMediaViewModel<Document>() {
+class DocsViewModel internal constructor(source: ContentSource = ContentSource.Local) : BaseMediaViewModel<Document>(source) {
     override val dataType = DataType.DOC
     override val showFoldersAsList = true
     val scrollStateMap = mutableStateMapOf<Int, LazyListState>()
     val fileType = mutableStateOf("")
     var tabs = mutableStateOf(listOf<VTabData>())
+
+    fun prepareFile(path: String, onReady: (String) -> Unit) {
+        if (source is ContentSource.Local) {
+            onReady(path)
+        } else {
+            viewModelScope.launchSafe {
+                DialogHelper.showLoading()
+                try { onReady(source.fileForOpen(path)) }
+                finally { DialogHelper.hideLoading() }
+            }
+        }
+    }
 
     override suspend fun getQuery(): String {
         val query = super.getQuery()
@@ -39,8 +54,8 @@ class DocsViewModel : BaseMediaViewModel<Document>() {
         totalTrash.intValue = countMediaAsync(getTrashQuery())
         noMore.value = _itemsFlow.value.size < limit.intValue
         if (!trash.value) {
-            val extGroups = MediaCatalogClient.docExtGroups(super.getQuery())
-            val trashTabs = if (AppFeatureType.MEDIA_TRASH.has()) listOf(VTabData(LocaleHelper.getStringAsync(Res.string.trash), "trash", totalTrash.intValue)) else emptyList()
+            val extGroups = source.catalog.docExtGroups(super.getQuery())
+            val trashTabs = if (AppFeatureType.MEDIA_TRASH.has(source.capabilities)) listOf(VTabData(LocaleHelper.getStringAsync(Res.string.trash), "trash", totalTrash.intValue)) else emptyList()
             val extensions = extGroups.map { VTabData(it.first, it.first.lowercase(), it.second) }
             tabs.value = listOf(VTabData(LocaleHelper.getStringAsync(Res.string.all), "", total.intValue)) + trashTabs + extensions
         }

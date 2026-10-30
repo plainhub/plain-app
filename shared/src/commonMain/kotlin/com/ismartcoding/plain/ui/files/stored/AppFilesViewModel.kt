@@ -11,7 +11,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 
-class AppFilesViewModel : ViewModel() {
+class AppFilesViewModel internal constructor(val source: com.ismartcoding.plain.rust.graphql.ContentSource = com.ismartcoding.plain.rust.graphql.ContentSource.Local) : ViewModel() {
     private val _itemsFlow = MutableStateFlow<List<VAppFile>>(emptyList())
     val itemsFlow: StateFlow<List<VAppFile>> = _itemsFlow
 
@@ -22,7 +22,7 @@ class AppFilesViewModel : ViewModel() {
     val total = mutableIntStateOf(0)
 
     private val lock = Mutex()
-    private suspend fun fetchPage(pageOffset: Int): List<VAppFile> = AppFileStore.page(pageOffset,limit.intValue)
+    private suspend fun fetchPage(pageOffset: Int): List<VAppFile> = source.storedFiles.page(pageOffset,limit.intValue)
 
     suspend fun moreAsync() = withIO {
         lock.withLock {
@@ -37,7 +37,7 @@ class AppFilesViewModel : ViewModel() {
 
     suspend fun loadAsync() = withIO {
         lock.withLock {
-            val count = AppFileStore.count()
+            val count = source.storedFiles.count()
             val items = fetchPage(0)
             offset.intValue = 0
             total.intValue = count

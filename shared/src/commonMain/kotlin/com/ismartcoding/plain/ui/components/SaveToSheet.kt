@@ -37,7 +37,7 @@ import com.ismartcoding.plain.ui.base.PModalBottomSheet
 import com.ismartcoding.plain.ui.base.PSheetActionCard
 import com.ismartcoding.plain.ui.base.PSheetActionRow
 import com.ismartcoding.plain.ui.base.VerticalSpace
-import kotlinx.coroutines.launch
+import com.ismartcoding.plain.ui.state.launchSafe
 import org.jetbrains.compose.resources.stringResource
 import com.ismartcoding.plain.ui.resources.Res as UiRes
 import com.ismartcoding.plain.i18n.download
@@ -63,17 +63,20 @@ fun SaveToSheet(
     onDownloads: () -> Unit,
     onDirectory: (dirPath: String) -> Unit,
     onZip: (() -> Unit)? = null,
-    downloadsAvailable: Boolean = getDownloadsDirPath().isNotEmpty(),
+    source: com.ismartcoding.plain.rust.graphql.ContentSource = com.ismartcoding.plain.ui.navigation.LocalContentSource.current,
+    downloadsAvailable: Boolean = (if (source is com.ismartcoding.plain.rust.graphql.ContentSource.Remote) source.info.downloadsDir else getDownloadsDirPath()).isNotEmpty(),
 ) {
     val scope = rememberCoroutineScope()
     var recentDirs by remember { mutableStateOf<List<String>>(emptyList()) }
-    LaunchedEffect(Unit) { recentDirs = FileLocationClient.recentSaveDirs() }
+    LaunchedEffect(source) { launchSafe { recentDirs = source.locations.recentSaveDirs() }.join() }
     var showFolderPick by remember { mutableStateOf(false) }
 
     fun useDirectory(dir: String) {
-        onDismiss()
-        scope.launch { FileLocationClient.recordSaveDir(dir) }
-        onDirectory(dir)
+        scope.launchSafe {
+            source.locations.recordSaveDir(dir)
+            onDirectory(dir)
+            onDismiss()
+        }
     }
 
     PModalBottomSheet(onDismissRequest = onDismiss, modifier = Modifier.fillMaxWidth()) {
@@ -115,6 +118,7 @@ fun SaveToSheet(
 
     if (showFolderPick) {
         FolderPickSheet(
+            source = source,
             onDismiss = { showFolderPick = false },
             onConfirm = { dir ->
                 showFolderPick = false

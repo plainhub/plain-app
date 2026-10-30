@@ -67,6 +67,7 @@ import com.ismartcoding.plain.ui.navigation.NavLoadGate
 import com.ismartcoding.plain.ui.casting.CastDialog
 import com.ismartcoding.plain.ui.tags.TagsBottomSheet
 import kotlinx.coroutines.Dispatchers
+import com.ismartcoding.plain.ui.state.launchSafe
 import kotlinx.coroutines.launch
 import com.ismartcoding.plain.ui.resources.Res as UiRes
 import com.ismartcoding.plain.ui.resources.image as ui_drawable_image
@@ -76,10 +77,11 @@ import com.ismartcoding.plain.ui.resources.image as ui_drawable_image
 fun ImagesPage(
     navController: NavHostController,
     initialLoadGate: NavLoadGate? = null,
-    imagesVM: ImagesViewModel = viewModel(key = "imagesVM") { ImagesViewModel() },
-    tagsVM: TagsViewModel = viewModel(key = "imageTagsVM") { TagsViewModel() },
-    mediaFoldersVM: MediaFoldersViewModel = viewModel(key = "imageFoldersVM") { MediaFoldersViewModel() },
-    castVM: CastViewModel = viewModel(key = "imageCastVM") { CastViewModel() },
+    source: com.ismartcoding.plain.rust.graphql.ContentSource = com.ismartcoding.plain.ui.navigation.LocalContentSource.current,
+    imagesVM: ImagesViewModel = viewModel(key = "imagesVM") { ImagesViewModel(source) },
+    tagsVM: TagsViewModel = viewModel(key = "imageTagsVM") { TagsViewModel(source.tags) },
+    mediaFoldersVM: MediaFoldersViewModel = viewModel(key = "imageFoldersVM") { MediaFoldersViewModel(source) },
+    castVM: CastViewModel = viewModel(key = "imageCastVM") { CastViewModel(source) },
 ) {
     val scope = rememberCoroutineScope()
     tagsVM.dataType.value = imagesVM.dataType
@@ -128,7 +130,7 @@ fun ImagesPage(
     }
 
     val reloadAfterGrant: () -> Unit = {
-        scope.launch {
+        scope.launchSafe(onDone = { imagesVM.showLoading.value = false }) {
             cellsPerRow.value = Prefs.imageGridCellsPerRow.value
             imagesVM.sortBy.value = Prefs.imageSortBy.value
             imagesVM.loadAsync(tagsVM)
@@ -136,7 +138,7 @@ fun ImagesPage(
         }
     }
 
-    MediaPermissionEffects(imagesVM.hasPermission, initialLoadGate, reloadAfterGrant)
+    MediaPermissionEffects(imagesVM.hasPermission, initialLoadGate, reloadAfterGrant, imagesVM.source)
     LaunchedEffect(dragSelectState.selectMode, (previewerState.visible && !isGestureInteractionMode())) {
         if (dragSelectState.selectMode || (previewerState.visible && !isGestureInteractionMode())) {
             scrollBehavior.reset()

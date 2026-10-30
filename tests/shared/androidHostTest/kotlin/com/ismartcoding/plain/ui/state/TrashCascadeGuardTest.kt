@@ -50,7 +50,8 @@ class TrashCascadeGuardTest {
         }
         val helper = source("shared/src/commonMain/kotlin/com/ismartcoding/plain/features/media/actions/MediaActionClient.kt")
         assertTrue(helper.contains("Mutation.mediaAction(action, type, query, destDir)"))
-        assertTrue(helper.contains("GraphqlApi.execute(request)"))
+        assertTrue(helper.contains("protected val api: GraphqlClient = GraphqlApi"))
+        assertTrue(helper.contains("return api.execute(request).affectedCount"))
         val mutations = source("shared/src/commonMain/kotlin/com/ismartcoding/plain/graphql/Mutation.kt")
         for (method in listOf("trashMediaItems", "restoreMediaItems", "deleteMediaItems", "moveMediaItems")) {
             assertTrue(mutations.contains(method))
@@ -63,7 +64,7 @@ class TrashCascadeGuardTest {
     fun `playlist detail page prunes trashed rows on load`() {
         val page = source(playlistDetailPagePath)
         assertTrue(
-            page.contains("list.pruneTrashedRows(playlistId)"),
+            page.contains("list.pruneTrashedRows(playlistId, audioVM.source)"),
             "PlaylistDetailPage reload must route rows through pruneTrashedRows so trashed items never show",
         )
     }

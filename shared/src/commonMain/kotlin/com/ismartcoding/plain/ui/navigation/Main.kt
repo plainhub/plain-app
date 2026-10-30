@@ -1,5 +1,7 @@
 package com.ismartcoding.plain.ui.navigation
 
+import com.ismartcoding.plain.ui.state.launchSafe
+
 import com.ismartcoding.plain.ui.media.extensions.collectAsStateValue
 
 import androidx.compose.foundation.background
@@ -56,8 +58,21 @@ fun Main(
     navControllerState.value = navController
     val useDarkTheme = DarkTheme.isDarkTheme(Prefs.darkTheme.collectAsStateValue())
 
-    LaunchedEffect(audioQueueVM.selectedPath.value) {
-        if (audioQueueVM.selectedPath.value.isEmpty()) audioQueueVM.audioPlayerVisible.value = false
+    val audioOutput by com.ismartcoding.plain.features.audio.AudioCommands.output.collectAsState()
+    val playbackSource = audioOutput.source
+    val playingQueue = if (playbackSource is com.ismartcoding.plain.rust.graphql.ContentSource.Local) audioQueueVM
+        else {
+            val owner = androidx.compose.runtime.remember(playbackSource) {
+                object : androidx.lifecycle.ViewModelStoreOwner {
+                    override val viewModelStore = androidx.lifecycle.ViewModelStore()
+                }
+            }
+            androidx.compose.runtime.DisposableEffect(owner) { onDispose { owner.viewModelStore.clear() } }
+            viewModel(viewModelStoreOwner = owner) { AudioQueueViewModel(playbackSource) }
+        }
+    LaunchedEffect(playingQueue) { scope.launchSafe { playingQueue.loadAsync() } }
+    LaunchedEffect(playingQueue.selectedPath.value) {
+        if (playingQueue.selectedPath.value.isEmpty() && audioOutput.track == null) playingQueue.audioPlayerVisible.value = false
     }
 
     LaunchedEffect(Unit) {
@@ -75,11 +90,6 @@ fun Main(
         }
     }
 
-    // Single source of truth for the system bar appearance: the theme Compose
-    // is actually rendering. SideEffect re-applies after EVERY recomposition,
-    // so any competing writer (enableEdgeToEdge's config-change re-apply,
-    // insets controller state, etc.) is corrected on the next frame instead of
-    // leaving inverted status bar icons until restart.
     SideEffect {
         applySystemBarAppearanceForDarkTheme(useDarkTheme)
     }
@@ -91,9 +101,11 @@ fun Main(
         // Global fullscreen audio player: hosted above all pages so playback
         // keeps working across tabs, with the page beneath visible during the
         // slide-up transition.
-        val audioPlayerVisible by audioQueueVM.audioPlayerVisible.collectAsState()
+        val audioPlayerVisible by playingQueue.audioPlayerVisible.collectAsState()
         if (audioPlayerVisible) {
-            AudioPlayerPage(audioQueueVM) { audioQueueVM.audioPlayerVisible.value = false }
+            androidx.compose.runtime.CompositionLocalProvider(LocalContentSource provides playbackSource) {
+                AudioPlayerPage(playingQueue) { playingQueue.audioPlayerVisible.value = false }
+            }
         }
 
         // Home-screen shortcut media preview: overlay instead of a route so the

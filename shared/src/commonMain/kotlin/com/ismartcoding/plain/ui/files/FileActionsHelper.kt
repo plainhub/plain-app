@@ -1,6 +1,5 @@
 package com.ismartcoding.plain.ui.files
 
-import com.ismartcoding.plain.features.files.FilesClient
 
 import com.ismartcoding.plain.models.File as FileEntry
 
@@ -49,7 +48,7 @@ internal fun performZipFiles(
         val destPath = firstFile.path + ".zip"
         val success = withIO {
             try {
-                FilesClient.createZipArchive(files.map { it.path }, destPath)
+                filesVM.source.files.createZipArchive(files.map { it.path }, destPath)
             } catch (e: Exception) {
                 DialogHelper.showErrorMessage(e.message ?: e.toString())
                 false

@@ -36,6 +36,7 @@ fun AudioPlayerBar(
     modifier: Modifier = Modifier,
     dragSelectState: DragSelectState? = null,
 ) {
+    val audioOutput by com.ismartcoding.plain.features.audio.AudioCommands.output.collectAsState()
     val scope = rememberCoroutineScope()
     var title by remember { mutableStateOf("") }
     var artist by remember { mutableStateOf("") }
@@ -49,7 +50,7 @@ fun AudioPlayerBar(
         scope.launch {
             val path = currentPlayingPath.value
             if (path.isNotEmpty()) {
-                val audio = withIO { MediaClient.audioInfo(path) }
+                val audio = withIO { audioQueueVM.source.media.audioInfo(path) }
                 title = audio.title; artist = audio.artist
                 durationMs = audio.durationMs.toFloat(); progress = audioPlayerProgress().toFloat()
             }
@@ -67,7 +68,7 @@ fun AudioPlayerBar(
     }
 
     AnimatedVisibility(
-        visible = currentPlayingPath.value.isNotEmpty() &&
+        visible = audioOutput.source.key == audioQueueVM.source.key && currentPlayingPath.value.isNotEmpty() &&
             dragSelectState?.selectMode != true &&
             castVM?.castMode?.value != true,
         enter = slideInVertically { it }, exit = slideOutVertically { it }, modifier = modifier,

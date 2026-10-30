@@ -40,7 +40,7 @@ private class FakeVideoPlayerController : VideoPlayerController {
     override fun setPlaybackSpeed(speed: Float) { speeds.add(speed) }
     override fun setMuted(muted: Boolean) { mutedValues.add(muted) }
     override fun release() { released = true }
-    override fun setMediaItem(path: String) { mediaItems.add(path) }
+    override fun setMediaItem(path: String, tlsCertificateSha256: String?) { mediaItems.add(path) }
     override fun setEventListener(listener: (VideoPlayerEvent) -> Unit) { this.listener = listener }
     override fun requestAudioFocus() { focusRequested = true }
     override fun abandonAudioFocus() { focusAbandoned = true }

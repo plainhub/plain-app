@@ -1,6 +1,6 @@
 package com.ismartcoding.plain.ui.media
 
-import com.ismartcoding.plain.features.media.MediaCatalogClient
+import com.ismartcoding.plain.rust.graphql.ContentSource
 import com.ismartcoding.plain.ui.tags.TagsViewModel
 import com.ismartcoding.plain.ui.state.ISearchableViewModel
 import com.ismartcoding.plain.ui.state.launchSafe
@@ -11,7 +11,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ismartcoding.plain.IData
 import com.ismartcoding.plain.platform.system.DataType
-import com.ismartcoding.plain.features.tags.TagsClient
 import com.ismartcoding.plain.features.files.FileSortBy
 import com.ismartcoding.plain.models.Tag
 import com.ismartcoding.plain.helpers.SearchHelper
@@ -24,7 +23,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 
-abstract class BaseMediaViewModel<T : IData> : ISearchableViewModel<T>, ViewModel() {
+abstract class BaseMediaViewModel<T : IData> internal constructor(val source: ContentSource = ContentSource.Local) : ISearchableViewModel<T>, ViewModel() {
     internal var onMediaChanged: (suspend () -> Unit)? = null
 
     internal val _itemsFlow = MutableStateFlow<List<T>>(emptyList())
@@ -33,7 +32,7 @@ abstract class BaseMediaViewModel<T : IData> : ISearchableViewModel<T>, ViewMode
     var trash = mutableStateOf(false)
     var bucketId = mutableStateOf("")
     var showLoading = mutableStateOf(true)
-    var hasPermission = mutableStateOf(false)
+    var hasPermission = mutableStateOf(source is ContentSource.Remote && com.ismartcoding.plain.platform.permissions.Permission.WRITE_EXTERNAL_STORAGE in source.info.permissions)
     var total = mutableIntStateOf(0)
     var totalTrash = mutableIntStateOf(0)
     val noMore = mutableStateOf(false)
@@ -74,7 +73,7 @@ abstract class BaseMediaViewModel<T : IData> : ISearchableViewModel<T>, ViewMode
         var query = "${SearchHelper.buildTextFilter(queryText.value)} trash:${trash.value}"
         if (tag.value != null) {
             val tagId = tag.value!!.id
-            val ids = TagsClient.getKeysByTagId(tagId)
+            val ids = source.tags.keys(tagId)
             query += " ids:${ids.joinToString(",")}"
         }
         if (bucketId.value.isNotEmpty()) {
@@ -102,6 +101,18 @@ abstract class BaseMediaViewModel<T : IData> : ISearchableViewModel<T>, ViewMode
         showLoading.value = false
     }
 
+    fun share(ids: Collection<String>) {
+        viewModelScope.launchSafe {
+            com.ismartcoding.plain.platform.system.shareFiles(source.catalog.shareUris(dataType, ids))
+        }
+    }
+
+    fun openFile(path: String) {
+        viewModelScope.launchSafe {
+            com.ismartcoding.plain.platform.system.openFileExternal(source.fileForOpen(path))
+        }
+    }
+
     fun trash(tagsVM: TagsViewModel, ids: Set<String>) {
         trashItems(tagsVM, ids)
     }
@@ -111,15 +122,15 @@ abstract class BaseMediaViewModel<T : IData> : ISearchableViewModel<T>, ViewMode
     }
 
     open fun delete(tagsVM: TagsViewModel, ids: Set<String>) {
-        viewModelScope.launchSafe { applyMediaAction(tagsVM) { deleteMedia(dataType, ids, trash.value) } }
+        viewModelScope.launchSafe { applyMediaAction(tagsVM) { if (source is ContentSource.Remote) source.mediaActions.run(dataType, com.ismartcoding.plain.features.media.actions.MediaAction.DELETE, ids, trash.value) else deleteMedia(dataType, ids, trash.value) } }
     }
 
     fun trashItems(tagsVM: TagsViewModel, ids: Set<String>) {
-        viewModelScope.launchSafe { applyMediaAction(tagsVM) { trashMedia(dataType, ids) } }
+        viewModelScope.launchSafe { applyMediaAction(tagsVM) { if (source is ContentSource.Remote) source.mediaActions.run(dataType, com.ismartcoding.plain.features.media.actions.MediaAction.TRASH, ids) else trashMedia(dataType, ids) } }
     }
 
     fun restoreItems(tagsVM: TagsViewModel, ids: Set<String>) {
-        viewModelScope.launchSafe { applyMediaAction(tagsVM) { restoreMedia(dataType, ids) } }
+        viewModelScope.launchSafe { applyMediaAction(tagsVM) { if (source is ContentSource.Remote) source.mediaActions.run(dataType, com.ismartcoding.plain.features.media.actions.MediaAction.RESTORE, ids) else restoreMedia(dataType, ids) } }
     }
 
     private suspend fun applyMediaAction(tagsVM: TagsViewModel, action: suspend () -> Unit) {
@@ -137,13 +148,13 @@ abstract class BaseMediaViewModel<T : IData> : ISearchableViewModel<T>, ViewMode
     suspend fun countMediaAsync(
         query: String,
     ): Int = withIO {
-        MediaCatalogClient.count(dataType, query)
+        source.catalog.count(dataType, query)
     }
 
     @Suppress("UNCHECKED_CAST")
     suspend fun searchMediaAsync(
         query: String,
     ): List<T> = withIO {
-        MediaCatalogClient.rows(dataType, query, limit.intValue, offset.intValue, sortBy.value) as List<T>
+        source.catalog.rows(dataType, query, limit.intValue, offset.intValue, sortBy.value) as List<T>
     }
 }

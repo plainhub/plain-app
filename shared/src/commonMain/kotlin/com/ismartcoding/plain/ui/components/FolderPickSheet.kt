@@ -2,7 +2,7 @@
 
 package com.ismartcoding.plain.ui.components
 
-import com.ismartcoding.plain.features.files.FilesClient
+import com.ismartcoding.plain.ui.state.launchSafe
 
 import com.ismartcoding.plain.models.File as FileEntry
 
@@ -26,7 +26,8 @@ import androidx.compose.ui.unit.dp
 import com.ismartcoding.plain.features.files.FileSortBy
 import com.ismartcoding.plain.i18n.*
 import com.ismartcoding.plain.lib.withIO
-import com.ismartcoding.plain.platform.files.getInternalStoragePath
+import com.ismartcoding.plain.rust.graphql.ContentSource
+import com.ismartcoding.plain.models.ManagedStorageRoot
 import com.ismartcoding.plain.ui.base.BottomActionButtons
 import com.ismartcoding.plain.ui.base.PBottomSheetTopAppBar
 import com.ismartcoding.plain.ui.base.PFilledButton
@@ -43,15 +44,23 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 fun FolderPickSheet(
     onDismiss: () -> Unit,
     onConfirm: (String) -> Unit,
+    source: com.ismartcoding.plain.rust.graphql.ContentSource = com.ismartcoding.plain.ui.navigation.LocalContentSource.current,
 ) {
-    val rootPath = remember { getInternalStoragePath() }
-    var currentPath by remember { mutableStateOf(rootPath) }
-    var dirs by remember { mutableStateOf<List<FileEntry>>(emptyList()) }
+    var rootPath by remember(source) { mutableStateOf(source.rootPath) }
+    var currentPath by remember(source) { mutableStateOf<String?>(rootPath) }
+    var roots by remember(source) { mutableStateOf<List<ManagedStorageRoot>>(emptyList()) }
+    val appDataTitle = stringResource(Res.string.app_data)
+    var dirs by remember(source) { mutableStateOf<List<FileEntry>>(emptyList()) }
 
-    LaunchedEffect(currentPath) {
-        withIO {
-            dirs = FilesClient.list(currentPath, showHidden = false, sortBy = FileSortBy.NAME_ASC).filter { it.isDir }
-        }
+    LaunchedEffect(currentPath, source) {
+        launchSafe {
+            val path = currentPath
+            if (path == null && source is ContentSource.Remote) {
+                roots = withIO { source.client.roots() }
+            } else if (path != null) {
+                dirs = withIO { source.files.list(path, showHidden = false, sortBy = FileSortBy.NAME_ASC).filter { it.isDir } }
+            }
+        }.join()
     }
 
     PModalBottomSheet(onDismissRequest = onDismiss, modifier = Modifier.fillMaxWidth()) {
@@ -59,7 +68,7 @@ fun FolderPickSheet(
             title = stringResource(Res.string.pick_directory),
         )
         Text(
-            text = currentPath,
+            text = currentPath ?: stringResource(Res.string.folders),
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             maxLines = 1,
@@ -71,16 +80,28 @@ fun FolderPickSheet(
                 .fillMaxWidth()
                 .padding(horizontal = 8.dp),
         ) {
-            if (currentPath != rootPath) {
+            val path = currentPath
+            if (path != null && (path != rootPath || source is ContentSource.Remote)) {
                 item {
                     DirBrowserRow(
                         name = "..",
                         subtitle = stringResource(Res.string.back),
-                        onClick = { currentPath = currentPath.substringBeforeLast('/', missingDelimiterValue = rootPath).ifEmpty { rootPath } },
+                        onClick = {
+                            currentPath = if (path == rootPath) null else path.substringBeforeLast('/', missingDelimiterValue = rootPath).ifEmpty { rootPath }
+                        },
                     )
                 }
             }
-            items(dirs, key = { it.path }) { dir ->
+            if (path == null) {
+                items((roots + ManagedStorageRoot(appDataTitle, source.appPath)).distinctBy { it.path }, key = { it.path }) { root ->
+                    DirBrowserRow(
+                        name = root.name.ifEmpty { root.path },
+                        subtitle = root.path,
+                        onClick = { rootPath = root.path; currentPath = root.path },
+                    )
+                }
+            }
+            items(if (path == null) emptyList() else dirs, key = { it.path }) { dir ->
                 DirBrowserRow(
                     name = dir.name,
                     onClick = { currentPath = dir.path },
@@ -90,7 +111,8 @@ fun FolderPickSheet(
         BottomActionButtons {
             PFilledButton(
                 text = stringResource(Res.string.choose_this_folder),
-                onClick = { onConfirm(currentPath) },
+                onClick = { currentPath?.let(onConfirm) },
+                enabled = currentPath != null,
                 modifier = Modifier
                     .weight(1f)
                     .padding(vertical = 8.dp),

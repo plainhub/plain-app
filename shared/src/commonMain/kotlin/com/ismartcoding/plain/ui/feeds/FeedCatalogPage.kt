@@ -44,8 +44,9 @@ import org.jetbrains.compose.resources.stringResource
 @Composable
 fun FeedCatalogPage(
     navController: NavHostController,
-    feedsVM: FeedsViewModel = viewModel { FeedsViewModel() },
-    catalogVM: FeedCatalogViewModel = viewModel { FeedCatalogViewModel() },
+    source: com.ismartcoding.plain.rust.graphql.ContentSource = com.ismartcoding.plain.ui.navigation.LocalContentSource.current,
+    feedsVM: FeedsViewModel = viewModel { FeedsViewModel(source) },
+    catalogVM: FeedCatalogViewModel = viewModel { FeedCatalogViewModel(source) },
 ) {
     val feedsState by feedsVM.itemsFlow.collectAsState()
     LaunchedEffect(Unit) {

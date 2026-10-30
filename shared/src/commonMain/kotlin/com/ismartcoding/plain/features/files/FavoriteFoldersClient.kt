@@ -4,13 +4,18 @@ import com.ismartcoding.plain.graphql.Mutation
 import com.ismartcoding.plain.graphql.Query
 import com.ismartcoding.plain.models.FavoriteFolder
 import com.ismartcoding.plain.rust.graphql.GraphqlRequest
+import com.ismartcoding.plain.rust.graphql.GraphqlClient
 import com.ismartcoding.plain.rust.graphql.GraphqlApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 
-object FavoriteFoldersClient {
+object FavoriteFoldersClient : FavoriteFoldersApi()
+
+open class FavoriteFoldersApi internal constructor(
+    protected val api: GraphqlClient = GraphqlApi,
+) {
     private val lock = Mutex()
     private val state = MutableStateFlow<List<FavoriteFolder>>(emptyList())
     val items = state.asStateFlow()
@@ -27,6 +32,6 @@ object FavoriteFoldersClient {
         update(Mutation.setFavoriteFolderAlias(fullPath, alias))
 
     private suspend fun update(request: GraphqlRequest<List<FavoriteFolder>>): List<FavoriteFolder> = lock.withLock {
-        GraphqlApi.execute(request).also { state.value = it }
+        api.execute(request).also { state.value = it }
     }
 }

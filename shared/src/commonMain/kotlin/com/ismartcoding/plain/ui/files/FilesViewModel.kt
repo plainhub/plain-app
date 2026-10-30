@@ -1,8 +1,7 @@
 package com.ismartcoding.plain.ui.files
 
-import com.ismartcoding.plain.features.files.FileLocationClient
+import com.ismartcoding.plain.rust.graphql.ContentSource
 
-import com.ismartcoding.plain.features.files.FilesClient
 
 import com.ismartcoding.plain.features.files.BreadcrumbItem
 
@@ -42,8 +41,8 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.CancellationException
 
-class FilesViewModel : ISearchableViewModel<FileEntry>, ISelectableViewModel<FileEntry>, ViewModel() {
-    var rootPath = getInternalStoragePath()
+class FilesViewModel internal constructor(val source: ContentSource = ContentSource.Local) : ISearchableViewModel<FileEntry>, ISelectableViewModel<FileEntry>, ViewModel() {
+    var rootPath = source.rootPath
     private var _selectedPath = rootPath
     var selectedPath: String
         get() = _selectedPath
@@ -52,11 +51,9 @@ class FilesViewModel : ISearchableViewModel<FileEntry>, ISelectableViewModel<Fil
             _selectedPath = value
             if (isChanged) {
                 selectedPathVersion.value++
-                viewModelScope.launchSafe {
-                    val breadcrumbsCopy = breadcrumbs.toList()
-                    val fullPath = if (breadcrumbsCopy.isNotEmpty()) breadcrumbsCopy.last().path else value
-                    FileLocationClient.saveLastPath(FilePathData(rootPath = rootPath, fullPath = fullPath, selectedPath = value))
-                }
+                val fullPath = breadcrumbs.lastOrNull()?.path ?: value
+                val savedPath = FilePathData(rootPath = rootPath, fullPath = fullPath, selectedPath = value)
+                viewModelScope.launchSafe { source.locations.saveLastPath(savedPath) }
             }
         }
 
@@ -68,7 +65,10 @@ class FilesViewModel : ISearchableViewModel<FileEntry>, ISelectableViewModel<Fil
     var cutFiles = mutableListOf<FileEntry>()
     var copyFiles = mutableListOf<FileEntry>()
     var type: FilesType = FilesType.INTERNAL_STORAGE
-    val hasPermission = mutableStateOf(AppFeatureType.FILES.hasPermission())
+    val hasPermission = mutableStateOf(when (source) {
+        ContentSource.Local -> AppFeatureType.FILES.hasPermission()
+        is ContentSource.Remote -> com.ismartcoding.plain.platform.permissions.Permission.WRITE_EXTERNAL_STORAGE in source.info.permissions
+    })
     var offset = 0
     var limit: Int = 1000
     var total: Int = 0
@@ -132,8 +132,11 @@ class FilesViewModel : ISearchableViewModel<FileEntry>, ISelectableViewModel<Fil
     }
 
     suspend fun loadLastPathAsync() = withIO {
-        val data = FileLocationClient.lastPath()
-        if (data.selectedPath.isNotEmpty() && fileExists(data.selectedPath)) {
+        val version = selectedPathVersion.intValue
+        val data = source.locations.lastPath()
+        val exists = data.selectedPath.isNotEmpty() && source.exists(data.selectedPath)
+        if (version != selectedPathVersion.intValue) return@withIO
+        if (exists) {
             type = inferFileTypeFromRoot(data.rootPath)
             initSelectedPath(data.rootPath, type, data.selectedPath, data.selectedPath)
         } else {
@@ -143,6 +146,7 @@ class FilesViewModel : ISearchableViewModel<FileEntry>, ISelectableViewModel<Fil
     }
 
     fun inferFileTypeFromRoot(rootPath: String): FilesType {
+        if (source is ContentSource.Remote) return if (rootPath == source.appPath) FilesType.APP else FilesType.INTERNAL_STORAGE
         val internalStoragePath = getInternalStoragePath()
         val appDataPath = appDir()
         val sdCardPath = getSDCardPath()
@@ -227,15 +231,18 @@ class FilesViewModel : ISearchableViewModel<FileEntry>, ISelectableViewModel<Fil
         val showHiddenFiles = Prefs.showHiddenFiles.value
         withIO {
             isLoading.value = true
-            val query = getQuery()
-            val files = when {
-                ZipBrowserHelper.isZipPath(selectedPath) -> FilesClient.list(selectedPath, true, sortBy.value)
-                showSearchBar.value && query.isNotEmpty() -> FilesClient.searchName(query, selectedPath, showHiddenFiles, sortBy.value)
-                type == FilesType.RECENTS -> FilesClient.recent()
-                else -> FilesClient.list(selectedPath, showHiddenFiles, sortBy.value)
-            }
-            _itemsFlow.value = files
-            isLoading.value = false
+            try {
+                val version = selectedPathVersion.intValue
+                val path = selectedPath
+                val query = getQuery()
+                val files = when {
+                    ZipBrowserHelper.isZipPath(path) -> source.files.list(path, true, sortBy.value)
+                    showSearchBar.value && query.isNotEmpty() -> source.files.searchName(query, path, showHiddenFiles, sortBy.value)
+                    type == FilesType.RECENTS -> source.files.recent()
+                    else -> source.files.list(path, showHiddenFiles, sortBy.value)
+                }
+                if (version == selectedPathVersion.intValue) _itemsFlow.value = files
+            } finally { isLoading.value = false }
         }
     }
 
@@ -244,7 +251,7 @@ class FilesViewModel : ISearchableViewModel<FileEntry>, ISelectableViewModel<Fil
             DialogHelper.showLoading()
             try {
                 withIO {
-                    FilesClient.deleteMany(paths.toList())
+                    source.files.deleteMany(paths.toList())
                 }
             } catch (cancelled: CancellationException) { throw cancelled }
             catch (error: Exception) { DialogHelper.showMessage(error) }

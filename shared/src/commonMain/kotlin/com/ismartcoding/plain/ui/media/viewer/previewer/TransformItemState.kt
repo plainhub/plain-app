@@ -21,6 +21,10 @@ class TransformItemState(
     var intrinsicSize: Size? = null,
     var checkInBound: (TransformItemState.() -> Boolean)? = null,
 ) {
+    fun updateIntrinsicSize(size: Size) {
+        if (size.width > 0f && size.height > 0f) intrinsicSize = size
+    }
+
     private fun checkItemInMap() {
         if (checkInBound == null) return
         if (checkInBound!!.invoke(this)) addItem() else removeItem()

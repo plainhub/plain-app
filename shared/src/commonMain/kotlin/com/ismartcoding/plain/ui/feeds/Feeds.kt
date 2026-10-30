@@ -11,7 +11,6 @@ import com.ismartcoding.plain.features.files.ExportFileType
 import com.ismartcoding.plain.features.files.PickFileTag
 import com.ismartcoding.plain.events.ExportFileResultEvent
 import com.ismartcoding.plain.events.PickFileResultEvent
-import com.ismartcoding.plain.features.feeds.FeedsClient
 import com.ismartcoding.plain.i18n.*
 import com.ismartcoding.plain.lib.Channel
 import com.ismartcoding.plain.ui.components.DialogHelper
@@ -27,7 +26,7 @@ fun FeedsPageEffects(feedsVM: FeedsViewModel) {
                     DialogHelper.showLoading()
                     try {
                         val content = readTextFile(event.uris.first())
-                        FeedsClient.importAsync(content)
+                        feedsVM.source.feeds.importAsync(content)
                         feedsVM.loadAsync(withCount = true)
                     } catch (cancelled: CancellationException) {
                         throw cancelled
@@ -41,7 +40,7 @@ fun FeedsPageEffects(feedsVM: FeedsViewModel) {
                 is ExportFileResultEvent -> {
                     if (event.type != ExportFileType.OPML) return@collect
                     try {
-                        val opml = FeedsClient.exportAsync()
+                        val opml = feedsVM.source.feeds.exportAsync()
                         check(FilesClient.writeChunks(event.uri, listOf(opml.encodeToByteArray()).iterator())) {
                             "Unable to write selected OPML file"
                         }

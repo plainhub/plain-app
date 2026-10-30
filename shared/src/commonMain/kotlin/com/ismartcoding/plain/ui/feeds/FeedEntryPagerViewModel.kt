@@ -1,10 +1,9 @@
 package com.ismartcoding.plain.ui.feeds
 
+import com.ismartcoding.plain.rust.graphql.ContentSource
 import androidx.compose.runtime.mutableStateListOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.ismartcoding.plain.features.feeds.FeedEntriesClient
-import com.ismartcoding.plain.features.feeds.FeedsClient
 import com.ismartcoding.plain.models.Feed
 import com.ismartcoding.plain.models.FeedEntry
 import com.ismartcoding.plain.ui.state.launchSafe
@@ -18,7 +17,7 @@ import kotlinx.coroutines.delay
  * swiping left/right walks the same filtered set, and caches entry rows plus
  * prefetched full content so neighbor pages render instantly.
  */
-class FeedEntryPagerViewModel : ViewModel() {
+class FeedEntryPagerViewModel internal constructor(val source: ContentSource = ContentSource.Local) : ViewModel() {
     val ids = mutableStateListOf<String>()
 
     private val entries = HashMap<String, FeedEntry>()
@@ -34,17 +33,17 @@ class FeedEntryPagerViewModel : ViewModel() {
 
     suspend fun entryAsync(id: String): FeedEntry? {
         entries[id]?.let { return it }
-        val m = FeedEntriesClient.getAsync(id) ?: return null
+        val m = source.feedEntries.getAsync(id) ?: return null
         entries[id] = m
         return m
     }
 
-    suspend fun feedAsync(feedId: String): Feed? = feeds.getOrPut(feedId) { FeedsClient.getById(feedId) }
+    suspend fun feedAsync(feedId: String): Feed? = feeds.getOrPut(feedId) { source.feeds.getById(feedId) }
 
     /** Mark an entry read while paging: persist immediately, keep the row cache in sync. */
     fun markRead(id: String) {
         entries[id]?.let { it.read = true }
-        viewModelScope.launchSafe { FeedEntriesClient.markReadAsync(setOf(id)) }
+        viewModelScope.launchSafe { source.feedEntries.markReadAsync(setOf(id)) }
     }
 
     fun cachedContent(id: String): String = contents[id] ?: entries[id]?.content ?: ""

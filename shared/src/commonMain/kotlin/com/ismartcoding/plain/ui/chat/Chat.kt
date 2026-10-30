@@ -16,11 +16,11 @@ fun handleChatFileSelection(
     focusManager: FocusManager,
 ) {
     coMain {
-        val target = ChatViewModel.target.value
+        val target = chatVM.target.value
         focusManager.clearFocus()
         sendPickedAttachments(listOf(target), event.uris.toList(),
             images = event.type == PickFileType.IMAGE_VIDEO,
-            normalize = event.type == PickFileType.IMAGE_VIDEO)
+            normalize = event.type == PickFileType.IMAGE_VIDEO, chatVM = chatVM)
     }
 }
 

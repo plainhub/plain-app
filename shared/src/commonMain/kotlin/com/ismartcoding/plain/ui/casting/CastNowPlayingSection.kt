@@ -1,6 +1,5 @@
 package com.ismartcoding.plain.ui.casting
 
-import com.ismartcoding.plain.features.media.MediaClient
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -73,14 +72,16 @@ fun CastNowPlayingSection(
     val isImage = currentUri.isImageFast()
     val canControl = isVideo || isAudio
 
+    val source = com.ismartcoding.plain.ui.navigation.LocalContentSource.current
+    val resource = com.ismartcoding.plain.ui.navigation.rememberContentResource(source, currentUri, 256).value?.getOrNull()
     var title by remember { mutableStateOf("") }
     var subtitle by remember { mutableStateOf("") }
 
-    LaunchedEffect(currentUri) {
+    LaunchedEffect(source, currentUri) {
         if (currentUri.isEmpty()) {
             title = ""; subtitle = ""
         } else if (isAudio) {
-            val (t, a) = withIO { MediaClient.audioInfo(currentUri).let { it.title to it.artist } }
+            val (t, a) = withIO { source.media.audioInfo(currentUri).let { it.title to it.artist } }
             title = t; subtitle = a
         } else {
             title = currentUri.getFilenameWithoutExtensionFromPath()
@@ -101,13 +102,13 @@ fun CastNowPlayingSection(
         ) {
             when {
                 isImage -> AsyncImage(
-                    model = currentUri,
+                    model = resource,
                     contentDescription = title,
                     contentScale = ContentScale.Fit,
                     modifier = Modifier.fillMaxWidth().aspectRatio(1f),
                 )
                 isVideo -> AsyncImage(
-                    model = currentUri,
+                    model = resource,
                     contentDescription = title,
                     contentScale = ContentScale.Crop,
                     modifier = Modifier.fillMaxWidth().aspectRatio(16f / 9f),

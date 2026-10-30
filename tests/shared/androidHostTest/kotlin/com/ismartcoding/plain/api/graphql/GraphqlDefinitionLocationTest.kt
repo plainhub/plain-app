@@ -20,7 +20,7 @@ class GraphqlDefinitionLocationTest {
                 } }.toList()
         }
         assertEquals(emptyList(), violations)
-        for (name in listOf("Query", "Mutation")) {
+        for (name in listOf("Query", "Mutation", "Subscription")) {
             val definitions = File(src, "commonMain/kotlin/com/ismartcoding/plain/graphql/$name.kt").readText()
             assertFalse("JsonPrimitive" in definitions, name)
             assertFalse("JsonHelper" in definitions, name)

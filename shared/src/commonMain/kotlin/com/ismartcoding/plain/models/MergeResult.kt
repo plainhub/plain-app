@@ -6,4 +6,5 @@ import kotlinx.serialization.Serializable
 data class MergeResult(
     val status: MergeTaskStatus,
     val error: String? = null,
+    val value: String? = null,
 )

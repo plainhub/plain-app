@@ -1,5 +1,6 @@
 package com.ismartcoding.plain.ui.files
 
+import com.ismartcoding.plain.ui.state.launchSafe
 import com.ismartcoding.plain.models.File as FileEntry
 
 import androidx.compose.foundation.layout.Column
@@ -55,8 +56,11 @@ internal fun FileInfoPrimaryActions(
             }
         }
         PSheetPrimaryAction(UiRes.drawable.ui_drawable_share_2, stringResource(Res.string.share)) {
-            shareFiles(listOf(file.path))
-            onDismiss()
+            scope.launchSafe {
+                val path = filesVM.source.fileForOpen(file.path, file.name)
+                shareFiles(listOf(path))
+                onDismiss()
+            }
         }
         PSheetPrimaryAction(UiRes.drawable.ui_drawable_copy, stringResource(Res.string.copy)) {
             performCopyFiles(filesVM, listOf(file), onShowPasteBar) { onDismiss() }
@@ -112,7 +116,7 @@ internal fun FileInfoSecondaryActions(
             }
             if (!file.isDir) {
                 PSheetActionRow(UiRes.drawable.ui_drawable_square_arrow_out_up_right, stringResource(Res.string.open_with)) {
-                    openFileExternal(file.path)
+                    scope.launchSafe { openFileExternal(filesVM.source.fileForOpen(file.path, file.name)) }
                 }
                 PSheetActionRow(UiRes.drawable.ui_drawable_package2, stringResource(Res.string.compress)) {
                     performZipFiles(scope, filesVM, listOf(file)) { onDismiss() }

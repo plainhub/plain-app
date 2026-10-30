@@ -13,8 +13,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ismartcoding.plain.platform.system.DataType
 import com.ismartcoding.plain.features.feeds.FeedEntryFilterType
-import com.ismartcoding.plain.features.tags.TagsClient
-import com.ismartcoding.plain.features.feeds.FeedEntriesClient
 import com.ismartcoding.plain.models.FeedEntry
 import com.ismartcoding.plain.models.Tag
 import com.ismartcoding.plain.helpers.SearchHelper
@@ -22,9 +20,8 @@ import com.ismartcoding.plain.lib.withIO
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
-import com.ismartcoding.plain.features.feeds.FeedsClient
 
-class FeedEntriesViewModel :
+class FeedEntriesViewModel internal constructor(val source: com.ismartcoding.plain.rust.graphql.ContentSource = com.ismartcoding.plain.rust.graphql.ContentSource.Local) :
     ISelectableViewModel<FeedEntry>,
     ISearchableViewModel<FeedEntry>,
     ViewModel() {
@@ -69,7 +66,7 @@ class FeedEntriesViewModel :
 
     suspend fun moreAsync(tagsViewModel: TagsViewModel) = withIO {
         offset.value += limit.intValue
-        val items = FeedEntriesClient.search(getQuery(), limit.intValue, offset.intValue)
+        val items = source.feedEntries.search(getQuery(), limit.intValue, offset.intValue)
         _itemsFlow.update { it + items }
         tagsViewModel.loadMoreAsync(items.map { it.id }.toSet())
         showLoading.value = false
@@ -79,10 +76,10 @@ class FeedEntriesViewModel :
     suspend fun loadAsync(tagsViewModel: TagsViewModel) = withIO {
         offset.intValue = 0
         val query = getQuery()
-        _itemsFlow.value = FeedEntriesClient.search(query, limit.intValue, offset.intValue)
+        _itemsFlow.value = source.feedEntries.search(query, limit.intValue, offset.intValue)
         tagsViewModel.loadAsync(_itemsFlow.value.map { it.id }.toSet())
-        total.intValue = FeedEntriesClient.count(getTotalAllQuery())
-        totalToday.intValue = FeedEntriesClient.count(getTotalTodayQuery())
+        total.intValue = source.feedEntries.count(getTotalAllQuery())
+        totalToday.intValue = source.feedEntries.count(getTotalTodayQuery())
         noMore.value = _itemsFlow.value.size < limit.intValue
         showLoading.value = false
     }
@@ -90,16 +87,16 @@ class FeedEntriesViewModel :
     /** Optimistic read-state flip: update the loaded list immediately, persist async. */
     fun markRead(ids: Set<String>, read: Boolean = true) {
         _itemsFlow.update { list -> list.map { if (it.id in ids) it.copy(read = read) else it } }
-        viewModelScope.launchSafe { FeedEntriesClient.markReadAsync(ids, read) }
+        viewModelScope.launchSafe { source.feedEntries.markReadAsync(ids, read) }
     }
 
     fun sync() {
-        viewModelScope.launchSafe { FeedsClient.sync(feedId.value) }
+        viewModelScope.launchSafe { source.feeds.sync(feedId.value) }
     }
 
     fun delete(tagsVM: TagsViewModel, ids: Set<String>) {
         viewModelScope.launchSafe {
-            FeedEntriesClient.deleteAsync(ids)
+            source.feedEntries.deleteAsync(ids)
             loadAsync(tagsVM)
         }
     }
@@ -129,7 +126,7 @@ class FeedEntriesViewModel :
         }
         if (tag.value != null) {
             val tagId = tag.value!!.id
-            val ids = TagsClient.getKeysByTagId(tagId)
+            val ids = source.tags.keys(tagId)
             query += " ids:${ids.joinToString(",")}"
         }
         if (feedId.value.isNotEmpty()) {

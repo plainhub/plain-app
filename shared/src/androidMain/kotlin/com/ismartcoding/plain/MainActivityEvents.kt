@@ -19,7 +19,7 @@ internal fun MainActivity.initEvents() {
             snapshotFlow { MainViewModel.pendingPairingRequest.value }.map { it != null },
             snapshotFlow { MainViewModel.pendingChannelInvite.value }.map { it != null },
             snapshotFlow { MainViewModel.pendingLoginRequest.value }.map { it != null },
-            snapshotFlow { MainViewModel.desktopAccessSettingsRequested.value },
+            snapshotFlow { MainViewModel.pendingWebAccessRequest.value }.map { it != null },
             DlnaRendererState.pendingCastRequest.map { it != null }.distinctUntilChanged(),
         ).collect { hasRequest ->
             if (hasRequest && !AppHelper.foregrounded()) openNew()

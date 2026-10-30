@@ -15,7 +15,6 @@ import com.ismartcoding.plain.platform.system.has
 import com.ismartcoding.plain.models.Tag
 import com.ismartcoding.plain.i18n.*
 import com.ismartcoding.plain.lib.withIO
-import com.ismartcoding.plain.features.media.MediaCatalogClient
 import com.ismartcoding.plain.ui.state.launchSafe
 import com.ismartcoding.plain.platform.system.shareFiles
 import com.ismartcoding.plain.ui.base.BottomActionButtons
@@ -93,12 +92,12 @@ fun AudioFilesSelectModeBottomActions(
                 IconTextSmallButtonShare {
                     val ids = dragSelectState.selectedIds.toList()
                     scope.launchSafe {
-                        val uris = withIO { MediaCatalogClient.shareUris(DataType.AUDIO, ids) }
+                        val uris = withIO { audioVM.source.catalog.shareUris(DataType.AUDIO, ids) }
                         shareFiles(uris)
                     }
                 }
             }
-            if (AppFeatureType.MEDIA_TRASH.has()) {
+            if (AppFeatureType.MEDIA_TRASH.has(audioVM.source.capabilities)) {
                 if (audioVM.trash.value) {
                     IconTextSmallButtonRestore {
                         audioVM.restore(tagsVM, dragSelectState.selectedIds.toSet())

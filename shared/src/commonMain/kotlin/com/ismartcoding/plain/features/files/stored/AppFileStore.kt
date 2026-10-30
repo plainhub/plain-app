@@ -13,7 +13,7 @@ import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.withContext
 
-object AppFileStore {
+object AppFileStore : AppFilesApi() {
     fun toFidUri(fileId: String, ext: String = ""): String = if (ext.isEmpty()) "fid:$fileId" else "fid:$fileId.$ext"
 
     fun toFidUri(file: AppFile): String = "fid:${file.realPath.substringAfterLast('/')}"
@@ -41,18 +41,22 @@ object AppFileStore {
             throw cancelled
         }
     }
+}
 
+open class AppFilesApi internal constructor(
+    private val api: com.ismartcoding.plain.rust.graphql.GraphqlClient = GraphqlApi,
+) {
     suspend fun page(offset: Int, limit: Int, query: String = ""): List<VAppFile> =
-        GraphqlApi.execute(Query.appFiles(offset, limit, query))
+        api.execute(Query.appFiles(offset, limit, query))
             .map { VAppFile(it, it.fileName) }
 
     suspend fun count(query: String = ""): Int =
-        GraphqlApi.execute(Query.appFileCount(query))
+        api.execute(Query.appFileCount(query))
 
     suspend fun displayName(id: String): String =
-        GraphqlApi.execute(Query.appFileName("text:$id")).firstOrNull()?.fileName.orEmpty()
+        api.execute(Query.appFileName("text:$id")).firstOrNull()?.fileName.orEmpty()
 
     suspend fun release(id: String) {
-        GraphqlApi.execute(Mutation.releaseAppFile(id.substringBefore('.')))
+        api.execute(Mutation.releaseAppFile(id.substringBefore('.')))
     }
 }

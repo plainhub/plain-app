@@ -181,10 +181,11 @@
     <string name="pair_chat_only">Chat only</string>
     <string name="peer_manage_access">Can manage</string>
     <string name="remote_management">Remote management</string>
-    <string name="managed_content">Content</string>
-    <string name="managed_delete_confirm">Delete “%1$s” from %2$s?</string>
-    <string name="managed_trash_confirm">Move “%1$s” to the trash on %2$s?</string>
-    <string name="managed_loading">Loading remote content…</string>
     <string name="managed_authorization_changed">The management authorization or device identity changed. Reopen remote management from the device chat.</string>
     <string name="managed_permission_denied">Access is not allowed. Check remote access and permissions on the target device.</string>
+    <string name="web_access_request">Access request</string>
+    <string name="web_access_request_message">Allow remote access to %1$s on this device?</string>
+    <string name="request_permission">Request permission</string>
+    <string name="remote_permission_required">This device has not granted access. Request permission to continue.</string>
+    <string name="pairing_failed">Pairing failed</string>
 </resources>

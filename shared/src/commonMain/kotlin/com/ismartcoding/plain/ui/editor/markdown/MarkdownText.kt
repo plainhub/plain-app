@@ -38,7 +38,7 @@ import coil3.compose.rememberAsyncImagePainter
 import coil3.request.ImageRequest
 import coil3.size.Size as CoilSize
 import com.ismartcoding.plain.ui.theme.MarkdownTheme
-import com.ismartcoding.plain.ui.extensions.rememberFilePath
+import com.ismartcoding.plain.ui.extensions.rememberImageResource
 import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.ui.media.viewer.PreviewItem
 import com.ismartcoding.plain.ui.media.viewer.previewer.MediaPreviewerState
@@ -66,6 +66,8 @@ import kotlinx.coroutines.launch
 import org.intellij.markdown.ast.getTextInNode
 import org.intellij.markdown.flavours.gfm.GFMElementTypes
 import com.ismartcoding.plain.features.files.FilePaths
+import com.ismartcoding.plain.rust.graphql.ContentSource
+import com.ismartcoding.plain.ui.navigation.LocalContentSource
 
 /**
  * Image transformer that resolves project-internal `app://` and `fid:` URIs to absolute file
@@ -84,7 +86,7 @@ internal class AppImageTransformer(
     @Composable
     override fun transform(link: String): ImageData? {
         val context = LocalPlatformContext.current
-        val resolved = rememberFilePath(link)
+        val resolved = rememberImageResource(link)
         val painter = rememberAsyncImagePainter(
             model = ImageRequest.Builder(context)
                 .data(resolved)
@@ -229,14 +231,17 @@ internal fun rememberMarkdownImageTransformer(
     previewerState: MediaPreviewerState?,
 ): ImageTransformer {
     val scope = rememberCoroutineScope()
+    val source = LocalContentSource.current
     val imageLinks = remember(parsed) {
         (parsed as? State.Success)?.let(::extractImageLinksFromMarkdown).orEmpty()
     }
-    return remember(imageLinks, previewerState) {
+    return remember(imageLinks, previewerState, source) {
         AppImageTransformer(onImageClick = previewerState?.let { state -> { link ->
             scope.launch {
-                val paths = FilePaths.resolveAll(imageLinks)
-                val items = imageLinks.mapIndexed { index, src -> PreviewItem(src, paths[index]) }
+                val paths = if (source is ContentSource.Local) FilePaths.resolveAll(imageLinks) else imageLinks
+                val items = imageLinks.mapIndexed { index, src ->
+                    PreviewItem(src, paths[index], source = source)
+                }
                 MediaPreviewData.items = items
                 val index = items.indexOfFirst { it.id == link || it.path == link }
                 state.open(index = index.coerceAtLeast(0))

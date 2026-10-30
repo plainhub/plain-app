@@ -25,7 +25,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import com.ismartcoding.plain.features.downloads.DownloadCenter
 import com.ismartcoding.plain.features.downloads.DownloadStatus
 import com.ismartcoding.plain.features.downloads.isTerminalDownloadStatus
 import com.ismartcoding.plain.features.shares.SharedFolderBatchTask
@@ -49,6 +48,8 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.ui.graphics.Color
 import com.ismartcoding.plain.features.shares.ShareBatchType
 import com.ismartcoding.plain.features.shares.SharedFolderDownloadEngine
+import com.ismartcoding.plain.features.shares.SharedFolderDownloadClient
+import com.ismartcoding.plain.features.shares.SharedDownloadCommand
 
 /**
  * One aggregated batch card: title, destination, status chip, byte progress
@@ -58,6 +59,7 @@ import com.ismartcoding.plain.features.shares.SharedFolderDownloadEngine
 fun DownloadBatchCard(
     task: SharedFolderBatchTask,
     modifier: Modifier = Modifier,
+    downloads: SharedFolderDownloadClient = SharedFolderDownloadEngine,
 ) {
     var failuresExpanded by remember(task.id) { mutableStateOf(false) }
     val active = !task.status.isTerminalDownloadStatus()
@@ -93,7 +95,7 @@ fun DownloadBatchCard(
                     PIconButton(
                         icon = UiRes.drawable.ui_drawable_x,
                         contentDescription = stringResource(Res.string.cancel),
-                    ) { DownloadCenter.cancel(task.id) }
+                    ) { downloads.control(task.id, SharedDownloadCommand.CANCEL) }
                 } else {
                     if (task.status == DownloadStatus.PARTIAL || task.status == DownloadStatus.FAILED) {
                         PIconButton(
@@ -101,13 +103,13 @@ fun DownloadBatchCard(
                             contentDescription = stringResource(Res.string.try_again),
                         ) {
                             failuresExpanded = false
-                            SharedFolderDownloadEngine.retryFailed(task.id)
+                            downloads.retryFailed(task.id)
                         }
                     }
                     PIconButton(
                         icon = UiRes.drawable.ui_drawable_x,
                         contentDescription = stringResource(Res.string.cancel),
-                    ) { DownloadCenter.remove(task.id) }
+                    ) { downloads.control(task.id, SharedDownloadCommand.REMOVE) }
                 }
             }
 
@@ -176,7 +178,7 @@ fun DownloadBatchCard(
                     onToggle = { failuresExpanded = !failuresExpanded },
                     onRetryItem = {
                         failuresExpanded = false
-                        SharedFolderDownloadEngine.retryFailed(task.id)
+                        downloads.retryFailed(task.id)
                     },
                     modifier = Modifier.padding(top = 8.dp),
                 )

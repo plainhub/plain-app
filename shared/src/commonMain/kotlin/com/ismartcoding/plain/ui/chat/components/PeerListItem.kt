@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -77,7 +78,7 @@ fun PeerListItem(
                     }
                 }
             },
-            subtitle = if (subtitle.isEmpty()) null else { { Text(subtitle) } },
+            subtitle = if (subtitle.isEmpty()) null else { { Text(subtitle, maxLines = 1, softWrap = false, overflow = TextOverflow.Ellipsis) } },
             start = { PeerIconWithStatus(icon = icon, online = online) },
         )
 

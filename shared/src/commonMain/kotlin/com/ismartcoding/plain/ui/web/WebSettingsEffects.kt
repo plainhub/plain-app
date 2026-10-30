@@ -14,7 +14,7 @@ import com.ismartcoding.plain.features.permissions.getWebList
 import com.ismartcoding.plain.lib.sendEvent
 import com.ismartcoding.plain.platform.permissions.isGranted
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.launch
+import com.ismartcoding.plain.ui.state.launchSafe
 
 @Composable
 internal fun WebSettingsEffects(
@@ -44,7 +44,7 @@ internal fun WebSettingsEffects(
 }
 
 internal fun togglePermission(scope: CoroutineScope, m: PermissionItem, enable: Boolean) {
-    scope.launch {
+    scope.launchSafe {
         Prefs.setApiPermission(m.permission, enable)
         if (enable) {
             val ps = m.permissions.filter { !it.isGranted() }

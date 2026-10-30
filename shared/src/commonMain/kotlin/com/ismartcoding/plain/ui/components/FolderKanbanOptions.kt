@@ -21,6 +21,23 @@ suspend fun buildFolderOptions(
     usbStorageText: String,
     fileTransferAssistantText: String,
 ): List<FolderOption> = withIO {
+    val source = filesVM.source
+    if (source is com.ismartcoding.plain.rust.graphql.ContentSource.Remote) {
+        val roots = source.client.roots()
+        val favorites = source.favorites.refresh()
+        val paths = roots.map { it.path } + source.appPath + favorites.map { it.fullPath }
+        val selected = paths.filter { filesVM.selectedPath.startsWith(it) }.maxByOrNull { it.length }
+        return@withIO buildList {
+            add(FolderOption(rootPath = "", fullPath = "", type = FilesType.RECENTS, isChecked = filesVM.type == FilesType.RECENTS, title = recentsText))
+            roots.filter { it.path != source.appPath }.forEach { root ->
+                add(FolderOption(rootPath = root.path, fullPath = root.path, type = FilesType.INTERNAL_STORAGE, isChecked = selected == root.path, title = root.name))
+            }
+            add(FolderOption(rootPath = source.appPath, fullPath = source.appPath, type = FilesType.APP, isChecked = selected == source.appPath, title = fileTransferAssistantText))
+            favorites.forEach { favorite ->
+                add(FolderOption(rootPath = favorite.rootPath, fullPath = favorite.fullPath, type = filesVM.inferFileTypeFromRoot(favorite.rootPath), isChecked = selected == favorite.fullPath, title = favorite.alias ?: favorite.fullPath, isFavoriteFolder = true))
+            }
+        }
+    }
     val internalStoragePath = getInternalStoragePath()
     val externalFilesDirPath = appDir()
     val sdCardPath = getSDCardPath()

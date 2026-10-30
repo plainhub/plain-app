@@ -67,3 +67,5 @@ actual fun openFileExternal(path: String) {
     }
     controller.openFileExternal(path)
 }
+
+actual fun isFileShareable(path: String): Boolean = platform.Foundation.NSFileManager.defaultManager.isReadableFileAtPath(path)

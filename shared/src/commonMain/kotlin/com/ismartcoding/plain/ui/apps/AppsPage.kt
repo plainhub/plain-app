@@ -42,10 +42,12 @@ import com.ismartcoding.plain.ui.resources.Res as UiRes
 import com.ismartcoding.plain.ui.resources.left_panel_open as ui_drawable_left_panel_open
 import com.ismartcoding.plain.ui.resources.sort as ui_drawable_sort
 import com.ismartcoding.plain.i18n.sort
+import com.ismartcoding.plain.ui.resources.package2
+import com.ismartcoding.plain.ui.state.launchSafe
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
-fun AppsPage(navController: NavHostController, appsVM: AppsViewModel = viewModel { AppsViewModel() }) {
+fun AppsPage(navController: NavHostController, source: com.ismartcoding.plain.rust.graphql.ContentSource = com.ismartcoding.plain.ui.navigation.LocalContentSource.current, appsVM: AppsViewModel = viewModel { AppsViewModel(source) }) {
     val itemsState by appsVM.itemsFlow.collectAsState()
     val scope = rememberCoroutineScope()
     val scrollState = rememberLazyListState()
@@ -54,10 +56,15 @@ fun AppsPage(navController: NavHostController, appsVM: AppsViewModel = viewModel
     val topRefreshLayoutState = rememberRefreshLayoutState {
         scope.launch { appsVM.loadAsync(); setRefreshState(RefreshContentState.Finished) }
     }
+    if (source is com.ismartcoding.plain.rust.graphql.ContentSource.Remote) {
+        com.ismartcoding.plain.ui.permissions.RemotePermissionEffects(source, com.ismartcoding.plain.platform.permissions.Permission.QUERY_ALL_PACKAGES, appsVM.hasPermission) {
+            appsVM.loadAsync()
+        }
+    }
     val lifecycleEvent = rememberLifecycleEvent()
     LaunchedEffect(lifecycleEvent) {
-        if (lifecycleEvent == Lifecycle.Event.ON_RESUME) {
-            scope.launch(Dispatchers.Default) { appsVM.loadAsync() }
+        if (lifecycleEvent == Lifecycle.Event.ON_RESUME && appsVM.hasPermission.value) {
+            scope.launchSafe { appsVM.loadAsync() }
         }
     }
     val onSelectTab: (VTabData) -> Unit = { tab ->
@@ -92,11 +99,11 @@ fun AppsPage(navController: NavHostController, appsVM: AppsViewModel = viewModel
         },
     ) {
     PScaffold(topBar = {
-        if (appsVM.showSearchBar.value) { ListSearchBar(viewModel = appsVM, onSearch = onSearch); return@PScaffold }
+        if (appsVM.showSearchBar.value && appsVM.hasPermission.value) { ListSearchBar(viewModel = appsVM, onSearch = onSearch); return@PScaffold }
         PTopAppBar(modifier = Modifier.combinedClickable(onClick = {}, onDoubleClick = { scope.launch { scrollState.scrollToItem(0) } }),
             onNavigateBack = { navController.navigateUp() },
-            navigationIcon = { PIconButton(icon = UiRes.drawable.ui_drawable_left_panel_open, contentDescription = stringResource(Res.string.apps), click = { scope.launch { if (drawerState.isOpen) drawerState.close() else drawerState.open() } }) },
-            title = title, scrollBehavior = scrollBehavior, actions = {
+            navigationIcon = if (appsVM.hasPermission.value) { { PIconButton(icon = UiRes.drawable.ui_drawable_left_panel_open, contentDescription = stringResource(Res.string.apps), click = { scope.launch { if (drawerState.isOpen) drawerState.close() else drawerState.open() } }) } } else null,
+            title = title, scrollBehavior = scrollBehavior, actions = if (appsVM.hasPermission.value) { {
                 ActionButtonSearch { appsVM.enterSearchMode() }
                 PCapsuleMoreClose(onClose = { navController.navigateUp() }) { dismiss ->
                     PSheetActionRow(UiRes.drawable.ui_drawable_sort, stringResource(Res.string.sort)) {
@@ -104,9 +111,13 @@ fun AppsPage(navController: NavHostController, appsVM: AppsViewModel = viewModel
                         appsVM.showSortDialog.value = true
                     }
                 }
-            })
+            } } else null)
     }) { paddingValues ->
         Column(modifier = Modifier.padding(top = paddingValues.calculateTopPadding())) {
+            if (!appsVM.hasPermission.value) {
+                NeedPermissionColumn(UiRes.drawable.package2, com.ismartcoding.plain.platform.permissions.FeaturePermission(setOf(com.ismartcoding.plain.platform.permissions.Permission.QUERY_ALL_PACKAGES), com.ismartcoding.plain.platform.permissions.Permission.QUERY_ALL_PACKAGES))
+                return@PScaffold
+            }
             if (appsVM.tabs.value.isEmpty()) { NoDataColumn(loading = appsVM.showLoading.value, search = appsVM.showSearchBar.value); return@PScaffold }
             AppsPageList(navController = navController, appsVM = appsVM, items = itemsState,
                 scrollState = scrollState, scrollBehavior = scrollBehavior, topRefreshLayoutState = topRefreshLayoutState, paddingValues = paddingValues)

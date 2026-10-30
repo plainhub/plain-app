@@ -1,6 +1,5 @@
 package com.ismartcoding.plain.ui.casting
 
-import com.ismartcoding.plain.features.media.MediaClient
 
 import com.ismartcoding.plain.i18n.*
 import androidx.compose.foundation.clickable
@@ -35,7 +34,6 @@ import androidx.compose.ui.draw.clip
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.unit.dp
-import com.ismartcoding.plain.features.dlna.sender.RustDlnaSender
 import com.ismartcoding.plain.ui.i18n.LocaleHelper
 import com.ismartcoding.plain.ui.base.PBottomSheetTopAppBar
 import com.ismartcoding.plain.ui.base.PModalBottomSheet
@@ -55,17 +53,17 @@ import com.ismartcoding.plain.ui.resources.delete_forever as ui_drawable_delete_
 fun AudioCastPlaylistPage(castVM: CastViewModel, onDismissRequest: () -> Unit) {
     val scope = rememberCoroutineScope()
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
-    val castItems by RustDlnaSender.items.collectAsState()
-    val currentUri by RustDlnaSender.currentUri.collectAsState()
-    val isPlaying by RustDlnaSender.isPlaying.collectAsState()
-    val progressMs by RustDlnaSender.progressMs.collectAsState()
-    val durationMs by RustDlnaSender.durationMs.collectAsState()
-    val supportsCallback by RustDlnaSender.supportsCallback.collectAsState()
+    val castItems by castVM.items.collectAsState()
+    val currentUri by castVM.currentUri.collectAsState()
+    val isPlaying by castVM.isPlaying.collectAsState()
+    val progressMs by castVM.progressMs.collectAsState()
+    val durationMs by castVM.durationMs.collectAsState()
+    val supportsCallback by castVM.supportsCallback.collectAsState()
     var nowPlayingTitle by remember { mutableStateOf("") }
     var nowPlayingArtist by remember { mutableStateOf("") }
     LaunchedEffect(currentUri) {
         if (currentUri.isNotEmpty()) {
-            val (t, a) = MediaClient.audioInfo(currentUri).let { it.title to it.artist }
+            val (t, a) = castVM.source.media.audioInfo(currentUri).let { it.title to it.artist }
             nowPlayingTitle = t
             nowPlayingArtist = a
         } else {
@@ -141,7 +139,7 @@ fun AudioCastPlaylistPage(castVM: CastViewModel, onDismissRequest: () -> Unit) {
                                         item = audio, index = index, isPlaying = isPlaying,
                                         isLoading = castVM.isLoading.value && isPlaying,
                                         onLoadMetadata = { path ->
-                                            val (title, artist) = MediaClient.audioInfo(path).let { it.title to it.artist }
+                                            val (title, artist) = castVM.source.media.audioInfo(path).let { it.title to it.artist }
                                             title to artist
                                         },
                                         onRemove = { scope.launch(Dispatchers.Default) { castVM.removeCastItemAt(index) } })

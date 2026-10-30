@@ -61,9 +61,16 @@ import com.ismartcoding.plain.rust.graphql.GraphqlRequest
 import com.ismartcoding.plain.rust.graphql.variable
 
 object Query {
+    fun appPermissions(): GraphqlRequest<List<com.ismartcoding.plain.platform.permissions.Permission>> =
+        GraphqlRequest<com.ismartcoding.plain.models.AppPermissions>("query { app { permissions } }", field = "app").map { it.permissions }
+
     fun chatConversations(): GraphqlRequest<List<ChatConversation>> = GraphqlRequest(
         $$"query { chatConversations { id chat { $${Fragments.CHAT_ITEM} } } }",
         field = "chatConversations",
+    )
+
+    internal fun peerSummaries(): GraphqlRequest<List<Peer>> = GraphqlRequest(
+        "query { peers { ${Fragments.PEER_SUMMARY} } }", field = "peers",
     )
 
     fun chatCount(query: String): GraphqlRequest<Int> = GraphqlRequest(
@@ -193,6 +200,15 @@ object Query {
         field = "audioPlaylistItems",
     )
 
+    internal fun audioPlaybackSettings(): GraphqlRequest<com.ismartcoding.plain.models.AudioPlaybackSettings> = GraphqlRequest(
+        "query { audioPlayback { mediaId path mode isPlaying positionMs revision } prefs }",
+    )
+
+    internal fun audioQueueSnapshot(limit: Int): GraphqlRequest<com.ismartcoding.plain.models.AudioQueueSnapshot> = GraphqlRequest(
+        $$"query($limit: Int!) { audioPlayback { mediaId path mode isPlaying positionMs revision } prefs count: audioQueueItemCount items: audioQueueItems(query: \"\", offset: 0, limit: $limit) { $${Fragments.AUDIO_TRACK_FIELDS} } queuedIds: audioQueueItems(query: \"\", offset: 0, limit: 2147483647) { mediaId } }",
+        mapOf(variable("limit", limit)),
+    )
+
     fun audioPlayback(): GraphqlRequest<AudioPlayback> = GraphqlRequest(
         $$"query { audioPlayback { mediaId path mode isPlaying positionMs revision } }",
         field = "audioPlayback",
@@ -213,6 +229,11 @@ object Query {
         $$"query($offset: Int!, $limit: Int!, $query: String!) { audioQueueItems(offset: $offset, limit: $limit, query: $query) { $${Fragments.AUDIO_TRACK_FIELDS} } }",
         mapOf(variable("offset", offset), variable("limit", limit), variable("query", query)),
         field = "audioQueueItems",
+    )
+
+    internal fun dlnaSenderState(): GraphqlRequest<com.ismartcoding.plain.features.dlna.sender.CastSnapshot> = GraphqlRequest(
+        "query { dlnaSenderState { ${Fragments.DLNA_STATE} } }",
+        field = "dlnaSenderState",
     )
 
     internal fun sessions(): GraphqlRequest<List<SessionFacts>> = GraphqlRequest(
@@ -378,7 +399,7 @@ object Query {
     )
 
     fun mergeStatus(fileId: String): GraphqlRequest<MergeResult> = GraphqlRequest(
-        $$"query($fileId: String!) { mergeStatus(fileId: $fileId) { status error } }",
+        $$"query($fileId: String!) { mergeStatus(fileId: $fileId) { status value error } }",
         mapOf(variable("fileId", fileId)),
         field = "mergeStatus",
     )
@@ -440,8 +461,8 @@ object Query {
         field = "chatChannels",
     )
 
-    fun chatDownloadQueue(): GraphqlRequest<ChatDownloadSnapshot> = GraphqlRequest(
-        $$"query { chatDownloadQueue { $${Fragments.CHAT_DOWNLOAD_QUEUE} } }",
+    fun chatDownloadQueue(includePeerCredentials: Boolean = true): GraphqlRequest<ChatDownloadSnapshot> = GraphqlRequest(
+        "query { chatDownloadQueue { ${if (includePeerCredentials) Fragments.CHAT_DOWNLOAD_QUEUE else Fragments.CHAT_DOWNLOAD_QUEUE_SUMMARY} } }",
         field = "chatDownloadQueue",
     )
 
@@ -526,6 +547,9 @@ object Query {
         val variables = ids.mapIndexed { index, id -> variable("id$index", id) }.toMap()
         return GraphqlRequest($$"query($${definitions}) { $${selections} }", variables)
     }
+
+    fun prefs(): GraphqlRequest<Map<String, kotlinx.serialization.json.JsonElement>> =
+        GraphqlRequest("query { prefs }", field = "prefs")
 
     inline fun <reified T> savedValue(key: String, default: T): GraphqlRequest<T> = GraphqlRequest<T?>(
         $$"query($key: String!) { savedValue(key: $key) }",

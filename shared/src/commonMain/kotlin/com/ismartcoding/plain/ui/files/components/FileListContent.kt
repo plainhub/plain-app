@@ -75,7 +75,7 @@ fun FileListContent(
                                 // Enter the zip as a virtual directory
                                 filesVM.navigateToDirectory(ZipBrowserHelper.joinPath(file.path, ""))
                             } else {
-                                openFile(files, file, navController, previewerState, itemState, audioQueueVM)
+                                openFile(files, file, navController, previewerState, itemState, audioQueueVM, filesVM.source)
                             }
                         }
                     },

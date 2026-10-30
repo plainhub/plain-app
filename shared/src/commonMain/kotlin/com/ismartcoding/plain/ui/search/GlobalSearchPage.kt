@@ -31,18 +31,12 @@ import com.ismartcoding.plain.ui.permissions.checkNotificationPermission
 import com.ismartcoding.plain.ui.base.BottomSpace
 import com.ismartcoding.plain.ui.base.PAlert
 import com.ismartcoding.plain.ui.audio.AudioQueueViewModel
-import com.ismartcoding.plain.ui.audio.AudioViewModel
-import com.ismartcoding.plain.ui.casting.CastViewModel
-import com.ismartcoding.plain.ui.files.documents.DocsViewModel
-import com.ismartcoding.plain.ui.feeds.FeedEntriesViewModel
 import com.ismartcoding.plain.ui.search.GlobalSearchAction
 import com.ismartcoding.plain.ui.search.GlobalSearchDomain
 import com.ismartcoding.plain.ui.search.GlobalSearchHit
 import com.ismartcoding.plain.ui.search.GlobalSearchSource
 import com.ismartcoding.plain.ui.search.GlobalSearchViewModel
 import com.ismartcoding.plain.ui.media.MediaPreviewData
-import com.ismartcoding.plain.ui.tags.TagsViewModel
-import com.ismartcoding.plain.ui.search.globalSearchDomains
 import com.ismartcoding.plain.ui.media.viewer.previewer.TransformItemState
 import com.ismartcoding.plain.ui.navigation.MainNavScaffold
 import com.ismartcoding.plain.ui.base.AlertType
@@ -69,7 +63,7 @@ fun GlobalSearchPage(
     val scope = rememberCoroutineScope()
     val focusManager = LocalFocusManager.current
     val keyboard = LocalSoftwareKeyboardController.current
-    val domains = globalSearchDomains()
+    val domains = viewModel.domains.value
     val query = viewModel.queryText.value
     val domainScope = viewModel.domain.value
 
@@ -88,6 +82,10 @@ fun GlobalSearchPage(
         ).collect { viewModel.refreshHits(GlobalSearchDomain.CHAT) }
     }
 
+    LaunchedEffect(viewModel, "search-permissions") {
+        AppSubscriptions.permissionsUpdated.changes().collect { if (viewModel.queryText.value.isNotBlank()) viewModel.search() }
+    }
+
     // Live suggestions: re-arm the debounce on every keystroke; a submit or a
     // recent-term tap flips `submitted` before this fires, so it stays quiet.
     // The `searchedQuery` guard keeps this from wiping and reloading the
@@ -102,25 +100,40 @@ fun GlobalSearchPage(
         }
     }
 
+    val rowContext = rememberGlobalSearchRowContext(navController, audioQueueVM)
+    val rowContexts = rememberGlobalSearchDeviceContexts(
+        rowContext, viewModel.domainStates.values.flatMap { state -> state.devices.map { it.device } }.distinct(),
+    )
     val onOpen: (GlobalSearchHit) -> Unit = { hit ->
         when (val action = hit.action) {
-            is GlobalSearchAction.Navigate -> navController.navigate(action.route)
+            is GlobalSearchAction.Navigate -> {
+                val device = hit.device
+                if (device is com.ismartcoding.plain.rust.graphql.ContentSource.Remote) {
+                    val feature: com.ismartcoding.plain.platform.system.AppFeatureType
+                    var id = ""
+                    var path = ""
+                    var title = ""
+                    when (val route = action.route) {
+                        is com.ismartcoding.plain.ui.navigation.Routing.NoteDetail -> { feature = com.ismartcoding.plain.platform.system.AppFeatureType.NOTES; id = route.id }
+                        is com.ismartcoding.plain.ui.navigation.Routing.FeedEntry -> { feature = com.ismartcoding.plain.platform.system.AppFeatureType.FEEDS; id = route.id }
+                        is com.ismartcoding.plain.ui.navigation.Routing.AppDetails -> { feature = com.ismartcoding.plain.platform.system.AppFeatureType.APPS; id = route.id }
+                        is com.ismartcoding.plain.ui.navigation.Routing.Files -> { feature = com.ismartcoding.plain.platform.system.AppFeatureType.FILES; path = route.folderPath }
+                        is com.ismartcoding.plain.ui.navigation.Routing.Chat -> { feature = com.ismartcoding.plain.platform.system.AppFeatureType.CHAT; id = route.id }
+                        is com.ismartcoding.plain.ui.navigation.Routing.Docs -> {
+                            feature = com.ismartcoding.plain.platform.system.AppFeatureType.DOCS
+                            val doc = (hit.source as GlobalSearchSource.Doc).doc
+                            id = doc.id; path = doc.path; title = doc.title
+                        }
+                        else -> error("Unsupported remote search result")
+                    }
+                    navController.navigate(com.ismartcoding.plain.ui.navigation.Routing.ManagedTools(device.client.peerId, device.client.publicKey, feature.name, id, path, title))
+                } else navController.navigate(action.route)
+            }
             is GlobalSearchAction.PlayAudio -> checkNotificationPermission(Res.string.audio_notification_prompt) {
-                scope.launch(Dispatchers.Default) { audioQueueVM.enqueueAndPlayAsync(action.audio) }
+                scope.launch(Dispatchers.Default) { rowContexts.getValue(hit.device).audioQueueVM.enqueueAndPlayAsync(action.audio) }
             }
         }
     }
-
-    // Fresh VMs (search-prefixed keys) so search rows never mutate the source pages' state.
-    val rowContext = rememberGlobalSearchRowContext(
-        navController = navController,
-        audioQueueVM = audioQueueVM,
-        audioVM = viewModel(key = "searchAudioVM") { AudioViewModel() },
-        tagsVM = viewModel(key = "searchTagsVM") { TagsViewModel() },
-        castVM = viewModel(key = "searchCastVM") { CastViewModel() },
-        docsVM = viewModel(key = "searchDocsVM") { DocsViewModel() },
-        feedEntriesVM = viewModel(key = "searchFeedEntriesVM") { FeedEntriesViewModel() },
-    )
 
     // Tapping an image/video hit opens the shared fullscreen previewer seeded
     // with every loaded hit of that section, at the tapped index. Same flow as
@@ -131,15 +144,8 @@ fun GlobalSearchPage(
         val hits = viewModel.domainStates[domain]?.hits?.value ?: emptyList()
         scope.launch {
             withIO {
-                val image = (hit.source as? GlobalSearchSource.Image)?.image
-                val video = (hit.source as? GlobalSearchSource.Video)?.video
-                if (image != null) {
-                    val items = hits.mapNotNull { (it.source as? GlobalSearchSource.Image)?.image }
-                    MediaPreviewData.setDataAsync(itemState, items, image)
-                } else if (video != null) {
-                    val items = hits.mapNotNull { (it.source as? GlobalSearchSource.Video)?.video }
-                    MediaPreviewData.setDataAsync(itemState, items, video)
-                }
+                val selected = hit.previewItem() ?: return@withIO
+                MediaPreviewData.setDataAsync(itemState, hits.mapNotNull { it.previewItem() }, selected)
             }
             val index = MediaPreviewData.items.indexOfFirst { it.id == hit.previewItem()?.id }
             if (index >= 0) {
@@ -193,7 +199,7 @@ fun GlobalSearchPage(
                     viewModel = viewModel,
                     domains = domains,
                     paddingValues = paddingValues,
-                    rowContext = rowContext,
+                    rowContexts = rowContexts,
                     onOpen = onOpen,
                     onPreviewMedia = onPreviewMedia,
                 )

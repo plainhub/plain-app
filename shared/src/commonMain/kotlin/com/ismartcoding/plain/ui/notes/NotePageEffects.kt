@@ -14,8 +14,6 @@ import com.ismartcoding.plain.ui.platform.system.hideNavigationBar
 import com.ismartcoding.plain.ui.platform.system.showNavigationBar
 import com.ismartcoding.plain.ui.navigation.PBackHandler
 import com.ismartcoding.plain.platform.system.DataType
-import com.ismartcoding.plain.features.notes.NotesClient
-import com.ismartcoding.plain.features.tags.TagsClient
 import com.ismartcoding.plain.ui.media.viewer.previewer.MediaPreviewerState
 import com.ismartcoding.plain.ui.editor.markdown.MdEditorViewModel
 import com.ismartcoding.plain.ui.notes.NoteViewModel
@@ -34,6 +32,7 @@ internal fun NotePageEffects(
     id: MutableState<String>, tagId: String, noteVM: NoteViewModel,
     tagsVM: TagsViewModel, mdEditorVM: MdEditorViewModel,
     previewerState: MediaPreviewerState,
+    notesVM: NotesViewModel = NotesViewModel.local,
 ) {
     val scope = rememberCoroutineScope()
     val keyboardController = LocalSoftwareKeyboardController.current
@@ -44,7 +43,7 @@ internal fun NotePageEffects(
         noteVM.editMode.value = true
         scope.launch(Dispatchers.Default) {
             if (id.value.isNotEmpty()) {
-                val item = NotesClient.getById(id.value)
+                val item = notesVM.api.getById(id.value)
                 noteVM.item.value = item
                 noteVM.content.value = item?.content ?: ""
             }
@@ -54,15 +53,15 @@ internal fun NotePageEffects(
                 if (noteVM.content.value == t) return@collectLatest
                 scope.launch(Dispatchers.Default) {
                     noteVM.content.value = t
-                    val newItem = NotesClient.save(id = id.value, title = "", content = t)
+                    val newItem = notesVM.api.save(id = id.value, title = "", content = t)
                     id.value = newItem.id
                     if (isNew && tagId.isNotEmpty()) {
-                        TagsClient.editTagRelations(DataType.NOTE, listOf(id.value), listOf(tagId), emptyList())
+                        tagsVM.api.edit(DataType.NOTE, listOf(id.value), listOf(tagId), emptyList())
                     }
                     if (isNew) {
                         tagsVM.loadAsync(setOf(id.value))
                     }
-                    NotesViewModel.updateItem(newItem)
+                    notesVM.updateItem(newItem)
                 }
             }
         }

@@ -20,8 +20,7 @@ import com.ismartcoding.plain.ui.base.PSheetPrimaryActionsCard
 import com.ismartcoding.plain.ui.components.SaveToSheet
 import com.ismartcoding.plain.ui.components.DialogHelper
 import com.ismartcoding.plain.ui.files.stored.VAppFile
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
+import com.ismartcoding.plain.ui.state.launchSafe
 import org.jetbrains.compose.resources.stringResource
 import com.ismartcoding.plain.ui.resources.Res as UiRes
 import com.ismartcoding.plain.ui.resources.forward as ui_drawable_forward
@@ -37,6 +36,7 @@ fun AppFileInfoActionButtons(
     onShowForwardDialog: () -> Unit,
     onDismiss: () -> Unit,
 ) {
+    val source = com.ismartcoding.plain.ui.navigation.LocalContentSource.current
     val scope = rememberCoroutineScope()
     var showSaveSheet by remember { mutableStateOf(false) }
     val realPath = file.appFile.realPath
@@ -46,16 +46,16 @@ fun AppFileInfoActionButtons(
             onShowForwardDialog()
         }
         PSheetPrimaryAction(UiRes.drawable.ui_drawable_share_2, stringResource(Res.string.share)) {
-            scope.launch(Dispatchers.Default) {
-                shareFiles(listOf(realPath))
+            scope.launchSafe {
+                shareFiles(listOf(source.fileForOpen(realPath, file.fileName)))
+                onDismiss()
             }
-            onDismiss()
         }
         PSheetPrimaryAction(UiRes.drawable.ui_drawable_save, stringResource(Res.string.save_as)) {
             showSaveSheet = true
         }
         PSheetPrimaryAction(UiRes.drawable.ui_drawable_square_arrow_out_up_right, stringResource(Res.string.open_with)) {
-            openFileExternal(realPath)
+            scope.launchSafe { openFileExternal(source.fileForOpen(realPath, file.fileName)) }
         }
     }
 
@@ -66,7 +66,9 @@ fun AppFileInfoActionButtons(
             onDownloads = {
                 showSaveSheet = false
                 coMain {
-                    val result = withIO { saveFileToDownloads(realPath, file.fileName) }
+                    val result = withIO { if (source is com.ismartcoding.plain.rust.graphql.ContentSource.Remote) {
+                        source.files.copyToDirectory(realPath, source.info.downloadsDir, file.fileName)
+                    } else saveFileToDownloads(realPath, file.fileName) }
                     if (result.isNotEmpty()) {
                         DialogHelper.showConfirmDialog("", LocaleHelper.getStringFAsync(Res.string.file_save_to, result))
                     } else {
@@ -77,7 +79,7 @@ fun AppFileInfoActionButtons(
             onDirectory = { dir ->
                 showSaveSheet = false
                 coMain {
-                    val result = withIO { FilesClient.copyToDirectory(realPath, dir, file.fileName) }
+                    val result = withIO { source.files.copyToDirectory(realPath, dir, file.fileName) }
                     if (result.isNotEmpty()) {
                         DialogHelper.showConfirmDialog("", LocaleHelper.getStringFAsync(Res.string.file_save_to, result))
                     } else {

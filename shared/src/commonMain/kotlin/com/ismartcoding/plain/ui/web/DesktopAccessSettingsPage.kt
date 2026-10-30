@@ -8,31 +8,17 @@ import com.ismartcoding.plain.i18n.*
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.gestures.animateScrollBy
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.geometry.Rect
-import androidx.compose.ui.layout.boundsInRoot
-import androidx.compose.ui.layout.onGloballyPositioned
-import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
-import com.ismartcoding.plain.features.web.WebSettingsFeature
 import com.ismartcoding.plain.platform.system.openAppSettings
 import org.jetbrains.compose.resources.stringResource
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -57,7 +43,6 @@ import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.settings.DesktopAccessSettingsViewModel
 import com.ismartcoding.plain.ui.navigation.Routing
 import com.ismartcoding.plain.ui.theme.PlainTheme
-import kotlinx.coroutines.delay
 import com.ismartcoding.plain.ui.resources.Res as UiRes
 import com.ismartcoding.plain.ui.resources.bell as ui_drawable_bell
 import com.ismartcoding.plain.ui.resources.code as ui_drawable_code
@@ -81,57 +66,14 @@ fun DesktopAccessSettingsPage(
     val notificationListenerGranted = remember { mutableStateOf(Permission.NOTIFICATION_LISTENER.isGranted()) }
     val notificationsCard = AppFeatureType.NOTIFICATIONS.has()
     val listState = rememberLazyListState()
-    val anchors = remember { mutableStateMapOf<WebSettingsFeature, Rect>() }
-    val switches = remember { mutableStateMapOf<WebSettingsFeature, Rect>() }
-    var listBounds by remember { mutableStateOf<Rect?>(null) }
-    var overlayOrigin by remember { mutableStateOf(Offset.Zero) }
-    var overlaySize by remember { mutableStateOf(IntSize.Zero) }
-    var bubbleFeature by remember { mutableStateOf<WebSettingsFeature?>(null) }
-    val density = LocalDensity.current
-
-    LaunchedEffect(Unit) {
-    AccessFeatureHighlight.pending.collect { f ->
-        if (f == null) return@collect
-        AccessFeatureHighlight.pending.value = null
-        val index = itemIndexFor(f, permissionList.value, notificationsCard)
-        if (index == null) return@collect
-        delay(300)
-        listState.animateScrollToItem(index)
-        delay(150)
-        with(density) {
-            val margin = 16.dp.roundToPx().toFloat()
-            val rect = anchors[f]
-            val viewport = listBounds
-            if (rect != null && viewport != null) {
-                when {
-                    rect.bottom > viewport.bottom - margin -> listState.animateScrollBy(rect.bottom - viewport.bottom + margin)
-                    rect.top < viewport.top + margin -> listState.animateScrollBy(rect.top - viewport.top - margin)
-                }
-            }
-        }
-        delay(150)
-        bubbleFeature = f
-    }
-    }
-
     WebSettingsEffects(permissionList, systemAlertWindow, notificationListenerGranted)
 
     PScaffold(topBar = {
     PTopAppBar(onNavigateBack = { navController.navigateUp() }, title = stringResource(Res.string.access_settings))
     }, content = { paddingValues ->
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .onGloballyPositioned {
-                overlayOrigin = it.boundsInRoot().topLeft
-                overlaySize = it.size
-            }
-    ) {
         LazyColumn(
             state = listState,
-            modifier = Modifier
-                .padding(top = paddingValues.calculateTopPadding())
-                .onGloballyPositioned { listBounds = it.boundsInRoot() }
+            modifier = Modifier.padding(top = paddingValues.calculateTopPadding())
         ) {
             item {
                 TopSpace()
@@ -154,30 +96,15 @@ fun DesktopAccessSettingsPage(
             item { PSectionTitle(title = stringResource(Res.string.features)) }
             itemsIndexed(permissionList.value) { index, m ->
                 val permission = m.permission
-                val af = permission.accessFeatureOf()
-                val baseModifier = if (af != null) {
-                    Modifier.onGloballyPositioned { anchors[af] = it.boundsInRoot() }
-                } else {
-                    Modifier
-                }
                 PListItem(
-                    modifier = baseModifier
-                        .then(PlainTheme.getCardModifier(index = index, size = permissionList.value.size))
+                    modifier = PlainTheme.getCardModifier(index = index, size = permissionList.value.size)
                         .clickable { togglePermission(scope, m, !enabledPermissions.contains(permission.name)) },
                     icon = m.icon, title = permission.getText(),
                     subtitle = stringResource(if (m.granted) Res.string.system_permission_granted else Res.string.system_permission_not_granted)
                 ) {
-                    if (af != null) {
-                        Box(Modifier.onGloballyPositioned { switches[af] = it.boundsInRoot() }) {
-                            Switch(checked = enabledPermissions.contains(permission.name), onCheckedChange = { enable ->
-                                togglePermission(scope, m, enable)
-                            })
-                        }
-                    } else {
-                        Switch(checked = enabledPermissions.contains(permission.name), onCheckedChange = { enable ->
-                            togglePermission(scope, m, enable)
-                        })
-                    }
+                    Switch(checked = enabledPermissions.contains(permission.name), onCheckedChange = { enable ->
+                        togglePermission(scope, m, enable)
+                    })
                 }
             }
             if (notificationsCard) {
@@ -188,16 +115,12 @@ fun DesktopAccessSettingsPage(
                         val permission = m.permission
                         val enabled = notificationListenerGranted.value && enabledPermissions.contains(permission.name)
                         PListItem(
-                            modifier = Modifier
-                                .onGloballyPositioned { anchors[WebSettingsFeature.NOTIFICATIONS] = it.boundsInRoot() }
-                                .clickable { navController.navigate(Routing.NotificationSettings) },
+                            modifier = Modifier.clickable { navController.navigate(Routing.NotificationSettings) },
                             icon = m.icon, title = permission.getText(),
                             subtitle = stringResource(if (notificationListenerGranted.value) Res.string.system_permission_granted else Res.string.system_permission_not_granted),
                             separatedActions = true
                         ) {
-                            Box(Modifier.onGloballyPositioned { switches[WebSettingsFeature.NOTIFICATIONS] = it.boundsInRoot() }) {
-                                Switch(checked = enabled, onCheckedChange = { enable -> togglePermission(scope, m, enable) })
-                            }
+                            Switch(checked = enabled, onCheckedChange = { enable -> togglePermission(scope, m, enable) })
                         }
                     }
                 }
@@ -208,15 +131,11 @@ fun DesktopAccessSettingsPage(
                 val clipboardEnabled = enabledPermissions.contains(m.permission.name)
                 PCard(modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN)) {
                     PListItem(
-                        modifier = Modifier
-                            .onGloballyPositioned { anchors[WebSettingsFeature.CLIPBOARD] = it.boundsInRoot() }
-                            .clickable { navController.navigate(Routing.ClipboardHistory) },
+                        modifier = Modifier.clickable { navController.navigate(Routing.ClipboardHistory) },
                         icon = m.icon, title = stringResource(Res.string.clipboard_sync),
                         separatedActions = true
                     ) {
-                        Box(Modifier.onGloballyPositioned { switches[WebSettingsFeature.CLIPBOARD] = it.boundsInRoot() }) {
-                            Switch(checked = clipboardEnabled, onCheckedChange = { enable -> togglePermission(scope, m, enable) })
-                        }
+                        Switch(checked = clipboardEnabled, onCheckedChange = { enable -> togglePermission(scope, m, enable) })
                     }
                 }
                 if (clipboardEnabled) {
@@ -250,19 +169,6 @@ fun DesktopAccessSettingsPage(
             }
             item { BottomSpace(paddingValues) }
         }
-        bubbleFeature?.let { f ->
-            anchors[f]?.let { rect ->
-                AccessFeatureBubble(
-                    anchor = rect,
-                    switchAnchor = switches[f],
-                    overlayOrigin = overlayOrigin,
-                    overlaySize = overlaySize,
-                    label = bubbleLabel(f),
-                    onDismiss = { bubbleFeature = null },
-                )
-            }
-        }
-    }
     })
 
 }

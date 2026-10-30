@@ -59,7 +59,8 @@ fun FolderShareSheet(
     onDismiss: () -> Unit,
     onConfirm: (dirPath: String, name: String, expiry: ShareExpiry) -> Unit,
 ) {
-    val rootPath = remember { getInternalStoragePath() }
+    val source = com.ismartcoding.plain.ui.navigation.LocalContentSource.current
+    val rootPath = source.rootPath
     var currentPath by remember { mutableStateOf(rootPath) }
     var dirs by remember { mutableStateOf<List<FileEntry>>(emptyList()) }
     var itemCount by remember { mutableStateOf(0) }
@@ -70,13 +71,13 @@ fun FolderShareSheet(
 
     LaunchedEffect(currentPath) {
         withIO {
-            val entries = FilesClient.list(currentPath, showHidden = false, sortBy = FileSortBy.NAME_ASC)
+            val entries = source.files.list(currentPath, showHidden = false, sortBy = FileSortBy.NAME_ASC)
             dirs = entries.filter { it.isDir }
             itemCount = entries.size
             totalSize = entries.sumOf { if (it.isDir) 0L else it.size }
         }
         if (!nameEdited) {
-            name = if (currentPath == rootPath) getInternalStorageName() else currentPath.getFilenameFromPath()
+            name = if (currentPath == rootPath) (if (source is com.ismartcoding.plain.rust.graphql.ContentSource.Remote) source.info.deviceName else getInternalStorageName()) else currentPath.getFilenameFromPath()
         }
     }
 
@@ -162,7 +163,7 @@ fun FolderShareSheet(
             PFilledButton(
                 text = stringResource(Res.string.share_this_folder),
                 onClick = {
-                    val fallbackName = if (currentPath == rootPath) getInternalStorageName() else currentPath.getFilenameFromPath()
+                    val fallbackName = if (currentPath == rootPath) (if (source is com.ismartcoding.plain.rust.graphql.ContentSource.Remote) source.info.deviceName else getInternalStorageName()) else currentPath.getFilenameFromPath()
                     onConfirm(currentPath, name.ifBlank { fallbackName }, expiry)
                 },
                 modifier = Modifier.weight(1f),

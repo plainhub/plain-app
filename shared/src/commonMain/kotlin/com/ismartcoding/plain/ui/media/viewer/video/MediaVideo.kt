@@ -69,7 +69,7 @@ fun MediaVideo(
             when (val data = model.data) {
                 is MediaVideo -> model.initAsync(data)
                 else -> {
-                    val meta = MediaClient.videoInfo(model.path)
+                    val meta = model.source.media.videoInfo(model.path)
                     if (meta != null) {
                         model.intrinsicSize = if (meta.rotation == 90 || meta.rotation == 270) {
                             IntSize(meta.height, meta.width)

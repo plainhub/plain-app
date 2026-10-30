@@ -36,6 +36,10 @@ fun PackageListItem(
     onClick: () -> Unit = { },
     onLongClick: (() -> Unit)? = null,
 ) {
+    val source = com.ismartcoding.plain.ui.navigation.LocalContentSource.current
+    val icon = if (source is com.ismartcoding.plain.rust.graphql.ContentSource.Remote) {
+        com.ismartcoding.plain.ui.navigation.rememberContentResource(source, "pkgicon://${item.id}").value?.getOrNull()
+    } else item
     Surface(
         modifier = modifier
             .combinedClickable(
@@ -56,7 +60,7 @@ fun PackageListItem(
                 Modifier
                     .padding(end = 16.dp)
                     .size(48.dp),
-                model = item,
+                model = icon,
                 contentDescription = item.name,
             )
             Column(

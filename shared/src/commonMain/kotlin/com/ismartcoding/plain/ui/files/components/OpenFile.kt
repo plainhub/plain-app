@@ -28,6 +28,7 @@ import com.ismartcoding.plain.ui.media.extensions.toPreviewItem
 import com.ismartcoding.plain.ui.components.DialogHelper
 import com.ismartcoding.plain.ui.audio.AudioQueueViewModel
 import com.ismartcoding.plain.ui.media.MediaPreviewData
+import com.ismartcoding.plain.ui.navigation.navigateOtherFile
 import com.ismartcoding.plain.ui.navigation.navigatePdf
 import com.ismartcoding.plain.ui.navigation.navigateTextFile
 import kotlinx.coroutines.CancellationException
@@ -39,7 +40,36 @@ fun openFile(
     previewerState: MediaPreviewerState,
     itemState: TransformItemState,
     audioQueueVM: AudioQueueViewModel? = null,
+    source: com.ismartcoding.plain.rust.graphql.ContentSource = com.ismartcoding.plain.rust.graphql.ContentSource.Local,
 ) {
+    if (source is com.ismartcoding.plain.rust.graphql.ContentSource.Remote) {
+        coMain {
+            DialogHelper.showLoading()
+            try {
+                val path = if (ZipBrowserHelper.isZipPath(file.path)) source.files.cacheZipEntry(file.path) ?: error("archive_entry_unavailable") else file.path
+                when {
+                    file.name.isImageFast() || file.name.isVideoFast() -> {
+                        val previewFiles = if (ZipBrowserHelper.isZipPath(file.path)) listOf(file.copy(path = path)) else files.filter { it.path.isImageFast() || it.path.isVideoFast() }
+                        val selected = file.copy(path = path).toPreviewItem(source)
+                        MediaPreviewData.setDataAsync(itemState, previewFiles.map { it.toPreviewItem(source) }, selected)
+                        previewerState.openTransform(index = MediaPreviewData.items.indexOfFirst { it.id == path }, itemState = itemState)
+                    }
+                    else -> openFileByType(
+                        path, navController, source = source, name = file.name,
+                        onPreviewMedia = {},
+                        onUnsupported = { navController.navigateOtherFile(path, file.name) },
+                    )
+                }
+            } catch (cancelled: CancellationException) {
+                throw cancelled
+            } catch (error: Exception) {
+                DialogHelper.showMessage(error)
+            } finally {
+                DialogHelper.hideLoading()
+            }
+        }
+        return
+    }
     // For files inside a zip archive, extract to the cache dir first, then open normally.
     if (ZipBrowserHelper.isZipPath(file.path)) {
         coMain {
@@ -78,7 +108,7 @@ fun openFile(
 
     val path = file.path
 
-    openLocalFileByType(
+    openFileByType(
         path = path,
         navController = navController,
         audioQueueVM = audioQueueVM,
@@ -101,28 +131,27 @@ fun openFile(
     )
 }
 
-/**
- * Type dispatch shared by every "open a local file" flow (FilesPage, zip
- * browser, shared-folder browser): media → [onPreviewMedia] (the caller owns
- * how its previewer opens), audio → the audio player, text/PDF → their
- * pages, anything else → [onUnsupported]. [mediaHint] forces the media
- * branch when the path lacks a recognizable media extension (e.g. a shared
- * entry typed only by its MIME).
- */
-fun openLocalFileByType(
+fun openFileByType(
     path: String,
     navController: NavHostController,
     audioQueueVM: AudioQueueViewModel? = null,
     mediaHint: Boolean = false,
+    source: com.ismartcoding.plain.rust.graphql.ContentSource = com.ismartcoding.plain.rust.graphql.ContentSource.Local,
+    name: String = path.substringAfterLast('/'),
     onPreviewMedia: () -> Unit,
     onUnsupported: () -> Unit = {},
 ) {
     when {
-        path.isImageFast() || path.isVideoFast() || mediaHint -> onPreviewMedia()
+        name.isImageFast() || name.isVideoFast() || mediaHint -> onPreviewMedia()
 
-        path.isAudioFast() -> {
+        name.isAudioFast() -> {
             coMain {
                 try {
+                    if (source is com.ismartcoding.plain.rust.graphql.ContentSource.Remote) {
+                        val audio = source.media.audioInfo(path)
+                        com.ismartcoding.plain.platform.media.audioJustPlayWithNotificationCheck(audio, source)
+                        return@coMain
+                    }
                     if (audioQueueVM != null) {
                         val audio = MediaClient.audioInfo(path)
                         audioQueueVM.playSingleAsync(audio)
@@ -135,13 +164,15 @@ fun openLocalFileByType(
                 }
             }
         }
-        path.isTextFile() -> {
-            navController.navigateTextFile(path)
+        name.isTextFile() -> {
+            navController.navigateTextFile(path, name)
         }
 
-        path.isPdfFile() -> {
+        name.isPdfFile() -> coMain {
             try {
-                navController.navigatePdf(fileToUriString(path))
+                navController.navigatePdf(fileToUriString(source.fileForOpen(path, name)))
+            } catch (cancelled: CancellationException) {
+                throw cancelled
             } catch (ex: Exception) {
                 DialogHelper.showMessage(Res.string.pdf_open_error)
             }

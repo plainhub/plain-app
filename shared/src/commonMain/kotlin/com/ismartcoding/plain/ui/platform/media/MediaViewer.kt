@@ -29,6 +29,17 @@ fun MediaViewer(
     gesture: GestureScope,
     boundClip: Boolean = true,
 ) {
+    androidx.compose.runtime.LaunchedEffect(model.path) {
+        try {
+            model.prepareResource()
+        } catch (cancelled: kotlinx.coroutines.CancellationException) {
+            throw cancelled
+        } catch (error: Exception) {
+            com.ismartcoding.plain.ui.components.DialogHelper.showMessage(error)
+            state.mountedFlow.emit(true)
+        }
+    }
+    if (model.resourcePath.isEmpty()) return
     val scope = rememberCoroutineScope()
     val (rawGesture, sizeChange) = rememberMediaViewerGesture(state, gesture, scope)
     val imageRenderer = LocalImageRenderer.current

@@ -1,5 +1,6 @@
 package com.ismartcoding.plain.ui.feeds
 
+import com.ismartcoding.plain.rust.graphql.ContentSource
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
@@ -10,7 +11,7 @@ import com.ismartcoding.plain.models.FeedEntry
 import com.ismartcoding.plain.preferences.*
 import kotlinx.coroutines.launch
 
-class FeedEntryViewModel : ViewModel() {
+class FeedEntryViewModel internal constructor(val source: ContentSource = ContentSource.Local) : ViewModel() {
     val showSelectTagsDialog = mutableStateOf(false)
     val item = mutableStateOf<FeedEntry?>(null)
     val feed = mutableStateOf<Feed?>(null)

@@ -180,10 +180,12 @@
     <string name="pair_chat_only">僅聊天</string>
     <string name="peer_manage_access">可管理</string>
     <string name="remote_management">遠端管理</string>
-    <string name="managed_content">內容</string>
-    <string name="managed_delete_confirm">從 %2$s 刪除「%1$s」？</string>
-    <string name="managed_trash_confirm">將「%1$s」移至 %2$s 的資源回收筒？</string>
-    <string name="managed_loading">正在讀取遠端內容…</string>
     <string name="managed_authorization_changed">管理授權或裝置身分已變更，請從該裝置的聊天頁重新進入遠端管理。</string>
     <string name="managed_permission_denied">目前不允許存取，請檢查目標裝置的遠端存取開關和權限。</string>
+    <string name="web_access_request">存取權限請求</string>
+    <string name="web_access_request_message">允許遠端存取此裝置的%1$s嗎？</string>
+    <string name="request_permission">請求權限</string>
+    <string name="remote_permission_required">此裝置尚未授予存取權限，請請求權限後繼續。</string>
+    <string name="pairing_failed">配對失敗</string>
+    <string name="pair_manage_device">可管理</string>
 </resources>

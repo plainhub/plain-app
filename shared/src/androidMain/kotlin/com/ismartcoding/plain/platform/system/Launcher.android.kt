@@ -71,7 +71,7 @@ actual fun openFileExternal(path: String) {
     ctx.startActivity(intent)
 }
 
-fun isFileShareable(path: String): Boolean {
+actual fun isFileShareable(path: String): Boolean {
     val file = File(path)
     if (!file.exists() || !file.canRead()) return false
     if (path.startsWith("/apex/")) return false

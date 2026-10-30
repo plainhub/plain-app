@@ -43,7 +43,7 @@ class RustUploadChunksTest {
         assertEquals(1, fixture.ids.size)
         assertEquals(JsonPrimitive(3), fixture.mutations.first().variables["totalChunks"])
         assertEquals(JsonPrimitive(bytes.size), fixture.mutations.first().variables["totalSize"])
-        assertTrue(fixture.mutations.first().query.contains("replace: true"))
+        assertEquals(JsonPrimitive(true), fixture.mutations.first().variables["replace"])
         assertEquals(1, fixture.queries)
         assertTrue(fixture.mutations.last().query.contains("deleteChunks("))
     }
@@ -63,7 +63,7 @@ class RustUploadChunksTest {
             assertTrue(fixture.client.replace(path, listOf(bytes).iterator()))
             assertContentEquals(bytes, fixture.chunks.single())
             assertEquals(JsonPrimitive(path), fixture.mutations.first().variables["path"])
-            assertTrue(fixture.mutations.first().query.contains("replace: true"))
+            assertEquals(JsonPrimitive(true), fixture.mutations.first().variables["replace"])
             assertTrue(fixture.mutations.last().query.contains("deleteChunks("))
         }
     }
@@ -106,6 +106,28 @@ class RustUploadChunksTest {
         }
         assertEquals(1, fixture.queries)
         assertTrue(fixture.mutations.last().query.contains("deleteChunks("))
+    }
+
+    @Test fun new_files_use_no_replace_and_return_the_server_selected_name() = runTest {
+        val operations = mutableListOf<GraphqlOperation>()
+        val received = mutableListOf<ByteArray>()
+        val api = com.ismartcoding.plain.rust.graphql.GraphqlClient { operation ->
+            operations += operation
+            val response = when {
+                "mergeChunks(" in operation.query -> """{"mergeChunks":{"status":"STARTED"}}"""
+                "mergeStatus(" in operation.query -> """{"mergeStatus":{"status":"DONE","value":"fixture-image.png"}}"""
+                else -> """{"deleteChunks":true}"""
+            }
+            com.ismartcoding.plain.rust.graphql.GraphqlResponse(data = com.ismartcoding.plain.lib.JsonHelper.jsonDecode(response))
+        }
+        val client = UploadChunksClient({ _, _, bytes -> received += bytes.copyOf(); "" }, api)
+        val bytes = byteArrayOf(0, 1, -1, 42)
+        assertEquals("fixture-image.png", client.create("app://note-images/selected.png") { it.write(bytes) })
+        assertContentEquals(bytes, received.single())
+        assertEquals(JsonPrimitive("app://note-images/selected.png"), operations.first().variables["path"])
+        assertEquals(JsonPrimitive(false), operations.first().variables["replace"])
+        assertFalse(operations.any { "importAppFile(" in it.query || "mergeAppFileChunks(" in it.query })
+        assertTrue("deleteChunks(" in operations.last().query)
     }
 
 }

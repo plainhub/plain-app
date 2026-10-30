@@ -80,6 +80,7 @@ fun NotePage(
     navController: NavHostController, initId: String, tagId: String,
     tagsVM: TagsViewModel,
     noteVM: NoteViewModel = viewModel { NoteViewModel() }, mdEditorVM: MdEditorViewModel = viewModel { MdEditorViewModel() },
+    notesVM: NotesViewModel = NotesViewModel.local,
 ) {
     val id = remember { mutableStateOf(initId) }
     val previewerState = rememberPreviewerState()
@@ -91,7 +92,7 @@ fun NotePage(
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(canScroll = { !noteVM.editMode.value })
     val tagIds = tagsMapState[id.value]?.map { it.tagId } ?: emptyList()
 
-    NotePageEffects(id, tagId, noteVM, tagsVM, mdEditorVM, previewerState)
+    NotePageEffects(id, tagId, noteVM, tagsVM, mdEditorVM, previewerState, notesVM)
 
     if (noteVM.showSelectTagsDialog.value) {
         val m = noteVM.item.value

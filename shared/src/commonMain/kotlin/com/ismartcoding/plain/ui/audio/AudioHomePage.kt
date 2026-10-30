@@ -26,7 +26,6 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.ismartcoding.plain.Prefs
 import com.ismartcoding.plain.platform.system.AppFeatureType
-import com.ismartcoding.plain.features.audio.AudioPlaylistsClient
 import com.ismartcoding.plain.features.audio.AudioQueueClient
 import com.ismartcoding.plain.i18n.*
 import com.ismartcoding.plain.lib.coIO
@@ -225,11 +224,11 @@ fun AudioHomePage(
                             onShuffleAll = {
                                 scope.launch {
                                     coIO {
-                                        AudioQueueClient.clearQueue()
-                                        AudioQueueClient.add("trash:false")
-                                        val start = AudioQueueClient.resolveNext(isNext = true, shuffle = true)
+                                        audioVM.source.queue.clearQueue()
+                                        audioVM.source.queue.add("trash:false")
+                                        val start = audioVM.source.queue.resolveNext(isNext = true, shuffle = true)
                                         if (start != null) {
-                                            audioJustPlayWithNotificationCheck(start)
+                                            audioJustPlayWithNotificationCheck(start, audioVM.source)
                                             audioQueueVM.onStarted(start)
                                         }
                                     }
@@ -262,7 +261,7 @@ fun AudioHomePage(
             onConfirm = { name ->
                 showCreatePlaylist = false
                 scope.launch(Dispatchers.Default) {
-                    AudioPlaylistsClient.createPlaylist(name)
+                    audioVM.source.playlists.createPlaylist(name)
                     homeVM.loadAsync(tagsVM)
                 }
             },

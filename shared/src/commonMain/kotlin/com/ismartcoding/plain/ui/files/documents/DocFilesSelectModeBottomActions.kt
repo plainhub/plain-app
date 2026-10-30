@@ -65,11 +65,10 @@ fun DocFilesSelectModeBottomActions(
                 }
                 IconTextSmallButtonShare {
                     val selectedIds = dragSelectState.selectedIds
-                    val paths = docsVM.itemsFlow.value.filter { selectedIds.contains(it.id) }.map { it.path }
-                    shareFiles(paths)
+                    docsVM.share(selectedIds.toList())
                 }
             }
-            if (AppFeatureType.MEDIA_TRASH.has()) {
+            if (AppFeatureType.MEDIA_TRASH.has(docsVM.source.capabilities)) {
                 if (docsVM.trash.value) {
                     IconTextSmallButtonRestore {
                         docsVM.restore(tagsVM, dragSelectState.selectedIds.toSet())

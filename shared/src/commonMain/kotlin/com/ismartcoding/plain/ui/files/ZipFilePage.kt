@@ -1,5 +1,6 @@
 package com.ismartcoding.plain.ui.files
 
+import com.ismartcoding.plain.ui.state.launchSafe
 import com.ismartcoding.plain.preferences.*
 
 import com.ismartcoding.plain.i18n.*
@@ -62,7 +63,8 @@ fun ZipFilePage(
     audioQueueVM: AudioQueueViewModel,
     path: String,
     title: String = "",
-    filesVM: FilesViewModel = viewModel { FilesViewModel() },
+    source: com.ismartcoding.plain.rust.graphql.ContentSource = com.ismartcoding.plain.ui.navigation.LocalContentSource.current,
+    filesVM: FilesViewModel = viewModel { FilesViewModel(source) },
 ) {
     val scope = rememberCoroutineScope()
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
@@ -77,9 +79,9 @@ fun ZipFilePage(
 
     LaunchedEffect(path) {
         withContext(Dispatchers.Default) {
-            val appDataPath = appDir()
+            val appDataPath = source.appPath
             val type = if (path.startsWith(appDataPath)) FilesType.APP else FilesType.INTERNAL_STORAGE
-            val rootPath = when (type) { FilesType.APP -> appDataPath; else -> getInternalStoragePath() }
+            val rootPath = when (type) { FilesType.APP -> appDataPath; else -> source.rootPath }
             filesVM.initSelectedPath(rootPath, type, zipVirtualRoot, zipVirtualRoot)
             filesVM.sortBy.value = Prefs.fileSortBy.value
             audioQueueVM.loadAsync()
@@ -126,7 +128,7 @@ fun ZipFilePage(
                         contentDescription = stringResource(Res.string.share),
                         tint = MaterialTheme.colorScheme.onSurface,
                     ) {
-                        shareFile(path)
+                        scope.launchSafe { shareFile(source.fileForOpen(path)) }
                     }
                     ActionButtonSort { filesVM.showSortDialog.value = true }
                     ActionButtonMoreWithMenu { dismiss ->
@@ -145,7 +147,7 @@ fun ZipFilePage(
                             text = { Text(stringResource(Res.string.open_with_other_app)) },
                             onClick = {
                                 dismiss()
-                                openFileExternal(path)
+                                scope.launchSafe { openFileExternal(source.fileForOpen(path)) }
                             })
                     }
                 },

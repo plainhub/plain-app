@@ -1,6 +1,5 @@
 package com.ismartcoding.plain.ui.casting
 
-import com.ismartcoding.plain.features.media.MediaClient
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -54,12 +53,14 @@ fun CastSessionPlaylistItem(
     onClick: () -> Unit,
     onRemove: () -> Unit,
 ) {
+    val source = com.ismartcoding.plain.ui.navigation.LocalContentSource.current
+    val resource = com.ismartcoding.plain.ui.navigation.rememberContentResource(source, item.path, 256).value?.getOrNull()
     var title by remember { mutableStateOf("") }
     var subtitle by remember { mutableStateOf("") }
 
-    LaunchedEffect(item.path) {
+    LaunchedEffect(source, item.path) {
         if (item is CastItem && item.audio) {
-            val (t, a) = withIO { MediaClient.audioInfo(item.path).let { it.title to it.artist } }
+            val (t, a) = withIO { source.media.audioInfo(item.path).let { it.title to it.artist } }
             title = t; subtitle = a
         } else {
             title = item.title.ifEmpty { item.path.getFilenameWithoutExtensionFromPath() }
@@ -83,14 +84,14 @@ fun CastSessionPlaylistItem(
         ) {
             when {
                 item.path.isImageFast() -> AsyncImage(
-                    model = item.path,
+                    model = resource,
                     contentDescription = null,
                     contentScale = ContentScale.Crop,
                     modifier = Modifier.fillMaxSize(),
                 )
 
                 item.path.isVideoFast() -> AsyncImage(
-                    model = item.path,
+                    model = resource,
                     contentDescription = null,
                     contentScale = ContentScale.Crop,
                     modifier = Modifier.fillMaxSize(),

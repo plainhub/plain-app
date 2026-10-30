@@ -69,6 +69,7 @@ import com.ismartcoding.plain.ui.navigation.NavLoadGate
 import com.ismartcoding.plain.ui.casting.CastDialog
 import com.ismartcoding.plain.ui.tags.TagsBottomSheet
 import kotlinx.coroutines.Dispatchers
+import com.ismartcoding.plain.ui.state.launchSafe
 import kotlinx.coroutines.launch
 import com.ismartcoding.plain.ui.resources.Res as UiRes
 import com.ismartcoding.plain.ui.resources.video as ui_drawable_video
@@ -78,10 +79,11 @@ import com.ismartcoding.plain.ui.resources.video as ui_drawable_video
 fun VideosPage(
     navController: NavHostController,
     initialLoadGate: NavLoadGate? = null,
-    videosVM: VideosViewModel = viewModel(key = "videosVM") { VideosViewModel() },
-    tagsVM: TagsViewModel = viewModel(key = "videoTagsVM") { TagsViewModel() },
-    mediaFoldersVM: MediaFoldersViewModel = viewModel(key = "videoFoldersVM") { MediaFoldersViewModel() },
-    castVM: CastViewModel = viewModel(key = "videoCastVM") { CastViewModel() },
+    source: com.ismartcoding.plain.rust.graphql.ContentSource = com.ismartcoding.plain.ui.navigation.LocalContentSource.current,
+    videosVM: VideosViewModel = viewModel(key = "videosVM") { VideosViewModel(source) },
+    tagsVM: TagsViewModel = viewModel(key = "videoTagsVM") { TagsViewModel(source.tags) },
+    mediaFoldersVM: MediaFoldersViewModel = viewModel(key = "videoFoldersVM") { MediaFoldersViewModel(source) },
+    castVM: CastViewModel = viewModel(key = "videoCastVM") { CastViewModel(source) },
 ) {
     val scope = rememberCoroutineScope()
     val density = LocalDensity.current
@@ -138,7 +140,7 @@ fun VideosPage(
         }
     }
 
-    MediaPermissionEffects(videosVM.hasPermission, initialLoadGate, reloadAfterGrant)
+    MediaPermissionEffects(videosVM.hasPermission, initialLoadGate, reloadAfterGrant, videosVM.source)
     LaunchedEffect(dragSelectState.selectMode, (previewerState.visible && !isGestureInteractionMode())) {
         if (dragSelectState.selectMode || (previewerState.visible && !isGestureInteractionMode())) scrollBehavior.reset()
     }

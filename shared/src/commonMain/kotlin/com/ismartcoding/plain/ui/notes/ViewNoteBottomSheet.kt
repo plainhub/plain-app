@@ -41,10 +41,11 @@ fun ViewNoteBottomSheet(
     tagsVM: TagsViewModel,
     tagsMap: Map<String, List<TagRelation>>,
     tagsState: List<Tag>,
+    notesVM: NotesViewModel = NotesViewModel.local,
 ) {
-    val m = NotesViewModel.selectedItem.value ?: return
+    val m = notesVM.selectedItem.value ?: return
     val onDismiss = {
-        NotesViewModel.selectedItem.value = null
+        notesVM.selectedItem.value = null
     }
     val scope = rememberCoroutineScope()
 
@@ -59,31 +60,31 @@ fun ViewNoteBottomSheet(
             }
             item {
                 PSheetPrimaryActionsCard {
-                    if (!NotesViewModel.showSearchBar.value) {
+                    if (!notesVM.showSearchBar.value) {
                         PSheetPrimaryAction(UiRes.drawable.ui_drawable_list_checks, stringResource(Res.string.select)) {
-                            NotesViewModel.enterSelectMode()
-                            NotesViewModel.select(m.id)
+                            notesVM.enterSelectMode()
+                            notesVM.select(m.id)
                             onDismiss()
                         }
                     }
-                    if (NotesViewModel.trash.value) {
+                    if (notesVM.trash.value) {
                         PSheetPrimaryAction(UiRes.drawable.ui_drawable_archive_restore, stringResource(Res.string.restore)) {
-                            NotesViewModel.restore(tagsVM, setOf(m.id))
+                            notesVM.restore(tagsVM, setOf(m.id))
                             onDismiss()
                         }
                         PSheetPrimaryDeleteAction(stringResource(Res.string.delete)) {
-                            NotesViewModel.delete(tagsVM, setOf(m.id))
+                            notesVM.delete(tagsVM, setOf(m.id))
                             onDismiss()
                         }
                     } else {
                         PSheetPrimaryTrashAction(stringResource(Res.string.trash)) {
-                            NotesViewModel.trash(tagsVM, setOf(m.id))
+                            notesVM.trash(tagsVM, setOf(m.id))
                             onDismiss()
                         }
                     }
                 }
             }
-            if (!NotesViewModel.trash.value) {
+            if (!notesVM.trash.value) {
                 item {
                     VerticalSpace(dp = 16.dp)
                     PSectionTitle(title = stringResource(Res.string.tags))
@@ -93,7 +94,7 @@ fun ViewNoteBottomSheet(
                         tagsMap = tagsMap,
                         tagsState = tagsState,
                         onChangedAsync = {
-                            NotesViewModel.loadAsync(tagsVM)
+                            notesVM.loadAsync(tagsVM)
                         }
                     )
                 }

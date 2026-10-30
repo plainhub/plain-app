@@ -59,7 +59,7 @@ fun ImageGridItem(
                         dragSelectState.addSelected(m.id)
                     } else {
                         scope.launch {
-                            withIO { MediaPreviewData.setDataAsync(itemState, imagesVM.itemsFlow.value, m) }
+                            withIO { MediaPreviewData.setDataAsync(itemState, imagesVM.itemsFlow.value, m, imagesVM.source) }
                             previewerState.openTransform(
                                 index = MediaPreviewData.items.indexOfFirst { it.id == m.id },
                                 itemState = itemState,

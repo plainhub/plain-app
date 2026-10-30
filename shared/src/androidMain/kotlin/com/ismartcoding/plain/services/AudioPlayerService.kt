@@ -40,7 +40,12 @@ class AudioPlayerService : MediaLibraryService() {
 
     private fun createPlayer(): Player {
         val attributes = AudioAttributes.Builder().setContentType(C.AUDIO_CONTENT_TYPE_MUSIC).setUsage(C.USAGE_MEDIA).build()
-        val dataSourceFactory = DefaultDataSource.Factory(this)
+        val dataSourceFactory = DefaultDataSource.Factory(this, androidx.media3.datasource.DataSource.Factory {
+            val output = com.ismartcoding.plain.features.audio.AudioCommands.output.value
+            if (output.source is com.ismartcoding.plain.rust.graphql.ContentSource.Remote) {
+                com.ismartcoding.plain.platform.media.PeerResourceDataSource(checkNotNull(output.resource))
+            } else androidx.media3.datasource.DefaultHttpDataSource.Factory().createDataSource()
+        })
         val extractorsFactory = DefaultExtractorsFactory()
         extractorsFactory.setConstantBitrateSeekingAlwaysEnabled(false)
         extractorsFactory.setMp3ExtractorFlags(Mp3Extractor.FLAG_ENABLE_INDEX_SEEKING)

@@ -60,18 +60,18 @@ internal fun getApplicationIcon(packageId: String): Drawable? {
     }
 }
 
-internal suspend fun getPackageDetail(id: String): PackageDetails? = withIO {
+internal actual suspend fun getPackageDetail(id: String): PackageDetails? = withIO {
     runCatching { PackageHelper.getPackageDetail(id) }.getOrNull()
 }
 
 internal fun isPackageInstalled(id: String): Boolean = PackageHelper.isInstalled(id)
 
-internal fun canLaunchPackage(id: String): Boolean = PackageHelper.canLaunch(id)
+internal actual fun canLaunchPackage(id: String): Boolean = PackageHelper.canLaunch(id)
 
-internal fun launchPackage(id: String) {
+internal actual fun launchPackage(id: String) {
     PackageHelper.launch(appContext, id)
 }
 
-internal fun viewPackageInSettings(id: String) {
+internal actual fun viewPackageInSettings(id: String) {
     PackageHelper.viewInSettings(appContext, id)
 }

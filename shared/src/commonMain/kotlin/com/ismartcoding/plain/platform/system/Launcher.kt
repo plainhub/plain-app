@@ -40,3 +40,5 @@ expect fun shareFiles(paths: List<String>)
  * Open a file with the default external app (ACTION_VIEW on Android).
  */
 expect fun openFileExternal(path: String)
+
+expect fun isFileShareable(path: String): Boolean

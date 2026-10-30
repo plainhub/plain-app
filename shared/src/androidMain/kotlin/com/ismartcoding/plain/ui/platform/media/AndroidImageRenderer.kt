@@ -62,25 +62,25 @@ private val fileExistsCache = ConcurrentHashMap<String, Boolean>()
 
 @Composable
 private fun rememberTiledImageDecoder(item: PreviewItem): ImageDecoder? {
-    if (item.isVideo() || item.path.isUrl()) return null
-    if (item.size <= 2000 * 1000) return null
+    if (item.isVideo() || item.resourcePath.isUrl()) return null
+    if (item.size <= com.ismartcoding.plain.platform.media.TILED_IMAGE_MIN_BYTES) return null
 
-    val imageType = remember(item.path) { ImageHelper.getImageType(item.path, item.path) }
+    val imageType = remember(item.resourcePath) { ImageHelper.getImageType(item.resourcePath, item.resourcePath) }
     if (imageType.isApplicableAnimated() || imageType == ImageType.SVG) return null
 
-    var rotation by remember(item.path) { mutableStateOf(item.rotation) }
-    LaunchedEffect(item.path) {
+    var rotation by remember(item.resourcePath) { mutableStateOf(item.rotation) }
+    LaunchedEffect(item.resourcePath) {
         if (rotation == -1) {
             item.initImageAsync()
             rotation = item.rotation.takeIf { it >= 0 } ?: 0
         }
     }
     if (rotation == -1) return null
-    val fileExists = remember(item.path) { fileExistsCache.getOrPut(item.path) { File(item.path).exists() } }
+    val fileExists = remember(item.resourcePath) { fileExistsCache.getOrPut(item.resourcePath) { File(item.resourcePath).exists() } }
     if (!fileExists) return null
 
-    val inputStream = remember(item.path) {
-        try { File(item.path).inputStream() } catch (e: Exception) { fileExistsCache.remove(item.path); null }
+    val inputStream = remember(item.resourcePath) {
+        try { File(item.resourcePath).inputStream() } catch (e: Exception) { fileExistsCache.remove(item.resourcePath); null }
     }
     val decoder = if (inputStream != null) rememberImageDecoder(inputStream = inputStream, rotation = rotation) else null
     if (decoder != null) item.intrinsicSize = IntSize(decoder.decoderWidth, decoder.decoderHeight)

@@ -32,7 +32,7 @@ fun PDialogRadioRow(selected: Boolean, onClick: () -> Unit, text: String, modifi
     ) {
         RadioButton(selected = selected, onClick = null, enabled = enabled)
         Text(
-            modifier = Modifier.padding(start = 6.dp),
+            modifier = Modifier.padding(start = 8.dp),
             text = text,
             style = MaterialTheme.typography.bodyLarge.copy(
                 baselineShift = BaselineShift.None,

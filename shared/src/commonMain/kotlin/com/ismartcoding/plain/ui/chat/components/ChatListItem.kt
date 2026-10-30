@@ -27,6 +27,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import com.ismartcoding.plain.i18n.request_permission
 import com.ismartcoding.plain.ui.chat.ChatViewModel
 import com.ismartcoding.plain.features.chat.data.ChatTarget
 import com.ismartcoding.plain.features.chat.models.MessageStatusData
@@ -60,6 +61,8 @@ fun ChatListItem(
     focusManager: FocusManager,
     previewerState: MediaPreviewerState,
     onForward: (VChat) -> Unit = {},
+    filesAllowed: Boolean = true,
+    onRequestFilePermission: () -> Unit = {},
 ) {
     val showContextMenu = remember { mutableStateOf(false) }
     val showDeliveryDialog = remember { mutableStateOf<MessageStatusData?>(null) }
@@ -116,7 +119,9 @@ fun ChatListItem(
                         onShowDeliveryDetails = if (!chatTarget.isLocal()) {
                             { statusData -> showDeliveryDialog.value = statusData }
                         } else null)
-                    when (m.type) {
+                    if (!filesAllowed && m.type in setOf(MessageType.IMAGES, MessageType.FILES)) {
+                        com.ismartcoding.plain.ui.base.PTextButton(text = org.jetbrains.compose.resources.stringResource(com.ismartcoding.plain.i18n.Res.string.request_permission), onClick = onRequestFilePermission)
+                    } else when (m.type) {
                         MessageType.IMAGES -> ChatImages(items, m, peer, imageWidthDp, imageWidthPx, previewerState, chatVM)
                         MessageType.FILES -> ChatFiles(items, navController, m, peer, audioQueueVM, previewerState)
                         MessageType.TEXT -> ChatText(focusManager, m, isSelectMode = chatVM.selectMode.value, onSelect = { chatVM.select(it) }, onDoubleClick = {

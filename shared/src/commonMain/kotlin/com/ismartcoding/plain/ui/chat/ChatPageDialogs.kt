@@ -19,13 +19,14 @@ internal fun ChatPageDialogs(
     onForward: (VChat, List<ChatTarget>) -> Unit,
 ) {
     val scope = rememberCoroutineScope()
+    val source = com.ismartcoding.plain.ui.navigation.LocalContentSource.current
     if (showFolderShare) {
         FolderShareSheet(
             onDismiss = onDismissFolder,
             onConfirm = { path, name, expiry ->
                 onDismissFolder()
                 scope.launch {
-                    ShareSendClient.sendFolderShare(listOf(target), path, name, expiry.expiresAt(TimeHelper.now()))
+                    source.chatSender.sendFolderShare(listOf(target), path, name, expiry.expiresAt(TimeHelper.now()))
                 }
             },
         )

@@ -43,6 +43,8 @@ fun ChatInput(
     onSend: () -> Unit = {},
     onValueChange: (String) -> Unit = {},
     onShareFolder: () -> Unit = {},
+    filesAllowed: Boolean = true,
+    onRequestFilePermission: () -> Unit = {},
 ) {
     var hasFocus by remember { mutableStateOf(false) }
     Column(modifier = Modifier.fillMaxWidth()) {
@@ -78,6 +80,9 @@ fun ChatInput(
                     .padding(start = 16.dp, end = 16.dp, bottom = 8.dp),
                 horizontalArrangement = Arrangement.SpaceBetween,
             ) {
+                if (!filesAllowed) {
+                    com.ismartcoding.plain.ui.base.PTextButton(text = stringResource(Res.string.request_permission), onClick = onRequestFilePermission)
+                } else {
                 PIconButton(
                     icon = UiRes.drawable.ui_drawable_image,
                     contentDescription = stringResource(Res.string.images),
@@ -98,6 +103,7 @@ fun ChatInput(
                     tint = MaterialTheme.colorScheme.primary,
                 ) {
                     onShareFolder()
+                }
                 }
                 Spacer(modifier = Modifier.weight(1f))
                 PIconButton(

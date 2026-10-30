@@ -48,17 +48,23 @@ fun ChatFileItem(
     downloadProgressMap: Map<String, DownloadTask>,
     onShowAudioPlayer: () -> Unit,
 ) {
+    val source = com.ismartcoding.plain.ui.navigation.LocalContentSource.current
+    val downloads = com.ismartcoding.plain.ui.chat.LocalChatDownloads.current
     val itemState = rememberTransformItemState()
-    val previewPath by produceState("", item.uri, peer?.id, peer?.address, peer?.ip, peer?.port, peer?.key, peer?.publicKey, peer?.status) {
-        value = try { item.getPreviewPath(peer) }
+    val previewPath by produceState("", source, item.uri, peer?.id, peer?.address, peer?.ip, peer?.port, peer?.key, peer?.publicKey, peer?.status) {
+        value = try {
+            if (source is com.ismartcoding.plain.rust.graphql.ContentSource.Remote) { if (item.isRemoteFile()) "" else item.uri }
+            else item.getPreviewPath(peer)
+        }
         catch (cancelled: CancellationException) { throw cancelled }
         catch (_: Exception) { "" }
     }
-    val path = rememberFilePath(item.uri)
+    val path = if (source is com.ismartcoding.plain.rust.graphql.ContentSource.Remote) item.uri else rememberFilePath(item.uri)
     val fileName = item.fileName.ifEmpty { path.getFilenameFromPath() }
     val isAudio = fileName.isAudioFast()
     val currentPlayingPath = audioQueueVM.selectedPath
-    val isCurrentlyPlaying = path.isNotEmpty() && currentPlayingPath.value == path && isAudio
+    val output by com.ismartcoding.plain.features.audio.AudioCommands.output.collectAsState()
+    val isCurrentlyPlaying = output.source.key == source.key && path.isNotEmpty() && currentPlayingPath.value == path && isAudio
     val isPlaying by audioIsPlayingFlow().collectAsState()
 
     val showContextMenu = remember { mutableStateOf(false) }
@@ -71,7 +77,7 @@ fun ChatFileItem(
 
     LaunchedEffect(item.uri) {
         if (item.isRemoteFile() && downloadTask == null && peer != null) {
-            DownloadQueue.addDownloadTask(item, peer, m.id)
+            downloads.addDownloadTask(item, peer, m.id)
         }
     }
 
@@ -83,7 +89,7 @@ fun ChatFileItem(
         if (isAudio && isCurrentlyPlaying && durationMs <= 0f) {
             val loadedDurationMs = withIO {
                 runCatching {
-                    MediaClient.durationMs(path).toFloat()
+                    source.media.durationMs(path).toFloat()
                 }.getOrDefault(0f)
             }
             if (loadedDurationMs > 0f) {

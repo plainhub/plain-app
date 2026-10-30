@@ -9,9 +9,53 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.*
 import kotlin.test.Test
 import kotlin.test.assertTrue
+import kotlin.test.assertEquals
 import kotlin.time.Instant
 
 class PeerViewModelTest {
+    @Test
+    @OptIn(kotlinx.coroutines.ExperimentalCoroutinesApi::class)
+    fun recipient_observers_share_target_updates_and_reconnect_after_the_picker_reopens() = runTest {
+        Dispatchers.setMain(StandardTestDispatcher(testScheduler))
+        val events = kotlinx.coroutines.flow.MutableSharedFlow<Unit>()
+        var connections = 0
+        var closed = 0
+        var peerReads = 0
+        var channelReads = 0
+        val changes = kotlinx.coroutines.flow.flow {
+            connections++
+            try { events.collect { emit(it) } }
+            finally { closed++ }
+        }
+        val peers = PeerViewModel(
+            readPeers = { peerReads++; emptyList() }, readLatestChats = { emptyMap() }, sourceChanges = changes,
+        )
+        val channels = ChannelViewModel(readChannels = { channelReads++; emptyList() }, sourceChanges = peers.sourceUpdates)
+        val store = ViewModelStore().apply { put("peers", peers); put("channels", channels) }
+        try {
+            repeat(2) { opening ->
+                val peerObserver = backgroundScope.launch { peers.observe() }
+                val channelObserver = backgroundScope.launch { channels.observe() }
+                runCurrent()
+                assertEquals(opening + 1, connections)
+                val peerBefore = peerReads
+                val channelBefore = channelReads
+                events.emit(Unit)
+                runCurrent()
+                assertEquals(peerBefore + 1, peerReads)
+                assertEquals(channelBefore + 1, channelReads)
+                peerObserver.cancel()
+                channelObserver.cancel()
+                runCurrent()
+                assertEquals(opening + 1, closed)
+            }
+        } finally {
+            store.clear()
+            runCurrent()
+            Dispatchers.resetMain()
+        }
+    }
+
     @Test
     fun pairing_changes_never_render_the_same_peer_twice() = runTest {
         Dispatchers.setMain(StandardTestDispatcher(testScheduler))

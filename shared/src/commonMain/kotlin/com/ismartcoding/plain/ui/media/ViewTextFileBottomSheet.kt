@@ -78,7 +78,7 @@ fun ViewTextFileBottomSheet(
         VerticalSpace(16.dp)
         PSheetPrimaryActionsCard {
             PSheetPrimaryAction(UiRes.drawable.ui_drawable_share_2, stringResource(Res.string.share)) {
-                shareFiles(listOf(path))
+                textFileVM.share(path)
                 onDismiss()
             }
             PSheetPrimaryAction(UiRes.drawable.ui_drawable_arrow_up_to_line, stringResource(Res.string.jump_to_top)) {
@@ -97,7 +97,7 @@ fun ViewTextFileBottomSheet(
                         callback = {
                             scope.launch(Dispatchers.Default) {
                                 try {
-                                    if (FilesClient.delete(path)) {
+                                    if (textFileVM.source.files.delete(path)) {
                                         onDismiss()
                                         onDeleted()
                                     }

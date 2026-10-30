@@ -1,5 +1,6 @@
 package com.ismartcoding.plain.ui.files.text
 
+import com.ismartcoding.plain.rust.graphql.ContentSource
 import com.ismartcoding.plain.models.File as FileEntry
 
 import com.ismartcoding.plain.preferences.*
@@ -20,12 +21,17 @@ import com.ismartcoding.plain.lib.TimeHelper
 import com.ismartcoding.plain.platform.files.openByteSource as filesOpenByteSource
 import com.ismartcoding.plain.platform.files.writeByteChunksStreaming as filesWriteByteChunksStreaming
 
-class TextFileViewModel : ViewModel() {
+class TextFileViewModel internal constructor(
+    internal val source: ContentSource = ContentSource.Local,
+) : ViewModel() {
+    private lateinit var cachedPath: String
     val controller = EditorController(viewModelScope, object : EditorFileIO {
         override fun nowMillis() = TimeHelper.nowMillis()
-        override fun openByteSource(path: String) = filesOpenByteSource(path)
+        override fun openByteSource(path: String) = filesOpenByteSource(if (source is ContentSource.Remote) cachedPath else path)
         override suspend fun writeByteChunksStreaming(path: String, chunks: Iterator<ByteArray>) =
-            filesWriteByteChunksStreaming(path, chunks)
+            if (source is ContentSource.Remote) {
+                source.files.writeChunks(path, chunks).also { if (it) cachedPath = source.fileForOpen(path) }
+            } else filesWriteByteChunksStreaming(path, chunks)
     })
     val showMoreActions = mutableStateOf(false)
     val file = mutableStateOf<FileEntry?>(null)
@@ -44,14 +50,23 @@ class TextFileViewModel : ViewModel() {
 
     suspend fun loadFileAsync(path: String, mediaId: String, gotoEnd: Boolean) {
         try {
-            if (mediaId.isNotEmpty()) {
+            if (mediaId.isNotEmpty() && source is ContentSource.Local) {
                 file.value = getFileByMediaId(mediaId)
             }
             isExternalFile.value = isContentUri(path)
+            if (source is ContentSource.Remote) cachedPath = source.fileForOpen(path)
             controller.open(path, gotoEnd)
+        } catch (cancelled: kotlinx.coroutines.CancellationException) {
+            throw cancelled
         } catch (e: Exception) {
             DialogHelper.showErrorDialog(e.toString())
             LogCat.e(e.toString())
+        }
+    }
+
+    fun share(path: String) {
+        viewModelScope.launchSafe {
+            com.ismartcoding.plain.platform.system.shareFiles(listOf(source.fileForOpen(path)))
         }
     }
 

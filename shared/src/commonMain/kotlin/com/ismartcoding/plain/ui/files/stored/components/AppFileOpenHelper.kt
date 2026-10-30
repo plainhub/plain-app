@@ -32,7 +32,13 @@ fun openAppFile(
     previewerState: MediaPreviewerState,
     itemState: TransformItemState,
     audioQueueVM: AudioQueueViewModel,
+    source: com.ismartcoding.plain.rust.graphql.ContentSource = com.ismartcoding.plain.rust.graphql.ContentSource.Local,
 ) {
+    if (source is com.ismartcoding.plain.rust.graphql.ContentSource.Remote) {
+        val entries = files.map { com.ismartcoding.plain.models.File(name = it.fileName, path = it.appFile.realPath, size = it.appFile.size, createdAt = it.appFile.createdAt, updatedAt = it.appFile.updatedAt, isDir = false, childCount = 0) }
+        com.ismartcoding.plain.ui.files.components.openFile(entries, entries.first { it.path == file.appFile.realPath }, navController, previewerState, itemState, audioQueueVM, source)
+        return
+    }
     val path = file.appFile.realPath
     val fileName = file.fileName
 

@@ -22,16 +22,14 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
-import com.ismartcoding.plain.features.chat.ShareSendClient
 import com.ismartcoding.plain.ui.components.ButtonType
 import com.ismartcoding.plain.features.shares.ShareExpiry
-import com.ismartcoding.plain.features.shares.SharesClient
+import com.ismartcoding.plain.ui.navigation.LocalContentSource
 import com.ismartcoding.plain.models.ShareRecord
 import com.ismartcoding.plain.i18n.Res
 import com.ismartcoding.plain.i18n.confirm_to_delete
 import com.ismartcoding.plain.i18n.delete
 import com.ismartcoding.plain.i18n.edit_share_link
-import com.ismartcoding.plain.i18n.folder
 import com.ismartcoding.plain.i18n.name
 import com.ismartcoding.plain.i18n.save
 import com.ismartcoding.plain.i18n.sent
@@ -43,6 +41,10 @@ import com.ismartcoding.plain.i18n.share_link
 import com.ismartcoding.plain.i18n.share_link_desc
 import com.ismartcoding.plain.i18n.share_name_placeholder
 import com.ismartcoding.plain.lib.TimeHelper
+import com.ismartcoding.plain.lib.logcat.LogCat
+import com.ismartcoding.plain.ui.i18n.LocaleHelper
+import com.ismartcoding.plain.i18n.load_failed
+import com.ismartcoding.plain.ui.state.launchSafe
 import com.ismartcoding.plain.lib.extensions.toBreakableUrl
 import com.ismartcoding.plain.lib.withIO
 import com.ismartcoding.plain.platform.system.formatDateTime
@@ -54,7 +56,6 @@ import com.ismartcoding.plain.ui.components.CornerCopyCard
 import com.ismartcoding.plain.ui.components.IconTextForwardButton
 import com.ismartcoding.plain.ui.components.IconTextQrCodeButton
 import com.ismartcoding.plain.ui.components.IconTextShareButton
-import com.ismartcoding.plain.ui.base.PFilledButton
 import com.ismartcoding.plain.ui.base.PFilterChip
 import com.ismartcoding.plain.ui.base.POutlinedButton
 import com.ismartcoding.plain.ui.base.PScaffold
@@ -67,11 +68,8 @@ import com.ismartcoding.plain.ui.components.DialogHelper
 import com.ismartcoding.plain.ui.components.confirmActionAsync
 import com.ismartcoding.plain.ui.chat.components.ForwardTargetDialog
 import com.ismartcoding.plain.ui.files.label
-import com.ismartcoding.plain.ui.resources.Res as UiRes
-import com.ismartcoding.plain.ui.resources.save as ui_drawable_save
 import kotlin.math.abs
 import kotlinx.coroutines.launch
-import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 
 /**
@@ -84,27 +82,33 @@ fun EditSharePage(
     navController: NavHostController,
     shareId: String,
 ) {
+    val source = LocalContentSource.current
     val scope = rememberCoroutineScope()
-    var share by remember { mutableStateOf<ShareRecord?>(null) }
-    var link by remember { mutableStateOf("") }
-    var name by remember { mutableStateOf("") }
-    var expiry by remember { mutableStateOf(ShareExpiry.NEVER) }
-    var paths by remember { mutableStateOf(listOf<String>()) }
-    var isLoading by remember { mutableStateOf(false) }
-    var showQr by remember { mutableStateOf(false) }
-    var showForwardDialog by remember { mutableStateOf(false) }
-    var showItemsPicker by remember { mutableStateOf(false) }
-    val dirFlags = remember { mutableStateMapOf<String, Boolean>() }
+    var share by remember(source, shareId) { mutableStateOf<ShareRecord?>(null) }
+    var link by remember(source, shareId) { mutableStateOf("") }
+    var name by remember(source, shareId) { mutableStateOf("") }
+    var expiry by remember(source, shareId) { mutableStateOf(ShareExpiry.NEVER) }
+    var paths by remember(source, shareId) { mutableStateOf(listOf<String>()) }
+    var isLoading by remember(source, shareId) { mutableStateOf(false) }
+    var showQr by remember(source, shareId) { mutableStateOf(false) }
+    var showForwardDialog by remember(source, shareId) { mutableStateOf(false) }
+    var showItemsPicker by remember(source, shareId) { mutableStateOf(false) }
+    val dirFlags = remember(source, shareId) { mutableStateMapOf<String, Boolean>() }
 
-    LaunchedEffect(shareId) {
-        val s = withIO { SharesClient.getShare(shareId) } ?: return@LaunchedEffect
-        share = s
-        name = s.name
-        expiry = s.toExpiryOption()
-        paths = s.roots.map { it.realPath }
-        dirFlags.clear()
-        dirFlags.putAll(s.roots.associate { it.realPath to it.isDir })
-        link = SharesClient.buildLink(s)
+    LaunchedEffect(shareId, source) {
+        launchSafe(onError = {
+            LogCat.e("Share editor load", it)
+            DialogHelper.showErrorMessage(LocaleHelper.getString(Res.string.load_failed))
+        }) {
+            val s = withIO { source.shares.getShare(shareId) } ?: return@launchSafe
+            share = s
+            name = s.name
+            expiry = s.toExpiryOption()
+            paths = s.roots.map { it.realPath }
+            dirFlags.clear()
+            dirFlags.putAll(s.roots.associate { it.realPath to it.isDir })
+            link = source.shares.buildLink(s)
+        }.join()
     }
 
 
@@ -118,13 +122,10 @@ fun EditSharePage(
     }
 
     val save: () -> Unit = {
-        scope.launch {
+        scope.launchSafe(onDone = { isLoading = false }) {
             isLoading = true
-            val updated = withIO {
-                SharesClient.updateShare(current.id, name, expiry.expiresAt(TimeHelper.now()), realPaths = paths)
-            }
-            isLoading = false
-            if (updated != null) navController.popBackStack()
+            withIO { source.shares.updateShare(current.id, name, expiry.expiresAt(TimeHelper.now()), realPaths = paths) }
+            navController.popBackStack()
         }
     }
 
@@ -134,7 +135,7 @@ fun EditSharePage(
                 onNavigateBack = { navController.navigateUp() },
                 title = stringResource(Res.string.edit_share_link),
                 actions = {
-                    PTextButton(text = stringResource(Res.string.save), onClick = save)
+                    PTextButton(text = stringResource(Res.string.save), onClick = save, isLoading = isLoading)
                 },
             )
         },
@@ -192,8 +193,8 @@ fun EditSharePage(
                             Res.string.delete,
                             Res.string.confirm_to_delete,
                             callback = {
-                                scope.launch {
-                                    withIO { SharesClient.deleteShare(current.id) }
+                                scope.launchSafe {
+                                    withIO { source.shares.deleteShare(current.id) }
                                     navController.popBackStack()
                                 }
                             },
@@ -213,6 +214,7 @@ fun EditSharePage(
 
     if (showItemsPicker) {
         ShareItemsPickerSheet(
+            source = source,
             initialSelected = paths.associateWith { dirFlags[it] == true },
             onDismiss = { showItemsPicker = false },
             onConfirm = { picked ->
@@ -228,8 +230,8 @@ fun EditSharePage(
             onDismiss = { showForwardDialog = false },
             onTargetsSelected = { targets ->
                 showForwardDialog = false
-                scope.launch {
-                    ShareSendClient.sendShare(targets, current.id)
+                scope.launchSafe {
+                    source.chatSender.sendShare(targets, current.id)
                     DialogHelper.showSuccess(Res.string.sent)
                 }
             },

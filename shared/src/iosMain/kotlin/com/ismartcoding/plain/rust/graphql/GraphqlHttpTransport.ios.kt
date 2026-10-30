@@ -11,12 +11,12 @@ import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 
 internal actual fun createGraphqlHttpTransport(): GraphqlHttpTransport = object : GraphqlHttpTransport {
-    override suspend fun post(url: String, clientId: String, body: ByteArray): GraphqlHttpResponse = suspendCancellableCoroutine { continuation ->
+    override suspend fun post(url: String, clientId: String, body: ByteArray, contentType: String, tlsCertificateSha256: String?): GraphqlHttpResponse = suspendCancellableCoroutine { continuation ->
         val request = NSMutableURLRequest.requestWithURL(NSURL(string = url)).apply {
             HTTPMethod = "POST"
             HTTPBody = body.toNSData()
             setTimeoutInterval(30.0)
-            setValue("application/octet-stream", forHTTPHeaderField = "Content-Type")
+            setValue(contentType, forHTTPHeaderField = "Content-Type")
             setValue(clientId, forHTTPHeaderField = "c-id")
         }
         val chunks = mutableListOf<ByteArray>()
@@ -50,6 +50,12 @@ internal actual fun createGraphqlHttpTransport(): GraphqlHttpTransport = object 
                 session.finishTasksAndInvalidate()
             }
             override fun URLSession(session: NSURLSession, task: NSURLSessionTask, didReceiveChallenge: NSURLAuthenticationChallenge, completionHandler: (NSURLSessionAuthChallengeDisposition, NSURLCredential?) -> Unit) {
+                if (tlsCertificateSha256 != null) {
+                    val credential = peerResourceCredential(didReceiveChallenge, request.URL?.host, tlsCertificateSha256)
+                    if (credential == null) completionHandler(NSURLSessionAuthChallengeCancelAuthenticationChallenge, null)
+                    else completionHandler(NSURLSessionAuthChallengeUseCredential, credential)
+                    return
+                }
                 val trust = didReceiveChallenge.protectionSpace.serverTrust
                 if (didReceiveChallenge.protectionSpace.authenticationMethod == NSURLAuthenticationMethodServerTrust && trust != null && didReceiveChallenge.protectionSpace.host == request.URL?.host) {
                     completionHandler(NSURLSessionAuthChallengeUseCredential, NSURLCredential.credentialForTrust(trust))

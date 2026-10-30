@@ -1,6 +1,7 @@
 package com.ismartcoding.plain.ui.feeds
 
 
+import com.ismartcoding.plain.rust.graphql.ContentSource
 import com.ismartcoding.plain.ui.state.ISelectableViewModel
 import com.ismartcoding.plain.ui.state.launchSafe
 
@@ -8,7 +9,6 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.ismartcoding.plain.features.feeds.FeedsClient
 import com.ismartcoding.plain.models.Feed
 import com.ismartcoding.plain.i18n.Res
 import com.ismartcoding.plain.i18n.error
@@ -21,7 +21,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 
-class FeedsViewModel : ISelectableViewModel<Feed>, ViewModel() {
+class FeedsViewModel internal constructor(val source: ContentSource = ContentSource.Local) : ISelectableViewModel<Feed>, ViewModel() {
+    val syncState = if (source is ContentSource.Remote) FeedSyncStateStore(source.feeds) else FeedWorkerState
     private val _itemsFlow = MutableStateFlow<List<Feed>>(emptyList())
     override val itemsFlow: StateFlow<List<Feed>> = _itemsFlow
     var showLoading = mutableStateOf(true)
@@ -40,14 +41,14 @@ class FeedsViewModel : ISelectableViewModel<Feed>, ViewModel() {
 
     fun loadAsync(withCount: Boolean = false) {
         viewModelScope.launchSafe {
-            _itemsFlow.value = FeedsClient.getAll(withCount)
+            _itemsFlow.value = source.feeds.getAll(withCount)
             showLoading.value = false
         }
     }
 
     fun updateFetchContent(id: String, value: Boolean) {
         viewModelScope.launchSafe {
-            FeedsClient.update(id, fetchContent = value)
+            source.feeds.update(id, fetchContent = value)
         }
     }
 
@@ -55,7 +56,7 @@ class FeedsViewModel : ISelectableViewModel<Feed>, ViewModel() {
     fun refreshSelectedItemAsync() {
         val id = selectedItem.value?.id ?: return
         viewModelScope.launchSafe {
-            val fresh = FeedsClient.getById(id) ?: return@launchSafe
+            val fresh = source.feeds.getById(id) ?: return@launchSafe
             fresh.entryCount = selectedItem.value?.entryCount ?: 0
             selectedItem.value = fresh
         }
@@ -66,14 +67,14 @@ class FeedsViewModel : ISelectableViewModel<Feed>, ViewModel() {
     }
 
     suspend fun deleteAsync(ids: Set<String>) {
-        FeedsClient.deleteAsync(ids)
+        source.feeds.deleteAsync(ids)
         _itemsFlow.update { it.filterNot { i -> ids.contains(i.id) } }
     }
 
     fun add() {
         editUrlError.value = ""
         viewModelScope.launchSafe {
-            FeedsClient.create(editUrl.value, editName.value, editFetchContent.value)
+            source.feeds.create(editUrl.value, editName.value, editFetchContent.value)
             loadAsync(withCount = true)
             showAddDialog.value = false
         }
@@ -84,7 +85,7 @@ class FeedsViewModel : ISelectableViewModel<Feed>, ViewModel() {
         val url = editUrl.value
         viewModelScope.launchSafe {
             try {
-                val preview = FeedsClient.preview(url)
+                val preview = source.feeds.preview(url)
                 if (!showAddDialog.value || editUrl.value != url) return@launchSafe
                 feedPreview.value = preview
                 editName.value = preview.title
@@ -100,7 +101,7 @@ class FeedsViewModel : ISelectableViewModel<Feed>, ViewModel() {
         editUrlError.value = ""
         viewModelScope.launchSafe {
             try {
-                FeedsClient.update(editId.value, name = editName.value, url = editUrl.value, fetchContent = editFetchContent.value)
+                source.feeds.update(editId.value, name = editName.value, url = editUrl.value, fetchContent = editFetchContent.value)
             } catch (cancelled: CancellationException) {
                 throw cancelled
             } catch (e: Exception) {

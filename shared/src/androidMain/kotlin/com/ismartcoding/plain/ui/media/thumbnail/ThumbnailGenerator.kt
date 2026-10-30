@@ -60,7 +60,7 @@ object ThumbnailGenerator {
         fileName: String = "",
     ): Bitmap? {
         val effectiveName = fileName.ifEmpty { file.name }
-        if (effectiveName.endsWith(".svg", true)) {
+        if (centerCrop && effectiveName.endsWith(".svg", true)) {
             return try {
                 val svg = SvgParser.parse(file.readText())
                 val picture = svg.renderToPicture(width, height)
@@ -78,7 +78,7 @@ object ThumbnailGenerator {
         // mediaId is known (path lookup would require a full content-resolver scan).
         if (isQPlus()) {
             val isMedia = effectiveName.isVideoFast() || effectiveName.isImageFast() || effectiveName.isAudioFast()
-            if (isMedia) {
+            if (isMedia && (centerCrop || !effectiveName.isImageFast())) {
                 val contentUri = when {
                     mediaId.isNotEmpty() -> file.path.pathToMediaStoreUri(mediaId)
                     effectiveName.isVideoFast() -> context.contentResolver.getMediaContentUri(file.path)

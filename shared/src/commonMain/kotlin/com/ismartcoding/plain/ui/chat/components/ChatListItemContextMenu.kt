@@ -44,6 +44,7 @@ fun ChatListItemContextMenu(
     onSelect: (String) -> Unit,
     onDelete: (Set<String>) -> Unit,
 ) {
+    val source = com.ismartcoding.plain.ui.navigation.LocalContentSource.current
     var showSaveSheet by remember { mutableStateOf(false) }
     PDropdownMenu(
         expanded = showContextMenu.value && selectedItem.value == m,
@@ -126,19 +127,20 @@ fun ChatListItemContextMenu(
     if (showSaveSheet) {
         val images = (m.value as? MessageImages)?.items.orEmpty()
         SaveToSheet(
+            source = source,
             title = images.firstOrNull()?.fileName?.takeIf { it.isNotEmpty() }
                 ?: stringResource(Res.string.image),
             onDismiss = { showSaveSheet = false },
             onDownloads = {
                 showSaveSheet = false
                 coMain {
-                    saveMessageImages(images) { path, name -> withIO { saveFileToDownloads(path, name) } }
+                    saveMessageImages(images, source) { path, name -> withIO { if (source is com.ismartcoding.plain.rust.graphql.ContentSource.Remote) source.files.copyToDirectory(path, source.info.downloadsDir, name) else saveFileToDownloads(path, name) } }
                 }
             },
             onDirectory = { dir ->
                 showSaveSheet = false
                 coMain {
-                    saveMessageImages(images) { path, name -> withIO { FilesClient.copyToDirectory(path, dir, name) } }
+                    saveMessageImages(images, source) { path, name -> withIO { source.files.copyToDirectory(path, dir, name) } }
                 }
             },
         )
@@ -148,11 +150,12 @@ fun ChatListItemContextMenu(
 /** Saves every image of an IMAGES message to [sink]'s destination, then reports the first saved path. */
 private suspend fun saveMessageImages(
     images: List<MessageFile>,
+    source: com.ismartcoding.plain.rust.graphql.ContentSource,
     sink: suspend (path: String, name: String) -> String,
 ) {
     var firstSavedPath = ""
     images.forEach { image ->
-        val path = image.uri.getFinalPath()
+        val path = if (source is com.ismartcoding.plain.rust.graphql.ContentSource.Local) image.uri.getFinalPath() else image.uri
         val name = image.fileName.ifEmpty { path.getFilenameFromPath() }
         val result = sink(path, name)
         if (result.isNotEmpty() && firstSavedPath.isEmpty()) firstSavedPath = result

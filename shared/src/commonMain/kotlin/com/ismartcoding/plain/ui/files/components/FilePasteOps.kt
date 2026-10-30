@@ -18,7 +18,7 @@ private suspend fun executePaste(filesVM: FilesViewModel, type: FileTaskType, on
     if (files.isEmpty()) return
     DialogHelper.showLoading()
     try {
-        val task = FileTaskClient.execute(type,files.map { FileTaskOp(it.path,filesVM.selectedPath) })
+        val task = filesVM.source.tasks.execute(type,files.map { FileTaskOp(it.path,filesVM.selectedPath) })
         val completed = task.completedOps.map { it.src }.toSet()
         pending.removeAll { it.path in completed }
         if (task.status == FileTaskStatus.ERROR) DialogHelper.showErrorMessage(task.error)

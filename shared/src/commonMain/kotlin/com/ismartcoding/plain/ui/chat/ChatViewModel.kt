@@ -1,7 +1,6 @@
 package com.ismartcoding.plain.ui.chat
 
-import com.ismartcoding.plain.features.chat.ChatClient
-import com.ismartcoding.plain.features.chat.RustChatStore
+import com.ismartcoding.plain.ui.state.launchSafe
 import com.ismartcoding.plain.features.chat.readChatSnapshot
 
 import androidx.compose.runtime.mutableStateListOf
@@ -37,17 +36,31 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 
-/**
- * Process-wide chat state holder. UI (ChatPage), non-UI writers
- * (ShareSendClient, GraphQL mutations, ChatMessageReceiver, download
- * completion) all talk to this single instance directly instead of
- * synchronizing through events. [ChatClient] sends business commands to
- * the Rust HTTP service.
- *
- * Writers may run on arbitrary dispatchers; [mutex] serializes the
- * event projections so per-message updates land on the in-memory list in order.
- */
-object ChatViewModel : ISelectableViewModel<VChat> {
+class ChatViewModel internal constructor(
+    val source: com.ismartcoding.plain.rust.graphql.ContentSource = com.ismartcoding.plain.rust.graphql.ContentSource.Local,
+    initialTargetId: String = "local",
+) : androidx.lifecycle.ViewModel(), ISelectableViewModel<VChat> {
+    companion object { val local: ChatViewModel by lazy { ChatViewModel() } }
+    val client = source.chats
+    val downloads by lazy {
+        if (source is com.ismartcoding.plain.rust.graphql.ContentSource.Local) com.ismartcoding.plain.features.chat.download.DownloadQueue
+        else com.ismartcoding.plain.features.chat.download.ChatDownloadClient(source.api, scope)
+    }
+    internal val sourceChanges = kotlinx.coroutines.flow.MutableSharedFlow<Unit>(extraBufferCapacity = 1)
+    internal suspend fun observeSource() {
+        val remote = source as? com.ismartcoding.plain.rust.graphql.ContentSource.Remote ?: return
+        remote.client.refreshPermissions()
+        downloads.refresh()
+        val fields = listOf("permissionsUpdated", "contentChanged", "messagesCreated { id }", "messagesUpdated { id }", "messagesDeleted", "peersChanged", "channelsChanged { changed }", "downloadsChanged")
+        remote.client.subscriptionUpdates(fields.map { com.ismartcoding.plain.rust.graphql.GraphqlOperation("subscription { $it }") }).collect { update ->
+            if (update is com.ismartcoding.plain.rust.graphql.SubscriptionUpdate.Failed) throw update.error
+            if (update is com.ismartcoding.plain.rust.graphql.SubscriptionUpdate.Attached ||
+                update is com.ismartcoding.plain.rust.graphql.SubscriptionUpdate.Data && update.value.data?.containsKey("permissionsUpdated") == true) remote.client.refreshPermissions()
+            fetchAsync(target.value.toId)
+            downloads.refresh()
+            sourceChanges.emit(Unit)
+        }
+    }
     val visibleConversationId = MutableStateFlow<String?>(null)
     internal val _itemsFlow = MutableStateFlow<List<VChat>>(emptyList())
     override val itemsFlow: StateFlow<List<VChat>> = _itemsFlow
@@ -55,7 +68,7 @@ object ChatViewModel : ISelectableViewModel<VChat> {
     override var selectMode = mutableStateOf(false)
     override val selectedIds = mutableStateListOf<String>()
 
-    private val _target = MutableStateFlow(ChatTarget("local", ChatTargetType.PEER))
+    private val _target = MutableStateFlow(ChatTarget.parseId(initialTargetId))
     val target = _target.asStateFlow()
 
     // Transport has an event snapshot, not a query; retain it before the page opens.
@@ -68,22 +81,40 @@ object ChatViewModel : ISelectableViewModel<VChat> {
 
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
 
+    init {
+        if (source is com.ismartcoding.plain.rust.graphql.ContentSource.Remote) launchSafe { observeSource() }
+    }
+
+    override fun onCleared() {
+        scope.coroutineContext[kotlinx.coroutines.Job]?.cancel()
+        super.onCleared()
+    }
+
     private fun launchSafe(block: suspend CoroutineScope.() -> Unit) {
-        scope.launch {
-            runCatching { block() }
-        }
+        scope.launchSafe(block = block)
     }
 
     suspend fun initializeTargetAsync(chatId: String) = withIO {
-        _target.value = ChatTarget.parseId(chatId)
+        mutex.withLock {
+            val next = ChatTarget.parseId(chatId)
+            if (_target.value != next) {
+                _itemsFlow.value = emptyList()
+                _target.value = next
+                selectedIds.clear()
+                selectMode.value = false
+                selectedItem.value = null
+            }
+        }
     }
 
     suspend fun fetchAsync(toId: String) = withIO {
         val current = _target.value
-        val dao = RustChatStore
+        val dao = client.records
         val isChannel = current.type == ChatTargetType.CHANNEL
         val list = if (isChannel) dao.getByChannelId(current.toId) else dao.getByPeerId(toId)
-        _itemsFlow.value = list.sortedByDescending { it.createdAt }.map { VChat.from(it) }
+        mutex.withLock {
+            if (_target.value == current) _itemsFlow.value = list.sortedByDescending { it.createdAt }.map { VChat.from(it) }
+        }
     }
 
     fun addAll(items: List<ChatItem>) {
@@ -116,7 +147,7 @@ object ChatViewModel : ISelectableViewModel<VChat> {
     fun clearAllMessages() {
         launchSafe {
             val target = target.value
-            ChatClient.clearAllMessages(target)
+            client.clearAllMessages(target)
             _itemsFlow.value = emptyList()
         }
     }
@@ -127,20 +158,20 @@ object ChatViewModel : ISelectableViewModel<VChat> {
                 val item = itemsFlow.value.firstOrNull { it.id == messageId } ?: return@launchSafe
                 sendMessage(target.value, MessageContent(item.type, item.value), pendingId = messageId)
             } else {
-                update(ChatClient.deliver(messageId))
+                update(client.deliver(messageId))
             }
         }
     }
 
     fun resendToMembers(messageId: String, peerIds: List<String>) {
         launchSafe {
-            update(ChatClient.deliver(messageId, peerIds))
+            update(client.deliver(messageId, peerIds))
         }
     }
 
     fun forwardMessage(messageId: String, targets: List<ChatTarget>) {
         launchSafe {
-            val items = ChatClient.forward(messageId, targets)
+            val items = client.forward(messageId, targets)
             if (items.isNotEmpty() && items.all { it.status == ChatStatus.SENT }) {
                 DialogHelper.showSuccess(Res.string.sent)
             }
@@ -149,7 +180,7 @@ object ChatViewModel : ISelectableViewModel<VChat> {
 
     fun delete(ids: Set<String>) {
         launchSafe {
-            ChatClient.deleteByIds(ids.filterNot { it.startsWith("pending_") }.toSet())
+            client.deleteByIds(ids.filterNot { it.startsWith("pending_") }.toSet())
             _itemsFlow.update { it.filterNot { m -> ids.contains(m.id) } }
         }
     }
@@ -158,7 +189,7 @@ object ChatViewModel : ISelectableViewModel<VChat> {
         target: ChatTarget,
         content: MessageContent,
         pendingId: String = "pending_${generateId()}",
-        send: suspend (ChatTarget, MessageContent) -> ChatItem = ChatClient::sendContent,
+        send: suspend (ChatTarget, MessageContent) -> ChatItem = client::sendContent,
     ): Boolean {
         val pending = VChat(pendingId, "me", TimeHelper.now(), content.type, ChatStatus.PENDING, value = content.value)
         if (_target.value == target) {
@@ -219,7 +250,7 @@ object ChatViewModel : ISelectableViewModel<VChat> {
     }
 
     internal suspend fun refreshLoaded(
-        read: suspend (List<String>) -> Map<String, ChatItem?> = { readChatSnapshot(it) },
+        read: suspend (List<String>) -> Map<String, ChatItem?> = { readChatSnapshot(it, source.api) },
     ) {
         val previous = _itemsFlow.value
         if (previous.isEmpty()) return
@@ -238,7 +269,7 @@ object ChatViewModel : ISelectableViewModel<VChat> {
     }
 
     suspend fun onMessageUpdated(id: String) {
-        val chat = ChatClient.getChatItem(id) ?: return
+        val chat = client.getChatItem(id) ?: return
         mutex.withLock {
             update(chat)
         }

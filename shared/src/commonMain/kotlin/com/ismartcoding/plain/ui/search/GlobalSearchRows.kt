@@ -1,5 +1,7 @@
 package com.ismartcoding.plain.ui.search
 
+import org.jetbrains.compose.resources.painterResource
+
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -23,6 +25,7 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.ismartcoding.plain.i18n.*
+import com.ismartcoding.plain.ui.state.launchSafe
 import com.ismartcoding.plain.platform.system.DataType
 import com.ismartcoding.plain.lib.extensions.getFilenameFromPath
 import com.ismartcoding.plain.platform.media.audioIsPlayingFlow
@@ -57,6 +60,7 @@ fun GlobalSearchRow(
     onOpen: (GlobalSearchHit) -> Unit,
     onPreviewMedia: (GlobalSearchHit, TransformItemState) -> Unit = { _, _ -> },
 ) {
+    androidx.compose.runtime.CompositionLocalProvider(com.ismartcoding.plain.ui.navigation.LocalContentSource provides hit.device) {
     when (val src = hit.source) {
         is GlobalSearchSource.Note -> CardSpace {
             NoteListItem(
@@ -79,7 +83,7 @@ fun GlobalSearchRow(
                 tags = emptyList(),
                 dragSelectState = ctx.dragSelectState,
                 isCurrentlyPlaying = isAudioPlaying && ctx.audioQueueVM.selectedPath.value == src.audio.path,
-                isInQueue = ctx.audioQueueVM.isInQueue(src.audio.path),
+                isInQueue = ctx.audioQueueVM.isInQueue(src.audio.id),
             )
         }
 
@@ -98,7 +102,7 @@ fun GlobalSearchRow(
                             modifier = Modifier.size(40.dp),
                             path = src.image.path,
                             fileName = src.image.path.getFilenameFromPath(),
-                            key = src.image.id,
+                            key = hit.key,
                             uri = getMediaItemUriString(DataType.IMAGE, src.image.id, src.image.path),
                             itemState = itemState,
                             previewerState = ctx.previewerState,
@@ -109,14 +113,13 @@ fun GlobalSearchRow(
                             modifier = Modifier.size(40.dp),
                             path = src.video.path,
                             fileName = src.video.path.getFilenameFromPath(),
-                            key = src.video.id,
+                            key = hit.key,
                             uri = getMediaItemUriString(DataType.VIDEO, src.video.id, src.video.path),
                             itemState = itemState,
                             previewerState = ctx.previewerState,
                             widthPx = widthPx,
                         )
 
-                        else -> Unit
                     }
                 },
             )
@@ -130,6 +133,7 @@ fun GlobalSearchRow(
                 m = src.doc,
                 tags = emptyList(),
                 onTagClick = { },
+                onOpen = if (hit.device is com.ismartcoding.plain.rust.graphql.ContentSource.Remote) ({ onOpen(hit) }) else null,
             )
         }
 
@@ -169,6 +173,7 @@ fun GlobalSearchRow(
             thumb = { GlobalSearchThumb(hit) },
         )
     }
+}
 }
 
 /** 8dp gap between stacked cards: 4dp below each card row. */
@@ -257,6 +262,6 @@ private fun GlobalSearchThumb(hit: GlobalSearchHit) {
             .background(MaterialTheme.colorScheme.cardBackgroundNormal),
         contentAlignment = Alignment.Center,
     ) {
-        PIcon(icon = iconRes, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
+        PIcon(icon = painterResource(iconRes), contentDescription = null, tint = MaterialTheme.colorScheme.primary)
     }
 }

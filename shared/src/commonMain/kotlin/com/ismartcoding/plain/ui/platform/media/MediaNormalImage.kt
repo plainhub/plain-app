@@ -98,11 +98,11 @@ fun MediaNormalImage(
         scope.launch { viewerAlpha.animateTo(1F, DEFAULT_CROSS_FADE_ANIMATE_SPEC); onMounted() }
     }
 
-    val isUrl = model.path.isUrl()
+    val isUrl = model.resourcePath.isUrl()
     val painter: Painter = rememberAsyncImagePainter(
         model = if (isUrl) {
             ImageRequest.Builder(LocalPlatformContext.current)
-                .data(model.path)
+                .data(model.imageModel)
                 .size(Size.ORIGINAL)
                 .build()
         } else {
@@ -124,7 +124,7 @@ fun MediaNormalImage(
         }
     } else {
         imageSpecified = true
-        LaunchedEffect(model.path) {
+        LaunchedEffect(model.resourcePath) {
             if (model.intrinsicSize == IntSize.Zero) model.initImageAsync()
             oSize = model.intrinsicSize
             if (oSize != IntSize.Zero) goMounted()
@@ -172,10 +172,10 @@ fun MediaNormalImage(
                 ),
             )
         } else if (uSize != IntSize.Zero) {
-            val isSvg = model.path.endsWith(".svg", true)
+            val isSvg = model.resourcePath.endsWith(".svg", true)
             AsyncImage(
-                model = model.path,
-                contentDescription = model.path,
+                model = model.imageModel,
+                contentDescription = model.resourcePath,
                 contentScale = ContentScale.Fit,
                 modifier = imageModifier
                     .let { if (isSvg) it.background(Color.White) else it }

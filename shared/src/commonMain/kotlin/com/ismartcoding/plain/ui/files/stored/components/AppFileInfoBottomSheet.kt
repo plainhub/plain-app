@@ -33,7 +33,7 @@ import com.ismartcoding.plain.ui.components.DialogHelper
 import com.ismartcoding.plain.ui.files.stored.VAppFile
 import com.ismartcoding.plain.ui.chat.components.ForwardTargetDialog
 import com.ismartcoding.plain.ui.theme.PlainTheme
-import kotlinx.coroutines.launch
+import com.ismartcoding.plain.ui.state.launchSafe
 import org.jetbrains.compose.resources.stringResource
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -42,6 +42,7 @@ fun AppFileInfoBottomSheet(
     file: VAppFile,
     onDismiss: () -> Unit,
 ) {
+    val source = com.ismartcoding.plain.ui.navigation.LocalContentSource.current
     var showForwardDialog by remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
 
@@ -49,25 +50,15 @@ fun AppFileInfoBottomSheet(
         ForwardTargetDialog(
             onDismiss = { showForwardDialog = false },
             onTargetsSelected = { targets ->
-                val dFile = MessageFile(
-                    uri = AppFileStore.toFidUri(file.appFile),
-                    size = file.appFile.size,
-                    fileName = file.fileName,
-                )
-                val isImageVideo = file.fileName.isImageFast() ||
-                        file.fileName.isVideoFast() ||
-                        file.appFile.mimeType.startsWith("image/") ||
-                        file.appFile.mimeType.startsWith("video/")
-                val content = if (isImageVideo) {
-                    MessageContent(MessageType.IMAGES, MessageImages(listOf(dFile)))
-                } else {
-                    MessageContent(MessageType.FILES, MessageFiles(listOf(dFile)))
-                }
                 showForwardDialog = false
-                onDismiss()
-                scope.launch {
-                    ShareSendClient.sendContent(targets, content)
+                scope.launchSafe {
+                    val dFile = MessageFile(uri = AppFileStore.toFidUri(file.appFile), size = file.appFile.size, fileName = file.fileName)
+                    val isMedia = file.fileName.isImageFast() || file.fileName.isVideoFast() || file.appFile.mimeType.startsWith("image/") || file.appFile.mimeType.startsWith("video/")
+                    val content = if (isMedia) MessageContent(MessageType.IMAGES, MessageImages(listOf(dFile)))
+                        else MessageContent(MessageType.FILES, MessageFiles(listOf(dFile)))
+                    source.chatSender.sendContent(targets, content)
                     DialogHelper.showSuccess(Res.string.sent)
+                    onDismiss()
                 }
             }
         )

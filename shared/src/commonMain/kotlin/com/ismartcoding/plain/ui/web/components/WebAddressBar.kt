@@ -38,6 +38,7 @@ import com.ismartcoding.plain.platform.setClipboardText
 import com.ismartcoding.plain.ui.components.PIconButton
 import com.ismartcoding.plain.Prefs
 import com.ismartcoding.plain.ui.base.PExpandableSection
+import com.ismartcoding.plain.ui.base.VerticalSpace
 import org.jetbrains.compose.resources.stringResource
 import com.ismartcoding.plain.ui.resources.Res as UiRes
 import com.ismartcoding.plain.ui.resources.pen as ui_drawable_pen
@@ -85,35 +86,35 @@ fun WebAddressBar(
             val toggle: () -> Unit = {
                 scope.launch { Prefs.set(PrefKeys.WEB_ADDRESS_BAR_EXPANDED, !expanded.value) }
             }
-            val backupRows: @Composable () -> Unit = {
-                Column {
-                    backupAddresses.forEach { address ->
-                        val url = UrlHelper.buildUrl(scheme, address, port.value)
-                        AddressRow(
-                            url,
-                            address == hostname,
-                            {
-                                if (address == hostname) {
-                                    mdnsEditDialogVisible = true
-                                } else {
-                                    portDialogVisible = true
-                                }
-                            },
-                            {
-                                qrCodeUrl = url
-                                qrCodeDialogVisible = true
-                            },
-                        )
-                    }
-                }
-            }
             PExpandableSection(
                 toggleModifier = Modifier.padding(start = 16.dp, end = 8.dp),
                 text = text,
                 expanded = expanded.value,
                 stateDescription = expansion,
                 onClick = toggle,
-                content = backupRows,
+                content = {
+                    Column {
+                        backupAddresses.forEach { address ->
+                            val url = UrlHelper.buildUrl(scheme, address, port.value)
+                            AddressRow(
+                                url,
+                                address == hostname,
+                                {
+                                    if (address == hostname) {
+                                        mdnsEditDialogVisible = true
+                                    } else {
+                                        portDialogVisible = true
+                                    }
+                                },
+                                {
+                                    qrCodeUrl = url
+                                    qrCodeDialogVisible = true
+                                },
+                            )
+                        }
+                        VerticalSpace(8.dp)
+                    }
+                },
             )
         }
     }
@@ -189,15 +190,15 @@ private fun AddressRow(
         }
         PIconButton(
             icon = UiRes.drawable.ui_drawable_pen,
-            modifier = Modifier.size(48.dp),
-            iconSize = 20.dp,
+            modifier = Modifier.size(32.dp),
+            iconSize = 16.dp,
             contentDescription = stringResource(if (isHostname) Res.string.mdns_hostname else Res.string.change_port),
             click = onEdit,
         )
         PIconButton(
             icon = UiRes.drawable.ui_drawable_qr_code,
-            modifier = Modifier.size(48.dp),
-            iconSize = 20.dp,
+            modifier = Modifier.size(32.dp),
+            iconSize = 16.dp,
             contentDescription = stringResource(Res.string.show_qr_code),
             click = onQr,
         )

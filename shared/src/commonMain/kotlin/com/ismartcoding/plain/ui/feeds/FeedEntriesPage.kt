@@ -38,7 +38,6 @@ import com.ismartcoding.plain.features.files.PickFileTag
 import com.ismartcoding.plain.features.files.PickFileType
 import com.ismartcoding.plain.events.ExportFileEvent
 import com.ismartcoding.plain.events.PickFileEvent
-import com.ismartcoding.plain.features.feeds.FeedsClient
 import com.ismartcoding.plain.models.Tag
 import com.ismartcoding.plain.i18n.*
 import com.ismartcoding.plain.i18n.settings
@@ -82,8 +81,9 @@ import org.jetbrains.compose.resources.stringResource
 fun FeedEntriesPage(
     navController: NavHostController, feedId: String, tagsVM: TagsViewModel,
     pagerVM: FeedEntryPagerViewModel,
-    feedEntriesVM: FeedEntriesViewModel = viewModel { FeedEntriesViewModel() }, feedsVM: FeedsViewModel = viewModel { FeedsViewModel() },
-    catalogVM: FeedCatalogViewModel = viewModel { FeedCatalogViewModel() },
+    source: com.ismartcoding.plain.rust.graphql.ContentSource = com.ismartcoding.plain.ui.navigation.LocalContentSource.current,
+    feedEntriesVM: FeedEntriesViewModel = viewModel { FeedEntriesViewModel(source) }, feedsVM: FeedsViewModel = viewModel { FeedsViewModel(source) },
+    catalogVM: FeedCatalogViewModel = viewModel { FeedCatalogViewModel(source) },
 ) {
     val feedsState by feedsVM.itemsFlow.collectAsState()
     val feedsMap = remember(feedsState) { derivedStateOf { feedsState.associateBy { it.id } } }
@@ -217,10 +217,11 @@ fun FeedEntriesPage(
                 }
                 if (failingFeeds.isNotEmpty()) {
                     FeedSyncBanner(
+                        syncState = feedsVM.syncState,
                         failedFeeds = failingFeeds,
                         singleFeed = feedEntriesVM.feedId.value.isNotEmpty(),
-                        onRetry = { id -> scope.launch(Dispatchers.IO) { FeedsClient.sync(id) } },
-                        onRetryAll = { failingFeeds.forEach { f -> scope.launch(Dispatchers.IO) { FeedsClient.sync(f.id) } } },
+                        onRetry = { id -> scope.launch(Dispatchers.IO) { feedsVM.source.feeds.sync(id) } },
+                        onRetryAll = { failingFeeds.forEach { f -> scope.launch(Dispatchers.IO) { feedsVM.source.feeds.sync(f.id) } } },
                     )
                 }
                 PullToRefresh(

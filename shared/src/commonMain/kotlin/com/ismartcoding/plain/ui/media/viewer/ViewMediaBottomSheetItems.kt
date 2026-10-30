@@ -1,5 +1,6 @@
 package com.ismartcoding.plain.ui.media.viewer
 
+import com.ismartcoding.plain.ui.state.launchSafe
 import androidx.compose.foundation.layout.Column
 import com.ismartcoding.plain.features.chat.models.MessageFile
 
@@ -54,8 +55,10 @@ internal fun ViewMediaActionButtons(
     val renameInPrimary = !(isMediaFile && qrScanResult.isNotEmpty() && onCast != null)
     PSheetPrimaryActionsCard {
         PSheetPrimaryAction(UiRes.drawable.ui_drawable_share_2, stringResource(Res.string.share)) {
-            shareFile(m.path)
-            onDismiss()
+            scope.launchSafe {
+                shareFile(m.source.fileForOpen(m.path))
+                onDismiss()
+            }
         }
         if (qrScanResult.isNotEmpty()) {
             PSheetPrimaryAction(UiRes.drawable.ui_drawable_scan_qr_code, stringResource(Res.string.scan_qrcode)) {
@@ -66,12 +69,12 @@ internal fun ViewMediaActionButtons(
             PSheetPrimaryAction(UiRes.drawable.ui_drawable_cast, stringResource(Res.string.cast)) { onCast() }
         }
         if (isMediaFile) {
-            if (renameInPrimary && AppFeatureType.MEDIA_MOVE.has()) {
+            if (renameInPrimary && AppFeatureType.MEDIA_MOVE.has(m.source.capabilities)) {
                 PSheetPrimaryAction(UiRes.drawable.ui_drawable_pen, stringResource(Res.string.rename)) {
                     onShowRenameDialog()
                 }
             }
-            if (AppFeatureType.MEDIA_DELETE.has()) PSheetPrimaryDeleteAction(stringResource(Res.string.delete)) {
+            if (AppFeatureType.MEDIA_DELETE.has(m.source.capabilities)) PSheetPrimaryDeleteAction(stringResource(Res.string.delete)) {
                 scope.launch {
                     confirmActionAsync(
                         Res.string.delete,
@@ -86,7 +89,7 @@ internal fun ViewMediaActionButtons(
             }
         }
     }
-    if (!renameInPrimary && AppFeatureType.MEDIA_MOVE.has()) {
+    if (!renameInPrimary && AppFeatureType.MEDIA_MOVE.has(m.source.capabilities)) {
         VerticalSpace(16.dp)
         PCard(modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN)) {
             PSheetActionRow(UiRes.drawable.ui_drawable_pen, stringResource(Res.string.rename)) {

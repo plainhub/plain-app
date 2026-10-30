@@ -67,7 +67,7 @@ internal fun VideoActionButtons(
 ) {
     val scope = rememberCoroutineScope()
     var showAddToHomeDialog by remember { mutableStateOf(false) }
-    val canAddToHome = Capability.LAUNCHER_SHORTCUTS in getDeviceCapabilities()
+    val canAddToHome = videosVM.source is com.ismartcoding.plain.rust.graphql.ContentSource.Local && Capability.LAUNCHER_SHORTCUTS in getDeviceCapabilities()
     PCard(modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN)) {
         PSheetHeader(
             thumbnail = {
@@ -89,7 +89,7 @@ internal fun VideoActionButtons(
                 }
             }
             PSheetPrimaryAction(UiRes.drawable.ui_drawable_share_2, stringResource(Res.string.share)) {
-                shareFiles(listOf(getMediaItemUriString(videosVM.dataType, m.id, m.path)))
+                videosVM.share(listOf(m.id))
                 onDismiss()
             }
             if (!videosVM.trash.value) {
@@ -97,19 +97,19 @@ internal fun VideoActionButtons(
                     videosVM.showRenameDialog.value = true
                 }
             }
-            if (AppFeatureType.MEDIA_TRASH.has() && !videosVM.trash.value) {
+            if (AppFeatureType.MEDIA_TRASH.has(videosVM.source.capabilities) && !videosVM.trash.value) {
                 PSheetPrimaryTrashAction(stringResource(Res.string.trash)) {
                     videosVM.trash(tagsVM, setOf(m.id))
                     onDismiss()
                 }
             }
-            if (AppFeatureType.MEDIA_TRASH.has() && videosVM.trash.value) {
+            if (AppFeatureType.MEDIA_TRASH.has(videosVM.source.capabilities) && videosVM.trash.value) {
                 PSheetPrimaryAction(UiRes.drawable.ui_drawable_archive_restore, stringResource(Res.string.restore)) {
                     videosVM.restore(tagsVM, setOf(m.id))
                     onDismiss()
                 }
             }
-            if (!AppFeatureType.MEDIA_TRASH.has() || videosVM.trash.value) {
+            if (!AppFeatureType.MEDIA_TRASH.has(videosVM.source.capabilities) || videosVM.trash.value) {
                 PSheetPrimaryDeleteAction(stringResource(Res.string.delete)) {
                     scope.launch {
                         confirmActionAsync(
@@ -139,7 +139,7 @@ internal fun VideoActionButtons(
                         }
                     }
                     PSheetActionRow(UiRes.drawable.ui_drawable_square_arrow_out_up_right, stringResource(Res.string.open_with)) {
-                        openFileExternal(m.path)
+                        videosVM.openFile(m.path)
                     }
                 }
                 if (videosVM.trash.value) {

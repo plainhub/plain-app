@@ -22,7 +22,8 @@ object MediaPreviewData {
     suspend fun setDataAsync(
         itemState: TransformItemState,
         chatItems: List<VChat>,
-        m: MessageFile
+        m: MessageFile,
+        source: com.ismartcoding.plain.rust.graphql.ContentSource = com.ismartcoding.plain.rust.graphql.ContentSource.Local,
     ) {
         val newItems = mutableListOf<MessageFile>()
         chatItems.forEach { item ->
@@ -32,41 +33,44 @@ object MediaPreviewData {
                 newItems.addAll((item.value as MessageFiles).items.filter { it.fileName.isVideoFast() || it.fileName.isImageFast() })
             }
         }
-        val paths = FilePaths.resolveAll(newItems.map { it.uri })
+        if (source is com.ismartcoding.plain.rust.graphql.ContentSource.Remote) newItems.removeAll { it.isRemoteFile() }
+        val paths = if (source is com.ismartcoding.plain.rust.graphql.ContentSource.Local) FilePaths.resolveAll(newItems.map { it.uri }) else newItems.map { it.uri }
         items = newItems.mapIndexed { index, f ->
-            PreviewItem(f.id, paths[index], f.size, data = f)
+            PreviewItem(f.id, paths[index], f.size, data = f, source = source)
         }
         items.find { it.id == m.id }?.let {
             it.initAsync(m)
-            itemState.intrinsicSize = it.intrinsicSize.toSize()
+            itemState.updateIntrinsicSize(it.intrinsicSize.toSize())
         }
     }
 
     suspend fun setDataAsync(
         itemState: TransformItemState,
         items: List<MediaImage>,
-        m: MediaImage
+        m: MediaImage,
+        source: com.ismartcoding.plain.rust.graphql.ContentSource = com.ismartcoding.plain.rust.graphql.ContentSource.Local,
     ) {
         MediaPreviewData.items = items.map { f ->
-            PreviewItem(f.id, f.path, f.size, mediaId = f.id, data = f)
+            PreviewItem(f.id, f.path, f.size, mediaId = f.id, data = f, source = source)
         }
         MediaPreviewData.items.find { it.id == m.id }?.let {
             it.initAsync(m)
-            itemState.intrinsicSize = it.intrinsicSize.toSize()
+            itemState.updateIntrinsicSize(it.intrinsicSize.toSize())
         }
     }
 
     suspend fun setDataAsync(
         itemState: TransformItemState,
         items: List<MediaVideo>,
-        m: MediaVideo
+        m: MediaVideo,
+        source: com.ismartcoding.plain.rust.graphql.ContentSource = com.ismartcoding.plain.rust.graphql.ContentSource.Local,
     ) {
         MediaPreviewData.items = items.map { f ->
-            PreviewItem(f.id, f.path, f.size, mediaId = f.id, data = f)
+            PreviewItem(f.id, f.path, f.size, mediaId = f.id, data = f, source = source)
         }
         MediaPreviewData.items.find { it.id == m.id }?.let {
             it.initAsync(m)
-            itemState.intrinsicSize = it.intrinsicSize.toSize()
+            itemState.updateIntrinsicSize(it.intrinsicSize.toSize())
         }
     }
 
@@ -82,7 +86,7 @@ object MediaPreviewData {
             } else if (it.isImage()) {
                 it.initImageAsync()
             }
-            itemState.intrinsicSize = it.intrinsicSize.toSize()
+            itemState.updateIntrinsicSize(it.intrinsicSize.toSize())
         }
     }
 }

@@ -10,25 +10,30 @@ import androidx.lifecycle.ViewModel
 import com.ismartcoding.plain.features.audio.AudioQueueClient
 import com.ismartcoding.plain.models.AudioItem
 import com.ismartcoding.plain.platform.media.audioJustPlay
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.CancellationException
 import com.ismartcoding.plain.lib.logcat.LogCat
 
-class AudioQueueViewModel : ViewModel() {
+class AudioQueueViewModel internal constructor(val source: com.ismartcoding.plain.rust.graphql.ContentSource = com.ismartcoding.plain.rust.graphql.ContentSource.Local) : ViewModel() {
     companion object {
+        private val playerVisible = MutableStateFlow(false)
         private val active = mutableSetOf<AudioQueueViewModel>()
         suspend fun refreshActive() {
             for (viewModel in active.toList()) viewModel.loadAsync()
         }
     }
 
-    val audioPlayerVisible = MutableStateFlow(false)
+    val audioPlayerVisible = playerVisible
+    val playMode = mutableStateOf(com.ismartcoding.plain.features.audio.MediaPlayMode.REPEAT)
+    val playbackSpeed = androidx.compose.runtime.mutableFloatStateOf(1f)
     val queueItems = mutableStateOf<List<AudioItem>>(listOf())
     val queueCount = mutableStateOf(0)
     val noMore = mutableStateOf(false)
 
+    val error = mutableStateOf<String?>(null)
     val canReorder = mutableStateOf(false)
 
     val queuedMediaIds = mutableStateOf<Set<String>>(emptySet())
@@ -41,10 +46,21 @@ class AudioQueueViewModel : ViewModel() {
     init {
         active.add(this)
         viewModelScope.launch(start = CoroutineStart.UNDISPATCHED) {
-            AppSubscriptions.contentChanged.changes().collect {
-                try { loadAsync() }
-                catch (cancelled: CancellationException) { throw cancelled }
-                catch (error: Exception) { LogCat.e("Refresh audio queue", error) }
+            try {
+                val changes = if (source is com.ismartcoding.plain.rust.graphql.ContentSource.Local) AppSubscriptions.contentChanged.changes()
+                    else kotlinx.coroutines.flow.merge(
+                        (source as com.ismartcoding.plain.rust.graphql.ContentSource.Remote).client.changes(listOf(com.ismartcoding.plain.rust.graphql.GraphqlOperation("subscription { contentChanged }"), com.ismartcoding.plain.rust.graphql.GraphqlOperation("subscription { permissionsUpdated }"))),
+                        com.ismartcoding.plain.features.audio.AudioCommands.changed.filter { com.ismartcoding.plain.features.audio.AudioCommands.output.value.source.key == source.key },
+                    )
+                changes.collect {
+                    try { loadAsync() }
+                    catch (cancelled: CancellationException) { throw cancelled }
+                    catch (error: Exception) { LogCat.e("Refresh audio queue", error) }
+                }
+            } catch (cancelled: CancellationException) { throw cancelled }
+            catch (failure: Exception) {
+                error.value = failure.message ?: failure.toString()
+                LogCat.e("Observe audio queue", failure)
             }
         }
     }
@@ -55,10 +71,22 @@ class AudioQueueViewModel : ViewModel() {
     }
 
     suspend fun loadAsync() {
-        val playback = AudioQueueClient.playback()
-        selectedPath.value = playback.path.orEmpty()
-        selectedMediaId.value = playback.mediaId
-        refreshWindow()
+        try {
+            val snapshot = refreshWindow()
+            val playback = snapshot.audioPlayback
+            val rendered = if (source is com.ismartcoding.plain.rust.graphql.ContentSource.Remote && com.ismartcoding.plain.features.audio.AudioCommands.output.value.source.key == source.key) com.ismartcoding.plain.features.audio.AudioCommands.output.value.track else null
+            selectedPath.value = rendered?.path ?: playback.path.orEmpty()
+            selectedMediaId.value = rendered?.mediaId ?: playback.mediaId
+            playMode.value = playback.mode
+            if (source is com.ismartcoding.plain.rust.graphql.ContentSource.Remote) {
+                playbackSpeed.floatValue = com.ismartcoding.plain.models.audioPlaybackSpeed(snapshot.prefs)
+            }
+            error.value = null
+        } catch (cancelled: CancellationException) { throw cancelled }
+        catch (failure: Exception) {
+            error.value = failure.message ?: failure.toString()
+            throw failure
+        }
     }
 
     fun isInQueue(mediaId: String): Boolean = mediaId in queuedMediaIds.value
@@ -73,21 +101,23 @@ class AudioQueueViewModel : ViewModel() {
 
     suspend fun addAsync(items: List<AudioTrack>) {
         val audio = items.map { it.toPlaylistAudio() }
-        AudioQueueClient.enqueue(audio)
+        source.queue.enqueue(audio)
         loadAsync()
     }
 
     suspend fun playSingleAsync(audio: AudioItem) {
-        AudioQueueClient.clearQueue()
-        AudioQueueClient.enqueue(listOf(audio))
-        audioJustPlay(audio)
+        if (source is com.ismartcoding.plain.rust.graphql.ContentSource.Local || audio.mediaId != null) {
+            source.queue.clearQueue()
+            source.queue.enqueue(listOf(audio))
+        }
+        com.ismartcoding.plain.features.audio.AudioCommands.play(audio, source)
         selectedPath.value = audio.path
         selectedMediaId.value = audio.mediaId
         refreshWindow()
     }
 
     suspend fun clearAsync() {
-        AudioQueueClient.clearQueue()
+        com.ismartcoding.plain.features.audio.AudioCommands.clearQueue(source)
         selectedPath.value = ""
         selectedMediaId.value = null
         refreshWindow()
@@ -105,42 +135,38 @@ class AudioQueueViewModel : ViewModel() {
 
     suspend fun playAsync(item: AudioTrack) {
         val audio = item.toPlaylistAudio()
-        audioJustPlay(audio)
+        com.ismartcoding.plain.features.audio.AudioCommands.play(audio, source)
         setCurrentPlaying(audio)
         refreshWindow()
     }
 
     suspend fun enqueueAndPlayAsync(item: AudioTrack) {
         val audio = item.toPlaylistAudio()
-        AudioQueueClient.enqueue(listOf(audio))
-        audioJustPlay(audio)
+        com.ismartcoding.plain.features.audio.AudioCommands.play(audio, source, enqueue = true)
         setCurrentPlaying(audio)
         refreshWindow()
     }
 
     suspend fun removeAsync(mediaId: String) {
-        AudioQueueClient.removeQueued(mediaId)
-        val playback = AudioQueueClient.playback()
-        selectedPath.value = playback.path.orEmpty()
-        selectedMediaId.value = playback.mediaId
-        refreshWindow()
+        com.ismartcoding.plain.features.audio.AudioCommands.removeQueued(source, mediaId)
+        loadAsync()
     }
 
     suspend fun reorder(from: Int, to: Int) {
         val list = queueItems.value.toMutableList()
         if (from !in list.indices || to !in list.indices) return
         list.add(to,list.removeAt(from))
-        AudioQueueClient.reorderQueued(list.map { requireNotNull(it.mediaId) })
+        source.queue.reorderQueued(list.map { requireNotNull(it.mediaId) })
         queueItems.value = list
     }
 
-    private suspend fun refreshWindow(target: Int = pageLimit) {
-        val total = AudioQueueClient.queueTotal()
-        val window = AudioQueueClient.queuePage(0, maxOf(target, pageLimit))
-        queueItems.value = window
-        queueCount.value = total
-        noMore.value = window.size >= total
+    private suspend fun refreshWindow(target: Int = pageLimit): com.ismartcoding.plain.models.AudioQueueSnapshot {
+        val snapshot = source.queue.snapshot(maxOf(target, pageLimit))
+        queueItems.value = snapshot.items
+        queueCount.value = snapshot.count
+        noMore.value = snapshot.items.size >= snapshot.count
         canReorder.value = true
-        queuedMediaIds.value = AudioQueueClient.queuedMediaIds()
+        queuedMediaIds.value = snapshot.queuedIds.mapNotNull { it.mediaId }.toSet()
+        return snapshot
     }
 }

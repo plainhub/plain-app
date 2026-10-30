@@ -81,6 +81,7 @@ internal fun FeedSyncBanner(
     singleFeed: Boolean,
     onRetry: (String) -> Unit,
     onRetryAll: () -> Unit,
+    syncState: FeedSyncStateStore = FeedWorkerState,
 ) {
     // The key includes each feed's last_sync_at, so a new sync that fails
     // again produces a new key and the dismissal is forgotten (a dismissed
@@ -135,6 +136,7 @@ internal fun FeedSyncBanner(
                         if (index > 0) HorizontalDivider()
                         FeedSyncBannerRow(
                             feed = feed,
+                            syncState = syncState,
                             detailExpanded = detailFeedId == feed.id,
                             onToggleDetail = { detailFeedId = if (detailFeedId == feed.id) null else feed.id },
                             onRetry = { onRetry(feed.id) },
@@ -165,11 +167,12 @@ internal fun FeedSyncBanner(
 @Composable
 private fun FeedSyncBannerRow(
     feed: Feed,
+    syncState: FeedSyncStateStore,
     detailExpanded: Boolean,
     onToggleDetail: () -> Unit,
     onRetry: () -> Unit,
 ) {
-    val busy = FeedWorkerState.status(feed.id) in setOf(FeedWorkerStatus.QUEUED, FeedWorkerStatus.RUNNING)
+    val busy = syncState.status(feed.id) in setOf(FeedWorkerStatus.QUEUED, FeedWorkerStatus.RUNNING)
     val reason = feedSyncErrorReason(feed.lastError.code) ?: stringResource(Res.string.sync_failed)
     val lastSyncedAt = feed.lastSyncAt?.timeAgo()
     var showMenu by remember { mutableStateOf(false) }

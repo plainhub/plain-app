@@ -15,8 +15,17 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 
-object DownloadQueue {
-    private val scope = CoroutineScope(Dispatchers.Default + SupervisorJob())
+object DownloadQueue : ChatDownloadClient(
+    includePeerCredentials = true,
+    publish = { tasks -> DownloadCenter.replaceExternal(DOWNLOAD_KIND_CHAT, tasks.values.toList()) },
+)
+
+open class ChatDownloadClient internal constructor(
+    private val api: com.ismartcoding.plain.rust.graphql.GraphqlClient = GraphqlApi,
+    private val scope: CoroutineScope = CoroutineScope(Dispatchers.Default + SupervisorJob()),
+    private val includePeerCredentials: Boolean = false,
+    private val publish: (Map<String, DownloadTask>) -> Unit = {},
+) {
     private val intents = Channel<Request>(128)
     private val stateLock = Mutex()
     private val version = DownloadQueueVersion()
@@ -54,7 +63,7 @@ object DownloadQueue {
     }
 
     suspend fun refresh() = stateLock.withLock {
-        val snapshot = GraphqlApi.execute(Query.chatDownloadQueue())
+        val snapshot = api.execute(Query.chatDownloadQueue(includePeerCredentials))
         if (!version.accept(snapshot.runtimeId, snapshot.revision)) return@withLock
         val tasks = snapshot.tasks.map { row ->
             DownloadTask(
@@ -68,7 +77,7 @@ object DownloadQueue {
             )
         }.associateBy { it.id }
         downloadProgress.value = tasks
-        DownloadCenter.replaceExternal(DOWNLOAD_KIND_CHAT, tasks.values.toList())
+        publish(tasks)
     }
 
     private suspend fun call(request: Request) {
@@ -76,7 +85,7 @@ object DownloadQueue {
             is Request.Enqueue -> Mutation.enqueueChatDownload(request.messageId, request.fileId, request.peerId)
             is Request.Control -> Mutation.chatDownloadControl(request.command, request.id)
         }
-        GraphqlApi.execute(operation)
+        api.execute(operation)
     }
 
     private sealed interface Request {

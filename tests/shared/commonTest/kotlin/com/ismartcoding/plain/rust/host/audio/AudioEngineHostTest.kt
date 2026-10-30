@@ -49,6 +49,33 @@ class AudioEngineHostTest {
     )
 
     @Test
+    fun remoteRenderingPreservesLocalSdkFactsAcrossTracksAndLocalRestores() = runTest {
+        Dispatchers.setMain(StandardTestDispatcher(testScheduler))
+        val player = Player().apply { gate.complete(Unit); progress = 3210 }
+        val previous = AudioEngineHost.install(player)
+        try {
+            AudioEngineHost.command(command(false))
+            player.progress = 3210
+            AudioEngineHost.renderRemote(AudioItem(path = "https://peer/fs?one", title = "One", artist = "", durationMs = 60000), 10, 0, 1f) {}
+            player.progress = 10004
+            player.isPlayingFlow.value = true
+            assertEquals(com.ismartcoding.plain.rust.host.provider.AudioPlaybackFacts(false, 3210), AudioEngineHost.localPlaybackFacts())
+            AudioEngineHost.renderRemote(AudioItem(path = "https://peer/fs?two", title = "Two", artist = "", durationMs = 60000), 11, 0, 1f) {}
+            assertEquals(3210, AudioEngineHost.localPlaybackFacts().positionMs)
+            val bound = player.calls.last { it.startsWith("bind:") }
+            AudioEngineHost.restore(AudioPlaybackState(6, 4321))
+            assertEquals(bound, player.calls.last { it.startsWith("bind:") })
+            assertEquals(4321, AudioEngineHost.localPlaybackFacts().positionMs)
+            AudioEngineHost.command(command(false))
+            assertEquals(player.progress, AudioEngineHost.localPlaybackFacts().positionMs)
+        } finally {
+            AudioEngineHost.command(command(false))
+            AudioEngineHost.install(previous)
+            Dispatchers.resetMain()
+        }
+    }
+
+    @Test
     fun resume_acknowledges_only_after_seek_speed_and_play_complete() = runTest {
         Dispatchers.setMain(StandardTestDispatcher(testScheduler))
         val player = Player()
@@ -106,6 +133,31 @@ class AudioEngineHostTest {
             assertEquals(1234L, player.lastPositionMs)
             assertEquals(listOf("bind:5", "load", "bind:6"), player.calls)
         } finally {
+            AudioEngineHost.install(previous)
+            Dispatchers.resetMain()
+        }
+    }
+
+    @Test
+    fun remote_reports_stay_with_their_rendered_resource_and_stale_callbacks_are_discarded() = runTest {
+        Dispatchers.setMain(StandardTestDispatcher(testScheduler))
+        val player = Player().apply { gate.complete(Unit) }
+        val previous = AudioEngineHost.install(player)
+        val first = mutableListOf<AudioHostReport>()
+        val second = mutableListOf<AudioHostReport>()
+        try {
+            val audio = AudioItem(title = "Remote", artist = "", path = "https://fixture.invalid/fs?id=first", durationMs = 1000)
+            AudioEngineHost.renderRemote(audio, 7, 0, 1f) { first += it }
+            val queued = AudioEngineHost.reportProgress(audio.path, 7, 100)
+            AudioEngineHost.renderRemote(audio.copy(path = "https://fixture.invalid/fs?id=second"), 8, 0, 1f) { second += it }
+            queued?.join()
+            AudioEngineHost.reportProgress(audio.path, 7, 200)?.join()
+            AudioEngineHost.reportProgress(player.currentPath, 8, 300)?.join()
+            assertEquals(listOf<AudioHostReport>(AudioHostReport.Progress(audio.path, 100, 7)), first)
+            assertEquals(listOf<AudioHostReport>(AudioHostReport.Progress(player.currentPath, 300, 8)), second)
+            assertEquals("https://fixture.invalid/fs?id=second", player.currentPath)
+        } finally {
+            AudioEngineHost.command(command(true))
             AudioEngineHost.install(previous)
             Dispatchers.resetMain()
         }

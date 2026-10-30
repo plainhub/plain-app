@@ -1,6 +1,6 @@
 package com.ismartcoding.plain.ui.apps
 
-import com.ismartcoding.plain.features.packages.PackagesClient
+import com.ismartcoding.plain.rust.graphql.ContentSource
 import com.ismartcoding.plain.ui.state.ISearchableViewModel
 import com.ismartcoding.plain.ui.state.VTabData
 
@@ -20,9 +20,10 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 
-class AppsViewModel : ISearchableViewModel<AppPackage>, ViewModel() {
+class AppsViewModel internal constructor(val source: ContentSource = ContentSource.Local) : ISearchableViewModel<AppPackage>, ViewModel() {
     private val _itemsFlow = MutableStateFlow<List<AppPackage>>(emptyList())
     val itemsFlow: StateFlow<List<AppPackage>> = _itemsFlow
+    val hasPermission = mutableStateOf(source is ContentSource.Local || source is ContentSource.Remote && com.ismartcoding.plain.platform.permissions.Permission.QUERY_ALL_PACKAGES in source.info.permissions)
     var showLoading = mutableStateOf(true)
     var offset = mutableIntStateOf(0)
     var limit = mutableIntStateOf(50)
@@ -40,7 +41,7 @@ class AppsViewModel : ISearchableViewModel<AppPackage>, ViewModel() {
 
     suspend fun moreAsync() = withIO {
         offset.value += limit.intValue
-        val items = PackagesClient.search(getQuery(), limit.intValue, offset.intValue, sortBy.value)
+        val items = source.packages.search(getQuery(), limit.intValue, offset.intValue, sortBy.value)
         _itemsFlow.update { it + items }
         showLoading.value = false
         noMore.value = items.size < limit.intValue
@@ -48,9 +49,9 @@ class AppsViewModel : ISearchableViewModel<AppPackage>, ViewModel() {
 
     suspend fun loadAsync() = withIO {
         offset.intValue = 0
-        _itemsFlow.value = PackagesClient.search(getQuery(), limit.intValue, 0, sortBy.value)
-        total.intValue = PackagesClient.count(SearchHelper.buildTextFilter(queryText.value))
-        totalSystem.intValue = PackagesClient.count("${SearchHelper.buildTextFilter(queryText.value)} type:${PackageType.SYSTEM.name}")
+        _itemsFlow.value = source.packages.search(getQuery(), limit.intValue, 0, sortBy.value)
+        total.intValue = source.packages.count(SearchHelper.buildTextFilter(queryText.value))
+        totalSystem.intValue = source.packages.count("${SearchHelper.buildTextFilter(queryText.value)} type:${PackageType.SYSTEM.name}")
         noMore.value = _itemsFlow.value.size < limit.intValue
         tabs.value = listOf(
             VTabData(LocaleHelper.getStringAsync(Res.string.all), "", total.intValue),

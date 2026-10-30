@@ -14,6 +14,12 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.trySendBlocking
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
+import platform.Foundation.NSURLAuthenticationChallenge
+import platform.Foundation.NSURLCredential
+import platform.Foundation.NSURLSessionAuthChallengePerformDefaultHandling
+import platform.Foundation.NSURLSessionAuthChallengeUseCredential
+import platform.Foundation.NSURLSessionAuthChallengeCancelAuthenticationChallenge
+import platform.Foundation.NSURLSessionAuthChallengeDisposition
 import platform.Foundation.NSData
 import platform.Foundation.NSHTTPURLResponse
 import platform.Foundation.NSMutableURLRequest
@@ -51,12 +57,13 @@ import okio.BufferedSink
 import okio.FileSystem
 import okio.Path
 
-internal class IosImageNetworkClient : NetworkClient {
+internal class IosImageNetworkClient(private val tlsCertificateSha256: String? = null) : NetworkClient {
     override suspend fun <T> executeRequest(
         request: NetworkRequest,
         block: suspend (NetworkResponse) -> T,
     ): T {
         val nativeRequest = request.toImageRequest()
+        if (tlsCertificateSha256 != null) require(nativeRequest.URL?.scheme == "https") { "Peer resources require HTTPS" }
         val chunks = Channel<ByteArray>(capacity = 8)
         var status = 0
         var responseHeaders: Map<String, List<String>> = emptyMap()
@@ -75,6 +82,19 @@ internal class IosImageNetworkClient : NetworkClient {
                 responseHeaders = headerMap(http)
                 headerContinuation?.invoke()
                 completionHandler(NSURLSessionResponseAllow)
+            }
+
+            override fun URLSession(session: NSURLSession, task: NSURLSessionTask, didReceiveChallenge: NSURLAuthenticationChallenge, completionHandler: (NSURLSessionAuthChallengeDisposition, NSURLCredential?) -> Unit) {
+                val pin = tlsCertificateSha256
+                if (pin == null) completionHandler(NSURLSessionAuthChallengePerformDefaultHandling, null)
+                else {
+                    val credential = com.ismartcoding.plain.rust.graphql.peerResourceCredential(didReceiveChallenge, nativeRequest.URL?.host, pin)
+                    if (credential != null) completionHandler(NSURLSessionAuthChallengeUseCredential, credential)
+                    else completionHandler(NSURLSessionAuthChallengeCancelAuthenticationChallenge, null)
+                }
+            }
+            override fun URLSession(session: NSURLSession, task: NSURLSessionTask, willPerformHTTPRedirection: NSHTTPURLResponse, newRequest: platform.Foundation.NSURLRequest, completionHandler: (platform.Foundation.NSURLRequest?) -> Unit) {
+                completionHandler(if (tlsCertificateSha256 == null) newRequest else null)
             }
 
             override fun URLSession(

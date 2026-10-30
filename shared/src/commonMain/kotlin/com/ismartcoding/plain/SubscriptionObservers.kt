@@ -43,7 +43,7 @@ internal object SubscriptionObservers {
             try { FavoriteFoldersClient.refresh() }
             catch (cancelled: CancellationException) { throw cancelled }
             catch (error: Exception) { LogCat.e("Favorite folders refresh", error) }
-            NotesViewModel.reloadAsync()
+            NotesViewModel.local.reloadAsync()
         }
         scope.observeChatChanges(AppSubscriptions.messagesCreated) { values ->
             values.forEach { value ->
@@ -51,7 +51,7 @@ internal object SubscriptionObservers {
                     if (item.fromId == "me") {
                         val target = if (item.channelId.isNullOrEmpty()) ChatTarget.parseId("peer:" + item.toId)
                             else ChatTarget.parseId("channel:" + item.channelId)
-                        ChatViewModel.onMessagesCreated(target, listOf(item), scroll = true)
+                        ChatViewModel.local.onMessagesCreated(target, listOf(item), scroll = true)
                     } else RustPeerStore.getById(item.fromId)?.let { peer ->
                         val channel = item.channelId?.takeIf { it.isNotEmpty() }?.let { channelGraphql(it) }
                         ChatMessageReceiver.applyCommitted(item, peer, channel)
@@ -60,11 +60,11 @@ internal object SubscriptionObservers {
             }
         }
         scope.observeChatChanges(AppSubscriptions.messagesUpdated) { values ->
-            values.mapNotNull { RustChatStore.getById(it.id) }.forEach { ChatViewModel.update(it) }
+            values.mapNotNull { RustChatStore.getById(it.id) }.forEach { ChatViewModel.local.update(it) }
         }
         scope.observeChatChanges(AppSubscriptions.messagesDeleted) { target ->
-            if (target.startsWith("ids=")) ChatViewModel.onMessagesDeleted(target.removePrefix("ids=").split(',').filter { it.isNotEmpty() }.toSet())
-            else ChatViewModel.onConversationCleared(target)
+            if (target.startsWith("ids=")) ChatViewModel.local.onMessagesDeleted(target.removePrefix("ids=").split(',').filter { it.isNotEmpty() }.toSet())
+            else ChatViewModel.local.onConversationCleared(target)
         }
     }
     private fun <T> CoroutineScope.observe(source: Flow<SubscriptionUpdate<T>>, consume: suspend (SubscriptionUpdate<T>) -> Unit) = launch(start = CoroutineStart.UNDISPATCHED) {
@@ -82,7 +82,7 @@ internal object SubscriptionObservers {
     private fun <T> CoroutineScope.observeChatChanges(source: Flow<SubscriptionUpdate<T>>, consume: suspend (T) -> Unit) = observe(source) { update ->
         when (update) {
             is SubscriptionUpdate.Data -> consume(update.value)
-            SubscriptionUpdate.Attached -> if (ChatViewModel.visibleConversationId.value != null) ChatViewModel.fetchAsync(ChatViewModel.target.value.toId)
+            SubscriptionUpdate.Attached -> if (ChatViewModel.local.visibleConversationId.value != null) ChatViewModel.local.fetchAsync(ChatViewModel.local.target.value.toId)
             is SubscriptionUpdate.Failed -> Unit
         }
     }

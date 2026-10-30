@@ -21,7 +21,6 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.ismartcoding.plain.ui.components.ButtonSize
 import com.ismartcoding.plain.ui.components.ButtonType
-import com.ismartcoding.plain.features.dlna.sender.RustDlnaSender
 import com.ismartcoding.plain.i18n.Res
 import com.ismartcoding.plain.i18n.casting
 import com.ismartcoding.plain.i18n.casting_to
@@ -42,15 +41,16 @@ import org.jetbrains.compose.resources.stringResource
 @Composable
 fun CastSessionPage(
     navController: NavHostController,
-    castVM: CastViewModel = viewModel(key = "castSessionVM") { CastViewModel() },
+    source: com.ismartcoding.plain.rust.graphql.ContentSource = com.ismartcoding.plain.ui.navigation.LocalContentSource.current,
+    castVM: CastViewModel = viewModel(key = "castSessionVM") { CastViewModel(source) },
 ) {
-    val currentUri by RustDlnaSender.currentUri.collectAsState()
-    val isPlaying by RustDlnaSender.isPlaying.collectAsState()
-    val progressMs by RustDlnaSender.progressMs.collectAsState()
-    val durationMs by RustDlnaSender.durationMs.collectAsState()
-    val supportsCallback by RustDlnaSender.supportsCallback.collectAsState()
-    val castItems by RustDlnaSender.items.collectAsState()
-    val deviceName = RustDlnaSender.currentDevice?.getDeviceName() ?: ""
+    val currentUri by castVM.currentUri.collectAsState()
+    val isPlaying by castVM.isPlaying.collectAsState()
+    val progressMs by castVM.progressMs.collectAsState()
+    val durationMs by castVM.durationMs.collectAsState()
+    val supportsCallback by castVM.supportsCallback.collectAsState()
+    val castItems by castVM.items.collectAsState()
+    val deviceName = castVM.currentDeviceName
 
     val titleText = if (deviceName.isNotEmpty()) {
         stringResource(Res.string.casting_to, deviceName)

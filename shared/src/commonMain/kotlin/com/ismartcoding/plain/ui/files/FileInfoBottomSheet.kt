@@ -1,6 +1,5 @@
 package com.ismartcoding.plain.ui.files
 
-import com.ismartcoding.plain.features.files.FilesClient
 import androidx.compose.foundation.layout.padding
 import androidx.compose.ui.Modifier
 import com.ismartcoding.plain.ui.theme.PlainTheme
@@ -36,7 +35,6 @@ import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.components.FileRenameDialog
 import com.ismartcoding.plain.ui.files.FilesViewModel
 import kotlinx.coroutines.launch
-import com.ismartcoding.plain.features.files.FavoriteFoldersClient
 import com.ismartcoding.plain.ui.state.launchSafe
 import com.ismartcoding.plain.ui.resources.Res as UiRes
 import com.ismartcoding.plain.ui.resources.file as ui_drawable_file
@@ -50,20 +48,20 @@ fun FileInfoBottomSheet(filesVM: FilesViewModel) {
     // Scoped to this sheet instance: a fresh long-press always starts with the dialog
     // closed, so a stale flag can never pop rename together with the sheet.
     val showRenameDialog = remember { mutableStateOf(false) }
-    val favorites by FavoriteFoldersClient.items.collectAsState()
+    val favorites by filesVM.source.favorites.items.collectAsState()
     val isFavorite = favorites.any { it.fullPath == file.path }
     val onDismiss = { filesVM.selectedFile.value = null }
 
     LaunchedEffect(file.path) {
         if (file.isDir) {
-            scope.launchSafe { FavoriteFoldersClient.refresh() }
+            scope.launchSafe { filesVM.source.favorites.refresh() }
         }
     }
 
     if (showRenameDialog.value) {
         FileRenameDialog(path = file.path, onDismiss = {
             showRenameDialog.value = false
-        }, onRename = { p, name -> FilesClient.rename(p, name) }, onRenamed = {
+        }, onRename = { p, name -> filesVM.source.files.rename(p, name) }, onRenamed = {
             file.name = it.getFilenameFromPath()
             file.path = it
             filesVM.selectedFile.value = null
@@ -101,9 +99,9 @@ fun FileInfoBottomSheet(filesVM: FilesViewModel) {
                     onFavoriteToggle = {
                         scope.launchSafe {
                             if (isFavorite) {
-                                FavoriteFoldersClient.remove(file.path)
+                                filesVM.source.favorites.remove(file.path)
                             } else {
-                                FavoriteFoldersClient.add(filesVM.rootPath,file.path)
+                                filesVM.source.favorites.add(filesVM.rootPath,file.path)
                             }
                             filesVM.favoriteFoldersVersion.value++
                         }

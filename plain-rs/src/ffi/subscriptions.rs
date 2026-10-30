@@ -4,10 +4,13 @@ use super::{
 };
 use std::ffi::c_char;
 
-fn open() -> Result<u64, String> {
+fn open(target: Option<&str>) -> Result<u64, String> {
     let (runtime, executor) = parts()?;
     let _entered = runtime.enter();
-    executor.open_subscriptions(Default::default())
+    match target {
+        Some(target) => executor.open_peer_subscriptions(serde_json::from_str(target).map_err(|error| error.to_string())?, Default::default()),
+        None => executor.open_subscriptions(Default::default()),
+    }
 }
 fn send(handle: u64, message: &str) -> Result<(), String> {
     let (runtime, executor) = parts()?;
@@ -29,9 +32,9 @@ fn close(handle: u64) -> Result<(), String> {
     Ok(())
 }
 #[unsafe(no_mangle)]
-pub extern "C" fn plain_graphql_subscription_open() -> *mut c_char {
+pub extern "C" fn plain_graphql_subscription_open(target: *const c_char) -> *mut c_char {
     c_string(
-        match open() {
+        match (if target.is_null() { Ok(None) } else { input(target).map(Some) }).and_then(|target| open(target.as_deref())) {
             Ok(handle) => serde_json::json!({"handle":handle}),
             Err(error) => serde_json::json!({"error":error}),
         }
@@ -84,9 +87,11 @@ mod android {
     pub extern "system" fn Java_com_ismartcoding_plain_rust_native_RustNativeBindings_graphqlSubscriptionOpen(
         mut env: EnvUnowned<'_>,
         _: JObject<'_>,
+        target: JString<'_>,
     ) -> jlong {
         env.with_env(|env| -> jni::errors::Result<_> {
-            match open() {
+            let target = if target.is_null() { None } else { Some(target.to_string()) };
+            match open(target.as_deref()) {
                 Ok(handle) => Ok(handle as jlong),
                 Err(error) => {
                     fail(env, error)?;

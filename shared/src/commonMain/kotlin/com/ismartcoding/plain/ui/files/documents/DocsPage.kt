@@ -38,10 +38,11 @@ import com.ismartcoding.plain.ui.resources.file_text as ui_drawable_file_text
 fun DocsPage(
     navController: NavHostController,
     initialLoadGate: NavLoadGate? = null,
-    docsVM: DocsViewModel = viewModel { DocsViewModel() },
-    tagsVM: TagsViewModel = viewModel(key = "docTagsVM") { TagsViewModel() },
+    source: com.ismartcoding.plain.rust.graphql.ContentSource = com.ismartcoding.plain.ui.navigation.LocalContentSource.current,
+    docsVM: DocsViewModel = viewModel { DocsViewModel(source) },
+    tagsVM: TagsViewModel = viewModel(key = "docTagsVM") { TagsViewModel(source.tags) },
     castVM: CastViewModel = viewModel(key = "docsCastVM") { CastViewModel() },
-    mediaFoldersVM: MediaFoldersViewModel = viewModel(key = "docFoldersVM") { MediaFoldersViewModel() },
+    mediaFoldersVM: MediaFoldersViewModel = viewModel(key = "docFoldersVM") { MediaFoldersViewModel(source) },
 ) {
     val scope = rememberCoroutineScope()
     val docsState = DocsPageState.create(docsVM, tagsVM, mediaFoldersVM)

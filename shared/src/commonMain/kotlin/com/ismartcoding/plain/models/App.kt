@@ -21,4 +21,5 @@ data class App(
     var downloadsDir: String,
     var developerMode: Boolean,
     var debug: Boolean,
+    var tlsCertificateSha256: String? = null,
 )

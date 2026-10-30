@@ -42,8 +42,8 @@ import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import com.ismartcoding.plain.ui.resources.Res as UiRes
 
-suspend fun loadLyrics(audioPath: String): List<LrcParser.LrcLine> =
-    withIO { LrcParser.parse(MediaClient.lyricsByPath(audioPath)) }
+suspend fun loadLyrics(audioPath: String, source: com.ismartcoding.plain.rust.graphql.ContentSource): List<LrcParser.LrcLine> =
+    withIO { LrcParser.parse(source.media.lyricsByPath(audioPath)) }
 
 /**
  * Auto-scrolling lyrics view. [lines] is the parsed LRC content (null while

@@ -1,7 +1,5 @@
 package com.ismartcoding.plain.ui.images
 
-import com.ismartcoding.plain.features.files.FilesClient
-import com.ismartcoding.plain.features.media.MediaClient
 
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
@@ -43,6 +41,7 @@ import com.ismartcoding.plain.ui.tags.TagsViewModel
 import com.ismartcoding.plain.ui.theme.PlainTheme
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import com.ismartcoding.plain.ui.state.launchSafe
 import org.jetbrains.compose.resources.stringResource
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
@@ -62,16 +61,13 @@ fun ViewImageBottomSheet(
 
     val scope = rememberCoroutineScope()
     LaunchedEffect(Unit) {
-        scope.launch(Dispatchers.Default) {
-            if (m.path.endsWith(".svg", true)) {
-                viewSize = getSvgSize(m.path)
-            }
-            try {
-                val result = tryDecodeQrCode(m.path)
-                if (result != null) {
-                    qrScanResult = result
+        scope.launchSafe {
+            kotlinx.coroutines.withContext(Dispatchers.Default) {
+                if (m.path.endsWith(".svg", true)) {
+                    viewSize = if (imagesVM.source is com.ismartcoding.plain.rust.graphql.ContentSource.Local) getSvgSize(m.path)
+                        else imagesVM.source.media.imageInfo(m.path)?.let { androidx.compose.ui.unit.IntSize(it.width, it.height) } ?: viewSize
                 }
-            } catch (e: Exception) {
+                qrScanResult = tryDecodeQrCode(m.path, imagesVM.source).orEmpty()
             }
         }
     }
@@ -79,7 +75,7 @@ fun ViewImageBottomSheet(
     if (imagesVM.showRenameDialog.value) {
         FileRenameDialog(path = m.path, onDismiss = {
             imagesVM.showRenameDialog.value = false
-        }, onRename = { p, name -> FilesClient.rename(p, name) }, onRenamed = {
+        }, onRename = { p, name -> imagesVM.source.files.rename(p, name) }, onRenamed = {
             imagesVM.loadAsync(tagsVM)
             onDismiss()
         })
@@ -115,7 +111,7 @@ fun ViewImageBottomSheet(
                     PListItem(title = stringResource(Res.string.dimensions), value = "${viewSize.width}\u00d7${viewSize.height}")
                     PListItem(title = stringResource(Res.string.created_at), value = m.createdAt.formatDateTime())
                     PListItem(title = stringResource(Res.string.updated_at), value = m.updatedAt.formatDateTime())
-                    ImageMetaRows(path = m.path, loadMeta = { MediaClient.imageInfo(it) }, formatTexts = { mt -> formatImageMetaTexts(mt) })
+                    ImageMetaRows(path = m.path, loadMeta = { imagesVM.source.media.imageInfo(it) }, formatTexts = { mt -> formatImageMetaTexts(mt) })
                 }
             }
             item { BottomSpace() }

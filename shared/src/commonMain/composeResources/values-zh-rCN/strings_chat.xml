@@ -177,14 +177,15 @@
     <string name="no_finished_downloads">暂无已完成的下载</string>
     <string name="saved_n_of_m">已保存 %1$d/%2$d 项</string>
     <string name="saved_to_x">已保存到 %1$s</string>
-    <string name="pair_manage_device">管理设备</string>
+    <string name="pair_manage_device">可管理</string>
     <string name="pair_chat_only">仅聊天</string>
     <string name="peer_manage_access">可管理</string>
     <string name="remote_management">远程管理</string>
-    <string name="managed_content">内容</string>
-    <string name="managed_delete_confirm">从 %2$s 删除“%1$s”？</string>
-    <string name="managed_trash_confirm">将“%1$s”移入 %2$s 的回收站？</string>
-    <string name="managed_loading">正在读取远程内容…</string>
     <string name="managed_authorization_changed">管理授权或设备身份已变化，请从该设备的聊天页重新进入远程管理。</string>
     <string name="managed_permission_denied">当前不允许访问，请检查目标设备的远程访问开关和权限。</string>
+    <string name="web_access_request">访问权限请求</string>
+    <string name="web_access_request_message">允许远程访问此设备的%1$s吗？</string>
+    <string name="request_permission">请求权限</string>
+    <string name="remote_permission_required">此设备尚未授予访问权限，请请求权限后继续。</string>
+    <string name="pairing_failed">配对失败</string>
 </resources>

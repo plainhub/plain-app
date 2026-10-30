@@ -16,7 +16,7 @@ import coil3.compose.LocalPlatformContext
 import coil3.request.ImageRequest
 import com.ismartcoding.plain.lib.extensions.isVideoFast
 import com.ismartcoding.plain.platform.media.applyForceVideoDecoder
-import com.ismartcoding.plain.ui.extensions.rememberFilePath
+import com.ismartcoding.plain.ui.extensions.rememberImageResource
 
 @Composable
 fun MediaThumbnailGrid(
@@ -44,7 +44,7 @@ fun MediaThumbnailGrid(
                     for (path in row) {
                         AsyncImage(
                             model = ImageRequest.Builder(LocalPlatformContext.current)
-                                .data(rememberFilePath(path))
+                                .data(rememberImageResource(path))
                                 .applyForceVideoDecoder(path.isVideoFast())
                                 .build(),
                             contentDescription = null,

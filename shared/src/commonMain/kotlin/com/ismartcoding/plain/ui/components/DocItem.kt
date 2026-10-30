@@ -49,6 +49,7 @@ fun DocItem(
     m: Document,
     tags: List<Tag>,
     onTagClick: (Tag) -> Unit,
+    onOpen: (() -> Unit)? = null,
 ) {
     Row {
         if (dragSelectState.selectMode) {
@@ -63,13 +64,15 @@ fun DocItem(
                     onClick = {
                         if (dragSelectState.selectMode) {
                             dragSelectState.select(m.id)
+                        } else if (onOpen != null) {
+                            onOpen()
                         } else {
                             if (m.path.isTextFile()) {
                                 navController.navigateTextFile(m.path, mediaId = m.id)
                             } else if (m.path.isPdfFile()) {
-                                navController.navigatePdf(fileToUriString(m.path), m.title)
+                                docsVM.prepareFile(m.path) { navController.navigatePdf(fileToUriString(it), m.title) }
                             } else {
-                                navController.navigateOtherFile(m.path)
+                                navController.navigateOtherFile(m.path, m.title)
                             }
                         }
                     },

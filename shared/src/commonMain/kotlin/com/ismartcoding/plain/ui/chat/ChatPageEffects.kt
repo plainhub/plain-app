@@ -15,6 +15,8 @@ import com.ismartcoding.plain.features.files.PickFileTag
 import com.ismartcoding.plain.lib.Channel
 import com.ismartcoding.plain.ui.state.launchSafe
 
+internal val LocalChatDownloads = androidx.compose.runtime.staticCompositionLocalOf<com.ismartcoding.plain.features.chat.download.ChatDownloadClient> { DownloadQueue }
+
 @Composable
 internal fun ChatPageEffects(
     chatVM: ChatViewModel, peerVM: PeerViewModel, channelVM: ChannelViewModel,
@@ -34,12 +36,18 @@ internal fun ChatPageEffects(
             chatVM.visibleConversationId.compareAndSet(id, null)
         }
     }
+    LaunchedEffect(chatVM, id) {
+        launchSafe {
+            chatVM.initializeTargetAsync(id)
+            chatVM.fetchAsync(chatVM.target.value.toId)
+        }
+    }
     LaunchedEffect(peerVM) { peerVM.observe() }
     LaunchedEffect(channelVM, targetType) {
         if (targetType == ChatTargetType.CHANNEL) channelVM.observe()
     }
-    LaunchedEffect(Unit) {
-        launchSafe { DownloadQueue.refresh() }
+    LaunchedEffect(chatVM.source) {
+        if (chatVM.source is com.ismartcoding.plain.rust.graphql.ContentSource.Local) launchSafe { chatVM.downloads.refresh() }
     }
     LaunchedEffect(chatVM, peerVM, focusManager) {
         Channel.sharedFlow.collect { event ->

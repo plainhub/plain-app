@@ -17,7 +17,7 @@ import javax.net.ssl.X509TrustManager
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 
-internal actual fun createGraphqlHttpTransport(): GraphqlHttpTransport {
+internal val peerHttpClient: OkHttpClient by lazy {
     // Paired HTTP bodies and request-bound responses authenticate with the management key over self-signed TLS.
     val trust = object : X509TrustManager {
         override fun getAcceptedIssuers(): Array<X509Certificate> = emptyArray()
@@ -25,7 +25,7 @@ internal actual fun createGraphqlHttpTransport(): GraphqlHttpTransport {
         override fun checkServerTrusted(chain: Array<X509Certificate>, authType: String) = Unit
     }
     val ssl = SSLContext.getInstance("TLS").apply { init(null, arrayOf<TrustManager>(trust), null) }
-    val client = OkHttpClient.Builder()
+    OkHttpClient.Builder()
         .sslSocketFactory(ssl.socketFactory, trust)
         .hostnameVerifier { _, _ -> true }
         .followRedirects(false)
@@ -33,10 +33,17 @@ internal actual fun createGraphqlHttpTransport(): GraphqlHttpTransport {
         .retryOnConnectionFailure(false)
         .callTimeout(30, TimeUnit.SECONDS)
         .build()
+}
+
+internal actual fun createGraphqlHttpTransport(): GraphqlHttpTransport {
     return object : GraphqlHttpTransport {
-        override suspend fun post(url: String, clientId: String, body: ByteArray): GraphqlHttpResponse = suspendCancellableCoroutine { continuation ->
+        override suspend fun post(url: String, clientId: String, body: ByteArray, contentType: String, tlsCertificateSha256: String?): GraphqlHttpResponse = suspendCancellableCoroutine { continuation ->
             val request = Request.Builder().url(url).header("c-id", clientId)
-                .post(body.toRequestBody("application/octet-stream".toMediaType())).build()
+                .post(body.toRequestBody(contentType.toMediaType())).build()
+            val client = if (tlsCertificateSha256 == null) peerHttpClient else {
+                createPeerResourceHttpClient(com.ismartcoding.plain.models.ManagedResource(url, tlsCertificateSha256))
+                    .newBuilder().callTimeout(30, TimeUnit.SECONDS).build()
+            }
             val call = client.newCall(request)
             continuation.invokeOnCancellation { call.cancel() }
             call.enqueue(object : Callback {

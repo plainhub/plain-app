@@ -1,6 +1,5 @@
 package com.ismartcoding.plain.features.chat
 
-import com.ismartcoding.plain.features.settings.SavedValuesClient
 import com.ismartcoding.plain.features.chat.data.ChatTarget
 import com.ismartcoding.plain.features.chat.data.ChatTargetType
 import com.ismartcoding.plain.features.chat.models.MessageContent
@@ -13,32 +12,37 @@ import com.ismartcoding.plain.models.ChatItem
 import com.ismartcoding.plain.rust.graphql.GraphqlApi
 import com.ismartcoding.plain.rust.graphql.selectionQuery
 
-object ChatClient {
-    suspend fun readDraft(id: String): String = SavedValuesClient.get(draftKey(id), "")
+object ChatClient : ChatApi()
 
-    suspend fun writeDraft(id: String, value: String) = SavedValuesClient.set(draftKey(id), value)
+open class ChatApi internal constructor(private val api: com.ismartcoding.plain.rust.graphql.GraphqlClient = GraphqlApi) {
+    val records = ChatStoreClient(api)
+    suspend fun readDraft(id: String): String = api.execute(com.ismartcoding.plain.graphql.Query.savedValue(draftKey(id), ""))
+
+    suspend fun writeDraft(id: String, value: String) {
+        api.execute(Mutation.setSavedValue(draftKey(id), com.ismartcoding.plain.lib.JsonHelper.jsonEncodeToElement(value)))
+    }
 
     private fun draftKey(id: String) = "chat_input_text:${ChatTarget.parseId(id).encodedToId}"
 
-    suspend fun getChatItem(id: String): ChatItem? = ChatQueries.getChatItem(id)
+    suspend fun getChatItem(id: String): ChatItem? = records.getById(id)
 
     suspend fun sendContent(target: ChatTarget, content: MessageContent): ChatItem =
-        GraphqlApi.execute(Mutation.sendChatItem(target.encodedToId, content.toJSONString())).single()
+        api.execute(Mutation.sendChatItem(target.encodedToId, content.toJSONString())).single()
 
     suspend fun sendText(target: ChatTarget, text: String): ChatItem =
         sendContent(target, MessageContent(MessageType.TEXT, MessageText(text)))
 
     suspend fun forward(id: String, targets: List<ChatTarget>): List<ChatItem> =
-        GraphqlApi.execute(Mutation.forwardChatItems(id, targets.map { it.encodedToId }))
+        api.execute(Mutation.forwardChatItems(id, targets.map { it.encodedToId }))
 
     suspend fun deleteQuery(query: String): Int =
-        GraphqlApi.execute(Mutation.deleteChatItems(query)).affectedCount
+        api.execute(Mutation.deleteChatItems(query)).affectedCount
 
     suspend fun deliver(id: String, recipients: List<String>? = null): ChatItem =
-        GraphqlApi.execute(Mutation.deliverChatItem(id, recipients))
+        api.execute(Mutation.deliverChatItem(id, recipients))
 
     suspend fun deleteOne(id: String) {
-        GraphqlApi.execute(Mutation.deleteChatItem(id))
+        api.execute(Mutation.deleteChatItem(id))
     }
 
     suspend fun deleteByIds(ids: Set<String>) {

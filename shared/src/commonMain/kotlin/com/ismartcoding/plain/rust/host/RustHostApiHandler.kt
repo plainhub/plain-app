@@ -14,8 +14,6 @@ import com.ismartcoding.plain.platform.files.FileResourceStreamHost
 import com.ismartcoding.plain.platform.files.storageVolumeFacts
 import com.ismartcoding.plain.platform.media.readImageBounds
 import com.ismartcoding.plain.platform.telephony.phoneLocaleFacts
-import com.ismartcoding.plain.platform.media.audioIsPlayingFlow
-import com.ismartcoding.plain.platform.media.audioPlayerProgressAsync
 import com.ismartcoding.plain.platform.media.handleImageCatalogHost
 import com.ismartcoding.plain.platform.media.observeImageCatalog
 import com.ismartcoding.plain.platform.network.ble.PairingTransport
@@ -44,7 +42,6 @@ import com.ismartcoding.plain.rust.host.network.MdnsMulticastHost
 import com.ismartcoding.plain.rust.host.network.NearbyScanHost
 import com.ismartcoding.plain.rust.host.network.PairingNotificationHost
 import com.ismartcoding.plain.rust.host.network.PeerTransportPrewarmHost
-import com.ismartcoding.plain.rust.host.provider.AudioPlaybackFacts
 import com.ismartcoding.plain.rust.host.provider.SystemAppHost
 import com.ismartcoding.plain.rust.native.RustNativeBindings
 import com.ismartcoding.plain.rust.native.readRustStream
@@ -240,10 +237,7 @@ internal suspend fun executeHostRequest(
         "systemFileResource" -> hostResult(FileResourceHost.handle(params))
         "systemMountFacts" -> hostResult(storageVolumeFacts())
         "imageDecodeBounds" -> hostResult(readImageBounds(JsonHelper.jsonDecodeFromElement<PathRequest>(params).path))
-        "systemAudioPlaybackState" -> hostResult(AudioPlaybackFacts(
-            isPlaying = audioIsPlayingFlow().value,
-            positionMs = audioPlayerProgressAsync(),
-        ))
+        "systemAudioPlaybackState" -> hostResult(AudioEngineHost.localPlaybackFacts())
         "systemSetClipboard", "systemPermissionFacts", "systemOpenWebSettings",
         "systemNetworkType", "systemScheduleBackgroundWake", "systemCompleteBackgroundExecution",
         "systemProperties", "systemBatterySample",

@@ -29,8 +29,48 @@ object AudioEngineHost {
     private val mutex = Mutex()
     private var overridePlayer: AudioPlayer? = null
     private var revision = -1L
+    private var localRevision = -1L
+    private var pausedLocalPositionMs = 0L
     private var reporter: Job? = null
     private var pendingReport: Job? = null
+    private var remoteReport: RemoteReport? = null
+
+    private class RemoteReport(val path: String, val revision: Long, val send: suspend (AudioHostReport) -> Unit)
+
+    internal suspend fun renderRemote(track: AudioItem, requestedRevision: Long, positionMs: Long, speed: Float, report: suspend (AudioHostReport) -> Unit) = withContext(Dispatchers.Main) {
+        mutex.withLock {
+            val player = engine()
+            if (remoteReport == null) pausedLocalPositionMs = player.progress
+            player.pause()
+            remoteReport = RemoteReport(track.path, requestedRevision, report)
+            revision = requestedRevision
+            player.bindRevision(requestedRevision)
+            player.load(track, positionMs, speed, requestedRevision)
+        }
+    }
+
+    internal suspend fun controlRemote(action: com.ismartcoding.plain.models.AudioCommand, positionMs: Long, speed: Float) = withContext(Dispatchers.Main) {
+        mutex.withLock {
+            val player = engine()
+            when (action) {
+                com.ismartcoding.plain.models.AudioCommand.PLAY -> player.play()
+                com.ismartcoding.plain.models.AudioCommand.PAUSE -> player.pause()
+                com.ismartcoding.plain.models.AudioCommand.SEEK -> player.seekTo(positionMs)
+                com.ismartcoding.plain.models.AudioCommand.CLEAR -> player.clear()
+                com.ismartcoding.plain.models.AudioCommand.RESTART -> player.restartIfPlaying()
+                com.ismartcoding.plain.models.AudioCommand.SET_SPEED -> player.setPlaybackSpeed(speed)
+                else -> error("Audio selection must be resolved before rendering")
+            }
+        }
+    }
+
+    internal suspend fun localPlaybackFacts() = withContext(Dispatchers.Main) {
+        mutex.withLock {
+            val player = engine()
+            if (remoteReport == null) com.ismartcoding.plain.rust.host.provider.AudioPlaybackFacts(player.isPlayingFlow.value, player.progress)
+            else com.ismartcoding.plain.rust.host.provider.AudioPlaybackFacts(false, pausedLocalPositionMs)
+        }
+    }
 
     suspend fun install(player: AudioPlayer?): AudioPlayer? = withContext(Dispatchers.Main) {
         mutex.withLock {
@@ -84,10 +124,12 @@ object AudioEngineHost {
 
     private fun enqueueReport(report: AudioHostReport): Job {
         val previous = pendingReport
+        val target = remoteReport
         return scope.launch {
             previous?.join()
             try {
-                report.sendToRust()
+                if (target == null) report.sendToRust()
+                else if (target.path == report.path && target.revision == report.revision) target.send(report)
             } catch (cancelled: CancellationException) {
                 throw cancelled
             } catch (error: Exception) {
@@ -102,9 +144,13 @@ object AudioEngineHost {
         require(restoredRevision >= 0 && position >= 0)
         withContext(Dispatchers.Main) {
             mutex.withLock {
-                if (restoredRevision <= revision) return@withLock
-                revision = restoredRevision
-                engine().restorePlayback(restoredRevision, position)
+                if (restoredRevision <= localRevision) return@withLock
+                localRevision = restoredRevision
+                pausedLocalPositionMs = position
+                if (remoteReport == null) {
+                    revision = restoredRevision
+                    engine().restorePlayback(restoredRevision, position)
+                }
             }
         }
     }
@@ -113,6 +159,11 @@ object AudioEngineHost {
         mutex.withLock {
             val player = engine()
             val command = JsonHelper.jsonDecodeFromElement<AudioEngineCommand>(params)
+            if (remoteReport != null) {
+                player.pause()
+                remoteReport = null
+            }
+            com.ismartcoding.plain.features.audio.AudioCommands.useLocalSource()
             val requestedRevision = command.playback.revision
             val position = command.playback.positionMs
             val speed = command.speed
@@ -138,6 +189,7 @@ object AudioEngineHost {
                 else -> error("Unknown audio engine command: $action")
             }
             revision = requestedRevision
+            localRevision = requestedRevision
             val reported = sampleProgress(player)
             hostResult(AudioEngineReport(
                 reported.path, if (action == "PLAY" || action == "SEEK") position else reported.positionMs, reported.revision, loaded,

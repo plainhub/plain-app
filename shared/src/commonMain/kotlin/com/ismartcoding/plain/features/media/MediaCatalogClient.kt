@@ -13,7 +13,12 @@ import com.ismartcoding.plain.rust.graphql.GraphqlClient
 import com.ismartcoding.plain.rust.graphql.GraphqlApi
 import com.ismartcoding.plain.rust.graphql.selectionQuery
 
-object MediaCatalogClient {
+object MediaCatalogClient : MediaCatalogApi()
+
+open class MediaCatalogApi internal constructor(
+    protected val api: GraphqlClient = GraphqlApi,
+    private val shareUri: suspend (DataType, String, String) -> String = { type, id, path -> getMediaItemUriString(type, id, path) },
+) {
     suspend fun rows(type: DataType, query: String, limit: Int, offset: Int, sortBy: FileSortBy): List<IData> {
         when (type) {
             DataType.CALL -> return CallsClient.search(query, limit, offset)
@@ -21,12 +26,12 @@ object MediaCatalogClient {
             DataType.SMS -> return RustSmsQuery.search(query, limit, offset)
             else -> Unit
         }
-        return GraphqlApi.execute(Query.mediaRows(type, query, limit, offset, sortBy))
+        return api.execute(Query.mediaRows(type, query, limit, offset, sortBy))
     }
 
     suspend fun shareUris(type: DataType, ids: Collection<String>): List<String> =
-        readSelectedMediaPaths(Query.mediaRoot(type), ids)
-            .map { (id, path) -> getMediaItemUriString(type, id, path) }
+        readSelectedMediaPaths(Query.mediaRoot(type), ids, api)
+            .map { (id, path) -> shareUri(type, id, path) }
 
     suspend fun count(type: DataType, query: String): Int {
         when (type) {
@@ -35,14 +40,14 @@ object MediaCatalogClient {
             DataType.SMS -> return RustSmsQuery.count(query)
             else -> Unit
         }
-        return GraphqlApi.execute(Query.mediaCount(type, query))
+        return api.execute(Query.mediaCount(type, query))
     }
 
     suspend fun docExtGroups(query: String): List<Pair<String, Int>> =
-        GraphqlApi.execute(Query.docExtGroups(query)).map { it.ext to it.count }
+        api.execute(Query.docExtGroups(query)).map { it.ext to it.count }
 
     suspend fun buckets(dataType: DataType): List<MediaBucket> =
-        GraphqlApi.execute(Query.mediaBuckets(dataType))
+        api.execute(Query.mediaBuckets(dataType))
 }
 
 internal suspend fun readSelectedMediaPaths(

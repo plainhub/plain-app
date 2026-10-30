@@ -20,7 +20,7 @@ import androidx.compose.ui.unit.dp
 import com.ismartcoding.plain.features.chat.ShareSendClient
 import com.ismartcoding.plain.ui.components.ButtonSize
 import com.ismartcoding.plain.features.shares.ShareExpiry
-import com.ismartcoding.plain.features.shares.SharesClient
+import com.ismartcoding.plain.ui.navigation.LocalContentSource
 import com.ismartcoding.plain.models.ShareRecord
 import com.ismartcoding.plain.i18n.Res
 import com.ismartcoding.plain.i18n.cancel
@@ -76,6 +76,7 @@ fun CreateShareDialog(
     onDismiss: () -> Unit,
     onCreated: (ShareRecord) -> Unit = {},
 ) {
+    val source = LocalContentSource.current
     val scope = rememberCoroutineScope()
     val defaultName = remember(paths) { if (paths.size == 1) paths[0].getFilenameFromPath() else "" }
     var name by remember { mutableStateOf(defaultName) }
@@ -98,7 +99,7 @@ fun CreateShareDialog(
                 showForwardDialog = false
                 onDismiss()
                 scope.launch {
-                    ShareSendClient.sendShare(targets, share!!.id)
+                    source.chatSender.sendShare(targets, share!!.id)
                     DialogHelper.showSuccess(Res.string.sent)
                 }
             },
@@ -177,13 +178,13 @@ fun CreateShareDialog(
                     scope.launch {
                         isLoading = true
                         val created = withIO {
-                            val s = SharesClient.createShare(
+                            val s = source.shares.createShare(
                                 name = name.ifBlank { defaultName },
                                 realPaths = paths,
                                 readOnly = true,
                                 expiresAt = expiry.expiresAt(TimeHelper.now()),
                             )
-                            link = SharesClient.buildLink(s)
+                            link = source.shares.buildLink(s)
                             s
                         }
                         isLoading = false

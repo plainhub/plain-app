@@ -1,6 +1,5 @@
 package com.ismartcoding.plain.ui.audio
 
-import com.ismartcoding.plain.features.media.MediaCatalogClient
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 
@@ -111,24 +110,25 @@ fun AudioArtistPage(
     val sortBy = audioVM.sortBy.value
     LaunchedEffect(artistName, sortBy) {
         items = withIO {
-            MediaCatalogClient.rows(DataType.AUDIO, artistName, 500, 0, sortBy)
+            audioVM.source.catalog.rows(DataType.AUDIO, artistName, 500, 0, sortBy)
         }.filterIsInstance<AudioTrack>().filter { it.artist == artistName }
     }
 
     // Play-all fills the manual queue with exactly this artist's tracks;
     // while that set matches, the play button toggles pause/resume.
     val artistPaths = remember(items) { items.map { it.path }.toSet() }
-    val contextActive = items.isNotEmpty() && audioQueueVM.queuedMediaIds.value == items.map { it.id }.toSet()
+    val audioOutput by com.ismartcoding.plain.features.audio.AudioCommands.output.collectAsState()
+    val contextActive = audioOutput.source.key == audioVM.source.key && items.isNotEmpty() && audioQueueVM.queuedMediaIds.value == items.map { it.id }.toSet()
 
     val playAll: (Boolean) -> Unit = { shuffle ->
         scope.launch {
             val list = if (shuffle) items.shuffled() else items
             withIO {
-                AudioQueueClient.clearQueue()
-                AudioQueueClient.enqueue(list.map { it.toPlaylistAudio() })
+                audioVM.source.queue.clearQueue()
+                audioVM.source.queue.enqueue(list.map { it.toPlaylistAudio() })
             }
             val first = list.firstOrNull()?.toPlaylistAudio() ?: return@launch
-            audioJustPlayWithNotificationCheck(first)
+            audioJustPlayWithNotificationCheck(first, audioVM.source)
             audioQueueVM.onStarted(first)
         }
     }

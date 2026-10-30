@@ -1,6 +1,5 @@
 package com.ismartcoding.plain.ui.chat
 
-import com.ismartcoding.plain.features.chat.ChatClient
 
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
@@ -67,6 +66,7 @@ import com.ismartcoding.plain.ui.audio.AudioQueueViewModel
 import com.ismartcoding.plain.ui.chat.ChannelViewModel
 import com.ismartcoding.plain.ui.chat.PeerViewModel
 import com.ismartcoding.plain.ui.chat.VChat
+import com.ismartcoding.plain.ui.state.launchSafe
 import com.ismartcoding.plain.ui.state.exitSelectMode
 import com.ismartcoding.plain.ui.state.isAllSelected
 import com.ismartcoding.plain.ui.state.showBottomActions
@@ -89,11 +89,17 @@ fun ChatPage(
     channelVM: ChannelViewModel,
     id: String = "",
 ) {
+    val remote = chatVM.source as? com.ismartcoding.plain.rust.graphql.ContentSource.Remote
+    val filesAllowed = remote == null || com.ismartcoding.plain.platform.permissions.Permission.WRITE_EXTERNAL_STORAGE in remote.client.state.collectAsState().value.permissions
     val itemsState = chatVM.itemsFlow.collectAsState()
     val chatTarget = chatVM.target.collectAsState()
     val channelsState = channelVM.channels.collectAsState()
     val peers by peerVM.peersMap.collectAsState()
     val scope = rememberCoroutineScope()
+    val requestFilePermission = {
+        scope.launchSafe { chatVM.source.api.execute(com.ismartcoding.plain.graphql.Mutation.openWebSettings(com.ismartcoding.plain.features.web.WebSettingsFeature.FILES)) }
+        Unit
+    }
     var inputValue by remember { mutableStateOf("") }
     var showForwardDialog by remember { mutableStateOf(false) }
     var messageToForward by remember { mutableStateOf<VChat?>(null) }
@@ -116,12 +122,7 @@ fun ChatPage(
     val previewerState = rememberPreviewerState()
 
     LaunchedEffect(id) {
-        inputValue = ChatClient.readDraft(id)
-        scope.launch(Dispatchers.Default) {
-            chatVM.initializeTargetAsync(id)
-            chatVM.fetchAsync(chatVM.target.value.toId)
-
-        }
+        inputValue = chatVM.client.readDraft(id)
     }
 
     ChatPageEffects(chatVM, peerVM, channelVM, id, chatTarget.value.type, focusManager, scrollState)
@@ -155,6 +156,7 @@ fun ChatPage(
         currentTransportMap.value[chatTarget.value.toId]
     } else null
 
+    androidx.compose.runtime.CompositionLocalProvider(LocalChatDownloads provides chatVM.downloads) {
     PScaffold(
         modifier = Modifier.imePadding(),
         topBar = {
@@ -166,6 +168,7 @@ fun ChatPage(
                     else NavigationBackIcon { navController.navigateUp() }
                 },
                 title = pageTitle,
+                subtitle = remote?.info?.deviceName.orEmpty(),
                 titleTrailing = if (!chatVM.selectMode.value && transportType != null) {
                     { TransportIcon(transportType) }
                 } else null,
@@ -215,9 +218,11 @@ fun ChatPage(
                             ChatListItem(
                                 navController = navController,
                                 chatVM = chatVM,
+                                filesAllowed = filesAllowed,
+                                onRequestFilePermission = requestFilePermission,
                                 chatTarget = chatTarget.value,
-                                audioQueueVM,
-                                itemsState.value,
+                                audioQueueVM = audioQueueVM,
+                                items = itemsState.value,
                                 m = m,
                                 peer = (if (chatTarget.value.type == ChatTargetType.PEER) peers[chatTarget.value.toId] else null)
                                     ?: peers[m.fromId],
@@ -258,12 +263,14 @@ fun ChatPage(
                 Spacer(modifier = Modifier.navigationBarsPadding())
             } else if (!chatVM.showBottomActions() && (peer == null || peer.status == PeerStatus.PAIRED)) {
                 ChatInput(
+                    filesAllowed = filesAllowed,
+                    onRequestFilePermission = requestFilePermission,
                     value = inputValue,
                     hint = stringResource(Res.string.chat_input_hint),
                     onValueChange = {
                         inputValue = it
                         scope.launch(Dispatchers.Default) {
-                            ChatClient.writeDraft(id, it)
+                            chatVM.client.writeDraft(id, it)
                         }
                     },
                     onSend = {
@@ -271,7 +278,7 @@ fun ChatPage(
                         scope.launch {
                             chatVM.sendTextMessage(inputValue)
                             inputValue = ""
-                            ChatClient.writeDraft(id, "")
+                            chatVM.client.writeDraft(id, "")
                         }
                     },
                     onShareFolder = { showFolderShareSheet = true })
@@ -289,4 +296,5 @@ fun ChatPage(
         onDismissForward = { showForwardDialog = false; messageToForward = null },
         onForward = { message, targets -> chatVM.forwardMessage(message.id, targets) },
     )
+    }
 }

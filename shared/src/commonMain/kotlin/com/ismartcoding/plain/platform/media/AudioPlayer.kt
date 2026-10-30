@@ -45,17 +45,17 @@ fun audioPlay() = AudioCommands.submit(AudioCommand.PLAY)
 
 fun restartAudioIfPlaying() = AudioCommands.submit(AudioCommand.RESTART)
 
-fun playAudioWithNotificationCheck(path: String) {
+fun playAudioWithNotificationCheck(path: String, source: com.ismartcoding.plain.rust.graphql.ContentSource = com.ismartcoding.plain.rust.graphql.ContentSource.Local) {
     checkNotificationPermission(Res.string.audio_notification_prompt) {
-        AudioCommands.playPath(path)
+        AudioCommands.playPath(path, source)
     }
 }
 
 fun audioJustPlay(audio: AudioItem) = AudioCommands.playTrack(audio)
 
-fun audioJustPlayWithNotificationCheck(audio: AudioItem) {
+fun audioJustPlayWithNotificationCheck(audio: AudioItem, source: com.ismartcoding.plain.rust.graphql.ContentSource = com.ismartcoding.plain.rust.graphql.ContentSource.Local) {
     checkNotificationPermission(Res.string.audio_notification_prompt) {
-        AudioCommands.playTrack(audio)
+        AudioCommands.playTrack(audio, source)
     }
 }
 

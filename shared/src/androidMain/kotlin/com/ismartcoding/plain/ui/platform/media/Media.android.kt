@@ -2,6 +2,8 @@ package com.ismartcoding.plain.ui.platform.media
 
 import android.graphics.BitmapFactory
 import androidx.compose.ui.unit.IntSize
+import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.asAndroidBitmap
 import com.ismartcoding.plain.ui.media.SvgHelper
 import com.ismartcoding.plain.ui.scanner.QrCodeScanHelper
 
@@ -15,3 +17,5 @@ actual fun tryDecodeQrCode(path: String): String? {
 }
 
 actual fun getSvgSize(path: String): IntSize = SvgHelper.getSize(path)
+
+internal actual fun tryDecodeQrCode(image: ImageBitmap): String? = QrCodeScanHelper.tryDecode(image.asAndroidBitmap())

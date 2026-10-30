@@ -19,7 +19,7 @@ import com.ismartcoding.plain.ui.resources.timer as ui_drawable_timer
 import com.ismartcoding.plain.ui.resources.video as ui_drawable_video
 import com.ismartcoding.plain.platform.system.getDeviceCapabilities
 
-fun FeatureItem.Companion.getList(navController: NavHostController): List<FeatureItem> {
+fun FeatureItem.Companion.getList(navController: NavHostController, capabilities: Collection<com.ismartcoding.plain.platform.system.Capability> = getDeviceCapabilities()): List<FeatureItem> {
     val list = mutableListOf(
         FeatureItem(AppFeatureType.IMAGES, Res.string.images, UiRes.drawable.ui_drawable_image) {
             navController.navigate(Routing.Images)
@@ -32,7 +32,7 @@ fun FeatureItem.Companion.getList(navController: NavHostController): List<Featur
         },
     )
 
-    if (AppFeatureType.APPS.has()) {
+    if (AppFeatureType.APPS.has(capabilities)) {
         list.add(FeatureItem(AppFeatureType.APPS, Res.string.apps, UiRes.drawable.ui_drawable_layout_grid) {
             navController.navigate(Routing.Apps)
         })
@@ -61,7 +61,7 @@ fun FeatureItem.Companion.getList(navController: NavHostController): List<Featur
         )
     )
 
-    if (AppFeatureType.IMAGE_EDITOR.has()) {
+    if (AppFeatureType.IMAGE_EDITOR.has(capabilities)) {
         list.add(
             FeatureItem(AppFeatureType.IMAGE_EDITOR, Res.string.image_editor, UiRes.drawable.ui_drawable_square_pen) {
                 navController.navigate(Routing.ImageEditor)
@@ -69,6 +69,7 @@ fun FeatureItem.Companion.getList(navController: NavHostController): List<Featur
         )
     }
 
-    val capabilities = getDeviceCapabilities()
     return list.filter { it.type.has(capabilities) }
 }
+
+internal val localToolTypes = setOf(AppFeatureType.SOUND_METER, AppFeatureType.POMODORO_TIMER, AppFeatureType.IMAGE_EDITOR)

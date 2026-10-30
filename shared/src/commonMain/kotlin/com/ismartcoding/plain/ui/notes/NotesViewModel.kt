@@ -10,23 +10,26 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import com.ismartcoding.plain.platform.system.DataType
 import com.ismartcoding.plain.features.notes.NotesClient
-import com.ismartcoding.plain.features.tags.TagsClient
+import com.ismartcoding.plain.features.notes.NotesApi
+import com.ismartcoding.plain.features.tags.TagsApi
+import com.ismartcoding.plain.features.tags.RustContentTags
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.ismartcoding.plain.models.Note
 import com.ismartcoding.plain.models.Tag
 import com.ismartcoding.plain.helpers.SearchHelper
 import com.ismartcoding.plain.lib.withIO
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 
-// App-lifetime singleton so the HTTP server (GraphQL mutations) and the UI share
-// one notes list state: server writes call [reloadAsync]/[updateItem] and every
-// collector sees the change without event passing.
-object NotesViewModel : ISearchableViewModel<Note>, ISelectableViewModel<Note> {
-    private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
+class NotesViewModel internal constructor(
+    val api: NotesApi = NotesClient,
+    private val tagsApi: TagsApi = RustContentTags,
+) : ISearchableViewModel<Note>, ISelectableViewModel<Note>, ViewModel() {
+    companion object {
+        val local by lazy { NotesViewModel() }
+    }
 
     private val _itemsFlow = MutableStateFlow<List<Note>>(emptyList())
     override val itemsFlow: StateFlow<List<Note>> = _itemsFlow
@@ -51,20 +54,18 @@ object NotesViewModel : ISearchableViewModel<Note>, ISelectableViewModel<Note> {
 
     suspend fun moreAsync(tagsVM: TagsViewModel) = withIO {
         offset.value += limit.intValue
-        val items = NotesClient.search(getQuery(), limit.intValue, offset.value)
+        val items = api.search(getQuery(), limit.intValue, offset.value)
         _itemsFlow.update { it + items }
         tagsVM.loadMoreAsync(items.map { it.id }.toSet())
         showLoading.value = false
         noMore.value = items.size < limit.intValue
     }
 
-    // Re-queries the notes list from the DB. Called by the UI and by GraphQL
-    // mutations so both write paths converge on this single state.
     suspend fun reloadAsync() = withIO {
         offset.intValue = 0
-        _itemsFlow.value = NotesClient.search(getQuery(), limit.intValue, offset.intValue)
-        total.intValue = NotesClient.count(getTotalQuery())
-        totalTrash.intValue = NotesClient.count(getTrashQuery())
+        _itemsFlow.value = api.search(getQuery(), limit.intValue, offset.intValue)
+        total.intValue = api.count(getTotalQuery())
+        totalTrash.intValue = api.count(getTrashQuery())
         noMore.value = _itemsFlow.value.size < limit.intValue
         showLoading.value = false
     }
@@ -75,8 +76,8 @@ object NotesViewModel : ISearchableViewModel<Note>, ISelectableViewModel<Note> {
     }
 
     fun trash(tagsVM: TagsViewModel, ids: Set<String>) {
-        scope.launchSafe {
-            NotesClient.trashAsync(ids)
+        viewModelScope.launchSafe {
+            api.trashAsync(ids)
             loadAsync(tagsVM)
         }
     }
@@ -93,15 +94,15 @@ object NotesViewModel : ISearchableViewModel<Note>, ISelectableViewModel<Note> {
     }
 
     fun restore(tagsVM: TagsViewModel, ids: Set<String>) {
-        scope.launchSafe {
-            NotesClient.restoreAsync(ids)
+        viewModelScope.launchSafe {
+            api.restoreAsync(ids)
             loadAsync(tagsVM)
         }
     }
 
     fun delete(tagsVM: TagsViewModel, ids: Set<String>) {
-        scope.launchSafe {
-            NotesClient.deleteAsync(ids)
+        viewModelScope.launchSafe {
+            api.deleteAsync(ids)
             loadAsync(tagsVM)
         }
     }
@@ -118,7 +119,7 @@ object NotesViewModel : ISearchableViewModel<Note>, ISelectableViewModel<Note> {
         var query = "${SearchHelper.buildTextFilter(queryText.value)} trash:${trash.value}"
         if (tag.value != null) {
             val tagId = tag.value!!.id
-            val ids = TagsClient.getKeysByTagId(tagId)
+            val ids = tagsApi.keys(tagId)
             query += " ids:${ids.joinToString(",")}"
         }
 

@@ -68,6 +68,7 @@ fun AppFileListItem(
     onClick: () -> Unit,
     onLongClick: () -> Unit = {},
 ) {
+    val source = com.ismartcoding.plain.ui.navigation.LocalContentSource.current
     val scope = rememberCoroutineScope()
     val density = LocalDensity.current
     val fileName = file.fileName
@@ -85,7 +86,7 @@ fun AppFileListItem(
     LaunchedEffect(isCurrentlyPlaying) {
         if (isCurrentlyPlaying && isAudio) {
             scope.launch {
-                val audio = withIO { MediaClient.audioInfo(path) }
+                val audio = withIO { source.media.audioInfo(path) }
                 durationMs = audio.durationMs.toFloat()
             }
         }

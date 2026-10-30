@@ -28,7 +28,6 @@ import com.ismartcoding.plain.features.shares.SharedFolderDownloadEngine
 import com.ismartcoding.plain.i18n.Res
 import com.ismartcoding.plain.i18n.pomodoro_notification_prompt
 import com.ismartcoding.plain.ui.app.MainViewModel
-import com.ismartcoding.plain.ui.apps.AppsPage
 import com.ismartcoding.plain.ui.audio.ArtistsPage
 import com.ismartcoding.plain.ui.audio.AudioAllPage
 import com.ismartcoding.plain.ui.audio.AudioArtistPage
@@ -67,7 +66,7 @@ import com.ismartcoding.plain.ui.nav.navPopEnterTransition
 import com.ismartcoding.plain.ui.nav.navPopExitTransition
 import com.ismartcoding.plain.ui.nearby.NearbyPage
 import com.ismartcoding.plain.ui.notes.NotePage
-import com.ismartcoding.plain.ui.notes.NotesPage
+import com.ismartcoding.plain.ui.notes.NotesViewModel
 import com.ismartcoding.plain.ui.permissions.checkNotificationPermission
 import com.ismartcoding.plain.ui.pomodoro.PomodoroPage
 import com.ismartcoding.plain.ui.pomodoro.PomodoroSettingsDialog
@@ -123,7 +122,7 @@ fun MainNavGraph(
         ) {
             platformPages?.invoke(this, navController)
             addMainFilePages(navController, audioQueueVM)
-            addManagedDevicePages(navController)
+            addManagedDevicePages(navController, audioQueueVM)
             addMainSettingsPages(navController, updateVM, peerVM, batterySettings)
             composable<Routing.Home> {
                 val selectedTab by MainViewModel.currentRootTab
@@ -156,8 +155,8 @@ fun MainNavGraph(
                 val r = backStackEntry.toRoute<Routing.PlaylistAddItems>()
                 PlaylistAddItemsPage(navController, r.id)
             }
-            composable<Routing.Apps> { AppsPage(navController) }
-            composable<Routing.Notes> { NotesPage(navController, tagsVM = noteTagsVM) }
+            addAppsPages(navController)
+            addNotesPages(navController) { NotesNavigationState(NotesViewModel.local, noteTagsVM) }
             composable<Routing.SoundMeter> { SoundMeterPage(navController) }
 
             composable<Routing.PomodoroTimer> {
@@ -174,10 +173,10 @@ fun MainNavGraph(
             }
             composable<Routing.Chat> { backStackEntry ->
                 val r = backStackEntry.toRoute<Routing.Chat>()
-                ChatPage(navController, audioQueueVM = audioQueueVM, chatVM = ChatViewModel, peerVM = peerVM, channelVM = channelVM, r.id)
+                ChatPage(navController, audioQueueVM = audioQueueVM, chatVM = ChatViewModel.local, peerVM = peerVM, channelVM = channelVM, r.id)
             }
             composable<Routing.ChatInfo> {
-                val chatVM = ChatViewModel
+                val chatVM = ChatViewModel.local
                 val chatTarget = chatVM.target.collectAsState()
                 if (chatTarget.value.type == ChatTargetType.PEER) {
                     PeerInfoPage(navController, chatVM.target, { chatVM.clearAllMessages() }, peerVM)
@@ -196,14 +195,6 @@ fun MainNavGraph(
             composable<Routing.FeedEntry> { backStackEntry ->
                 val r = backStackEntry.toRoute<Routing.FeedEntry>()
                 FeedEntryPage(navController, r.id, tagsVM = feedTagsVM, pagerVM = feedEntryPagerVM)
-            }
-            composable<Routing.NotesCreate> { backStackEntry ->
-                val r = backStackEntry.toRoute<Routing.NotesCreate>()
-                NotePage(navController, "", r.tagId, tagsVM = noteTagsVM)
-            }
-            composable<Routing.NoteDetail> { backStackEntry ->
-                val r = backStackEntry.toRoute<Routing.NoteDetail>()
-                NotePage(navController, r.id, "", tagsVM = noteTagsVM)
             }
             composable<Routing.ImageEditor> { ImageEditorListPage(navController) }
             composable<Routing.ImageEditorDetail> { backStackEntry ->

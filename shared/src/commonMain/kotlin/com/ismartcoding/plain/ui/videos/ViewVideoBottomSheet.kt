@@ -1,7 +1,5 @@
 package com.ismartcoding.plain.ui.videos
 
-import com.ismartcoding.plain.features.files.FilesClient
-import com.ismartcoding.plain.features.media.MediaClient
 
 import androidx.compose.runtime.getValue
 
@@ -56,7 +54,7 @@ fun ViewVideoBottomSheet(
     if (videosVM.showRenameDialog.value) {
         FileRenameDialog(path = m.path, onDismiss = {
             videosVM.showRenameDialog.value = false
-        }, onRename = { p, name -> FilesClient.rename(p, name) }, onRenamed = {
+        }, onRename = { p, name -> videosVM.source.files.rename(p, name) }, onRenamed = {
             videosVM.loadAsync(tagsVM)
             onDismiss()
         })
@@ -95,7 +93,7 @@ fun ViewVideoBottomSheet(
                     PListItem(title = stringResource(Res.string.dimensions), value = "${viewSize.width}\u00d7${viewSize.height}")
                     PListItem(title = stringResource(Res.string.created_at), value = m.createdAt.formatDateTime())
                     PListItem(title = stringResource(Res.string.updated_at), value = m.updatedAt.formatDateTime())
-                    VideoMetaRows(path = m.path, loadMeta = { MediaClient.videoInfo(it) })
+                    VideoMetaRows(path = m.path, loadMeta = { videosVM.source.media.videoInfo(it) })
                 }
             }
             item {

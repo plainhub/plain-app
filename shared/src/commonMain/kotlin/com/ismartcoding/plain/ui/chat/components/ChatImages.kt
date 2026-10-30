@@ -30,8 +30,9 @@ fun ChatImages(
     previewerState: MediaPreviewerState,
     chatViewModel: ChatViewModel,
 ) {
+    val downloads = com.ismartcoding.plain.ui.chat.LocalChatDownloads.current
     val imageItems = (m.value as MessageImages).items
-    val downloadProgressMap by DownloadQueue.downloadProgress.collectAsState(mapOf())
+    val downloadProgressMap by downloads.downloadProgress.collectAsState(mapOf())
 
     FlowRow(
         modifier = Modifier

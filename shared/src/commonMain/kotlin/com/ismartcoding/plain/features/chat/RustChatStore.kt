@@ -4,7 +4,9 @@ import com.ismartcoding.plain.graphql.Query
 import com.ismartcoding.plain.models.ChatItem
 import com.ismartcoding.plain.rust.graphql.GraphqlApi
 
-object RustChatStore {
+object RustChatStore : ChatStoreClient()
+
+open class ChatStoreClient internal constructor(private val api: com.ismartcoding.plain.rust.graphql.GraphqlClient = GraphqlApi) {
     suspend fun getAll(): List<ChatItem> = page()
 
     suspend fun getByPeerId(id: String): List<ChatItem> = page(peer = id)
@@ -12,7 +14,7 @@ object RustChatStore {
     suspend fun getByChannelId(id: String): List<ChatItem> = page(channel = id)
 
     suspend fun getLatestConversations(): Map<String, ChatItem> =
-        GraphqlApi.execute(Query.chatConversations()).associate { it.id to it.chat }
+        api.execute(Query.chatConversations()).associate { it.id to it.chat }
 
     suspend fun search(
         text: String,
@@ -20,7 +22,7 @@ object RustChatStore {
         offset: Int,
     ): List<ChatItem> = page(text = text, limit = limit, offset = offset, descending = true)
 
-    suspend fun count(text: String): Int = GraphqlApi.execute(Query.chatCount("text:${term(text)}"))
+    suspend fun count(text: String): Int = api.execute(Query.chatCount("text:${term(text)}"))
 
     suspend fun page(
         peer: String? = null,
@@ -38,10 +40,10 @@ object RustChatStore {
             if (descending) "sort:desc" else null,
             if (latest) "latest:true" else null,
         ).joinToString(" ")
-        return GraphqlApi.execute(Query.chatRecords(query, offset, limit ?: Int.MAX_VALUE))
+        return api.execute(Query.chatRecords(query, offset, limit ?: Int.MAX_VALUE))
     }
 
-    suspend fun getById(id: String): ChatItem? = GraphqlApi.execute(Query.chatItem(id))
+    suspend fun getById(id: String): ChatItem? = api.execute(Query.chatItem(id))
 
     private fun term(value: String): String = "\"" + value.replace("\\", "\\\\").replace("\"", "\\\"") + "\""
 }

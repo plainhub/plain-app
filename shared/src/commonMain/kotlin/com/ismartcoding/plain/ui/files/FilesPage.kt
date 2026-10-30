@@ -1,5 +1,7 @@
 package com.ismartcoding.plain.ui.files
 
+import com.ismartcoding.plain.ui.navigation.LocalContentSource
+import com.ismartcoding.plain.rust.graphql.ContentSource
 import com.ismartcoding.plain.i18n.*
 
 import androidx.compose.animation.AnimatedVisibility
@@ -18,6 +20,7 @@ import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -41,6 +44,7 @@ import com.ismartcoding.plain.ui.components.NeedPermissionColumn
 import com.ismartcoding.plain.ui.components.PCapsuleMoreClose
 import com.ismartcoding.plain.ui.components.PIconButton
 import com.ismartcoding.plain.ui.base.PScaffold
+import com.ismartcoding.plain.ui.base.PTopAppBar
 import com.ismartcoding.plain.ui.base.PTopRightButton
 import com.ismartcoding.plain.ui.components.SearchableTopBar
 import com.ismartcoding.plain.ui.base.pullrefresh.PullToRefresh
@@ -71,7 +75,9 @@ import com.ismartcoding.plain.i18n.folder
 @Composable
 fun FilesPage(
     navController: NavHostController, audioQueueVM: AudioQueueViewModel,
-    folderPath: String = "", filesVM: FilesViewModel = viewModel { FilesViewModel() },
+    folderPath: String = "",
+    source: ContentSource = LocalContentSource.current,
+    filesVM: FilesViewModel = viewModel { FilesViewModel(source) },
 ) {
     val scope = rememberCoroutineScope()
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
@@ -79,14 +85,21 @@ fun FilesPage(
     val previewerState = rememberPreviewerState()
     val itemsState by filesVM.itemsFlow.collectAsState()
     var showMoreSheet by remember { mutableStateOf(false) }
+    val canBrowse = filesVM.source is ContentSource.Local || filesVM.hasPermission.value
+    LaunchedEffect(canBrowse) {
+        if (!canBrowse) {
+            showMoreSheet = false
+            drawerState.close()
+        }
+    }
     val topRefreshLayoutState = rememberRefreshLayoutState {
         scope.launch { filesVM.loadAsync(); setRefreshState(RefreshContentState.Finished) }
     }
 
     FilesPageEffects(filesVM, scope, folderPath, previewerState, audioQueueVM)
-    FilesPageDialogs(filesVM, scope)
+    if (canBrowse) FilesPageDialogs(filesVM, scope)
 
-    if (showMoreSheet) {
+    if (canBrowse && showMoreSheet) {
         FilesMoreActionsSheet(filesVM = filesVM, onDismiss = { showMoreSheet = false })
     }
 
@@ -111,8 +124,9 @@ fun FilesPage(
 
     ModalNavigationDrawer(
         drawerState = drawerState,
+        gesturesEnabled = canBrowse,
         drawerContent = {
-            ModalDrawerSheet {
+            if (canBrowse) ModalDrawerSheet {
                 FilesDrawerContent(
                     filesVM = filesVM,
                     drawerState = drawerState,
@@ -127,7 +141,11 @@ fun FilesPage(
                 )
             }
         }) {
-    PScaffold(modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection), topBar = {
+    PScaffold(modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection), topBar = toolbar@ {
+        if (!canBrowse) {
+            PTopAppBar(onNavigateBack = { navController.navigateUp() }, title = title)
+            return@toolbar
+        }
         SearchableTopBar(
             navController = navController,
             viewModel = filesVM,
@@ -155,7 +173,7 @@ fun FilesPage(
             })
     }, bottomBar = {
         AnimatedVisibility(
-            visible = filesVM.showBottomActions() && !ZipBrowserHelper.isZipPath(filesVM.selectedPath),
+            visible = canBrowse && filesVM.showBottomActions() && !ZipBrowserHelper.isZipPath(filesVM.selectedPath),
             enter = slideInVertically { it } + fadeIn(),
             exit = slideOutVertically { it } + fadeOut()) {
             FilesSelectModeBottomActions(
@@ -163,7 +181,7 @@ fun FilesPage(
                 onShowPasteBar = { filesVM.showPasteBar.value = it })
         }
         AnimatedVisibility(
-            visible = filesVM.showPasteBar.value && !ZipBrowserHelper.isZipPath(filesVM.selectedPath),
+            visible = canBrowse && filesVM.showPasteBar.value && !ZipBrowserHelper.isZipPath(filesVM.selectedPath),
             enter = slideInVertically { it } + fadeIn(),
             exit = slideOutVertically { it } + fadeOut()) {
             FilePasteBar(
@@ -177,7 +195,7 @@ fun FilesPage(
                 .fillMaxSize()
                 .padding(paddingValues)
         ) {
-            if (!filesVM.hasPermission.value && filesVM.type != FilesType.APP) {
+            if (!filesVM.hasPermission.value && (filesVM.source is com.ismartcoding.plain.rust.graphql.ContentSource.Remote || filesVM.type != FilesType.APP)) {
                 NeedPermissionColumn(UiRes.drawable.ui_drawable_folder, AppFeatureType.FILES.getPermission()!!)
                 return@Column
             }

@@ -40,10 +40,7 @@ expect fun fileExists(path: String): Boolean
  */
 expect suspend fun ensureParentDir(path: String)
 
-/**
- * Stream the contents of a content:// URI (Android) or a remote resource (iOS)
- * into [sink]. Returns the resolved MIME type, or null if the stream fails.
- */
+/** Streams a resource into [sink]; returns null when no input is available and propagates read errors. */
 expect suspend fun streamContentUri(uri: String, sink: StreamSink): String?
 
 /**

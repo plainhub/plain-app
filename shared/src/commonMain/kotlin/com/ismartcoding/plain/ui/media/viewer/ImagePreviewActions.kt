@@ -42,6 +42,7 @@ import com.ismartcoding.plain.ui.resources.ellipsis as ui_drawable_ellipsis
 import com.ismartcoding.plain.ui.resources.rotate_cw_square as ui_drawable_rotate_cw_square
 import com.ismartcoding.plain.ui.resources.save as ui_drawable_save
 import kotlinx.coroutines.launch
+import com.ismartcoding.plain.ui.state.launchSafe
 import org.jetbrains.compose.resources.stringResource
 
 @Composable
@@ -70,7 +71,7 @@ fun ImagePreviewActions(
                     }
                 }
             }
-            if (canSavePreviewMedia && m.data !is MediaImage && m.data !is FileEntry) {
+            if (canSavePreviewMedia(m.source) && m.data !is MediaImage && m.data !is FileEntry) {
                 HorizontalSpace(dp = 20.dp)
                 ControlChipIconButton(icon = UiRes.drawable.ui_drawable_save, contentDescription = stringResource(Res.string.save)) {
                     showSaveSheet = true
@@ -85,16 +86,17 @@ fun ImagePreviewActions(
 
     if (showSaveSheet) {
         SaveToSheet(
+            source = m.source,
             title = (m.data as? MessageFile)?.fileName?.takeIf { it.isNotEmpty() }
                 ?: m.path.getFilenameFromPath().ifEmpty { stringResource(Res.string.image) },
             onDismiss = { showSaveSheet = false },
             onDownloads = {
                 showSaveSheet = false
-                scope.launch { savePreviewMedia(m, null) }
+                scope.launchSafe { savePreviewMedia(m, null) }
             },
             onDirectory = { dir ->
                 showSaveSheet = false
-                scope.launch { savePreviewMedia(m, dir) }
+                scope.launchSafe { savePreviewMedia(m, dir) }
             },
         )
     }

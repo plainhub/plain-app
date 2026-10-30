@@ -27,11 +27,12 @@ import androidx.compose.ui.graphics.ImageBitmap
 
 @Composable
 fun AudioCoverArt(path: String, modifier: Modifier = Modifier) {
-    var coverBitmap by remember(path) { mutableStateOf<ImageBitmap?>(null) }
-    var loaded by remember(path) { mutableStateOf(false) }
+    val source = com.ismartcoding.plain.ui.navigation.LocalContentSource.current
+    var coverBitmap by remember(source, path) { mutableStateOf<ImageBitmap?>(null) }
+    var loaded by remember(source, path) { mutableStateOf(false) }
 
-    LaunchedEffect(path) {
-        coverBitmap = withIO { loadAudioCoverBitmap(path) }
+    LaunchedEffect(source, path) {
+        coverBitmap = withIO { loadAudioCoverBitmap(path, source) }
         loaded = true
     }
 

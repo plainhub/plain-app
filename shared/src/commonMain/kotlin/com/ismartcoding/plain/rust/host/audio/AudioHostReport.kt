@@ -5,14 +5,16 @@ import com.ismartcoding.plain.rust.native.RustHostReports
 import kotlinx.serialization.Serializable
 
 internal sealed interface AudioHostReport {
+    val path: String
+    val revision: Long
     @Serializable
-    data class Started(val path: String, val revision: Long) : AudioHostReport
+    data class Started(override val path: String, override val revision: Long) : AudioHostReport
 
     @Serializable
-    data class Completed(val path: String, val revision: Long) : AudioHostReport
+    data class Completed(override val path: String, override val revision: Long) : AudioHostReport
 
     @Serializable
-    data class Progress(val path: String, val positionMs: Long, val revision: Long) : AudioHostReport
+    data class Progress(override val path: String, val positionMs: Long, override val revision: Long) : AudioHostReport
 
     suspend fun sendToRust() {
         when (this) {

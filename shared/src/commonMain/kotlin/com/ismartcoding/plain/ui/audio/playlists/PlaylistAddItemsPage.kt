@@ -25,7 +25,6 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
-import com.ismartcoding.plain.features.audio.AudioPlaylistsClient
 import com.ismartcoding.plain.i18n.*
 import com.ismartcoding.plain.lib.extensions.formatDurationMs
 import com.ismartcoding.plain.lib.withIO
@@ -61,9 +60,10 @@ import com.ismartcoding.plain.i18n.search
 fun PlaylistAddItemsPage(
     navController: NavHostController,
     playlistId: String,
+    source: com.ismartcoding.plain.rust.graphql.ContentSource = com.ismartcoding.plain.ui.navigation.LocalContentSource.current,
 ) {
     val scope = rememberCoroutineScope()
-    val vm: PlaylistAddItemsViewModel = viewModel { PlaylistAddItemsViewModel() }
+    val vm: PlaylistAddItemsViewModel = viewModel { PlaylistAddItemsViewModel(source) }
     val scrollState = rememberLazyListState()
 
     LaunchedEffect(playlistId) {
@@ -170,8 +170,8 @@ fun PlaylistAddItemsPage(
                         withIO {
                             val audioByPath = vm.items.value.associateBy { it.path }
                             val items = toAdd.mapNotNull { path -> audioByPath[path]?.toPlaylistAudio() }
-                            AudioPlaylistsClient.addPlaylistItems(playlistId, items)
-                            AudioPlaylistsClient.removePlaylistItems(playlistId, toRemove.mapNotNull { audioByPath[it]?.id })
+                            source.playlists.addPlaylistItems(playlistId, items)
+                            source.playlists.removePlaylistItems(playlistId, toRemove.mapNotNull { audioByPath[it]?.id })
                         }
                         DialogHelper.showMessage(addedMsg)
                         navController.popBackStack()

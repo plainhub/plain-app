@@ -20,6 +20,7 @@ import com.ismartcoding.plain.features.shares.SharedFileDto
 import com.ismartcoding.plain.features.shares.SharedLink
 import com.ismartcoding.plain.models.ActionResult
 import com.ismartcoding.plain.models.AppFile
+import com.ismartcoding.plain.models.AudioItem
 import com.ismartcoding.plain.models.AudioCommand
 import com.ismartcoding.plain.models.AudioPlaylist
 import com.ismartcoding.plain.models.ChatChannel
@@ -46,6 +47,16 @@ import kotlin.time.Instant
 import kotlinx.serialization.json.JsonElement
 
 object Mutation {
+    fun uninstallPackages(ids: List<String>): GraphqlRequest<Boolean> = GraphqlRequest(
+        $$"mutation($ids: [ID!]!) { uninstallPackages(ids: $ids) }",
+        mapOf(variable("ids", ids)), field = "uninstallPackages",
+    )
+
+    fun openWebSettings(feature: com.ismartcoding.plain.features.web.WebSettingsFeature?): GraphqlRequest<Boolean> = GraphqlRequest(
+        $$"mutation($feature: WebSettingsFeature) { openWebSettings(feature: $feature) }",
+        mapOf(variable("feature", feature?.name)), field = "openWebSettings",
+    )
+
     fun editChatText(id: String, text: String): GraphqlRequest<ChatTextEdit> = GraphqlRequest(
         $$"mutation($id: ID!, $text: String!) { editChatText(id: $id, text: $text) { changed chat { $${Fragments.CHAT_ITEM} } } }",
         mapOf(variable("id", id), variable("text", text)),
@@ -212,13 +223,24 @@ object Mutation {
         field = "removeAudioPlaylistItem",
     )
 
+    internal fun enqueueAndSelectAudio(mediaId: String): GraphqlRequest<AudioItem> = GraphqlRequest(
+        $$"mutation($query: String!, $mediaId: ID!) { addAudioToQueue(query: $query) playAudio(mediaId: $mediaId) { $${Fragments.AUDIO_TRACK_FIELDS} } }",
+        mapOf(variable("query", com.ismartcoding.plain.rust.graphql.selectionQuery(setOf(mediaId))), variable("mediaId", mediaId)),
+        field = "playAudio",
+    )
+
+    fun playAudio(mediaId: String): GraphqlRequest<AudioItem> = GraphqlRequest(
+        $$"mutation($mediaId: ID!) { playAudio(mediaId: $mediaId) { $${Fragments.AUDIO_TRACK_FIELDS} } }",
+        mapOf(variable("mediaId", mediaId)), field = "playAudio",
+    )
+
     fun advanceAudioSelection(
         action: AudioSelectionAction,
         expectedPath: String,
         expectedRevision: Long,
         shuffle: Boolean,
     ): GraphqlRequest<AdvancedAudioSelection?> = GraphqlRequest(
-        $$"mutation($action: AudioSelectionAction!, $expectedPath: String!, $expectedRevision: Long!, $shuffle: Boolean!) { advanceAudioSelection(action: $action, expectedPath: $expectedPath, expectedRevision: $expectedRevision, shuffle: $shuffle) { track { $${Fragments.AUDIO_TRACK_FIELDS} } } }",
+        $$"mutation($action: AudioSelectionAction!, $expectedPath: String!, $expectedRevision: Long!, $shuffle: Boolean!) { advanceAudioSelection(action: $action, expectedPath: $expectedPath, expectedRevision: $expectedRevision, shuffle: $shuffle) { path positionMs revision track { $${Fragments.AUDIO_TRACK_FIELDS} } } }",
         mapOf(variable("action", action.name), variable("expectedPath", expectedPath), variable("expectedRevision", expectedRevision), variable("shuffle", shuffle)),
         field = "advanceAudioSelection",
     )
@@ -382,12 +404,6 @@ object Mutation {
         field = "setFavoriteFolderAlias",
     )
 
-    fun cacheRemoteFile(url: String, name: String): GraphqlRequest<String> = GraphqlRequest(
-        $$"mutation($url: String!, $name: String!) { cacheRemoteFile(url: $url, name: $name) }",
-        mapOf(variable("url", url), variable("name", name)),
-        field = "cacheRemoteFile",
-    )
-
     fun createFileTask(type: FileTaskType, ops: List<FileTaskOp>): GraphqlRequest<FileTask> = GraphqlRequest(
         $$"mutation($type:FileTaskType!,$title:String!,$ops:[FileTaskOpInput!]!){createFileTask(type:$type,title:$title,ops:$ops,waitForCompletion:true){ $${Fragments.FILE_TASK} }}",
         mapOf(variable("type", type.name), variable("title", type.name), variable("ops", ops)),
@@ -439,9 +455,9 @@ object Mutation {
         field = "deleteClipboardItems",
     )
 
-    fun mergeChunks(fileId: String, totalChunks: Long, path: String, totalSize: Long): GraphqlRequest<MergeResult> = GraphqlRequest(
-        $$"mutation($fileId: String!, $totalChunks: Int!, $path: String!, $totalSize: Long!) { mergeChunks(fileId: $fileId, totalChunks: $totalChunks, path: $path, replace: true, totalSize: $totalSize) { status error } }",
-        mapOf(variable("fileId", fileId), variable("totalChunks", totalChunks), variable("path", path), variable("totalSize", totalSize)),
+    fun mergeChunks(fileId: String, totalChunks: Long, path: String, totalSize: Long, replace: Boolean = true): GraphqlRequest<MergeResult> = GraphqlRequest(
+        $$"mutation($fileId: String!, $totalChunks: Int!, $path: String!, $totalSize: Long!, $replace: Boolean!) { mergeChunks(fileId: $fileId, totalChunks: $totalChunks, path: $path, replace: $replace, totalSize: $totalSize) { status value error } }",
+        mapOf(variable("fileId", fileId), variable("totalChunks", totalChunks), variable("path", path), variable("totalSize", totalSize), variable("replace", replace)),
         field = "mergeChunks",
     )
 
@@ -703,6 +719,12 @@ object Mutation {
             field = field,
         )
     }
+
+    fun setPref(key: String, value: kotlinx.serialization.json.JsonElement): GraphqlRequest<Boolean> = GraphqlRequest(
+        $$"mutation($key: String!, $value: JSON!) { setPref(key: $key, value: $value) }",
+        mapOf(variable("key", key), variable("value", value)),
+        field = "setPref",
+    )
 
     fun setSavedValue(key: String, value: JsonElement): GraphqlRequest<Unit> = GraphqlRequest(
         $$"mutation($key: String!, $value: JSON!) { setSavedValue(key: $key, value: $value) }",

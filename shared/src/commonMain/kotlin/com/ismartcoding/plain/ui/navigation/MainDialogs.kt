@@ -13,6 +13,16 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.collectAsState
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.material3.LinearProgressIndicator
+import com.ismartcoding.plain.features.files.RemoteFiles
+import com.ismartcoding.plain.lib.extensions.formatBytes
+import com.ismartcoding.plain.i18n.Res
+import com.ismartcoding.plain.i18n.download
+import com.ismartcoding.plain.i18n.cancel
+import org.jetbrains.compose.resources.stringResource
 import kotlinx.coroutines.delay
 import com.ismartcoding.plain.ui.components.DialogHelper
 import com.ismartcoding.plain.ui.components.ToastManager
@@ -31,9 +41,11 @@ fun MainDialogs() {
     val loading by DialogHelper.loading
     val confirmation by DialogHelper.confirmation
     val toast by ToastManager.current
+    val resourceDownloads by RemoteFiles.progress.collectAsState()
+    val resourceDownload = resourceDownloads.firstOrNull()
 
-    DisposableEffect(loading) {
-        keepScreenOn(loading)
+    DisposableEffect(loading, resourceDownload != null) {
+        keepScreenOn(loading || resourceDownload != null)
         onDispose { keepScreenOn(false) }
     }
     LaunchedEffect(toast) {
@@ -43,7 +55,27 @@ fun MainDialogs() {
         }
     }
 
-    if (loading) {
+    if (resourceDownload != null) {
+        AlertDialog(
+            containerColor = MaterialTheme.colorScheme.dialogSheetBackground,
+            onDismissRequest = resourceDownload.cancel,
+            title = { Text(stringResource(Res.string.download)) },
+            text = {
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Text(resourceDownload.name)
+                    val total = resourceDownload.totalBytes
+                    if (total != null && total > 0) {
+                        LinearProgressIndicator(progress = { (resourceDownload.downloadedBytes.toFloat() / total).coerceIn(0f, 1f) })
+                        Text(resourceDownload.downloadedBytes.formatBytes() + " / " + total.formatBytes())
+                    } else {
+                        LinearProgressIndicator()
+                        Text(resourceDownload.downloadedBytes.formatBytes())
+                    }
+                }
+            },
+            confirmButton = { PTextButton(text = stringResource(Res.string.cancel), onClick = resourceDownload.cancel) },
+        )
+    } else if (loading) {
         Dialog(
             onDismissRequest = { },
             properties = DialogProperties(dismissOnBackPress = false, dismissOnClickOutside = false),

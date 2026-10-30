@@ -41,7 +41,7 @@ fun ReorderableCollectionItemScope.AudioQueueItemRow(
     Card(
         modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 4.dp)
             .clip(RoundedCornerShape(12.dp))
-            .clickable { audioJustPlayWithNotificationCheck(audio) },
+            .clickable { audioJustPlayWithNotificationCheck(audio, audioQueueVM.source) },
         colors = CardDefaults.cardColors(containerColor = if (isPlaying) MaterialTheme.colorScheme.cardBackgroundActive else MaterialTheme.colorScheme.cardBackgroundNormal),
     ) {
         Row(modifier = Modifier.fillMaxWidth().padding(12.dp), verticalAlignment = Alignment.CenterVertically) {

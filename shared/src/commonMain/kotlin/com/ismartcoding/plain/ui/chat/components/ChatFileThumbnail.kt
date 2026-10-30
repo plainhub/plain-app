@@ -33,7 +33,7 @@ fun ChatFileThumbnail(
 ) {
     val widthPx = with(LocalDensity.current) { 48.dp.toPx() }.toInt()
     Box {
-        if (fileName.isImageFast() || fileName.isVideoFast()) {
+        if (previewPath.isNotEmpty() && (fileName.isImageFast() || fileName.isVideoFast())) {
             TransformImageViewWithUri(
                 modifier = Modifier
                     .size(48.dp)

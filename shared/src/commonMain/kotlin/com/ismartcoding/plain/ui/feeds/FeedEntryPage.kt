@@ -47,7 +47,8 @@ fun FeedEntryPage(
     id: String,
     tagsVM: TagsViewModel,
     pagerVM: FeedEntryPagerViewModel,
-    feedEntryVM: FeedEntryViewModel = viewModel { FeedEntryViewModel() },
+    source: com.ismartcoding.plain.rust.graphql.ContentSource = com.ismartcoding.plain.ui.navigation.LocalContentSource.current,
+    feedEntryVM: FeedEntryViewModel = viewModel { FeedEntryViewModel(source) },
 ) {
     val scope = rememberCoroutineScope()
     val tagsState by tagsVM.itemsFlow.collectAsState()

@@ -11,8 +11,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.mutableStateSetOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.ismartcoding.plain.features.chat.channel.ChannelManager
-import com.ismartcoding.plain.features.chat.channel.snapshotChannelsGraphql
 import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.models.ChatChannel
 import com.ismartcoding.plain.ui.components.ToastManager
@@ -24,7 +22,11 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 
-class ChannelViewModel : ViewModel() {
+class ChannelViewModel internal constructor(
+    private val api: com.ismartcoding.plain.rust.graphql.GraphqlClient = com.ismartcoding.plain.rust.graphql.GraphqlApi,
+    private val readChannels: suspend () -> List<ChatChannel> = { api.execute(com.ismartcoding.plain.graphql.Query.chatChannels()) },
+    private val sourceChanges: kotlinx.coroutines.flow.Flow<Unit>? = null,
+) : ViewModel() {
     private val lock = Mutex()
     val channels = MutableStateFlow<List<ChatChannel>>(emptyList())
 
@@ -35,16 +37,16 @@ class ChannelViewModel : ViewModel() {
 
     suspend fun observe() = coroutineScope {
         launch(start = CoroutineStart.UNDISPATCHED) {
-            merge(
+            (sourceChanges ?: merge(
                 AppSubscriptions.contentChanged.changes(),
                 AppSubscriptions.channelsChanged.changes(),
-            ).collect { refreshSafely() }
+            )).collect { refreshSafely() }
         }
         refreshSafely()
     }
 
     private suspend fun refresh() = lock.withLock {
-        channels.value = snapshotChannelsGraphql()
+        channels.value = readChannels()
     }
 
     private suspend fun refreshSafely() {
@@ -59,27 +61,27 @@ class ChannelViewModel : ViewModel() {
 
     fun createChannel(name: String) {
         viewModelScope.launchSafe {
-            ChannelManager.createChannel(name)
+            api.execute(com.ismartcoding.plain.graphql.Mutation.createChatChannel(name))
             showCreateChannelDialog.value = false
         }
     }
 
     fun renameChannel(channelId: String, newName: String) {
         viewModelScope.launchSafe {
-            ChannelManager.renameChannel(channelId, newName)
+            api.execute(com.ismartcoding.plain.graphql.Mutation.updateChatChannel(channelId, newName))
             renameChannelId.value = ""
         }
     }
 
     fun removeChannel(channelId: String) {
         viewModelScope.launchSafe {
-            ChannelManager.deleteChannel(channelId)
+            api.execute(com.ismartcoding.plain.graphql.Mutation.deleteChatChannel(channelId))
         }
     }
 
     fun leaveChannel(channelId: String) {
         viewModelScope.launchSafe {
-            ChannelManager.leaveChannel(channelId)
+            api.execute(com.ismartcoding.plain.graphql.Mutation.leaveChatChannel(channelId))
         }
     }
 
@@ -88,13 +90,13 @@ class ChannelViewModel : ViewModel() {
             pendingIds.remove(peerId)
         }) {
             pendingIds.add(peerId)
-            ChannelManager.inviteMember(channelId, peerId)
+            api.execute(com.ismartcoding.plain.graphql.Mutation.addChatChannelMember(channelId, peerId))
         }
     }
 
     fun resendInvite(channelId: String, peerId: String) {
         viewModelScope.launchSafe {
-            ChannelManager.resendInvite(channelId, peerId)
+            api.execute(com.ismartcoding.plain.graphql.Mutation.addChatChannelMember(channelId, peerId))
         }
     }
 
@@ -103,7 +105,7 @@ class ChannelViewModel : ViewModel() {
             pendingIds.remove(peerId)
         }) {
             pendingIds.add(peerId)
-            ChannelManager.kickMember(channelId, peerId)
+            api.execute(com.ismartcoding.plain.graphql.Mutation.removeChatChannelMember(channelId, peerId))
         }
     }
 
@@ -113,12 +115,8 @@ class ChannelViewModel : ViewModel() {
         onDone: () -> Unit = {},
     ) {
         viewModelScope.launchSafe(onDone = onDone) {
-            val r = ChannelManager.acceptInvite(channelId)
-            if (r.isSuccess) {
-                onSuccess()
-            } else {
-                ToastManager.showErrorToast(r.getError())
-            }
+            api.execute(com.ismartcoding.plain.graphql.Mutation.acceptChatChannelInvite(channelId))
+            onSuccess()
         }
     }
 
@@ -127,7 +125,7 @@ class ChannelViewModel : ViewModel() {
         onDone: () -> Unit = {},
     ) {
         viewModelScope.launchSafe(onDone = onDone) {
-            ChannelManager.declineInvite(channelId)
+            api.execute(com.ismartcoding.plain.graphql.Mutation.declineChatChannelInvite(channelId))
         }
     }
 }

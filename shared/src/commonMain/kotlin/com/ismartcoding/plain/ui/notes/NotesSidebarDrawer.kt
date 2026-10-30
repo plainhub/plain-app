@@ -41,7 +41,7 @@ import com.ismartcoding.plain.ui.resources.trash_2 as ui_drawable_trash_2
 
 /**
  * Sidebar drawer content for the notes page. Shows All, Trash, and Tags.
- * Selecting a filter only updates [NotesViewModel.trash] / [NotesViewModel.tag];
+ * Selecting a filter only updates [notesVM.trash] / [notesVM.tag];
  * the notes page reacts to the change and reloads the list.
  */
 @OptIn(ExperimentalMaterial3Api::class)
@@ -49,6 +49,7 @@ import com.ismartcoding.plain.ui.resources.trash_2 as ui_drawable_trash_2
 fun NotesSidebarDrawer(
     tagsVM: TagsViewModel,
     drawerState: DrawerState,
+    notesVM: NotesViewModel = NotesViewModel.local,
 ) {
     val tags by tagsVM.itemsFlow.collectAsState()
     val scope = rememberCoroutineScope()
@@ -72,26 +73,26 @@ fun NotesSidebarDrawer(
         SidebarItem(
             label = stringResource(Res.string.all),
             icon = UiRes.drawable.ui_drawable_layout_grid,
-            isSelected = !NotesViewModel.trash.value && NotesViewModel.tag.value == null,
+            isSelected = !notesVM.trash.value && notesVM.tag.value == null,
             onClick = {
-                NotesViewModel.trash.value = false
-                NotesViewModel.tag.value = null
+                notesVM.trash.value = false
+                notesVM.tag.value = null
                 scope.launch { drawerState.close() }
             },
-            badge = NotesViewModel.total.intValue.toString()
+            badge = notesVM.total.intValue.toString()
         )
 
         // Trash
         SidebarItem(
             label = stringResource(Res.string.trash),
             icon = UiRes.drawable.ui_drawable_trash_2,
-            isSelected = NotesViewModel.trash.value,
+            isSelected = notesVM.trash.value,
             onClick = {
-                NotesViewModel.trash.value = true
-                NotesViewModel.tag.value = null
+                notesVM.trash.value = true
+                notesVM.tag.value = null
                 scope.launch { drawerState.close() }
             },
-            badge = NotesViewModel.totalTrash.intValue.toString()
+            badge = notesVM.totalTrash.intValue.toString()
         )
 
         HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
@@ -109,7 +110,7 @@ fun NotesSidebarDrawer(
             tags.forEach { tag ->
                 MediaSidebarTagItem(
                     tag = tag,
-                    isSelected = !NotesViewModel.trash.value && NotesViewModel.tag.value?.id == tag.id,
+                    isSelected = !notesVM.trash.value && notesVM.tag.value?.id == tag.id,
                     onEdit = { tagsVM.showEditDialog(tag) },
                     onDelete = {
                         scope.launch {
@@ -124,8 +125,8 @@ fun NotesSidebarDrawer(
                         }
                     },
                     onClick = {
-                        NotesViewModel.trash.value = false
-                        NotesViewModel.tag.value = tag
+                        notesVM.trash.value = false
+                        notesVM.tag.value = tag
                         scope.launch { drawerState.close() }
                     }
                 )

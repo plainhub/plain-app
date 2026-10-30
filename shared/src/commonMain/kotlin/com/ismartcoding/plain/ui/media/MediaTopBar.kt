@@ -25,6 +25,7 @@ import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
@@ -34,7 +35,6 @@ import androidx.navigation.NavHostController
 import com.ismartcoding.plain.IData
 import com.ismartcoding.plain.platform.system.DataType
 import com.ismartcoding.plain.features.files.FileSortBy
-import com.ismartcoding.plain.features.dlna.sender.RustDlnaSender
 import com.ismartcoding.plain.ui.base.dragselect.DragSelectState
 import com.ismartcoding.plain.ui.casting.CastViewModel
 import com.ismartcoding.plain.ui.files.MediaFoldersViewModel
@@ -85,11 +85,18 @@ fun <T : IData> MediaTopBar(
     val isDocs = mediaVM.dataType == DataType.DOC
     val scope = rememberCoroutineScope()
     val drawerState = rememberDrawerState(DrawerValue.Closed)
+    val canBrowse = mediaVM.hasPermission.value
+    LaunchedEffect(canBrowse) {
+        if (!canBrowse) {
+            mediaVM.showSortAndBrowseDialog.value = false
+            drawerState.close()
+        }
+    }
 
     val title = getMediaPageTitle(
         mediaType = mediaVM.dataType,
         isCastMode = castVM.castMode.value,
-        castDeviceName = RustDlnaSender.currentDevice?.name,
+        castDeviceName = castVM.currentDeviceName,
         bucket = bucketsMap[mediaVM.bucketId.value],
         dragSelectState = dragSelectState,
         tagName = mediaVM.tag.value?.name,
@@ -117,7 +124,11 @@ fun <T : IData> MediaTopBar(
     val page: @Composable () -> Unit = {
         Box(Modifier.fillMaxSize()) {
             PScaffold(
-                topBar = {
+                topBar = toolbar@ {
+                    if (!canBrowse) {
+                        PTopAppBar(onNavigateBack = { navController.navigateUp() }, title = title)
+                        return@toolbar
+                    }
                     SearchableTopBar(
                         navController = navController,
                         viewModel = mediaVM,
@@ -179,17 +190,17 @@ fun <T : IData> MediaTopBar(
                         }
                     )
                 },
-                bottomBar = { bottomBar?.invoke() },
+                bottomBar = { if (canBrowse) bottomBar?.invoke() },
             ) { paddingValues ->
                 CompositionLocalProvider(LocalDrawerState provides drawerState) {
                     content(paddingValues)
                 }
             }
-            DrawerEdgeSwipeStrip(drawerState)
+            if (canBrowse) DrawerEdgeSwipeStrip(drawerState)
         }
     }
 
-    if (showSidebar) {
+    if (showSidebar && canBrowse) {
         ModalNavigationDrawer(
             drawerState = drawerState,
             drawerContent = {
@@ -209,7 +220,7 @@ fun <T : IData> MediaTopBar(
         page()
     }
 
-    if (mediaVM.showSortAndBrowseDialog.value) {
+    if (canBrowse && mediaVM.showSortAndBrowseDialog.value) {
         SortAndBrowseDialog(
             mediaVM = mediaVM,
             sortByEntries = if (setOf(DataType.IMAGE, DataType.VIDEO).contains(mediaVM.dataType)) FileSortBy.entries else FileSortBy.entries.filter { it != FileSortBy.TAKEN_AT_DESC },

@@ -33,9 +33,12 @@ internal object Fragments {
     const val DLNA_STATE = "version devices { id hostAddress name } currentDevice { id hostAddress name } items { path title albumArt artist durationMs audio } currentUri playing progressMs durationMs supportsCallback"
     const val IMAGE_EDITOR_SUMMARY = "id thumbnail canvasWidth canvasHeight layerCount updatedAt"
     const val IMAGE_EDITOR_PROJECT = $$"$$IMAGE_EDITOR_SUMMARY stateB64 createdAt"
+    const val PEER_SUMMARY = "id name ip publicKey status port deviceType createdAt updatedAt online"
     const val PEER = "id name ip key publicKey status port deviceType token createdAt updatedAt online address { bestIp name baseUrl apiUrl statusWsUrl }"
     const val CHANNEL_FIELDS = "id ownerId name actions { isOwner canRename canManageMembers canLeave canDelete } members { peerId status } version status createdAt updatedAt"
-    const val CHAT_DOWNLOAD_QUEUE = "runtimeId revision tasks { id messageId status error downloaded total speed file { id: fileId uri size durationMs width height summary fileName } peer { id name ip key publicKey status port deviceType token createdAt updatedAt } }"
+    private const val CHAT_DOWNLOAD_TASKS = "runtimeId revision tasks { id messageId status error downloaded total speed file { id: fileId uri size durationMs width height summary fileName } "
+    const val CHAT_DOWNLOAD_QUEUE = CHAT_DOWNLOAD_TASKS + "peer { " + PEER + " } }"
+    const val CHAT_DOWNLOAD_QUEUE_SUMMARY = CHAT_DOWNLOAD_TASKS + "peer { " + PEER_SUMMARY + " } }"
 
     fun mediaFields(type: DataType): String {
         val extra = when (type) {

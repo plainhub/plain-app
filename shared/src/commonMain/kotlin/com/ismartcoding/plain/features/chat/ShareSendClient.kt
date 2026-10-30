@@ -8,12 +8,14 @@ import com.ismartcoding.plain.models.ChatItem
 import com.ismartcoding.plain.rust.graphql.GraphqlApi
 import kotlin.time.Instant
 
-object ShareSendClient {
+object ShareSendClient : ShareSendApi()
+
+open class ShareSendApi internal constructor(private val api: com.ismartcoding.plain.rust.graphql.GraphqlClient = GraphqlApi) {
     suspend fun sendContent(targets: List<ChatTarget>, content: MessageContent): List<ChatItem> =
-        GraphqlApi.execute(Mutation.sendChatItems(targets.map { it.encodedToId }, content.toJSONString()))
+        api.execute(Mutation.sendChatItems(targets.map { it.encodedToId }, content.toJSONString()))
 
     suspend fun sendShare(targets: List<ChatTarget>, shareId: String): List<ChatItem> =
-        GraphqlApi.execute(Mutation.sendShare(targets.map { it.encodedToId }, shareId))
+        api.execute(Mutation.sendShare(targets.map { it.encodedToId }, shareId))
 
     suspend fun sendFolderShare(
         targets: List<ChatTarget>,
@@ -21,5 +23,5 @@ object ShareSendClient {
         name: String,
         expiresAt: Instant?,
     ): List<ChatItem> =
-        GraphqlApi.execute(Mutation.sendFolderShare(targets.map { it.encodedToId }, dirPath, name, expiresAt))
+        api.execute(Mutation.sendFolderShare(targets.map { it.encodedToId }, dirPath, name, expiresAt))
 }

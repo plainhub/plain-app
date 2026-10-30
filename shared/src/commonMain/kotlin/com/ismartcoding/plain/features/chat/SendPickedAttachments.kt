@@ -23,9 +23,10 @@ suspend fun sendPickedAttachments(
     caption: String? = null,
     images: Boolean? = null,
     normalize: Boolean = false,
+    chatVM: ChatViewModel = ChatViewModel.local,
 ): Boolean {
     if (targets.isEmpty()) return false
-    return PickedAttachments.withFiles(uris, normalize) { attachments ->
+    return PickedAttachments.withFiles(uris, normalize, chatVM.source) { attachments ->
         if (uris.isNotEmpty() && attachments.isEmpty()) false
         else coroutineScope {
             val content = if (attachments.isEmpty()) null else {
@@ -35,10 +36,10 @@ suspend fun sendPickedAttachments(
             }
             if (content == null && text.isNullOrBlank()) return@coroutineScope false
             targets.map { target -> async {
-                val item = if (content == null) ChatClient.sendText(target, text!!) else ChatClient.sendContent(target, content)
-                ChatViewModel.onMessagesCreated(target, listOf(item), scroll = true)
-                val captionItem = if (content != null && !caption.isNullOrBlank()) ChatClient.sendText(target, caption) else null
-                captionItem?.let { ChatViewModel.onMessagesCreated(target, listOf(it), scroll = true) }
+                val item = if (content == null) chatVM.client.sendText(target, text!!) else chatVM.client.sendContent(target, content)
+                chatVM.onMessagesCreated(target, listOf(item), scroll = true)
+                val captionItem = if (content != null && !caption.isNullOrBlank()) chatVM.client.sendText(target, caption) else null
+                captionItem?.let { chatVM.onMessagesCreated(target, listOf(it), scroll = true) }
                 item.status == ChatStatus.SENT && (captionItem == null || captionItem.status == ChatStatus.SENT)
             } }.awaitAll().all { it }
         }

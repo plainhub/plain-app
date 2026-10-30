@@ -69,8 +69,9 @@ internal fun AudioPlayerTrackPage(
     onSeek: (Long) -> Unit,
 ) {
     var lyrics by remember(item.path) { mutableStateOf<List<LrcParser.LrcLine>?>(null) }
-    LaunchedEffect(item.path) {
-        lyrics = loadLyrics(item.path)
+    val source = com.ismartcoding.plain.ui.navigation.LocalContentSource.current
+    LaunchedEffect(item.path, source) {
+        lyrics = loadLyrics(item.path, source)
     }
     val hasLyrics = !lyrics.isNullOrEmpty()
 

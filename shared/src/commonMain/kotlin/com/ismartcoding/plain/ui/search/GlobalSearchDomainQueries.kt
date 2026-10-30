@@ -1,8 +1,7 @@
 package com.ismartcoding.plain.ui.search
 
-import com.ismartcoding.plain.features.packages.PackagesClient
-import com.ismartcoding.plain.features.media.MediaCatalogClient
-import com.ismartcoding.plain.features.files.FilesClient
+import com.ismartcoding.plain.rust.graphql.ContentSource
+import com.ismartcoding.plain.graphql.Query
 
 import com.ismartcoding.plain.features.files.extension
 
@@ -12,14 +11,9 @@ import com.ismartcoding.plain.models.Audio as AudioTrack
 import com.ismartcoding.plain.models.Doc as Document
 import com.ismartcoding.plain.models.Video as MediaVideo
 import com.ismartcoding.plain.models.Image as MediaImage
-import com.ismartcoding.plain.features.chat.ChatQueries
-import com.ismartcoding.plain.features.chat.channel.snapshotChannelsGraphql
 import com.ismartcoding.plain.features.chat.models.getMessagePreview
-import com.ismartcoding.plain.features.chat.peer.RustPeerStore
 import com.ismartcoding.plain.platform.system.DataType
 import com.ismartcoding.plain.ui.platform.system.getIcon
-import com.ismartcoding.plain.features.notes.NotesClient
-import com.ismartcoding.plain.features.feeds.FeedEntriesClient
 import com.ismartcoding.plain.features.files.FileSortBy
 import com.ismartcoding.plain.models.Audio
 import com.ismartcoding.plain.models.ChatItem
@@ -57,17 +51,17 @@ import org.jetbrains.compose.resources.DrawableResource
  * `Meeting`, which the notes and media query layers refuse by name.
  */
 
-internal suspend fun GlobalSearchViewModel.countDomain(d: GlobalSearchDomain, q: String): Int =
+internal suspend fun GlobalSearchViewModel.countDomain(d: GlobalSearchDomain, q: String, device: ContentSource = ContentSource.Local): Int =
     when (d) {
-        GlobalSearchDomain.NOTES -> NotesClient.count("${SearchHelper.buildTextFilter(q)} trash:false")
-        GlobalSearchDomain.AUDIO -> MediaCatalogClient.count(DataType.AUDIO, "${SearchHelper.buildTextFilter(q)} trash:false")
-        GlobalSearchDomain.IMAGES -> MediaCatalogClient.count(DataType.IMAGE, "${SearchHelper.buildTextFilter(q)} trash:false")
-        GlobalSearchDomain.VIDEOS -> MediaCatalogClient.count(DataType.VIDEO, "${SearchHelper.buildTextFilter(q)} trash:false")
-        GlobalSearchDomain.DOCS -> MediaCatalogClient.count(DataType.DOC, "${SearchHelper.buildTextFilter(q)} trash:false")
-        GlobalSearchDomain.FILES -> FilesClient.indexedCount(SearchHelper.buildTextFilter(q))
-        GlobalSearchDomain.FEEDS -> FeedEntriesClient.count(SearchHelper.buildTextFilter(q))
-        GlobalSearchDomain.CHAT -> ChatQueries.countAsync(q)
-        GlobalSearchDomain.APPS -> PackagesClient.count(q)
+        GlobalSearchDomain.NOTES -> device.notes.count("${SearchHelper.buildTextFilter(q)} trash:false")
+        GlobalSearchDomain.AUDIO -> device.catalog.count(DataType.AUDIO, "${SearchHelper.buildTextFilter(q)} trash:false")
+        GlobalSearchDomain.IMAGES -> device.catalog.count(DataType.IMAGE, "${SearchHelper.buildTextFilter(q)} trash:false")
+        GlobalSearchDomain.VIDEOS -> device.catalog.count(DataType.VIDEO, "${SearchHelper.buildTextFilter(q)} trash:false")
+        GlobalSearchDomain.DOCS -> device.catalog.count(DataType.DOC, "${SearchHelper.buildTextFilter(q)} trash:false")
+        GlobalSearchDomain.FILES -> device.files.indexedCount(SearchHelper.buildTextFilter(q))
+        GlobalSearchDomain.FEEDS -> device.feedEntries.count(SearchHelper.buildTextFilter(q))
+        GlobalSearchDomain.CHAT -> device.chats.records.count(q)
+        GlobalSearchDomain.APPS -> device.packages.count(SearchHelper.buildTextFilter(q))
     }
 
 internal suspend fun GlobalSearchViewModel.queryDomain(
@@ -75,37 +69,38 @@ internal suspend fun GlobalSearchViewModel.queryDomain(
     q: String,
     limit: Int,
     offset: Int,
+    device: ContentSource = ContentSource.Local,
 ): List<GlobalSearchHit> =
-    when (d) {
+    (when (d) {
         GlobalSearchDomain.NOTES ->
-            NotesClient.search("${SearchHelper.buildTextFilter(q)} trash:false", limit, offset).map { it.toHit(q) }
+            device.notes.search("${SearchHelper.buildTextFilter(q)} trash:false", limit, offset).map { it.toHit(q) }
         GlobalSearchDomain.AUDIO ->
-            MediaCatalogClient.rows(DataType.AUDIO, "${SearchHelper.buildTextFilter(q)} trash:false", limit, offset, FileSortBy.DATE_DESC)
+            device.catalog.rows(DataType.AUDIO, "${SearchHelper.buildTextFilter(q)} trash:false", limit, offset, FileSortBy.DATE_DESC)
                 .filterIsInstance<AudioTrack>().map { it.toHit() }
         GlobalSearchDomain.IMAGES ->
-            MediaCatalogClient.rows(DataType.IMAGE, "${SearchHelper.buildTextFilter(q)} trash:false", limit, offset, FileSortBy.DATE_DESC)
+            device.catalog.rows(DataType.IMAGE, "${SearchHelper.buildTextFilter(q)} trash:false", limit, offset, FileSortBy.DATE_DESC)
                 .filterIsInstance<MediaImage>().map { it.toHit() }
         GlobalSearchDomain.VIDEOS ->
-            MediaCatalogClient.rows(DataType.VIDEO, "${SearchHelper.buildTextFilter(q)} trash:false", limit, offset, FileSortBy.DATE_DESC)
+            device.catalog.rows(DataType.VIDEO, "${SearchHelper.buildTextFilter(q)} trash:false", limit, offset, FileSortBy.DATE_DESC)
                 .filterIsInstance<MediaVideo>().map { it.toHit() }
         GlobalSearchDomain.DOCS ->
-            MediaCatalogClient.rows(DataType.DOC, "${SearchHelper.buildTextFilter(q)} trash:false", limit, offset, FileSortBy.DATE_DESC)
+            device.catalog.rows(DataType.DOC, "${SearchHelper.buildTextFilter(q)} trash:false", limit, offset, FileSortBy.DATE_DESC)
                 .filterIsInstance<Document>().map { it.toHit() }
         GlobalSearchDomain.FILES ->
-            FilesClient.indexed(SearchHelper.buildTextFilter(q), limit, offset, FileSortBy.DATE_DESC).map { it.toHit() }
+            device.files.indexed(SearchHelper.buildTextFilter(q), limit, offset, FileSortBy.DATE_DESC).map { it.toHit() }
         GlobalSearchDomain.FEEDS ->
-            FeedEntriesClient.search(SearchHelper.buildTextFilter(q), limit, offset).map { it.toHit(q) }
+            device.feedEntries.search(SearchHelper.buildTextFilter(q), limit, offset).map { it.toHit(q) }
         GlobalSearchDomain.CHAT -> {
-            val items = ChatQueries.searchAsync(q, limit, offset)
-            val peers = if (items.isEmpty()) emptyMap() else RustPeerStore.getAll().associateBy { it.id }
+            val items = device.chats.records.search(q, limit, offset)
+            val peers = if (items.isEmpty()) emptyMap() else device.api.execute(Query.peerSummaries()).associateBy { it.id }
             val channels = if (items.any { !it.channelId.isNullOrEmpty() }) {
-                snapshotChannelsGraphql().associateBy { it.id }
+                device.api.execute(Query.chatChannels()).associateBy { it.id }
             } else emptyMap()
             items.map { it.toHit(q, peers, channels) }
         }
         GlobalSearchDomain.APPS ->
-            PackagesClient.search(q, limit, offset, FileSortBy.DATE_DESC).filter { it.name.isNotBlank() }.map { it.toHit() }
-    }
+            device.packages.search(SearchHelper.buildTextFilter(q), limit, offset, FileSortBy.DATE_DESC).map { it.toHit() }
+    }).map { it.copy(key = device.key + ":" + it.key, device = device) }
 
 /**
  * Re-fetches the currently loaded hits of an editable domain by their source
@@ -117,27 +112,35 @@ internal suspend fun GlobalSearchViewModel.reloadDomainHits(
     d: GlobalSearchDomain,
     hits: List<GlobalSearchHit>,
     q: String,
+    device: ContentSource = ContentSource.Local,
 ): List<GlobalSearchHit>? =
-    when (d) {
-        GlobalSearchDomain.NOTES -> hits.mapNotNull { hit ->
-            val src = hit.source as? GlobalSearchSource.Note ?: return@mapNotNull hit
-            NotesClient.getById(src.note.id)?.toHit(q)
+    (when (d) {
+        GlobalSearchDomain.NOTES -> {
+            val ids = hits.mapNotNull { (it.source as? GlobalSearchSource.Note)?.note?.id }.toSet()
+            if (ids.isEmpty()) hits else {
+                val notes = device.notes.search("${com.ismartcoding.plain.rust.graphql.selectionQuery(ids)} trash:false", ids.size, 0).associateBy { it.id }
+                hits.mapNotNull { hit ->
+                    val src = hit.source as? GlobalSearchSource.Note ?: return@mapNotNull hit
+                    notes[src.note.id]?.toHit(q)
+                }
+            }
         }
         GlobalSearchDomain.FEEDS -> hits.mapNotNull { hit ->
             val src = hit.source as? GlobalSearchSource.Feed ?: return@mapNotNull hit
-            FeedEntriesClient.getAsync(src.entry.id)?.toHit(q)
+            device.feedEntries.getAsync(src.entry.id)?.toHit(q)
         }
-        GlobalSearchDomain.AUDIO -> reloadMediaHits<AudioTrack>(hits, DataType.AUDIO) { it.toHit() }
-        GlobalSearchDomain.IMAGES -> reloadMediaHits<MediaImage>(hits, DataType.IMAGE) { it.toHit() }
-        GlobalSearchDomain.VIDEOS -> reloadMediaHits<MediaVideo>(hits, DataType.VIDEO) { it.toHit() }
-        GlobalSearchDomain.DOCS -> reloadMediaHits<Document>(hits, DataType.DOC) { it.toHit() }
-        GlobalSearchDomain.CHAT -> queryDomain(d, q, hits.size, 0)
+        GlobalSearchDomain.AUDIO -> reloadMediaHits<AudioTrack>(hits, DataType.AUDIO, device) { it.toHit() }
+        GlobalSearchDomain.IMAGES -> reloadMediaHits<MediaImage>(hits, DataType.IMAGE, device) { it.toHit() }
+        GlobalSearchDomain.VIDEOS -> reloadMediaHits<MediaVideo>(hits, DataType.VIDEO, device) { it.toHit() }
+        GlobalSearchDomain.DOCS -> reloadMediaHits<Document>(hits, DataType.DOC, device) { it.toHit() }
+        GlobalSearchDomain.CHAT -> queryDomain(d, q, hits.size, 0, device)
         else -> null
-    }
+    })?.map { if (it.device.key == device.key && it.key.startsWith(device.key + ":")) it else it.copy(key = device.key + ":" + it.key, device = device) }
 
 private suspend inline fun <reified T : Any> reloadMediaHits(
     hits: List<GlobalSearchHit>,
     dataType: DataType,
+    device: ContentSource,
     crossinline toHit: (T) -> GlobalSearchHit,
 ): List<GlobalSearchHit>? {
     val ids = hits.mapNotNull { hit ->
@@ -150,7 +153,7 @@ private suspend inline fun <reified T : Any> reloadMediaHits(
         }
     }
     if (ids.isEmpty()) return null
-    return MediaCatalogClient.rows(dataType, "ids:${ids.joinToString(",")} trash:false", ids.size, 0, FileSortBy.DATE_DESC)
+    return device.catalog.rows(dataType, "ids:${ids.joinToString(",")} trash:false", ids.size, 0, FileSortBy.DATE_DESC)
         .filterIsInstance<T>()
         .map { toHit(it) }
 }
@@ -239,7 +242,7 @@ private fun ChatItem.toHit(q: String, peers: Map<String, Peer>, channels: Map<St
     return GlobalSearchHit(
         key = "chat_$id",
         title = senderName,
-        snippet = getMessagePreview().snippetAround(q),
+        snippet = ((messageContent.value as? com.ismartcoding.plain.features.chat.models.MessageText)?.text ?: getMessagePreview()).snippetAround(q),
         subtitle = conversation,
         iconRes = thumbRes,
         roundThumb = true,
@@ -249,7 +252,7 @@ private fun ChatItem.toHit(q: String, peers: Map<String, Peer>, channels: Map<St
 
 private fun AppPackage.toHit(): GlobalSearchHit = GlobalSearchHit(
     key = "app_$id",
-    title = name,
+    title = name.ifBlank { id },
     subtitle = id,
     source = GlobalSearchSource.App(this),
     action = GlobalSearchAction.Navigate(Routing.AppDetails(id)),

@@ -70,22 +70,11 @@ actual suspend fun ensureParentDir(path: String) {
 }
 
 actual suspend fun streamContentUri(uri: String, sink: StreamSink): String? = withIO {
-    val context = appContext
+    val resolver = appContext.contentResolver
     val parsed = Uri.parse(uri)
-    val mimeType = context.contentResolver.getType(parsed).orEmpty()
-    try {
-        context.contentResolver.openInputStream(parsed)?.buffered()?.use { input ->
-            val buffer = ByteArray(64 * 1024)
-            while (true) {
-                val read = input.read(buffer)
-                if (read <= 0) break
-                sink.write(buffer, 0, read)
-            }
-        }
-        mimeType.ifEmpty { null }
-    } catch (e: Exception) {
-        null
-    }
+    val input = resolver.openInputStream(parsed) ?: return@withIO null
+    input.use { it.copyChunksTo(sink) }
+    resolver.getType(parsed).orEmpty()
 }
 
 actual suspend fun getPackageIconBytes(packageName: String): ByteArray? = withIO {

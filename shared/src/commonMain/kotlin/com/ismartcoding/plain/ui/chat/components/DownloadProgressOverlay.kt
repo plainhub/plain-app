@@ -52,10 +52,11 @@ private fun DownloadActionButton(
     taskId: String,
     status: DownloadStatus,
 ) {
+    val downloads = com.ismartcoding.plain.ui.chat.LocalChatDownloads.current
     when (status) {
         DownloadStatus.DOWNLOADING -> PIconButton(
             icon = UiRes.drawable.ui_drawable_pause,
-            click = { DownloadQueue.pauseDownload(taskId) },
+            click = { downloads.pauseDownload(taskId) },
             tint = Color.White,
             contentDescription = stringResource(Res.string.pause),
             modifier = Modifier.size(24.dp)
@@ -63,7 +64,7 @@ private fun DownloadActionButton(
 
         DownloadStatus.PAUSED -> PIconButton(
             icon = UiRes.drawable.ui_drawable_download,
-            click = { DownloadQueue.resumeDownload(taskId) },
+            click = { downloads.resumeDownload(taskId) },
             tint = Color.White,
             contentDescription = stringResource(Res.string.resume),
             modifier = Modifier.size(24.dp)
@@ -71,7 +72,7 @@ private fun DownloadActionButton(
 
         DownloadStatus.PENDING -> PIconButton(
             icon = UiRes.drawable.ui_drawable_x,
-            click = { DownloadQueue.removeDownload(taskId) },
+            click = { downloads.removeDownload(taskId) },
             tint = Color.White,
             contentDescription = stringResource(Res.string.cancel),
             modifier = Modifier.size(24.dp)
@@ -79,7 +80,7 @@ private fun DownloadActionButton(
 
         DownloadStatus.FAILED -> PIconButton(
             icon = UiRes.drawable.ui_drawable_circle_alert,
-            click = { DownloadQueue.retryDownload(taskId) },
+            click = { downloads.retryDownload(taskId) },
             tint = Color.White,
             contentDescription = stringResource(Res.string.try_again),
             modifier = Modifier.size(24.dp)

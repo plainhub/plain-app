@@ -26,9 +26,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.ismartcoding.plain.features.downloads.DownloadCenter
+import com.ismartcoding.plain.features.shares.SharedFolderDownloadClient
+import com.ismartcoding.plain.features.shares.SharedFolderDownloadEngine
+import com.ismartcoding.plain.features.shares.SharedDownloadCommand
 import com.ismartcoding.plain.features.downloads.isTerminalDownloadStatus
-import com.ismartcoding.plain.features.shares.SharedFolderBatchTask
 import com.ismartcoding.plain.i18n.*
 import com.ismartcoding.plain.ui.base.PBottomSheetTopAppBar
 import com.ismartcoding.plain.ui.base.PModalBottomSheet
@@ -41,19 +42,15 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Surface
 
-/**
- * Global download list: running and finished share batches behind two filter
- * pills. Shared by the folder page and the app-level floating widget; reads
- * straight from [DownloadCenter], so entries survive page navigation.
- */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DownloadListSheet(
     onDismiss: () -> Unit,
+    downloads: SharedFolderDownloadClient = SharedFolderDownloadEngine,
 ) {
     val scope = rememberCoroutineScope()
-    val tasksMap = DownloadCenter.progress.collectAsState().value
-    val shareTasks = tasksMap.values.filterIsInstance<SharedFolderBatchTask>()
+    val tasksMap = downloads.progress.collectAsState().value
+    val shareTasks = tasksMap.values
     val running = shareTasks.filter { !it.status.isTerminalDownloadStatus() }
     val finished = shareTasks.filter { it.status.isTerminalDownloadStatus() }
     var runningTab by remember { mutableStateOf(true) }
@@ -70,7 +67,7 @@ fun DownloadListSheet(
                                 confirmActionAsync(
                                     title = Res.string.clear,
                                     message = Res.string.clear_completed_confirm,
-                                    callback = { finished.forEach { DownloadCenter.remove(it.id) } },
+                                    callback = { finished.forEach { downloads.control(it.id, SharedDownloadCommand.REMOVE) } },
                                     danger = true,
                                 )
                             }
@@ -112,7 +109,7 @@ fun DownloadListSheet(
                     ),
                 ) {
                     items(visible, key = { it.id }) { task ->
-                        DownloadBatchCard(task)
+                        DownloadBatchCard(task, downloads = downloads)
                     }
                 }
             }

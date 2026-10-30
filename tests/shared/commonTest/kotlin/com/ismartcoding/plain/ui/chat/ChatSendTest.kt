@@ -25,7 +25,7 @@ class ChatSendTest {
     fun setup() { Dispatchers.setMain(StandardTestDispatcher()) }
 
     @AfterTest
-    fun cleanup() { ChatViewModel._itemsFlow.value = emptyList(); Dispatchers.resetMain() }
+    fun cleanup() { ChatViewModel.local._itemsFlow.value = emptyList(); Dispatchers.resetMain() }
 
     private fun sent(target: ChatTarget) = ChatItem(
         id = "committed", fromId = "me", toId = target.toId,
@@ -34,59 +34,59 @@ class ChatSendTest {
 
     @Test
     fun pendingMessageAppearsBeforeSendReturnsAndIsReplacedWithoutEventDuplicates() = runTest {
-        ChatViewModel.initializeTargetAsync("peer:fixture")
-        val target = ChatViewModel.target.value
+        ChatViewModel.local.initializeTargetAsync("peer:fixture")
+        val target = ChatViewModel.local.target.value
         val started = CompletableDeferred<Unit>()
         val release = CompletableDeferred<Unit>()
         val sending = async {
-            ChatViewModel.sendMessage(target, content) { to, _ ->
+            ChatViewModel.local.sendMessage(target, content) { to, _ ->
                 started.complete(Unit)
                 release.await()
                 sent(to)
             }
         }
         started.await()
-        assertEquals(ChatStatus.PENDING, ChatViewModel.itemsFlow.value.single().status)
-        assertEquals("hello", (ChatViewModel.itemsFlow.value.single().value as MessageText).text)
-        ChatViewModel.onMessagesCreated(target, listOf(sent(target)))
+        assertEquals(ChatStatus.PENDING, ChatViewModel.local.itemsFlow.value.single().status)
+        assertEquals("hello", (ChatViewModel.local.itemsFlow.value.single().value as MessageText).text)
+        ChatViewModel.local.onMessagesCreated(target, listOf(sent(target)))
         release.complete(Unit)
         assertTrue(sending.await())
-        assertEquals(listOf("committed"), ChatViewModel.itemsFlow.value.map { it.id })
-        assertEquals(ChatStatus.SENT, ChatViewModel.itemsFlow.value.single().status)
-        ChatViewModel.onMessagesCreated(target, listOf(sent(target)))
-        assertEquals(1, ChatViewModel.itemsFlow.value.size)
+        assertEquals(listOf("committed"), ChatViewModel.local.itemsFlow.value.map { it.id })
+        assertEquals(ChatStatus.SENT, ChatViewModel.local.itemsFlow.value.single().status)
+        ChatViewModel.local.onMessagesCreated(target, listOf(sent(target)))
+        assertEquals(1, ChatViewModel.local.itemsFlow.value.size)
     }
 
     @Test
     fun failedSendKeepsMessageAndRetryReplacesIt() = runTest {
-        ChatViewModel.initializeTargetAsync("peer:fixture")
-        val target = ChatViewModel.target.value
-        assertFalse(ChatViewModel.sendMessage(target, content) { _, _ -> error("Offline") })
-        val failed = ChatViewModel.itemsFlow.value.single()
+        ChatViewModel.local.initializeTargetAsync("peer:fixture")
+        val target = ChatViewModel.local.target.value
+        assertFalse(ChatViewModel.local.sendMessage(target, content) { _, _ -> error("Offline") })
+        val failed = ChatViewModel.local.itemsFlow.value.single()
         assertEquals(ChatStatus.FAILED, failed.status)
-        assertTrue(ChatViewModel.sendMessage(target, content, pendingId = failed.id) { to, _ -> sent(to) })
-        assertEquals(listOf("committed"), ChatViewModel.itemsFlow.value.map { it.id })
+        assertTrue(ChatViewModel.local.sendMessage(target, content, pendingId = failed.id) { to, _ -> sent(to) })
+        assertEquals(listOf("committed"), ChatViewModel.local.itemsFlow.value.map { it.id })
     }
 
     @Test
     fun switchingConversationsWhileSendingDoesNotInsertTheResultIntoTheNewConversation() = runTest {
-        ChatViewModel.initializeTargetAsync("peer:fixture")
-        val target = ChatViewModel.target.value
-        assertTrue(ChatViewModel.sendMessage(target, content) { to, _ ->
-            ChatViewModel.initializeTargetAsync("peer:other")
-            ChatViewModel._itemsFlow.value = emptyList()
+        ChatViewModel.local.initializeTargetAsync("peer:fixture")
+        val target = ChatViewModel.local.target.value
+        assertTrue(ChatViewModel.local.sendMessage(target, content) { to, _ ->
+            ChatViewModel.local.initializeTargetAsync("peer:other")
+            ChatViewModel.local._itemsFlow.value = emptyList()
             sent(to)
         })
-        assertTrue(ChatViewModel.itemsFlow.value.isEmpty())
+        assertTrue(ChatViewModel.local.itemsFlow.value.isEmpty())
     }
 
     @Test
     fun deliveryFailureUsesTheCommittedMessageForRetry() = runTest {
-        ChatViewModel.initializeTargetAsync("peer:fixture")
-        assertFalse(ChatViewModel.sendMessage(ChatViewModel.target.value, content) { to, _ ->
+        ChatViewModel.local.initializeTargetAsync("peer:fixture")
+        assertFalse(ChatViewModel.local.sendMessage(ChatViewModel.local.target.value, content) { to, _ ->
             sent(to).copy(status = ChatStatus.FAILED)
         })
-        assertEquals("committed", ChatViewModel.itemsFlow.value.single().id)
-        assertEquals(ChatStatus.FAILED, ChatViewModel.itemsFlow.value.single().status)
+        assertEquals("committed", ChatViewModel.local.itemsFlow.value.single().id)
+        assertEquals(ChatStatus.FAILED, ChatViewModel.local.itemsFlow.value.single().status)
     }
 }

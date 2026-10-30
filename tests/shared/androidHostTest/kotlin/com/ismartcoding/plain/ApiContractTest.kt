@@ -9,8 +9,14 @@ class ApiContractTest {
     private val sdl: String = readMainSchema()
 
     @Test
+    fun activeHttpsCertificateFingerprintIsNullableAppMetadata() {
+        val app = Regex("type App \\{([\\s\\S]*?)\\}").find(sdl)?.groupValues?.get(1) ?: fail("App type missing")
+        assertEquals("String", Regex("tlsCertificateSha256: ([^\\s]+)").find(app)?.groupValues?.get(1))
+    }
+
+    @Test
     fun localManagementOperationsAreNotGraphqlRoots() {
-        for (name in listOf("systemPrefs", "systemSettings", "userSettings", "toggleNotificationApp", "cycleAudioPlayMode",
+        for (name in listOf("cacheRemoteFile", "systemPrefs", "systemSettings", "userSettings", "toggleNotificationApp", "cycleAudioPlayMode",
             "tlsCertificateSignature", "resetPassword", "resetUrlToken", "resetAdbToken",
             "setNotificationFilterMode", "clearNotificationFilterApps", "pairingCode", "isPairingRequestCurrent",
             "logoutPeer", "controlPeerStatus", "filePaths", "importNoteImage", "importPomodoroSound",
@@ -61,10 +67,10 @@ class ApiContractTest {
         val queries = operationFieldNamesIn("Query")
         val mutations = operationFieldNamesIn("Mutation")
         val subscriptions = operationFieldNamesIn("Subscription")
-        if (queries.size != 129 || mutations.size != 200 || subscriptions.size != 38) {
+        if (queries.size != 130 || mutations.size != 199 || subscriptions.size != 39) {
             fail(
                 "Shared Rust schema fragments declare ${queries.size} Query / ${mutations.size} " +
-                    "Mutation and ${subscriptions.size} Subscription operations — the contract has 129 / 200 / 38. The snapshot looks truncated or " +
+                    "Mutation and ${subscriptions.size} Subscription operations — the contract has 130 / 199 / 39. The snapshot looks truncated or " +
                     "drifted; every check in this class reads it, so they would pass on an empty file.",
             )
         }

@@ -1,5 +1,6 @@
 package com.ismartcoding.plain.ui.navigation
 
+import com.ismartcoding.plain.rust.graphql.ContentSource
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
@@ -25,67 +26,76 @@ import com.ismartcoding.plain.ui.shares.EditSharePage
 import com.ismartcoding.plain.ui.shares.browser.SharedFolderPage
 import com.ismartcoding.plain.ui.shares.send.ShareImagePage
 
+@androidx.compose.runtime.Composable
+private fun contentAudioQueue(local: AudioQueueViewModel): AudioQueueViewModel {
+    val source = LocalContentSource.current
+    return if (source is ContentSource.Local) local
+        else androidx.lifecycle.viewmodel.compose.viewModel(key = "file-audio-queue") { AudioQueueViewModel(source) }
+}
+
 internal fun NavGraphBuilder.addMainFilePages(
     navController: NavHostController,
     audioQueueVM: AudioQueueViewModel,
+    source: @androidx.compose.runtime.Composable () -> ContentSource? = { ContentSource.Local },
 ) {
-    composable<Routing.Docs> { DocsPage(navController, initialLoadGate = rememberNavLoadGate()) }
-    composable<Routing.Text> { backStackEntry ->
+    contentDestination<Routing.Docs>(source = source) { DocsPage(navController, initialLoadGate = rememberNavLoadGate()) }
+    contentDestination<Routing.Text>(source = source) { backStackEntry ->
         val r = backStackEntry.toRoute<Routing.Text>()
         TextPage(navController, r.title, r.content, r.language)
     }
-    composable<Routing.TextFile> { backStackEntry ->
+    contentDestination<Routing.TextFile>(source = source) { backStackEntry ->
         val r = backStackEntry.toRoute<Routing.TextFile>()
         TextFilePage(navController, r.path, r.title, r.mediaId, r.type)
     }
-    composable<Routing.ChatText> { backStackEntry ->
+    contentDestination<Routing.ChatText>(source = source) { backStackEntry ->
         val r = backStackEntry.toRoute<Routing.ChatText>()
         ChatTextPage(navController, r.content, onPrint = { tm, jobName, content ->
             printText(tm, jobName, content)
         })
     }
-    composable<Routing.ChatEditText> { backStackEntry ->
+    contentDestination<Routing.ChatEditText>(source = source) { backStackEntry ->
         val r = backStackEntry.toRoute<Routing.ChatEditText>()
+        val content = LocalContentSource.current
         ChatEditTextPage(navController, r.content, onSave = { text ->
             coIO {
-                val originalChat = ChatQueries.getChatItem(r.id) ?: return@coIO
-                updateChatMessageTextAsync(originalChat, text)
-                ChatViewModel.update(originalChat)
+                val originalChat = content.chats.getChatItem(r.id) ?: return@coIO
+                com.ismartcoding.plain.features.chat.ChatMessageEditor.updateTextAsync(originalChat, text, content.api)
+                if (content is ContentSource.Local) ChatViewModel.local.update(originalChat)
             }
         })
     }
-    composable<Routing.OtherFile> { backStackEntry ->
+    contentDestination<Routing.OtherFile>(source = source) { backStackEntry ->
         val r = backStackEntry.toRoute<Routing.OtherFile>()
         OtherFilePage(navController, r.path, r.title)
     }
-    composable<Routing.ZipFile> { backStackEntry ->
+    contentDestination<Routing.ZipFile>(source = source) { backStackEntry ->
         val r = backStackEntry.toRoute<Routing.ZipFile>()
-        ZipFilePage(navController, audioQueueVM, r.path, r.title)
+        ZipFilePage(navController, contentAudioQueue(audioQueueVM), r.path, r.title)
     }
-    composable<Routing.PdfViewer> { backStackEntry ->
+    contentDestination<Routing.PdfViewer>(source = source) { backStackEntry ->
         val r = backStackEntry.toRoute<Routing.PdfViewer>()
         PdfPage(navController, r.uri, r.fileName)
     }
-    composable<Routing.Files> { backStackEntry ->
+    contentDestination<Routing.Files>(source = source) { backStackEntry ->
         val r = backStackEntry.toRoute<Routing.Files>()
-        FilesPage(navController, audioQueueVM, r.folderPath)
+        FilesPage(navController, contentAudioQueue(audioQueueVM), r.folderPath)
     }
-    composable<Routing.AppFiles> {
-        AppFilesPage(navController, audioQueueVM)
+    contentDestination<Routing.AppFiles>(source = source) {
+        AppFilesPage(navController, contentAudioQueue(audioQueueVM))
     }
-    composable<Routing.EditShare> { backStackEntry ->
+    contentDestination<Routing.EditShare>(source = source) { backStackEntry ->
         val r = backStackEntry.toRoute<Routing.EditShare>()
         EditSharePage(navController, r.id)
     }
-    composable<Routing.SharedFolder> { backStackEntry ->
+    contentDestination<Routing.SharedFolder>(source = source) { backStackEntry ->
         val r = backStackEntry.toRoute<Routing.SharedFolder>()
         SharedFolderPage(navController, r.messageId)
     }
-    composable<Routing.PlayMedia> { backStackEntry ->
+    contentDestination<Routing.PlayMedia>(source = source) { backStackEntry ->
         val r = backStackEntry.toRoute<Routing.PlayMedia>()
-        PlayMediaPage(navController, r.path, audioQueueVM)
+        PlayMediaPage(navController, r.path, contentAudioQueue(audioQueueVM))
     }
-    composable<Routing.ShareImage> { backStackEntry ->
+    contentDestination<Routing.ShareImage>(source = source) { backStackEntry ->
         val r = backStackEntry.toRoute<Routing.ShareImage>()
         ShareImagePage(navController, r.path, r.name)
     }

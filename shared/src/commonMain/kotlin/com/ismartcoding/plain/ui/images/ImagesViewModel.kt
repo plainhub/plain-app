@@ -1,5 +1,6 @@
 package com.ismartcoding.plain.ui.images
 
+import com.ismartcoding.plain.rust.graphql.ContentSource
 import com.ismartcoding.plain.ui.tags.TagsViewModel
 import com.ismartcoding.plain.ui.media.BaseMediaViewModel
 
@@ -12,7 +13,7 @@ import com.ismartcoding.plain.platform.system.DataType
 import com.ismartcoding.plain.features.images.search.RustImageModels
 import com.ismartcoding.plain.features.images.search.ImageSearchStatusType
 
-class ImagesViewModel : BaseMediaViewModel<MediaImage>() {
+class ImagesViewModel internal constructor(source: ContentSource = ContentSource.Local) : BaseMediaViewModel<MediaImage>(source) {
     override val dataType = DataType.IMAGE
     val scrollStateMap = mutableStateMapOf<Int, LazyGridState>()
     val useAiSearch = mutableStateOf(false)

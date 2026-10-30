@@ -75,6 +75,7 @@ fun FileListItem(
     itemState: TransformItemState, previewerState: MediaPreviewerState,
     onClick: () -> Unit, onLongClick: () -> Unit, audioQueueVM: AudioQueueViewModel,
 ) {
+    val source = com.ismartcoding.plain.ui.navigation.LocalContentSource.current
     val scope = rememberCoroutineScope()
     val density = LocalDensity.current
     val isAudio = file.path.isAudioFast()
@@ -87,7 +88,7 @@ fun FileListItem(
     LaunchedEffect(isCurrentlyPlaying) {
         if (isCurrentlyPlaying && isAudio) {
             scope.launch { withIO {
-                val audio = MediaClient.audioInfo(file.path)
+                val audio = source.media.audioInfo(file.path)
                 durationMs = audio.durationMs.toFloat()
             } }
         }
@@ -147,6 +148,7 @@ fun FileListItem(
 private fun FileListItemThumbnail(
     file: FileEntry, itemState: TransformItemState, previewerState: MediaPreviewerState, density: Density,
 ) {
+    val source = com.ismartcoding.plain.ui.navigation.LocalContentSource.current
     val isMedia = file.path.isImageFast() || file.path.isVideoFast()
     val isZipEntry = ZipBrowserHelper.isZipPath(file.path)
 
@@ -155,7 +157,7 @@ private fun FileListItemThumbnail(
     var zipCachedPath by remember(file.path) { mutableStateOf<String?>(null) }
     if (isMedia && isZipEntry) {
         LaunchedEffect(file.path) {
-            zipCachedPath = withIO { FilesClient.cacheZipEntry(file.path) }
+            zipCachedPath = withIO { source.files.cacheZipEntry(file.path) }
         }
     }
 

@@ -1,7 +1,7 @@
 package com.ismartcoding.plain.ui.files
 
-import com.ismartcoding.plain.features.files.FilesClient
 
+import com.ismartcoding.plain.ui.state.launchSafe
 import com.ismartcoding.plain.i18n.*
 
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
@@ -44,7 +44,7 @@ fun FilesSelectModeBottomActions(
         FileRenameDialog(
             path = file.path,
             onDismiss = { showRenameDialog.value = false },
-            onRename = { p, name -> FilesClient.rename(p, name) },
+            onRename = { p, name -> filesVM.source.files.rename(p, name) },
             onRenamed = { newPath ->
                 val oldPath = file.path
                 file.name = newPath.substringAfterLast("/")
@@ -69,7 +69,8 @@ fun FilesSelectModeBottomActions(
                 performCopyFiles(filesVM, selectedFiles, onShowPasteBar) { filesVM.exitSelectMode() }
             }
             IconTextSmallButtonShare {
-                shareFiles(filesVM.selectedIds.toList())
+                val paths = filesVM.selectedIds.toList()
+                scope.launchSafe { shareFiles(paths.map { filesVM.source.fileForOpen(it) }) }
             }
             IconTextSmallButtonShareLink {
                 filesVM.sharePaths.clear()
@@ -87,7 +88,7 @@ fun FilesSelectModeBottomActions(
                                 DialogHelper.showLoading()
                                 try {
                                     withIO {
-                                        FilesClient.deleteMany(paths.toList())
+                                        filesVM.source.files.deleteMany(paths.toList())
                                     }
                                 } catch (cancelled: CancellationException) { throw cancelled }
                                 catch (error: Exception) { DialogHelper.showMessage(error) }
@@ -112,7 +113,7 @@ fun FilesSelectModeBottomActions(
                         val file = selectedFiles[0]
                         val destPath = file.path.removeSuffix(".zip")
                         val success = withIO {
-                            FilesClient.extractZipArchive(file.path, destPath)
+                            filesVM.source.files.extractZipArchive(file.path, destPath)
                         }
                         if (success) {
                             withIO {

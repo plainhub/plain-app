@@ -1,6 +1,6 @@
 package com.ismartcoding.plain.ui.files
 
-import com.ismartcoding.plain.features.media.MediaCatalogClient
+import com.ismartcoding.plain.rust.graphql.ContentSource
 import com.ismartcoding.plain.models.MediaBucket
 import com.ismartcoding.plain.i18n.*
 import androidx.compose.runtime.mutableIntStateOf
@@ -20,7 +20,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 
-class MediaFoldersViewModel : ViewModel() {
+class MediaFoldersViewModel internal constructor(val source: ContentSource = ContentSource.Local) : ViewModel() {
     private val _itemsFlow = MutableStateFlow<List<MediaBucket>>(emptyList())
     val itemsFlow: StateFlow<List<MediaBucket>> = _itemsFlow.asStateFlow()
     val totalBucket = mutableStateOf<MediaBucket?>(null)
@@ -36,8 +36,8 @@ class MediaFoldersViewModel : ViewModel() {
 
     suspend fun loadAsync() = withIO {
         val startTime = TimeHelper.nowMillis()
-        _itemsFlow.value = MediaCatalogClient.buckets(dataType.value)
-        trashCount.intValue = MediaCatalogClient.count(dataType.value, "trash:true")
+        _itemsFlow.value = source.catalog.buckets(dataType.value)
+        trashCount.intValue = source.catalog.count(dataType.value, "trash:true")
 
         var totalValue = 0
         var sizeValue = 0L
@@ -50,7 +50,7 @@ class MediaFoldersViewModel : ViewModel() {
 
             if (subItems.size < 4) {
                 // Add the first item from each folder's topItems if available
-                val validTopItems = bucket.topItemPaths.filter { fileExists(it) }
+                val validTopItems = bucket.topItemPaths.filter { source is ContentSource.Remote || fileExists(it) }
                 if (validTopItems.isNotEmpty()) {
                     subItems.add(validTopItems.first())
                 }
@@ -61,7 +61,7 @@ class MediaFoldersViewModel : ViewModel() {
         // take additional items from the first folder that has multiple items
         if (subItems.size < 4 && _itemsFlow.value.isNotEmpty()) {
             for (bucket in _itemsFlow.value) {
-                val validTopItems = bucket.topItemPaths.filter { fileExists(it) }
+                val validTopItems = bucket.topItemPaths.filter { source is ContentSource.Remote || fileExists(it) }
                 if (validTopItems.size > 1) {
                     // Start from the second item (index 1) since we've already added the first one
                     for (i in 1 until validTopItems.size) {
@@ -94,7 +94,7 @@ class MediaFoldersViewModel : ViewModel() {
      */
     suspend fun preValidateFilesAsync() = withIO {
         _itemsFlow.value.forEach { bucket ->
-            val toRemove = bucket.topItemPaths.filter { !fileExists(it) }
+            val toRemove = bucket.topItemPaths.filter { source is ContentSource.Local && !fileExists(it) }
             bucket.topItemPaths = bucket.topItemPaths.filterNot { it in toRemove }
         }
     }

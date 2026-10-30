@@ -127,6 +127,7 @@ private fun EntryList(
         items(state.entries, key = { it.virtualPath }) { entry ->
             EntryRow(
                 entry = entry,
+                source = state.source,
                 link = link,
                 urlToken = state.rootInfo?.urlToken ?: "",
                 selectMode = state.selectMode,

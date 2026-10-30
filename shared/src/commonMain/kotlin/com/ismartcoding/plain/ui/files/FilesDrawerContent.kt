@@ -26,8 +26,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.ismartcoding.plain.features.files.FilesType
-import com.ismartcoding.plain.features.files.FavoriteFoldersClient
-import com.ismartcoding.plain.features.shares.SharesClient
 import com.ismartcoding.plain.models.ShareRecord
 import com.ismartcoding.plain.i18n.*
 import com.ismartcoding.plain.ui.base.PDropdownMenu
@@ -75,7 +73,7 @@ fun FilesDrawerContent(
     val usbStorageText = stringResource(Res.string.usb_storage)
     val fileTransferAssistantText = stringResource(Res.string.app_data)
     val scope = rememberCoroutineScope()
-    val favoriteFolders by FavoriteFoldersClient.items.collectAsState()
+    val favoriteFolders by filesVM.source.favorites.items.collectAsState()
     val options = remember { mutableStateListOf<FolderOption>() }
     var shares by remember { mutableStateOf<List<ShareRecord>>(emptyList()) }
     var contextMenuPath by remember { mutableStateOf<String?>(null) }
@@ -87,7 +85,7 @@ fun FilesDrawerContent(
 
     val removeFavorite: (String) -> Unit = { fullPath ->
         scope.launchSafe {
-            FavoriteFoldersClient.remove(fullPath)
+            filesVM.source.favorites.remove(fullPath)
             filesVM.favoriteFoldersVersion.value++
         }
     }
@@ -105,7 +103,7 @@ fun FilesDrawerContent(
     // (created via dialog, edited on the EditShare page, or deleted here).
     LaunchedEffect(filesVM.sharesVersion.intValue, drawerState.targetValue) {
         if (drawerState.targetValue == DrawerValue.Open) {
-            shares = SharesClient.listShares()
+            shares = filesVM.source.shares.listShares()
         }
     }
 
@@ -202,7 +200,7 @@ fun FilesDrawerContent(
                                     Res.string.confirm_to_delete,
                                     callback = {
                                         scope.launch {
-                                            SharesClient.deleteShare(share.id)
+                                            filesVM.source.shares.deleteShare(share.id)
                                             filesVM.sharesVersion.value++
                                         }
                                     },
@@ -226,7 +224,7 @@ fun FilesDrawerContent(
             onDismissRequest = { renameFavorite = null },
             onConfirm = { name ->
                 scope.launchSafe {
-                    FavoriteFoldersClient.rename(favorite.fullPath, name)
+                    filesVM.source.favorites.rename(favorite.fullPath, name)
                     filesVM.favoriteFoldersVersion.value++
                 }
                 renameFavorite = null

@@ -16,7 +16,15 @@ internal fun MediaPermissionEffects(
     hasPermission: MutableState<Boolean>,
     initialLoadGate: NavLoadGate?,
     reload: () -> Unit,
+    source: com.ismartcoding.plain.rust.graphql.ContentSource = com.ismartcoding.plain.ui.navigation.LocalContentSource.current,
 ) {
+    if (source is com.ismartcoding.plain.rust.graphql.ContentSource.Remote) {
+        com.ismartcoding.plain.ui.permissions.RemotePermissionEffects(source, com.ismartcoding.plain.platform.permissions.Permission.WRITE_EXTERNAL_STORAGE, hasPermission) {
+            initialLoadGate?.await()
+            reload()
+        }
+        return
+    }
     LaunchedEffect(Unit) {
         hasPermission.value = AppFeatureType.FILES.hasPermission()
         if (hasPermission.value) {

@@ -34,6 +34,7 @@ import com.ismartcoding.plain.ui.media.viewer.previewer.TransformImageViewWithUr
 import com.ismartcoding.plain.ui.media.viewer.previewer.MediaPreviewerState
 import com.ismartcoding.plain.ui.media.viewer.previewer.rememberTransformItemState
 import com.ismartcoding.plain.ui.media.MediaPreviewData
+import com.ismartcoding.plain.ui.resources.image as ui_drawable_image
 import com.ismartcoding.plain.ui.chat.VChat
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.launch
@@ -49,6 +50,8 @@ internal fun ChatImageItem(
     previewerState: MediaPreviewerState,
     downloadTask: DownloadTask?,
 ) {
+    val source = com.ismartcoding.plain.ui.navigation.LocalContentSource.current
+    val downloads = com.ismartcoding.plain.ui.chat.LocalChatDownloads.current
     val itemState = rememberTransformItemState()
     val isRemoteFile = item.isRemoteFile()
     val taskActive = downloadTask?.isActive() == true
@@ -57,8 +60,11 @@ internal fun ChatImageItem(
     val downloadProgress = downloadTask?.let {
         if (it.messageFile.size > 0) it.downloadedSize.toFloat() / it.messageFile.size.toFloat() else 0f
     } ?: 0f
-    val previewPath by produceState("", item.uri, peer?.id, peer?.address, peer?.ip, peer?.port, peer?.key, peer?.publicKey, peer?.status) {
-        value = try { item.getPreviewPath(peer) }
+    val previewPath by produceState("", source, item.uri, peer?.id, peer?.address, peer?.ip, peer?.port, peer?.key, peer?.publicKey, peer?.status) {
+        value = try {
+            if (source is com.ismartcoding.plain.rust.graphql.ContentSource.Remote) { if (item.isRemoteFile()) "" else item.uri }
+            else item.getPreviewPath(peer)
+        }
         catch (cancelled: CancellationException) { throw cancelled }
         catch (_: Exception) { "" }
     }
@@ -66,7 +72,7 @@ internal fun ChatImageItem(
 
     LaunchedEffect(item.uri) {
         if (isRemoteFile && downloadTask == null && peer != null) {
-            DownloadQueue.addDownloadTask(item, peer, messageId)
+            downloads.addDownloadTask(item, peer, messageId)
         }
     }
 
@@ -76,11 +82,12 @@ internal fun ChatImageItem(
             // while a download is actively in flight (pending/downloading).
             if (isDownloading) return@clickable
             if (isFailed) {
-                DownloadQueue.retryDownload(item.id)
+                downloads.retryDownload(item.id)
                 return@clickable
             }
+            if (source is com.ismartcoding.plain.rust.graphql.ContentSource.Remote && item.isRemoteFile()) return@clickable
             scope.launch {
-                withIO { MediaPreviewData.setDataAsync(itemState, items.reversed(), item) }
+                withIO { MediaPreviewData.setDataAsync(itemState, items.reversed(), item, source) }
                 previewerState.openTransform(
                     index = MediaPreviewData.items.indexOfFirst { it.id == item.id },
                     itemState = itemState,
@@ -88,7 +95,7 @@ internal fun ChatImageItem(
             }
         },
     ) {
-        TransformImageViewWithUri(
+        if (previewPath.isNotEmpty()) TransformImageViewWithUri(
             modifier = Modifier.size(imageWidthDp).clip(RoundedCornerShape(6.dp)),
             path = previewPath,
             fileName = item.fileName,
@@ -97,7 +104,13 @@ internal fun ChatImageItem(
             previewerState = previewerState,
             widthPx = imageWidthPx,
             forceVideoDecoder = item.fileName.isVideoFast() && !item.isRemoteFile(),
-        )
+        ) else Box(Modifier.size(imageWidthDp)) {
+            androidx.compose.material3.Icon(
+                painter = org.jetbrains.compose.resources.painterResource(com.ismartcoding.plain.ui.resources.Res.drawable.ui_drawable_image),
+                contentDescription = item.fileName,
+                modifier = Modifier.align(Alignment.Center),
+            )
+        }
 
         if (taskActive) {
             DownloadProgressOverlay(

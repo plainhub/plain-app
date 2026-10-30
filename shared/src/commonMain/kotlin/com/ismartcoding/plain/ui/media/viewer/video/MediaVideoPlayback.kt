@@ -39,7 +39,7 @@ internal fun rememberMediaVideoController(
         val id = mediaId
         val positionMs = controller.currentPositionMs
         if (id.isEmpty() || positionMs < 0) return
-        MediaPlayHistoryClient.saveProgress(id, DataType.VIDEO, positionMs)
+        model.source.history.saveProgress(id, DataType.VIDEO, positionMs)
     }
 
     controller.setEventListener { event ->
@@ -50,7 +50,7 @@ internal fun rememberMediaVideoController(
                 val id = mediaId
                 val positionMs = controller.currentPositionMs
                 if (event.isPlaying && !playRecorded && id.isNotEmpty() && positionMs >= 0) {
-                    MediaPlayHistoryClient.recordPlay(id, DataType.VIDEO, positionMs)
+                    model.source.history.recordPlay(id, DataType.VIDEO, positionMs)
                     playRecorded = true
                 }
                 videoState.isPlaying = event.isPlaying
@@ -79,9 +79,9 @@ internal fun rememberMediaVideoController(
                 return@launchSafe
             }
             if (isActive) {
-                if (mediaId.isEmpty()) mediaId = getVideoMediaId(model.path).orEmpty()
+                if (mediaId.isEmpty() && model.source is com.ismartcoding.plain.rust.graphql.ContentSource.Local) mediaId = getVideoMediaId(model.path).orEmpty()
                 val savedPos = if (mediaId.isNotEmpty()) {
-                    MediaPlayHistoryClient.find(mediaId, DataType.VIDEO, Clock.System.now() - 30.days)?.positionMs
+                    model.source.history.find(mediaId, DataType.VIDEO, Clock.System.now() - 30.days)?.positionMs
                 } else null
                 if (!videoState.isPreviewerOpen || pagerState.settledPage != page) return@launchSafe
                 videoState.initData(controller)
@@ -90,20 +90,20 @@ internal fun rememberMediaVideoController(
                 val atEnd = savedPos != null && savedPos > 0 && expectedTotalMs > 0 && savedPos >= expectedTotalMs - 1000
                 val positionMs = if (savedPos != null && savedPos > 0 && !atEnd) savedPos else 0L
                 videoState.currentTime = positionMs
-                if (preparedPath != model.path) {
-                    controller.setMediaItem(model.path)
+                if (preparedPath != model.resourcePath) {
+                    controller.setMediaItem(model.resourcePath, model.tlsCertificateSha256)
                     controller.prepare()
-                    preparedPath = model.path
+                    preparedPath = model.resourcePath
                 }
                 controller.seekTo(positionMs)
                 controller.requestAudioFocus()
                 wasActive = true
                 controller.play()
             } else if (abs(page - pagerState.settledPage) <= 1) {
-                if (preparedPath != model.path) {
-                    controller.setMediaItem(model.path)
+                if (preparedPath != model.resourcePath) {
+                    controller.setMediaItem(model.resourcePath, model.tlsCertificateSha256)
                     controller.prepare()
-                    preparedPath = model.path
+                    preparedPath = model.resourcePath
                 }
                 controller.pause()
                 controller.abandonAudioFocus()

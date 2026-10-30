@@ -16,6 +16,7 @@ import com.ismartcoding.plain.ui.base.PTextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -31,12 +32,27 @@ import com.ismartcoding.plain.ui.platform.media.PickImageEffect
 import com.ismartcoding.plain.ui.base.PFilledButton
 import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.theme.dialogSheetBackground
+import com.ismartcoding.plain.rust.graphql.ContentSource
+import com.ismartcoding.plain.ui.navigation.LocalContentSource
+import com.ismartcoding.plain.platform.permissions.Permission
+import com.ismartcoding.plain.ui.permissions.RemotePermissionEffects
+import com.ismartcoding.plain.ui.state.launchSafe
+import com.ismartcoding.plain.graphql.Mutation
+import com.ismartcoding.plain.ui.web.accessFeatureOf
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class, ExperimentalFoundationApi::class)
 @Composable
 fun MdEditorInsertImageDialog(
     mdEditorVM: MdEditorViewModel,
 ) {
+    val source = LocalContentSource.current
+    val scope = rememberCoroutineScope()
+    val permission = Permission.WRITE_EXTERNAL_STORAGE
+    val canUpload = remember(source) { mutableStateOf(when (source) {
+        ContentSource.Local -> true
+        is ContentSource.Remote -> permission in source.client.currentInfo.permissions
+    }) }
+    if (source is ContentSource.Remote) RemotePermissionEffects(source, permission, canUpload)
     val imageUrlState = remember { mutableStateOf("") }
     var imageUrl by imageUrlState
     var description by remember { mutableStateOf("") }
@@ -89,10 +105,12 @@ fun MdEditorInsertImageDialog(
                         }
                     )
                     PFilledButton(
-                        text = stringResource(Res.string.browse),
+                        text = stringResource(if (canUpload.value) Res.string.browse else Res.string.request_permission),
                         buttonSize = ButtonSize.MEDIUM,
                         onClick = {
-                            sendEvent(PickFileEvent(PickFileTag.EDITOR, PickFileType.IMAGE, multiple = false))
+                            if (source is ContentSource.Remote && !canUpload.value) {
+                                scope.launchSafe { source.api.execute(Mutation.openWebSettings(permission.accessFeatureOf())) }
+                            } else sendEvent(PickFileEvent(PickFileTag.EDITOR, PickFileType.IMAGE, multiple = false))
                         },
                         modifier = Modifier
                             .padding(start = 8.dp)

@@ -10,7 +10,9 @@ import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.Serializable
 
-object FeedWorkerState {
+object FeedWorkerState : FeedSyncStateStore(com.ismartcoding.plain.features.feeds.FeedsClient)
+
+open class FeedSyncStateStore internal constructor(private val client: com.ismartcoding.plain.features.feeds.FeedsApi) {
     private val lock = Mutex()
     private val states = mutableStateMapOf<String, FeedSyncState>()
 
@@ -20,7 +22,7 @@ object FeedWorkerState {
         it.status in setOf(FeedWorkerStatus.COMPLETED, FeedWorkerStatus.ERROR, FeedWorkerStatus.CANCELLED)
     }
 
-    suspend fun refresh() = lock.withLock { applyLocked(FeedsClient.syncStates(), replace = true) }
+    suspend fun refresh() = lock.withLock { applyLocked(client.syncStates(), replace = true) }
     internal suspend fun apply(update: FeedSyncUpdate) = lock.withLock {
         withContext(Dispatchers.Main) { update.removed.forEach(states::remove) }
         applyLocked(update.states, replace = update.replace)

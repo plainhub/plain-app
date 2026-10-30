@@ -114,10 +114,10 @@ internal actual object RustNativeBindings {
     actual fun decryptHttpResponse(token: String, endpoint: String, request: String, response: String): String = memScoped {
         readString(plain_decrypt_http_response(token.cstr.ptr, endpoint.cstr.ptr, request.cstr.ptr, response.cstr.ptr))
     }
-    actual fun graphqlSubscriptionOpen(): Long {
-        val reply = JsonHelper.jsonDecode<NativeSubscriptionReply>(readString(plain_graphql_subscription_open()))
+    actual fun graphqlSubscriptionOpen(target: String?): Long = memScoped {
+        val reply = JsonHelper.jsonDecode<NativeSubscriptionReply>(readString(plain_graphql_subscription_open(target?.cstr?.ptr)))
         reply.error?.let { error(it) }
-        return requireNotNull(reply.handle) { "Subscription handle missing" }
+        requireNotNull(reply.handle) { "Subscription handle missing" }
     }
     actual fun graphqlSubscriptionSend(handle: Long, message: String) = memScoped {
         val error = readString(plain_graphql_subscription_send(handle.toULong(), message.cstr.ptr))

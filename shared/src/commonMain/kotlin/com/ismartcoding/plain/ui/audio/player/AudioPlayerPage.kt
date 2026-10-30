@@ -66,8 +66,8 @@ fun AudioPlayerPage(audioQueueVM: AudioQueueViewModel, onDismissRequest: () -> U
     val scope = rememberCoroutineScope()
     var progress by remember { mutableFloatStateOf(0f) }
     val isPlaying by audioIsPlayingFlow().collectAsState()
-    val playMode by Prefs.audioPlayMode.collectAsState()
-    val playbackSpeed by Prefs.audioPlaybackSpeed.collectAsState()
+    val playMode = if (audioQueueVM.source is com.ismartcoding.plain.rust.graphql.ContentSource.Local) Prefs.audioPlayMode.collectAsState().value else audioQueueVM.playMode.value
+    val playbackSpeed = if (audioQueueVM.source is com.ismartcoding.plain.rust.graphql.ContentSource.Local) Prefs.audioPlaybackSpeed.collectAsState().value else audioQueueVM.playbackSpeed.floatValue
     var showQueue by remember { mutableStateOf(false) }
     var showSleepTimer by remember { mutableStateOf(false) }
     var isDragging by remember { mutableStateOf(false) }
@@ -80,7 +80,7 @@ fun AudioPlayerPage(audioQueueVM: AudioQueueViewModel, onDismissRequest: () -> U
         fallbackItem = null
         if (!isDragging) progress = audioPlayerProgress().toFloat()
         if (currentPlayingPath.value.isNotEmpty() && audioQueueVM.queueItems.value.none { if (it.mediaId != null) it.mediaId == audioQueueVM.selectedMediaId.value else it.path == currentPlayingPath.value }) {
-            fallbackItem = withIO { MediaClient.audioInfo(currentPlayingPath.value) }.copy(mediaId = audioQueueVM.selectedMediaId.value)
+            fallbackItem = withIO { audioQueueVM.source.media.audioInfo(currentPlayingPath.value) }.copy(mediaId = audioQueueVM.selectedMediaId.value)
         }
     }
     val pages = if (fallbackItem != null) listOfNotNull(fallbackItem) else audioQueueVM.queueItems.value
@@ -93,7 +93,7 @@ fun AudioPlayerPage(audioQueueVM: AudioQueueViewModel, onDismissRequest: () -> U
         snapshotFlow { pagerState.settledPage }.drop(1).collect { page ->
             val item = pages.getOrNull(page) ?: return@collect
             if (currentPlayingPath.value.isNotEmpty() && (if (item.mediaId != null) item.mediaId != audioQueueVM.selectedMediaId.value else item.path != currentPlayingPath.value)) {
-                audioJustPlayWithNotificationCheck(item)
+                audioJustPlayWithNotificationCheck(item, audioQueueVM.source)
             }
         }
     }

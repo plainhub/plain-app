@@ -17,7 +17,7 @@ import com.ismartcoding.plain.ui.files.MediaFoldersViewModel
 import com.ismartcoding.plain.ui.tags.TagsViewModel
 import com.ismartcoding.plain.ui.navigation.NavLoadGate
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
+import com.ismartcoding.plain.ui.state.launchSafe
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -31,7 +31,7 @@ internal fun DocsPageEffects(
     val scope = rememberCoroutineScope()
     val sharedFlow = Channel.sharedFlow
     val reloadAfterGrant: () -> Unit = {
-        scope.launch(Dispatchers.Default) {
+        scope.launchSafe(onDone = { docsVM.showLoading.value = false }) {
             docsVM.sortBy.value = Prefs.docSortBy.value
             tagsVM.loadAsync()
             mediaFoldersVM.loadAsync()
@@ -39,23 +39,9 @@ internal fun DocsPageEffects(
         }
     }
 
-    LaunchedEffect(Unit) {
-        docsVM.hasPermission.value = AppFeatureType.FILES.hasPermission()
-        if (docsVM.hasPermission.value) {
-            initialLoadGate?.await()
-            reloadAfterGrant()
-        }
-    }
-
-    StoragePermissionResumeEffect(docsVM.hasPermission, reloadAfterGrant)
-
-    LaunchedEffect(sharedFlow) {
-        sharedFlow.collect { event ->
-            if (event is PermissionsResultEvent) {
-                refreshStoragePermission(docsVM.hasPermission, reloadAfterGrant)
-            }
-        }
-    }
+    com.ismartcoding.plain.ui.media.MediaPermissionEffects(
+        docsVM.hasPermission, initialLoadGate, reloadAfterGrant, docsVM.source,
+    )
 
     LaunchedEffect(docsState.dragSelectState.selectMode, !isGestureInteractionMode()) {
         if (docsState.dragSelectState.selectMode || !isGestureInteractionMode()) {

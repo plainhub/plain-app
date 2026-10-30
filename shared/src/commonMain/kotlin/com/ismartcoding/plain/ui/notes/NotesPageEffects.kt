@@ -22,18 +22,19 @@ internal fun NotesPageEffects(
     scrollBehavior: TopAppBarScrollBehavior,
     scrollState: LazyListState,
     scope: CoroutineScope, isFirstTime: MutableState<Boolean>,
+    notesVM: NotesViewModel = NotesViewModel.local,
 ) {
     LaunchedEffect(Unit) {
-        scope.launch(Dispatchers.IO) { NotesViewModel.loadAsync(tagsVM) }
+        scope.launch(Dispatchers.IO) { notesVM.loadAsync(tagsVM) }
     }
 
-    LaunchedEffect(NotesViewModel.selectMode.value) {
-        if (NotesViewModel.selectMode.value) scrollBehavior.reset()
+    LaunchedEffect(notesVM.selectMode.value) {
+        if (notesVM.selectMode.value) scrollBehavior.reset()
     }
 
-    LaunchedEffect(NotesViewModel.trash.value, NotesViewModel.tag.value) {
+    LaunchedEffect(notesVM.trash.value, notesVM.tag.value) {
         if (isFirstTime.value) { isFirstTime.value = false; return@LaunchedEffect }
         scope.launch { scrollBehavior.reset(); scrollState.scrollToItem(0) }
-        scope.launch(Dispatchers.IO) { NotesViewModel.loadAsync(tagsVM) }
+        scope.launch(Dispatchers.IO) { notesVM.loadAsync(tagsVM) }
     }
 }

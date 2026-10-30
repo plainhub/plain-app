@@ -1,6 +1,5 @@
 package com.ismartcoding.plain.ui.audio.components
 
-import com.ismartcoding.plain.features.files.FilesClient
 
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -52,7 +51,7 @@ fun ViewAudioBottomSheet(
     if (audioVM.showRenameDialog.value) {
         FileRenameDialog(path = m.path, onDismiss = {
             audioVM.showRenameDialog.value = false
-        }, onRename = { p, name -> FilesClient.rename(p, name) }, onRenamed = {
+        }, onRename = { p, name -> audioVM.source.files.rename(p, name) }, onRenamed = {
             audioVM.loadAsync(tagsVM)
             onDismiss()
         })

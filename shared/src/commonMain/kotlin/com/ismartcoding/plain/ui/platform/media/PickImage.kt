@@ -15,13 +15,17 @@ import kotlinx.coroutines.CancellationException
 
 @Composable
 fun PickImageEffect(imageUrl: MutableState<String>) {
-    LaunchedEffect(Channel.sharedFlow) {
+    val contentSource = com.ismartcoding.plain.ui.navigation.LocalContentSource.current
+    LaunchedEffect(Channel.sharedFlow, contentSource) {
         Channel.sharedFlow.collect { event ->
             if (event is PickFileResultEvent && event.tag == PickFileTag.EDITOR) {
                 val source = event.uris.firstOrNull() ?: return@collect
                 try {
                     val info = checkNotNull(queryPickedFileInfo(source)) { "Unable to read selected image" }
-                    imageUrl.value = RustNativeApi.importNoteImage(source, info.displayName)
+                    imageUrl.value = when (contentSource) {
+                        com.ismartcoding.plain.rust.graphql.ContentSource.Local -> RustNativeApi.importNoteImage(source, info.displayName)
+                        is com.ismartcoding.plain.rust.graphql.ContentSource.Remote -> contentSource.client.importNoteImage(source, info.mimeType)
+                    }
                 } catch (error: CancellationException) {
                     throw error
                 } catch (error: Exception) {

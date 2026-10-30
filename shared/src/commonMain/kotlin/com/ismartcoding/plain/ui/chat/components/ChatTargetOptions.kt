@@ -5,6 +5,15 @@ import com.ismartcoding.plain.ui.chat.joinedMembers
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
+import com.ismartcoding.plain.rust.graphql.ContentSource
+import com.ismartcoding.plain.rust.graphql.GraphqlOperation
+import com.ismartcoding.plain.rust.graphql.SubscriptionUpdate
+import com.ismartcoding.plain.ui.components.DialogHelper
+import com.ismartcoding.plain.i18n.load_failed
+import com.ismartcoding.plain.lib.logcat.LogCat
+import kotlinx.coroutines.flow.transform
+import kotlinx.coroutines.flow.catch
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -38,8 +47,32 @@ data class ChatTargetOption(
 
 @Composable
 fun chatTargetOptions(): List<ChatTargetOption> {
-    val peerVM: PeerViewModel = viewModel(key = "chatTargetPeers") { PeerViewModel() }
-    val channelVM: ChannelViewModel = viewModel(key = "chatTargetChannels") { ChannelViewModel() }
+    val source = com.ismartcoding.plain.ui.navigation.LocalContentSource.current
+    val changes = remember(source) {
+        if (source is ContentSource.Remote) {
+            val fields = listOf("contentChanged", "messagesCreated { id }", "messagesUpdated { id }", "messagesDeleted", "peersChanged", "channelsChanged { changed }")
+            source.client.subscriptionUpdates(fields.map { GraphqlOperation("subscription { $it }") }).transform { update ->
+                when (update) {
+                    is SubscriptionUpdate.Failed -> throw update.error
+                    else -> emit(Unit)
+                }
+            }.catch {
+                LogCat.e("Chat destination updates", it)
+                DialogHelper.showMessage(Res.string.load_failed)
+            }
+        } else null
+    }
+    val peerVM: PeerViewModel = viewModel(key = "chatTargetPeers:${source.key}") {
+        PeerViewModel(
+            readPeers = { source.api.execute(com.ismartcoding.plain.graphql.Query.peerSummaries()) },
+            readLatestChats = { source.api.execute(com.ismartcoding.plain.graphql.Query.chatConversations()).associate { it.id to it.chat } },
+            sourceChanges = changes,
+            api = source.api,
+        )
+    }
+    val channelVM: ChannelViewModel = viewModel(key = "chatTargetChannels:${source.key}") {
+        ChannelViewModel(api = source.api, sourceChanges = peerVM.sourceUpdates)
+    }
     val peers = peerVM.peerList.collectAsStateValue()
     val latestChats by peerVM.latestChats.collectAsState()
     LaunchedEffect(peerVM) { peerVM.observe() }

@@ -60,7 +60,7 @@ class PlayAudioQueueOrderGuardTest {
         val body = functionBody(source(vmPath), "playAsync")
             ?: fail("playAsync not found in $vmPath")
         assertTrue(
-            "audioJustPlay(" in body,
+            "AudioCommands.play(" in body,
             "queue-tap playAsync must start playback",
         )
         assertTrue(
@@ -75,9 +75,11 @@ class PlayAudioQueueOrderGuardTest {
         val combiner = functionBody(vm, "enqueueAndPlayAsync")
             ?: fail("enqueueAndPlayAsync not found in $vmPath")
         assertTrue(
-            "AudioQueueClient.enqueue(" in combiner && "audioJustPlay(" in combiner,
+            "enqueue = true" in combiner && "AudioCommands.play(" in combiner,
             "enqueueAndPlayAsync is the sanctioned enqueue+play combiner for tracks outside the queue",
         )
+        val commands = source("shared/src/commonMain/kotlin/com/ismartcoding/plain/features/audio/AudioCommands.kt")
+        assertTrue("if (enqueue) source.queue.enqueue(listOf(audio))" in commands, "Native playback retains enqueue before the native play command")
         val search = source(searchPath)
         assertTrue(
             "enqueueAndPlayAsync(" in search && ".playAsync(" !in search,

@@ -37,7 +37,7 @@ internal fun FeedEntriesPageEffects(
             feedEntriesVM.feedId.value = feedId
         }
         feedsVM.loadAsync(withCount = true)
-        scope.launchSafe { FeedWorkerState.refresh() }
+        scope.launchSafe { feedsVM.syncState.refresh() }
         scope.launch(Dispatchers.IO) { feedEntriesVM.loadAsync(tagsVM) }
     }
 
@@ -47,9 +47,18 @@ internal fun FeedEntriesPageEffects(
             feedsVM.refreshSelectedItemAsync()
             scope.launch(Dispatchers.IO) { feedEntriesVM.loadAsync(tagsVM) }
         }
-        launch { AppSubscriptions.contentChanged.changes().collect { refreshEntries() } }
-        val observed = FeedWorkerState.completed().mapValues { it.value.revision }.toMutableMap()
-        snapshotFlow { FeedWorkerState.completed() }.collect { completed ->
+        if (feedsVM.source is com.ismartcoding.plain.rust.graphql.ContentSource.Local) {
+            launch { AppSubscriptions.contentChanged.changes().collect { refreshEntries() } }
+        } else {
+            launch {
+                while (true) {
+                    feedsVM.syncState.refresh()
+                    kotlinx.coroutines.delay(1000)
+                }
+            }
+        }
+        val observed = feedsVM.syncState.completed().mapValues { it.value.revision }.toMutableMap()
+        snapshotFlow { feedsVM.syncState.completed() }.collect { completed ->
             val latest = completed.values.filter { state ->
                 state.revision > (observed[state.feedId] ?: -1L)
             }.maxByOrNull { it.revision }

@@ -40,18 +40,19 @@ fun NoteListItem(
     tags: List<Tag>,
     onClick: () -> Unit,
     onLongClick: () -> Unit,
+    notesVM: NotesViewModel = NotesViewModel.local,
     onClickTag: (Tag) -> Unit
 ) {
     Row {
-        if (NotesViewModel.selectMode.value) {
+        if (notesVM.selectMode.value) {
             HorizontalSpace(dp = 16.dp)
-            CheckCircle(selected = NotesViewModel.selectedIds.contains(m.id), onClick = { NotesViewModel.select(m.id) })
+            CheckCircle(selected = notesVM.selectedIds.contains(m.id), onClick = { notesVM.select(m.id) })
         }
 
         Surface(
             modifier =
             PlainTheme
-                .getCardModifier(selected = NotesViewModel.selectedItem.value?.id == m.id || NotesViewModel.selectedIds.contains(m.id))
+                .getCardModifier(selected = notesVM.selectedItem.value?.id == m.id || notesVM.selectedIds.contains(m.id))
                 .combinedClickable(
                     onClick = onClick,
                     onLongClick = onLongClick,

@@ -7,7 +7,7 @@ import com.ismartcoding.plain.features.chat.peer.transport.PeerTransportType
 
 object PeerTransportProjection {
     internal fun apply(active: List<PeerTransportState>) {
-        ChatViewModel.currentTransportMap.value = active.associate { row ->
+        ChatViewModel.local.currentTransportMap.value = active.associate { row ->
             row.peerId to PeerTransportType.valueOf(row.transport)
         }
     }

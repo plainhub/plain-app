@@ -1,6 +1,6 @@
 package com.ismartcoding.plain.ui.chat.components
 
-import com.ismartcoding.plain.features.files.FilesClient
+import com.ismartcoding.plain.ui.state.launchSafe
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.combinedClickable
@@ -68,17 +68,20 @@ internal fun ChatFileItemContent(
     showContextMenu: MutableState<Boolean>,
     index: Int,
 ) {
+    val source = com.ismartcoding.plain.ui.navigation.LocalContentSource.current
+    val scope = androidx.compose.runtime.rememberCoroutineScope()
     val keyboardController = LocalSoftwareKeyboardController.current
     var showSaveSheet by remember { mutableStateOf(false) }
 
     if (showSaveSheet) {
         SaveToSheet(
             title = fileName,
+            source = source,
             onDismiss = { showSaveSheet = false },
             onDownloads = {
                 showSaveSheet = false
                 coMain {
-                    val result = withIO { saveFileToDownloads(path, fileName) }
+                    val result = withIO { if (source is com.ismartcoding.plain.rust.graphql.ContentSource.Remote) source.files.copyToDirectory(path, source.info.downloadsDir, fileName) else saveFileToDownloads(path, fileName) }
                     if (result.isNotEmpty()) {
                         DialogHelper.showConfirmDialog("", LocaleHelper.getStringFAsync(Res.string.file_save_to, result))
                     } else {
@@ -89,7 +92,7 @@ internal fun ChatFileItemContent(
             onDirectory = { dir ->
                 showSaveSheet = false
                 coMain {
-                    val result = withIO { FilesClient.copyToDirectory(path, dir, fileName) }
+                    val result = withIO { source.files.copyToDirectory(path, dir, fileName) }
                     if (result.isNotEmpty()) {
                         DialogHelper.showConfirmDialog("", LocaleHelper.getStringFAsync(Res.string.file_save_to, result))
                     } else {
@@ -105,22 +108,22 @@ internal fun ChatFileItemContent(
             .fillMaxWidth()
             .combinedClickable(
                 onClick = {
-                    if (isActive) return@combinedClickable
+                    if (isActive || source is com.ismartcoding.plain.rust.graphql.ContentSource.Remote && item.isRemoteFile()) return@combinedClickable
                     if (fileName.isImageFast() || fileName.isVideoFast()) {
                         coMain {
                             keyboardController?.hide()
-                            withIO { MediaPreviewData.setDataAsync(itemState, items.reversed(), item) }
+                            withIO { MediaPreviewData.setDataAsync(itemState, items.reversed(), item, source) }
                             previewerState.openTransform(
                                 index = MediaPreviewData.items.indexOfFirst { it.id == item.id },
                                 itemState = itemState,
                             )
                         }
                     } else if (fileName.isAudioFast()) {
-                        playAudioWithNotificationCheck(path)
+                        playAudioWithNotificationCheck(path, source)
                     } else if (fileName.isTextFile()) {
                         navController.navigateTextFile(path, fileName, mediaId = "", type = TextFileType.CHAT)
                     } else if (fileName.isPdfFile()) {
-                        navController.navigatePdf(fileToUriString(path), fileName)
+                        scope.launchSafe { navController.navigatePdf(fileToUriString(source.fileForOpen(path, fileName)), fileName) }
                     } else if (fileName.isZipFile()) {
                         navController.navigateZipFile(path, fileName)
                     } else {

@@ -220,7 +220,7 @@ private suspend fun downloadDlnaMedia(url: String, mediaType: DlnaMediaType, tit
     val filename = "${title.ifEmpty { "dlna_${TimeHelper.nowMillis()}" }}.${defaultExtensionFor(mediaType)}"
     var temporary: String? = null
     return try {
-        val path = RemoteFiles.cache(url, filename)
+        val path = RemoteFiles.download(url, filename)
         temporary = path
         val saved = withIO { if (dir == null) saveFileToDownloads(path, filename) else FilesClient.copyToDirectory(path, dir, filename) }
         if (saved.isEmpty()) {
