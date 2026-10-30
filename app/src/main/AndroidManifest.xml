@@ -310,7 +310,7 @@
         </provider>
 
         <provider
-            android:name="rikka.shizuku.ShizukuProvider"
+            android:name="com.ismartcoding.plain.platform.system.ShizukuBinderProvider"
             android:authorities="${applicationId}.shizuku"
             android:multiprocess="false"
             android:enabled="true"

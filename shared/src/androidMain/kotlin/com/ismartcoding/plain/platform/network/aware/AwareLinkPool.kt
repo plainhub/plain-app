@@ -12,6 +12,7 @@ import com.ismartcoding.plain.lib.logcat.LogCat
 import java.util.concurrent.ConcurrentHashMap
 import kotlin.time.Duration.Companion.milliseconds
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
@@ -55,8 +56,13 @@ internal class AwareLinkPool(
                 LogCat.d("[AWARE] onPublishHelloReceived skip peer=$peerId state=${link.stateName()}")
                 return@launch
             }
-            runCatching { buildLink(peerId) }
-                .onFailure { LogCat.w("[AWARE] onPublishHelloReceived build fail peer=$peerId msg=${it.message}") }
+            try {
+                buildLink(peerId)
+            } catch (cancelled: CancellationException) {
+                throw cancelled
+            } catch (error: Exception) {
+                LogCat.w("[AWARE] onPublishHelloReceived build fail peer=$peerId type=${error::class.simpleName} msg=${error.message}")
+            }
         }
     }
 
@@ -70,8 +76,13 @@ internal class AwareLinkPool(
                 LogCat.d("[AWARE] onSubscribeReadyReceived skip peer=$peerId state=${link.stateName()}")
                 return@launch
             }
-            runCatching { buildLink(peerId) }
-                .onFailure { LogCat.w("[AWARE] onSubscribeReadyReceived build fail peer=$peerId msg=${it.message}") }
+            try {
+                buildLink(peerId)
+            } catch (cancelled: CancellationException) {
+                throw cancelled
+            } catch (error: Exception) {
+                LogCat.w("[AWARE] onSubscribeReadyReceived build fail peer=$peerId type=${error::class.simpleName} msg=${error.message}")
+            }
         }
     }
 

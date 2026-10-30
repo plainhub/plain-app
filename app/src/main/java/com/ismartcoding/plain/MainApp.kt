@@ -9,6 +9,7 @@ class MainApp : Application() {
         super.onCreate()
         setAppContext(this, buildChannel = BuildConfig.CHANNEL)
         CrashHandler.install(this)
+        NetworkMonitor.init(this)
         initializeApp()
     }
 

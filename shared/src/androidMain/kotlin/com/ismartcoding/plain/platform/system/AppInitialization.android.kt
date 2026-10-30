@@ -1,6 +1,6 @@
 package com.ismartcoding.plain.platform.system
 
-import com.ismartcoding.plain.NetworkMonitor
+import com.ismartcoding.plain.platform.network.NetworkEvents
 import com.ismartcoding.plain.app.AppHelper
 import com.ismartcoding.plain.app.HttpServerForegroundServiceManager
 import com.ismartcoding.plain.appContext
@@ -35,7 +35,7 @@ internal actual fun initializePlatformApp() {
             DialogHelper.showMessage(error)
         }
     }
-    NetworkMonitor.init(appContext)
+    NetworkEvents.changed()
     setDarkMode(Prefs.darkTheme.value)
     HttpServerForegroundServiceManager.observe()
     HttpServerResources.observe()

@@ -21,10 +21,12 @@ import java.util.concurrent.atomic.AtomicLong
 import java.util.concurrent.atomic.AtomicReference
 import kotlin.time.Duration.Companion.milliseconds
 import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
-import kotlinx.coroutines.withTimeout
+import kotlinx.coroutines.withTimeoutOrNull
 import kotlin.io.encoding.Base64
 
 @RequiresApi(Build.VERSION_CODES.S)
@@ -104,7 +106,7 @@ class AwarePeerLink(
             check(!closed.get()) { "Aware link closed" }
             state = LinkState.CONNECTING
             try {
-                return@withLock withTimeout(ATTEMPT_TIMEOUT_MS.milliseconds) {
+                return@withLock withTimeoutOrNull(ATTEMPT_TIMEOUT_MS.milliseconds) {
                     // 角色分流（对齐官方 "Create a connection" 流程）：
                     // - publisher (server): 等 subscriber 的 hello 拿到 PeerHandle，
                     //   requestNetwork 后发 ready 回执给 subscriber（非阻塞信号）。
@@ -124,14 +126,14 @@ class AwarePeerLink(
                     connection.set(conn)
                     LogCat.d("[AWARE] build ok peer=${d.id} ip=${conn.peerIpv6} port=${conn.peerPort}")
                     conn
-                }
+                } ?: error("Wi-Fi Aware connection attempt timed out")
             } catch (e: Throwable) {
-                lastError = e
                 state = if (closed.get()) LinkState.CLOSED else LinkState.IDLE
                 session.clearPeerReady(d.id)
-                LogCat.w("[AWARE] build attempt ${attempt + 1}/$maxAttempts fail peer=${d.id} type=${e::class.simpleName} msg=${e.message}")
+                currentCoroutineContext().ensureActive()
+                lastError = e
                 if (attempt < maxAttempts - 1) {
-                    LogCat.d("[AWARE] build retry in ${RETRY_DELAY_MS}ms peer=${d.id}")
+                    LogCat.d("[AWARE] build attempt ${attempt + 1}/$maxAttempts failed, retry in ${RETRY_DELAY_MS}ms peer=${d.id} type=${e::class.simpleName} msg=${e.message}")
                     delay(RETRY_DELAY_MS)
                 }
             }
@@ -164,7 +166,6 @@ class AwarePeerLink(
             }
 
             override fun onUnavailable() {
-                LogCat.w("[AWARE] onUnavailable peer=$peerId")
                 runCatching { connectivityManager.unregisterNetworkCallback(this) }
                 // 不调 session.invalidatePeerHandle —— PeerHandle 本身没失效，只是 NDP 配对没成功
                 // （框架在另一端 requestNetwork 到达前就拒绝了）。清掉会让重试等不到新的
@@ -218,14 +219,12 @@ class AwarePeerLink(
                 session.sendReadyMessage(handle)
             }
         } catch (e: Exception) {
-            LogCat.e("[AWARE] requestNetwork error peer=$peerId msg=${e.message}")
             if (!ready.isCompleted) ready.completeExceptionally(e)
         }
 
         return try {
             ready.await()
         } catch (e: Throwable) {
-            LogCat.w("[AWARE] openNetwork await fail peer=$peerId type=${e::class.simpleName} msg=${e.message}")
             if (registered) {
                 runCatching { connectivityManager.unregisterNetworkCallback(callback) }
             }

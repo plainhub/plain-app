@@ -121,19 +121,18 @@ class AndroidBleGattServer : BleGattServer {
         val uuid = ParcelUuid(UUID.fromString(BleUuids.SERVICE_UUID))
         val data = AdvertiseData.Builder().setIncludeDeviceName(false).addServiceUuid(uuid).build()
         val scanResponse = AdvertiseData.Builder().addServiceData(uuid, payload.copyOf()).build()
-        val revision = advertisingRevision
         val callback = object : AdvertiseCallback() {
             override fun onStartSuccess(settingsInEffect: AdvertiseSettings) {
                 synchronized(advertisingLock) {
-                    if (closed || advertiser !== target || advertisingRevision != revision || advertiseCallback !== this) {
-                        try { target.stopAdvertising(this) }
-                        catch (error: Exception) { LogCat.e("Stale BLE advertising cleanup", error) }
-                    } else LogCat.d("GATT advertising started")
+                    if (advertiseCallback === this) LogCat.d("GATT advertising started")
                 }
             }
             override fun onStartFailure(errorCode: Int) {
                 synchronized(advertisingLock) {
-                    if (!closed && advertiseCallback === this) LogCat.e("GATT advertising failed: $errorCode")
+                    if (advertiseCallback === this) {
+                        advertiseCallback = null
+                        LogCat.e("GATT advertising failed: $errorCode")
+                    }
                 }
             }
         }

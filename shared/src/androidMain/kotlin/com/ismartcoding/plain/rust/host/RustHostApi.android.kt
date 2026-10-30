@@ -1,6 +1,7 @@
 package com.ismartcoding.plain.rust.host
 
 import com.ismartcoding.plain.appContext
+import com.ismartcoding.plain.NetworkMonitor
 import com.ismartcoding.plain.features.contacts.ContactInput
 import com.ismartcoding.plain.lib.JsonHelper
 import com.ismartcoding.plain.platform.contacts.GroupHelper
@@ -34,6 +35,7 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonObject
 
 internal actual suspend fun executePlatformHostRequest(method: String, params: JsonObject, scope: CoroutineScope): HostResult = when (method) {
+    "systemNetworkInterfaceFacts" -> hostResult(NetworkMonitor.interfaceFacts())
     "peerStartAware", "peerStopAware", "peerTransportSocketOpen", "peerTransportSocketClose",
     "peerTransportSocketRead", "peerTransportSocketWrite", "peerTransportSocketCloseAll" ->
         PeerAwareHost.handle(method, params, scope)
