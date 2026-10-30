@@ -108,7 +108,7 @@ fun ImagesPage(
     }
     val topRefreshLayoutState = rememberRefreshLayoutState {
         scope.launch {
-            imagesVM.loadWithAiSearchAsync(tagsVM)
+            imagesVM.loadAsync(tagsVM)
             mediaFoldersVM.loadAsync()
             setRefreshState(RefreshContentState.Finished)
         }
@@ -160,7 +160,6 @@ fun ImagesPage(
     // would re-run the O(n) grouping each time.
     val isGroupMode = imagesVM.sortBy.value == FileSortBy.TAKEN_AT_DESC
             && imagesVM.queryText.value.isEmpty()
-            && !imagesVM.useAiSearch.value
     val groupedItems = remember(itemsState, isGroupMode) {
         if (isGroupMode) groupMediaByDate(itemsState, { it.takenAt ?: it.createdAt }) else emptyList()
     }
@@ -189,7 +188,7 @@ fun ImagesPage(
                 },
                 onSearchAction = { tv ->
                     scope.launch {
-                        imagesVM.loadWithAiSearchAsync(tv)
+                        imagesVM.loadAsync(tv)
                     }
                 },
         bottomBar = {
