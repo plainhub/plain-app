@@ -32,27 +32,19 @@ val BrandPrimary = Color(0xFF4F5F9E)
 
 val ColorScheme.green: Color
     @Composable @ReadOnlyComposable
-    get() = greenText
-
-val ColorScheme.onGreen: Color
-    @Composable @ReadOnlyComposable
-    get() = if (LocalDarkTheme.current) Color(0xFF153A24) else Color.White
+    get() = if (LocalDarkTheme.current) Color(0xFF81C784) else Color(0xFF43A047)
 
 val ColorScheme.grey: Color
     @Composable @ReadOnlyComposable
-    get() = when {
-        !LocalDarkTheme.current -> Color(0xFF8A909C)
-        LocalAmoledDarkTheme.current -> Color(0xFF6D7483)
-        else -> Color(0xFF747B8A)
-    }
+    get() = if (LocalDarkTheme.current) Color(0xFF636366) else Color(0xFF8E8E93)
 
 val ColorScheme.yellow: Color
     @Composable @ReadOnlyComposable
-    get() = warning
+    get() = if (LocalDarkTheme.current) Color(0xFFFFD60A) else Color(0xFFFFCC00)
 
 val ColorScheme.orange: Color
     @Composable @ReadOnlyComposable
-    get() = if (LocalDarkTheme.current) Color(0xFFC9A685) else Color(0xFF92542F)
+    get() = if (LocalDarkTheme.current) Color(0xFFFF9F0A) else Color(0xFFFF9500)
 
 val LocalFloatingHostColor: ProvidableCompositionLocal<Color?> = staticCompositionLocalOf { null }
 
@@ -61,61 +53,87 @@ val ColorScheme.filledButtonContent: Color
     get() = if (LocalDarkTheme.current) this.onSurface else Color(0xFFFFFFFF)
 
 val ColorScheme.backgroundNormal: Color
-    get() = background
+    @Composable @ReadOnlyComposable
+    get() = if (LocalDarkTheme.current) Color(0xFF1C1B1F) else Color(0xFFFFFBFE)
 
 val ColorScheme.cardBackgroundNormal: Color
     @Composable @ReadOnlyComposable
-    get() = if (LocalFloatingHostColor.current == null) surfaceContainer else surfaceContainerHigh
+    get() {
+        val base = this.surfaceContainerLow
+        val host = LocalFloatingHostColor.current
+        return if (host == base) this.surfaceContainerHighest else base
+    }
 
 val ColorScheme.dialogSheetBackground: Color
-    get() = surfaceContainerLow
+    @Composable @ReadOnlyComposable
+    get() = if (LocalDarkTheme.current) this.surfaceContainerLow else this.surface
 
 val ColorScheme.cardBackgroundActive: Color
-    get() = primaryContainer
+    @Composable @ReadOnlyComposable
+    get() {
+        val base = this.surfaceContainerHighest
+        val host = LocalFloatingHostColor.current
+        return if (host == this.surfaceContainerLow) this.surfaceBright else base
+    }
 
 val ColorScheme.circleBackground: Color
     @Composable @ReadOnlyComposable
-    get() = cardBackgroundNormal
-
-val ColorScheme.warning: Color
-    @Composable @ReadOnlyComposable
-    get() = if (LocalDarkTheme.current) Color(0xFFC8B17A) else Color(0xFF805600)
-
-val ColorScheme.warningContainer: Color
-    @Composable @ReadOnlyComposable
-    get() = if (LocalDarkTheme.current) Color(0xFF443B26) else Color(0xFFF1E4C8)
-
-val ColorScheme.onWarningContainer: Color
-    @Composable @ReadOnlyComposable
-    get() = if (LocalDarkTheme.current) Color(0xFFD7C69B) else Color(0xFF614711)
+    get() {
+        val base = if (LocalDarkTheme.current) Color(0xFF2C2C2E) else Color(0xFFFFFFFF)
+        val host = LocalFloatingHostColor.current
+        return if (host == base) this.surfaceBright else base
+    }
 
 val ColorScheme.greenDot: Color
     @Composable @ReadOnlyComposable
-    get() = greenText
+    get() = if (LocalDarkTheme.current) Color(0xFF66BB6A) else Color(0xFF4CAF50)
 
 val ColorScheme.greenText: Color
     @Composable @ReadOnlyComposable
-    get() = if (LocalDarkTheme.current) Color(0xFF9EBDA7) else Color(0xFF356B4D)
+    get() = if (LocalDarkTheme.current) Color(0xFFA5D6A7) else Color(0xFF2E7D32)
 
 val ColorScheme.greenPill: Color
     @Composable @ReadOnlyComposable
-    get() = if (LocalDarkTheme.current) Color(0xFF263D30) else Color(0xFFDEECE2)
+    get() = if (LocalDarkTheme.current) Color(0x4D1B5E20) else Color(0xFFE8F5E9)
 
 val ColorScheme.primaryPill: Color
-    get() = primaryContainer
+    @Composable @ReadOnlyComposable
+    get() = if (LocalDarkTheme.current) {
+        Color(0x33B8C4FF)
+    } else {
+        Color(0xFFDDE2F9)
+    }
 
 val ColorScheme.waveInactiveColor: Color
-    get() = outlineVariant
+    @Composable @ReadOnlyComposable
+    get() = if (LocalDarkTheme.current) Color(0xFF48484A) else Color(0xFFE5E5EA)
 
 val ColorScheme.badgeBorderColor: Color
-    get() = surface
+    @Composable @ReadOnlyComposable
+    get() = if (LocalDarkTheme.current) Color(0xFF1C1C1E) else Color(0xFFFFFFFF)
 
 val ColorScheme.searchHighlight: Color
     @Composable @ReadOnlyComposable
-    get() = if (LocalDarkTheme.current) Color(0xFF564A2D) else Color(0xFFF2E3B4)
+    get() = if (LocalDarkTheme.current) Color(0xFF5A512E) else Color(0xFFFFF1B8)
 
 @Composable
 fun ColorScheme.lightMask(): Color = Color.White.copy(alpha = 0.4f)
 
 @Composable
 fun ColorScheme.darkMask(alpha: Float = 0.4f): Color = Color.Black.copy(alpha = alpha)
+
+val ColorScheme.onGreen: Color
+    @Composable @ReadOnlyComposable
+    get() = if (LocalDarkTheme.current) Color(0xFF153A24) else Color.White
+
+val ColorScheme.warning: Color
+    @Composable @ReadOnlyComposable
+    get() = orange
+
+val ColorScheme.warningContainer: Color
+    @Composable @ReadOnlyComposable
+    get() = orange.copy(alpha = 0.15f)
+
+val ColorScheme.onWarningContainer: Color
+    @Composable @ReadOnlyComposable
+    get() = onSurface

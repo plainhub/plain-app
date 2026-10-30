@@ -5,7 +5,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Switch
-import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -28,7 +27,6 @@ import com.ismartcoding.plain.ui.components.ButtonType
 import com.ismartcoding.plain.ui.base.PTextButton
 import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.theme.tipsText
-import com.ismartcoding.plain.ui.theme.plainColors
 import org.jetbrains.compose.resources.stringResource
 
 @Composable
@@ -47,7 +45,6 @@ fun PlainAppServiceSection(
                 subtitle = stringResource(Res.string.keep_online_in_background_desc),
             ) {
                 Switch(
-                    colors = SwitchDefaults.plainColors(),
                     checked = backgroundServiceEnabled,
                     enabled = !foregroundServiceState.isProcessing(),
                     onCheckedChange = { HttpServerManager.setBackgroundServiceEnabled(it) },

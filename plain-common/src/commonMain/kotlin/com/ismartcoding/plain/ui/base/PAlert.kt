@@ -24,7 +24,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.ismartcoding.plain.ui.theme.onWarningContainer
 import com.ismartcoding.plain.ui.theme.warning
 import com.ismartcoding.plain.ui.theme.warningContainer
 import org.jetbrains.compose.resources.painterResource
@@ -52,14 +51,10 @@ fun PAlert(
     val colors = MaterialTheme.colorScheme
     val containerColor = when (type) {
         AlertType.WARNING -> colors.warningContainer
-        AlertType.ERROR -> colors.errorContainer
-        AlertType.INFO -> colors.primaryContainer
+        AlertType.ERROR -> colors.error.copy(alpha = 0.12f)
+        AlertType.INFO -> colors.primary.copy(alpha = 0.12f)
     }
-    val contentColor = when (type) {
-        AlertType.WARNING -> colors.onWarningContainer
-        AlertType.ERROR -> colors.onErrorContainer
-        AlertType.INFO -> colors.onPrimaryContainer
-    }
+    val contentColor = colors.onSurface
     val iconColor = when (type) {
         AlertType.WARNING -> colors.warning
         AlertType.ERROR -> colors.error
