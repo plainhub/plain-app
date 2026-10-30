@@ -1,5 +1,7 @@
 package com.ismartcoding.plain.graphql
 
+import com.ismartcoding.plain.features.files.FileSortBy
+
 import com.ismartcoding.plain.models.AdvancedAudioSelection
 import com.ismartcoding.plain.models.MergeResult
 import com.ismartcoding.plain.features.audio.AudioSelectionAction
@@ -245,9 +247,9 @@ object Mutation {
         field = "advanceAudioSelection",
     )
 
-    fun replaceAudioQueue(query: String, shuffle: Boolean): GraphqlRequest<AudioItem?> = GraphqlRequest(
-        $$"mutation($query: String!, $shuffle: Boolean!) { replaceAudioQueue(query: $query, shuffle: $shuffle) { $${Fragments.AUDIO_TRACK_FIELDS} } }",
-        mapOf(variable("query", query), variable("shuffle", shuffle)),
+    fun replaceAudioQueue(query: String, sortBy: FileSortBy, shuffle: Boolean): GraphqlRequest<AudioItem?> = GraphqlRequest(
+        $$"mutation($query: String!, $sortBy: FileSortBy!, $shuffle: Boolean!) { replaceAudioQueue(query: $query, sortBy: $sortBy, shuffle: $shuffle) { $${Fragments.AUDIO_TRACK_FIELDS} } }",
+        mapOf(variable("query", query), variable("sortBy", sortBy.name), variable("shuffle", shuffle)),
         field = "replaceAudioQueue",
     )
 

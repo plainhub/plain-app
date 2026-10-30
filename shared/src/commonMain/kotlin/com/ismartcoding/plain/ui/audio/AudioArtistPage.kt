@@ -119,7 +119,7 @@ fun AudioArtistPage(
 
     val playAll: (Boolean) -> Unit = { shuffle ->
         scope.launchSafe {
-            audioQueueVM.playQueryAsync(artistQuery(artistName), shuffle = shuffle)
+            audioQueueVM.playQueryAsync(artistQuery(artistName), audioVM.sortBy.value, shuffle = shuffle)
         }
     }
 

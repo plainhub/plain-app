@@ -1,5 +1,6 @@
 package com.ismartcoding.plain.features.audio
 
+import com.ismartcoding.plain.features.files.FileSortBy
 import com.ismartcoding.plain.lib.JsonHelper
 import com.ismartcoding.plain.rust.graphql.GraphqlClient
 import com.ismartcoding.plain.rust.graphql.GraphqlResponse
@@ -90,11 +91,12 @@ class AudioQueueClientTest {
             operations.add(operation)
             GraphqlResponse(data = JsonHelper.jsonDecode("""{"replaceAudioQueue":{"mediaId":"track","path":"/audio/track.mp3","title":"Track","artist":"","durationMs":1000}}"""))
         })
-        assertEquals("track", api.replace("playlist_id:list", true)?.mediaId)
+        assertEquals("track", api.replace("playlist_id:list", FileSortBy.NAME_DESC, true)?.mediaId)
         assertEquals(1, operations.size)
         val request = operations.single()
         assertEquals("\"playlist_id:list\"", request.variables.getValue("query").toString())
         assertEquals("true", request.variables.getValue("shuffle").toString())
+        assertEquals("\"NAME_DESC\"", request.variables.getValue("sortBy").toString())
         kotlin.test.assertFalse(request.query.contains("clearAudioQueue"))
         kotlin.test.assertFalse(request.query.contains("audioQueueItems"))
     }

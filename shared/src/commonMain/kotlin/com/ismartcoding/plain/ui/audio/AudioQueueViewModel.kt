@@ -2,6 +2,7 @@ package com.ismartcoding.plain.ui.audio
 
 import com.ismartcoding.plain.rust.graphql.AppSubscriptions
 import com.ismartcoding.plain.rust.graphql.changes
+import com.ismartcoding.plain.features.files.FileSortBy
 import com.ismartcoding.plain.features.audio.toPlaylistAudio
 import com.ismartcoding.plain.models.Audio as AudioTrack
 import androidx.compose.runtime.mutableStateOf
@@ -105,8 +106,8 @@ class AudioQueueViewModel internal constructor(val source: com.ismartcoding.plai
         loadAsync()
     }
 
-    suspend fun playQueryAsync(query: String, shuffle: Boolean = false) {
-        val start = withIO { source.queue.replace(query, shuffle) }
+    suspend fun playQueryAsync(query: String, sortBy: FileSortBy, shuffle: Boolean = false) {
+        val start = withIO { source.queue.replace(query, sortBy, shuffle) }
         if (start != null) {
             audioJustPlayWithNotificationCheck(start, source)
         }

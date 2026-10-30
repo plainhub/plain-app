@@ -275,10 +275,10 @@ fun PlaylistDetailPage(
                         if (contextActive) {
                             if (isPlaying) audioPause() else audioPlay()
                         } else {
-                            scope.launchSafe { audioQueueVM.playQueryAsync("playlist_id:$playlistId") }
+                            scope.launchSafe { audioQueueVM.playQueryAsync("playlist_id:$playlistId", audioVM.sortBy.value) }
                         }
                     },
-                    onShuffle = { scope.launchSafe { audioQueueVM.playQueryAsync("playlist_id:$playlistId", shuffle = true) } },
+                    onShuffle = { scope.launchSafe { audioQueueVM.playQueryAsync("playlist_id:$playlistId", audioVM.sortBy.value, shuffle = true) } },
                 )
             }
             AudioPlayerBar(
