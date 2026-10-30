@@ -1,5 +1,6 @@
 package com.ismartcoding.plain.ui.search
 
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
@@ -8,6 +9,8 @@ import com.ismartcoding.plain.features.chat.peer.ManagedDeviceClient
 import com.ismartcoding.plain.features.search.SearchHistoryClient
 import com.ismartcoding.plain.i18n.devices
 import com.ismartcoding.plain.graphql.Query
+import com.ismartcoding.plain.models.Peer
+import com.ismartcoding.plain.rust.graphql.GraphqlHttpException
 import com.ismartcoding.plain.rust.graphql.ContentSource
 import com.ismartcoding.plain.rust.graphql.GraphqlApi
 import com.ismartcoding.plain.ui.state.launchSafe
@@ -26,12 +29,15 @@ class GlobalSearchViewModel internal constructor(
     val domain = mutableStateOf<GlobalSearchDomain?>(null)
     val submitted = mutableStateOf(false)
     val searching = mutableStateOf(false)
-    val empty = mutableStateOf(false)
     val searchedQuery = mutableStateOf("")
     val domainStates = mutableStateMapOf<GlobalSearchDomain, GlobalSearchDomainState>()
     val recentQueries = mutableStateOf<List<String>>(emptyList())
     val domains = mutableStateOf(initialDomains)
     internal val deviceErrors = mutableStateOf<List<GlobalSearchDeviceError>>(emptyList())
+    val empty = derivedStateOf {
+        searchedQuery.value.isNotEmpty() && !searching.value && deviceErrors.value.isEmpty() &&
+            domainStates.values.all { it.total.value == 0 && !it.hasErrors.value }
+    }
     private var revision = 0L
     private var searchJob: Job? = null
     private val refreshJobs = mutableMapOf<GlobalSearchDeviceState, Job>()
@@ -77,7 +83,7 @@ class GlobalSearchViewModel internal constructor(
                         state.loaded.intValue += hits.size
                     }
                 } catch (cancelled: CancellationException) { throw cancelled }
-                catch (error: Exception) { state.error.value = error.message ?: error.toString() }
+                catch (error: Exception) { handleDeviceError(state, error) }
                 finally { state.loading.value = false }
             }
         }
@@ -91,7 +97,6 @@ class GlobalSearchViewModel internal constructor(
         deviceErrors.value = emptyList()
         searchedQuery.value = ""
         searching.value = false
-        empty.value = false
     }
     fun search() {
         val query = queryText.value.trim()
@@ -120,12 +125,11 @@ class GlobalSearchViewModel internal constructor(
                                     device.loaded.intValue = device.hits.value.size
                                 }
                             } catch (cancelled: CancellationException) { throw cancelled }
-                            catch (error: Exception) { device.error.value = error.message ?: error.toString() }
+                            catch (error: Exception) { handleDeviceError(device, error) }
                             finally { device.loading.value = false }
                         }
                     } }
                 }
-                empty.value = deviceErrors.value.isEmpty() && domainStates.values.all { it.total.value == 0 && !it.hasErrors.value }
             } catch (cancelled: CancellationException) { throw cancelled }
             catch (error: Exception) {
                 deviceErrors.value = listOf(GlobalSearchDeviceError(com.ismartcoding.plain.ui.i18n.LocaleHelper.getString(com.ismartcoding.plain.i18n.Res.string.devices), error.message ?: error.toString()))
@@ -152,9 +156,19 @@ class GlobalSearchViewModel internal constructor(
                         }
                         device.error.value = null
                     } catch (cancelled: CancellationException) { throw cancelled }
-                    catch (error: Exception) { device.error.value = error.message ?: error.toString() }
+                    catch (error: Exception) { handleDeviceError(device, error) }
                 }
             }
+        }
+    }
+    private fun handleDeviceError(state: GlobalSearchDeviceState, error: Exception) {
+        if (state.device is ContentSource.Remote && error.isRemoteAccessDisabled()) {
+            state.hits.value = emptyList()
+            state.total.intValue = 0
+            state.loaded.intValue = 0
+            state.error.value = null
+        } else {
+            state.error.value = error.message ?: error.toString()
         }
     }
     companion object {
@@ -163,15 +177,20 @@ class GlobalSearchViewModel internal constructor(
     }
 }
 
-private suspend fun searchDevices(): GlobalSearchDevices = coroutineScope {
-    val peers = GraphqlApi.execute(Query.peers()).filter { it.isPaired() && it.token.isNotEmpty() }
-    val remote = peers.map { peer -> async {
+private fun Exception.isRemoteAccessDisabled(): Boolean =
+    this is GraphqlHttpException && status == 404 || message == "desktop_access_disabled"
+
+internal suspend fun searchDevices(
+    readPeers: suspend () -> List<Peer> = { GraphqlApi.execute(Query.peers()) },
+    loadDevice: suspend (Peer) -> ManagedDeviceClient = { ManagedDeviceClient.load(it) },
+): GlobalSearchDevices = coroutineScope {
+    val remote = readPeers().filter { it.isPaired() && it.token.isNotEmpty() }.map { peer -> async {
         try {
-            val client = ManagedDeviceClient.load(peer)
+            val client = loadDevice(peer)
             GlobalSearchDevices(listOf(ContentSource.Remote(client)))
         } catch (cancelled: CancellationException) { throw cancelled }
         catch (error: Exception) {
-            GlobalSearchDevices(emptyList(), listOf(GlobalSearchDeviceError(peer.name, error.message ?: error.toString())))
+            GlobalSearchDevices(emptyList(), if (error.isRemoteAccessDisabled()) emptyList() else listOf(GlobalSearchDeviceError(peer.name, error.message ?: error.toString())))
         }
     } }.awaitAll()
     GlobalSearchDevices(listOf(ContentSource.Local) + remote.flatMap { it.devices }, remote.flatMap { it.errors })

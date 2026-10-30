@@ -11,6 +11,8 @@ import kotlinx.coroutines.withTimeoutOrNull
 import io.ktor.http.Url
 import kotlin.io.encoding.Base64
 
+internal class GraphqlHttpException(val status: Int) : IllegalStateException("HTTP $status")
+
 internal data class GraphqlHttpResponse(val status: Int, val body: ByteArray)
 
 internal interface GraphqlHttpTransport {
@@ -49,7 +51,7 @@ internal class PeerHttpClient(
             401 -> error("unauthorized")
             403 -> error("desktop_access_disabled")
             in 200..299 -> Unit
-            else -> error("HTTP ${response.status}")
+            else -> throw GraphqlHttpException(response.status)
         }
         current()
         return response

@@ -149,6 +149,73 @@ class GlobalSearchDevicesTest {
     }
 
     @Test
+    fun discovery_omits_disabled_devices_but_preserves_other_errors() = runTest {
+        val disabled = Device("disabled", 1).also { it.httpStatus = 404 }
+        val forbidden = Device("forbidden", 1).also { it.httpStatus = 403 }
+        val available = Device("available", 1)
+        val broken = Device("broken", 1).also { it.httpStatus = 503 }
+        val devices = listOf(disabled, forbidden, available, broken).associateBy { it.name }
+        val result = searchDevices(
+            readPeers = { devices.values.map { it.peer() } },
+            loadDevice = { devices.getValue(it.id).source().client },
+        )
+        assertEquals(listOf(ContentSource.Local.key, available.source().key), result.devices.map { it.key })
+        assertEquals(listOf(GlobalSearchDeviceError("broken", "HTTP 503")), result.errors)
+    }
+
+    @Test
+    fun disabled_remote_access_has_no_results_or_error_during_search() = runTest {
+        val device = Device("disabled", 1)
+        val source = device.source()
+        device.httpStatus = 404
+        val vm = model { GlobalSearchDevices(listOf(source)) }
+        vm.search()
+        advanceUntilIdle()
+        val state = vm.domainStates.getValue(GlobalSearchDomain.NOTES)
+        assertTrue(state.hits.value.isEmpty())
+        assertEquals(0, state.total.value)
+        assertFalse(state.hasErrors.value)
+        assertTrue(vm.deviceErrors.value.isEmpty())
+        assertTrue(vm.empty.value)
+    }
+
+    @Test
+    fun disabling_remote_access_clears_paged_results_and_keeps_other_devices() = runTest {
+        val disabled = Device("disabled", 25)
+        val available = Device("available", 1)
+        val sources = listOf(disabled.source(), available.source())
+        val vm = model { GlobalSearchDevices(sources) }
+        vm.search()
+        advanceUntilIdle()
+        disabled.httpStatus = 404
+        vm.loadMore(GlobalSearchDomain.NOTES)
+        advanceUntilIdle()
+        val state = vm.domainStates.getValue(GlobalSearchDomain.NOTES)
+        assertEquals(1, state.total.value)
+        assertEquals(1, state.loaded.value)
+        assertSame(sources.last(), state.hits.value.single().device)
+        assertFalse(state.hasErrors.value)
+    }
+
+    @Test
+    fun disabling_remote_access_clears_refreshed_results_without_error() = runTest {
+        val device = Device("disabled", 1)
+        val source = device.source()
+        val vm = model { GlobalSearchDevices(listOf(source)) }
+        vm.search()
+        advanceUntilIdle()
+        device.httpStatus = 404
+        vm.refreshHits()
+        advanceUntilIdle()
+        val state = vm.domainStates.getValue(GlobalSearchDomain.NOTES)
+        assertTrue(state.hits.value.isEmpty())
+        assertEquals(0, state.total.value)
+        assertEquals(0, state.loaded.value)
+        assertFalse(state.hasErrors.value)
+        assertTrue(vm.empty.value)
+    }
+
+    @Test
     fun a_cancelled_query_does_not_finish_or_populate_its_replacement() = runTest {
         val device = Device("first", 1)
         val source = device.source()
@@ -207,17 +274,20 @@ class GlobalSearchDevicesTest {
         var rows = (0 until count).map { Note("row-$it", "$name $it", "$name needle $it", null, now, now) }
         var chats = emptyList<com.ismartcoding.plain.models.ChatItem>()
         var failure: String? = null
+        var httpStatus = 200
         var beforeResponse: suspend (GraphqlOperation) -> Unit = {}
         val requests = mutableListOf<GraphqlOperation>()
         fun pages() = requests.filter { "notes(" in it.query }
 
+        fun peer() = Peer(
+            id = name, name = name, ip = "", status = PeerStatus.PAIRED, port = 8443,
+            deviceType = DeviceType.PHONE, createdAt = now, updatedAt = now,
+            publicKey = "public-$name", token = "token-$name",
+            address = PeerAddress("device.test", name, "https://device.test:8443", "", ""),
+        )
+
         suspend fun source(): ContentSource.Remote {
-            val peer = Peer(
-                id = name, name = name, ip = "", status = PeerStatus.PAIRED, port = 8443,
-                deviceType = DeviceType.PHONE, createdAt = now, updatedAt = now,
-                publicKey = "public-$name", token = "token-$name",
-                address = PeerAddress("device.test", name, "https://device.test:8443", "", ""),
-            )
+            val peer = peer()
             val http = PeerHttpClient(peer, peers = { listOf(peer) }, clientId = { "fixture-client" },
                 encrypt = { _, payload -> Base64.encode(payload.encodeToByteArray()) },
                 decrypt = { _, encoded, _ ->
@@ -237,7 +307,7 @@ class GlobalSearchDevicesTest {
                     Base64.encode(JsonHelper.jsonEncode(GraphqlResponse(data = data.jsonObject)).encodeToByteArray())
                 },
                 transport = object : GraphqlHttpTransport {
-                    override suspend fun post(url: String, clientId: String, body: ByteArray, contentType: String, tlsCertificateSha256: String?) = GraphqlHttpResponse(200, byteArrayOf(1))
+                    override suspend fun post(url: String, clientId: String, body: ByteArray, contentType: String, tlsCertificateSha256: String?) = GraphqlHttpResponse(httpStatus, byteArrayOf(1))
                 },
             )
             return ContentSource.Remote(ManagedDeviceClient.load(peer, http))

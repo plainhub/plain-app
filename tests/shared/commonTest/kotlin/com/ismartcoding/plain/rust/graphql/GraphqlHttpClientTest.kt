@@ -110,7 +110,7 @@ class GraphqlHttpClientTest {
     @Test
     fun does_not_decrypt_or_retry_rejected_sessions_and_redirects() = runTest {
         val peer = peer()
-        for (status in listOf(301, 401, 403, 500)) {
+        for (status in listOf(301, 401, 403, 404, 500)) {
             var posts = 0
             val client = PeerHttpClient(peer, peers = { listOf(peer) },
                 encrypt = { _, _ -> Base64.encode(byteArrayOf(1)) },
@@ -122,7 +122,11 @@ class GraphqlHttpClientTest {
                     }
                 },
             ).graphql
-            assertFailsWith<IllegalStateException> { client.execute(request) }
+            val error = assertFailsWith<IllegalStateException> { client.execute(request) }
+            if (status != 401 && status != 403) {
+                assertEquals(status, assertIs<GraphqlHttpException>(error).status)
+                assertEquals("HTTP $status", error.message)
+            }
             assertEquals(1, posts)
         }
     }
