@@ -126,7 +126,10 @@ fun QuickNoteCard(
                     cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
                     keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Sentences),
                     decorationBox = { innerField ->
-                        Box(modifier = Modifier.padding(vertical = 8.dp)) {
+                        Box(
+                            modifier = Modifier.padding(vertical = 8.dp),
+                            contentAlignment = Alignment.CenterStart,
+                        ) {
                             if (text.isEmpty()) {
                                 Text(
                                     text = stringResource(Res.string.quick_note_hint),
