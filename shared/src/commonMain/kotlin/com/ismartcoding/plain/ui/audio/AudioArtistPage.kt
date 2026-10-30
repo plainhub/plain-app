@@ -187,7 +187,7 @@ fun AudioArtistPage(
         },
         bottomBar = {
             AnimatedBottomAction(visible = dragSelectState.showBottomActions()) {
-                AudioFilesSelectModeBottomActions(audioVM, audioQueueVM, tagsVM, tagsState, dragSelectState)
+                AudioFilesSelectModeBottomActions(audioVM, audioQueueVM, tagsVM, tagsState, dragSelectState, items)
             }
         },
     ) { paddingValues ->

@@ -3,8 +3,8 @@ package com.ismartcoding.plain.ui.audio.components
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import com.ismartcoding.plain.models.Audio
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -47,6 +47,7 @@ fun AudioFilesSelectModeBottomActions(
     tagsVM: TagsViewModel,
     tagsState: List<Tag>,
     dragSelectState: DragSelectState,
+    items: List<Audio>,
     // Generic slot (playlist detail, artist page, ...): when provided, a
     // remove-from-playlist action leads the bar and the slot runs the removal.
     removeFromPlaylist: (() -> Unit)? = null,
@@ -55,9 +56,9 @@ fun AudioFilesSelectModeBottomActions(
     var showSelectTagsDialog by remember { mutableStateOf(false) }
     var removeFromTags by remember { mutableStateOf(false) }
 
+    val selectedItems = items.filter { it.id in dragSelectState.selectedIds }
+
     if (showSelectTagsDialog) {
-        val selectedIds = dragSelectState.selectedIds
-        val selectedItems = audioVM.itemsFlow.collectAsState().value.filter { selectedIds.contains(it.id) }
         BatchSelectTagsDialog(tagsVM, tagsState, selectedItems, removeFromTags) {
             showSelectTagsDialog = false
             dragSelectState.exitSelectMode()
@@ -80,8 +81,6 @@ fun AudioFilesSelectModeBottomActions(
                 }
                 IconTextSmallButtonQueueAdd {
                     scope.launch {
-                        val selectedIds = dragSelectState.selectedIds
-                        val selectedItems = audioVM.itemsFlow.value.filter { selectedIds.contains(it.id) }
                         withIO {
                             audioQueueVM.addAsync(selectedItems)
                         }

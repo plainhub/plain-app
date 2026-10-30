@@ -234,6 +234,7 @@ fun PlaylistDetailPage(
                     tagsVM = tagsVM,
                     tagsState = tagsState,
                     dragSelectState = dragSelectState,
+                    items = rowAudios,
                     removeFromPlaylist = {
                         scope.launch {
                             val paths = dragSelectState.selectedIds.toList()

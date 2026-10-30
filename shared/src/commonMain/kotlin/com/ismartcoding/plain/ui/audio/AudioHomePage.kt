@@ -184,7 +184,7 @@ fun AudioHomePage(
         },
         bottomBar = {
             AnimatedBottomAction(visible = dragSelectState.showBottomActions()) {
-                AudioFilesSelectModeBottomActions(audioVM, audioQueueVM, tagsVM, tagsState, dragSelectState)
+                AudioFilesSelectModeBottomActions(audioVM, audioQueueVM, tagsVM, tagsState, dragSelectState, itemsState)
             }
         },
     ) { paddingValues ->
