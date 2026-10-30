@@ -5,7 +5,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.NavigationBarItemDefaults
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import com.ismartcoding.plain.ui.theme.primaryPill
@@ -20,7 +19,6 @@ fun MainBottomBar(
 ) {
     val itemColors = NavigationBarItemDefaults.colors(
         selectedIconColor = MaterialTheme.colorScheme.primary,
-        selectedTextColor = MaterialTheme.colorScheme.primary,
         indicatorColor = MaterialTheme.colorScheme.primaryPill,
     )
     NavigationBar(
@@ -34,10 +32,9 @@ fun MainBottomBar(
                 icon = {
                     Icon(
                         painter = painterResource(item.icon),
-                        contentDescription = null,
+                        contentDescription = stringResource(item.label),
                     )
                 },
-                label = { Text(stringResource(item.label)) },
                 colors = itemColors,
             )
         }
