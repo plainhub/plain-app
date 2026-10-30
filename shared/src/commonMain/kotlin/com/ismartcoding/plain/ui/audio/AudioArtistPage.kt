@@ -110,8 +110,8 @@ fun AudioArtistPage(
     val sortBy = audioVM.sortBy.value
     LaunchedEffect(artistName, sortBy) {
         items = withIO {
-            audioVM.source.catalog.rows(DataType.AUDIO, artistName, 500, 0, sortBy)
-        }.filterIsInstance<AudioTrack>().filter { it.artist == artistName }
+            audioVM.source.catalog.artistTracks(artistName, sortBy)
+        }
     }
 
     // Play-all fills the manual queue with exactly this artist's tracks;

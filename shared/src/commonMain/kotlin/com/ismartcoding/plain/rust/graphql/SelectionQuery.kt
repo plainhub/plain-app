@@ -5,17 +5,14 @@ internal fun selectionQuery(ids: Collection<String>): String {
     require(ids.all { id -> id.isNotBlank() && ',' !in id }) { "Invalid ID list" }
 
     val joinedIds = ids.distinct().joinToString(",")
-    return buildString {
-        append("ids:=")
-        for (character in joinedIds) {
-            val needsEscape = when (character) {
-                '\\', '\'', '"' -> true
-                else -> character.isWhitespace()
-            }
-            if (needsEscape) {
-                append('\\')
-            }
-            append(character)
+    return "ids:=${escapeQueryValue(joinedIds)}"
+}
+
+internal fun escapeQueryValue(value: String): String = buildString {
+    for (character in value) {
+        if (character == '\\' || character == '\'' || character == '"' || character.isWhitespace()) {
+            append('\\')
         }
+        append(character)
     }
 }
