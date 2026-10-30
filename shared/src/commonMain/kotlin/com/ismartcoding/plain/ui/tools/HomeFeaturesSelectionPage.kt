@@ -13,6 +13,8 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import com.ismartcoding.plain.ui.state.launchSafe
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -24,37 +26,24 @@ import androidx.compose.ui.Modifier
 import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
-import com.ismartcoding.plain.Prefs
 import com.ismartcoding.plain.ui.base.BottomSpace
 import com.ismartcoding.plain.ui.base.PScaffold
 import com.ismartcoding.plain.ui.base.PTopAppBar
 import com.ismartcoding.plain.ui.components.reorderable.ReorderableItem
 import com.ismartcoding.plain.ui.components.reorderable.rememberReorderableLazyListState
-import com.ismartcoding.plain.ui.media.extensions.collectAsStateValue
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeFeaturesSelectionPage(navController: NavHostController) {
     val scope = rememberCoroutineScope()
-    val allFeatureItems = remember { FeatureItem.getList(navController) }
+    val source = com.ismartcoding.plain.ui.navigation.LocalContentSource.current
+    val viewModel = rememberToolsViewModel()
+    val allFeatureItems = remember(source, navController) { FeatureItem.getList(navController, source.capabilities, source is com.ismartcoding.plain.rust.graphql.ContentSource.Local) }
 
-    val featuresStr = Prefs.appHomeFeatures.collectAsStateValue()
+    val enabledIds by viewModel.enabledFeatures.collectAsState()
 
-    var enabledIds by remember(featuresStr) {
-        mutableStateOf(
-            Prefs.parseFeatures(featuresStr)
-        )
-    }
-
-    fun persist(newList: List<String>) {
-        enabledIds = newList
-        scope.launch(Dispatchers.Default) {
-            Prefs.set(PrefKeys.APP_HOME_FEATURES, Prefs.formatFeatures(newList))
-        }
-    }
+    fun persist(newList: List<String>) { scope.launchSafe { viewModel.save(newList) } }
 
     val lazyListState = rememberLazyListState()
     val reorderableLazyListState = rememberReorderableLazyListState(lazyListState) { from, to ->
@@ -67,7 +56,7 @@ fun HomeFeaturesSelectionPage(navController: NavHostController) {
         }
     }
 
-    val disabledItems = remember(enabledIds) {
+    val disabledItems = remember(enabledIds, allFeatureItems) {
         allFeatureItems.filter { it.type.name !in enabledIds }
     }
 

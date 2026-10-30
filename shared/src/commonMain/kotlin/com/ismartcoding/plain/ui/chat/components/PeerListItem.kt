@@ -34,7 +34,6 @@ fun PeerListItem(
     desc: String,
     icon: DrawableResource,
     online: Boolean? = null,
-    accessLabel: String? = null,
     latestChat: ChatItem? = null,
     peerId: String? = null,
     onDelete: ((String) -> Unit)? = null,
@@ -45,8 +44,7 @@ fun PeerListItem(
     val deleteText = stringResource(Res.string.delete)
     val deleteWarningText = stringResource(Res.string.delete_peer_warning)
     val cancelText = stringResource(Res.string.cancel)
-    val subtitle = listOfNotNull(accessLabel, (latestChat?.getMessagePreview() ?: desc).takeIf { it.isNotEmpty() })
-        .joinToString(" · ")
+    val subtitle = latestChat?.getMessagePreview() ?: desc
 
     val onlineDescription = when (online) {
         true -> stringResource(Res.string.online)

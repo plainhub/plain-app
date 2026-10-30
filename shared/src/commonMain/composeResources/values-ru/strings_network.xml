@@ -137,4 +137,5 @@
     <string name="turn_off_keep_online_in_background">Выключить фоновый режим</string>
     <string name="enable_desktop_access">Включить доступ с компьютера</string>
     <string name="disable_desktop_access">Выключить доступ с компьютера</string>
+    <string name="services">Службы</string>
 </resources>

@@ -137,4 +137,5 @@
     <string name="turn_off_keep_online_in_background">Arka plan modunu kapat</string>
     <string name="enable_desktop_access">Bilgisayar erişimini aç</string>
     <string name="disable_desktop_access">Bilgisayar erişimini kapat</string>
+    <string name="services">Hizmetler</string>
 </resources>

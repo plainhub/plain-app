@@ -48,7 +48,6 @@ internal fun NavGraphBuilder.addMainSettingsPages(
     composable<Routing.Language> { LanguagePage(navController) }
     composable<Routing.BackupRestore> { BackupRestorePage(navController) }
     composable<Routing.DesktopAccessSettings> { DesktopAccessSettingsPage(navController, batterySettings = batterySettings) }
-    composable<Routing.CustomFeatures> { HomeFeaturesSelectionPage(navController) }
     composable<Routing.ClipboardHistory> { ClipboardHistoryPage(navController) }
     composable<Routing.Connections> { ConnectionsPage(navController) }
     composable<Routing.ApiTokenTips> { backStackEntry ->

@@ -24,9 +24,9 @@ private data class AudioNavigationState(
 )
 
 @Composable
-private fun audioNavigationState(owner: NavBackStackEntry): AudioNavigationState {
-    val source = LocalContentSource.current as ContentSource.Remote
-    val queue = viewModel(viewModelStoreOwner = owner, key = "audio-queue") { AudioQueueViewModel(source) }
+private fun audioNavigationState(owner: NavBackStackEntry, localQueue: AudioQueueViewModel): AudioNavigationState {
+    val source = LocalContentSource.current
+    val queue = if (source is ContentSource.Local) localQueue else viewModel(viewModelStoreOwner = owner, key = "audio-queue") { AudioQueueViewModel(source) }
     val library = viewModel(viewModelStoreOwner = owner, key = "audio-library") { AudioViewModel(source) }
     val tags = viewModel(viewModelStoreOwner = owner, key = "audio-tags") { TagsViewModel(source.tags) }
     val folders = viewModel(viewModelStoreOwner = owner, key = "audio-folders") { MediaFoldersViewModel(source) }
@@ -35,30 +35,29 @@ private fun audioNavigationState(owner: NavBackStackEntry): AudioNavigationState
     return AudioNavigationState(queue, library, tags, folders, cast, home)
 }
 
-internal fun NavGraphBuilder.addManagedAudioRoutes(
+internal fun NavGraphBuilder.addDeviceAudioRoutes(
     navController: NavHostController,
-    owner: NavBackStackEntry,
-    manager: com.ismartcoding.plain.ui.tools.ManagedDeviceViewModel,
+    localQueue: AudioQueueViewModel,
+    source: @Composable () -> ContentSource?,
 ) {
-    val source: @Composable () -> ContentSource? = { managedScope(manager) }
     contentDestination<Routing.Audio>(source) {
-        val state = audioNavigationState(owner)
+        val state = audioNavigationState(navController.getBackStackEntry<Routing.Home>(), localQueue)
         AudioHomePage(navController, state.queue, state.library, state.tags, state.folders, state.cast, state.home)
     }
     contentDestination<Routing.AudioAll>(source) {
-        val state = audioNavigationState(owner)
+        val state = audioNavigationState(navController.getBackStackEntry<Routing.Home>(), localQueue)
         AudioAllPage(navController, state.queue, state.library, state.tags, state.folders, state.cast)
     }
     contentDestination<Routing.Artists>(source) {
-        val state = audioNavigationState(owner)
+        val state = audioNavigationState(navController.getBackStackEntry<Routing.Home>(), localQueue)
         ArtistsPage(navController, state.library, state.home)
     }
     contentDestination<Routing.ArtistDetail>(source) { entry ->
-        val state = audioNavigationState(owner)
+        val state = audioNavigationState(navController.getBackStackEntry<Routing.Home>(), localQueue)
         AudioArtistPage(navController, entry.toRoute<Routing.ArtistDetail>().name, state.queue, state.library, state.tags, state.folders, state.cast)
     }
     contentDestination<Routing.PlaylistDetail>(source) { entry ->
-        val state = audioNavigationState(owner)
+        val state = audioNavigationState(navController.getBackStackEntry<Routing.Home>(), localQueue)
         PlaylistDetailPage(navController, entry.toRoute<Routing.PlaylistDetail>().id, state.queue, state.library, state.tags, state.folders, state.cast)
     }
     contentDestination<Routing.PlaylistAddItems>(source) { entry ->

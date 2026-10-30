@@ -52,7 +52,7 @@ import com.ismartcoding.plain.i18n.save
 
 /** In-process cache so re-entering the page renders the draft immediately, without an async swap. */
 object QuickNoteDraftCache {
-    var text: String? = null
+    val drafts = mutableMapOf<String, String>()
 }
 
 @Composable
@@ -61,32 +61,34 @@ fun QuickNoteCard(
     onOpenNote: (String) -> Unit,
     onEmptyExpand: () -> Unit,
 ) {
+    val source = com.ismartcoding.plain.ui.navigation.LocalContentSource.current
+    val drafts = QuickNoteDraftCache.drafts
     val scope = rememberCoroutineScope()
-    var text by remember { mutableStateOf(QuickNoteDraftCache.text ?: "") }
+    var text by remember(source.key) { mutableStateOf(drafts[source.key] ?: "") }
     var isFocused by remember { mutableStateOf(false) }
 
-    LaunchedEffect(Unit) {
-        if (QuickNoteDraftCache.text == null) {
-            val saved = NotesClient.readDraft()
-            QuickNoteDraftCache.text = saved
+    LaunchedEffect(source) {
+        if (drafts[source.key] == null) {
+            val saved = source.notes.readDraft()
+            drafts[source.key] = saved
             text = saved
         }
     }
     // Persist the draft (debounced) so it survives process death.
-    LaunchedEffect(Unit) {
+    LaunchedEffect(source) {
         snapshotFlow { text }
             .drop(1)
             .collectLatest { t ->
-                QuickNoteDraftCache.text = t
+                drafts[source.key] = t
                 delay(300)
-                NotesClient.writeDraft(t)
+                source.notes.writeDraft(t)
             }
     }
-    DisposableEffect(Unit) {
+    DisposableEffect(source) {
         onDispose {
             val t = text
-            QuickNoteDraftCache.text = t
-            coIO { NotesClient.writeDraft(t) }
+            drafts[source.key] = t
+            coIO { source.notes.writeDraft(t) }
         }
     }
 
@@ -100,7 +102,7 @@ fun QuickNoteCard(
             text = ""
             val id =
                 withIO {
-                    NotesClient.save(id = "", title = "", content = content).id
+                    source.notes.save(id = "", title = "", content = content).id
                 }
             onSaved(id)
         }

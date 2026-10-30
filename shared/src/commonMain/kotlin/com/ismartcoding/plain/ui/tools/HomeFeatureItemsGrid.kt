@@ -10,44 +10,47 @@ import androidx.compose.foundation.lazy.grid.LazyGridItemScope
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
+import androidx.compose.runtime.collectAsState
+import com.ismartcoding.plain.ui.state.launchSafe
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
-import com.ismartcoding.plain.Prefs
 import com.ismartcoding.plain.platform.system.AppFeatureType
-import com.ismartcoding.plain.platform.system.getDeviceCapabilities
-import com.ismartcoding.plain.preferences.PrefKeys
 import com.ismartcoding.plain.ui.base.PIconTextActionButton
 import com.ismartcoding.plain.ui.components.reorderable.ReorderableItem
 import com.ismartcoding.plain.ui.components.reorderable.rememberReorderableLazyGridState
-import com.ismartcoding.plain.ui.media.extensions.collectAsStateValue
 import org.jetbrains.compose.resources.stringResource
 
 @Composable
-fun HomeFeatureItemsGrid(
+internal fun HomeFeatureItemsGrid(
     navController: NavHostController,
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(0.dp),
+    viewModel: ToolsViewModel,
     header: @Composable () -> Unit,
 ) {
-    val featuresStr = Prefs.appHomeFeatures.collectAsStateValue()
-    var enabledIds by remember(featuresStr) { mutableStateOf(Prefs.parseFeatures(featuresStr)) }
-    val capabilities = getDeviceCapabilities()
-    val allFeatureItems = remember(navController, capabilities) { FeatureItem.getList(navController) }
+    val enabledIds by viewModel.enabledFeatures.collectAsState()
+    val source = com.ismartcoding.plain.ui.navigation.LocalContentSource.current
+    val capabilities = source.capabilities
+    val allFeatureItems = remember(navController, capabilities) { FeatureItem.getList(navController, capabilities, source is com.ismartcoding.plain.rust.graphql.ContentSource.Local) }
     val items = enabledIds.filter { it != AppFeatureType.CHAT.name }
         .mapNotNull { typeName -> allFeatureItems.find { it.type.name == typeName } }
+    if (source is com.ismartcoding.plain.rust.graphql.ContentSource.Remote) {
+        FeatureItemsGrid(items, modifier, contentPadding, header = header)
+        return
+    }
+    val scope = androidx.compose.runtime.rememberCoroutineScope()
     val gridState = rememberLazyGridState()
     val reorderState = rememberReorderableLazyGridState(gridState) { from, to ->
         val fromIndex = enabledIds.indexOf(from.key as String)
         val toIndex = enabledIds.indexOf(to.key as String)
         if (fromIndex >= 0 && toIndex >= 0) {
-            enabledIds = enabledIds.toMutableList().apply { add(toIndex, removeAt(fromIndex)) }
-            Prefs.set(PrefKeys.APP_HOME_FEATURES, Prefs.formatFeatures(enabledIds))
+            val reordered = enabledIds.toMutableList().apply { add(toIndex, removeAt(fromIndex)) }
+            scope.launchSafe { viewModel.save(reordered) }
         }
     }
 

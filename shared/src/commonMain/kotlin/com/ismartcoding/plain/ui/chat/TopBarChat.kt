@@ -11,7 +11,11 @@ import androidx.navigation.NavHostController
 import com.ismartcoding.plain.ui.components.ActionButtonAddWithMenu
 import com.ismartcoding.plain.ui.components.ActionButtonFolders
 import com.ismartcoding.plain.ui.base.PDropdownMenuItem
-import com.ismartcoding.plain.ui.base.PTopAppBar
+import com.ismartcoding.plain.ui.navigation.DeviceTopAppBar
+import com.ismartcoding.plain.ui.navigation.LocalDeviceNavigation
+import com.ismartcoding.plain.ui.navigation.LocalContentSource
+import com.ismartcoding.plain.rust.graphql.ContentSource
+import com.ismartcoding.plain.ui.components.ActionButtonSettings
 import com.ismartcoding.plain.ui.navigation.Routing
 import com.ismartcoding.plain.ui.navigation.navigateAppFiles
 import com.ismartcoding.plain.ui.resources.Res as UiRes
@@ -24,8 +28,10 @@ fun TopBarChat(
     navController: NavHostController,
     onCreateChannel: () -> Unit,
 ) {
-    PTopAppBar(
-        title = stringResource(Res.string.chat),
+    val deviceNavigation = LocalDeviceNavigation.current
+    val local = LocalContentSource.current is ContentSource.Local
+    DeviceTopAppBar(
+        fallbackTitle = stringResource(Res.string.chat),
         actions = {
             ActionButtonFolders {
                 navController.navigateAppFiles()
@@ -44,7 +50,7 @@ fun TopBarChat(
                         onCreateChannel()
                     },
                 )
-                PDropdownMenuItem(
+                if (local) PDropdownMenuItem(
                     text = { Text(stringResource(Res.string.pair_device)) },
                     leadingIcon = {
                         Icon(
@@ -58,6 +64,7 @@ fun TopBarChat(
                     },
                 )
             }
+            deviceNavigation?.let { ActionButtonSettings(it.onSettings) }
         }
     )
 }

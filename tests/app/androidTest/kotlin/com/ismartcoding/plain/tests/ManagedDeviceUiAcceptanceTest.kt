@@ -1,6 +1,9 @@
 package com.ismartcoding.plain.tests
 
 import com.ismartcoding.plain.ui.resources.smartphone
+import com.ismartcoding.plain.ui.resources.srl_header_finish
+import com.ismartcoding.plain.ui.resources.srl_header_failed
+import com.ismartcoding.plain.ui.resources.srl_header_refreshing
 import androidx.activity.compose.setContent
 import com.ismartcoding.plain.features.audio.toPlaylistAudio
 import androidx.compose.foundation.background
@@ -54,6 +57,8 @@ import androidx.compose.ui.semantics.SemanticsActions
 import androidx.compose.ui.semantics.getOrNull
 import androidx.compose.ui.state.ToggleableState
 import androidx.compose.ui.text.AnnotatedString
+import kotlinx.serialization.json.jsonObject
+import kotlinx.serialization.json.jsonPrimitive
 import kotlinx.serialization.Serializable
 import org.junit.Assert.*
 import org.junit.Test
@@ -92,9 +97,20 @@ private data class ManagedAcceptancePeer(val id: String, val manageable: Boolean
 @Serializable
 private data class ManagedAcceptanceDescriptor(val id: String, val peers: List<ManagedAcceptancePeer>)
 
+@Serializable
+private data class ManagedFixtureApp(val app: com.ismartcoding.plain.models.ManagedDeviceInfo)
+
+@Serializable
+private data class ManagedFixturePrefs(val prefs: Map<String, String>)
+
 @RunWith(AndroidJUnit4::class)
 class ManagedDeviceUiAcceptanceTest {
     private val instrumentation = InstrumentationRegistry.getInstrumentation()
+    @org.junit.Before
+    fun resetSelectedDevice() {
+        instrumentation.runOnMainSync { MainViewModel.selectDevice(null) }
+    }
+
     private val identityRequest = GraphqlRequest<ManagedAcceptanceIdentity>("query { app { clientId deviceName } }", field = "app")
 
     @Test
@@ -496,6 +512,8 @@ class ManagedDeviceUiAcceptanceTest {
         updates: kotlinx.coroutines.flow.Flow<com.ismartcoding.plain.rust.graphql.SubscriptionUpdate<com.ismartcoding.plain.rust.graphql.GraphqlResponse>> = kotlinx.coroutines.flow.emptyFlow(),
         readPeers: () -> List<Peer> = { emptyList() },
         failRead: (com.ismartcoding.plain.rust.graphql.GraphqlOperation) -> Boolean = { false },
+        capabilities: List<com.ismartcoding.plain.platform.system.Capability> = emptyList(),
+        readFeatures: () -> String = { "NOTES|FILES" },
     ): com.ismartcoding.plain.rust.graphql.ContentSource.Remote {
         val peer = com.ismartcoding.plain.models.Peer(
             id = "share-ui-fixture-peer", name = "Target fixture", ip = "", port = 8443,
@@ -526,7 +544,15 @@ class ManagedDeviceUiAcceptanceTest {
                     requests.add(operation)
                     if (failRead(operation)) error("connection_timeout")
                     val response = when {
-                        operation.query.contains("app {") -> """{"data":{"app":{"deviceName":"Target fixture","capabilities":[],"permissions":["WRITE_EXTERNAL_STORAGE"],"appDir":"/target-share-root","downloadsDir":"/target-downloads","urlToken":"fixture-resource-token","tlsCertificateSha256":"fixture-certificate"}}}"""
+                        operation.query.contains("app {") -> JsonHelper.jsonEncode(com.ismartcoding.plain.rust.graphql.GraphqlResponse(
+                            data = JsonHelper.jsonEncodeToElement(ManagedFixtureApp(com.ismartcoding.plain.models.ManagedDeviceInfo(
+                                "Target fixture", capabilities, listOf(Permission.WRITE_EXTERNAL_STORAGE), "/target-share-root", "/target-downloads", "fixture-resource-token", "fixture-certificate",
+                            ))).jsonObject,
+                        ))
+                        operation.query.contains("{ prefs }") -> JsonHelper.jsonEncode(com.ismartcoding.plain.rust.graphql.GraphqlResponse(
+                            data = JsonHelper.jsonEncodeToElement(ManagedFixturePrefs(mapOf("app_home_features" to readFeatures()))).jsonObject,
+                        ))
+                        operation.query.contains("setSavedValue(") -> """{"data":{"setSavedValue":true}}"""
                         operation.query.contains("shareRecord(") -> """{"data":{"shareRecord":{"id":"share-ui-fixture","name":"Target fixture share","password":"","urlToken":"fixture-resource-token","readOnly":true,"expiresAt":null,"createdAt":"2026-01-01T00:00:00Z","updatedAt":"2026-01-01T00:00:00Z","roots":[{"virtualPath":"root","realPath":"/target-share-root/existing.txt","isDir":false}]}}}"""
                         operation.query.contains("shareLink(") -> """{"data":{"shareLink":{"host":"device.test","port":8443,"sharedId":"share-ui-fixture","token":"fixture-share-token","pageUrl":"https://device.test:8443/share/fixture"}}}"""
                         operation.query.contains("sendShare(") -> """{"data":{"sendShare":[]}}"""
@@ -571,23 +597,238 @@ class ManagedDeviceUiAcceptanceTest {
     }
 
     @Test
+    fun localRootStartsWithChatAndKeepsServicesLastAndSettingsAccessible() = runBlocking {
+        instrumentation.runOnMainSync {
+            Prefs.onboardingCompleted.value = true
+            MainViewModel.selectDevice(null)
+            MainViewModel.currentRootTab.intValue = 1
+        }
+        ActivityScenario.launch(MainActivity::class.java).use { scenario ->
+            awaitNode("Chat settings action") { it.contentDescription == text(Res.string.settings) }
+            click(text(Res.string.devices), "device menu without pairs")
+            val rename = awaitNode("rename-only menu") { it.overlay && it.text == text(Res.string.rename) }
+            val renameItem = generateSequence(rename) { it.parent }.first { it.isClickable }
+            assertTrue(renameItem.boundsInWindow.width < 240 * instrumentation.targetContext.resources.displayMetrics.density)
+            captureNavigation("rename-only-menu")
+            assertFalse(allText().contains(text(Res.string.pair_device)))
+            assertFalse(allText().contains(text(Res.string.this_device)))
+            click(text(Res.string.rename), "rename selected device")
+            awaitNode("rename input") { it.isEditable }
+            click(text(Res.string.cancel), "cancel rename")
+            awaitMainWindowFocus(scenario)
+            assertEquals(1, MainViewModel.currentRootTab.intValue)
+            captureNavigation("local-chat")
+            click(text(Res.string.tools), "local tools tab")
+            click(text(Res.string.add), "local tools actions")
+            click(text(Res.string.customize_home_features), "local customization remains available")
+            awaitNode("local customization page") { it.text == text(Res.string.customize_home_features) }
+            awaitMainWindowFocus(scenario)
+            click(text(Res.string.back), "return from local customization")
+            click(text(Res.string.services), "services tab")
+            awaitNode("Remote Access service") { it.text == text(Res.string.home_remote_access) }
+            assertEquals(0, MainViewModel.currentRootTab.intValue)
+            captureNavigation("local-services")
+            click(text(Res.string.chat), "chat tab")
+            click(text(Res.string.settings), "app settings")
+            awaitNode("application settings") { it.text == text(Res.string.dark_theme) }
+            click(text(Res.string.back), "return from app settings")
+            awaitNode("Chat settings action after return") { it.contentDescription == text(Res.string.settings) }
+            assertEquals(1, MainViewModel.currentRootTab.intValue)
+        }
+    }
+
+    @Test
+    fun unavailableSelectedDeviceKeepsSettingsAndCanSwitchBackToLocal() = runBlocking<Unit> {
+        instrumentation.runOnMainSync {
+            Prefs.onboardingCompleted.value = true
+            MainViewModel.selectDevice(null)
+            MainViewModel.currentRootTab.intValue = 1
+        }
+        val now = kotlin.time.Instant.fromEpochMilliseconds(0)
+        val peer = Peer(
+            id = "unavailable-fixture", name = "Remote device for testing", ip = "",
+            status = com.ismartcoding.plain.features.nearby.PeerStatus.PAIRED, port = 8443,
+            deviceType = com.ismartcoding.plain.platform.system.DeviceType.PHONE,
+            createdAt = now, updatedAt = now, publicKey = "fixture-public-key", token = "fixture-token",
+        )
+        ActivityScenario.launch(MainActivity::class.java).use { scenario ->
+            scenario.onActivity { activity ->
+                activity.setContent {
+                    com.ismartcoding.plain.ui.theme.AppTheme(useDarkTheme = false) {
+                        val nav = androidx.compose.runtime.key(MainViewModel.selectedDevice.value) { androidx.navigation.compose.rememberNavController() }
+                        val peers = androidx.lifecycle.viewmodel.compose.viewModel(key = "navigation-fixture-peers") {
+                            com.ismartcoding.plain.ui.chat.PeerViewModel(readPeers = { listOf(peer) }, readLatestChats = { emptyMap() })
+                        }
+                        com.ismartcoding.plain.ui.navigation.MainNavGraph(
+                            navController = nav,
+                            peerVM = peers,
+                            channelVM = androidx.lifecycle.viewmodel.compose.viewModel { com.ismartcoding.plain.ui.chat.ChannelViewModel() },
+                            audioQueueVM = androidx.lifecycle.viewmodel.compose.viewModel { com.ismartcoding.plain.ui.audio.AudioQueueViewModel() },
+                            pomodoroVM = androidx.lifecycle.viewmodel.compose.viewModel { com.ismartcoding.plain.ui.pomodoro.PomodoroViewModel() },
+                            noteTagsVM = androidx.lifecycle.viewmodel.compose.viewModel(key = "fixture-note-tags") { com.ismartcoding.plain.ui.tags.TagsViewModel() },
+                            platformPages = null, batterySettings = null,
+                        )
+                    }
+                }
+            }
+            click(text(Res.string.devices), "device selector")
+            val menuName = awaitNode("device menu") { it.overlay && it.text == peer.name }
+            instrumentation.runOnMainSync {
+                val layouts = mutableListOf<androidx.compose.ui.text.TextLayoutResult>()
+                assertTrue(menuName.semantic.config.getOrNull(SemanticsActions.GetTextLayoutResult)?.action?.invoke(layouts) == true)
+                assertEquals(1, layouts.single().lineCount)
+                assertFalse(layouts.single().isLineEllipsized(0))
+            }
+            assertFalse(allText().contains(text(Res.string.pair_device)))
+            assertFalse(allText().contains(text(Res.string.online)))
+            assertFalse(allText().contains(text(Res.string.offline)))
+            captureNavigation("device-menu")
+            click(peer.name, "unavailable device")
+            awaitNode("remote authorization error") { it.text == text(Res.string.managed_authorization_changed) }
+            awaitValue("remote navigation without local services") {
+                if (uiNodes().none { it.contentDescription == text(Res.string.services) }) true else null
+            }
+            captureNavigation("remote-error")
+            click(text(Res.string.settings), "app settings from remote")
+            awaitNode("app settings contents") { it.text == text(Res.string.dark_theme) }
+            for (step in 0 until 8) {
+                if (uiNodes().any { it.isVisible && it.text == text(Res.string.logs) }) break
+                instrumentation.runOnMainSync {
+                    val page = currentNodes().first { it.semantic.config.getOrNull(SemanticsActions.ScrollBy) != null }
+                    page.semantic.config.getOrNull(SemanticsActions.ScrollBy)?.action?.invoke(0f, page.boundsInWindow.height * 0.6f)
+                }
+            }
+            val logs = awaitNode("application-local logs") { it.text == text(Res.string.logs) }
+            val logsAction = generateSequence(logs) { it.parent }.first { it.isClickable }
+            assertTrue(logsAction.performAction(AccessibilityNodeInfo.ACTION_CLICK))
+            awaitNode("loaded local log viewer") { it.contentDescription == text(Res.string.wrap_content) }
+            click(text(Res.string.back), "return from local logs")
+            click(text(Res.string.back), "return to selected device")
+            awaitNode("selected device retained") { it.text == peer.name }
+            click(text(Res.string.devices), "device selector from remote")
+            click(text(Res.string.this_device), "switch back to local")
+            awaitNode("local services tab restored") { it.contentDescription == text(Res.string.services) }
+        }
+    }
+
+    @Test
+    fun sharedToolsPageRefreshesPreferencesAndWritesDraftOnlyToTheSelectedDevice() = runBlocking<Unit> {
+        ActivityScenario.launch(MainActivity::class.java).use { scenario ->
+            val localBefore = GraphqlApi.execute(Query.savedValue("quick_note_draft", ""))
+            val requests = java.util.Collections.synchronizedList(mutableListOf<com.ismartcoding.plain.rust.graphql.GraphqlOperation>())
+            val features = java.util.concurrent.atomic.AtomicReference("NOTES|FILES")
+            val failRefresh = java.util.concurrent.atomic.AtomicBoolean(false)
+            val source = shareFixtureSource(requests, capabilities = listOf(
+                com.ismartcoding.plain.platform.system.Capability.NOTES,
+                com.ismartcoding.plain.platform.system.Capability.FILE_BROWSER,
+            ), readFeatures = { features.get() }, failRead = { failRefresh.get() && "{ prefs }" in it.query })
+            scenario.onActivity { activity ->
+                activity.setContent {
+                    com.ismartcoding.plain.ui.theme.AppTheme(useDarkTheme = false) {
+                        val nav = androidx.navigation.compose.rememberNavController()
+                        androidx.compose.runtime.CompositionLocalProvider(com.ismartcoding.plain.ui.navigation.LocalContentSource provides source) {
+                            com.ismartcoding.plain.ui.tools.ToolsPage(nav, onTabSelected = {})
+                        }
+                    }
+                }
+            }
+            awaitNode("selected device notes tool") { it.text == text(Res.string.notes) }
+            awaitNode("selected device files tool") { it.text == text(Res.string.files) }
+            assertFalse(allText().contains(text(Res.string.sound_meter)))
+            assertTrue(uiNodes().none { it.contentDescription == text(Res.string.add) })
+            val draft = "Selected device quick draft"
+            val field = awaitNode("selected device quick note") { it.isEditable }
+            assertTrue(field.performAction(AccessibilityNodeInfo.ACTION_SET_TEXT, Bundle().apply {
+                putCharSequence(AccessibilityNodeInfo.ACTION_ARGUMENT_SET_TEXT_CHARSEQUENCE, draft)
+            }))
+            awaitValue("selected device draft save") {
+                synchronized(requests) {
+                    requests.firstOrNull { "setSavedValue(" in it.query && it.variables["value"]?.jsonPrimitive?.content == draft }
+                }
+            }
+            assertEquals(localBefore, GraphqlApi.execute(Query.savedValue("quick_note_draft", "")))
+            features.set("FILES")
+            pullToolsDown()
+            awaitValue("refreshed selected-device tools") {
+                if (uiNodes().none { it.isVisible && it.text == text(Res.string.notes) }) true else null
+            }
+            awaitNode("files after refresh") { it.text == text(Res.string.files) }
+            awaitToolsRefreshFinished()
+            features.set("NOTES|FILES")
+            failRefresh.set(true)
+            pullToolsDown()
+            awaitValue("failed refresh reached the selected device") {
+                if (synchronized(requests) { requests.count { "{ prefs }" in it.query } } == 3) true else null
+            }
+            awaitNode("failed tools refresh indicator") { it.text == text(com.ismartcoding.plain.ui.resources.Res.string.srl_header_failed) }
+            awaitToolsRefreshFinished()
+            assertTrue(uiNodes().none { it.isVisible && it.text == text(Res.string.notes) })
+            awaitNode("tools preserved after failed refresh") { it.text == text(Res.string.files) }
+            failRefresh.set(false)
+            pullToolsDown()
+            awaitNode("notes restored after refresh recovery") { it.text == text(Res.string.notes) }
+            assertEquals(draft, awaitNode("draft preserved across refresh") { it.isEditable }.text)
+            assertEquals(4, synchronized(requests) { requests.count { "{ prefs }" in it.query } })
+            assertTrue(synchronized(requests) { requests.none { "setPref(" in it.query } })
+            assertEquals(localBefore, GraphqlApi.execute(Query.savedValue("quick_note_draft", "")))
+            captureNavigation("selected-tools")
+        }
+    }
+
+    private suspend fun awaitToolsRefreshFinished() {
+        val finished = text(com.ismartcoding.plain.ui.resources.Res.string.srl_header_finish)
+        val refreshing = text(com.ismartcoding.plain.ui.resources.Res.string.srl_header_refreshing)
+        val failed = text(com.ismartcoding.plain.ui.resources.Res.string.srl_header_failed)
+        awaitValue("tools refresh indicator retracted") {
+            if (uiNodes().none { it.isVisible && (it.text == finished || it.text == refreshing || it.text == failed) }) true else null
+        }
+    }
+
+    private fun pullToolsDown() {
+        val display = instrumentation.targetContext.resources.displayMetrics
+        val x = display.widthPixels * 0.5f
+        val start = display.heightPixels * 0.45f
+        val distance = display.heightPixels * 0.3f
+        val down = android.os.SystemClock.uptimeMillis()
+        for (step in 0..24) {
+            val action = when (step) {
+                0 -> android.view.MotionEvent.ACTION_DOWN
+                24 -> android.view.MotionEvent.ACTION_UP
+                else -> android.view.MotionEvent.ACTION_MOVE
+            }
+            val event = android.view.MotionEvent.obtain(down, android.os.SystemClock.uptimeMillis(), action, x, start + distance * step / 24, 0)
+            assertTrue(instrumentation.uiAutomation.injectInputEvent(event, true))
+            event.recycle()
+            android.os.SystemClock.sleep(16)
+        }
+        instrumentation.waitForIdleSync()
+    }
+
+    private fun captureNavigation(name: String) {
+        val image = instrumentation.uiAutomation.takeScreenshot()
+        java.io.File(instrumentation.targetContext.cacheDir, "navigation-$name.png").outputStream().use {
+            image.compress(android.graphics.Bitmap.CompressFormat.PNG, 100, it)
+        }
+        image.recycle()
+    }
+
+    @Test
     fun longChatPreviewUsesOneEllipsizedLine() {
         val message = "managed-chat-2bf41508-8317-426e-9d7c-b3c4fe7c8f0f ".repeat(4)
-        val access = text(Res.string.peer_manage_access)
         ActivityScenario.launch(MainActivity::class.java).use { scenario ->
             scenario.onActivity { activity ->
                 activity.setContent {
                     com.ismartcoding.plain.ui.theme.AppTheme(useDarkTheme = false) {
                         Box(Modifier.width(320.dp)) {
                             com.ismartcoding.plain.ui.chat.components.PeerListItem(
-                                title = "Device", desc = message, accessLabel = access,
+                                title = "Device", desc = message,
                                 icon = com.ismartcoding.plain.ui.resources.Res.drawable.smartphone,
                             )
                         }
                     }
                 }
             }
-            val subtitle = awaitNode("long device chat preview") { it.text == "$access · $message" }
+            val subtitle = awaitNode("long device chat preview") { it.text == message }
             instrumentation.runOnMainSync {
                 val layouts = mutableListOf<androidx.compose.ui.text.TextLayoutResult>()
                 assertTrue(subtitle.semantic.config.getOrNull(SemanticsActions.GetTextLayoutResult)?.action?.invoke(layouts) == true)
@@ -1043,9 +1284,7 @@ class ManagedDeviceUiAcceptanceTest {
             val localIds = GraphqlApi.execute(Query.packages("", 0, 1000, FileSortBy.NAME_ASC)).map { it.id }.toSet()
             val packages = remote.execute(Query.packages("", 0, 50, FileSortBy.NAME_ASC))
             val target = checkNotNull(packages.take(5).find { it.id !in localIds }) { "A visible target-only package is required" }
-            click(text(Res.string.chat), "chat navigation")
-            click(peer.name, "managed peer")
-            click(text(Res.string.remote_management), "management entry")
+            openRemoteTools(peer.name)
             click(text(Res.string.apps), "remote apps")
             click(target.id, "target-only package row")
             awaitNode("existing application details") { it.text == text(Res.string.source_directory) }
@@ -1083,9 +1322,7 @@ class ManagedDeviceUiAcceptanceTest {
             val peer = checkNotNull(GraphqlApi.execute(Query.peers()).find { it.id == peerId })
             val remote = GraphqlApi.forPeer(peer)
             awaitValue("target permission disabled") { if (permission !in remote.execute(Query.appPermissions())) true else null }
-            click(text(Res.string.chat), "chat navigation")
-            click(peer.name, "managed peer")
-            click(text(Res.string.remote_management), "management entry")
+            openRemoteTools(peer.name)
             click(title, "remote content requiring access")
             awaitNode("remote request permission button") { it.text == text(Res.string.request_permission) }
             assertFalse("Search must not query content before permission", uiNodes().any { it.isVisible && it.contentDescription == text(Res.string.search) })
@@ -1120,9 +1357,7 @@ class ManagedDeviceUiAcceptanceTest {
                 remote.execute(Query.files(target.appDir, "", FileSortBy.NAME_ASC, 0, 1))
                 fail("The target must reject disabled file access")
             } catch (expected: IllegalStateException) { assertEquals("no_permission", expected.message) }
-            click(text(Res.string.chat), "chat navigation")
-            click(peer.name, "managed peer")
-            click(text(Res.string.remote_management), "management entry")
+            openRemoteTools(peer.name)
             click(text(Res.string.files), "remote files")
             awaitNode("target permission request action") { it.text == text(Res.string.request_permission) }
             assertFalse(allText().any { it.contains("no_permission") })
@@ -1382,8 +1617,7 @@ class ManagedDeviceUiAcceptanceTest {
             click(text(Res.string.back), "back to chat list")
             click(text(Res.string.chat), "chat navigation")
             click(peer.name, "paired chat")
-            if (mode == PairingMode.MANAGE) awaitNode("management button") { it.text?.toString() == text(Res.string.remote_management) }
-            else assertFalse(allText().any { it == text(Res.string.remote_management) })
+            assertFalse(allText().any { it == text(Res.string.remote_management) })
             report("pairing_result", mode.name + "_verified")
         }
     }
@@ -1398,13 +1632,11 @@ class ManagedDeviceUiAcceptanceTest {
             assertTrue(peer.isPaired())
             assertEquals(mode == PairingMode.MANAGE, peer.token.isNotEmpty())
             click(text(Res.string.chat), "chat navigation")
-            var row = awaitNode("paired device") { it.text == peer.name }
-            val access = text(if (mode == PairingMode.MANAGE) Res.string.peer_manage_access else Res.string.pair_chat_only)
-            while (nodes(row).none { it.text?.contains(access) == true } && row.parent != null) row = checkNotNull(row.parent)
-            assertTrue(nodes(row).any { it.text?.contains(access) == true })
+            awaitNode("paired device") { it.text == peer.name }
+            assertFalse(allText().any { it == text(Res.string.pair_chat_only) })
             click(peer.name, "paired chat")
             if (mode == PairingMode.MANAGE) {
-                awaitNode("management button") { it.text == text(Res.string.remote_management) }
+                assertFalse(allText().any { it == text(Res.string.remote_management) })
                 assertEquals(targetId, GraphqlApi.forPeer(peer).execute(identityRequest).clientId)
             } else {
                 assertFalse(allText().any { it == text(Res.string.remote_management) })
@@ -1456,7 +1688,7 @@ class ManagedDeviceUiAcceptanceTest {
     }
 
     @Test
-    fun managesRemoteNoteThroughTheChatEntryWithoutWritingLocalContent() = runBlocking {
+    fun managesRemoteNoteThroughTheDeviceSelectorWithoutWritingLocalContent() = runBlocking {
         ActivityScenario.launch(MainActivity::class.java).use {
             val targetId = checkNotNull(InstrumentationRegistry.getArguments().getString("managedPeerId"))
             val peer = checkNotNull(GraphqlApi.execute(Query.peers()).find { it.id == targetId })
@@ -1468,9 +1700,7 @@ class ManagedDeviceUiAcceptanceTest {
             val note = remote.execute(Mutation.saveNote("", marker, "# $marker\n\nInitial $marker"))
             try {
                 assertNull(GraphqlApi.execute(Query.note(note.id)))
-                click(text(Res.string.chat), "chat navigation")
-                click(peer.name, "selected peer")
-                click(text(Res.string.remote_management), "remote management entry")
+                openRemoteTools(peer.name)
                 awaitNode("target tools page") { it.text?.toString() == target.deviceName }
                 val tools = allText()
                 for (excluded in listOf(Res.string.sound_meter, Res.string.pomodoro_timer, Res.string.image_editor)) {
@@ -1560,10 +1790,15 @@ class ManagedDeviceUiAcceptanceTest {
         }
     }
 
-    private suspend fun openRemoteNoteImageEditor(peerName: String, noteTitle: String) {
+    private fun openRemoteTools(peerName: String) {
         click(text(Res.string.chat), "chat navigation")
-        click(peerName, "selected peer")
-        click(text(Res.string.remote_management), "management entry")
+        click(text(Res.string.devices), "device selector")
+        click(peerName, "selected device")
+        click(text(Res.string.tools), "selected device tools")
+    }
+
+    private suspend fun openRemoteNoteImageEditor(peerName: String, noteTitle: String) {
+        openRemoteTools(peerName)
         click(text(Res.string.notes), "remote notes")
         click(noteTitle, "owned remote note")
         val paragraph = awaitNode("editable note preview") { it.text?.contains("Initial $noteTitle") == true }
@@ -1956,9 +2191,7 @@ class ManagedDeviceUiAcceptanceTest {
             val nativeSpeed = com.ismartcoding.plain.Prefs.audioPlaybackSpeed.value
             try {
                 remote.execute(Mutation.updateAudioPlayMode(com.ismartcoding.plain.features.audio.MediaPlayMode.REPEAT))
-                click(text(Res.string.chat), "chat navigation")
-                click(peer.name, "selected peer")
-                click(text(Res.string.remote_management), "management entry")
+                openRemoteTools(peer.name)
                 click(text(Res.string.audios), "remote audio library")
                 assertFalse("Granted remote storage must not flash the request-permission page", allText().contains(text(Res.string.remote_permission_required)))
                 click(text(Res.string.view_all), "all remote audio", firstMatch = true)
@@ -2030,9 +2263,7 @@ class ManagedDeviceUiAcceptanceTest {
             val feed = source.feeds.getAll().single { it.name == marker }
             try {
                 assertNull(com.ismartcoding.plain.features.feeds.FeedsClient.getById(feed.id))
-                click(text(Res.string.chat), "chat navigation")
-                click(peer.name, "selected peer")
-                click(text(Res.string.remote_management), "management entry")
+                openRemoteTools(peer.name)
                 click(text(Res.string.feeds), "existing target feed page")
                 var drawer = awaitNode("target feeds drawer") { it.contentDescription == text(Res.string.feeds) }
                 while (!drawer.isClickable) drawer = checkNotNull(drawer.parent)
@@ -2139,9 +2370,7 @@ class ManagedDeviceUiAcceptanceTest {
             assertTrue(path.substringAfterLast('/').startsWith(prefix))
             assertTrue(com.ismartcoding.plain.features.media.MediaCatalogClient.rows(type, query, 10, 0, FileSortBy.NAME_ASC).isEmpty())
             assertFalse(java.io.File(path).exists())
-            click(text(Res.string.chat), "chat navigation")
-            click(peer.name, "selected peer")
-            click(text(Res.string.remote_management), "management entry")
+            openRemoteTools(peer.name)
             click(text(title), "selected remote media page")
             click(text(Res.string.search), "remote media search")
             val field = awaitNode("remote media search input") { it.isEditable }
@@ -2202,9 +2431,7 @@ class ManagedDeviceUiAcceptanceTest {
                 report("file_stage", "seed_text")
                 remote.execute(Mutation.fileWrite(FileWriteAction.WRITE_TEXT, path, initial, false))
                 assertTrue(GraphqlApi.execute(Query.files(local.appDir, "", FileSortBy.NAME_ASC, 0, 1000)).none { it.name == name })
-                click(text(Res.string.chat), "chat navigation")
-                click(peer.name, "managed peer")
-                click(text(Res.string.remote_management), "management entry")
+                openRemoteTools(peer.name)
                 report("file_stage", "open_remote_root")
                 click(text(Res.string.files), "remote files")
                 click(text(Res.string.folders), "remote storage drawer")
@@ -2411,6 +2638,14 @@ class ManagedDeviceUiAcceptanceTest {
             Thread.sleep(100)
         }
         throw AssertionError("Timed out waiting for $role; visible text: ${allText()}")
+    }
+
+    private suspend fun awaitMainWindowFocus(scenario: ActivityScenario<MainActivity>) {
+        awaitValue("main window focus after dialog dismissal") {
+            var focused = false
+            scenario.onActivity { focused = it.window.decorView.hasWindowFocus() }
+            if (focused) true else null
+        }
     }
 
     private fun allText(): List<String> = uiNodes().filter { it.isVisible }.mapNotNull { it.text }

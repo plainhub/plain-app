@@ -25,7 +25,7 @@ fun MainBottomBar(
         modifier = modifier,
         containerColor = MaterialTheme.colorScheme.background,
     ) {
-        mainNavItems.forEach { item ->
+        mainNavItems().forEach { item ->
             NavigationBarItem(
                 selected = selectedIndex == item.index,
                 onClick = { onTabSelected(item.index) },

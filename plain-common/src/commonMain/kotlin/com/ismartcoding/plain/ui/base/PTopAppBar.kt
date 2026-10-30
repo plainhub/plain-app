@@ -1,5 +1,8 @@
 package com.ismartcoding.plain.ui.base
 
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.ui.semantics.Role
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -42,6 +45,7 @@ fun PTopAppBar(
     subtitleColor: Color? = null,
     actions: (@Composable RowScope.() -> Unit)? = null,
     scrollBehavior: TopAppBarScrollBehavior? = null,
+    onTitleClick: (() -> Unit)? = null,
 ) {
     val topBarColor = containerColor ?: MaterialTheme.colorScheme.background
     val topBarSubtitleColor = subtitleColor ?: MaterialTheme.colorScheme.onSurfaceVariant
@@ -54,7 +58,11 @@ fun PTopAppBar(
     ) {
         TopAppBar(
             title = {
-                Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                Row(
+                    modifier = if (onTitleClick == null) Modifier else Modifier.heightIn(min = 48.dp).clickable(role = Role.Button, onClick = onTitleClick),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                ) {
                     if (subtitle.isEmpty()) {
                         Text(
                             title,

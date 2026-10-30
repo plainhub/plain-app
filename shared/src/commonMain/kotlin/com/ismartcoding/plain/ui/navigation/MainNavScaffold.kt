@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.displayCutout
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.only
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.layout.union
 import androidx.compose.material3.Icon
@@ -33,12 +32,11 @@ import androidx.compose.ui.unit.dp
 import com.ismartcoding.plain.i18n.Res
 import com.ismartcoding.plain.i18n.chat
 import com.ismartcoding.plain.ui.resources.layout_grid as ui_drawable_layout_grid
-import com.ismartcoding.plain.i18n.home
-import com.ismartcoding.plain.ui.resources.house as ui_drawable_house
+import com.ismartcoding.plain.i18n.services
+import com.ismartcoding.plain.ui.resources.power_settings as ui_drawable_power_settings
 import com.ismartcoding.plain.ui.resources.message_circle as ui_drawable_message_circle
 import com.ismartcoding.plain.ui.resources.search as ui_drawable_search
 import com.ismartcoding.plain.i18n.tools
-import com.ismartcoding.plain.platform.system.getDeviceCapabilities
 import com.ismartcoding.plain.ui.base.PScaffold
 import com.ismartcoding.plain.ui.theme.primaryPill
 import org.jetbrains.compose.resources.DrawableResource
@@ -55,14 +53,24 @@ internal data class MainNavItem(
     val label: StringResource,
 )
 
-internal val mainNavItems: List<MainNavItem>
-    get() = buildList {
-        add(MainNavItem(0, UiRes.drawable.ui_drawable_house, Res.string.home))
+@Composable
+internal fun mainNavItems(): List<MainNavItem> {
+    val device = LocalDeviceNavigation.current
+    val source = LocalContentSource.current
+    return mainNavItems(device?.capabilities ?: source.capabilities,
+        localOperationsAllowed = if (device == null) source is com.ismartcoding.plain.rust.graphql.ContentSource.Local else device.selectedPeerId == null)
+}
+
+internal fun mainNavItems(capabilities: Collection<com.ismartcoding.plain.platform.system.Capability>, localOperationsAllowed: Boolean): List<MainNavItem> =
+    buildList {
         add(MainNavItem(1, UiRes.drawable.ui_drawable_message_circle, Res.string.chat))
-        if (hasTools(getDeviceCapabilities())) {
+        if (hasTools(capabilities, localToolsAllowed = localOperationsAllowed)) {
             add(MainNavItem(2, UiRes.drawable.ui_drawable_layout_grid, Res.string.tools))
         }
         add(MainNavItem(3, UiRes.drawable.ui_drawable_search, Res.string.search))
+        if (localOperationsAllowed) {
+            add(MainNavItem(0, UiRes.drawable.ui_drawable_power_settings, Res.string.services))
+        }
     }
 
 // Material 3 window width classes: compact < 600dp <= medium < 840dp <= expanded.
@@ -142,7 +150,7 @@ private fun MainNavRail(selectedIndex: Int, onTabSelected: (Int) -> Unit) {
             containerColor = MaterialTheme.colorScheme.background,
         ),
     ) {
-        mainNavItems.forEach { item ->
+        mainNavItems().forEach { item ->
             WideNavigationRailItem(
                 selected = selectedIndex == item.index,
                 onClick = { onTabSelected(item.index) },
@@ -163,7 +171,7 @@ private fun MainNavRail(selectedIndex: Int, onTabSelected: (Int) -> Unit) {
 private fun MainNavDrawerContent(selectedIndex: Int, onTabSelected: (Int) -> Unit) {
     PermanentDrawerSheet(drawerContainerColor = MaterialTheme.colorScheme.background) {
         Spacer(Modifier.height(16.dp))
-        mainNavItems.forEach { item ->
+        mainNavItems().forEach { item ->
             NavigationDrawerItem(
                 label = { Text(stringResource(item.label)) },
                 selected = selectedIndex == item.index,

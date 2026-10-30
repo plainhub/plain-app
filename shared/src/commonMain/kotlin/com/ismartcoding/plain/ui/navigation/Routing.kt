@@ -76,15 +76,6 @@ class Routing {
     data class ChatInfo(val chatId: String)
 
     @Serializable
-    data class ManagedTools(
-        val peerId: String, val publicKey: String,
-        val entryFeature: String = "", val entryId: String = "", val entryPath: String = "", val entryTitle: String = "",
-    )
-
-    @Serializable
-    object ManagedToolsRoot
-
-    @Serializable
     data class ChatText(val content: String)
 
     @Serializable

@@ -138,4 +138,5 @@
     <string name="login_compare_code">Compare this code on both devices before allowing login.</string>
     <string name="home_try_other_addresses">Try other addresses</string>
     <string name="home_remote_access">Remote Access</string>
+    <string name="services">Services</string>
 </resources>

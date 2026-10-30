@@ -11,10 +11,13 @@ import com.ismartcoding.plain.ui.audio.AudioQueueViewModel
 import com.ismartcoding.plain.ui.navigation.LocalContentSource
 
 @Composable
-fun ChatListPageRoute(navController: NavHostController) {
-    val peerVM = viewModel { PeerViewModel() }
-    val channelVM = viewModel { ChannelViewModel() }
-    ChatListPage(navController, peerVM, channelVM)
+fun ChatListPageRoute(
+    navController: NavHostController,
+    owner: ViewModelStoreOwner = checkNotNull(LocalViewModelStoreOwner.current),
+    onTabSelected: ((Int) -> Unit)? = null,
+) {
+    val state = rememberChatPageState(owner)
+    ChatListPage(navController, state.peers, state.channels, onTabSelected)
 }
 
 internal data class ChatPageState(val chat: ChatViewModel, val peers: PeerViewModel, val channels: ChannelViewModel, val audio: AudioQueueViewModel)

@@ -49,6 +49,11 @@ import kotlin.time.Instant
 import kotlinx.serialization.json.JsonElement
 
 object Mutation {
+    fun updateDeviceName(name: String): GraphqlRequest<Boolean> = GraphqlRequest(
+        $$"mutation($name: String!) { updateDeviceName(name: $name) }",
+        mapOf(variable("name", name)), field = "updateDeviceName",
+    )
+
     fun uninstallPackages(ids: List<String>): GraphqlRequest<Boolean> = GraphqlRequest(
         $$"mutation($ids: [ID!]!) { uninstallPackages(ids: $ids) }",
         mapOf(variable("ids", ids)), field = "uninstallPackages",

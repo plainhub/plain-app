@@ -137,4 +137,5 @@
     <string name="disable_desktop_access">關閉桌面存取</string>
     <string name="home_try_other_addresses">嘗試其他位址</string>
     <string name="home_remote_access">遠端存取</string>
+    <string name="services">服務</string>
 </resources>

@@ -137,4 +137,5 @@
     <string name="turn_off_keep_online_in_background">バックグラウンドモードをオフにする</string>
     <string name="enable_desktop_access">パソコンからのアクセスを有効にする</string>
     <string name="disable_desktop_access">パソコンからのアクセスを無効にする</string>
+    <string name="services">サービス</string>
 </resources>

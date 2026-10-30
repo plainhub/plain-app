@@ -54,7 +54,6 @@ import com.ismartcoding.plain.ui.base.PBottomAppBar
 import com.ismartcoding.plain.ui.base.PScaffold
 import com.ismartcoding.plain.ui.base.PTopAppBar
 import com.ismartcoding.plain.ui.base.PTopRightButton
-import com.ismartcoding.plain.ui.base.PTextButton
 import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.base.fastscroll.LazyColumnScrollbar
 import com.ismartcoding.plain.ui.base.pullrefresh.PullToRefresh
@@ -177,14 +176,6 @@ fun ChatPage(
                         PTopRightButton(label = stringResource(if (chatVM.isAllSelected()) Res.string.unselect_all else Res.string.select_all), click = { chatVM.toggleSelectAll() })
                         HorizontalSpace(dp = 8.dp)
                     } else {
-                        if (chatTarget.value.type == ChatTargetType.PEER && !chatTarget.value.isLocal()) {
-                            peers[chatTarget.value.toId]?.takeIf { it.isPaired() && it.token.isNotEmpty() }?.let { peer ->
-                                PTextButton(
-                                    text = stringResource(Res.string.remote_management),
-                                    onClick = { navController.navigate(Routing.ManagedTools(peer.id, peer.publicKey)) },
-                                )
-                            }
-                        }
                         ActionButtonMore(onClick = {
                             navController.navigate(Routing.ChatInfo(id))
                         })

@@ -24,9 +24,6 @@ import com.ismartcoding.plain.i18n.Res
 import com.ismartcoding.plain.i18n.grant_permission
 import com.ismartcoding.plain.i18n.local_chat
 import com.ismartcoding.plain.i18n.local_chat_desc
-import com.ismartcoding.plain.i18n.pair_chat_only
-import com.ismartcoding.plain.i18n.peer_manage_access
-import com.ismartcoding.plain.i18n.unpaired
 import com.ismartcoding.plain.i18n.nearby_wifi_devices_required_for_chat
 import com.ismartcoding.plain.lib.Channel
 import com.ismartcoding.plain.lib.sendEvent
@@ -67,13 +64,15 @@ fun ChatListPage(
     peerVM: PeerViewModel,
     channelVM: ChannelViewModel,
     onTabSelected: ((Int) -> Unit)? = null,
+    observePeers: Boolean = true,
 ) {
+    val local = com.ismartcoding.plain.ui.navigation.LocalContentSource.current is com.ismartcoding.plain.rust.graphql.ContentSource.Local
     val allPeers = peerVM.peerList.collectAsStateValue()
     val latestChats by peerVM.latestChats.collectAsState()
-    LaunchedEffect(peerVM) { peerVM.observe() }
+    LaunchedEffect(peerVM, observePeers) { if (observePeers) peerVM.observe() }
     LaunchedEffect(channelVM) { channelVM.observe() }
     val refreshState = rememberRefreshLayoutState {
-        PeerStatusClient.reconnectNow("chat_list_pull_refresh")
+        if (local) PeerStatusClient.reconnectNow("chat_list_pull_refresh")
         peerVM.load()
         channelVM.load()
         setRefreshState(RefreshContentState.Finished)
@@ -116,7 +115,7 @@ fun ChatListPage(
             LazyColumn(modifier = Modifier.fillMaxSize()) {
                 item { TopSpace() }
                 item {
-                    if (!bleReady || !awareReady) PAlert(
+                    if (local && (!bleReady || !awareReady)) PAlert(
                         description = stringResource(Res.string.nearby_wifi_devices_required_for_chat),
                         type = AlertType.WARNING,
                     ) {
@@ -170,11 +169,6 @@ fun ChatListPage(
                             desc = if (peer.isPaired()) peer.getBestIp() else peer.ip,
                             icon = peer.deviceType.getIcon(),
                             online = peer.online,
-                            accessLabel = stringResource(when {
-                                !peer.isPaired() -> Res.string.unpaired
-                                peer.token.isNotEmpty() -> Res.string.peer_manage_access
-                                else -> Res.string.pair_chat_only
-                            }),
                             latestChat = latestChats[peer.id],
                             peerId = peer.id,
                             onDelete = { peerVM.removePeer(it) },

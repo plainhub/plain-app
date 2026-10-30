@@ -7,6 +7,7 @@ import com.ismartcoding.plain.ui.media.extensions.collectAsStateValue
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.runtime.key
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
@@ -27,7 +28,6 @@ import com.ismartcoding.plain.ui.theme.DarkTheme
 import com.ismartcoding.plain.ui.base.DebugCornerBadge
 import com.ismartcoding.plain.ui.audio.AudioQueueViewModel
 import com.ismartcoding.plain.ui.chat.ChannelViewModel
-import com.ismartcoding.plain.ui.feeds.FeedEntryPagerViewModel
 import com.ismartcoding.plain.ui.app.MainViewModel
 import com.ismartcoding.plain.ui.chat.PeerViewModel
 import com.ismartcoding.plain.ui.pomodoro.PomodoroViewModel
@@ -47,14 +47,13 @@ fun Main(
     pomodoroVM: PomodoroViewModel,
     peerVM: PeerViewModel,
     channelVM: ChannelViewModel,
-    feedTagsVM: TagsViewModel = viewModel(key = "feedTagsVM") { TagsViewModel() },
-    feedEntryPagerVM: FeedEntryPagerViewModel = viewModel(key = "feedEntryPagerVM") { FeedEntryPagerViewModel() },
     noteTagsVM: TagsViewModel = viewModel(key = "noteTagsVM") { TagsViewModel() },
     platformPages: (NavGraphBuilder.(NavHostController) -> Unit)? = null,
     batterySettings: (@Composable () -> Unit)? = null,
 ) {
     val scope = rememberCoroutineScope()
-    val navController = rememberNavController()
+    val selectedDevice by MainViewModel.selectedDevice
+    val navController = key(selectedDevice) { rememberNavController() }
     navControllerState.value = navController
     val useDarkTheme = DarkTheme.isDarkTheme(Prefs.darkTheme.collectAsStateValue())
 
@@ -95,7 +94,7 @@ fun Main(
     }
 
     Box(modifier = Modifier.background(MaterialTheme.colorScheme.backgroundNormal)) {
-        MainNavGraph(navController, audioQueueVM, peerVM, channelVM, feedTagsVM, feedEntryPagerVM, noteTagsVM, pomodoroVM, platformPages, batterySettings)
+        MainNavGraph(navController, audioQueueVM, peerVM, channelVM, noteTagsVM, pomodoroVM, platformPages, batterySettings)
         MainRequestNavigation(navController)
 
         // Global fullscreen audio player: hosted above all pages so playback

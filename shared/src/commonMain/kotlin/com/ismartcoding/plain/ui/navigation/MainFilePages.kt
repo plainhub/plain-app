@@ -1,5 +1,7 @@
 package com.ismartcoding.plain.ui.navigation
 
+import androidx.compose.runtime.CompositionLocalProvider
+import com.ismartcoding.plain.features.files.TextFileType
 import com.ismartcoding.plain.rust.graphql.ContentSource
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
@@ -43,9 +45,17 @@ internal fun NavGraphBuilder.addMainFilePages(
         val r = backStackEntry.toRoute<Routing.Text>()
         TextPage(navController, r.title, r.content, r.language)
     }
-    contentDestination<Routing.TextFile>(source = source) { backStackEntry ->
+    composable<Routing.TextFile> { backStackEntry ->
         val r = backStackEntry.toRoute<Routing.TextFile>()
-        TextFilePage(navController, r.path, r.title, r.mediaId, r.type)
+        val fileSource = when (r.type) {
+            TextFileType.APP_LOG.name, TextFileType.CRASH_REPORT.name -> ContentSource.Local
+            else -> source()
+        }
+        fileSource?.let {
+            CompositionLocalProvider(LocalContentSource provides it) {
+                TextFilePage(navController, r.path, r.title, r.mediaId, r.type)
+            }
+        }
     }
     contentDestination<Routing.ChatText>(source = source) { backStackEntry ->
         val r = backStackEntry.toRoute<Routing.ChatText>()

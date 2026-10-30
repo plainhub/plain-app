@@ -108,7 +108,7 @@ fun GlobalSearchPage(
         when (val action = hit.action) {
             is GlobalSearchAction.Navigate -> {
                 val device = hit.device
-                if (device is com.ismartcoding.plain.rust.graphql.ContentSource.Remote) {
+                if (device is com.ismartcoding.plain.rust.graphql.ContentSource.Remote || com.ismartcoding.plain.ui.app.MainViewModel.selectedDevice.value != null) {
                     val feature: com.ismartcoding.plain.platform.system.AppFeatureType
                     var id = ""
                     var path = ""
@@ -126,7 +126,10 @@ fun GlobalSearchPage(
                         }
                         else -> error("Unsupported remote search result")
                     }
-                    navController.navigate(com.ismartcoding.plain.ui.navigation.Routing.ManagedTools(device.client.peerId, device.client.publicKey, feature.name, id, path, title))
+                    val identity = (device as? com.ismartcoding.plain.rust.graphql.ContentSource.Remote)?.client?.let {
+                        com.ismartcoding.plain.ui.app.DeviceIdentity(it.peerId, it.publicKey)
+                    }
+                    com.ismartcoding.plain.ui.app.MainViewModel.openDeviceContent(identity, com.ismartcoding.plain.ui.app.DeviceContentEntry(feature, id, path, title))
                 } else navController.navigate(action.route)
             }
             is GlobalSearchAction.PlayAudio -> checkNotificationPermission(Res.string.audio_notification_prompt) {
