@@ -82,7 +82,7 @@ fun PAlert(
         Column(
             modifier = Modifier
                 .then(if (onClick != null) Modifier.clip(shape).clickable(onClick = onClick) else Modifier)
-                .padding(16.dp),
+                .padding(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 8.dp),
         ) {
             Row(verticalAlignment = Alignment.Top, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 Box(

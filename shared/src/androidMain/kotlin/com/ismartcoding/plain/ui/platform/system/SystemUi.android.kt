@@ -114,8 +114,8 @@ actual fun applySystemBarAppearanceForDarkTheme(useDarkTheme: Boolean) {
         isAppearanceLightStatusBars = !useDarkTheme
         isAppearanceLightNavigationBars = !useDarkTheme
     }
-    if (isQPlus() && isGestureInteractionMode()) {
-        window.isNavigationBarContrastEnforced = false
+    if (isQPlus()) {
+        window.isNavigationBarContrastEnforced = !isGestureInteractionMode()
     }
 }
 

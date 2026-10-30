@@ -5,10 +5,8 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -33,11 +31,11 @@ import com.ismartcoding.plain.ui.media.extensions.collectAsStateValue
 import com.ismartcoding.plain.ui.navigation.Routing
 import com.ismartcoding.plain.ui.settings.DesktopAccessSettingsViewModel
 import com.ismartcoding.plain.ui.state.launchSafe
+import com.ismartcoding.plain.ui.theme.plainColors
 import com.ismartcoding.plain.ui.web.components.WebAddressPager
 import kotlinx.coroutines.flow.map
-import com.ismartcoding.plain.ui.theme.plainColors
-import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.compose.resources.stringResource
 import com.ismartcoding.plain.ui.resources.Res as UiRes
 import com.ismartcoding.plain.ui.resources.chevron_right as ui_drawable_chevron_right
 
@@ -49,10 +47,8 @@ fun DesktopAccessSection(navController: NavHostController) {
 
     Column {
         PListItem(
-            title = { Text(stringResource(Res.string.home_remote_access), style = MaterialTheme.typography.headlineSmall) },
-            subtitle = {
-                Text(stringResource(if (desktopAccessEnabled) Res.string.desktop_access_instructions else Res.string.desktop_access_desc))
-            },
+            title = stringResource(Res.string.home_remote_access),
+            subtitle = stringResource(if (desktopAccessEnabled) Res.string.desktop_access_instructions else Res.string.desktop_access_desc)
         ) {
             Switch(colors = SwitchDefaults.plainColors(), checked = desktopAccessEnabled, onCheckedChange = { enable ->
                 scope.launchSafe { setDesktopAccessEnabled(enable) }

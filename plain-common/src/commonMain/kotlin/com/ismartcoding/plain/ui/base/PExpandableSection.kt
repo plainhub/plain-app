@@ -62,6 +62,7 @@ fun PExpandableSection(
                 tint = MaterialTheme.colorScheme.primary,
                 modifier = Modifier.size(16.dp),
             )
+            HorizontalSpace(8.dp)
         }
         AnimatedVisibility(
             visible = expanded,

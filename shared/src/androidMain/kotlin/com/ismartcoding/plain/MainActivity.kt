@@ -11,7 +11,6 @@ import android.content.res.Configuration
 import android.database.CursorWindow
 import android.net.wifi.WifiManager
 import android.os.Bundle
-import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
@@ -141,7 +140,7 @@ class MainActivity : AppCompatActivity() {
     @SuppressLint("ClickableViewAccessibility", "DiscouragedPrivateApi")
     override fun onCreate(savedInstanceState: Bundle?) {
         installSplashScreen(); super.onCreate(savedInstanceState)
-        WindowCompat.setDecorFitsSystemWindows(window, false); enableEdgeToEdge()
+        WindowCompat.enableEdgeToEdge(window)
         Language.applyLocale()
         WindowCompat.getInsetsController(window, window.decorView).systemBarsBehavior = WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
         instance = WeakReference(this)
