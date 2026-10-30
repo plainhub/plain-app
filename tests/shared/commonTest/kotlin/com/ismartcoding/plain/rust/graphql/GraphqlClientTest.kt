@@ -9,6 +9,8 @@ import com.ismartcoding.plain.models.Doc
 import com.ismartcoding.plain.graphql.Mutation
 import com.ismartcoding.plain.graphql.Query
 import com.ismartcoding.plain.lib.JsonHelper
+import com.ismartcoding.plain.lib.logcat.LogAdapter
+import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.models.AudioItem
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.test.runTest
@@ -22,6 +24,38 @@ import kotlin.test.assertNull
 import kotlin.test.assertSame
 
 class GraphqlClientTest {
+    @Test
+    fun request_logs_report_transport_result_and_cancellation_without_payloads() = runTest {
+        val logs = mutableListOf<Pair<Int, String>>()
+        LogCat.addLogAdapter(object : LogAdapter {
+            override fun isLoggable(priority: Int, tag: String?) = true
+            override fun log(priority: Int, tag: String?, message: String) { logs += priority to message }
+        })
+        try {
+            val request = GraphqlRequest<String>(
+                "query DeviceName { deviceName }", operationName = "DeviceName", field = "deviceName",
+                variables = mapOf(variable("secret", "private-variable")),
+            )
+            val client = GraphqlClient("http") {
+                JsonHelper.jsonDecode<GraphqlResponse>("""{"data":{"deviceName":"private-response"}}""")
+            }
+            assertEquals("private-response", client.execute(request))
+            val cancellation = CancellationException("private-cancellation")
+            val cancelled = GraphqlClient { throw cancellation }
+            assertSame(cancellation, assertFailsWith<CancellationException> { cancelled.execute(request) })
+            val failure = IllegalStateException("private-error")
+            val failed = GraphqlClient { throw failure }
+            assertSame(failure, assertFailsWith<IllegalStateException> { failed.execute(request) })
+            assertEquals(listOf(LogCat.DEBUG, LogCat.DEBUG, LogCat.ERROR), logs.map { it.first })
+            assertTrue(logs[0].second.startsWith("GraphQL transport=http operation=DeviceName result=success elapsedMs="))
+            assertTrue(logs[1].second.startsWith("GraphQL transport=native operation=DeviceName result=cancelled elapsedMs="))
+            assertTrue(logs[2].second.startsWith("GraphQL transport=native operation=DeviceName result=error error=IllegalStateException elapsedMs="))
+            assertTrue(logs.none { it.second.contains("private-") || it.second.contains("query DeviceName") })
+        } finally {
+            LogCat.clearLogAdapters()
+        }
+    }
+
     @Test
     fun one_execution_selects_and_decodes_the_request_result() = runTest {
         val request = Query.audioQueueItems(0, 10, "")

@@ -55,7 +55,7 @@ internal class PeerHttpClient(
         return response
     }
 
-    val graphql = GraphqlClient { operation ->
+    val graphql = GraphqlClient("http") { operation ->
         val peer = current()
         val encoded = encrypt(peer.token, JsonHelper.jsonEncode(operation))
         val response = post(peer, "/graphql", Base64.decode(encoded))

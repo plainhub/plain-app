@@ -6,7 +6,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
 import kotlinx.coroutines.withContext
 
-object GraphqlApi : GraphqlClient(::executeNativeGraphql) {
+object GraphqlApi : GraphqlClient("native", ::executeNativeGraphql) {
     fun forPeer(peer: com.ismartcoding.plain.models.Peer): GraphqlClient = PeerHttpClient(peer).graphql
 }
 
