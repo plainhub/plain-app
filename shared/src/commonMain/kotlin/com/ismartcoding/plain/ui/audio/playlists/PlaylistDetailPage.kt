@@ -58,14 +58,13 @@ import com.ismartcoding.plain.ui.audio.player.components.AudioPlayerBar
 import com.ismartcoding.plain.ui.casting.CastDialog
 import com.ismartcoding.plain.ui.casting.CastQueueFab
 import com.ismartcoding.plain.ui.audio.playlists.components.PlaylistMoreSheet
-import com.ismartcoding.plain.ui.audio.playlists.components.playPlaylistFrom
-import com.ismartcoding.plain.ui.audio.playlists.components.playPlaylistShuffled
 import com.ismartcoding.plain.ui.audio.playlists.components.pruneTrashedRows
 import com.ismartcoding.plain.ui.audio.playlists.components.toAudioTrack
 import com.ismartcoding.plain.ui.resources.Res as UiRes
 import com.ismartcoding.plain.ui.resources.cast as ui_drawable_cast
 import com.ismartcoding.plain.ui.resources.more_horiz as ui_drawable_more_horiz
 import com.ismartcoding.plain.ui.resources.sort as ui_drawable_sort
+import com.ismartcoding.plain.ui.state.launchSafe
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
 
@@ -276,10 +275,10 @@ fun PlaylistDetailPage(
                         if (contextActive) {
                             if (isPlaying) audioPause() else audioPlay()
                         } else {
-                            scope.launch { playPlaylistFrom(playlistId, null, audioQueueVM) }
+                            scope.launchSafe { audioQueueVM.playQueryAsync("playlist_id:$playlistId") }
                         }
                     },
-                    onShuffle = { scope.launch { playPlaylistShuffled(playlistId, audioQueueVM) } },
+                    onShuffle = { scope.launchSafe { audioQueueVM.playQueryAsync("playlist_id:$playlistId", shuffle = true) } },
                 )
             }
             AudioPlayerBar(

@@ -32,7 +32,7 @@ open class MediaCatalogApi internal constructor(
     }
 
     suspend fun artistTracks(artist: String, sortBy: FileSortBy): List<Audio> {
-        val query = "artist:=${escapeQueryValue(artist)}"
+        val query = artistQuery(artist)
         val items = mutableListOf<Audio>()
         val pageSize = 500
         do {
@@ -76,3 +76,5 @@ internal suspend fun readSelectedMediaPaths(
     val paths = rows.associate { it.id to it.path }
     return selected.map { id -> id to paths.getValue(id) }
 }
+
+internal fun artistQuery(artist: String): String = "artist:=${escapeQueryValue(artist)}"

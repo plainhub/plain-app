@@ -245,6 +245,12 @@ object Mutation {
         field = "advanceAudioSelection",
     )
 
+    fun replaceAudioQueue(query: String, shuffle: Boolean): GraphqlRequest<AudioItem?> = GraphqlRequest(
+        $$"mutation($query: String!, $shuffle: Boolean!) { replaceAudioQueue(query: $query, shuffle: $shuffle) { $${Fragments.AUDIO_TRACK_FIELDS} } }",
+        mapOf(variable("query", query), variable("shuffle", shuffle)),
+        field = "replaceAudioQueue",
+    )
+
     fun clearAudioQueue(): GraphqlRequest<Unit> = GraphqlRequest(
         $$"mutation { clearAudioQueue }",
         field = "clearAudioQueue",

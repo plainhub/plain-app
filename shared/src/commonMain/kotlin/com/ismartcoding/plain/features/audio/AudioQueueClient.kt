@@ -35,6 +35,9 @@ open class AudioQueueApi internal constructor(private val api: GraphqlClient = G
         return result?.track
     }
 
+    suspend fun replace(query: String, shuffle: Boolean = false): AudioItem? =
+        api.execute(Mutation.replaceAudioQueue(query, shuffle))
+
     suspend fun clearQueue() {
         api.execute(Mutation.clearAudioQueue())
     }

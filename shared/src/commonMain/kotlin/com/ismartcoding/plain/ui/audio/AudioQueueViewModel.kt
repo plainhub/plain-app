@@ -7,9 +7,9 @@ import com.ismartcoding.plain.models.Audio as AudioTrack
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.ViewModel
-import com.ismartcoding.plain.features.audio.AudioQueueClient
+import com.ismartcoding.plain.lib.withIO
+import com.ismartcoding.plain.platform.media.audioJustPlayWithNotificationCheck
 import com.ismartcoding.plain.models.AudioItem
-import com.ismartcoding.plain.platform.media.audioJustPlay
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.CoroutineStart
@@ -103,6 +103,15 @@ class AudioQueueViewModel internal constructor(val source: com.ismartcoding.plai
         val audio = items.map { it.toPlaylistAudio() }
         source.queue.enqueue(audio)
         loadAsync()
+    }
+
+    suspend fun playQueryAsync(query: String, shuffle: Boolean = false) {
+        val start = withIO { source.queue.replace(query, shuffle) }
+        if (start != null) {
+            audioJustPlayWithNotificationCheck(start, source)
+        }
+        setCurrentPlaying(start)
+        refreshWindow()
     }
 
     suspend fun playSingleAsync(audio: AudioItem) {

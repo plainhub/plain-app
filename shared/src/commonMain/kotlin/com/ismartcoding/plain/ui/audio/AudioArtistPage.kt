@@ -3,7 +3,7 @@ package com.ismartcoding.plain.ui.audio
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 
-import com.ismartcoding.plain.features.audio.toPlaylistAudio
+import com.ismartcoding.plain.features.media.artistQuery
 import com.ismartcoding.plain.models.Audio as AudioTrack
 import com.ismartcoding.plain.preferences.*
 import androidx.compose.foundation.layout.Box
@@ -34,13 +34,10 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.ismartcoding.plain.Prefs
-import com.ismartcoding.plain.platform.system.DataType
-import com.ismartcoding.plain.features.audio.AudioQueueClient
 import com.ismartcoding.plain.i18n.*
 import com.ismartcoding.plain.lib.withIO
 import com.ismartcoding.plain.ui.navigation.PBackHandler
 import com.ismartcoding.plain.platform.media.audioIsPlayingFlow
-import com.ismartcoding.plain.platform.media.audioJustPlayWithNotificationCheck
 import com.ismartcoding.plain.platform.media.audioPause
 import com.ismartcoding.plain.platform.media.audioPlay
 import com.ismartcoding.plain.ui.base.AnimatedBottomAction
@@ -64,6 +61,7 @@ import com.ismartcoding.plain.ui.audio.components.AudioListItem
 import com.ismartcoding.plain.ui.audio.components.ViewAudioBottomSheet
 import com.ismartcoding.plain.ui.theme.listItemSubtitle
 import com.ismartcoding.plain.ui.theme.listItemTitle
+import com.ismartcoding.plain.ui.state.launchSafe
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.pluralStringResource
@@ -116,20 +114,12 @@ fun AudioArtistPage(
 
     // Play-all fills the manual queue with exactly this artist's tracks;
     // while that set matches, the play button toggles pause/resume.
-    val artistPaths = remember(items) { items.map { it.path }.toSet() }
     val audioOutput by com.ismartcoding.plain.features.audio.AudioCommands.output.collectAsState()
     val contextActive = audioOutput.source.key == audioVM.source.key && items.isNotEmpty() && audioQueueVM.queuedMediaIds.value == items.map { it.id }.toSet()
 
     val playAll: (Boolean) -> Unit = { shuffle ->
-        scope.launch {
-            val list = if (shuffle) items.shuffled() else items
-            withIO {
-                audioVM.source.queue.clearQueue()
-                audioVM.source.queue.enqueue(list.map { it.toPlaylistAudio() })
-            }
-            val first = list.firstOrNull()?.toPlaylistAudio() ?: return@launch
-            audioJustPlayWithNotificationCheck(first, audioVM.source)
-            audioQueueVM.onStarted(first)
+        scope.launchSafe {
+            audioQueueVM.playQueryAsync(artistQuery(artistName), shuffle = shuffle)
         }
     }
 

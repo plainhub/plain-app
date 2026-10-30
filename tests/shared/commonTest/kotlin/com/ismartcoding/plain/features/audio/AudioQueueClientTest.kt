@@ -82,4 +82,20 @@ class AudioQueueClientTest {
         val target = client("""{"prefs":{"audio_playback_speed":"invalid"}}""")
         assertFailsWith<IllegalArgumentException> { target.playbackSpeed() }
     }
+
+    @Test
+    fun replace_queue_returns_the_selected_track_in_one_request() = runTest {
+        val operations = mutableListOf<com.ismartcoding.plain.rust.graphql.GraphqlOperation>()
+        val api = AudioQueueApi(GraphqlClient { operation ->
+            operations.add(operation)
+            GraphqlResponse(data = JsonHelper.jsonDecode("""{"replaceAudioQueue":{"mediaId":"track","path":"/audio/track.mp3","title":"Track","artist":"","durationMs":1000}}"""))
+        })
+        assertEquals("track", api.replace("playlist_id:list", true)?.mediaId)
+        assertEquals(1, operations.size)
+        val request = operations.single()
+        assertEquals("\"playlist_id:list\"", request.variables.getValue("query").toString())
+        assertEquals("true", request.variables.getValue("shuffle").toString())
+        kotlin.test.assertFalse(request.query.contains("clearAudioQueue"))
+        kotlin.test.assertFalse(request.query.contains("audioQueueItems"))
+    }
 }
