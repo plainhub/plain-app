@@ -1,201 +1,107 @@
 package com.ismartcoding.plain.ui.nearby
 
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
-
-import com.ismartcoding.plain.models.PairingRequestInput
-import com.ismartcoding.plain.ui.theme.PlainTheme
-import com.ismartcoding.plain.i18n.*
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import com.ismartcoding.plain.features.nearby.PairingResponder
+import com.ismartcoding.plain.i18n.*
+import com.ismartcoding.plain.models.PairingRequestNotice
+import com.ismartcoding.plain.ui.base.CircularTimer
+import com.ismartcoding.plain.ui.base.PFilledButton
+import com.ismartcoding.plain.ui.components.RequestDecisionActions
+import com.ismartcoding.plain.ui.components.RequestPageLayout
+import com.ismartcoding.plain.ui.components.RequestVerificationCodeCard
+import com.ismartcoding.plain.ui.components.ButtonSize
+import com.ismartcoding.plain.ui.navigation.PBackHandler
+import com.ismartcoding.plain.ui.platform.system.getIcon
+import kotlinx.coroutines.delay
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.dp
-import com.ismartcoding.plain.ui.navigation.PBackHandler
-import com.ismartcoding.plain.features.nearby.PairingResponder
-import com.ismartcoding.plain.ui.components.ButtonSize
-import com.ismartcoding.plain.ui.components.ButtonType
-import com.ismartcoding.plain.ui.platform.system.getIcon
-import com.ismartcoding.plain.ui.base.PCard
-import com.ismartcoding.plain.ui.base.PFilledButton
-import com.ismartcoding.plain.ui.base.PListItem
-import com.ismartcoding.plain.ui.base.VerticalSpace
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 
 private const val PAIRING_REQUEST_TIMEOUT_SECONDS = 90
 
 @Composable
 fun PairingRequestPage(
-    request: PairingRequestInput,
+    notice: PairingRequestNotice,
     onClose: () -> Unit,
 ) {
+    val request = notice.requestInput()
     var remainingSeconds by remember { mutableIntStateOf(PAIRING_REQUEST_TIMEOUT_SECONDS) }
-    var expired by remember { mutableStateOf(false) }
+    val expired = remainingSeconds == 0
     PBackHandler(onBack = onClose)
-    var accepting by remember { mutableStateOf(false) }
-    var denying by remember { mutableStateOf(false) }
-    val scope = rememberCoroutineScope()
 
     LaunchedEffect(Unit) {
         while (remainingSeconds > 0) {
             delay(1000)
             remainingSeconds--
         }
-        expired = true
     }
 
     val displayIp = request.fromIp.ifEmpty { request.ips.firstOrNull() ?: "" }
+    val requester = listOf(request.fromName, displayIp).filter { it.isNotEmpty() }.joinToString(" · ")
 
-    LazyColumn(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background)
-            .safeDrawingPadding(),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        contentPadding = PaddingValues(vertical = 48.dp),
-    ) {
-        item {
-            VerticalSpace(40.dp)
-            Box(
-                modifier = Modifier
-                    .size(88.dp)
-                    .background(MaterialTheme.colorScheme.primaryContainer, CircleShape),
-                contentAlignment = Alignment.Center,
-            ) {
-                Icon(
-                    painter = painterResource(request.deviceType.getIcon()),
-                    contentDescription = null,
-                    modifier = Modifier.size(44.dp),
-                    tint = MaterialTheme.colorScheme.primary,
+    RequestPageLayout(
+        title = stringResource(if (expired) Res.string.pairing_request_expired else Res.string.pairing_request),
+        description = stringResource(Res.string.pairing_request_hint),
+        icon = painterResource(request.deviceType.getIcon()),
+        requester = requester,
+        content = { item { RequestVerificationCodeCard(notice.verificationCode, stringResource(Res.string.pairing_compare_code)) } },
+        footer = if (expired) null else ({ PairingExpiry(remainingSeconds) }),
+        actions = {
+            if (expired) {
+                PFilledButton(
+                    modifier = Modifier.fillMaxWidth(),
+                    text = stringResource(Res.string.close),
+                    buttonSize = ButtonSize.LARGE,
+                    onClick = onClose,
+                )
+            } else {
+                RequestDecisionActions(
+                    onDeny = { PairingResponder.respond(request, false); onClose() },
+                    onAllow = { PairingResponder.respond(request, true); onClose() },
                 )
             }
-            VerticalSpace(dp = 24.dp)
-        }
-        item {
-            Text(
-                text = stringResource(
-                    if (expired) Res.string.pairing_request_expired
-                    else Res.string.pairing_request
-                ),
-                style = MaterialTheme.typography.headlineMedium.copy(
-                    color = MaterialTheme.colorScheme.onSurface,
-                ),
-                textAlign = TextAlign.Center,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp),
-            )
-            VerticalSpace(dp = 16.dp)
-            Text(
-                text = stringResource(Res.string.pairing_request_message, request.fromName),
-                style = MaterialTheme.typography.bodyLarge.copy(
-                    color = MaterialTheme.colorScheme.onSurface,
-                ),
-                textAlign = TextAlign.Center,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp),
-            )
-            VerticalSpace(dp = 8.dp)
-            Text(
-                text = stringResource(Res.string.pairing_request_hint),
-                style = MaterialTheme.typography.bodyMedium.copy(
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                ),
-                textAlign = TextAlign.Center,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp),
-            )
-            VerticalSpace(dp = 40.dp)
-        }
-        item {
-            PCard(modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN)) {
-                PListItem(title = stringResource(Res.string.device_name), value = request.fromName)
-                if (displayIp.isNotEmpty()) {
-                    PListItem(title = stringResource(Res.string.ip_address), value = displayIp)
-                }
-            }
-        }
-        item {
-            VerticalSpace(dp = 56.dp)
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp),
-            ) {
-                if (expired) {
-                    PFilledButton(
-                        modifier = Modifier.fillMaxWidth(),
-                        text = stringResource(Res.string.close),
-                        buttonSize = ButtonSize.LARGE,
-                        onClick = onClose,
-                    )
-                } else {
-                    Text(
-                        text = "${remainingSeconds}s",
-                        style = MaterialTheme.typography.bodyMedium.copy(
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        ),
-                        textAlign = TextAlign.Center,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(bottom = 16.dp),
-                    )
-                    PFilledButton(
-                        modifier = Modifier.fillMaxWidth(),
-                        text = stringResource(Res.string.allow),
-                        buttonSize = ButtonSize.LARGE,
-                        isLoading = accepting,
-                        enabled = !accepting && !denying,
-                        onClick = {
-                            accepting = true
-                            scope.launch {
-                                PairingResponder.respond(request, true)
-                                onClose()
-                            }
-                        },
-                    )
-                    VerticalSpace(32.dp)
-                    PFilledButton(
-                        modifier = Modifier.fillMaxWidth(),
-                        text = stringResource(Res.string.deny),
-                        buttonSize = ButtonSize.LARGE,
-                        type = ButtonType.DANGER,
-                        isLoading = denying,
-                        enabled = !accepting && !denying,
-                        onClick = {
-                            denying = true
-                            scope.launch {
-                                PairingResponder.respond(request, false)
-                                onClose()
-                            }
-                        },
-                    )
-                }
-            }
-        }
+        },
+    )
+}
+
+@Composable
+private fun PairingExpiry(remainingSeconds: Int) {
+    Row(
+        modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
+        horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterHorizontally),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        CircularTimer(
+            progress = remainingSeconds.toFloat() / PAIRING_REQUEST_TIMEOUT_SECONDS,
+            modifier = Modifier.size(24.dp),
+            strokeWidth = 2.dp,
+            trackColor = MaterialTheme.colorScheme.outline,
+        )
+        Text(
+            text = "${(remainingSeconds / 60).toString().padStart(2, '0')}:${(remainingSeconds % 60).toString().padStart(2, '0')}",
+            style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Medium, fontFeatureSettings = "tnum"),
+            color = MaterialTheme.colorScheme.onSurface,
+        )
+        Text(
+            text = stringResource(Res.string.pairing_expiry_label),
+            modifier = Modifier.weight(1f, fill = false),
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
     }
 }

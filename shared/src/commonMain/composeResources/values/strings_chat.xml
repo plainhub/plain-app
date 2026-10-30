@@ -70,6 +70,8 @@
     <string name="pairing_request">Pairing request</string>
     <string name="pairing_request_message">Do you want to pair with device "%1$s"?</string>
     <string name="pairing_request_hint">After pairing, you can exchange messages between both devices.</string>
+    <string name="pairing_compare_code">Compare this code on both devices before allowing pairing.</string>
+    <string name="pairing_expiry_label">until expiry</string>
     <string name="pairing_request_expired">Pairing request expired</string>
     <string name="allow">Allow</string>
     <string name="deny">Deny</string>

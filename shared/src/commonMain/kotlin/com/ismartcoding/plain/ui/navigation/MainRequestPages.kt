@@ -24,7 +24,7 @@ internal fun NavGraphBuilder.addMainRequestPages(
         val request = MainViewModel.pendingPairingRequest.value
         if (request != null) {
             key(request) {
-                PairingRequestPage(request = request, onClose = {
+                PairingRequestPage(notice = request, onClose = {
                     if (MainViewModel.pendingPairingRequest.value == request) {
                         MainViewModel.pendingPairingRequest.value = null
                         if (navController.currentBackStackEntry == backStackEntry) navController.popBackStack()

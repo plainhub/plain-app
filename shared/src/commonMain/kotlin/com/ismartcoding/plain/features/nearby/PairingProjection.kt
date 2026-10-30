@@ -2,7 +2,7 @@ package com.ismartcoding.plain.features.nearby
 
 import com.ismartcoding.plain.features.chat.peer.PeerStatusClient
 import com.ismartcoding.plain.features.chat.peer.RustPeerStore
-import com.ismartcoding.plain.models.PairingRequestInput
+import com.ismartcoding.plain.models.PairingRequestNotice
 import com.ismartcoding.plain.ui.app.MainViewModel
 import com.ismartcoding.plain.ui.nearby.NearbyItemStatus
 import com.ismartcoding.plain.ui.nearby.NearbyViewModel
@@ -49,7 +49,7 @@ object PairingProjection {
         }
     }
 
-    suspend fun request(request: PairingRequestInput) {
+    suspend fun request(request: PairingRequestNotice) {
         if (!RustPairingRuntime.currentRequest(request.fromId, request.signature)) return
         MainViewModel.pendingPairingRequest.value = request
     }

@@ -23,6 +23,7 @@ import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.jetbrains.compose.resources.stringResource
+import com.ismartcoding.plain.ui.components.RequestVerificationCodeCard
 import com.ismartcoding.plain.ui.components.TextFieldDialog
 import com.ismartcoding.plain.ui.components.ToastManager
 
@@ -72,15 +73,19 @@ fun PairPeerDialog(device: NearbyDevice, onDismiss: () -> Unit) {
         )
         return
     }
-    if (generation != null) return
+    val waiting = generation != null || submitting
     AlertDialog(
         onDismissRequest = onDismiss,
         containerColor = MaterialTheme.colorScheme.dialogSheetBackground,
-        title = { Text(stringResource(Res.string.pair_device)) },
+        title = { Text(stringResource(if (waiting) Res.string.waiting_for_confirmation else Res.string.pair_device)) },
         text = {
             Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
                 Text(device.name, style = MaterialTheme.typography.bodyLarge, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                Column(Modifier.selectableGroup(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                if (waiting) {
+                    state?.verificationCode?.takeIf { it.isNotEmpty() }?.let { code ->
+                        RequestVerificationCodeCard(code, stringResource(Res.string.pairing_compare_code))
+                    }
+                } else Column(Modifier.selectableGroup(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     listOf(
                         PairingMode.MANAGE to Res.string.pair_manage_device,
                         PairingMode.CHAT to Res.string.pair_chat_only,
@@ -97,7 +102,7 @@ fun PairPeerDialog(device: NearbyDevice, onDismiss: () -> Unit) {
             }
         },
         confirmButton = {
-            PFilledButton(
+            if (!waiting) PFilledButton(
                 text = stringResource(Res.string.pair),
                 isLoading = submitting,
                 onClick = {

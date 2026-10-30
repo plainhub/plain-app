@@ -137,6 +137,8 @@
     <string name="resend_selected">নির্বাচিত পুনরায় পাঠান</string>
     <string name="bluetooth_permission_required_for_nearby">ব্লুটুথের মাধ্যমে নিকটবর্তী ডিভাইস আবিষ্কার করতে ব্লুটুথ অনুমতি প্রয়োজন।</string>
     <string name="nearby_wifi_devices_required_for_chat">নিকটবর্তী ডিভাইস আবিষ্কার করতে ব্লুটুথ এবং নিকটবর্তী ডিভাইস অনুমতি প্রয়োজন।</string>
+    <string name="pairing_compare_code">পেয়ারিংয়ের অনুমতি দেওয়ার আগে উভয় ডিভাইসে এই কোডটি মিলিয়ে নিন।</string>
+    <string name="pairing_expiry_label">পরে মেয়াদ শেষ হবে</string>
     <string name="pairing_request_expired">পেয়ারিং অনুরোধের মেয়াদ শেষ হয়েছে</string>
     <string name="share_folder">ফোল্ডার শেয়ার করুন</string>
     <string name="share_this_folder">এই ফোল্ডারটি শেয়ার করুন</string>

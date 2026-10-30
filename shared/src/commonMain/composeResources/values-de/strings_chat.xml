@@ -137,6 +137,8 @@
     <string name="resend_selected">Ausgewählte erneut senden</string>
     <string name="bluetooth_permission_required_for_nearby">Die Bluetooth-Berechtigung ist erforderlich, um Geräte in der Nähe über Bluetooth zu erkennen.</string>
     <string name="nearby_wifi_devices_required_for_chat">Bluetooth- und Geräte in der Nähe-Berechtigungen sind erforderlich, um Geräte in der Nähe zu erkennen.</string>
+    <string name="pairing_compare_code">Vergleiche diesen Code auf beiden Geräten, bevor du die Kopplung erlaubst.</string>
+    <string name="pairing_expiry_label">bis zum Ablauf</string>
     <string name="pairing_request_expired">Pairing-Anfrage abgelaufen</string>
     <string name="share_folder">Ordner teilen</string>
     <string name="share_this_folder">Diesen Ordner teilen</string>

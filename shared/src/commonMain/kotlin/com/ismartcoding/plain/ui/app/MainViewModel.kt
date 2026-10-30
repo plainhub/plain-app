@@ -1,6 +1,6 @@
 package com.ismartcoding.plain.ui.app
 
-import com.ismartcoding.plain.models.PairingRequestInput
+import com.ismartcoding.plain.models.PairingRequestNotice
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import com.ismartcoding.plain.features.sessions.WebLoginRequestFacts
@@ -17,7 +17,7 @@ object MainViewModel {
     val shortcutMediaPath = mutableStateOf<String?>(null)
     val currentRootTab = mutableIntStateOf(0)
     val pendingLoginRequest = mutableStateOf<WebLoginRequestFacts?>(null)
-    val pendingPairingRequest = mutableStateOf<PairingRequestInput?>(null)
+    val pendingPairingRequest = mutableStateOf<PairingRequestNotice?>(null)
     val pendingChannelInvite = mutableStateOf<Routing.ChannelInviteRequest?>(null)
     val pendingWebAccessRequest = mutableStateOf<com.ismartcoding.plain.models.WebAccessRequest?>(null)
 }

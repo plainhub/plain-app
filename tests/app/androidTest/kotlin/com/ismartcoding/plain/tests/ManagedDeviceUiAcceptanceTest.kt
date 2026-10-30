@@ -1361,10 +1361,10 @@ class ManagedDeviceUiAcceptanceTest {
             performClick(choices, "access radio")
             awaitNode("selected access radio") { it.semantic.id == radioId && it.isChecked }
             click(text(Res.string.pair), "confirm pairing")
-            awaitValue("pairing choice closes without a waiting dialog") {
-                if (uiNodes().none { it.overlay && it.text == text(Res.string.pair_device) }) true else null
+            awaitNode("waiting for the other device to confirm pairing") {
+                it.overlay && it.text == text(Res.string.waiting_for_confirmation)
             }
-            assertFalse(allText().contains(text(Res.string.pending)))
+            assertFalse(uiNodes().any { it.overlay && it.text == text(Res.string.pair_device) })
             var lastPhase: PairingPhase? = null
             val terminal = awaitValue("pairing completion") {
                 val state = RustPairingRuntime.states().lastOrNull { it.deviceId == targetId && it.generation !in previous }

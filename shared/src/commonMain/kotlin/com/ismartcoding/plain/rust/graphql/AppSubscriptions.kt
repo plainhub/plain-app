@@ -15,7 +15,6 @@ import kotlinx.serialization.json.jsonPrimitive
 
 import com.ismartcoding.plain.features.chat.channel.ChannelRuntimeEvent
 import com.ismartcoding.plain.features.images.search.ImageModelsSnapshot
-import com.ismartcoding.plain.models.PairingRequestInput
 import com.ismartcoding.plain.models.PomodoroAction
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -51,10 +50,10 @@ object AppSubscriptions {
         subscription<Boolean>("pairingChanged")
             .shareIn(scope, SharingStarted.WhileSubscribed())
     internal val pairingRequested =
-        subscription<PairingRequestInput>(
+        subscription<com.ismartcoding.plain.models.PairingRequestNotice>(
             "pairingRequested",
             "{ fromId fromName port deviceType ecdhPublicKey signaturePublicKey " +
-                "timestamp ips signature fromIp awareSupported }",
+                "timestamp ips signature fromIp awareSupported verificationCode }",
         )
             .shareIn(scope, SharingStarted.WhileSubscribed())
     internal val pomodoroAction =
