@@ -67,7 +67,7 @@
     <string name="same_network_hint">सुनिश्चित करें कि आपका कंप्यूटर और फ़ोन एक ही नेटवर्क पर हैं</string>
     <string name="ready">तैयार</string>
     <string name="permission_settings">अनुमति सेटिंग्स</string>
-    <string name="desktop_access_desc">उसी नेटवर्क पर अपने कंप्यूटर से अपने फ़ोन को प्रबंधित करें।</string>
+    <string name="desktop_access_desc">उसी नेटवर्क पर किसी अन्य डिवाइस से अपने फ़ोन को प्रबंधित करें।</string>
     <string name="last_active">अंतिम सक्रिय: %1$s</string>
     <string name="revoke_session">इस सत्र को रद्द करें</string>
     <string name="how_to_use">उपयोग कैसे करें</string>

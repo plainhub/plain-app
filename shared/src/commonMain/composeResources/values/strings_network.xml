@@ -114,7 +114,7 @@
     <string name="same_network_hint">Make sure your computer and phone are on the same network</string>
     <string name="ready">Ready</string>
     <string name="permission_settings">Permission Settings</string>
-    <string name="desktop_access_desc">Manage your phone from your computer on the same network.</string>
+    <string name="desktop_access_desc">Manage your phone from another device on the same network.</string>
     <string name="desktop_access_instructions">On the same Wi-Fi, open this address in your computer’s browser.</string>
     <string name="developer_options">Developer options</string>
     <string name="adb_automation">ADB Automation</string>

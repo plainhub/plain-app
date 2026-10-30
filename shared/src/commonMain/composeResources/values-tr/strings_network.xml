@@ -67,7 +67,7 @@
     <string name="same_network_hint">Bilgisayarınızın ve telefonunuzun aynı ağda olduğundan emin olun</string>
     <string name="ready">Hazır</string>
     <string name="permission_settings">İzin ayarları</string>
-    <string name="desktop_access_desc">Aynı ağdaki bilgisayarınızdan telefonunuzu yönetin.</string>
+    <string name="desktop_access_desc">Aynı ağdaki başka bir cihazdan telefonunuzu yönetin.</string>
     <string name="last_active">Son aktif: %1$s</string>
     <string name="revoke_session">Bu oturumu iptal et</string>
     <string name="how_to_use">Nasıl kullanılır</string>

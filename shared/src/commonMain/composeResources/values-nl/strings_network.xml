@@ -67,7 +67,7 @@
     <string name="same_network_hint">Zorg dat je computer en telefoon met hetzelfde netwerk zijn verbonden</string>
     <string name="ready">Gereed</string>
     <string name="permission_settings">Machtigingsinstellingen</string>
-    <string name="desktop_access_desc">Beheer uw telefoon vanaf uw computer in hetzelfde netwerk.</string>
+    <string name="desktop_access_desc">Beheer uw telefoon vanaf een ander apparaat in hetzelfde netwerk.</string>
     <string name="last_active">Laatste actief: %1$s</string>
     <string name="revoke_session">Deze sessie intrekken</string>
     <string name="how_to_use">Hoe te gebruiken</string>

@@ -67,7 +67,7 @@
     <string name="same_network_hint">請確認你的電腦與手機位於同一網路</string>
     <string name="ready">就緒</string>
     <string name="permission_settings">權限設定</string>
-    <string name="desktop_access_desc">在同一網路下透過電腦管理您的手機。</string>
+    <string name="desktop_access_desc">在同一網路下透過其他裝置管理您的手機。</string>
     <string name="desktop_access_instructions">電腦和手機連接同一 Wi-Fi，在電腦瀏覽器開啟下方的網址。</string>
     <string name="last_active">最後活躍：%1$s</string>
     <string name="revoke_session">撤銷此工作階段</string>

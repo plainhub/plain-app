@@ -67,7 +67,7 @@
     <string name="same_network_hint">컴퓨터와 휴대폰이 같은 네트워크에 연결되어 있는지 확인하세요</string>
     <string name="ready">준비 완료</string>
     <string name="permission_settings">권한 설정</string>
-    <string name="desktop_access_desc">같은 네트워크에서 컴퓨터로 휴대전화를 관리하세요.</string>
+    <string name="desktop_access_desc">같은 네트워크의 다른 기기에서 휴대전화를 관리하세요.</string>
     <string name="last_active">마지막 활성: %1$s</string>
     <string name="revoke_session">이 세션 취소</string>
     <string name="how_to_use">사용 방법</string>

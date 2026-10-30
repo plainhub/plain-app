@@ -67,7 +67,7 @@
     <string name="same_network_hint">Убедитесь, что компьютер и телефон подключены к одной сети</string>
     <string name="ready">Готово</string>
     <string name="permission_settings">Настройки разрешений</string>
-    <string name="desktop_access_desc">Управляйте телефоном с компьютера в одной сети.</string>
+    <string name="desktop_access_desc">Управляйте телефоном с другого устройства в той же сети.</string>
     <string name="last_active">Последняя активность: %1$s</string>
     <string name="revoke_session">Отозвать этот сеанс</string>
     <string name="how_to_use">Как пользоваться</string>

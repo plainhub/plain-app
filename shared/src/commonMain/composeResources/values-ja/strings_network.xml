@@ -67,7 +67,7 @@
     <string name="same_network_hint">パソコンとスマホが同じネットワークに接続されていることを確認してください</string>
     <string name="ready">準備完了</string>
     <string name="permission_settings">権限設定</string>
-    <string name="desktop_access_desc">同じネットワーク上でコンピューターからスマートフォンを管理します。</string>
+    <string name="desktop_access_desc">同じネットワーク上の別のデバイスからスマートフォンを管理します。</string>
     <string name="last_active">最終アクティブ：%1$s</string>
     <string name="revoke_session">このセッションを取り消す</string>
     <string name="how_to_use">使い方</string>

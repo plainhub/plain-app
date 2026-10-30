@@ -67,7 +67,7 @@
     <string name="same_network_hint">உங்கள் கணினியும் தொலைபேசியும் ஒரே நெட்வொர்க்கில் உள்ளதா என்பதை உறுதிப்படுத்துங்கள்</string>
     <string name="ready">தயார்</string>
     <string name="permission_settings">அனுமதி அமைப்புகள்</string>
-    <string name="desktop_access_desc">ஒரே நெட்வொர்க்கில் உங்கள் கணினியிலிருந்து உங்கள் தொலைபேசியை நிர்வகிக்கவும்.</string>
+    <string name="desktop_access_desc">ஒரே நெட்வொர்க்கில் மற்றொரு சாதனத்திலிருந்து உங்கள் தொலைபேசியை நிர்வகிக்கவும்.</string>
     <string name="last_active">கடைசியாக செயலில்: %1$s</string>
     <string name="revoke_session">இந்த அமர்வை திரும்பப் பெறு</string>
     <string name="how_to_use">எப்படி பயன்படுத்துவது</string>

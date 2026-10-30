@@ -67,7 +67,7 @@
     <string name="same_network_hint">请确保你的电脑和手机在同一网络下</string>
     <string name="ready">就绪</string>
     <string name="permission_settings">权限设置</string>
-    <string name="desktop_access_desc">在同一网络下通过电脑管理您的手机。</string>
+    <string name="desktop_access_desc">在同一网络下通过其他设备管理您的手机。</string>
     <string name="desktop_access_instructions">电脑和手机连接同一 Wi-Fi，在电脑浏览器打开下面的地址。</string>
     <string name="last_active">最后活跃：%1$s</string>
     <string name="revoke_session">撤销此会话</string>

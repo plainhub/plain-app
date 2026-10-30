@@ -67,7 +67,7 @@
     <string name="same_network_hint">Stellen Sie sicher, dass sich Ihr Computer und Ihr Telefon im selben Netzwerk befinden</string>
     <string name="ready">Bereit</string>
     <string name="permission_settings">Berechtigungseinstellungen</string>
-    <string name="desktop_access_desc">Verwalten Sie Ihr Telefon von Ihrem Computer im selben Netzwerk.</string>
+    <string name="desktop_access_desc">Verwalten Sie Ihr Telefon von einem anderen Gerät im selben Netzwerk.</string>
     <string name="last_active">Zuletzt aktiv: %1$s</string>
     <string name="revoke_session">Diese Sitzung widerrufen</string>
     <string name="how_to_use">Verwendung</string>

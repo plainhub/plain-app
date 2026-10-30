@@ -65,7 +65,7 @@
     <string name="same_network_hint">নিশ্চিত করুন আপনার কম্পিউটার ও ফোন একই নেটওয়ার্কে আছে</string>
     <string name="ready">প্রস্তুত</string>
     <string name="permission_settings">অনুমতির সেটিংস</string>
-    <string name="desktop_access_desc">একই নেটওয়ার্কে আপনার কম্পিউটার থেকে আপনার ফোন পরিচালনা করুন।</string>
+    <string name="desktop_access_desc">একই নেটওয়ার্কে অন্য ডিভাইস থেকে আপনার ফোন পরিচালনা করুন।</string>
     <string name="last_active">সর্বশেষ সক্রিয়: %1$s</string>
     <string name="revoke_session">এই সেশন প্রত্যাহার করুন</string>
     <string name="how_to_use">ব্যবহারের নির্দেশনা</string>

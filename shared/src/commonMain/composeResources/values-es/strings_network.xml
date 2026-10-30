@@ -67,7 +67,7 @@
     <string name="same_network_hint">Asegúrate de que tu computadora y tu teléfono estén en la misma red</string>
     <string name="ready">Listo</string>
     <string name="permission_settings">Configuración de permisos</string>
-    <string name="desktop_access_desc">Gestiona tu teléfono desde tu ordenador en la misma red.</string>
+    <string name="desktop_access_desc">Gestiona tu teléfono desde otro dispositivo en la misma red.</string>
     <string name="last_active">Último activo: %1$s</string>
     <string name="revoke_session">Revocar esta sesión</string>
     <string name="how_to_use">Cómo usar</string>

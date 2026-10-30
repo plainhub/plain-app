@@ -67,7 +67,7 @@
     <string name="same_network_hint">Đảm bảo máy tính và điện thoại của bạn cùng một mạng</string>
     <string name="ready">Sẵn sàng</string>
     <string name="permission_settings">Cài đặt quyền</string>
-    <string name="desktop_access_desc">Quản lý điện thoại của bạn từ máy tính trên cùng một mạng.</string>
+    <string name="desktop_access_desc">Quản lý điện thoại của bạn từ thiết bị khác trên cùng một mạng.</string>
     <string name="last_active">Lần cuối hoạt động: %1$s</string>
     <string name="revoke_session">Thu hồi phiên này</string>
     <string name="how_to_use">Cách sử dụng</string>
