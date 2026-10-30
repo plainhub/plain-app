@@ -1,5 +1,7 @@
 package com.ismartcoding.plain.rust.host.provider
 
+import com.ismartcoding.plain.appContext
+import com.ismartcoding.plain.platform.media.provider.DocMediaStoreHelper
 import com.ismartcoding.plain.IData
 import com.ismartcoding.plain.features.files.FileSortBy
 import com.ismartcoding.plain.lib.JsonHelper
@@ -21,37 +23,43 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.*
 
 internal object SystemMediaHost {
-    internal suspend fun handle(method: String, params: JsonObject): HostResult = when (method) {
-        "systemMediaBucketItemFacts" -> {
-            val request = JsonHelper.jsonDecodeFromElement<MediaPlanRequest>(params)
-            hostResult(mediaBucketItemFacts(
-                DataType.valueOf(request.dataType), request.plan))
+    internal suspend fun handle(method: String, params: JsonObject): HostResult {
+        return when (method) {
+            "systemMediaBucketItemFacts" -> {
+                val request = JsonHelper.jsonDecodeFromElement<MediaPlanRequest>(params)
+                hostResult(mediaBucketItemFacts(
+                    DataType.valueOf(request.dataType), request.plan))
+            }
+            "systemMediaRows" -> {
+                val request = JsonHelper.jsonDecodeFromElement<MediaRowsRequest>(params)
+                if (request.pathsOnly) {
+                    require(request.dataType == DataType.DOC.name) { "Path projection requires documents" }
+                    return hostResult(DocMediaStoreHelper.pathsAsync(appContext, request.plan.where(), request.limit, request.offset))
+                }
+                val includeRevision = request.includeRevision == true
+                val before = if (includeRevision) mediaStoreRevision() else null
+                val items = searchMedia(
+                    DataType.valueOf(request.dataType),
+                    request.plan, request.limit, request.offset,
+                    FileSortBy.valueOf(request.sortBy),
+                )
+                val rows = items.map { mediaFacts(it) }
+                if (includeRevision) hostResult(MediaRowsFacts(rows, before, mediaStoreRevision()))
+                else hostResult(rows)
+            }
+            "systemMediaCount" -> {
+                val request = JsonHelper.jsonDecodeFromElement<MediaPlanRequest>(params)
+                hostResult(countMedia(
+                    DataType.valueOf(request.dataType), request.plan))
+            }
+            "systemMediaIdsFacts" -> {
+                val request = JsonHelper.jsonDecodeFromElement<MediaPlanRequest>(params)
+                val type = DataType.valueOf(request.dataType)
+                val plan = request.plan
+                hostResult(getMediaIds(type, plan))
+            }
+            else -> error("Unsupported provider operation")
         }
-        "systemMediaRows" -> {
-            val request = JsonHelper.jsonDecodeFromElement<MediaRowsRequest>(params)
-            val includeRevision = request.includeRevision == true
-            val before = if (includeRevision) mediaStoreRevision() else null
-            val items = searchMedia(
-                DataType.valueOf(request.dataType),
-                request.plan, request.limit, request.offset,
-                FileSortBy.valueOf(request.sortBy),
-            )
-            val rows = items.map { mediaFacts(it) }
-            if (includeRevision) hostResult(MediaRowsFacts(rows, before, mediaStoreRevision()))
-            else hostResult(rows)
-        }
-        "systemMediaCount" -> {
-            val request = JsonHelper.jsonDecodeFromElement<MediaPlanRequest>(params)
-            hostResult(countMedia(
-                DataType.valueOf(request.dataType), request.plan))
-        }
-        "systemMediaIdsFacts" -> {
-            val request = JsonHelper.jsonDecodeFromElement<MediaPlanRequest>(params)
-            val type = DataType.valueOf(request.dataType)
-            val plan = request.plan
-            hostResult(getMediaIds(type, plan))
-        }
-        else -> error("Unsupported provider operation")
     }
 
     private fun mediaFacts(item: IData): HostResult = when (item) {

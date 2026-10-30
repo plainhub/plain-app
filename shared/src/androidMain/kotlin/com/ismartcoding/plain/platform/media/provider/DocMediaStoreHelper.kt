@@ -6,6 +6,9 @@ import com.ismartcoding.plain.helpers.ContentWhere
 import android.content.Context
 import android.net.Uri
 import android.provider.MediaStore
+import com.ismartcoding.plain.lib.extensions.getPagingCursor
+import com.ismartcoding.plain.features.files.SortBy
+import com.ismartcoding.plain.features.files.SortDirection
 import com.ismartcoding.plain.lib.extensions.getLongValue
 import com.ismartcoding.plain.lib.extensions.getStringValue
 import com.ismartcoding.plain.lib.extensions.getTimeSecondsValue
@@ -35,6 +38,15 @@ object DocMediaStoreHelper : BaseMediaContentHelper() {
             cols.add(MediaStore.MediaColumns.BUCKET_ID)
         }
         return cols.toTypedArray()
+    }
+
+    suspend fun pathsAsync(context: Context, where: ContentWhere, limit: Int, offset: Int): List<String> = withIO {
+        context.contentResolver.getPagingCursor(
+            uriExternal, arrayOf(MediaStore.Files.FileColumns.DATA), where, limit, offset,
+            SortBy(MediaStore.Files.FileColumns._ID, SortDirection.ASC),
+        )?.map { cursor, cache ->
+            cursor.getStringValue(MediaStore.Files.FileColumns.DATA, cache)
+        }.orEmpty()
     }
 
     suspend fun searchAsync(

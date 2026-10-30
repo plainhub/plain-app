@@ -19,4 +19,5 @@ internal data class MediaRowsRequest(
     val offset: Int,
     val sortBy: String,
     val includeRevision: Boolean? = null,
+    val pathsOnly: Boolean = false,
 )
