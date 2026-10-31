@@ -1,8 +1,4 @@
-use super::{
-    host::bridge,
-    management::reply,
-    values::{c_string, input},
-};
+use super::{host::bridge, management::reply, values::{c_string, input}};
 use std::ffi::c_char;
 
 fn grant(id: String, deadline_ms: i64) -> String {
@@ -57,12 +53,7 @@ pub extern "C" fn plain_revoke_background_execution(id: *const c_char) -> *mut c
 #[cfg(target_os = "android")]
 mod android {
     use super::*;
-    use jni::{
-        EnvUnowned,
-        errors::ThrowRuntimeExAndDefault,
-        objects::{JObject, JString},
-        sys::{jlong, jstring},
-    };
+    use jni::{EnvUnowned, errors::ThrowRuntimeExAndDefault, objects::{JObject, JString}, sys::{jlong, jstring}};
 
     #[unsafe(no_mangle)]
     pub extern "system" fn Java_com_ismartcoding_plain_rust_native_RustNativeBindings_executionStateChanged(

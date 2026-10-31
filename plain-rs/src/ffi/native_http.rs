@@ -29,7 +29,7 @@ pub unsafe extern "C" fn plain_ble_incoming(
     len: usize,
 ) -> BleIncomingBuffer {
     let result = (|| {
-        if len > plain_rs::protocols::ble::MAX_MESSAGE {
+        if len > plain_rs::libs::protocols::ble::MAX_MESSAGE {
             return Err("BLE message exceeds limit".into());
         }
         let bytes = if len == 0 {
@@ -107,12 +107,7 @@ pub unsafe extern "C" fn plain_http_status(error: *mut *mut c_char) -> *mut c_ch
 #[cfg(target_os = "android")]
 mod android {
     use super::*;
-    use jni::{
-        EnvUnowned,
-        errors::ThrowRuntimeExAndDefault,
-        objects::{JByteArray, JObject, JString},
-        sys::{jbyteArray, jstring},
-    };
+    use jni::{EnvUnowned, errors::ThrowRuntimeExAndDefault, objects::{JByteArray, JObject, JString}, sys::{jbyteArray, jstring}};
 
     #[unsafe(no_mangle)]
     pub extern "system" fn Java_com_ismartcoding_plain_rust_native_RustNativeBindings_bleIncoming(
@@ -123,7 +118,7 @@ mod android {
         bytes: JByteArray<'_>,
     ) -> jbyteArray {
         env.with_env(|env| -> jni::errors::Result<_> {
-            let result = if bytes.len(env)? > plain_rs::protocols::ble::MAX_MESSAGE {
+            let result = if bytes.len(env)? > plain_rs::libs::protocols::ble::MAX_MESSAGE {
                 Err("BLE message exceeds limit".into())
             } else {
                 ble_incoming(

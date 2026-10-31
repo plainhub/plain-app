@@ -10,12 +10,7 @@ pub extern "C" fn plain_file_icon(extension: *const c_char) -> *mut c_char {
 
 #[cfg(target_os = "android")]
 mod android {
-    use jni::{
-        EnvUnowned,
-        errors::ThrowRuntimeExAndDefault,
-        objects::{JObject, JString},
-        sys::jstring,
-    };
+    use jni::{EnvUnowned, errors::ThrowRuntimeExAndDefault, objects::{JObject, JString}, sys::jstring};
     #[unsafe(no_mangle)]
     pub extern "system" fn Java_com_ismartcoding_plain_rust_native_RustNativeBindings_fileIcon(
         mut env: EnvUnowned<'_>,

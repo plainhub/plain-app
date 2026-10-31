@@ -39,12 +39,7 @@ pub unsafe extern "C" fn plain_upload_chunk(
 #[cfg(target_os = "android")]
 mod android {
     use super::*;
-    use jni::{
-        EnvUnowned,
-        errors::ThrowRuntimeExAndDefault,
-        objects::{JByteArray, JObject, JString},
-        sys::{jlong, jstring},
-    };
+    use jni::{EnvUnowned, errors::ThrowRuntimeExAndDefault, objects::{JByteArray, JObject, JString}, sys::{jlong, jstring}};
 
     #[unsafe(no_mangle)]
     pub extern "system" fn Java_com_ismartcoding_plain_rust_native_RustNativeBindings_uploadChunk(

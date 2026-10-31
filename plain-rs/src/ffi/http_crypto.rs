@@ -4,15 +4,15 @@ use std::ffi::c_char;
 fn reply(result: Result<Vec<u8>, &str>) -> String {
     match result {
         Ok(value) => {
-            serde_json::json!({"value":plain_rs::crypto::base64_encode(&value)}).to_string()
+            serde_json::json!({"value":plain_rs::libs::utils::base64::base64_encode(&value)}).to_string()
         }
         Err(error) => serde_json::json!({"error":error}).to_string(),
     }
 }
 
 fn encrypt(token: &str, payload: &str) -> String {
-    reply(plain_rs::transport::http_request::encrypt(
-        &plain_rs::crypto::base64_decode(token),
+    reply(plain_rs::libs::transport::http_request::encrypt(
+        &plain_rs::libs::utils::base64::base64_decode(token),
         payload,
     ))
 }
@@ -24,10 +24,10 @@ fn reference(token: &str, payload: &str) -> String {
             .as_str()
             .ok_or("Missing resource client")?;
         let path = input["path"].as_str().ok_or("Missing resource path")?;
-        plain_rs::files::resource_link::seal(
-            &plain_rs::files::resource_link::Scope::Session(client_id.into()),
-            &plain_rs::crypto::base64_decode(token),
-            &plain_rs::files::resource_link::Resource::reference(path),
+        plain_rs::features::files::resource_link::seal(
+            &plain_rs::features::files::resource_link::Scope::Session(client_id.into()),
+            &plain_rs::libs::utils::base64::base64_decode(token),
+            &plain_rs::features::files::resource_link::Resource::reference(path),
         )
         .map_err(|e| e.to_string())
     })();
@@ -49,11 +49,11 @@ pub extern "C" fn plain_encrypt_resource_reference(
 }
 
 fn decrypt(token: &str, endpoint: &str, request: &str, response: &str) -> String {
-    reply(plain_rs::transport::http_request::decrypt_response(
-        &plain_rs::crypto::base64_decode(token),
+    reply(plain_rs::libs::transport::http_request::decrypt_response(
+        &plain_rs::libs::utils::base64::base64_decode(token),
         endpoint,
-        &plain_rs::crypto::base64_decode(request),
-        &plain_rs::crypto::base64_decode(response),
+        &plain_rs::libs::utils::base64::base64_decode(request),
+        &plain_rs::libs::utils::base64::base64_decode(response),
     ))
 }
 
@@ -93,12 +93,7 @@ pub extern "C" fn plain_decrypt_http_response(
 #[cfg(target_os = "android")]
 mod android {
     use super::*;
-    use jni::{
-        EnvUnowned,
-        errors::ThrowRuntimeExAndDefault,
-        objects::{JObject, JString},
-        sys::jstring,
-    };
+    use jni::{EnvUnowned, errors::ThrowRuntimeExAndDefault, objects::{JObject, JString}, sys::jstring};
 
     #[unsafe(no_mangle)]
     pub extern "system" fn Java_com_ismartcoding_plain_rust_native_RustNativeBindings_encryptResourceReference(

@@ -2321,28 +2321,15 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "f6b464fbc74e149a392436b17d523f769e057cb6877f6a5c4618bc6f11800548"
 
 [[package]]
-name = "plain-inference"
-version = "0.1.0"
-source = "git+https://github.com/plainhub/plain-core.git?branch=main#e405dbc65ad508c45de791094d520c201d438f14"
-dependencies = [
- "cc",
- "image",
- "log",
- "serde",
- "serde_json",
- "sha2 0.10.9",
- "tokenizers",
-]
-
-[[package]]
 name = "plain-rs"
 version = "0.1.0"
-source = "git+https://github.com/plainhub/plain-core.git?branch=main#e405dbc65ad508c45de791094d520c201d438f14"
+source = "git+https://github.com/plainhub/plain-core.git?branch=main#60f751fc8e946d9e72c83425b5b7989a0caa482f"
 dependencies = [
  "anyhow",
  "async-graphql",
  "bytes",
  "cbc",
+ "cc",
  "chacha20poly1305",
  "chrono",
  "der 0.8.2",
@@ -2350,13 +2337,19 @@ dependencies = [
  "ed25519-dalek",
  "flate2",
  "futures-core",
+ "futures-util",
  "hmac",
+ "http",
+ "hyper",
+ "hyper-util",
+ "image",
  "jni",
  "kamadak-exif",
  "libc",
  "lofty",
  "log",
  "p256",
+ "parking_lot",
  "pkcs12",
  "pkcs5",
  "pkcs8 0.11.0",
@@ -2366,6 +2359,7 @@ dependencies = [
  "regex",
  "reqwest",
  "rusqlite",
+ "rustls",
  "serde",
  "serde_json",
  "sha1 0.11.0",
@@ -2373,9 +2367,14 @@ dependencies = [
  "sha2 0.11.0",
  "socket2 0.5.10",
  "sysinfo",
+ "tempfile",
+ "tokenizers",
  "tokio",
+ "tokio-rustls",
+ "tokio-tungstenite 0.30.0",
  "uuid",
  "x509-parser",
+ "zip",
 ]
 
 [[package]]
@@ -2392,43 +2391,26 @@ dependencies = [
 [[package]]
 name = "plain-server"
 version = "0.1.0"
-source = "git+https://github.com/plainhub/plain-core.git?branch=main#e405dbc65ad508c45de791094d520c201d438f14"
+source = "git+https://github.com/plainhub/plain-core.git?branch=main#60f751fc8e946d9e72c83425b5b7989a0caa482f"
 dependencies = [
  "anyhow",
  "async-graphql",
  "axum",
  "axum-server",
- "bytes",
  "chrono",
  "futures-util",
- "hmac",
- "hyper",
- "hyper-util",
- "image",
- "libc",
  "log",
- "parking_lot",
- "plain-inference",
  "plain-rs",
- "rand 0.8.8",
- "regex",
  "reqwest",
  "rusqlite",
- "rustls",
  "serde",
  "serde_json",
  "sha2 0.10.9",
- "sha2 0.11.0",
- "socket2 0.5.10",
  "subtle",
- "sysinfo",
- "tempfile",
  "tokio",
- "tokio-rustls",
  "tokio-tungstenite 0.30.0",
  "tower",
  "uuid",
- "zip",
 ]
 
 [[package]]

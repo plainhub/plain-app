@@ -1,11 +1,11 @@
 use plain_server::server::ContentServer;
-use plain_rs::platform::system::log;
-use plain_rs::platform::system::log::Level;
+use plain_rs::libs::platform::system::log;
+use plain_rs::libs::platform::system::log::Level;
 use std::sync::Arc;
 
 pub(crate) fn start(data_dir: &str, token: &str, config: &str) -> Result<String, String> {
     let mut guard = crate::ffi::server::CORE.lock().map_err(|e| e.to_string())?;
-    let config: plain_rs::host::startup::StartupConfig =
+    let config: plain_rs::libs::host::startup::StartupConfig =
         serde_json::from_str(config).map_err(|error| error.to_string())?;
     let cache_directory = config
         .cache_dir
@@ -15,7 +15,7 @@ pub(crate) fn start(data_dir: &str, token: &str, config: &str) -> Result<String,
     if !directory.is_absolute() {
         return Err("Absolute data directory required".into());
     }
-    let paths = plain_rs::data_paths::DataPaths::new(directory);
+    let paths = plain_rs::libs::data_paths::DataPaths::new(directory);
     if let Some(core) = guard.as_ref() {
         if core.server.data_directory() != directory
             || core.token != token
@@ -25,13 +25,13 @@ pub(crate) fn start(data_dir: &str, token: &str, config: &str) -> Result<String,
         }
     } else {
         // Apply a pending restore and acquire the directory lock before loading preferences.
-        let _data_directory = plain_rs::data_paths::directory::DataDirectory::open(
+        let _data_directory = plain_rs::libs::data_paths::directory::DataDirectory::open(
             directory,
             std::path::Path::new(&cache_directory),
         )?;
-        plain_rs::platform::system::log::init_file(&paths.rust_log_file(), "info")?;
+        plain_rs::libs::platform::system::log::init_file(&paths.rust_log_file(), "info")?;
         let prefs =
-            Arc::new(plain_rs::prefs::Prefs::load(&paths.prefs()).map_err(|e| e.to_string())?);
+            Arc::new(plain_rs::features::prefs::Prefs::load(&paths.prefs()).map_err(|e| e.to_string())?);
         let runtime = tokio::runtime::Builder::new_multi_thread()
             .worker_threads(2)
             .enable_all()

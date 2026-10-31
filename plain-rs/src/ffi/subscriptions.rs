@@ -1,7 +1,4 @@
-use super::{
-    graphql::parts,
-    values::{c_string, input},
-};
+use super::{graphql::parts, values::{c_string, input}};
 use std::ffi::c_char;
 
 fn open(target: Option<&str>) -> Result<u64, String> {
@@ -71,12 +68,7 @@ pub extern "C" fn plain_graphql_subscription_close(handle: u64) -> *mut c_char {
 #[cfg(target_os = "android")]
 mod android {
     use super::*;
-    use jni::{
-        EnvUnowned,
-        errors::ThrowRuntimeExAndDefault,
-        objects::{JObject, JString},
-        sys::{jlong, jstring},
-    };
+    use jni::{EnvUnowned, errors::ThrowRuntimeExAndDefault, objects::{JObject, JString}, sys::{jlong, jstring}};
     fn fail(env: &mut jni::Env<'_>, error: String) -> jni::errors::Result<()> {
         env.throw_new(
             jni::jni_str!("java/lang/IllegalStateException"),

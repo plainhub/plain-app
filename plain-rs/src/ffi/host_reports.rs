@@ -1,8 +1,4 @@
-use super::{
-    host::bridge,
-    management::reply,
-    values::{c_string, input},
-};
+use super::{host::bridge, management::reply, values::{c_string, input}};
 
 use std::ffi::c_char;
 
@@ -356,12 +352,7 @@ pub unsafe extern "C" fn plain_report_screen_mirror_audio(
 #[cfg(target_os = "android")]
 mod android {
     use super::*;
-    use jni::{
-        EnvUnowned,
-        errors::ThrowRuntimeExAndDefault,
-        objects::{JByteArray, JObject, JString},
-        sys::jstring,
-    };
+    use jni::{EnvUnowned, errors::ThrowRuntimeExAndDefault, objects::{JByteArray, JObject, JString}, sys::jstring};
 
     #[unsafe(no_mangle)]
     pub extern "system" fn Java_com_ismartcoding_plain_rust_native_RustNativeBindings_reportPairingResponse(

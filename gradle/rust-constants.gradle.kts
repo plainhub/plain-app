@@ -65,7 +65,7 @@ fun registerRustConstants(taskName: String, packageName: String, sourcePath: Str
     }
 }
 
-registerRustConstants("generatePrefKeys", "plain-rs", "src/prefs/pref_keys.rs",
+registerRustConstants("generatePrefKeys", "plain-rs", "src/features/prefs/pref_keys.rs",
     "prefKeys/PrefKeys.kt", ::preferenceKeys)
 registerRustConstants("generateHttpServerPorts", "plain-server", "src/http/listeners/bind.rs",
     "httpServerPorts/HttpServerPorts.kt", ::httpServerPorts)

@@ -1,11 +1,8 @@
 use super::values::{c_string, input};
 use plain_server::host::events::HostEvents;
-use plain_rs::platform::system::log;
-use plain_rs::platform::system::log::Level;
-use std::{
-    ffi::c_char,
-    sync::{Arc, Mutex},
-};
+use plain_rs::libs::platform::system::log;
+use plain_rs::libs::platform::system::log::Level;
+use std::{ffi::c_char, sync::{Arc, Mutex}};
 use tokio::runtime::Handle;
 
 static BRIDGE: Mutex<Option<(Handle, Arc<HostEvents>)>> = Mutex::new(None);
@@ -105,12 +102,7 @@ pub unsafe extern "C" fn plain_submit_thumbnail(
 #[cfg(target_os = "android")]
 mod android {
     use super::*;
-    use jni::{
-        EnvUnowned,
-        errors::ThrowRuntimeExAndDefault,
-        objects::{JByteArray, JObject, JString},
-        sys::jstring,
-    };
+    use jni::{EnvUnowned, errors::ThrowRuntimeExAndDefault, objects::{JByteArray, JObject, JString}, sys::jstring};
     #[unsafe(no_mangle)]
     pub extern "system" fn Java_com_ismartcoding_plain_rust_native_RustNativeBindings_hostNext(
         mut env: EnvUnowned<'_>,

@@ -49,12 +49,7 @@ pub extern "C" fn plain_release_mdns_debug_session(token: *const c_char) -> *mut
 #[cfg(target_os = "android")]
 mod android {
     use super::*;
-    use jni::{
-        EnvUnowned,
-        errors::ThrowRuntimeExAndDefault,
-        objects::{JObject, JString},
-        sys::jstring,
-    };
+    use jni::{EnvUnowned, errors::ThrowRuntimeExAndDefault, objects::{JObject, JString}, sys::jstring};
     #[unsafe(no_mangle)]
     pub extern "system" fn Java_com_ismartcoding_plain_rust_native_RustNativeBindings_lanIpv4Addresses(
         mut env: EnvUnowned<'_>,
