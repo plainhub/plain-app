@@ -21,6 +21,14 @@ fun rustPackage(metadata: String, name: String): File {
     return File(packages.single()["manifest_path"] as String).parentFile
 }
 
+tasks.withType<org.gradle.api.tasks.testing.Test>().configureEach {
+    val coreDirectory = cargoMetadata.map { rustPackage(it, "plain-rs").parentFile }
+    inputs.dir(coreDirectory.map { it.resolve("schema/api") }).withPropertyName("mainSchema")
+    doFirst {
+        environment("PLAIN_CORE_DIR", coreDirectory.get().absolutePath)
+    }
+}
+
 fun preferenceKeys(source: String): String {
     val keys = Regex("""^\s+([A-Z][A-Z_0-9]*) = "([a-z_0-9]+)",$""", RegexOption.MULTILINE)
         .findAll(source).map { it.groupValues[1] to it.groupValues[2] }.toList() +
