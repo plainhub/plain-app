@@ -383,7 +383,7 @@ class ManagedDeviceUiAcceptanceTest {
             }
             val input = JsonHelper.jsonDecodeFromElement<com.ismartcoding.plain.features.shares.SharedDownloadInput>(enqueued.variables.getValue("input"))
             assertEquals(id, input.messageId)
-            assertEquals(listOf("/root/target-card-file.txt"), input.entries.map { it.virtualPath })
+            assertEquals(listOf("/root/target-card-file.txt"), input.entries.map { it.relativePath })
             click("Target shared download", "target download summary")
             click(text(Res.string.cancel), "cancel target download")
             awaitValue("target shared download cancel") {
@@ -478,7 +478,7 @@ class ManagedDeviceUiAcceptanceTest {
                 val link = com.ismartcoding.plain.features.shares.SharedLinkClient.ownLink(share.id, "127.0.0.1")
                 val path = com.ismartcoding.plain.features.shares.SharedLinkClient.cacheFile(
                     link, share.urlToken,
-                    com.ismartcoding.plain.features.shares.SharedFileDto(file.name, share.roots.first { it.realPath == file.canonicalPath }.virtualPath, size = file.length(), mimeType = "text/plain"),
+                    com.ismartcoding.plain.features.shares.SharedFileDto(file.name, share.roots.first { it.realPath == file.canonicalPath }.relativePath, size = file.length(), mimeType = "text/plain"),
                 )
                 val preview = java.io.File(path).canonicalFile
                 assertTrue(preview.path.startsWith(instrumentation.targetContext.cacheDir.canonicalPath + "/"))
@@ -486,7 +486,7 @@ class ManagedDeviceUiAcceptanceTest {
                 assertEquals(file.readText(), preview.readText())
                 val thumbnailPath = com.ismartcoding.plain.features.shares.SharedLinkClient.cacheFile(
                     link, share.urlToken,
-                    com.ismartcoding.plain.features.shares.SharedFileDto(image.name, share.roots.first { it.realPath == image.canonicalPath }.virtualPath, size = image.length(), mimeType = "image/jpeg", hasThumb = true),
+                    com.ismartcoding.plain.features.shares.SharedFileDto(image.name, share.roots.first { it.realPath == image.canonicalPath }.relativePath, size = image.length(), mimeType = "image/jpeg", hasThumb = true),
                     thumbnail = true,
                 )
                 val thumbnailFile = java.io.File(thumbnailPath).canonicalFile
@@ -530,7 +530,7 @@ class ManagedDeviceUiAcceptanceTest {
             id = "share-card-ui-fixture", content = JsonHelper.jsonEncode(com.ismartcoding.plain.features.chat.models.MessageContent(com.ismartcoding.plain.features.chat.models.MessageType.SHARE, card)),
         )
         val browsed = com.ismartcoding.plain.features.shares.SharedBrowseResult(
-            com.ismartcoding.plain.features.shares.SharedInfoDto(name = "Target folder", urlToken = "fixture-link-key", entries = listOf(com.ismartcoding.plain.features.shares.SharedFileDto(name = "target-card-file.txt", virtualPath = "/root/target-card-file.txt", size = 8, mimeType = "text/plain"))),
+            com.ismartcoding.plain.features.shares.SharedInfoDto(name = "Target folder", urlToken = "fixture-link-key", entries = listOf(com.ismartcoding.plain.features.shares.SharedFileDto(name = "target-card-file.txt", relativePath = "/root/target-card-file.txt", size = 8, mimeType = "text/plain"))),
             com.ismartcoding.plain.features.shares.SharedLink("device.test", 8443, "fixture-shared-link", "fixture-token", "https://device.test:8443/share/fixture"), card,
         )
         val downloads = java.util.concurrent.atomic.AtomicReference(com.ismartcoding.plain.models.SharedDownloadSnapshot("fixture-runtime", 0, emptyList()))
@@ -553,7 +553,7 @@ class ManagedDeviceUiAcceptanceTest {
                             data = JsonHelper.jsonEncodeToElement(ManagedFixturePrefs(mapOf("app_home_features" to readFeatures()))).jsonObject,
                         ))
                         operation.query.contains("setSavedValue(") -> """{"data":{"setSavedValue":true}}"""
-                        operation.query.contains("shareRecord(") -> """{"data":{"shareRecord":{"id":"share-ui-fixture","name":"Target fixture share","password":"","urlToken":"fixture-resource-token","readOnly":true,"expiresAt":null,"createdAt":"2026-01-01T00:00:00Z","updatedAt":"2026-01-01T00:00:00Z","roots":[{"virtualPath":"root","realPath":"/target-share-root/existing.txt","isDir":false}]}}}"""
+                        operation.query.contains("shareRecord(") -> """{"data":{"shareRecord":{"id":"share-ui-fixture","name":"Target fixture share","password":"","urlToken":"fixture-resource-token","readOnly":true,"expiresAt":null,"createdAt":"2026-01-01T00:00:00Z","updatedAt":"2026-01-01T00:00:00Z","roots":[{"relativePath":"root","realPath":"/target-share-root/existing.txt","isDir":false}]}}}"""
                         operation.query.contains("shareLink(") -> """{"data":{"shareLink":{"host":"device.test","port":8443,"sharedId":"share-ui-fixture","token":"fixture-share-token","pageUrl":"https://device.test:8443/share/fixture"}}}"""
                         operation.query.contains("sendShare(") -> """{"data":{"sendShare":[]}}"""
                         operation.query.contains("peers {") -> JsonHelper.jsonEncode(mapOf("data" to mapOf("peers" to JsonHelper.jsonEncodeToElement(readPeers()))))

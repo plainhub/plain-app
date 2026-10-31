@@ -53,7 +53,7 @@ class ShareRustHttpTest {
             createTestHttpClient(TestHttpClientSpec.Local()).use { client ->
                 suspend fun guest(path: String = "photos"): Pair<Int, JsonObject?> {
                     val query = buildJsonObject {
-                        put("query", "query(\$path: String) { sharedInfo(virtualPath: \$path) { entries { virtualPath isDir } } }")
+                        put("query", "query(\$path: String) { sharedInfo(relativePath: \$path) { entries { relativePath isDir } } }")
                         put("variables", buildJsonObject { put("path", path) })
                     }
                     val body = CryptoFixtures.chaCha20Encrypt(key, "${System.currentTimeMillis()}|${UUID.randomUUID()}|$query")
@@ -68,7 +68,7 @@ class ShareRustHttpTest {
                     }
                 }
                 fun resource(path: String, route: String = "fs"): String {
-                    val payload = buildJsonObject { put("sharedId", share.id); put("virtualPath", path) }
+                    val payload = buildJsonObject { put("sharedId", share.id); put("relativePath", path) }
                     val encrypted = ResourceCrypto.encrypt(payload.toString(), Base64.decode(share.urlToken))
                     return "$base/$route?sid=${share.id}&id=${URLEncoder.encode(encrypted, "UTF-8")}"
                 }
@@ -81,7 +81,7 @@ class ShareRustHttpTest {
                 assertEquals(200, status)
                 val entries = listing!!.getValue("data").jsonObject.getValue("sharedInfo").jsonObject.getValue("entries").jsonArray
                 assertEquals(listOf("photos/a.txt"), entries.filter { !it.jsonObject.getValue("isDir").jsonPrimitive.boolean }
-                    .map { it.jsonObject.getValue("virtualPath").jsonPrimitive.content })
+                    .map { it.jsonObject.getValue("relativePath").jsonPrimitive.content })
                 client.get(resource("photos", "zip/dir")).use {
                     assertEquals(200, it.status.value)
                     val names = mutableListOf<String>()

@@ -18,9 +18,23 @@ fn encrypt(token: &str, payload: &str) -> String {
 }
 
 fn reference(token: &str, payload: &str) -> String {
-    reply(
-        plain_rs::crypto::xchacha_encrypt(token, payload.as_bytes()).ok_or("Invalid resource key"),
-    )
+    let result = (|| -> Result<String, String> {
+        let input: serde_json::Value = serde_json::from_str(payload).map_err(|e| e.to_string())?;
+        let client_id = input["clientId"]
+            .as_str()
+            .ok_or("Missing resource client")?;
+        let path = input["path"].as_str().ok_or("Missing resource path")?;
+        plain_rs::files::resource_link::seal(
+            &plain_rs::files::resource_link::Scope::Session(client_id.into()),
+            &plain_rs::crypto::base64_decode(token),
+            &plain_rs::files::resource_link::Resource::reference(path),
+        )
+        .map_err(|e| e.to_string())
+    })();
+    match result {
+        Ok(value) => serde_json::json!({"value":value}).to_string(),
+        Err(error) => serde_json::json!({"error":error}).to_string(),
+    }
 }
 
 #[unsafe(no_mangle)]

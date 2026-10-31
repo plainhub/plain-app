@@ -4,7 +4,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class Root(
-    var virtualPath: String,
+    var relativePath: String,
     var realPath: String,
     var isDir: Boolean,
 )

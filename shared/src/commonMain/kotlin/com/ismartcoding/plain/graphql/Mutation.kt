@@ -426,10 +426,10 @@ object Mutation {
     fun browseSharedLink(
         messageId: String,
         expected: MessageShare,
-        virtualPath: String?,
+        relativePath: String?,
     ): GraphqlRequest<SharedBrowseResult?> = GraphqlRequest(
-        $$"mutation($messageId: ID!, $expected: SharedMessageCardInput!, $virtualPath: String) { browseSharedLink(messageId: $messageId, expected: $expected, virtualPath: $virtualPath) { info { $${Fragments.SHARED_INFO} } link { $${Fragments.SHARE_LINK} } card { $${Fragments.SHARED_CARD} } } }",
-        mapOf(variable("messageId", messageId), variable("expected", expected), variable("virtualPath", virtualPath)),
+        $$"mutation($messageId: ID!, $expected: SharedMessageCardInput!, $relativePath: String) { browseSharedLink(messageId: $messageId, expected: $expected, relativePath: $relativePath) { info { $${Fragments.SHARED_INFO} } link { $${Fragments.SHARE_LINK} } card { $${Fragments.SHARED_CARD} } } }",
+        mapOf(variable("messageId", messageId), variable("expected", expected), variable("relativePath", relativePath)),
         field = "browseSharedLink",
     )
 

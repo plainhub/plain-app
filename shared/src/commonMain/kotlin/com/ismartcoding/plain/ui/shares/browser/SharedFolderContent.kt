@@ -60,7 +60,7 @@ internal fun SharedFolderContent(
         if (state.rootInfo != null) {
             val breadcrumbs = buildList {
                 add(BreadcrumbItem(state.rootInfo?.name ?: "/", ""))
-                state.crumbs.forEach { add(BreadcrumbItem(it.name, it.virtualPath)) }
+                state.crumbs.forEach { add(BreadcrumbItem(it.name, it.relativePath)) }
             }
             BreadcrumbView(
                 breadcrumbs = breadcrumbs,
@@ -124,7 +124,7 @@ private fun EntryList(
         modifier = modifier.fillMaxSize(),
         contentPadding = PaddingValues(bottom = bottomPadding.dp),
     ) {
-        items(state.entries, key = { it.virtualPath }) { entry ->
+        items(state.entries, key = { it.relativePath }) { entry ->
             EntryRow(
                 entry = entry,
                 source = state.source,

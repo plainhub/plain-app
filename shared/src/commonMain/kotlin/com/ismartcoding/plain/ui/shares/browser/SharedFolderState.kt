@@ -31,8 +31,8 @@ import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
-/** One visited level of the shared folder tree. Root level has an empty [Crumb.virtualPath]. */
-internal data class Crumb(val virtualPath: String, val name: String)
+/** One visited level of the shared folder tree. Root level has an empty [Crumb.relativePath]. */
+internal data class Crumb(val relativePath: String, val name: String)
 
 internal class SharedFolderState(
     private val messageId: String,
@@ -64,7 +64,7 @@ internal class SharedFolderState(
 
     private val previewHandles = mutableListOf<String>()
 
-    val currentPath: String get() = crumbs.lastOrNull()?.virtualPath ?: ""
+    val currentPath: String get() = crumbs.lastOrNull()?.relativePath ?: ""
     val currentInfo: SharedInfoDto? get() = dirCache[currentPath]
     val pathLoading: Boolean get() = loadingPath == currentPath
     val pathError: Boolean get() = errorPath == currentPath
@@ -121,7 +121,7 @@ internal class SharedFolderState(
         crumbs = if (path.isEmpty()) {
             emptyList()
         } else {
-            val index = crumbs.indexOfFirst { it.virtualPath == path }
+            val index = crumbs.indexOfFirst { it.relativePath == path }
             if (index >= 0) crumbs.take(index + 1) else crumbs
         }
     }
@@ -129,7 +129,7 @@ internal class SharedFolderState(
     fun onEntryClick(entry: SharedFileDto) {
         when {
             selectMode -> selected = if (selected.contains(entry)) selected - entry else selected + entry
-            entry.isDir -> crumbs = crumbs + Crumb(entry.virtualPath, entry.name)
+            entry.isDir -> crumbs = crumbs + Crumb(entry.relativePath, entry.name)
             entry.opensLikeLocal() -> openEntryPreview(entry)
         }
     }
@@ -150,13 +150,13 @@ internal class SharedFolderState(
         selected = if (selected.containsAll(entries)) emptySet() else entries.toSet()
     }
 
-    fun isPreviewLoading(entry: SharedFileDto): Boolean = previewLoading.contains(entry.virtualPath)
+    fun isPreviewLoading(entry: SharedFileDto): Boolean = previewLoading.contains(entry.relativePath)
 
     /** True while a batch covering [entry] is queued or downloading. */
     fun isEntryBusy(entry: SharedFileDto): Boolean = downloads.progress.value.values.any {
         it.messageId == messageId &&
             !it.status.isTerminalDownloadStatus() &&
-            it.entries.any { e -> e.virtualPath == entry.virtualPath }
+            it.entries.any { e -> e.relativePath == entry.relativePath }
     }
 
     fun withBrowserUrl(action: (String) -> Unit) {
@@ -172,8 +172,8 @@ internal class SharedFolderState(
 
     fun openEntryPreview(entry: SharedFileDto) {
         val (link, urlToken) = transferContext() ?: return
-        if (previewLoading.contains(entry.virtualPath)) return
-        previewLoading = previewLoading + entry.virtualPath
+        if (previewLoading.contains(entry.relativePath)) return
+        previewLoading = previewLoading + entry.relativePath
         scope.launch {
             val path = try {
                 source.sharedLinks.cacheFile(link, urlToken, entry)
@@ -182,7 +182,7 @@ internal class SharedFolderState(
                 DialogHelper.showMessage(error)
                 return@launch
             } finally {
-                previewLoading = previewLoading - entry.virtualPath
+                previewLoading = previewLoading - entry.relativePath
             }
             val inPagePreview = !(path.isAudioFast() || path.isTextFile() || path.isPdfFile())
             if (inPagePreview && source is ContentSource.Local) previewHandles.add(path)
@@ -193,7 +193,7 @@ internal class SharedFolderState(
                 name = entry.name,
                 mediaHint = entry.mimeType.startsWith("image/") || entry.mimeType.startsWith("video/"),
                 onPreviewMedia = {
-                    MediaPreviewData.items = listOf(PreviewItem(id = entry.virtualPath, path = path, source = source, size = entry.size))
+                    MediaPreviewData.items = listOf(PreviewItem(id = entry.relativePath, path = path, source = source, size = entry.size))
                     scope.launch { previewerState.open(0) }
                 },
             )

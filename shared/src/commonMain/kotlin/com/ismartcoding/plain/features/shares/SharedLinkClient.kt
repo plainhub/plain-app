@@ -14,8 +14,8 @@ open class SharedLinkApi internal constructor(private val api: com.ismartcoding.
     suspend fun initialLink(messageId: String, expected: MessageShare): SharedLink =
         api.execute(Query.initialSharedLink(messageId, expected))
 
-    suspend fun browse(messageId: String, expected: MessageShare, virtualPath: String?): SharedBrowseResult? =
-        api.execute(Mutation.browseSharedLink(messageId, expected, virtualPath))
+    suspend fun browse(messageId: String, expected: MessageShare, relativePath: String?): SharedBrowseResult? =
+        api.execute(Mutation.browseSharedLink(messageId, expected, relativePath))
 
     suspend fun cacheFile(
         link: SharedLink,

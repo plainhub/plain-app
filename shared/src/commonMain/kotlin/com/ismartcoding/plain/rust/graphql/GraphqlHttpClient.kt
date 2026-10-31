@@ -30,7 +30,7 @@ internal class PeerHttpClient(
         nativeCall { RustNativeBindings.decryptHttpResponse(token, "/graphql", request, response) }
     },
     private val clientId: () -> String = { Prefs.clientId.value },
-    internal val encryptResourceReference: suspend (String, String) -> String = { token, path -> nativeCall { RustNativeBindings.encryptResourceReference(token, path) } },
+    internal val encryptResourceReference: suspend (String, String) -> String = { token, path -> nativeCall { RustNativeBindings.encryptResourceReference(token, JsonHelper.jsonEncode(mapOf("clientId" to clientId(), "path" to path))) } },
 ) {
     private val expected = peer.copy()
 
