@@ -605,11 +605,14 @@ class ManagedDeviceUiAcceptanceTest {
         }
         ActivityScenario.launch(MainActivity::class.java).use { scenario ->
             awaitNode("Chat settings action") { it.contentDescription == text(Res.string.settings) }
-            click(text(Res.string.devices), "device menu without pairs")
-            val rename = awaitNode("rename-only menu") { it.overlay && it.text == text(Res.string.rename) }
+            click(text(Res.string.devices), "device sheet without pairs")
+            val rename = awaitNode("rename-only sheet") { it.overlay && it.text == text(Res.string.rename) }
             val renameItem = generateSequence(rename) { it.parent }.first { it.isClickable }
-            assertTrue(renameItem.boundsInWindow.width < 240 * instrumentation.targetContext.resources.displayMetrics.density)
-            captureNavigation("rename-only-menu")
+            val display = instrumentation.targetContext.resources.displayMetrics
+            assertTrue(renameItem.boundsInWindow.left > 0)
+            assertTrue(renameItem.boundsInWindow.right < display.widthPixels)
+            assertTrue(renameItem.boundsInWindow.top > display.heightPixels / 2)
+            captureNavigation("rename-only-sheet")
             assertFalse(allText().contains(text(Res.string.pair_device)))
             assertFalse(allText().contains(text(Res.string.this_device)))
             click(text(Res.string.rename), "rename selected device")
@@ -672,17 +675,20 @@ class ManagedDeviceUiAcceptanceTest {
                 }
             }
             click(text(Res.string.devices), "device selector")
-            val menuName = awaitNode("device menu") { it.overlay && it.text == peer.name }
+            val sheetName = awaitNode("device selection sheet") { it.overlay && it.text == peer.name }
             instrumentation.runOnMainSync {
                 val layouts = mutableListOf<androidx.compose.ui.text.TextLayoutResult>()
-                assertTrue(menuName.semantic.config.getOrNull(SemanticsActions.GetTextLayoutResult)?.action?.invoke(layouts) == true)
+                assertTrue(sheetName.semantic.config.getOrNull(SemanticsActions.GetTextLayoutResult)?.action?.invoke(layouts) == true)
                 assertEquals(1, layouts.single().lineCount)
                 assertFalse(layouts.single().isLineEllipsized(0))
             }
             assertFalse(allText().contains(text(Res.string.pair_device)))
             assertFalse(allText().contains(text(Res.string.online)))
             assertFalse(allText().contains(text(Res.string.offline)))
-            captureNavigation("device-menu")
+            val deviceRow = generateSequence(sheetName) { it.parent }.first { it.isClickable }
+            assertTrue(deviceRow.boundsInWindow.left > 0)
+            assertTrue(deviceRow.boundsInWindow.right < instrumentation.targetContext.resources.displayMetrics.widthPixels)
+            captureNavigation("device-sheet")
             click(peer.name, "unavailable device")
             awaitNode("remote authorization error") { it.text == text(Res.string.managed_authorization_changed) }
             awaitValue("remote navigation without local services") {
