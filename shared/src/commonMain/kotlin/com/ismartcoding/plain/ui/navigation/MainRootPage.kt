@@ -11,13 +11,12 @@ import com.ismartcoding.plain.i18n.chat
 import com.ismartcoding.plain.rust.graphql.ContentSource
 import com.ismartcoding.plain.ui.app.MainViewModel
 import com.ismartcoding.plain.ui.audio.AudioQueueViewModel
-import com.ismartcoding.plain.ui.base.NoDataColumn
 import com.ismartcoding.plain.ui.chat.ChatListPageRoute
 import com.ismartcoding.plain.ui.chat.PeerViewModel
 import com.ismartcoding.plain.ui.components.ActionButtonSettings
 import com.ismartcoding.plain.ui.search.GlobalSearchPage
 import com.ismartcoding.plain.ui.search.GlobalSearchViewModel
-import com.ismartcoding.plain.ui.tools.ManagedError
+import com.ismartcoding.plain.ui.tools.ManagedDeviceStatus
 import com.ismartcoding.plain.ui.tools.ToolsPage
 import org.jetbrains.compose.resources.stringResource
 
@@ -28,6 +27,7 @@ internal fun MainRootPage(
     source: ContentSource?,
     loading: Boolean,
     error: String?,
+    refreshDevice: suspend () -> Boolean,
     channelVM: com.ismartcoding.plain.ui.chat.ChannelViewModel,
     updateVM: com.ismartcoding.plain.ui.settings.UpdateViewModel,
     localPeerVM: PeerViewModel,
@@ -51,7 +51,7 @@ internal fun MainRootPage(
             }
         }) { padding ->
             Box(Modifier.padding(padding)) {
-                if (error != null) ManagedError(error) else NoDataColumn(loading = true)
+                ManagedDeviceStatus(loading, error, refreshDevice)
             }
         }
     } else {

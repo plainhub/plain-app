@@ -4,7 +4,6 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -35,7 +34,6 @@ import com.ismartcoding.plain.ui.resources.Res as UiRes
 import com.ismartcoding.plain.ui.resources.check as ui_drawable_check
 import com.ismartcoding.plain.ui.resources.chevron_down as ui_drawable_chevron_down
 import com.ismartcoding.plain.ui.resources.pen as ui_drawable_pen
-import com.ismartcoding.plain.ui.theme.PlainTheme
 import com.ismartcoding.plain.ui.theme.listItemTitle
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.painterResource
@@ -48,7 +46,7 @@ internal data class DeviceNavigation(
     val selectedPeerId: String? = null,
     val onSelect: (Peer?) -> Unit,
     val onSettings: () -> Unit,
-    val onRename: (suspend (String) -> Unit)?,
+    val onRename: suspend (String) -> Unit,
 )
 
 internal val LocalDeviceNavigation = staticCompositionLocalOf<DeviceNavigation?> { null }
@@ -62,7 +60,7 @@ internal fun DeviceTopAppBar(
     val navigation = LocalDeviceNavigation.current
     var showDevices by remember { mutableStateOf(false) }
     var showRename by remember { mutableStateOf(false) }
-    if (showRename && navigation?.onRename != null) DeviceRenameDialog(
+    if (showRename && navigation != null) DeviceRenameDialog(
         name = navigation.deviceName, onDismiss = { showRename = false }, onSave = navigation.onRename,
     )
     if (showDevices && navigation != null) DeviceSelectionSheet(
@@ -92,15 +90,13 @@ private fun DeviceSelectionSheet(navigation: DeviceNavigation, onDismiss: () -> 
                 PIconButton(
                     UiRes.drawable.ui_drawable_pen,
                     contentDescription = stringResource(Res.string.rename),
-                    enabled = navigation.onRename != null,
                     click = onRename,
                 )
             },
         )
         Column(
             Modifier.fillMaxWidth().weight(1f, fill = false)
-                .verticalScroll(rememberScrollState())
-                .padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN),
+                .verticalScroll(rememberScrollState()),
         ) {
             if (hasChoices) {
                 DeviceSelectionRow(

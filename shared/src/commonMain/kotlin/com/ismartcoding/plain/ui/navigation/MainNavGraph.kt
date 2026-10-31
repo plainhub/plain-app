@@ -10,8 +10,7 @@ import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
 import androidx.lifecycle.ViewModelStoreOwner
 import com.ismartcoding.plain.rust.graphql.ContentSource
 import com.ismartcoding.plain.ui.tools.ManagedDeviceViewModel
-import com.ismartcoding.plain.ui.tools.ManagedError
-import com.ismartcoding.plain.ui.base.NoDataColumn
+import com.ismartcoding.plain.ui.tools.ManagedDeviceStatus
 import androidx.compose.runtime.CompositionLocalProvider
 import com.ismartcoding.plain.Prefs
 import com.ismartcoding.plain.platform.system.getDeviceName
@@ -88,11 +87,14 @@ fun MainNavGraph(
         viewModel(viewModelStoreOwner = deviceOwner) { ManagedDeviceViewModel(device.peerId, device.publicKey) }
     }
     val state = manager?.state?.collectAsState()?.value
+    val refreshDevice: suspend () -> Boolean = manager?.let { it::refresh } ?: { true }
     val content = if (selectedDevice == null) ContentSource.Local else state?.client?.let { client -> remember(client) { ContentSource.Remote(client) } }
     val source: @Composable () -> ContentSource? = {
         when {
-            state?.error != null -> { ManagedError(state.error); null }
-            state?.loading == true -> { NoDataColumn(loading = true); null }
+            state != null && (state.error != null || state.loading) -> {
+                ManagedDeviceStatus(state.loading, state.error, refreshDevice)
+                null
+            }
             else -> content
         }
     }
@@ -112,10 +114,9 @@ fun MainNavGraph(
         capabilities = if (selectedDevice == null) getDeviceCapabilities() else state?.info?.capabilities.orEmpty(),
         onSelect = { peer -> MainViewModel.selectDevice(peer?.let { com.ismartcoding.plain.ui.app.DeviceIdentity(it.id, it.publicKey) }) },
         onSettings = { navController.navigate(Routing.Settings) },
-        onRename = content?.let { selected -> { name ->
-            selected.api.execute(com.ismartcoding.plain.graphql.Mutation.updateDeviceName(name))
-            manager?.refresh()
-        } },
+        onRename = if (manager != null) ({ name -> manager.rename(name) }) else ({ name ->
+            ContentSource.Local.api.execute(com.ismartcoding.plain.graphql.Mutation.updateDeviceName(name))
+        }),
     )
     val backStackEntry by navController.currentBackStackEntryAsState()
     var showDownloads by remember { mutableStateOf(false) }
@@ -141,7 +142,7 @@ fun MainNavGraph(
                     addDeviceContentRoutes(navController, audioQueueVM, peerVM, channelVM, noteTagsVM, source)
                     addMainSettingsPages(navController, updateVM, peerVM, batterySettings)
                     composable<Routing.Home> { owner ->
-                        MainRootPage(navController, owner, content, state?.loading == true, state?.error, channelVM, updateVM, peerVM, audioQueueVM, globalSearchVM)
+                        MainRootPage(navController, owner, content, state?.loading == true, state?.error, refreshDevice, channelVM, updateVM, peerVM, audioQueueVM, globalSearchVM)
                     }
                     if (selectedDevice == null) composable<Routing.CustomFeatures> {
                         com.ismartcoding.plain.ui.tools.HomeFeaturesSelectionPage(navController)

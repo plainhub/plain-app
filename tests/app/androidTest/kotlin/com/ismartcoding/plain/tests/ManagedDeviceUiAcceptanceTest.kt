@@ -597,6 +597,55 @@ class ManagedDeviceUiAcceptanceTest {
     }
 
     @Test
+    fun remoteServerFailureUsesFriendlyMessage() {
+        ActivityScenario.launch(MainActivity::class.java).use { scenario ->
+            scenario.onActivity { activity ->
+                activity.setContent {
+                    com.ismartcoding.plain.ui.theme.AppTheme(useDarkTheme = false) {
+                        com.ismartcoding.plain.ui.tools.ManagedError("HTTP 500")
+                    }
+                }
+            }
+            awaitNode("friendly remote server error") { it.text == text(Res.string.feed_err_server) || it.text == "HTTP 500" }
+            assertFalse(allText().contains("HTTP 500"))
+            awaitNode("server error description") { it.text == text(Res.string.feed_err_server) }
+        }
+    }
+
+    @Test
+    fun remoteFailureCanPullToRefreshAndRecover() = runBlocking<Unit> {
+        val attempts = java.util.concurrent.atomic.AtomicInteger()
+        ActivityScenario.launch(MainActivity::class.java).use { scenario ->
+            scenario.onActivity { activity ->
+                activity.setContent {
+                    com.ismartcoding.plain.ui.theme.AppTheme(useDarkTheme = false) {
+                        val error = androidx.compose.runtime.remember { androidx.compose.runtime.mutableStateOf<String?>("HTTP 500") }
+                        com.ismartcoding.plain.ui.tools.ManagedDeviceStatus(false, error.value) {
+                            if (attempts.incrementAndGet() == 1) false else {
+                                error.value = null
+                                true
+                            }
+                        }
+                    }
+                }
+            }
+            awaitNode("remote retry hint") { it.text == text(Res.string.srl_header_pulling) }
+            assertFalse(allText().contains("HTTP 500"))
+            captureNavigation("remote-server-error")
+            pullToolsDown()
+            awaitNode("failed remote retry") { it.text == text(com.ismartcoding.plain.ui.resources.Res.string.srl_header_failed) }
+            assertEquals(1, attempts.get())
+            awaitToolsRefreshFinished()
+            awaitNode("server error preserved after failure") { it.text == text(Res.string.feed_err_server) }
+            pullToolsDown()
+            awaitNode("remote retry succeeded") { it.text == text(com.ismartcoding.plain.ui.resources.Res.string.srl_header_finish) }
+            assertEquals(2, attempts.get())
+            awaitToolsRefreshFinished()
+            assertFalse(allText().contains(text(Res.string.feed_err_server)))
+        }
+    }
+
+    @Test
     fun localRootStartsWithChatAndKeepsServicesLastAndSettingsAccessible() = runBlocking {
         instrumentation.runOnMainSync {
             Prefs.onboardingCompleted.value = true
@@ -690,8 +739,8 @@ class ManagedDeviceUiAcceptanceTest {
             assertFalse(allText().contains(text(Res.string.online)))
             assertFalse(allText().contains(text(Res.string.offline)))
             val deviceRow = generateSequence(sheetName) { it.parent }.first { it.isClickable }
-            assertTrue(deviceRow.boundsInWindow.left > 0)
-            assertTrue(deviceRow.boundsInWindow.right < instrumentation.targetContext.resources.displayMetrics.widthPixels)
+            assertEquals(0f, deviceRow.boundsInWindow.left)
+            assertEquals(instrumentation.targetContext.resources.displayMetrics.widthPixels.toFloat(), deviceRow.boundsInWindow.right)
             captureNavigation("device-sheet")
             click(peer.name, "unavailable device")
             awaitNode("remote authorization error") { it.text == text(Res.string.managed_authorization_changed) }
@@ -699,6 +748,13 @@ class ManagedDeviceUiAcceptanceTest {
                 if (uiNodes().none { it.contentDescription == text(Res.string.services) }) true else null
             }
             captureNavigation("remote-error")
+            click(text(Res.string.select_a_device), "device selector after failed entry")
+            val rename = awaitNode("remote rename remains enabled") { it.overlay && it.contentDescription == text(Res.string.rename) }
+            assertTrue(generateSequence(rename) { it.parent }.first { it.isClickable }.isEnabled)
+            click(text(Res.string.rename), "rename unavailable remote device")
+            assertEquals(peer.name, awaitNode("remote device rename input") { it.isEditable }.text)
+            click(text(Res.string.cancel), "cancel remote rename")
+            awaitMainWindowFocus(scenario)
             click(text(Res.string.settings), "app settings from remote")
             awaitNode("app settings contents") { it.text == text(Res.string.dark_theme) }
             for (step in 0 until 8) {
