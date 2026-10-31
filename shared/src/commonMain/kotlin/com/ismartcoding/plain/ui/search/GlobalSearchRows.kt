@@ -133,7 +133,7 @@ fun GlobalSearchRow(
                 m = src.doc,
                 tags = emptyList(),
                 onTagClick = { },
-                onOpen = if (hit.device is com.ismartcoding.plain.rust.graphql.ContentSource.Remote) ({ onOpen(hit) }) else null,
+                onOpen = { onOpen(hit) },
             )
         }
 

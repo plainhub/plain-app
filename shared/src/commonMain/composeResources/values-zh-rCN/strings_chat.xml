@@ -70,8 +70,6 @@
     <string name="pairing_request_message">是否要与设备"%1$s"配对？</string>
     <string name="pairing_request_hint">配对后，你们可以互发消息。</string>
     <string name="pairing_compare_code">允许配对前，请核对两台设备显示的匹配码一致。</string>
-    <string name="pairing_expiry_label">后失效</string>
-    <string name="pairing_request_expired">配对请求已过期</string>
     <string name="allow">允许</string>
     <string name="deny">拒绝</string>
     <string name="chat">聊天</string>

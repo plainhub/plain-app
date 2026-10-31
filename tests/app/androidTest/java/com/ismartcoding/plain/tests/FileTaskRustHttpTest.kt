@@ -1,5 +1,6 @@
 package com.ismartcoding.plain.tests
 
+import java.util.UUID
 import com.ismartcoding.plain.rust.graphql.GraphqlRequest
 import com.ismartcoding.plain.rust.graphql.GraphqlApi
 

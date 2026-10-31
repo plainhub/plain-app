@@ -1,4 +1,4 @@
-package com.ismartcoding.plain.ui.nearby.connections
+package com.ismartcoding.plain.ui.connections
 
 import com.ismartcoding.plain.i18n.*
 
@@ -29,12 +29,10 @@ import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
-import com.ismartcoding.plain.ui.components.ButtonSize
 import com.ismartcoding.plain.ui.components.ActionButtonAdd
 import com.ismartcoding.plain.ui.base.BottomSpace
 import com.ismartcoding.plain.ui.components.NavigationBackIcon
 import com.ismartcoding.plain.ui.base.NoDataColumn
-import com.ismartcoding.plain.ui.base.PFilledButton
 import com.ismartcoding.plain.ui.base.PFilterChip
 import com.ismartcoding.plain.ui.base.PScaffold
 import com.ismartcoding.plain.ui.base.PScrollableTabRow

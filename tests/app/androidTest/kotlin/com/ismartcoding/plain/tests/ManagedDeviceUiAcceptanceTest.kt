@@ -116,7 +116,10 @@ class ManagedDeviceUiAcceptanceTest {
     private val instrumentation = InstrumentationRegistry.getInstrumentation()
     @org.junit.Before
     fun resetSelectedDevice() {
-        instrumentation.runOnMainSync { MainViewModel.selectDevice(null) }
+        instrumentation.runOnMainSync {
+            MainViewModel.selectDevice(null)
+            MainViewModel.pendingSearchHit.value = null
+        }
     }
 
     private val identityRequest = GraphqlRequest<ManagedAcceptanceIdentity>("query { app { clientId deviceName } }", field = "app")
@@ -1084,6 +1087,67 @@ class ManagedDeviceUiAcceptanceTest {
                 assertTrue(layouts.single().isLineEllipsized(0))
             }
             report("chat_preview_result", "one_line_ellipsis_verified")
+        }
+    }
+
+    @Test
+    fun globalSearchOpensNativeResultsAfterLeavingARemoteDeviceScope() = runBlocking {
+        val marker = "search-navigation-${UUID.randomUUID()}"
+        val note = GraphqlApi.execute(Mutation.saveNote("", marker, "$marker note body"))
+        val document = java.io.File(instrumentation.targetContext.cacheDir, "$marker.txt").apply { writeText("$marker document body") }
+        try {
+            instrumentation.runOnMainSync {
+                Prefs.onboardingCompleted.value = true
+                MainViewModel.selectDevice(com.ismartcoding.plain.ui.app.DeviceIdentity("unavailable-search-fixture", "fixture-key"))
+            }
+            ActivityScenario.launch(MainActivity::class.java).use { scenario ->
+                lateinit var search: com.ismartcoding.plain.ui.search.GlobalSearchViewModel
+                scenario.onActivity { activity ->
+                    search = com.ismartcoding.plain.ui.search.GlobalSearchViewModel(readDevices = {
+                        com.ismartcoding.plain.ui.search.GlobalSearchDevices(listOf(com.ismartcoding.plain.rust.graphql.ContentSource.Local))
+                    })
+                    search.domain.value = com.ismartcoding.plain.ui.search.GlobalSearchDomain.NOTES
+                    search.queryText.value = marker
+                    search.submitted.value = true
+                    activity.viewModelStore.put("globalSearchVM", search)
+                }
+                scenario.recreate()
+                scenario.onActivity { search.search() }
+                click(text(Res.string.search), "search while remote device is selected")
+                val result = searchResultNode(marker)
+                assertNotNull(MainViewModel.selectedDevice.value)
+                performClick(result, "open native note result")
+                awaitNode("original native note page") { it.isEditable && it.text?.contains("$marker note body") == true }
+                assertNull(MainViewModel.selectedDevice.value)
+                awaitValue("native search navigation consumed") { if (MainViewModel.pendingSearchHit.value == null) true else null }
+                captureNavigation("search-native-note")
+
+                val now = kotlin.time.Instant.fromEpochMilliseconds(0)
+                val doc = com.ismartcoding.plain.models.Doc(
+                    id = "", title = document.name, path = document.absolutePath, size = document.length(),
+                    bucketId = "", createdAt = now, updatedAt = now,
+                )
+                scenario.onActivity {
+                    MainViewModel.selectDevice(com.ismartcoding.plain.ui.app.DeviceIdentity("unavailable-search-fixture", "fixture-key"))
+                }
+                awaitNode("remote scope before document navigation") { it.text == text(Res.string.managed_authorization_changed) }
+                scenario.onActivity {
+                    MainViewModel.openSearchHit(com.ismartcoding.plain.ui.search.GlobalSearchHit(
+                        key = "native-document", title = doc.title,
+                        source = com.ismartcoding.plain.ui.search.GlobalSearchSource.Doc(doc),
+                        action = com.ismartcoding.plain.ui.search.GlobalSearchAction.Navigate(com.ismartcoding.plain.ui.navigation.Routing.Docs),
+                    ))
+                }
+                click(text(Res.string.edit), "open original native document editor")
+                awaitNode("original native document content") { it.isEditable && it.text == "$marker document body" }
+                assertNull(MainViewModel.selectedDevice.value)
+                assertNull(MainViewModel.pendingSearchHit.value)
+                captureNavigation("search-native-document")
+            }
+        } finally {
+            document.delete()
+            GraphqlApi.execute(Mutation.trashNotes("ids:=${note.id}"))
+            GraphqlApi.execute(Mutation.deleteNotes("ids:=${note.id}"))
         }
     }
 

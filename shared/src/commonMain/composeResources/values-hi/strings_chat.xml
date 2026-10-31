@@ -138,8 +138,6 @@
     <string name="bluetooth_permission_required_for_nearby">ब्लूटूथ के माध्यम से आसपास के डिवाइस खोजने के लिए ब्लूटूथ अनुमति आवश्यक है।</string>
     <string name="nearby_wifi_devices_required_for_chat">आसपास के डिवाइस खोजने के लिए ब्लूटूथ और आसपास के डिवाइस अनुमतियां आवश्यक हैं।</string>
     <string name="pairing_compare_code">पेयरिंग की अनुमति देने से पहले दोनों डिवाइस पर इस कोड का मिलान करें।</string>
-    <string name="pairing_expiry_label">में समाप्त होगा</string>
-    <string name="pairing_request_expired">पेयरिंग अनुरोध समाप्त</string>
     <string name="share_folder">फ़ोल्डर साझा करें</string>
     <string name="share_this_folder">इस फ़ोल्डर को साझा करें</string>
     <string name="folder_card_items">%1$d आइटम</string>

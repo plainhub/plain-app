@@ -138,8 +138,6 @@
     <string name="bluetooth_permission_required_for_nearby">블루투스를 통해 근처 기기를 검색하려면 블루투스 권한이 필요합니다.</string>
     <string name="nearby_wifi_devices_required_for_chat">근처 기기를 검색하려면 블루투스 및 근처 기기 권한이 필요합니다.</string>
     <string name="pairing_compare_code">페어링을 허용하기 전에 두 기기에 표시된 코드가 같은지 확인하세요.</string>
-    <string name="pairing_expiry_label">후 만료</string>
-    <string name="pairing_request_expired">페어링 요청이 만료되었습니다</string>
     <string name="share_folder">폴더 공유</string>
     <string name="share_this_folder">이 폴더 공유</string>
     <string name="folder_card_items">항목 %1$d개</string>

@@ -18,6 +18,17 @@ import kotlin.test.*
 
 class GraphqlArgumentsTest {
     @Test
+    fun mdns_status_only_requests_debug_data_when_selected() {
+        val status = Query.mdnsState().operation.query
+        val debug = Query.mdnsState(debug = true).operation.query
+        assertTrue(status.contains("runtimeId revision running scanning"))
+        for (field in listOf("services", "packetsIn", "packetsOut")) {
+            assertFalse(status.contains(field))
+            assertTrue(debug.contains(field))
+        }
+    }
+
+    @Test
     fun typedRequestsOwnTheirResponseFieldsWithoutChangingTheEnvelope() {
         val requests = listOf(
             Query.audioPlaylistCovers(listOf("playlist")) to "audioPlaylistCovers",

@@ -55,8 +55,8 @@ object RustMdnsRuntime {
 
     fun debugStop(token: String) = enqueue(Request.DebugStop(token))
 
-    suspend fun snapshot(): MdnsSnapshot =
-        GraphqlApi.execute(Query.mdnsState()).also { apply(it) }
+    suspend fun snapshot(debug: Boolean = false): MdnsSnapshot =
+        GraphqlApi.execute(Query.mdnsState(debug)).also { apply(it) }
 
     private suspend fun call(request: Request): MdnsSnapshot = when (request) {
         is Request.DebugStart -> RustNativeApi.acquireMdnsDebugSession(request.token)

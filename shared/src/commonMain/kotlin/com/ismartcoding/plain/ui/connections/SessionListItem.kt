@@ -1,4 +1,4 @@
-package com.ismartcoding.plain.ui.nearby.connections
+package com.ismartcoding.plain.ui.connections
 
 import com.ismartcoding.plain.ui.theme.PlainTheme
 

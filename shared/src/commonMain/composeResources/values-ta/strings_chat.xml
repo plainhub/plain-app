@@ -138,8 +138,6 @@
     <string name="bluetooth_permission_required_for_nearby">புளூடூத் வழியாக அருகிலுள்ள சாதனங்களைக் கண்டறிய புளூடூத் அனுமதி தேவை.</string>
     <string name="nearby_wifi_devices_required_for_chat">அருகிலுள்ள சாதனங்களைக் கண்டறிய புளூடூத் மற்றும் அருகிலுள்ள சாதன அனுமதிகள் தேவை.</string>
     <string name="pairing_compare_code">இணைக்க அனுமதிப்பதற்கு முன் இரு சாதனங்களிலும் இந்தக் குறியீடு ஒன்றாக இருப்பதை உறுதிசெய்யவும்.</string>
-    <string name="pairing_expiry_label">பிறகு காலாவதியாகும்</string>
-    <string name="pairing_request_expired">இணைப்பு கோரிக்கை காலாவதியானது</string>
     <string name="share_folder">கோப்புறையைப் பகிர்</string>
     <string name="share_this_folder">இந்த கோப்புறையைப் பகிர்</string>
     <string name="folder_card_items">%1$d பொருட்கள்</string>

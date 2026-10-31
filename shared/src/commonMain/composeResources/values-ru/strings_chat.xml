@@ -138,8 +138,6 @@
     <string name="bluetooth_permission_required_for_nearby">Для обнаружения ближайших устройств через Bluetooth требуется разрешение на использование Bluetooth.</string>
     <string name="nearby_wifi_devices_required_for_chat">Для обнаружения ближайших устройств требуются разрешения на использование Bluetooth и доступ к ближайшим устройствам.</string>
     <string name="pairing_compare_code">Прежде чем разрешить сопряжение, сравните этот код на обоих устройствах.</string>
-    <string name="pairing_expiry_label">до истечения</string>
-    <string name="pairing_request_expired">Срок действия запроса на сопряжение истек</string>
     <string name="share_folder">Поделиться папкой</string>
     <string name="share_this_folder">Поделиться этой папкой</string>
     <string name="folder_card_items">Элементов: %1$d</string>

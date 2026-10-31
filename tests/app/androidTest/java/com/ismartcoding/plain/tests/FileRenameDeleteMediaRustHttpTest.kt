@@ -29,7 +29,6 @@ import com.ismartcoding.plain.features.pomodoro.*
 import com.ismartcoding.plain.ui.pomodoro.*
 import com.ismartcoding.plain.features.tags.*
 import com.ismartcoding.plain.ui.tags.*
-import com.ismartcoding.plain.features.videos.*
 import com.ismartcoding.plain.ui.videos.*
 import com.ismartcoding.plain.features.files.*
 import com.ismartcoding.plain.ui.files.*

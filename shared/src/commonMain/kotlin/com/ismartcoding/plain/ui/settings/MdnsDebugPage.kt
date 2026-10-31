@@ -83,7 +83,7 @@ fun MdnsDebugPage(navController: NavHostController) {
             RustMdnsRuntime.debugStart(debugToken)
             while (true) {
                 if (!paused) {
-                    val current = RustMdnsRuntime.snapshot()
+                    val current = RustMdnsRuntime.snapshot(debug = true)
                     snapshots = current.services
                     packetsIn = current.packetsIn
                     packetsOut = current.packetsOut

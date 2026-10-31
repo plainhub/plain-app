@@ -1,6 +1,5 @@
 package com.ismartcoding.plain.ui.navigation
 
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -32,6 +31,7 @@ import com.ismartcoding.plain.ui.base.PBottomSheetTopAppBar
 import com.ismartcoding.plain.ui.base.PFilledButton
 import com.ismartcoding.plain.ui.base.PListItem
 import com.ismartcoding.plain.ui.base.PModalBottomSheet
+import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.chat.LocalPeerViewModel
 import com.ismartcoding.plain.ui.chat.components.PeerIconWithStatus
 import com.ismartcoding.plain.ui.components.CheckCircle
@@ -94,30 +94,32 @@ internal fun DeviceSelectionSheet(navController: NavHostController, onDismiss: (
                                 onDismiss()
                                 MainViewModel.selectDevice(peer?.let { DeviceIdentity(it.id, it.publicKey) })
                             }),
-                        title = { Text(title, style = MaterialTheme.typography.listItemTitle(), maxLines = 1, overflow = TextOverflow.Ellipsis) },
+                        title = {
+                            Text(
+                                title, style = MaterialTheme.typography.listItemTitle(),
+                                maxLines = 1, overflow = TextOverflow.Ellipsis
+                            )
+                        },
                         start = { PeerIconWithStatus((peer?.deviceType ?: getDeviceType()).getIcon(), peer?.online) },
                         action = { CheckCircle(selected = selected) },
                     )
                 }
             } else {
-                Column(
-                    modifier = Modifier.fillMaxWidth().padding(start = 16.dp, end = 16.dp, top = 16.dp),
-                    verticalArrangement = Arrangement.spacedBy(16.dp),
-                ) {
-                    Text(
-                        text = stringResource(Res.string.no_paired_devices_hint),
-                        style = MaterialTheme.typography.bodyLarge,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    )
-                    PFilledButton(
-                        text = stringResource(Res.string.pair_device),
-                        modifier = Modifier.fillMaxWidth(),
-                        onClick = {
-                            onDismiss()
-                            navController.navigate(Routing.Nearby)
-                        },
-                    )
-                }
+                Text(
+                    modifier = Modifier.fillMaxWidth().padding(horizontal = 24.dp),
+                    text = stringResource(Res.string.no_paired_devices_hint),
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+                VerticalSpace(16.dp)
+                PFilledButton(
+                    text = stringResource(Res.string.pair_device),
+                    modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
+                    onClick = {
+                        onDismiss()
+                        navController.navigate(Routing.Nearby)
+                    },
+                )
             }
             BottomSpace()
         }

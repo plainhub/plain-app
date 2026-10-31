@@ -1,4 +1,4 @@
-package com.ismartcoding.plain.ui.nearby.connections
+package com.ismartcoding.plain.ui.connections
 
 import org.jetbrains.compose.resources.DrawableResource
 import com.ismartcoding.plain.i18n.*

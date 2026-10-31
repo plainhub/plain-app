@@ -10,8 +10,8 @@ import com.ismartcoding.plain.lib.coIO
 import com.ismartcoding.plain.platform.system.getOwnPackageName
 import com.ismartcoding.plain.Prefs
 import com.ismartcoding.plain.ui.chat.PeerViewModel
-import com.ismartcoding.plain.ui.nearby.connections.ApiTokenTipsPage
-import com.ismartcoding.plain.ui.nearby.connections.ConnectionsPage
+import com.ismartcoding.plain.ui.connections.ApiTokenTipsPage
+import com.ismartcoding.plain.ui.connections.ConnectionsPage
 import com.ismartcoding.plain.ui.onboarding.OnboardingPage
 import com.ismartcoding.plain.ui.settings.AutoCheckUpdatePage
 import com.ismartcoding.plain.ui.settings.BackupRestorePage

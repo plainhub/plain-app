@@ -1,9 +1,9 @@
 package com.ismartcoding.plain.tests
 
+import java.util.UUID
 import kotlinx.serialization.json.JsonObject
 import com.ismartcoding.plain.rust.graphql.GraphqlRequest
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.ismartcoding.plain.features.chat.ChatCacher
 import com.ismartcoding.plain.features.chat.RustChatStore
 import com.ismartcoding.plain.features.chat.models.LinkPreview
 import com.ismartcoding.plain.features.chat.models.MessageContent
@@ -50,7 +50,6 @@ class LinkPreviewRustHttpTest {
         } finally {
             ChatClient.deleteOne(id)
             hash?.let { if (AppFileFixtures.exists(it)) AppFileStore.release(it) }
-            ChatCacher.load()
         }
     }
 }

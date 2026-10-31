@@ -1,19 +1,14 @@
 package com.ismartcoding.plain.ui.nearby
 
-import com.ismartcoding.plain.features.nearby.PairingState
-import com.ismartcoding.plain.features.nearby.RustNearbyDevices
-
-import com.ismartcoding.plain.ui.state.launchSafe
-
-import com.ismartcoding.plain.platform.network.ble.PairingTransport
-
-import com.ismartcoding.plain.models.NearbyDevice
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import com.ismartcoding.plain.features.chat.peer.PeerManager
 import com.ismartcoding.plain.features.nearby.PairingInitiator
+import com.ismartcoding.plain.features.nearby.PairingState
 import com.ismartcoding.plain.lib.logcat.LogCat
+import com.ismartcoding.plain.models.NearbyDevice
 import com.ismartcoding.plain.platform.network.ensureBlePermissionAsync
+import com.ismartcoding.plain.ui.state.launchSafe
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job

@@ -1,5 +1,6 @@
 package com.ismartcoding.plain.tests
 
+import java.util.UUID
 import com.ismartcoding.plain.rust.graphql.GraphqlRequest
 import com.ismartcoding.plain.rust.graphql.GraphqlApi
 
@@ -26,7 +27,6 @@ import android.graphics.Bitmap
 import androidx.core.content.FileProvider
 import com.ismartcoding.plain.app.AppIntents
 import com.ismartcoding.plain.appContext
-import com.ismartcoding.plain.features.chat.ChatCacher
 import com.ismartcoding.plain.features.chat.sendPickedAttachments
 import com.ismartcoding.plain.features.shares.SharedLinkClient
 import com.ismartcoding.plain.platform.network.ble.server.HttpServiceHandler
@@ -100,7 +100,6 @@ class ChatServiceRustHttpTest {
             files.forEach { assertFalse(AppFileFixtures.exists(it)) }
             root.deleteRecursively()
             Prefs.backgroundServiceEnabled.value = oldService
-            ChatCacher.load()
         }
     }
 }

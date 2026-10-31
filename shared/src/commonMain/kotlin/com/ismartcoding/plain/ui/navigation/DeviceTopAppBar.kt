@@ -36,7 +36,10 @@ internal fun DeviceTopAppBar(
         title = deviceName,
         onTitleClick = { showDevices = true },
         titleTrailing = {
-            Icon(painterResource(UiRes.drawable.ui_drawable_chevron_down), contentDescription = stringResource(Res.string.select_a_device))
+            Icon(
+                painterResource(UiRes.drawable.ui_drawable_chevron_down),
+                contentDescription = stringResource(Res.string.select_a_device)
+            )
         },
         actions = actions,
     )

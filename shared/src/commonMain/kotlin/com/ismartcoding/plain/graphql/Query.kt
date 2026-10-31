@@ -119,8 +119,8 @@ object Query {
         field = "parsePairingCode",
     )
 
-    fun mdnsState(): GraphqlRequest<MdnsSnapshot> = GraphqlRequest(
-        $$"query { mdnsState { $${Fragments.MDNS_STATE} } }",
+    fun mdnsState(debug: Boolean = false): GraphqlRequest<MdnsSnapshot> = GraphqlRequest(
+        "query { mdnsState { ${Fragments.MDNS_STATUS} ${if (debug) Fragments.MDNS_DEBUG else ""} } }",
         field = "mdnsState",
     )
 

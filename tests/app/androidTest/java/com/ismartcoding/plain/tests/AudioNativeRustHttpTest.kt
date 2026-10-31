@@ -1,5 +1,7 @@
 package com.ismartcoding.plain.tests
 
+import com.ismartcoding.plain.graphql.Query
+import java.util.UUID
 import com.ismartcoding.plain.rust.graphql.GraphqlRequest
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.ismartcoding.plain.appContext
@@ -34,7 +36,7 @@ class AudioNativeRustHttpTest {
         suspend fun playback() = GraphqlApi.execute(GraphqlRequest<JsonObject>("query { audioPlayback { path positionMs revision } }")).getValue("audioPlayback").jsonObject
         try {
             GraphqlApi.execute(GraphqlRequest<JsonObject>("mutation { audioPlayPath(path: ${JsonPrimitive(file.absolutePath)}) {path positionMs revision} }"))
-            assertTrue(TestAudioHistoryClient.recentPageFiltered(file.name,20,0).isEmpty())
+            assertTrue(GraphqlApi.execute(Query.mediaPlayHistory("type:AUDIO text:${JsonPrimitive(file.name)}", 0, 20)).isEmpty())
             assertTrue(AudioQueueClient.queuedMediaIds().isEmpty())
             assertNull(AudioQueueClient.playback().mediaId)
             withTimeout(5_000) {
@@ -48,7 +50,7 @@ class AudioNativeRustHttpTest {
             AudioCommands.command(AudioCommand.PLAY)
             delay(300)
             assertTrue(playback().getValue("positionMs").jsonPrimitive.long >= paused)
-            assertTrue(TestAudioHistoryClient.recentPageFiltered(file.name,20,0).isEmpty())
+            assertTrue(GraphqlApi.execute(Query.mediaPlayHistory("type:AUDIO text:${JsonPrimitive(file.name)}", 0, 20)).isEmpty())
         } finally {
             try {
                 AudioCommands.command(AudioCommand.CLEAR)

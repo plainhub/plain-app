@@ -25,6 +25,8 @@ import com.ismartcoding.plain.ui.nearby.PairPeerDialog
 import com.ismartcoding.plain.ui.nearby.NearbyViewModel
 import com.ismartcoding.plain.platform.system.DeviceType
 import com.ismartcoding.plain.ui.nearby.PairingRequestPage
+import com.ismartcoding.plain.ui.components.ToastManager
+import com.ismartcoding.plain.ui.components.ToastType
 import com.ismartcoding.plain.ui.theme.AppTheme
 import org.jetbrains.compose.resources.stringResource
 import org.junit.Assert.*
@@ -33,7 +35,6 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import java.io.File
-import java.util.concurrent.atomic.AtomicInteger
 
 @RunWith(AndroidJUnit4::class)
 class PairingRequestLayoutTest {
@@ -42,10 +43,7 @@ class PairingRequestLayoutTest {
     private val instrumentation = InstrumentationRegistry.getInstrumentation()
     private var allow = ""
     private var deny = ""
-    private var close = ""
-    private var expired = ""
     private var density = 1f
-    private val closed = AtomicInteger()
     private val code = "2048 4096"
     private var renderedScenario = ""
 
@@ -115,16 +113,21 @@ class PairingRequestLayoutTest {
         show(false, false, fontScale = 1.5f, deviceName = "Living room tablet with a long device name 客厅平板设备")
         assertActions()
         screenshot("large-text")
+    }
+
+    @Test
+    fun unavailableRequestShowsAnErrorForBothDecisions() {
         show(false, false)
-        waitUntil(95_000) { text(expired) != null }
-        onMain {
-            assertNull(text(allow))
-            assertNull(text(deny))
-            assertNotNull(text(close))
-            clickTarget(text(close)!!).config.getOrNull(SemanticsActions.OnClick)!!.action!!.invoke()
+        for (decision in listOf(allow, deny)) {
+            onMain { ToastManager.current.value = null }
+            clickText(decision)
+            waitUntil(10_000) {
+                ToastManager.current.value?.let {
+                    it.type == ToastType.ERROR && it.message.contains("Pairing request expired or no longer available")
+                } == true
+            }
+            onMain { assertNotNull(text(allow)); assertNotNull(text(deny)) }
         }
-        assertEquals(1, closed.get())
-        screenshot("expired")
     }
 
     private fun show(dark: Boolean, amoled: Boolean, fontScale: Float = 1f, deviceName: String = "Living room tablet") {
@@ -140,12 +143,10 @@ class PairingRequestLayoutTest {
                 density = base.density
                 allow = stringResource(Res.string.allow)
                 deny = stringResource(Res.string.deny)
-                close = stringResource(Res.string.close)
-                expired = stringResource(Res.string.pairing_request_expired)
                 CompositionLocalProvider(LocalDensity provides Density(base.density, fontScale)) {
                     AppTheme(useDarkTheme = dark, amoledDarkTheme = amoled) {
                         androidx.compose.runtime.key(notice, dark, amoled, fontScale) {
-                            PairingRequestPage(notice) { closed.incrementAndGet() }
+                            PairingRequestPage(notice) { }
                             androidx.compose.runtime.SideEffect { renderedScenario = scenario }
                         }
                     }
@@ -163,7 +164,7 @@ class PairingRequestLayoutTest {
         assertTrue(allowBounds.height >= 48 * density - 1)
         assertTrue(denyBounds.right <= allowBounds.left)
         assertTrue(text(code)!!.boundsInRoot.bottom < allowBounds.top)
-        assertTrue(nodes().any { it.config.getOrNull(SemanticsProperties.Text)?.any { value -> Regex("\\d{2}:\\d{2}").matches(value.text) } == true })
+        assertFalse(nodes().any { it.config.getOrNull(SemanticsProperties.Text)?.any { value -> Regex("\\d{2}:\\d{2}").matches(value.text) } == true })
     }
 
     private fun clickTarget(node: SemanticsNode): SemanticsNode =

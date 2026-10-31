@@ -138,8 +138,6 @@
     <string name="bluetooth_permission_required_for_nearby">Bluetooth経由で近くのデバイスを検出するには、Bluetooth権限が必要です。</string>
     <string name="nearby_wifi_devices_required_for_chat">近くのデバイスを検出するには、Bluetoothと近くのデバイスの権限が必要です。</string>
     <string name="pairing_compare_code">ペア設定を許可する前に、両方のデバイスのコードが一致することを確認してください。</string>
-    <string name="pairing_expiry_label">後に期限切れ</string>
-    <string name="pairing_request_expired">ペアリングリクエストの有効期限が切れました</string>
     <string name="share_folder">フォルダを共有</string>
     <string name="share_this_folder">このフォルダを共有</string>
     <string name="folder_card_items">%1$d個のアイテム</string>

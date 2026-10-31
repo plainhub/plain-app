@@ -138,8 +138,6 @@
     <string name="bluetooth_permission_required_for_nearby">Bluetooth üzerinden yakındaki cihazları keşfetmek için Bluetooth izni gereklidir.</string>
     <string name="nearby_wifi_devices_required_for_chat">Yakındaki cihazları keşfetmek için Bluetooth ve yakındaki cihazlar izinleri gereklidir.</string>
     <string name="pairing_compare_code">Eşleştirmeye izin vermeden önce bu kodu her iki cihazda karşılaştırın.</string>
-    <string name="pairing_expiry_label">sonra sona erer</string>
-    <string name="pairing_request_expired">Eşleştirme isteğinin süresi doldu</string>
     <string name="share_folder">Klasörü Paylaş</string>
     <string name="share_this_folder">Bu Klasörü Paylaş</string>
     <string name="folder_card_items">%1$d öğe</string>

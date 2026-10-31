@@ -6,14 +6,9 @@ import kotlinx.serialization.Serializable
 data class MdnsSnapshot(
     val runtimeId: String?,
     val revision: Long,
-    val receiver: Boolean,
     val running: Boolean,
     val scanning: Boolean,
-    val published: Boolean,
-    val manualScanning: Boolean,
-    val debugSessionCount: Int,
-    val capturing: Boolean,
-    val services: List<MdnsServiceSnapshot>,
-    val packetsIn: List<MdnsPacketLog>,
-    val packetsOut: List<MdnsPacketLog>,
+    val services: List<MdnsServiceSnapshot> = emptyList(),
+    val packetsIn: List<MdnsPacketLog> = emptyList(),
+    val packetsOut: List<MdnsPacketLog> = emptyList(),
 )

@@ -73,9 +73,21 @@ class ClientContractModelsTest {
     }
 
     @Test
+    fun mdns_status_decodes_without_debug_fields() {
+        val snapshot = JsonHelper.jsonDecode<MdnsSnapshot>(
+            """{"runtimeId":"runtime","revision":3,"running":true,"scanning":false}""",
+        )
+        assertEquals(true, snapshot.running)
+        assertEquals(false, snapshot.scanning)
+        assertEquals(emptyList(), snapshot.services)
+        assertEquals(emptyList(), snapshot.packetsIn)
+        assertEquals(emptyList(), snapshot.packetsOut)
+    }
+
+    @Test
     fun mdns_snapshots_preserve_addresses_packet_directions_and_large_revisions() {
         val snapshot = JsonHelper.jsonDecode<MdnsSnapshot>(
-            """{"runtimeId":"runtime","revision":3000000123,"receiver":true,"running":true,"scanning":false,"published":true,"manualScanning":false,"debugSessionCount":1,"capturing":true,"services":[{"serviceType":"service","instanceName":"instance","instanceFqdn":"instance.local","hostname":"host.local","port":8080,"txtRecords":[],"ips":["ipv4"],"ipv6":["ipv6"],"complete":true}],"packetsIn":[],"packetsOut":[{"time":3000000123,"direction":"OUT","srcIp":"source","srcPort":5353,"dstIp":"destination","dstPort":5353,"size":64,"summary":"summary","detail":"detail"}]}""",
+            """{"runtimeId":"runtime","revision":3000000123,"running":true,"scanning":false,"services":[{"serviceType":"service","instanceName":"instance","instanceFqdn":"instance.local","hostname":"host.local","port":8080,"txtRecords":[],"ips":["ipv4"],"ipv6":["ipv6"],"complete":true}],"packetsIn":[],"packetsOut":[{"time":3000000123,"direction":"OUT","srcIp":"source","srcPort":5353,"dstIp":"destination","dstPort":5353,"size":64,"summary":"summary","detail":"detail"}]}""",
         )
         assertEquals(3_000_000_123, snapshot.revision)
         assertEquals(listOf("ipv4"), snapshot.services.single().ips)

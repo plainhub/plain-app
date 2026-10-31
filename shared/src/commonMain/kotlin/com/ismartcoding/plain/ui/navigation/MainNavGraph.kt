@@ -59,6 +59,11 @@ import com.ismartcoding.plain.ui.pomodoro.PomodoroViewModel
 import com.ismartcoding.plain.ui.scan.ScanHistoryPage
 import com.ismartcoding.plain.ui.scan.ScanPage
 import com.ismartcoding.plain.ui.search.GlobalSearchViewModel
+import com.ismartcoding.plain.ui.search.GlobalSearchAction
+import com.ismartcoding.plain.ui.search.GlobalSearchSource
+import com.ismartcoding.plain.lib.extensions.isTextFile
+import com.ismartcoding.plain.lib.extensions.isPdfFile
+import com.ismartcoding.plain.platform.files.fileToUriString
 import com.ismartcoding.plain.ui.settings.UpdateViewModel
 import com.ismartcoding.plain.ui.state.launchSafe
 import com.ismartcoding.plain.ui.tags.TagsViewModel
@@ -97,12 +102,21 @@ fun MainNavGraph(
             else -> content
         }
     }
-    val pendingEntry by MainViewModel.pendingDeviceContent
-    LaunchedEffect(content, state?.loading, pendingEntry) {
-        val entry = pendingEntry
-        if (entry != null && content != null && state?.loading != true && state?.error == null) {
-            MainViewModel.pendingDeviceContent.value = null
-            launchSafe { openDeviceContentEntry(navController, entry, content) }
+    val pendingHit by MainViewModel.pendingSearchHit
+    LaunchedEffect(navController, content, state?.loading, state?.error, pendingHit) {
+        val hit = pendingHit
+        if (hit != null && content != null && state?.loading != true && state?.error == null) {
+            launchSafe(onDone = {
+                if (MainViewModel.pendingSearchHit.value === hit) MainViewModel.pendingSearchHit.value = null
+            }) {
+                val doc = (hit.source as? GlobalSearchSource.Doc)?.doc
+                when {
+                    doc == null -> navController.navigate((hit.action as GlobalSearchAction.Navigate).route)
+                    doc.path.isTextFile() -> navController.navigateTextFile(doc.path, doc.title, doc.id)
+                    doc.path.isPdfFile() -> navController.navigatePdf(fileToUriString(content.fileForOpen(doc.path, doc.title)), doc.title)
+                    else -> navController.navigateOtherFile(doc.path, doc.title)
+                }
+            }
         }
     }
     val backStackEntry by navController.currentBackStackEntryAsState()

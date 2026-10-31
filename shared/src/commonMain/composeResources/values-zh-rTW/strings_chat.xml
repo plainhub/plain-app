@@ -138,8 +138,6 @@
     <string name="delivery_status_summary">%1$d / %2$d 已送達</string>
     <string name="resend_selected">重新傳送選取</string>
     <string name="pairing_compare_code">允許配對前，請核對兩台裝置顯示的配對碼一致。</string>
-    <string name="pairing_expiry_label">後失效</string>
-    <string name="pairing_request_expired">配對請求已過期</string>
     <string name="share_folder">分享資料夾</string>
     <string name="share_this_folder">分享此資料夾</string>
     <string name="folder_card_items">%1$d 項</string>
