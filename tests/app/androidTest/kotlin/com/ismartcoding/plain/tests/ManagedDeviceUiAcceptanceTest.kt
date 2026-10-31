@@ -34,11 +34,15 @@ import com.ismartcoding.plain.platform.permissions.Permission
 import com.ismartcoding.plain.models.Peer
 import com.ismartcoding.plain.rust.graphql.GraphqlApi
 import com.ismartcoding.plain.rust.graphql.GraphqlRequest
+import com.ismartcoding.plain.rust.graphql.AppSubscriptions
+import com.ismartcoding.plain.rust.graphql.changes
 import com.ismartcoding.plain.ui.i18n.LocaleHelper
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.flow.onCompletion
 import com.ismartcoding.plain.features.nearby.PairingMode
 import com.ismartcoding.plain.features.nearby.PairingPhase
 import com.ismartcoding.plain.features.nearby.RustPairingRuntime
@@ -835,18 +839,35 @@ class ManagedDeviceUiAcceptanceTest {
             deviceType = com.ismartcoding.plain.platform.system.DeviceType.PHONE,
             createdAt = now, updatedAt = now, publicKey = "fixture-public-key", token = "fixture-token",
         )
+        val peerAttachments = java.util.concurrent.atomic.AtomicInteger()
+        val peerDetachments = java.util.concurrent.atomic.AtomicInteger()
+        val channelAttachments = java.util.concurrent.atomic.AtomicInteger()
+        val channelDetachments = java.util.concurrent.atomic.AtomicInteger()
+        val peerChanges = AppSubscriptions.messagesCreated.changes()
+            .onStart { peerAttachments.incrementAndGet() }
+            .onCompletion { peerDetachments.incrementAndGet() }
+        val channelChanges = AppSubscriptions.channelsChanged.changes()
+            .onStart { channelAttachments.incrementAndGet() }
+            .onCompletion { channelDetachments.incrementAndGet() }
+        lateinit var localPeers: com.ismartcoding.plain.ui.chat.PeerViewModel
+        lateinit var localChannels: com.ismartcoding.plain.ui.chat.ChannelViewModel
         ActivityScenario.launch(MainActivity::class.java).use { scenario ->
             scenario.onActivity { activity ->
                 activity.setContent {
                     com.ismartcoding.plain.ui.theme.AppTheme(useDarkTheme = false) {
                         val nav = androidx.compose.runtime.key(MainViewModel.selectedDevice.value) { androidx.navigation.compose.rememberNavController() }
                         val peers = androidx.lifecycle.viewmodel.compose.viewModel(key = "navigation-fixture-peers") {
-                            com.ismartcoding.plain.ui.chat.PeerViewModel(readPeers = { listOf(peer) }, readLatestChats = { emptyMap() })
+                            com.ismartcoding.plain.ui.chat.PeerViewModel(readPeers = { listOf(peer) }, sourceChanges = peerChanges)
                         }
+                        localPeers = peers
+                        val channels = androidx.lifecycle.viewmodel.compose.viewModel(key = "navigation-fixture-channels") {
+                            com.ismartcoding.plain.ui.chat.ChannelViewModel(sourceChanges = channelChanges)
+                        }
+                        localChannels = channels
                         com.ismartcoding.plain.ui.navigation.MainNavGraph(
                             navController = nav,
                             peerVM = peers,
-                            channelVM = androidx.lifecycle.viewmodel.compose.viewModel { com.ismartcoding.plain.ui.chat.ChannelViewModel() },
+                            channelVM = channels,
                             audioQueueVM = androidx.lifecycle.viewmodel.compose.viewModel { com.ismartcoding.plain.ui.audio.AudioQueueViewModel() },
                             pomodoroVM = androidx.lifecycle.viewmodel.compose.viewModel { com.ismartcoding.plain.ui.pomodoro.PomodoroViewModel() },
                             noteTagsVM = androidx.lifecycle.viewmodel.compose.viewModel(key = "fixture-note-tags") { com.ismartcoding.plain.ui.tags.TagsViewModel() },
@@ -854,6 +875,9 @@ class ManagedDeviceUiAcceptanceTest {
                         )
                     }
                 }
+            }
+            awaitValue("local observers attached") {
+                if (peerAttachments.get() == 1 && channelAttachments.get() == 1) true else null
             }
             click(text(Res.string.select_a_device), "device selector")
             val sheetName = awaitNode("device selection sheet") { it.overlay && it.text == peer.name }
@@ -880,6 +904,19 @@ class ManagedDeviceUiAcceptanceTest {
             awaitValue("remote navigation without local services") {
                 if (uiNodes().none { it.contentDescription == text(Res.string.services) }) true else null
             }
+            assertEquals(1, peerAttachments.get())
+            assertEquals(1, channelAttachments.get())
+            assertEquals(0, peerDetachments.get())
+            assertEquals(0, channelDetachments.get())
+            val message = ChatClient.sendText(ChatTarget("local", ChatTargetType.PEER), "local-state-${UUID.randomUUID()}")
+            try {
+                awaitValue("local chat updates while remote device is selected") {
+                    localPeers.latestChats.value["local"]?.takeIf { it.id == message.id }
+                }
+                assertEquals(peer.id, MainViewModel.selectedDevice.value?.peerId)
+            } finally {
+                ChatClient.deleteOne(message.id)
+            }
             captureNavigation("remote-error")
             click(text(Res.string.select_a_device), "device selector after failed entry")
             val rename = awaitNode("remote rename remains enabled") { it.overlay && it.contentDescription == text(Res.string.rename) }
@@ -890,6 +927,18 @@ class ManagedDeviceUiAcceptanceTest {
             awaitMainWindowFocus(scenario)
             click(text(Res.string.settings), "app settings from remote")
             awaitNode("app settings contents") { it.text == text(Res.string.dark_theme) }
+            val channel = GraphqlApi.execute(Mutation.createChatChannel("local-state-${UUID.randomUUID()}"))
+            try {
+                awaitValue("local channel updates away from the root page") {
+                    localChannels.channels.value.firstOrNull { it.id == channel.id }
+                }
+                assertEquals(1, peerAttachments.get())
+                assertEquals(1, channelAttachments.get())
+                assertEquals(0, peerDetachments.get())
+                assertEquals(0, channelDetachments.get())
+            } finally {
+                GraphqlApi.execute(Mutation.deleteChatChannel(channel.id))
+            }
             for (step in 0 until 8) {
                 if (uiNodes().any { it.isVisible && it.text == text(Res.string.logs) }) break
                 instrumentation.runOnMainSync {

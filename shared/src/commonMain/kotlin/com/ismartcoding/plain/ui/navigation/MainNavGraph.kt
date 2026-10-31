@@ -12,9 +12,6 @@ import com.ismartcoding.plain.rust.graphql.ContentSource
 import com.ismartcoding.plain.ui.tools.ManagedDeviceViewModel
 import com.ismartcoding.plain.ui.tools.ManagedDeviceStatus
 import androidx.compose.runtime.CompositionLocalProvider
-import com.ismartcoding.plain.Prefs
-import com.ismartcoding.plain.platform.system.getDeviceName
-import com.ismartcoding.plain.platform.system.getDeviceCapabilities
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -42,6 +39,8 @@ import com.ismartcoding.plain.ui.app.MainViewModel
 import com.ismartcoding.plain.ui.audio.AudioQueueViewModel
 import com.ismartcoding.plain.ui.chat.ChannelViewModel
 import com.ismartcoding.plain.ui.chat.PeerViewModel
+import com.ismartcoding.plain.ui.chat.LocalPeerViewModel
+import com.ismartcoding.plain.ui.tools.LocalManagedDeviceViewModel
 import com.ismartcoding.plain.ui.dlna.DlnaCastHistoryPage
 import com.ismartcoding.plain.ui.dlna.DlnaReceiverPage
 import com.ismartcoding.plain.ui.downloads.components.DownloadFloatingWidget
@@ -78,8 +77,8 @@ fun MainNavGraph(
 ) {
     val updateVM: UpdateViewModel = viewModel { UpdateViewModel() }
     val globalSearchVM = viewModel(key = "globalSearchVM") { GlobalSearchViewModel() }
-    val localPeers by peerVM.peersMap.collectAsState()
-    val localName by Prefs.deviceName.collectAsState()
+    LaunchedEffect(peerVM) { peerVM.observe() }
+    LaunchedEffect(channelVM) { channelVM.observe() }
     val selectedDevice by MainViewModel.selectedDevice
     val deviceOwner = remember(selectedDevice) { object : ViewModelStoreOwner { override val viewModelStore = ViewModelStore() } }
     DisposableEffect(deviceOwner) { onDispose { deviceOwner.viewModelStore.clear() } }
@@ -87,7 +86,6 @@ fun MainNavGraph(
         viewModel(viewModelStoreOwner = deviceOwner) { ManagedDeviceViewModel(device.peerId, device.publicKey) }
     }
     val state = manager?.state?.collectAsState()?.value
-    val deviceInfo = state?.client?.state?.collectAsState()?.value
     val refreshDevice: suspend () -> Boolean = manager?.let { it::refresh } ?: { true }
     val content = if (selectedDevice == null) ContentSource.Local else state?.client?.let { client -> remember(client) { ContentSource.Remote(client) } }
     val source: @Composable () -> ContentSource? = {
@@ -107,19 +105,6 @@ fun MainNavGraph(
             launchSafe { openDeviceContentEntry(navController, entry, content) }
         }
     }
-    val deviceNavigation = DeviceNavigation(
-        deviceName = if (selectedDevice == null) localName.ifEmpty { getDeviceName() }
-            else deviceInfo?.deviceName ?: localPeers[selectedDevice?.peerId]?.name.orEmpty(),
-        selectedPeerId = selectedDevice?.peerId,
-        peers = localPeers.values.filter { it.isPaired() && it.token.isNotEmpty() }.sortedBy { it.name.lowercase() },
-        capabilities = if (selectedDevice == null) getDeviceCapabilities() else deviceInfo?.capabilities.orEmpty(),
-        onSelect = { peer -> MainViewModel.selectDevice(peer?.let { com.ismartcoding.plain.ui.app.DeviceIdentity(it.id, it.publicKey) }) },
-        onPairDevice = { navController.navigate(Routing.Nearby) },
-        onSettings = { navController.navigate(Routing.Settings) },
-        onRename = if (manager != null) ({ name -> manager.rename(name) }) else ({ name ->
-            ContentSource.Local.api.execute(com.ismartcoding.plain.graphql.Mutation.updateDeviceName(name))
-        }),
-    )
     val backStackEntry by navController.currentBackStackEntryAsState()
     var showDownloads by remember { mutableStateOf(false) }
     val tasksMap = DownloadCenter.progress.collectAsState().value
@@ -129,7 +114,11 @@ fun MainNavGraph(
     val shareTasks = tasksMap.values.filterIsInstance<SharedFolderBatchTask>()
     val onShareFolderPage = backStackEntry?.destination?.hasRoute<Routing.SharedFolder>() == true
     key(selectedDevice) {
-        CompositionLocalProvider(LocalDeviceNavigation provides deviceNavigation, LocalViewModelStoreOwner provides deviceOwner) {
+        CompositionLocalProvider(
+            LocalPeerViewModel provides peerVM,
+            LocalManagedDeviceViewModel provides manager,
+            LocalViewModelStoreOwner provides deviceOwner,
+        ) {
             Box(modifier = Modifier.fillMaxSize()) {
                 NavHost(
                     modifier = Modifier.background(MaterialTheme.colorScheme.surface),

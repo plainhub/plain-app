@@ -33,7 +33,6 @@ import com.ismartcoding.plain.i18n.casting
 import com.ismartcoding.plain.i18n.casting_to
 import com.ismartcoding.plain.i18n.customize_home_features
 import com.ismartcoding.plain.i18n.launcher_shortcuts
-import com.ismartcoding.plain.i18n.tools
 import com.ismartcoding.plain.ui.components.ActionButtonAddWithMenu
 import com.ismartcoding.plain.ui.components.ToastManager
 import com.ismartcoding.plain.ui.base.PDropdownMenuItem
@@ -79,7 +78,7 @@ fun ToolsPage(
         onTabSelected = onTabSelected,
         topBar = {
             DeviceTopAppBar(
-                fallbackTitle = stringResource(Res.string.tools),
+                navController = navController,
                 actions = {
                     if (source is com.ismartcoding.plain.rust.graphql.ContentSource.Local) ActionButtonAddWithMenu { dismiss ->
                         PDropdownMenuItem(

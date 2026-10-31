@@ -66,13 +66,13 @@ fun ChatListPage(
     peerVM: PeerViewModel,
     channelVM: ChannelViewModel,
     onTabSelected: ((Int) -> Unit)? = null,
-    observePeers: Boolean = true,
+    observeUpdates: Boolean = true,
 ) {
     val local = com.ismartcoding.plain.ui.navigation.LocalContentSource.current is com.ismartcoding.plain.rust.graphql.ContentSource.Local
     val allPeers = peerVM.peerList.collectAsStateValue()
     val latestChats by peerVM.latestChats.collectAsState()
-    LaunchedEffect(peerVM, observePeers) { if (observePeers) peerVM.observe() }
-    LaunchedEffect(channelVM) { channelVM.observe() }
+    LaunchedEffect(peerVM, observeUpdates) { if (observeUpdates) peerVM.observe() }
+    LaunchedEffect(channelVM, observeUpdates) { if (observeUpdates) channelVM.observe() }
     val refreshState = rememberRefreshLayoutState {
         if (local) PeerStatusClient.reconnectNow("chat_list_pull_refresh")
         peerVM.load()

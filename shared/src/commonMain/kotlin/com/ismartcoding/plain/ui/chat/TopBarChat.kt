@@ -12,7 +12,6 @@ import com.ismartcoding.plain.ui.components.ActionButtonAddWithMenu
 import com.ismartcoding.plain.ui.components.ActionButtonFolders
 import com.ismartcoding.plain.ui.base.PDropdownMenuItem
 import com.ismartcoding.plain.ui.navigation.DeviceTopAppBar
-import com.ismartcoding.plain.ui.navigation.LocalDeviceNavigation
 import com.ismartcoding.plain.ui.navigation.LocalContentSource
 import com.ismartcoding.plain.rust.graphql.ContentSource
 import com.ismartcoding.plain.ui.components.ActionButtonSettings
@@ -28,10 +27,9 @@ fun TopBarChat(
     navController: NavHostController,
     onCreateChannel: () -> Unit,
 ) {
-    val deviceNavigation = LocalDeviceNavigation.current
     val local = LocalContentSource.current is ContentSource.Local
     DeviceTopAppBar(
-        fallbackTitle = stringResource(Res.string.chat),
+        navController = navController,
         actions = {
             ActionButtonFolders {
                 navController.navigateAppFiles()
@@ -64,7 +62,7 @@ fun TopBarChat(
                     },
                 )
             }
-            deviceNavigation?.let { ActionButtonSettings(it.onSettings) }
+            ActionButtonSettings { navController.navigate(Routing.Settings) }
         }
     )
 }

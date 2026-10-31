@@ -8,6 +8,7 @@ import com.ismartcoding.plain.rust.graphql.changes
 import com.ismartcoding.plain.preferences.PrefKeys
 
 import androidx.lifecycle.ViewModel
+import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.lifecycle.viewModelScope
 import com.ismartcoding.plain.features.chat.RustChatStore
 import com.ismartcoding.plain.features.chat.peer.PeerManager
@@ -32,6 +33,8 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlin.time.Instant
 
+internal val LocalPeerViewModel = staticCompositionLocalOf<PeerViewModel> { error("PeerViewModel not provided") }
+
 class PeerViewModel internal constructor(
     private val readPeers: suspend () -> List<Peer> = { RustPeerStore.getAll() },
     private val readLatestChats: suspend () -> Map<String, ChatItem> = { RustChatStore.getLatestConversations() },
@@ -47,7 +50,6 @@ class PeerViewModel internal constructor(
         sortPeers(values.values.filter { it.isPaired() || it.status == PeerStatus.UNPAIRED }, chats)
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyList())
 
-    // The consuming page owns this coroutine; hidden pages do not reload peers.
     suspend fun observe() = coroutineScope {
         launch(start = CoroutineStart.UNDISPATCHED) {
             (sourceUpdates ?: merge(

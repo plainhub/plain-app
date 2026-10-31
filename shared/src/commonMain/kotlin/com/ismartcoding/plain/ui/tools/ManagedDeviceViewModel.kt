@@ -1,6 +1,7 @@
 package com.ismartcoding.plain.ui.tools
 
 import androidx.lifecycle.ViewModel
+import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.lifecycle.viewModelScope
 import com.ismartcoding.plain.features.chat.peer.ManagedDeviceClient
 import com.ismartcoding.plain.graphql.Query
@@ -13,6 +14,8 @@ import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+
+internal val LocalManagedDeviceViewModel = staticCompositionLocalOf<ManagedDeviceViewModel?> { null }
 
 internal data class ManagedDeviceState(
     val client: ManagedDeviceClient? = null,

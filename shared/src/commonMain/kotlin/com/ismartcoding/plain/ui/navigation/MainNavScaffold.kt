@@ -27,6 +27,9 @@ import androidx.compose.material3.WideNavigationRailItemDefaults
 import androidx.compose.material3.WideNavigationRailValue
 import androidx.compose.material3.rememberWideNavigationRailState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import com.ismartcoding.plain.ui.app.MainViewModel
+import com.ismartcoding.plain.ui.tools.LocalManagedDeviceViewModel
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.ismartcoding.plain.i18n.Res
@@ -55,10 +58,15 @@ internal data class MainNavItem(
 
 @Composable
 internal fun mainNavItems(): List<MainNavItem> {
-    val device = LocalDeviceNavigation.current
+    val selectedDevice = MainViewModel.selectedDevice.value
+    val manager = LocalManagedDeviceViewModel.current
+    val state = manager?.state?.collectAsState()?.value
+    val info = state?.client?.state?.collectAsState()?.value
     val source = LocalContentSource.current
-    return mainNavItems(device?.capabilities ?: source.capabilities,
-        localOperationsAllowed = if (device == null) source is com.ismartcoding.plain.rust.graphql.ContentSource.Local else device.selectedPeerId == null)
+    return mainNavItems(
+        capabilities = if (selectedDevice == null) source.capabilities else info?.capabilities.orEmpty(),
+        localOperationsAllowed = selectedDevice == null && source is com.ismartcoding.plain.rust.graphql.ContentSource.Local,
+    )
 }
 
 internal fun mainNavItems(capabilities: Collection<com.ismartcoding.plain.platform.system.Capability>, localOperationsAllowed: Boolean): List<MainNavItem> =
