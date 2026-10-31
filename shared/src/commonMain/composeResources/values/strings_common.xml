@@ -91,7 +91,7 @@
     <string name="loading">Loading…</string>
     <string name="searching">Searching…</string>
     <string name="searching_devices">Searching devices…</string>
-    <string name="no_paired_devices_hint">Pair a device to access its content and tools.</string>
+    <string name="no_paired_devices_hint">Pair a device to manage it remotely.</string>
     <string name="no_devices_found">Searching devices…\n\nMake sure the player and your phone are connected to the same Wi-Fi.</string>
     <string name="no_data">No data</string>
     <string name="load_failed">Load failed</string>
