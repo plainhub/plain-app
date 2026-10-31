@@ -174,6 +174,14 @@ Keep [plain-core](https://github.com/plainhub/plain-core) next to this repositor
 ./scripts/core update       # Lock this project to the latest remote commit
 ```
 
+Before publishing Rust consumer changes, publish Core first, run `./scripts/core update`, and commit the resulting `plain-rs/Cargo.lock` with the consumer source. Verify with local overrides disabled:
+
+```bash
+bash scripts/check-ui.sh
+./gradlew :plain-common:testAndroidHostTest :shared:testAndroidHostTest
+./gradlew :app:assembleDebug
+```
+
 ## Build
 
 1. Generate `release.jks` file under `$rootProject/app` folder.

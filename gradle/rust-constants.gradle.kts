@@ -3,9 +3,15 @@ import groovy.json.JsonSlurper
 val cargo = File(System.getenv("CARGO_HOME") ?: "${System.getProperty("user.home")}/.cargo", "bin/cargo")
 val cargoMetadata = providers.exec {
     workingDir(rootDir)
+    isIgnoreExitValue = true
     commandLine(cargo, "metadata", "--locked", "--filter-platform", "aarch64-linux-android",
         "--format-version", "1", "--manifest-path", rootProject.file("plain-rs/Cargo.toml"))
-}.standardOutput.asText
+}.let { output ->
+    output.result.map { result ->
+        check(result.exitValue == 0) { output.standardError.asText.get() }
+        output.standardOutput.asText.get()
+    }
+}
 
 fun rustPackage(metadata: String, name: String): File {
     val document = JsonSlurper().parseText(metadata) as Map<*, *>

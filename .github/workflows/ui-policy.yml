@@ -1,10 +1,10 @@
-name: UI component policy
+name: UI policy and host tests
 on:
   pull_request:
-    paths: ['tests/**', 'plain-common/**', 'shared/src/**', 'app/src/**', 'app/build.gradle.kts', 'shared/build.gradle.kts', 'build.gradle.kts', 'settings.gradle.kts', 'ui-check/**', 'scripts/check-ui.sh', 'scripts/ui-component-baseline.tsv', '.github/workflows/ui-policy.yml', 'gradle/libs.versions.toml']
+    paths: ['tests/**', 'plain-common/**', 'shared/src/**', 'app/src/**', 'app/build.gradle.kts', 'shared/build.gradle.kts', 'build.gradle.kts', 'settings.gradle.kts', 'ui-check/**', 'scripts/check-ui.sh', 'scripts/ui-component-baseline.tsv', '.github/workflows/ui-policy.yml', 'gradle/**', 'plain-rs/Cargo.toml', 'plain-rs/Cargo.lock', 'rust-toolchain.toml']
   push:
     branches: [main]
-    paths: ['tests/**', 'plain-common/**', 'shared/src/**', 'app/src/**', 'app/build.gradle.kts', 'shared/build.gradle.kts', 'build.gradle.kts', 'settings.gradle.kts', 'ui-check/**', 'scripts/check-ui.sh', 'scripts/ui-component-baseline.tsv', '.github/workflows/ui-policy.yml', 'gradle/libs.versions.toml']
+    paths: ['tests/**', 'plain-common/**', 'shared/src/**', 'app/src/**', 'app/build.gradle.kts', 'shared/build.gradle.kts', 'build.gradle.kts', 'settings.gradle.kts', 'ui-check/**', 'scripts/check-ui.sh', 'scripts/ui-component-baseline.tsv', '.github/workflows/ui-policy.yml', 'gradle/**', 'plain-rs/Cargo.toml', 'plain-rs/Cargo.lock', 'rust-toolchain.toml']
 permissions:
   contents: read
 jobs:
@@ -22,4 +22,4 @@ jobs:
           java-version: '21'
       - uses: android-actions/setup-android@v4
       - run: bash scripts/check-ui.sh
-      - run: ./gradlew :plain-common:testAndroidHostTest
+      - run: ./gradlew :plain-common:testAndroidHostTest :shared:testAndroidHostTest

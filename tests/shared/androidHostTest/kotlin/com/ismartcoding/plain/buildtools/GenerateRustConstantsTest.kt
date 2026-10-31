@@ -24,9 +24,9 @@ class GenerateRustConstantsTest {
 
     private data class Result(val exitCode: Int, val output: String, val generated: String)
 
-    private fun generate(keys: String = "", ports: String? = null): Result {
+    private fun generate(keys: String = "", ports: String? = null, cargoError: String? = null): Result {
         val root = temporary.newFolder()
-        val source = if (ports == null) "src/prefs/pref_keys.rs" else "src/http/listeners/bind.rs"
+        val source = if (ports == null) "src/features/prefs/pref_keys.rs" else "src/http/listeners/bind.rs"
         File(root, source).apply { parentFile.mkdirs() }.writeText(ports ?: keys)
         File(root, "metadata.json").writeText(JsonHelper.jsonEncode(CargoMetadata(
             listOf(CargoPackage(if (ports == null) "plain-rs" else "plain-server", File(root, "Cargo.toml").path))
@@ -34,7 +34,8 @@ class GenerateRustConstantsTest {
         val cargoHome = File(root, "cargo-home")
         File(cargoHome, "bin").mkdirs()
         File(cargoHome, "bin/cargo").apply {
-            writeText("#!/bin/sh\ncat \"\$(dirname \"\$0\")/../../metadata.json\"\n")
+            writeText(if (cargoError == null) "#!/bin/sh\ncat \"\$(dirname \"\$0\")/../../metadata.json\"\n"
+                else "#!/bin/sh\necho '$cargoError' >&2\nexit 101\n")
             check(setExecutable(true))
         }
         val output = File(root, "build/generated/" + if (ports == null) "prefKeys/PrefKeys.kt" else "httpServerPorts/HttpServerPorts.kt")
@@ -55,6 +56,15 @@ class GenerateRustConstantsTest {
             error("Rust constant generation timed out")
         }
         return Result(process.exitValue(), log.readText(), output.takeIf { it.exists() }?.readText().orEmpty())
+    }
+
+    @Test
+    fun cargoFailureIncludesTheOriginalDiagnostic() {
+        val diagnostic = "locked Core dependency does not provide the requested feature"
+        val result = generate(cargoError = diagnostic)
+        assertNotEquals(0, result.exitCode)
+        assertTrue(diagnostic in result.output, result.output)
+        assertEquals("", result.generated)
     }
 
     @Test
