@@ -1,6 +1,7 @@
 use super::values::{c_string, input};
 use plain_server::host::events::HostEvents;
-use plain_server::platform::system::log::{self, Level};
+use plain_rs::platform::system::log;
+use plain_rs::platform::system::log::Level;
 use std::{
     ffi::c_char,
     sync::{Arc, Mutex},
@@ -10,7 +11,7 @@ use tokio::runtime::Handle;
 static BRIDGE: Mutex<Option<(Handle, Arc<HostEvents>)>> = Mutex::new(None);
 pub(crate) fn install(
     runtime: &tokio::runtime::Runtime,
-    server: &plain_server::assembly::server::ContentServer,
+    server: &plain_server::server::ContentServer,
 ) -> Result<(), String> {
     let _entered = runtime.enter();
     let host = Arc::new(server.host_events()?);

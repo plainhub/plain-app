@@ -1,5 +1,5 @@
 use super::values::{c_string, input};
-use plain_server::native::resource_stream::NativeResourceStream;
+use plain_rs::host::resource_stream::NativeResourceStream;
 use std::{ffi::c_char, sync::Mutex, time::Duration};
 use tokio::runtime::Handle;
 
@@ -155,7 +155,7 @@ fn provide_file(id: &str, fd: i32, offset: i64, length: i64) -> Result<(), Strin
     let file = unsafe { BorrowedFd::borrow_raw(fd) }
         .try_clone_to_owned()
         .map_err(|error| error.to_string())?;
-    let file = plain_server::native::resource_stream::NativeResourceFile::new(
+    let file = plain_rs::host::resource_stream::NativeResourceFile::new(
         std::fs::File::from(file),
         offset,
         length,

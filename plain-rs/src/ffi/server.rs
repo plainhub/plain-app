@@ -1,6 +1,6 @@
 use crate::ffi::values::c_string;
 use crate::ffi::values::input;
-use plain_server::assembly::server::ContentServer;
+use plain_server::server::ContentServer;
 use std::ffi::c_char;
 use std::sync::Mutex;
 use tokio::runtime::Runtime;

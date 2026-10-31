@@ -9,7 +9,7 @@ fn unknown_resource_does_not_replace_the_active_host() {
         .build()
         .unwrap();
     let core = runtime.block_on(async {
-        plain_server::assembly::server::ContentServer::open_with_cache(
+        plain_server::server::ContentServer::open_with_cache(
             &directory.join("data"),
             &directory.join("cache"),
         )

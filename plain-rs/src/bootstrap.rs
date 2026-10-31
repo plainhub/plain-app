@@ -1,10 +1,11 @@
-use plain_server::assembly::server::ContentServer;
-use plain_server::platform::system::log::{self, Level};
+use plain_server::server::ContentServer;
+use plain_rs::platform::system::log;
+use plain_rs::platform::system::log::Level;
 use std::sync::Arc;
 
 pub(crate) fn start(data_dir: &str, token: &str, config: &str) -> Result<String, String> {
     let mut guard = crate::ffi::server::CORE.lock().map_err(|e| e.to_string())?;
-    let config: plain_server::host::startup::StartupConfig =
+    let config: plain_rs::host::startup::StartupConfig =
         serde_json::from_str(config).map_err(|error| error.to_string())?;
     let cache_directory = config
         .cache_dir
@@ -24,11 +25,11 @@ pub(crate) fn start(data_dir: &str, token: &str, config: &str) -> Result<String,
         }
     } else {
         // Apply a pending restore and acquire the directory lock before loading preferences.
-        let _data_directory = plain_server::assembly::data_directory::DataDirectory::open(
+        let _data_directory = plain_rs::data_paths::directory::DataDirectory::open(
             directory,
             std::path::Path::new(&cache_directory),
         )?;
-        plain_server::platform::system::log::init_file(&paths.rust_log_file(), "info")?;
+        plain_rs::platform::system::log::init_file(&paths.rust_log_file(), "info")?;
         let prefs =
             Arc::new(plain_rs::prefs::Prefs::load(&paths.prefs()).map_err(|e| e.to_string())?);
         let runtime = tokio::runtime::Builder::new_multi_thread()
