@@ -25,7 +25,7 @@ import kotlin.test.assertSame
 
 class GraphqlClientTest {
     @Test
-    fun request_logs_report_transport_result_and_cancellation_without_payloads() = runTest {
+    fun request_logs_include_the_query_without_variable_or_response_values() = runTest {
         val logs = mutableListOf<Pair<Int, String>>()
         LogCat.addLogAdapter(object : LogAdapter {
             override fun isLoggable(priority: Int, tag: String?) = true
@@ -46,11 +46,16 @@ class GraphqlClientTest {
             val failure = IllegalStateException("private-error")
             val failed = GraphqlClient { throw failure }
             assertSame(failure, assertFailsWith<IllegalStateException> { failed.execute(request) })
-            assertEquals(listOf(LogCat.DEBUG, LogCat.DEBUG, LogCat.ERROR), logs.map { it.first })
+            val httpFailure = GraphqlHttpException(500)
+            val httpFailed = GraphqlClient("http") { throw httpFailure }
+            assertSame(httpFailure, assertFailsWith<GraphqlHttpException> { httpFailed.execute(request) })
+            assertEquals(listOf(LogCat.DEBUG, LogCat.DEBUG, LogCat.ERROR, LogCat.ERROR), logs.map { it.first })
             assertTrue(logs[0].second.startsWith("GraphQL transport=http operation=DeviceName result=success elapsedMs="))
             assertTrue(logs[1].second.startsWith("GraphQL transport=native operation=DeviceName result=cancelled elapsedMs="))
             assertTrue(logs[2].second.startsWith("GraphQL transport=native operation=DeviceName result=error error=IllegalStateException elapsedMs="))
-            assertTrue(logs.none { it.second.contains("private-") || it.second.contains("query DeviceName") })
+            assertTrue(logs[3].second.startsWith("GraphQL transport=http operation=DeviceName result=error error=GraphqlHttpException elapsedMs="))
+            assertTrue(logs.all { it.second.contains("query DeviceName { deviceName }") })
+            assertTrue(logs.none { it.second.contains("private-") })
         } finally {
             LogCat.clearLogAdapters()
         }

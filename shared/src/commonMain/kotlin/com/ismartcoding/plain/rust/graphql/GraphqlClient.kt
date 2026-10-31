@@ -18,13 +18,13 @@ open class GraphqlClient internal constructor(
             }
             val data = checkNotNull(response.data) { "GraphQL response has no data" }
             val result = request.decode(data)
-            LogCat.d("$label result=success elapsedMs=${started.elapsedNow().inWholeMilliseconds}")
+            LogCat.d("$label result=success elapsedMs=${started.elapsedNow().inWholeMilliseconds} query=${request.operation.query}")
             return result
         } catch (error: CancellationException) {
-            LogCat.d("$label result=cancelled elapsedMs=${started.elapsedNow().inWholeMilliseconds}")
+            LogCat.d("$label result=cancelled elapsedMs=${started.elapsedNow().inWholeMilliseconds} query=${request.operation.query}")
             throw error
         } catch (error: Exception) {
-            LogCat.e("$label result=error error=${error::class.simpleName} elapsedMs=${started.elapsedNow().inWholeMilliseconds}")
+            LogCat.e("$label result=error error=${error::class.simpleName} elapsedMs=${started.elapsedNow().inWholeMilliseconds} query=${request.operation.query}")
             throw error
         }
     }
