@@ -32,9 +32,6 @@ opt-level = 1
 [profile.dev.package.plain-rs]
 opt-level = 1
 
-[profile.dev.package.plain-inference]
-opt-level = 1
-
 [profile.release]
 opt-level = 3
 lto = "thin"

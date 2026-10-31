@@ -55,7 +55,7 @@ class AndroidRustBuildTest {
         assertEquals("false", dev["lto"])
         assertEquals("true", dev["incremental"])
         assertTrue(dev.getValue("codegen-units").toInt() > 1)
-        for (name in listOf("plain-server", "plain-rs", "plain-inference")) {
+        for (name in listOf("plain-server", "plain-rs")) {
             assertEquals("1", section("profile.dev.package.$name")["opt-level"])
         }
         assertEquals("3", section("profile.dev.package.\"*\"")["opt-level"])
