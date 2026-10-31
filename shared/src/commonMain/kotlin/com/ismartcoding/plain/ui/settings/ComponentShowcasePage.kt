@@ -74,13 +74,13 @@ fun ComponentShowcasePage(navController: NavHostController) {
 @Composable
 private fun ShowcaseAlerts() {
     PSectionTitle("PAlert")
-    PAlert(description = "This is a warning alert.", type = AlertType.WARNING)
+    PAlert(description = "This is a warning alert.", type = AlertType.WARNING, modifier = Modifier.padding(horizontal = 16.dp))
     VerticalSpace(8.dp)
-    PAlert(description = "This is an error alert.", type = AlertType.ERROR)
+    PAlert(description = "This is an error alert.", type = AlertType.ERROR, modifier = Modifier.padding(horizontal = 16.dp))
     VerticalSpace(8.dp)
-    PAlert(description = "This is an info alert.", type = AlertType.INFO)
+    PAlert(description = "This is an info alert.", type = AlertType.INFO, modifier = Modifier.padding(horizontal = 16.dp))
     VerticalSpace(8.dp)
-    PAlert(description = "Alert with action.", type = AlertType.WARNING) {
+    PAlert(description = "Alert with action.", type = AlertType.WARNING, modifier = Modifier.padding(horizontal = 16.dp)) {
         PTextButton(text = "Fix Now", buttonSize = ButtonSize.SMALL, onClick = {})
     }
     VerticalSpace(16.dp)

@@ -11,6 +11,8 @@ import com.ismartcoding.plain.models.PeerAddress
 import com.ismartcoding.plain.platform.system.DeviceType
 import com.ismartcoding.plain.rust.graphql.*
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.async
 import kotlinx.coroutines.test.*
 import kotlin.io.encoding.Base64
 import kotlin.test.*
@@ -18,6 +20,51 @@ import kotlin.time.Instant
 
 @OptIn(kotlinx.coroutines.ExperimentalCoroutinesApi::class)
 class ManagedDeviceViewModelTest {
+    @Test
+    fun only_first_entry_shows_loading_while_refresh_preserves_content_or_error() = runTest {
+        Dispatchers.setMain(StandardTestDispatcher(testScheduler))
+        try {
+            for (entryFails in listOf(false, true)) {
+                val store = ViewModelStore()
+                try {
+                    val fixture = Fixture().apply {
+                        fail = entryFails
+                        responseGate = CompletableDeferred()
+                    }
+                    val model = ViewModelProvider.create(store, viewModelFactory {
+                        initializer { ManagedDeviceViewModel(fixture.peer.id, fixture.peer.publicKey, { listOf(fixture.currentPeer) }, { fixture.http }) }
+                    })[ManagedDeviceViewModel::class]
+                    runCurrent()
+                    assertTrue(model.state.value.loading)
+                    assertNull(model.state.value.client)
+                    fixture.responseGate!!.complete(Unit)
+                    runCurrent()
+                    assertFalse(model.state.value.loading)
+                    assertEquals(if (entryFails) "HTTP 500" else null, model.state.value.error)
+                    val previous = model.state.value
+
+                    fixture.fail = false
+                    fixture.responseGate = CompletableDeferred()
+                    val refresh = async { model.refresh() }
+                    runCurrent()
+                    assertFalse(model.state.value.loading, "Pull refresh must not show the entry skeleton")
+                    assertSame(previous.client, model.state.value.client)
+                    assertEquals(previous.error, model.state.value.error)
+                    fixture.responseGate!!.complete(Unit)
+                    assertTrue(refresh.await())
+                    assertFalse(model.state.value.loading)
+                    assertNull(model.state.value.error)
+                    assertNotNull(model.state.value.client)
+                    if (!entryFails) assertSame(previous.client, model.state.value.client)
+                } finally {
+                    store.clear()
+                }
+            }
+        } finally {
+            Dispatchers.resetMain()
+        }
+    }
+
     @Test
     fun rename_after_failed_entry_uses_remote_mutation_and_reloads_remote_identity() = runTest {
         Dispatchers.setMain(StandardTestDispatcher(testScheduler))
@@ -32,14 +79,14 @@ class ManagedDeviceViewModelTest {
             assertNull(model.state.value.client)
             fixture.fail = false
             model.rename("Renamed remote")
-            assertEquals("Renamed remote", model.state.value.info?.deviceName)
+            assertEquals("Renamed remote", model.state.value.client?.currentInfo?.deviceName)
             assertNull(model.state.value.error)
             assertFalse(model.state.value.loading)
             assertEquals(1, fixture.requests.count { "updateDeviceName(" in it.query })
             assertEquals(2, fixture.requests.count { "query { app {" in it.query })
             fixture.fail = true
             assertFalse(model.refresh())
-            assertEquals("Renamed remote", model.state.value.info?.deviceName)
+            assertEquals("Renamed remote", model.state.value.client?.currentInfo?.deviceName)
             assertEquals("HTTP 500", model.state.value.error)
             fixture.fail = false
             assertTrue(model.refresh())
@@ -63,6 +110,7 @@ class ManagedDeviceViewModelTest {
         )
         var currentPeer = peer
         var fail = true
+        var responseGate: CompletableDeferred<Unit>? = null
         var name = peer.name
         val requests = mutableListOf<GraphqlOperation>()
         private lateinit var operation: GraphqlOperation
@@ -82,6 +130,7 @@ class ManagedDeviceViewModelTest {
             transport = object : GraphqlHttpTransport {
                 override suspend fun post(url: String, clientId: String, body: ByteArray, contentType: String, tlsCertificateSha256: String?): GraphqlHttpResponse {
                     assertEquals("https://device.test:8443/graphql", url)
+                    responseGate?.await()
                     return GraphqlHttpResponse(if (fail) 500 else 200, byteArrayOf(2))
                 }
             },

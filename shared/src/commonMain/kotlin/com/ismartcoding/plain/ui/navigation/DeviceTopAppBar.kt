@@ -1,11 +1,12 @@
 package com.ismartcoding.plain.ui.navigation
 
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.selection.selectable
+import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -14,8 +15,6 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.semantics.Role
-import androidx.compose.ui.semantics.selected
-import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextOverflow
 import com.ismartcoding.plain.i18n.*
 import com.ismartcoding.plain.models.Peer
@@ -28,10 +27,10 @@ import com.ismartcoding.plain.ui.base.PModalBottomSheet
 import com.ismartcoding.plain.ui.base.PTopAppBar
 import com.ismartcoding.plain.ui.chat.components.PeerIconWithStatus
 import com.ismartcoding.plain.ui.components.DeviceRenameDialog
+import com.ismartcoding.plain.ui.components.CheckCircle
 import com.ismartcoding.plain.ui.components.PIconButton
 import com.ismartcoding.plain.ui.platform.system.getIcon
 import com.ismartcoding.plain.ui.resources.Res as UiRes
-import com.ismartcoding.plain.ui.resources.check as ui_drawable_check
 import com.ismartcoding.plain.ui.resources.chevron_down as ui_drawable_chevron_down
 import com.ismartcoding.plain.ui.resources.pen as ui_drawable_pen
 import com.ismartcoding.plain.ui.theme.listItemTitle
@@ -96,7 +95,7 @@ private fun DeviceSelectionSheet(navigation: DeviceNavigation, onDismiss: () -> 
         )
         Column(
             Modifier.fillMaxWidth().weight(1f, fill = false)
-                .verticalScroll(rememberScrollState()),
+                .verticalScroll(rememberScrollState()).selectableGroup(),
         ) {
             if (hasChoices) {
                 DeviceSelectionRow(
@@ -122,10 +121,9 @@ private fun DeviceSelectionSheet(navigation: DeviceNavigation, onDismiss: () -> 
 private fun DeviceSelectionRow(title: String, icon: DrawableResource, online: Boolean?, isSelected: Boolean, onClick: () -> Unit) {
     PListItem(
         modifier = Modifier.clip(MaterialTheme.shapes.small)
-            .clickable(role = Role.Button, onClick = onClick)
-            .semantics { selected = isSelected },
+            .selectable(selected = isSelected, role = Role.RadioButton, onClick = onClick),
         title = { Text(title, style = MaterialTheme.typography.listItemTitle(), maxLines = 1, overflow = TextOverflow.Ellipsis) },
         start = { PeerIconWithStatus(icon, online) },
-        action = if (isSelected) ({ Icon(painterResource(UiRes.drawable.ui_drawable_check), contentDescription = null) }) else null,
+        action = { CheckCircle(selected = isSelected) },
     )
 }

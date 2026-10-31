@@ -51,7 +51,7 @@ internal fun MainRootPage(
             }
         }) { padding ->
             Box(Modifier.padding(padding)) {
-                ManagedDeviceStatus(loading, error, refreshDevice)
+                ManagedDeviceStatus(loading, error, tools = selectedTab == 2, onRefresh = refreshDevice)
             }
         }
     } else {

@@ -22,6 +22,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.layout.Layout
+import androidx.compose.ui.unit.offset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.ismartcoding.plain.ui.theme.warning
@@ -69,7 +71,7 @@ fun PAlert(
     val lineHeight = 24.sp
 
     Surface(
-        modifier = modifier.fillMaxWidth().padding(horizontal = 16.dp),
+        modifier = modifier.fillMaxWidth(),
         shape = shape,
         color = containerColor,
         contentColor = contentColor,
@@ -77,7 +79,7 @@ fun PAlert(
         Column(
             modifier = Modifier
                 .then(if (onClick != null) Modifier.clip(shape).clickable(onClick = onClick) else Modifier)
-                .padding(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 8.dp),
+                .padding(16.dp),
         ) {
             Row(verticalAlignment = Alignment.Top, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 Box(
@@ -97,18 +99,29 @@ fun PAlert(
                 }
             }
             if (actions != null) {
-                FlowRow(
-                    modifier = Modifier.fillMaxWidth().padding(top = 4.dp),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.End),
-                    verticalArrangement = Arrangement.spacedBy(8.dp),
-                ) {
-                    actions()
+                AlertSection {
+                    FlowRow(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.End),
+                        verticalArrangement = Arrangement.spacedBy(8.dp),
+                    ) {
+                        actions()
+                    }
                 }
             }
             if (content != null) {
-                Column(Modifier.fillMaxWidth().padding(top = 8.dp), content = content)
+                AlertSection { Column(Modifier.fillMaxWidth(), content = content) }
             }
         }
     }
-    VerticalSpace(8.dp)
+}
+
+@Composable
+private fun AlertSection(content: @Composable () -> Unit) {
+    Layout(content = content) { measurables, constraints ->
+        val gap = 8.dp.roundToPx()
+        val child = measurables.single().measure(constraints.offset(vertical = -gap))
+        val top = if (child.height == 0) 0 else gap
+        layout(child.width, child.height + top) { child.placeRelative(0, top) }
+    }
 }

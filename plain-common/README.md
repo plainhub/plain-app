@@ -73,6 +73,8 @@ Use `AppTheme` as the complete theme entry. Keep the brand palette, soft dark te
 
 `NoDataColumn` is a static centered empty state with no internal scroll container; it can be placed inside an existing lazy-list item.
 
+`PAlert` owns 16dp internal content padding and 8dp gaps before visible action or detail sections. Empty or collapsed sections add no gap. It emits one layout root with no outer margin or trailing spacer; callers supply page margins and spacing through their layout or the root modifier.
+
 Use the `PListItem` content-slot overload for a third description line or custom content. Slots supply text; the component provides the standard title, subtitle and description typography and owns line spacing, leading/trailing layout, dimming, and merged semantics. Optional `minHeight` keeps compact rows; `statusColor` draws a 4dp stripe at the layout start. String and key/value calls retain their existing defaults.
 
 Public layout components accept a root `modifier`. Actions use `onClick`, `enabled` and `onDismissRequest`. Required actions have no default empty callback; optional actions are nullable and create no click target when absent. Each distinct public component has its own file; overloads of the same component may share it. Code comments use English and explain only non-obvious decisions.

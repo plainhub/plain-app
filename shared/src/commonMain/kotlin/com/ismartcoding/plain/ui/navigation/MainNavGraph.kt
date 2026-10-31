@@ -87,12 +87,13 @@ fun MainNavGraph(
         viewModel(viewModelStoreOwner = deviceOwner) { ManagedDeviceViewModel(device.peerId, device.publicKey) }
     }
     val state = manager?.state?.collectAsState()?.value
+    val deviceInfo = state?.client?.state?.collectAsState()?.value
     val refreshDevice: suspend () -> Boolean = manager?.let { it::refresh } ?: { true }
     val content = if (selectedDevice == null) ContentSource.Local else state?.client?.let { client -> remember(client) { ContentSource.Remote(client) } }
     val source: @Composable () -> ContentSource? = {
         when {
             state != null && (state.error != null || state.loading) -> {
-                ManagedDeviceStatus(state.loading, state.error, refreshDevice)
+                ManagedDeviceStatus(state.loading, state.error, onRefresh = refreshDevice)
                 null
             }
             else -> content
@@ -108,10 +109,10 @@ fun MainNavGraph(
     }
     val deviceNavigation = DeviceNavigation(
         deviceName = if (selectedDevice == null) localName.ifEmpty { getDeviceName() }
-            else state?.info?.deviceName ?: localPeers[selectedDevice?.peerId]?.name.orEmpty(),
+            else deviceInfo?.deviceName ?: localPeers[selectedDevice?.peerId]?.name.orEmpty(),
         selectedPeerId = selectedDevice?.peerId,
         peers = localPeers.values.filter { it.isPaired() && it.token.isNotEmpty() }.sortedBy { it.name.lowercase() },
-        capabilities = if (selectedDevice == null) getDeviceCapabilities() else state?.info?.capabilities.orEmpty(),
+        capabilities = if (selectedDevice == null) getDeviceCapabilities() else deviceInfo?.capabilities.orEmpty(),
         onSelect = { peer -> MainViewModel.selectDevice(peer?.let { com.ismartcoding.plain.ui.app.DeviceIdentity(it.id, it.publicKey) }) },
         onSettings = { navController.navigate(Routing.Settings) },
         onRename = if (manager != null) ({ name -> manager.rename(name) }) else ({ name ->

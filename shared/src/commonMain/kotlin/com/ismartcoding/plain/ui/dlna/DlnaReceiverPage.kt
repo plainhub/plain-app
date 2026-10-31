@@ -80,6 +80,7 @@ fun DlnaReceiverPage(navController: NavHostController) {
                                 onClick = { DlnaRendererState.retry() }
                             )
                         },
+                        modifier = Modifier.padding(horizontal = 16.dp),
                     )
                 }
             }

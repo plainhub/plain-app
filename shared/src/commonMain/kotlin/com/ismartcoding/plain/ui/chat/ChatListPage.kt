@@ -1,5 +1,7 @@
 package com.ismartcoding.plain.ui.chat
 
+import androidx.compose.ui.unit.dp
+
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -118,6 +120,7 @@ fun ChatListPage(
                     if (local && (!bleReady || !awareReady)) PAlert(
                         description = stringResource(Res.string.nearby_wifi_devices_required_for_chat),
                         type = AlertType.WARNING,
+                        modifier = Modifier.padding(start = 16.dp, end = 16.dp, bottom = 8.dp),
                     ) {
                         PTextButton(
                             text = stringResource(Res.string.grant_permission),

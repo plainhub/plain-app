@@ -97,7 +97,7 @@ internal fun SearchResults(
     LazyColumn(Modifier.fillMaxSize(), state = listState) {
         viewModel.deviceErrors.value.forEachIndexed { index, error ->
             item(key = "device_error_$index") {
-                Column(Modifier.padding(16.dp)) {
+                Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     Text(error.name, style = MaterialTheme.typography.titleMedium)
                     com.ismartcoding.plain.ui.tools.ManagedError(error.message)
                     POutlinedButton(text = stringResource(Res.string.retry), onClick = viewModel::search)

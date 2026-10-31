@@ -112,12 +112,14 @@ fun HomePage(
                             PAlert(
                                 description = stringResource(Res.string.vpn_web_conflict_warning),
                                 AlertType.WARNING,
+                                modifier = Modifier.padding(start = 16.dp, end = 16.dp, bottom = 8.dp),
                             )
                         }
                         if (!systemAlertWindow) {
                             PAlert(
                                 description = stringResource(Res.string.system_alert_window_warning),
                                 AlertType.WARNING,
+                                modifier = Modifier.padding(start = 16.dp, end = 16.dp, bottom = 8.dp),
                             ) {
                                 PTextButton(
                                     text = stringResource(Res.string.grant_permission),

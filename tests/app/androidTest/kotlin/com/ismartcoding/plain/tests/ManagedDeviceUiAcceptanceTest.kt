@@ -7,10 +7,14 @@ import com.ismartcoding.plain.ui.resources.srl_header_refreshing
 import androidx.activity.compose.setContent
 import com.ismartcoding.plain.features.audio.toPlaylistAudio
 import androidx.compose.foundation.background
+import androidx.compose.runtime.collectAsState
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.asAndroidBitmap
 import androidx.compose.ui.unit.dp
@@ -597,6 +601,83 @@ class ManagedDeviceUiAcceptanceTest {
     }
 
     @Test
+    fun alertOwnsOnlyItsInternalPaddingAcrossVariants() {
+        ActivityScenario.launch(MainActivity::class.java).use { scenario ->
+            val variants = InstrumentationRegistry.getArguments().getString("alertVariant")?.toInt()?.let { listOf(it) } ?: (0..7).toList()
+            for (variant in variants) {
+                val marker = "Alert variant $variant"
+                scenario.onActivity { activity ->
+                    activity.setContent {
+                        com.ismartcoding.plain.ui.theme.AppTheme(useDarkTheme = variant == 3) {
+                            val density = androidx.compose.ui.platform.LocalDensity.current
+                            androidx.compose.runtime.CompositionLocalProvider(
+                                androidx.compose.ui.platform.LocalDensity provides androidx.compose.ui.unit.Density(density.density, if (variant == 5) 1.8f else 1f),
+                                androidx.compose.ui.platform.LocalLayoutDirection provides if (variant == 4) androidx.compose.ui.unit.LayoutDirection.Rtl else androidx.compose.ui.unit.LayoutDirection.Ltr,
+                            ) {
+                                com.ismartcoding.plain.ui.base.PScaffold { insets ->
+                                    androidx.compose.foundation.layout.Column(Modifier.fillMaxWidth().padding(insets).padding(16.dp)) {
+                                        com.ismartcoding.plain.ui.base.PAlert(
+                                            description = if (variant == 1 || variant == 5) "$marker " + "Long description that wraps across lines. ".repeat(5) else marker,
+                                            type = com.ismartcoding.plain.ui.base.AlertType.entries[variant % 3],
+                                            modifier = Modifier.testTag("alert-padding"),
+                                            trailing = if (variant == 2) ({ androidx.compose.material3.Text("Status") }) else null,
+                                            content = if (variant == 3) ({ androidx.compose.material3.Text("Expanded details") }) else if (variant == 6) ({}) else null,
+                                            actions = if (variant == 2) ({ com.ismartcoding.plain.ui.base.PTextButton(text = "Action", onClick = {}) }) else if (variant == 7) ({}) else null,
+                                        )
+                                        androidx.compose.material3.Text("After $variant")
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                val description = awaitNode("alert description $variant") { it.text?.startsWith(marker) == true }
+                val alert = awaitNode("alert root $variant") { it.semantic.config.getOrNull(SemanticsProperties.TestTag) == "alert-padding" }
+                val after = awaitNode("next element $variant") { it.text == "After $variant" }
+                val density = instrumentation.targetContext.resources.displayMetrics.density
+                val textStart = if (variant == 4) alert.boundsInWindow.right - description.boundsInWindow.right else description.boundsInWindow.left - alert.boundsInWindow.left
+                assertEquals(40f * density, textStart, 1f)
+                assertEquals(16f * density, description.boundsInWindow.top - alert.boundsInWindow.top, 1f)
+                assertEquals(alert.boundsInWindow.bottom, after.boundsInWindow.top, 1f)
+                if (variant in 6..7) assertEquals(56f * density, alert.boundsInWindow.height, 1f)
+                captureNavigation("alert-variant-$variant")
+            }
+        }
+    }
+
+    @OptIn(androidx.compose.material3.ExperimentalMaterial3Api::class)
+    @Test
+    fun selectedDeviceLoadingShowsPageSkeletonWithoutRefreshHint() {
+        ActivityScenario.launch(MainActivity::class.java).use { scenario ->
+            for (tools in listOf(false, true)) {
+                scenario.onActivity { activity ->
+                    activity.setContent {
+                        com.ismartcoding.plain.ui.theme.AppTheme(useDarkTheme = false) {
+                            com.ismartcoding.plain.ui.base.PScaffold(
+                                topBar = { com.ismartcoding.plain.ui.base.PTopAppBar(title = "Selected remote device") },
+                            ) { insets ->
+                                Box(Modifier.padding(insets)) {
+                                    com.ismartcoding.plain.ui.tools.ManagedDeviceStatus(true, null, tools = tools) { true }
+                                }
+                            }
+                        }
+                    }
+                }
+                awaitNode("device page skeleton") { it.semantic.config.getOrNull(SemanticsProperties.TestTag) == if (tools) "device-tools-skeleton" else "device-chat-skeleton" }
+                awaitNode("device top bar retained") { it.text == "Selected remote device" }
+                assertTrue(uiNodes().none { it.isVisible && it.text == text(Res.string.srl_header_pulling) })
+                val frame = java.util.concurrent.CountDownLatch(1)
+                scenario.onActivity { activity ->
+                    activity.window.decorView.viewTreeObserver.registerFrameCommitCallback { frame.countDown() }
+                    activity.window.decorView.invalidate()
+                }
+                assertTrue("Skeleton frame committed", frame.await(30, java.util.concurrent.TimeUnit.SECONDS))
+                captureNavigation(if (tools) "device-tools-skeleton" else "device-chat-skeleton")
+            }
+        }
+    }
+
+    @Test
     fun remoteServerFailureUsesFriendlyMessage() {
         ActivityScenario.launch(MainActivity::class.java).use { scenario ->
             scenario.onActivity { activity ->
@@ -615,32 +696,68 @@ class ManagedDeviceUiAcceptanceTest {
     @Test
     fun remoteFailureCanPullToRefreshAndRecover() = runBlocking<Unit> {
         val attempts = java.util.concurrent.atomic.AtomicInteger()
+        val failedRetry = kotlinx.coroutines.CompletableDeferred<Unit>()
+        val successfulRetry = kotlinx.coroutines.CompletableDeferred<Unit>()
+        val peer = Peer(
+            id = "refresh-ui-fixture", name = "Remote fixture", ip = "", port = 8443,
+            status = com.ismartcoding.plain.features.nearby.PeerStatus.PAIRED,
+            deviceType = com.ismartcoding.plain.platform.system.DeviceType.PHONE,
+            createdAt = kotlin.time.Instant.fromEpochMilliseconds(0), updatedAt = kotlin.time.Instant.fromEpochMilliseconds(0),
+            publicKey = "fixture-key", token = "fixture-token",
+            address = com.ismartcoding.plain.models.PeerAddress("device.test", "Remote fixture", "https://device.test:8443", "", ""),
+        )
+        val http = com.ismartcoding.plain.rust.graphql.PeerHttpClient(
+            peer, peers = { listOf(peer) }, clientId = { "fixture-client" },
+            encrypt = { _, payload -> kotlin.io.encoding.Base64.encode(payload.encodeToByteArray()) },
+            decrypt = { _, _, response -> response },
+            transport = object : com.ismartcoding.plain.rust.graphql.GraphqlHttpTransport {
+                override suspend fun post(url: String, clientId: String, body: ByteArray, contentType: String, tlsCertificateSha256: String?): com.ismartcoding.plain.rust.graphql.GraphqlHttpResponse {
+                    val attempt = attempts.incrementAndGet()
+                    if (attempt == 2) failedRetry.await()
+                    if (attempt == 3) successfulRetry.await()
+                    val response = JsonHelper.jsonEncode(com.ismartcoding.plain.rust.graphql.GraphqlResponse(
+                        data = JsonHelper.jsonEncodeToElement(ManagedFixtureApp(com.ismartcoding.plain.models.ManagedDeviceInfo(
+                            peer.name, emptyList(), emptyList(), "app://", "/downloads", "fixture-resource", null,
+                        ))).jsonObject,
+                    ))
+                    return com.ismartcoding.plain.rust.graphql.GraphqlHttpResponse(if (attempt < 3) 500 else 200, response.encodeToByteArray())
+                }
+            },
+        )
         ActivityScenario.launch(MainActivity::class.java).use { scenario ->
             scenario.onActivity { activity ->
                 activity.setContent {
                     com.ismartcoding.plain.ui.theme.AppTheme(useDarkTheme = false) {
-                        val error = androidx.compose.runtime.remember { androidx.compose.runtime.mutableStateOf<String?>("HTTP 500") }
-                        com.ismartcoding.plain.ui.tools.ManagedDeviceStatus(false, error.value) {
-                            if (attempts.incrementAndGet() == 1) false else {
-                                error.value = null
-                                true
-                            }
+                        val model = androidx.lifecycle.viewmodel.compose.viewModel {
+                            com.ismartcoding.plain.ui.tools.ManagedDeviceViewModel(peer.id, peer.publicKey, { listOf(peer) }, { http })
+                        }
+                        val state = model.state.collectAsState().value
+                        if (state.client == null) {
+                            com.ismartcoding.plain.ui.tools.ManagedDeviceStatus(state.loading, state.error, onRefresh = model::refresh)
+                        } else {
+                            androidx.compose.material3.Text(state.client!!.currentInfo.deviceName)
                         }
                     }
                 }
             }
-            awaitNode("remote retry hint") { it.text == text(Res.string.srl_header_pulling) }
+            awaitNode("remote server error") { it.text == text(Res.string.feed_err_server) }
+            assertTrue(uiNodes().none { it.isVisible && it.text == text(Res.string.srl_header_pulling) })
             assertFalse(allText().contains("HTTP 500"))
-            captureNavigation("remote-server-error")
             pullToolsDown()
-            awaitNode("failed remote retry") { it.text == text(com.ismartcoding.plain.ui.resources.Res.string.srl_header_failed) }
-            assertEquals(1, attempts.get())
+            awaitValue("failed remote retry reached the selected device") { attempts.get().takeIf { it == 2 } }
+            awaitNode("error remains visible during failed retry") { it.text == text(Res.string.feed_err_server) }
+            assertTrue(uiNodes().none { it.isVisible && it.semantic.config.getOrNull(SemanticsProperties.TestTag) in setOf("device-chat-skeleton", "device-tools-skeleton") })
+            captureNavigation("remote-refresh-preserves-error")
+            failedRetry.complete(Unit)
             awaitToolsRefreshFinished()
             awaitNode("server error preserved after failure") { it.text == text(Res.string.feed_err_server) }
             pullToolsDown()
-            awaitNode("remote retry succeeded") { it.text == text(com.ismartcoding.plain.ui.resources.Res.string.srl_header_finish) }
-            assertEquals(2, attempts.get())
-            awaitToolsRefreshFinished()
+            awaitValue("remote recovery request reached the selected device") { attempts.get().takeIf { it == 3 } }
+            awaitNode("error remains visible during successful retry") { it.text == text(Res.string.feed_err_server) }
+            assertTrue(uiNodes().none { it.isVisible && it.semantic.config.getOrNull(SemanticsProperties.TestTag) in setOf("device-chat-skeleton", "device-tools-skeleton") })
+            successfulRetry.complete(Unit)
+            awaitNode("recovered remote content") { it.text == peer.name }
+            assertEquals(3, attempts.get())
             assertFalse(allText().contains(text(Res.string.feed_err_server)))
         }
     }
@@ -739,6 +856,11 @@ class ManagedDeviceUiAcceptanceTest {
             assertFalse(allText().contains(text(Res.string.online)))
             assertFalse(allText().contains(text(Res.string.offline)))
             val deviceRow = generateSequence(sheetName) { it.parent }.first { it.isClickable }
+            assertEquals(androidx.compose.ui.semantics.Role.RadioButton, deviceRow.semantic.config.getOrNull(SemanticsProperties.Role))
+            assertEquals(false, deviceRow.semantic.config.getOrNull(SemanticsProperties.Selected))
+            val localName = awaitNode("selected local device") { it.overlay && it.text == text(Res.string.this_device) }
+            val localRow = generateSequence(localName) { it.parent }.first { it.isClickable }
+            assertEquals(true, localRow.semantic.config.getOrNull(SemanticsProperties.Selected))
             assertEquals(0f, deviceRow.boundsInWindow.left)
             assertEquals(instrumentation.targetContext.resources.displayMetrics.widthPixels.toFloat(), deviceRow.boundsInWindow.right)
             captureNavigation("device-sheet")

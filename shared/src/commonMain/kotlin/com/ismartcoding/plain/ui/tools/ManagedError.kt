@@ -1,9 +1,7 @@
 package com.ismartcoding.plain.ui.tools
 
-import androidx.compose.foundation.layout.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
 import com.ismartcoding.plain.i18n.*
 import com.ismartcoding.plain.ui.base.*
 import org.jetbrains.compose.resources.stringResource
@@ -17,7 +15,5 @@ internal fun ManagedError(message: String, modifier: Modifier = Modifier) {
         message.startsWith("HTTP ") && message.removePrefix("HTTP ").toIntOrNull() in 500..599 -> stringResource(Res.string.feed_err_server)
         else -> message
     }
-    Column(modifier.fillMaxWidth().padding(16.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
-        PAlert(description = description, type = AlertType.WARNING)
-    }
+    PAlert(description = description, type = AlertType.WARNING, modifier = modifier)
 }

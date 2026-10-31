@@ -52,7 +52,7 @@ fun PlainAppServiceSection(
             }
         }
         if (errorMessage.isNotEmpty()) {
-            PAlert(description = errorMessage, type = AlertType.ERROR) {
+            PAlert(description = errorMessage, type = AlertType.ERROR, modifier = Modifier.padding(start = 16.dp, end = 16.dp, bottom = 8.dp)) {
                 if (onRetry != null) {
                     PTextButton(
                         text = stringResource(Res.string.retry),

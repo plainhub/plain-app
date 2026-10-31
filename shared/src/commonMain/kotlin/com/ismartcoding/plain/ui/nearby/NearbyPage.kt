@@ -115,6 +115,7 @@ fun NearbyPage(
                     PAlert(
                         description = description,
                         AlertType.WARNING,
+                        modifier = Modifier.padding(start = 16.dp, end = 16.dp, bottom = 8.dp),
                     ) {
                         PTextButton(
                             text = stringResource(

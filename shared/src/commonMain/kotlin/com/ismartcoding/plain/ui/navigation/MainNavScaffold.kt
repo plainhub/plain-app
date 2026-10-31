@@ -33,7 +33,7 @@ import com.ismartcoding.plain.i18n.Res
 import com.ismartcoding.plain.i18n.chat
 import com.ismartcoding.plain.ui.resources.layout_grid as ui_drawable_layout_grid
 import com.ismartcoding.plain.i18n.services
-import com.ismartcoding.plain.ui.resources.power_settings as ui_drawable_power_settings
+import com.ismartcoding.plain.ui.resources.page_info as ui_drawable_page_info
 import com.ismartcoding.plain.ui.resources.message_circle as ui_drawable_message_circle
 import com.ismartcoding.plain.ui.resources.search as ui_drawable_search
 import com.ismartcoding.plain.i18n.tools
@@ -69,7 +69,7 @@ internal fun mainNavItems(capabilities: Collection<com.ismartcoding.plain.platfo
         }
         add(MainNavItem(3, UiRes.drawable.ui_drawable_search, Res.string.search))
         if (localOperationsAllowed) {
-            add(MainNavItem(0, UiRes.drawable.ui_drawable_power_settings, Res.string.services))
+            add(MainNavItem(0, UiRes.drawable.ui_drawable_page_info, Res.string.services))
         }
     }
 

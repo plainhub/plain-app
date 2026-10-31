@@ -8,7 +8,6 @@ import com.ismartcoding.plain.graphql.Mutation
 import com.ismartcoding.plain.models.Peer
 import com.ismartcoding.plain.rust.graphql.PeerHttpClient
 import com.ismartcoding.plain.lib.logcat.LogCat
-import com.ismartcoding.plain.models.ManagedDeviceInfo
 import com.ismartcoding.plain.rust.graphql.GraphqlApi
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.launch
@@ -19,9 +18,7 @@ internal data class ManagedDeviceState(
     val client: ManagedDeviceClient? = null,
     val loading: Boolean = true,
     val error: String? = null,
-) {
-    val info: ManagedDeviceInfo? get() = client?.currentInfo
-}
+)
 
 internal class ManagedDeviceViewModel(
     val peerId: String,
@@ -49,7 +46,6 @@ internal class ManagedDeviceViewModel(
     }
 
     suspend fun refresh(): Boolean {
-        _state.value = _state.value.copy(loading = true, error = null)
         try {
             val existing = _state.value.client
             val source = if (existing == null) {
