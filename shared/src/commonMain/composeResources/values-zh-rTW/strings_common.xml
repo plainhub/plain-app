@@ -89,6 +89,7 @@
     <string name="loading">加載中…</string>
     <string name="searching">搜索中…</string>
     <string name="searching_devices">搜索播放設備中…</string>
+    <string name="no_paired_devices_hint">配對設備後，即可在這裡存取設備內容與工具。</string>
     <string name="no_devices_found">搜索播放設備中…\n\n請確認播放設備與手機是否在同一Wi-Fi下。</string>
     <string name="no_data">沒有數據</string>
     <string name="load_failed">加載失敗</string>

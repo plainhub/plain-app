@@ -114,6 +114,7 @@ fun MainNavGraph(
         peers = localPeers.values.filter { it.isPaired() && it.token.isNotEmpty() }.sortedBy { it.name.lowercase() },
         capabilities = if (selectedDevice == null) getDeviceCapabilities() else deviceInfo?.capabilities.orEmpty(),
         onSelect = { peer -> MainViewModel.selectDevice(peer?.let { com.ismartcoding.plain.ui.app.DeviceIdentity(it.id, it.publicKey) }) },
+        onPairDevice = { navController.navigate(Routing.Nearby) },
         onSettings = { navController.navigate(Routing.Settings) },
         onRename = if (manager != null) ({ name -> manager.rename(name) }) else ({ name ->
             ContentSource.Local.api.execute(com.ismartcoding.plain.graphql.Mutation.updateDeviceName(name))

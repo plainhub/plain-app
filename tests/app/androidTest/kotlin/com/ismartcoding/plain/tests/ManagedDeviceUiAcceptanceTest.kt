@@ -772,7 +772,7 @@ class ManagedDeviceUiAcceptanceTest {
         ActivityScenario.launch(MainActivity::class.java).use { scenario ->
             awaitNode("Chat settings action") { it.contentDescription == text(Res.string.settings) }
             click(text(Res.string.select_a_device), "device sheet without pairs")
-            val rename = awaitNode("rename-only sheet") { it.overlay && it.contentDescription == text(Res.string.rename) }
+            val rename = awaitNode("empty device sheet rename") { it.overlay && it.contentDescription == text(Res.string.rename) }
             val renameItem = generateSequence(rename) { it.parent }.first { it.isClickable }
             val sheetTitle = awaitNode("device sheet title") { it.overlay && it.text == text(Res.string.select_a_device) }
             assertTrue(renameItem.boundsInWindow.left > sheetTitle.boundsInWindow.right)
@@ -782,9 +782,20 @@ class ManagedDeviceUiAcceptanceTest {
             assertTrue(renameItem.boundsInWindow.left > 0)
             assertTrue(renameItem.boundsInWindow.right < display.widthPixels)
             assertTrue(renameItem.boundsInWindow.top > display.heightPixels / 2)
-            captureNavigation("rename-only-sheet")
-            assertFalse(allText().contains(text(Res.string.pair_device)))
+            awaitNode("device pairing guidance") { it.overlay && it.text == text(Res.string.no_paired_devices_hint) }
+            val deviceName = Prefs.deviceName.value.ifEmpty { com.ismartcoding.plain.platform.system.getDeviceName() }
+            assertFalse(uiNodes().any { it.overlay && it.text == deviceName })
+            captureNavigation("device-empty-state")
             assertFalse(allText().contains(text(Res.string.this_device)))
+            click(text(Res.string.pair_device), "pair from empty device selector")
+            awaitNode("nearby devices page") { it.text == text(Res.string.nearby_devices) }
+            assertFalse(uiNodes().any { it.overlay && it.text == text(Res.string.select_a_device) })
+            awaitValue("nearby navigation transition finished") {
+                if (uiNodes().none { it.contentDescription == text(Res.string.settings) }) true else null
+            }
+            captureNavigation("device-empty-nearby")
+            click(text(Res.string.back), "return from nearby devices")
+            click(text(Res.string.select_a_device), "reopen empty device selector")
             click(text(Res.string.rename), "rename selected device")
             awaitNode("rename input") { it.isEditable }
             click(text(Res.string.cancel), "cancel rename")

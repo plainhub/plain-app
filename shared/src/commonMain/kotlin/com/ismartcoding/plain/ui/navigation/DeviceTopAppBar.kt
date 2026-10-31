@@ -1,8 +1,10 @@
 package com.ismartcoding.plain.ui.navigation
 
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.selection.selectable
@@ -13,6 +15,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.style.TextOverflow
@@ -23,6 +26,7 @@ import com.ismartcoding.plain.platform.system.getDeviceType
 import com.ismartcoding.plain.ui.base.BottomSpace
 import com.ismartcoding.plain.ui.base.PBottomSheetTopAppBar
 import com.ismartcoding.plain.ui.base.PListItem
+import com.ismartcoding.plain.ui.base.PFilledButton
 import com.ismartcoding.plain.ui.base.PModalBottomSheet
 import com.ismartcoding.plain.ui.base.PTopAppBar
 import com.ismartcoding.plain.ui.chat.components.PeerIconWithStatus
@@ -44,6 +48,7 @@ internal data class DeviceNavigation(
     val capabilities: List<Capability>,
     val selectedPeerId: String? = null,
     val onSelect: (Peer?) -> Unit,
+    val onPairDevice: () -> Unit,
     val onSettings: () -> Unit,
     val onRename: suspend (String) -> Unit,
 )
@@ -84,7 +89,6 @@ private fun DeviceSelectionSheet(navigation: DeviceNavigation, onDismiss: () -> 
     PModalBottomSheet(onDismissRequest = onDismiss, modifier = Modifier.fillMaxWidth()) {
         PBottomSheetTopAppBar(
             title = stringResource(Res.string.select_a_device),
-            subtitle = if (hasChoices) "" else navigation.deviceName,
             actions = {
                 PIconButton(
                     UiRes.drawable.ui_drawable_pen,
@@ -95,7 +99,8 @@ private fun DeviceSelectionSheet(navigation: DeviceNavigation, onDismiss: () -> 
         )
         Column(
             Modifier.fillMaxWidth().weight(1f, fill = false)
-                .verticalScroll(rememberScrollState()).selectableGroup(),
+                .verticalScroll(rememberScrollState())
+                .then(if (hasChoices) Modifier.selectableGroup() else Modifier),
         ) {
             if (hasChoices) {
                 DeviceSelectionRow(
@@ -109,6 +114,22 @@ private fun DeviceSelectionSheet(navigation: DeviceNavigation, onDismiss: () -> 
                         icon = peer.deviceType.getIcon(), online = peer.online,
                         isSelected = navigation.selectedPeerId == peer.id,
                         onClick = { onDismiss(); navigation.onSelect(peer) },
+                    )
+                }
+            } else {
+                Column(
+                    modifier = Modifier.fillMaxWidth().padding(start = 16.dp, end = 16.dp, top = 16.dp),
+                    verticalArrangement = Arrangement.spacedBy(16.dp),
+                ) {
+                    Text(
+                        text = stringResource(Res.string.no_paired_devices_hint),
+                        style = MaterialTheme.typography.bodyLarge,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                    PFilledButton(
+                        text = stringResource(Res.string.pair_device),
+                        modifier = Modifier.fillMaxWidth(),
+                        onClick = { onDismiss(); navigation.onPairDevice() },
                     )
                 }
             }
