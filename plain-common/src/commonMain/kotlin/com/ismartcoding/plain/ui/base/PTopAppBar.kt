@@ -25,6 +25,7 @@ import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -59,7 +60,7 @@ fun PTopAppBar(
         TopAppBar(
             title = {
                 Row(
-                    modifier = if (onTitleClick == null) Modifier else Modifier.heightIn(min = 48.dp).clickable(role = Role.Button, onClick = onTitleClick),
+                    modifier = if (onTitleClick == null) Modifier else Modifier.heightIn(min = 48.dp).clip(MaterialTheme.shapes.small).clickable(role = Role.Button, onClick = onTitleClick),
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
                 ) {

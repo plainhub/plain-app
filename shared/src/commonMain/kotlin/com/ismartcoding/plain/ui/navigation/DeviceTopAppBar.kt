@@ -26,10 +26,7 @@ import com.ismartcoding.plain.ui.base.BottomSpace
 import com.ismartcoding.plain.ui.base.PBottomSheetTopAppBar
 import com.ismartcoding.plain.ui.base.PListItem
 import com.ismartcoding.plain.ui.base.PModalBottomSheet
-import com.ismartcoding.plain.ui.base.PSheetActionRow
 import com.ismartcoding.plain.ui.base.PTopAppBar
-import com.ismartcoding.plain.ui.base.VerticalSpace
-import androidx.compose.ui.unit.dp
 import com.ismartcoding.plain.ui.chat.components.PeerIconWithStatus
 import com.ismartcoding.plain.ui.components.DeviceRenameDialog
 import com.ismartcoding.plain.ui.components.PIconButton
@@ -38,7 +35,6 @@ import com.ismartcoding.plain.ui.resources.Res as UiRes
 import com.ismartcoding.plain.ui.resources.check as ui_drawable_check
 import com.ismartcoding.plain.ui.resources.chevron_down as ui_drawable_chevron_down
 import com.ismartcoding.plain.ui.resources.pen as ui_drawable_pen
-import com.ismartcoding.plain.ui.resources.x as ui_drawable_x
 import com.ismartcoding.plain.ui.theme.PlainTheme
 import com.ismartcoding.plain.ui.theme.listItemTitle
 import org.jetbrains.compose.resources.DrawableResource
@@ -78,7 +74,7 @@ internal fun DeviceTopAppBar(
         title = navigation?.deviceName ?: fallbackTitle,
         onTitleClick = if (navigation != null) ({ showDevices = true }) else null,
         titleTrailing = if (navigation != null) ({
-            Icon(painterResource(UiRes.drawable.ui_drawable_chevron_down), contentDescription = stringResource(Res.string.devices))
+            Icon(painterResource(UiRes.drawable.ui_drawable_chevron_down), contentDescription = stringResource(Res.string.select_a_device))
         }) else null,
         actions = actions,
     )
@@ -90,10 +86,15 @@ private fun DeviceSelectionSheet(navigation: DeviceNavigation, onDismiss: () -> 
     val hasChoices = navigation.peers.isNotEmpty() || navigation.selectedPeerId != null
     PModalBottomSheet(onDismissRequest = onDismiss, modifier = Modifier.fillMaxWidth()) {
         PBottomSheetTopAppBar(
-            title = stringResource(Res.string.devices),
+            title = stringResource(Res.string.select_a_device),
             subtitle = if (hasChoices) "" else navigation.deviceName,
-            navigationIcon = {
-                PIconButton(UiRes.drawable.ui_drawable_x, contentDescription = stringResource(Res.string.close), click = onDismiss)
+            actions = {
+                PIconButton(
+                    UiRes.drawable.ui_drawable_pen,
+                    contentDescription = stringResource(Res.string.rename),
+                    enabled = navigation.onRename != null,
+                    click = onRename,
+                )
             },
         )
         Column(
@@ -115,14 +116,7 @@ private fun DeviceSelectionSheet(navigation: DeviceNavigation, onDismiss: () -> 
                         onClick = { onDismiss(); navigation.onSelect(peer) },
                     )
                 }
-                VerticalSpace(8.dp)
             }
-            PSheetActionRow(
-                icon = UiRes.drawable.ui_drawable_pen,
-                title = stringResource(Res.string.rename),
-                enabled = navigation.onRename != null,
-                onClick = onRename,
-            )
             BottomSpace()
         }
     }

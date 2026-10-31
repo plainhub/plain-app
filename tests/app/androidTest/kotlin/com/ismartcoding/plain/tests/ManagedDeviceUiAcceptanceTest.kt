@@ -605,9 +605,13 @@ class ManagedDeviceUiAcceptanceTest {
         }
         ActivityScenario.launch(MainActivity::class.java).use { scenario ->
             awaitNode("Chat settings action") { it.contentDescription == text(Res.string.settings) }
-            click(text(Res.string.devices), "device sheet without pairs")
-            val rename = awaitNode("rename-only sheet") { it.overlay && it.text == text(Res.string.rename) }
+            click(text(Res.string.select_a_device), "device sheet without pairs")
+            val rename = awaitNode("rename-only sheet") { it.overlay && it.contentDescription == text(Res.string.rename) }
             val renameItem = generateSequence(rename) { it.parent }.first { it.isClickable }
+            val sheetTitle = awaitNode("device sheet title") { it.overlay && it.text == text(Res.string.select_a_device) }
+            assertTrue(renameItem.boundsInWindow.left > sheetTitle.boundsInWindow.right)
+            assertTrue(kotlin.math.abs(renameItem.boundsInWindow.center.y - sheetTitle.boundsInWindow.center.y) < renameItem.boundsInWindow.height)
+            assertFalse(uiNodes().any { it.overlay && it.contentDescription == text(Res.string.close) })
             val display = instrumentation.targetContext.resources.displayMetrics
             assertTrue(renameItem.boundsInWindow.left > 0)
             assertTrue(renameItem.boundsInWindow.right < display.widthPixels)
@@ -674,7 +678,7 @@ class ManagedDeviceUiAcceptanceTest {
                     }
                 }
             }
-            click(text(Res.string.devices), "device selector")
+            click(text(Res.string.select_a_device), "device selector")
             val sheetName = awaitNode("device selection sheet") { it.overlay && it.text == peer.name }
             instrumentation.runOnMainSync {
                 val layouts = mutableListOf<androidx.compose.ui.text.TextLayoutResult>()
@@ -711,7 +715,7 @@ class ManagedDeviceUiAcceptanceTest {
             click(text(Res.string.back), "return from local logs")
             click(text(Res.string.back), "return to selected device")
             awaitNode("selected device retained") { it.text == peer.name }
-            click(text(Res.string.devices), "device selector from remote")
+            click(text(Res.string.select_a_device), "device selector from remote")
             click(text(Res.string.this_device), "switch back to local")
             awaitNode("local services tab restored") { it.contentDescription == text(Res.string.services) }
         }
@@ -1798,7 +1802,7 @@ class ManagedDeviceUiAcceptanceTest {
 
     private fun openRemoteTools(peerName: String) {
         click(text(Res.string.chat), "chat navigation")
-        click(text(Res.string.devices), "device selector")
+        click(text(Res.string.select_a_device), "device selector")
         click(peerName, "selected device")
         click(text(Res.string.tools), "selected device tools")
     }
