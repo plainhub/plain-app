@@ -111,16 +111,16 @@ internal fun DeviceSelectionSheet(navController: NavHostController, onDismiss: (
                     style = MaterialTheme.typography.bodyLarge,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
-                VerticalSpace(16.dp)
-                PFilledButton(
-                    text = stringResource(Res.string.pair_device),
-                    modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
-                    onClick = {
-                        onDismiss()
-                        navController.navigate(Routing.Nearby)
-                    },
-                )
             }
+            VerticalSpace(16.dp)
+            PFilledButton(
+                text = stringResource(Res.string.pair_device),
+                modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
+                onClick = {
+                    onDismiss()
+                    navController.navigate(Routing.Nearby)
+                },
+            )
             BottomSpace()
         }
     }

@@ -6,7 +6,7 @@ import kotlin.test.assertEquals
 
 class MainNavItemsTest {
     @Test
-    fun services_is_last_and_only_available_with_local_authorization() {
+    fun settings_is_last_and_only_available_with_local_authorization() {
         assertEquals(listOf(1, 2, 3, 0), mainNavItems(listOf(Capability.NOTES), localOperationsAllowed = true).map { it.index })
         assertEquals(listOf(1, 2, 3), mainNavItems(listOf(Capability.NOTES), localOperationsAllowed = false).map { it.index })
     }

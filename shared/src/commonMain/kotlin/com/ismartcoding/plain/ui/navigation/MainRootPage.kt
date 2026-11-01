@@ -42,7 +42,7 @@ internal fun MainRootPage(
     } else if (loading || error != null || source == null) {
         MainNavScaffold(selectedIndex = selectedTab, onTabSelected = onTabSelected, topBar = {
             DeviceTopAppBar(navController) {
-                ActionButtonSettings { navController.navigate(Routing.Settings) }
+                if (selectedTab == 0) ActionButtonSettings { navController.navigate(Routing.Settings) }
             }
         }) { padding ->
             Box(Modifier.padding(padding)) {
