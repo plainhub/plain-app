@@ -15,6 +15,7 @@ data class File(
     var isDir: Boolean,
     var childCount: Int,
     var permission: String = "",
+    val isSystem: Boolean = false,
 ) : IData {
     override var id: String
         get() = path

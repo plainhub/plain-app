@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="system_and_apps">System &amp; apps</string>
     <string name="video_save_to">Video saved to %1$s</string>
     <string name="video_save_to_failed">Failed to save video</string>
     <string name="image_save_to">Image saved to %1$s</string>

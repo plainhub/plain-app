@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="system_and_apps">系统与应用</string>
     <string name="video_save_to">视频已保存到%1$s</string>
     <string name="video_save_to_failed">保存视频失败</string>
     <string name="image_save_to">图像已保存至%1$s</string>

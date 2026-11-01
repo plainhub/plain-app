@@ -22,6 +22,14 @@ class CanonicalFileModelTest {
     }
 
     @Test
+    fun systemClassificationComesFromTheMainFileContract() {
+        val file = JsonHelper.jsonDecode<File>(payload.dropLast(1) + ",\"isSystem\":true}")
+        assertEquals(true, file.isSystem)
+        assertEquals("/music/song.mp3", file.path)
+        assertEquals(42L, file.size)
+    }
+
+    @Test
     fun pathChangesUpdateIdentityAndExtension() {
         val file = JsonHelper.jsonDecode<File>(payload)
         assertEquals("mp3", file.extension)

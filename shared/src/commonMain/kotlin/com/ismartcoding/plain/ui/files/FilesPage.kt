@@ -57,9 +57,7 @@ import com.ismartcoding.plain.ui.audio.AudioQueueViewModel
 import com.ismartcoding.plain.ui.files.FilesViewModel
 import com.ismartcoding.plain.ui.state.enterSearchMode
 import com.ismartcoding.plain.ui.state.exitSelectMode
-import com.ismartcoding.plain.ui.state.isAllSelected
 import com.ismartcoding.plain.ui.state.showBottomActions
-import com.ismartcoding.plain.ui.state.toggleSelectAll
 import com.ismartcoding.plain.ui.files.components.BreadcrumbView
 import com.ismartcoding.plain.ui.files.components.FileListContent
 import com.ismartcoding.plain.ui.files.components.FilePasteBar
@@ -84,6 +82,11 @@ fun FilesPage(
     val drawerState = rememberDrawerState(DrawerValue.Closed)
     val previewerState = rememberPreviewerState()
     val itemsState by filesVM.itemsFlow.collectAsState()
+    var systemExpanded by remember(filesVM.selectedPath, filesVM.queryText.value) { mutableStateOf(false) }
+    val groupSystem = !(filesVM.showSearchBar.value && filesVM.getQuery().isNotEmpty()) && filesVM.type != FilesType.RECENTS && !ZipBrowserHelper.isZipPath(filesVM.selectedPath)
+    val systemFiles = if (groupSystem) itemsState.filter { it.isSystem } else emptyList()
+    val regularFiles = if (groupSystem) itemsState.filterNot { it.isSystem } else itemsState
+    val visibleFiles = if (systemExpanded) systemFiles + regularFiles else regularFiles
     var showMoreSheet by remember { mutableStateOf(false) }
     val canBrowse = filesVM.source is ContentSource.Local || filesVM.hasPermission.value
     LaunchedEffect(canBrowse) {
@@ -114,8 +117,8 @@ fun FilesPage(
         else -> stringResource(Res.string.files)
     }
     val subtitle = if (!filesVM.selectMode.value) {
-        val fc = itemsState.count { it.isDir };
-        val flc = itemsState.count { !it.isDir }
+        val fc = regularFiles.count { it.isDir };
+        val flc = regularFiles.count { !it.isDir }
         val sl = mutableListOf<String>()
         if (fc > 0) sl.add(pluralStringResource(Res.plurals.x_folders, fc, fc))
         if (flc > 0) sl.add(pluralStringResource(Res.plurals.x_files, flc, flc))
@@ -162,8 +165,12 @@ fun FilesPage(
                     )
                 } else {
                     PTopRightButton(
-                        label = stringResource(if (filesVM.isAllSelected()) Res.string.unselect_all else Res.string.select_all),
-                        click = { filesVM.toggleSelectAll() }); HorizontalSpace(dp = 8.dp)
+                        label = stringResource(if (visibleFiles.all { it.id in filesVM.selectedIds }) Res.string.unselect_all else Res.string.select_all),
+                        click = {
+                            val allSelected = visibleFiles.all { it.id in filesVM.selectedIds }
+                            filesVM.selectedIds.clear()
+                            if (!allSelected) filesVM.selectedIds.addAll(visibleFiles.map { it.id })
+                        }); HorizontalSpace(dp = 8.dp)
                 }
             },
             onSearchAction = { q ->
@@ -209,7 +216,10 @@ fun FilesPage(
                 FileListContent(
                     navController = navController,
                     filesVM = filesVM,
-                    files = itemsState,
+                    files = visibleFiles,
+                    systemCount = systemFiles.size,
+                    systemExpanded = systemExpanded,
+                    onToggleSystem = { systemExpanded = !systemExpanded; filesVM.selectedIds.clear() },
                     loadFiles = { _, _ -> scope.launch(Dispatchers.Default) { filesVM.loadAsync() } },
                     previewerState = previewerState,
                     audioQueueVM = audioQueueVM

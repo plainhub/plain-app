@@ -18,7 +18,7 @@ internal object Fragments {
     const val NOTE_FIELDS = "id title content deletedAt createdAt updatedAt"
     const val BOOKMARK = "id url title faviconPath groupId pinned clickCount lastClickedAt sortOrder createdAt updatedAt"
     const val POMODORO = "date completedCount currentRound timeLeftSec totalTimeSec isRunning isPaused state"
-    const val FILE = "name path permission createdAt updatedAt size isDir childCount mediaId"
+    const val FILE = "name path permission createdAt updatedAt size isDir childCount mediaId isSystem"
     const val FAVORITE_FOLDER = "rootPath fullPath alias"
     const val FILE_TASK = "id clientId type status title error totalBytes doneBytes totalItems doneItems createdAt updatedAt completedOps { src dst }"
     const val SHARE_LINK = "host port sharedId token pageUrl"

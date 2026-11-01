@@ -168,6 +168,9 @@ fun ZipFilePage(
                     navController = navController,
                     filesVM = filesVM,
                     files = itemsState,
+                    systemCount = 0,
+                    systemExpanded = false,
+                    onToggleSystem = {},
                     loadFiles = { _, _ -> scope.launch(Dispatchers.Default) { filesVM.loadAsync() } },
                     previewerState = previewerState,
                     audioQueueVM = audioQueueVM

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="system_and_apps">系統與應用程式</string>
     <string name="video_save_to">影片已儲存在%1$s</string>
     <string name="video_save_to_failed">無法儲存影片</string>
     <string name="image_save_to">圖片已保存至%1$s</string>
