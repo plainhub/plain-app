@@ -177,4 +177,6 @@
     <string name="no_finished_downloads">Tamamlanan indirme yok</string>
     <string name="saved_n_of_m">%2$d öğeden %1$d kaydedildi</string>
     <string name="saved_to_x">%1$s konumuna kaydedildi</string>
+    <string name="confirm_unpair_device">%1$s ile eşleştirme kaldırılsın mı? Sohbet geçmişini silmek bu cihazı sohbet listesinden de kaldırır ve geri alınamaz.</string>
+    <string name="delete_chat_history">Sohbet geçmişini sil</string>
 </resources>

@@ -45,14 +45,14 @@ object NearbyViewModel {
         scope.launchSafe { PairingInitiator.start(device) }
     }
 
-    fun unpairDevice(deviceId: String) {
+    fun unpairDevice(deviceId: String, deleteChats: Boolean) {
         val current = itemStatus[deviceId]
         if (current == NearbyItemStatus.UNPAIRING || current == NearbyItemStatus.PAIRING) return
         itemStatus[deviceId] = NearbyItemStatus.UNPAIRING
         scope.launchSafe(onDone = {
             itemStatus.remove(deviceId)
         }) {
-            PeerManager.markUnpaired(deviceId)
+            if (deleteChats) PeerManager.deletePeer(deviceId) else PeerManager.markUnpaired(deviceId)
         }
     }
 

@@ -177,4 +177,6 @@
     <string name="no_finished_downloads">完了したダウンロードはありません</string>
     <string name="saved_n_of_m">%2$d 件中 %1$d 件を保存しました</string>
     <string name="saved_to_x">%1$s に保存しました</string>
+    <string name="confirm_unpair_device">%1$s とのペアリングを解除しますか？チャット履歴を削除すると、このデバイスもチャット一覧から削除されます。この操作は取り消せません。</string>
+    <string name="delete_chat_history">チャット履歴を削除</string>
 </resources>

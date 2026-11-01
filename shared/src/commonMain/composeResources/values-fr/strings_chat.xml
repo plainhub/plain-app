@@ -177,4 +177,6 @@
     <string name="no_finished_downloads">Aucun téléchargement terminé</string>
     <string name="saved_n_of_m">%1$d éléments sur %2$d enregistrés</string>
     <string name="saved_to_x">Enregistré dans %1$s</string>
+    <string name="confirm_unpair_device">Dissocier %1$s ? La suppression de l’historique retire aussi cet appareil de la liste des discussions et est irréversible.</string>
+    <string name="delete_chat_history">Supprimer l’historique des discussions</string>
 </resources>

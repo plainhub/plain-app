@@ -177,4 +177,6 @@
     <string name="no_finished_downloads">Keine abgeschlossenen Downloads</string>
     <string name="saved_n_of_m">%1$d von %2$d Elementen gespeichert</string>
     <string name="saved_to_x">Gespeichert in %1$s</string>
+    <string name="confirm_unpair_device">Kopplung mit %1$s aufheben? Das Löschen des Chatverlaufs entfernt dieses Gerät auch aus der Chatliste und kann nicht rückgängig gemacht werden.</string>
+    <string name="delete_chat_history">Chatverlauf löschen</string>
 </resources>

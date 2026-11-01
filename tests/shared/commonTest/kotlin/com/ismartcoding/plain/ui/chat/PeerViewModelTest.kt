@@ -87,4 +87,46 @@ class PeerViewModelTest {
             Dispatchers.resetMain()
         }
     }
+
+    @Test
+    fun unpaired_conversations_remain_until_the_peer_is_deleted_or_retained_only_for_a_channel() = runTest {
+        Dispatchers.setMain(StandardTestDispatcher(testScheduler))
+        val time = Instant.fromEpochMilliseconds(0)
+        val fixture = Peer(id = "unpair-fixture", name = "Device", ip = "", port = 8443,
+            status = PeerStatus.PAIRED, deviceType = DeviceType.PHONE,
+            publicKey = "fixture-key", createdAt = time, updatedAt = time)
+        var current = listOf(fixture)
+        val changes = kotlinx.coroutines.flow.MutableSharedFlow<Unit>()
+        val vm = PeerViewModel(readPeers = { current }, readLatestChats = { emptyMap() }, sourceChanges = changes)
+        val store = ViewModelStore().apply { put("fixture", vm) }
+        val collecting = backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) { vm.peerList.collect {} }
+        val observing = backgroundScope.launch { vm.observe() }
+        try {
+            runCurrent()
+            assertEquals(listOf(fixture.id), vm.peerList.value.map { it.id })
+            current = listOf(fixture.copy(status = PeerStatus.UNPAIRED))
+            changes.emit(Unit)
+            runCurrent()
+            assertEquals(listOf(fixture.id), vm.peerList.value.map { it.id })
+            current = listOf(fixture.copy(status = PeerStatus.CHANNEL))
+            changes.emit(Unit)
+            runCurrent()
+            assertTrue(vm.peerList.value.isEmpty())
+            current = listOf(fixture.copy(status = PeerStatus.UNPAIRED))
+            changes.emit(Unit)
+            runCurrent()
+            assertEquals(listOf(fixture.id), vm.peerList.value.map { it.id })
+            current = emptyList()
+            changes.emit(Unit)
+            runCurrent()
+            assertTrue(vm.peerList.value.isEmpty())
+        } finally {
+            observing.cancel()
+            collecting.cancel()
+            store.clear()
+            runCurrent()
+            Dispatchers.resetMain()
+        }
+    }
+
 }

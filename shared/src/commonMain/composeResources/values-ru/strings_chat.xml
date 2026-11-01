@@ -177,4 +177,6 @@
     <string name="no_finished_downloads">Нет завершённых загрузок</string>
     <string name="saved_n_of_m">Сохранено %1$d из %2$d</string>
     <string name="saved_to_x">Сохранено в %1$s</string>
+    <string name="confirm_unpair_device">Отменить сопряжение с %1$s? Удаление истории чата также удалит это устройство из списка чатов. Это действие нельзя отменить.</string>
+    <string name="delete_chat_history">Удалить историю чата</string>
 </resources>

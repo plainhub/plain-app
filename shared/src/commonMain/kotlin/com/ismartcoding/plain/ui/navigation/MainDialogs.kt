@@ -3,6 +3,12 @@ package com.ismartcoding.plain.ui.navigation
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.selection.toggleable
+import androidx.compose.material3.Checkbox
+import androidx.compose.ui.semantics.Role
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.CircularProgressIndicator
@@ -99,7 +105,25 @@ fun MainDialogs() {
                     Text(it.title)
                 }
             },
-            text = { Text(it.message) },
+            text = {
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Text(it.message)
+                    it.checkbox?.let { checkbox ->
+                        Row(
+                            modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).toggleable(
+                                value = checkbox.checked,
+                                role = Role.Checkbox,
+                                onValueChange = { checked -> checkbox.checked = checked },
+                            ),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        ) {
+                            Checkbox(checked = checkbox.checked, onCheckedChange = null)
+                            Text(checkbox.label, modifier = Modifier.weight(1f))
+                        }
+                    }
+                }
+            },
             confirmButton = {
                 PTextButton(
                     text = it.confirmButton.first,

@@ -177,4 +177,6 @@
     <string name="no_finished_downloads">No hay descargas terminadas</string>
     <string name="saved_n_of_m">%1$d de %2$d elementos guardados</string>
     <string name="saved_to_x">Guardado en %1$s</string>
+    <string name="confirm_unpair_device">¿Desvincular %1$s? Eliminar el historial de chat también elimina este dispositivo de la lista de chats y no se puede deshacer.</string>
+    <string name="delete_chat_history">Eliminar historial de chat</string>
 </resources>

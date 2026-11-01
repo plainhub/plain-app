@@ -29,6 +29,8 @@ import com.ismartcoding.plain.ui.resources.bluetooth as ui_drawable_bluetooth
 import com.ismartcoding.plain.ui.resources.wifi as ui_drawable_wifi
 import com.ismartcoding.plain.i18n.bluetooth
 import com.ismartcoding.plain.ui.nearby.PairPeerDialog
+import com.ismartcoding.plain.ui.components.ConfirmDialogCheckbox
+import com.ismartcoding.plain.ui.components.DialogHelper
 
 @Composable
 fun NearbyDeviceItem(
@@ -37,6 +39,10 @@ fun NearbyDeviceItem(
     bestIp: String,
 ) {
     var showPair by remember { mutableStateOf(false) }
+    val unpairText = stringResource(Res.string.unpair)
+    val unpairMessage = stringResource(Res.string.confirm_unpair_device, item.name)
+    val deleteChatsText = stringResource(Res.string.delete_chat_history)
+    val cancelText = stringResource(Res.string.cancel)
     val verificationCode = NearbyViewModel.pairingStates.values.firstOrNull {
         it.deviceId == item.id && it.phase !in setOf(PairingPhase.SUCCEEDED, PairingPhase.FAILED, PairingPhase.CANCELLED)
     }?.verificationCode
@@ -96,7 +102,17 @@ fun NearbyDeviceItem(
                         POutlinedButton(
                             text = stringResource(Res.string.unpair),
                             onClick = {
-                                NearbyViewModel.unpairDevice(item.id)
+                                val checkbox = ConfirmDialogCheckbox(deleteChatsText)
+                                DialogHelper.showConfirmDialog(
+                                    title = unpairText,
+                                    message = unpairMessage,
+                                    confirmButton = Pair(unpairText) {
+                                        NearbyViewModel.unpairDevice(item.id, checkbox.checked)
+                                    },
+                                    dismissButton = Pair(cancelText) {},
+                                    danger = true,
+                                    checkbox = checkbox,
+                                )
                             },
                             type = ButtonType.DANGER,
                             buttonSize = ButtonSize.SMALL,

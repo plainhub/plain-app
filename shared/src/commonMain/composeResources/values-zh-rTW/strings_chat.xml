@@ -188,4 +188,6 @@
     <string name="remote_permission_required">此裝置尚未授予存取權限，請請求權限後繼續。</string>
     <string name="pairing_failed">配對失敗</string>
     <string name="pair_manage_device">可管理</string>
+    <string name="confirm_unpair_device">要與 %1$s 解除配對嗎？刪除聊天記錄也會將此裝置從聊天清單中移除，此操作無法復原。</string>
+    <string name="delete_chat_history">刪除聊天記錄</string>
 </resources>

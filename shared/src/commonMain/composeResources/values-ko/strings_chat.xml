@@ -177,4 +177,6 @@
     <string name="no_finished_downloads">완료된 다운로드가 없습니다</string>
     <string name="saved_n_of_m">%2$d개 중 %1$d개 저장됨</string>
     <string name="saved_to_x">%1$s에 저장됨</string>
+    <string name="confirm_unpair_device">%1$s의 페어링을 해제하시겠습니까? 채팅 기록을 삭제하면 이 기기도 채팅 목록에서 제거되며 되돌릴 수 없습니다.</string>
+    <string name="delete_chat_history">채팅 기록 삭제</string>
 </resources>

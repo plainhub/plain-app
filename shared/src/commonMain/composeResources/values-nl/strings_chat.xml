@@ -177,4 +177,6 @@
     <string name="no_finished_downloads">Geen voltooide downloads</string>
     <string name="saved_n_of_m">%1$d van %2$d items opgeslagen</string>
     <string name="saved_to_x">Opgeslagen in %1$s</string>
+    <string name="confirm_unpair_device">Koppeling met %1$s verbreken? Als je de chatgeschiedenis verwijdert, verdwijnt dit apparaat ook uit de chatlijst. Dit kan niet ongedaan worden gemaakt.</string>
+    <string name="delete_chat_history">Chatgeschiedenis verwijderen</string>
 </resources>

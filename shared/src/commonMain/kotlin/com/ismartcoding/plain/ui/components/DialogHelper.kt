@@ -50,12 +50,13 @@ object DialogHelper {
         confirmButton: Pair<String, () -> Unit>? = null,
         dismissButton: Pair<String, () -> Unit>? = null,
         danger: Boolean = false,
+        checkbox: ConfirmDialogCheckbox? = null,
     ) {
         if (confirmButton != null) {
-            confirmation.value = ConfirmDialog(title, message, confirmButton, dismissButton, danger)
+            confirmation.value = ConfirmDialog(title, message, confirmButton, dismissButton, danger, checkbox)
         } else {
             coIO {
-                confirmation.value = ConfirmDialog(title, message, Pair(getComposeString(Res.string.ok)) {}, dismissButton, danger)
+                confirmation.value = ConfirmDialog(title, message, Pair(getComposeString(Res.string.ok)) {}, dismissButton, danger, checkbox)
             }
         }
     }

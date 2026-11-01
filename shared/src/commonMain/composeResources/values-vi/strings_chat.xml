@@ -177,4 +177,6 @@
     <string name="no_finished_downloads">Không có tải xuống nào hoàn tất</string>
     <string name="saved_n_of_m">Đã lưu %1$d/%2$d mục</string>
     <string name="saved_to_x">Đã lưu vào %1$s</string>
+    <string name="confirm_unpair_device">Hủy ghép đôi với %1$s? Xóa lịch sử trò chuyện cũng sẽ xóa thiết bị này khỏi danh sách trò chuyện và không thể hoàn tác.</string>
+    <string name="delete_chat_history">Xóa lịch sử trò chuyện</string>
 </resources>

@@ -177,4 +177,6 @@
     <string name="no_finished_downloads">Nessun download completato</string>
     <string name="saved_n_of_m">%1$d di %2$d elementi salvati</string>
     <string name="saved_to_x">Salvato in %1$s</string>
+    <string name="confirm_unpair_device">Annullare l’abbinamento con %1$s? Eliminare la cronologia chat rimuove anche questo dispositivo dall’elenco delle chat e non può essere annullato.</string>
+    <string name="delete_chat_history">Elimina cronologia chat</string>
 </resources>

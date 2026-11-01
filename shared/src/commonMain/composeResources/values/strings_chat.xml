@@ -188,4 +188,6 @@
     <string name="request_permission">Request permission</string>
     <string name="remote_permission_required">This device has not granted access. Request permission to continue.</string>
     <string name="pairing_failed">Pairing failed</string>
+    <string name="confirm_unpair_device">Unpair %1$s? Deleting chat history also removes this device from the chat list and cannot be undone.</string>
+    <string name="delete_chat_history">Delete chat history</string>
 </resources>

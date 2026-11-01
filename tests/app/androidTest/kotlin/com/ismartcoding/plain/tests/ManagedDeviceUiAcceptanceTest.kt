@@ -1859,6 +1859,48 @@ class ManagedDeviceUiAcceptanceTest {
     }
 
     @Test
+    fun unpairRequiresConfirmationAndResetsTheDeleteHistoryCheckbox() = runBlocking {
+        val device = com.ismartcoding.plain.models.NearbyDevice(
+            id = "unpair-confirmation-${UUID.randomUUID()}", name = "Confirmation device", port = 8443,
+            deviceType = com.ismartcoding.plain.platform.system.DeviceType.PHONE,
+            version = "4.0.0", platform = "Android", lastSeen = "",
+            status = com.ismartcoding.plain.features.nearby.PeerStatus.PAIRED,
+        )
+        ActivityScenario.launch(MainActivity::class.java).use { scenario ->
+            scenario.onActivity { activity ->
+                activity.setContent {
+                    com.ismartcoding.plain.ui.theme.AppTheme(useDarkTheme = false) {
+                        Box(Modifier.fillMaxSize().padding(32.dp)) {
+                            com.ismartcoding.plain.ui.chat.components.NearbyDeviceItem(
+                                device, com.ismartcoding.plain.ui.nearby.NearbyItemStatus.PAIRED, "",
+                            )
+                        }
+                        com.ismartcoding.plain.ui.navigation.MainDialogs()
+                    }
+                }
+            }
+            try {
+                awaitMainWindowFocus(scenario)
+                repeat(2) { opening ->
+                    click(text(Res.string.unpair), "request unpair confirmation")
+                    val checkbox = awaitNode("delete chat history checkbox") { it.isCheckable }
+                    assertFalse("Delete history must default to off", checkbox.isChecked)
+                    assertNull(com.ismartcoding.plain.ui.nearby.NearbyViewModel.itemStatus[device.id])
+                    performClick(checkbox, "toggle delete chat history")
+                    awaitNode("checked delete chat history") { it.isCheckable && it.isChecked }
+                    if (opening == 0) captureNavigation("unpair-confirmation")
+                    click(text(Res.string.cancel), "cancel unpair")
+                    awaitMainWindowFocus(scenario)
+                    assertNull(com.ismartcoding.plain.ui.components.DialogHelper.confirmation.value)
+                    assertNull(com.ismartcoding.plain.ui.nearby.NearbyViewModel.itemStatus[device.id])
+                }
+            } finally {
+                instrumentation.runOnMainSync { com.ismartcoding.plain.ui.components.DialogHelper.confirmation.value = null }
+            }
+        }
+    }
+
+    @Test
     fun unpairsTheExpectedPeerWithoutDeletingMessages() = runBlocking {
         ActivityScenario.launch(MainActivity::class.java).use {
             val id = checkNotNull(InstrumentationRegistry.getArguments().getString("managedPeerId"))

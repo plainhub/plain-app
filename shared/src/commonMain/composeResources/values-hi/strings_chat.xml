@@ -177,4 +177,6 @@
     <string name="no_finished_downloads">कोई पूर्ण डाउनलोड नहीं</string>
     <string name="saved_n_of_m">%2$d में से %1$d सहेजे गए</string>
     <string name="saved_to_x">%1$s में सहेजा गया</string>
+    <string name="confirm_unpair_device">%1$s के साथ पेयरिंग हटाएँ? चैट इतिहास हटाने से यह डिवाइस चैट सूची से भी हट जाएगा और इसे वापस नहीं लाया जा सकता।</string>
+    <string name="delete_chat_history">चैट इतिहास हटाएँ</string>
 </resources>

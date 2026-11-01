@@ -177,4 +177,6 @@
     <string name="no_finished_downloads">முடிந்த பதிவிறக்கம் இல்லை</string>
     <string name="saved_n_of_m">%2$d-இல் %1$d சேமிக்கப்பட்டது</string>
     <string name="saved_to_x">%1$s-இல் சேமிக்கப்பட்டது</string>
+    <string name="confirm_unpair_device">%1$s உடனான இணைப்பை நீக்கவா? அரட்டை வரலாற்றை நீக்கினால், இந்தச் சாதனமும் அரட்டைப் பட்டியலிலிருந்து அகற்றப்படும். இதைச் செயல்தவிர்க்க முடியாது.</string>
+    <string name="delete_chat_history">அரட்டை வரலாற்றை நீக்கு</string>
 </resources>

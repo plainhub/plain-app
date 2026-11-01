@@ -188,4 +188,6 @@
     <string name="request_permission">请求权限</string>
     <string name="remote_permission_required">此设备尚未授予访问权限，请请求权限后继续。</string>
     <string name="pairing_failed">配对失败</string>
+    <string name="confirm_unpair_device">要与 %1$s 解除配对吗？删除聊天记录也会将此设备从聊天列表中移除，此操作无法撤销。</string>
+    <string name="delete_chat_history">删除聊天记录</string>
 </resources>

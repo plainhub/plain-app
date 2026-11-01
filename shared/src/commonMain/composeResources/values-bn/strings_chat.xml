@@ -177,4 +177,6 @@
     <string name="no_finished_downloads">কোনো সম্পন্ন ডাউনলোড নেই</string>
     <string name="saved_n_of_m">%2$dটির মধ্যে %1$dটি সংরক্ষিত</string>
     <string name="saved_to_x">%1$s-এ সংরক্ষিত</string>
+    <string name="confirm_unpair_device">%1$s-এর সাথে পেয়ারিং বাতিল করবেন? চ্যাটের ইতিহাস মুছে ফেললে এই ডিভাইসটিও চ্যাট তালিকা থেকে সরে যাবে এবং এটি আর ফিরিয়ে আনা যাবে না।</string>
+    <string name="delete_chat_history">চ্যাটের ইতিহাস মুছুন</string>
 </resources>
