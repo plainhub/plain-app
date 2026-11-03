@@ -73,7 +73,7 @@ fun CastNowPlayingSection(
     val canControl = isVideo || isAudio
 
     val source = com.ismartcoding.plain.ui.navigation.LocalContentSource.current
-    val resource = com.ismartcoding.plain.ui.navigation.rememberContentResource(source, currentUri, 256).value?.getOrNull()
+    val resource = com.ismartcoding.plain.ui.navigation.rememberContentResource(source, currentUri, com.ismartcoding.plain.features.chat.peer.ResourceSize.SM).value?.getOrNull()
     var title by remember { mutableStateOf("") }
     var subtitle by remember { mutableStateOf("") }
 

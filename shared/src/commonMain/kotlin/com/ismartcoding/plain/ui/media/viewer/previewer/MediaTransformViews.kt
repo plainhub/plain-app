@@ -44,7 +44,7 @@ fun TransformImageViewWithUri(
     widthPx: Int, forceVideoDecoder: Boolean = false,
 ) {
     val source = com.ismartcoding.plain.ui.navigation.LocalContentSource.current
-    val resource by com.ismartcoding.plain.ui.navigation.rememberContentResource(source, path, widthPx)
+    val resource by com.ismartcoding.plain.ui.navigation.rememberContentResource(source, path, com.ismartcoding.plain.features.chat.peer.ResourceSize.SM)
     TransformImageView(modifier = modifier, key = key, itemState = itemState, contentState = previewerState.transformState) { itemKey ->
         key(itemKey) {
             val painter = rememberAsyncImagePainter(

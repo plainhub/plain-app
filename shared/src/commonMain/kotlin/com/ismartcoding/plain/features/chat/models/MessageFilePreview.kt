@@ -6,7 +6,7 @@ import com.ismartcoding.plain.ui.extensions.getFinalPath
 
 suspend fun MessageFile.getPreviewPath(peer: Peer?): String {
     return if (isRemoteFile()) {
-        peer?.getFileUrl(parseFileId())?.let { "$it&w=200&h=200" }.orEmpty()
+        peer?.getFileUrl(parseFileId())?.let { "$it&s=sm" }.orEmpty()
     } else {
         uri.getFinalPath()
     }

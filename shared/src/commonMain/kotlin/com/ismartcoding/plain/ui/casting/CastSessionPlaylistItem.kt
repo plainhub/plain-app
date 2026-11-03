@@ -54,7 +54,7 @@ fun CastSessionPlaylistItem(
     onRemove: () -> Unit,
 ) {
     val source = com.ismartcoding.plain.ui.navigation.LocalContentSource.current
-    val resource = com.ismartcoding.plain.ui.navigation.rememberContentResource(source, item.path, 256).value?.getOrNull()
+    val resource = com.ismartcoding.plain.ui.navigation.rememberContentResource(source, item.path, com.ismartcoding.plain.features.chat.peer.ResourceSize.SM).value?.getOrNull()
     var title by remember { mutableStateOf("") }
     var subtitle by remember { mutableStateOf("") }
 

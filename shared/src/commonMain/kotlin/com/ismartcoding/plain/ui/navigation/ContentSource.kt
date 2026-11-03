@@ -26,12 +26,12 @@ internal inline fun <reified T : Any> NavGraphBuilder.contentDestination(
 internal fun rememberContentResource(
     source: ContentSource,
     path: String,
-    thumbnailSize: Int = 0,
+    size: com.ismartcoding.plain.features.chat.peer.ResourceSize? = null,
 ): androidx.compose.runtime.State<Result<Any>?> {
     if (source is ContentSource.Local) return androidx.compose.runtime.rememberUpdatedState(Result.success(path))
-    return androidx.compose.runtime.produceState<Result<Any>?>(null, source, path, thumbnailSize) {
+    return androidx.compose.runtime.produceState<Result<Any>?>(null, source, path, size) {
         value = try {
-            Result.success((source as ContentSource.Remote).client.resource(path, thumbnailSize))
+            Result.success((source as ContentSource.Remote).client.resource(path, size))
         } catch (cancelled: kotlinx.coroutines.CancellationException) {
             throw cancelled
         } catch (error: Exception) {

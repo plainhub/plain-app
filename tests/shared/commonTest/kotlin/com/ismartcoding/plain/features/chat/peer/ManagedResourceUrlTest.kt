@@ -7,19 +7,27 @@ import kotlin.test.assertNull
 
 class ManagedResourceUrlTest {
     @Test
-    fun thumbnailKeepsTheOriginalAspectRatioAndOpaqueReference() {
-        val url = Url(managedResourceUrl("https://device.invalid:8443/", "opaque+/=reference", 256))
+    fun thumbnailUsesNamedSizeAndKeepsOpaqueReference() {
+        val url = Url(managedResourceUrl("https://device.invalid:8443/", "opaque+/=reference", ResourceSize.SM))
         assertEquals("/fs", url.encodedPath)
         assertEquals("opaque+/=reference", url.parameters["id"])
-        assertEquals("256", url.parameters["w"])
-        assertEquals("256", url.parameters["h"])
-        assertEquals("false", url.parameters["cc"])
+        assertEquals("sm", url.parameters["s"])
+        assertNull(url.parameters["w"])
+        assertNull(url.parameters["h"])
+        assertNull(url.parameters["cc"])
+    }
+
+    @Test
+    fun largePreviewUsesNamedSize() {
+        val url = Url(managedResourceUrl("https://device.invalid", "opaque", ResourceSize.LG))
+        assertEquals("lg", url.parameters["s"])
     }
 
     @Test
     fun fullResourceDoesNotRequestAThumbnail() {
-        val url = Url(managedResourceUrl("https://device.invalid:8443", "opaque", 0))
+        val url = Url(managedResourceUrl("https://device.invalid:8443", "opaque", null))
         assertEquals("opaque", url.parameters["id"])
+        assertNull(url.parameters["s"])
         assertNull(url.parameters["w"])
         assertNull(url.parameters["h"])
         assertNull(url.parameters["cc"])

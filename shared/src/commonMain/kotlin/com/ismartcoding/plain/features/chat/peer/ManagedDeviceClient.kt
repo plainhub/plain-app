@@ -19,6 +19,8 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.distinctUntilChanged
 
+internal enum class ResourceSize(val queryValue: String) { SM("sm"), LG("lg") }
+
 internal class ManagedDeviceClient private constructor(
     private val peer: Peer,
     private val http: com.ismartcoding.plain.rust.graphql.PeerHttpClient,
@@ -95,12 +97,12 @@ internal class ManagedDeviceClient private constructor(
         }
     }
 
-    suspend fun resource(path: String, thumbnailSize: Int = 0): com.ismartcoding.plain.models.ManagedResource {
+    suspend fun resource(path: String, size: ResourceSize? = null): com.ismartcoding.plain.models.ManagedResource {
         val info = currentInfo
         val current = http.current()
         val fileId = http.encryptResourceReference(info.urlToken, path)
         val base = current.address?.baseUrl ?: error("peer_address_unavailable")
-        val url = managedResourceUrl(base, fileId, thumbnailSize)
+        val url = managedResourceUrl(base, fileId, size)
         return com.ismartcoding.plain.models.ManagedResource(url, checkNotNull(info.tlsCertificateSha256) { "peer_https_unavailable" })
     }
 
@@ -113,12 +115,8 @@ internal class ManagedDeviceClient private constructor(
     }
 }
 
-internal fun managedResourceUrl(base: String, fileId: String, thumbnailSize: Int): String =
+internal fun managedResourceUrl(base: String, fileId: String, size: ResourceSize?): String =
     URLBuilder(base.trimEnd('/') + "/fs").apply {
         parameters.append("id", fileId)
-        if (thumbnailSize > 0) {
-            parameters.append("w", thumbnailSize.toString())
-            parameters.append("h", thumbnailSize.toString())
-            parameters.append("cc", "false")
-        }
+        size?.let { parameters.append("s", it.queryValue) }
     }.buildString()
