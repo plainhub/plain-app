@@ -23,6 +23,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
+import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.unit.dp
 import com.ismartcoding.plain.ui.resources.Res as UiRes
@@ -58,9 +59,12 @@ fun ActionButtonMore(onClick: () -> Unit) {
 }
 
 @Composable
-fun ActionButtonMoreWithMenu(content: @Composable ColumnScope.(dismiss: () -> Unit) -> Unit) {
+fun ActionButtonMoreWithMenu(
+    icon: DrawableResource = UiRes.drawable.ui_drawable_ellipsis_vertical,
+    content: @Composable ColumnScope.(dismiss: () -> Unit) -> Unit,
+) {
     var isMenuOpen by remember { mutableStateOf(false) }
-    PIconButton(icon = UiRes.drawable.ui_drawable_ellipsis_vertical, contentDescription = stringResource(Res.string.more),
+    PIconButton(icon = icon, contentDescription = stringResource(Res.string.more),
         tint = MaterialTheme.colorScheme.onSurface, click = { isMenuOpen = true })
     PDropdownMenu(expanded = isMenuOpen, onDismissRequest = { isMenuOpen = false }) { content { isMenuOpen = false } }
 }

@@ -24,8 +24,15 @@ class YjsEncoder {
     }
 
     fun writeVarInt(value: Long) {
-        val signed = if (value < 0) (-value - 1) shl 1 or 1L else value shl 1
-        writeVarUint(signed)
+        var magnitude = if (value < 0) -value else value
+        val first = (magnitude and 0x3F).toInt() or if (value < 0) 0x40 else 0
+        magnitude = magnitude ushr 6
+        writeUint8(first or if (magnitude != 0L) 0x80 else 0)
+        while (magnitude != 0L) {
+            val next = (magnitude and 0x7F).toInt()
+            magnitude = magnitude ushr 7
+            writeUint8(next or if (magnitude != 0L) 0x80 else 0)
+        }
     }
 
     fun writeVarString(value: String) {

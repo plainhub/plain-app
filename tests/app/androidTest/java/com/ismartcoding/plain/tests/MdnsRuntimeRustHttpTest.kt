@@ -1,6 +1,9 @@
 package com.ismartcoding.plain.tests
 
-import com.ismartcoding.plain.rust.graphql.GraphqlRequest
+import com.ismartcoding.plain.graphql.Mutation
+import com.ismartcoding.plain.lib.JsonHelper
+import com.ismartcoding.plain.rust.host.network.MulticastPermissionRequest
+import kotlinx.serialization.Serializable
 import com.ismartcoding.plain.rust.graphql.GraphqlApi
 import com.ismartcoding.plain.rust.native.RustNativeApi
 
@@ -11,7 +14,7 @@ import kotlin.uuid.ExperimentalUuidApi
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.withTimeout
-import kotlinx.serialization.json.*
+import kotlinx.serialization.json.jsonObject
 import org.junit.Assert.*
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -19,65 +22,73 @@ import com.ismartcoding.plain.rust.host.network.MdnsMulticastHost
 
 @RunWith(AndroidJUnit4::class)
 class MdnsRuntimeRustHttpTest {
-    private suspend fun awaitReceiver() = withTimeout(10_000) {
-        while (!RustMdnsRuntime.snapshot().receiver) delay(50)
+    @Serializable
+    private data class MulticastReply(val result: Boolean)
+
+    private suspend fun awaitRunning() = withTimeout(10_000) {
+        while (!RustMdnsRuntime.snapshot().running) delay(50)
     }
     @OptIn(ExperimentalUuidApi::class)
     @Test
-    fun closedPhysicalLeaseCannotAcquireAfterReleaseOrReplaceTheCurrentOwner() = runBlocking {
-        awaitReceiver()
+    fun closedPhysicalLeaseCannotAcquireAfterReleaseAndIndependentLeasePreservesRuntime() = runBlocking {
+        awaitRunning()
         val closed = Uuid.random().toString()
-        fun physical(acquire: Boolean, lease: String) = MdnsMulticastHost.handle(buildJsonObject {
-            put("acquire", acquire); put("lease", lease)
-        }).encodeReply(0).let { Json.parseToJsonElement(it).jsonObject.getValue("result").jsonPrimitive.boolean }
+        val before = RustMdnsRuntime.snapshot()
+        fun physical(acquire: Boolean, lease: String) = JsonHelper.jsonDecode<MulticastReply>(
+            MdnsMulticastHost.handle(JsonHelper.jsonEncodeToElement(MulticastPermissionRequest(lease, acquire)).jsonObject).encodeReply(0)
+        ).result
         assertTrue(physical(false, closed))
         assertFalse(physical(true, closed))
-        assertFalse(physical(true, Uuid.random().toString()))
-        assertTrue(RustMdnsRuntime.snapshot().receiver)
+        val independent = Uuid.random().toString()
+        try {
+            assertTrue(physical(true, independent))
+            assertEquals(before.runtimeId, RustMdnsRuntime.snapshot().runtimeId)
+            assertTrue(RustMdnsRuntime.snapshot().running)
+        } finally { assertTrue(physical(false, independent)) }
+        assertTrue(RustMdnsRuntime.snapshot().running)
     }
 
     @OptIn(ExperimentalUuidApi::class)
     @Test
     fun rustControlsReceiverAndScannerWithActualAndroidMulticastPermission() = runBlocking {
-        awaitReceiver()
+        awaitRunning()
         suspend fun snapshot() = RustMdnsRuntime.snapshot()
         val before = snapshot()
         val debugToken = Uuid.random().toString()
+        val discoveryToken = Uuid.random().toString()
+        val nestedDiscoveryToken = Uuid.random().toString()
         try {
-            suspend fun discovering(): Boolean =
-                GraphqlApi.execute(GraphqlRequest<JsonObject>("query { isDiscovering }")).getValue("isDiscovering").jsonPrimitive.boolean
-            assertEquals(true, GraphqlApi.execute(GraphqlRequest<JsonObject>("mutation { startDiscovery }")).getValue("startDiscovery").jsonPrimitive.boolean)
-            assertTrue(discovering())
+            GraphqlApi.execute(Mutation.acquireDiscovery(discoveryToken))
             val started = snapshot()
-            assertTrue(started.receiver)
+            assertTrue(started.running)
             assertTrue(started.scanning)
             assertTrue(started.revision > before.revision)
-            assertEquals(true, GraphqlApi.execute(GraphqlRequest<JsonObject>("mutation { stopDiscovery }")).getValue("stopDiscovery").jsonPrimitive.boolean)
-            assertFalse(discovering())
+            GraphqlApi.execute(Mutation.releaseDiscovery(discoveryToken))
             val stopped = snapshot()
-            assertFalse(stopped.scanning)
-            assertTrue(stopped.receiver)
+            assertEquals(before.scanning, stopped.scanning)
+            assertTrue(stopped.running)
             assertTrue(stopped.revision > started.revision)
             assertTrue(snapshot().revision >= stopped.revision)
             RustMdnsRuntime.debugStart(debugToken)
-            assertTrue(snapshot().capturing)
-            val captured = RustMdnsRuntime.snapshot()
+            assertTrue(snapshot().scanning)
+            val captured = RustMdnsRuntime.snapshot(debug = true)
             val packets = captured.packetsOut
             assertEquals(captured.running, RustMdnsRuntime.running)
             if (RustNativeApi.lanIpv4Addresses().isEmpty()) {
                 assertTrue(packets.all { it.srcPort > 0 && it.size > 0 })
             } else assertTrue(packets.any { it.summary.contains("PTR") && it.detail.contains("_plainapp._tcp.local") && it.srcPort > 0 && it.size > 0 })
             assertTrue(captured.services.all { it.serviceType == "_plainapp._tcp.local" })
-            GraphqlApi.execute(GraphqlRequest<JsonObject>("mutation { stopDiscovery }"))
-            assertTrue(discovering())
+            GraphqlApi.execute(Mutation.acquireDiscovery(nestedDiscoveryToken))
+            GraphqlApi.execute(Mutation.releaseDiscovery(nestedDiscoveryToken))
+            assertTrue(snapshot().scanning)
             RustMdnsRuntime.debugStop(debugToken).await()
-            val cleaned = snapshot()
-            assertFalse(cleaned.scanning)
-            assertFalse(cleaned.capturing)
+            val cleaned = RustMdnsRuntime.snapshot(debug = true)
+            assertEquals(before.scanning, cleaned.scanning)
             assertTrue(cleaned.packetsOut.isEmpty())
         } finally {
             RustMdnsRuntime.debugStop(debugToken).await()
-            GraphqlApi.execute(GraphqlRequest<JsonObject>("mutation { " + (if (before.manualScanning) "startDiscovery" else "stopDiscovery") + " }"))
+            GraphqlApi.execute(Mutation.releaseDiscovery(discoveryToken))
+            GraphqlApi.execute(Mutation.releaseDiscovery(nestedDiscoveryToken))
         }
     }
 }

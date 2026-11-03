@@ -4,10 +4,11 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.runtime.DisposableEffect
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelStore
 import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
 import androidx.lifecycle.ViewModelStoreOwner
+import com.ismartcoding.plain.ui.app.DeviceIdentity
 import com.ismartcoding.plain.rust.graphql.ContentSource
 import com.ismartcoding.plain.ui.tools.ManagedDeviceViewModel
 import com.ismartcoding.plain.ui.tools.ManagedDeviceStatus
@@ -69,6 +70,23 @@ import com.ismartcoding.plain.ui.state.launchSafe
 import com.ismartcoding.plain.ui.tags.TagsViewModel
 import com.ismartcoding.plain.ui.tools.SoundMeterPage
 
+private class DeviceNavigationStore(initialDevice: DeviceIdentity?) : ViewModel(), ViewModelStoreOwner {
+    private var device = initialDevice
+    override var viewModelStore = ViewModelStore()
+        private set
+
+    fun selectDevice(selected: DeviceIdentity?) {
+        if (device == selected) return
+        viewModelStore.clear()
+        viewModelStore = ViewModelStore()
+        device = selected
+    }
+
+    override fun onCleared() {
+        viewModelStore.clear()
+    }
+}
+
 @Composable
 fun MainNavGraph(
     navController: NavHostController,
@@ -85,8 +103,8 @@ fun MainNavGraph(
     LaunchedEffect(peerVM) { peerVM.observe() }
     LaunchedEffect(channelVM) { channelVM.observe() }
     val selectedDevice by MainViewModel.selectedDevice
-    val deviceOwner = remember(selectedDevice) { object : ViewModelStoreOwner { override val viewModelStore = ViewModelStore() } }
-    DisposableEffect(deviceOwner) { onDispose { deviceOwner.viewModelStore.clear() } }
+    val deviceOwner = viewModel { DeviceNavigationStore(selectedDevice) }
+    deviceOwner.selectDevice(selectedDevice)
     val manager = selectedDevice?.let { device ->
         viewModel(viewModelStoreOwner = deviceOwner) { ManagedDeviceViewModel(device.peerId, device.publicKey) }
     }

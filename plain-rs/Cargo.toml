@@ -8,10 +8,14 @@ name = "plain_rust"
 crate-type = ["cdylib", "staticlib"]
 
 [dependencies]
+plain-libs = { git = "https://github.com/plainhub/plain-core.git", branch = "main", default-features = false }
 plain-server = { git = "https://github.com/plainhub/plain-core.git", branch = "main", default-features = false, features = ["core", "http_transport"] }
 plain-rs = { git = "https://github.com/plainhub/plain-core.git", branch = "main", default-features = false, features = ["ble-native", "prefs"] }
 serde_json = "1"
 tokio = { version = "1", features = ["rt-multi-thread", "sync"] }
+
+[target.'cfg(target_os = "ios")'.dependencies]
+plain-server = { git = "https://github.com/plainhub/plain-core.git", branch = "main", default-features = false, features = ["media"] }
 
 [target.'cfg(target_os = "android")'.dependencies]
 jni = "0.22"
@@ -24,13 +28,20 @@ incremental = true
 debug = 0
 
 [profile.dev.package."*"]
+debug = false
 opt-level = 3
 
 [profile.dev.package.plain-server]
 opt-level = 1
 
+[profile.dev.package.plain-libs]
+opt-level = 1
+
 [profile.dev.package.plain-rs]
 opt-level = 1
+
+[profile.dev.package.async-graphql]
+incremental = false
 
 [profile.release]
 opt-level = 3

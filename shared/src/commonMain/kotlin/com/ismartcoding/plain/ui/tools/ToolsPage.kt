@@ -31,9 +31,9 @@ import com.ismartcoding.plain.platform.system.has
 import com.ismartcoding.plain.i18n.Res
 import com.ismartcoding.plain.i18n.casting
 import com.ismartcoding.plain.i18n.casting_to
-import com.ismartcoding.plain.i18n.customize_home_features
+import com.ismartcoding.plain.i18n.customize_features
 import com.ismartcoding.plain.i18n.launcher_shortcuts
-import com.ismartcoding.plain.ui.components.ActionButtonAddWithMenu
+import com.ismartcoding.plain.ui.components.ActionButtonMoreWithMenu
 import com.ismartcoding.plain.ui.components.ToastManager
 import com.ismartcoding.plain.ui.base.PDropdownMenuItem
 import com.ismartcoding.plain.ui.navigation.DeviceTopAppBar
@@ -43,8 +43,9 @@ import com.ismartcoding.plain.ui.notes.components.QuickNoteCard
 import com.ismartcoding.plain.ui.navigation.Routing
 import com.ismartcoding.plain.ui.navigation.MainNavScaffold
 import com.ismartcoding.plain.ui.resources.Res as UiRes
-import com.ismartcoding.plain.ui.resources.grid_3x3 as ui_drawable_grid_3x3
-import com.ismartcoding.plain.ui.resources.layout_grid as ui_drawable_layout_grid
+import com.ismartcoding.plain.ui.resources.tune as ui_drawable_tune
+import com.ismartcoding.plain.ui.resources.square_arrow_out_up_right as ui_drawable_square_arrow_out_up_right
+import com.ismartcoding.plain.ui.resources.more_horiz as ui_drawable_more_horiz
 import com.ismartcoding.plain.ui.theme.greenText
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
@@ -80,12 +81,14 @@ fun ToolsPage(
             DeviceTopAppBar(
                 navController = navController,
                 actions = {
-                    if (source is com.ismartcoding.plain.rust.graphql.ContentSource.Local) ActionButtonAddWithMenu { dismiss ->
+                    if (source is com.ismartcoding.plain.rust.graphql.ContentSource.Local) ActionButtonMoreWithMenu(
+                        icon = UiRes.drawable.ui_drawable_more_horiz,
+                    ) { dismiss ->
                         PDropdownMenuItem(
-                            text = { Text(stringResource(Res.string.customize_home_features)) },
+                            text = { Text(stringResource(Res.string.customize_features)) },
                             leadingIcon = {
                                 Icon(
-                                    painter = painterResource(UiRes.drawable.ui_drawable_layout_grid),
+                                    painter = painterResource(UiRes.drawable.ui_drawable_tune),
                                     contentDescription = null,
                                 )
                             },
@@ -99,7 +102,7 @@ fun ToolsPage(
                                 text = { Text(stringResource(Res.string.launcher_shortcuts)) },
                                 leadingIcon = {
                                     Icon(
-                                        painter = painterResource(UiRes.drawable.ui_drawable_grid_3x3),
+                                        painter = painterResource(UiRes.drawable.ui_drawable_square_arrow_out_up_right),
                                         contentDescription = null,
                                     )
                                 },

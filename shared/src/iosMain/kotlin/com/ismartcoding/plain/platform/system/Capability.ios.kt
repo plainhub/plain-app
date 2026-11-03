@@ -9,6 +9,7 @@ actual fun getDeviceCapabilities(): List<Capability> = buildList {
         Capability.FEEDS, Capability.POMODORO, Capability.CLIPBOARD,
         Capability.IMAGE_LIBRARY, Capability.VIDEO_LIBRARY, Capability.AUDIO_LIBRARY,
         Capability.DOCUMENT_LIBRARY, Capability.MEDIA_DELETE, Capability.MEDIA_MOVE,
+        Capability.MEDIA_SCAN,
     ))
     if (isBluetoothSupported()) add(Capability.BLE_DISCOVERY)
     if (isAppForegrounded()) add(Capability.BACKGROUND_TIMER)

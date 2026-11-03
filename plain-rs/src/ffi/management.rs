@@ -42,8 +42,10 @@ fn tls_certificate_signature() -> String {
     reply!((|| -> Result<serde_json::Value, String> {
         let response = super::server::with_core(|core| {
             core.server.native_management()?;
-            let path = plain_rs::libs::data_paths::DataPaths::new(core.server.data_directory()).tls_identity();
-            plain_rs::libs::tls_identity::action(&path, r#"{"action":"get"}"#)
+            let path =
+                plain_rs::infrastructure::data_paths::DataPaths::new(core.server.data_directory())
+                    .tls_identity();
+            plain_rs::infrastructure::tls_identity::action(&path, r#"{"action":"get"}"#)
         })??;
         let value: serde_json::Value =
             serde_json::from_str(&response).map_err(|e| e.to_string())?;
@@ -307,7 +309,12 @@ pub extern "C" fn plain_toggle_notification_app(package_name: *const c_char) -> 
 #[cfg(target_os = "android")]
 mod android {
     use super::*;
-    use jni::{EnvUnowned, errors::ThrowRuntimeExAndDefault, objects::{JByteArray, JObject, JString}, sys::{jboolean, jstring}};
+    use jni::{
+        EnvUnowned,
+        errors::ThrowRuntimeExAndDefault,
+        objects::{JByteArray, JObject, JString},
+        sys::{jboolean, jstring},
+    };
 
     #[unsafe(no_mangle)]
     pub extern "system" fn Java_com_ismartcoding_plain_rust_native_RustNativeBindings_restartHttpServer(
@@ -529,10 +536,12 @@ mod android {
     }
     #[unsafe(no_mangle)]
     pub extern "system" fn Java_com_ismartcoding_plain_rust_native_RustNativeBindings_completeOnboarding(
-        mut env: EnvUnowned<'_>, _: JObject<'_>,
+        mut env: EnvUnowned<'_>,
+        _: JObject<'_>,
     ) -> jstring {
         env.with_env(|env| -> jni::errors::Result<_> { env.new_string(complete_onboarding()) })
-            .resolve::<ThrowRuntimeExAndDefault>().into_raw()
+            .resolve::<ThrowRuntimeExAndDefault>()
+            .into_raw()
     }
     #[unsafe(no_mangle)]
     pub extern "system" fn Java_com_ismartcoding_plain_rust_native_RustNativeBindings_toggleNotificationApp(

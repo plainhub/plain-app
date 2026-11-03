@@ -14,6 +14,8 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.draw.clip
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
@@ -32,6 +34,7 @@ internal fun ReorderableCollectionItemScope.EnabledFeatureCard(
     index: Int,
     onDisable: () -> Unit,
 ) {
+    val title = stringResource(feature.titleRes)
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -62,18 +65,18 @@ internal fun ReorderableCollectionItemScope.EnabledFeatureCard(
             HorizontalSpace(12.dp)
             PIcon(
                 icon = painterResource(feature.iconRes),
-                contentDescription = stringResource(feature.titleRes),
+                contentDescription = title,
                 modifier = Modifier.size(24.dp),
                 tint = MaterialTheme.colorScheme.primary,
             )
             HorizontalSpace(12.dp)
             Text(
-                text = stringResource(feature.titleRes),
+                text = title,
                 style = MaterialTheme.typography.listItemTitle(),
                 modifier = Modifier.weight(1f),
             )
             HorizontalSpace(8.dp)
-            Switch(checked = true, onCheckedChange = { onDisable() })
+            Switch(checked = true, onCheckedChange = { onDisable() }, modifier = Modifier.semantics { contentDescription = title })
         }
     }
 }
@@ -83,6 +86,7 @@ internal fun DisabledFeatureCard(
     feature: FeatureItem,
     onEnable: () -> Unit,
 ) {
+    val title = stringResource(feature.titleRes)
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -112,19 +116,19 @@ internal fun DisabledFeatureCard(
             HorizontalSpace(12.dp)
             PIcon(
                 icon = painterResource(feature.iconRes),
-                contentDescription = stringResource(feature.titleRes),
+                contentDescription = title,
                 modifier = Modifier.size(24.dp),
                 tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
             )
             HorizontalSpace(12.dp)
             Text(
-                text = stringResource(feature.titleRes),
+                text = title,
                 style = MaterialTheme.typography.listItemTitle(),
                 modifier = Modifier.weight(1f),
                 color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
             )
             HorizontalSpace(8.dp)
-            Switch(checked = false, onCheckedChange = { onEnable() })
+            Switch(checked = false, onCheckedChange = { onEnable() }, modifier = Modifier.semantics { contentDescription = title })
         }
     }
 }

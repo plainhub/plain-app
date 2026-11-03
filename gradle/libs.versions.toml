@@ -20,7 +20,6 @@ atomicfu = "0.33.0"
 kotlinxSerializationJsonVersion="1.11.0"
 kotlinxCoroutinesVersion ="1.11.0"
 ktor = "3.6.0"
-leakcanaryAndroidVersion = "2.14"
 lifecycleViewmodelKtxVersion="2.11.0"
 jetbrainsLifecycleViewmodel = "2.11.0"
 jetbrainsMarkdown = "0.7.18"
@@ -93,8 +92,6 @@ zxing-core = { module = "com.google.zxing:core", version.ref = "coreVersion" }
 
 
 androidx-work-runtime-ktx = { module = "androidx.work:work-runtime-ktx", version.ref = "workRuntimeKtxVersion" }
-# LeakCanary 2.x uses WorkManager as compileOnly; work-multiprocess provides RemoteListenableWorker
-androidx-work-multiprocess = { module = "androidx.work:work-multiprocess", version.ref = "workRuntimeKtxVersion" }
 
 # compose
 compose-ui = { module = "androidx.compose.ui:ui", version.ref = "compose" }
@@ -140,7 +137,6 @@ okhttp = { module = "com.squareup.okhttp3:okhttp", version.ref = "okhttpVersion"
 shizuku-api = { module = "dev.rikka.shizuku:api", version.ref = "shizukuVersion" }
 shizuku-provider = { module = "dev.rikka.shizuku:provider", version.ref = "shizukuVersion" }
 shizuku-aidl = { module = "dev.rikka.shizuku:aidl", version.ref = "shizukuVersion" }
-leakcanary-android = { module = "com.squareup.leakcanary:leakcanary-android", version.ref = "leakcanaryAndroidVersion" }
 tink-android = { module = "com.google.crypto.tink:tink-android", version.ref = "tinkAndroidVersion" }
 pdfium-android = { module = "io.github.oothp:pdfium-android", version.ref = "pdfiumAndroidVersion" }
 

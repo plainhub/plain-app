@@ -65,7 +65,7 @@ fun HomeFeaturesSelectionPage(navController: NavHostController) {
 
     PScaffold(
         topBar = {
-            PTopAppBar(onNavigateBack = { navController.navigateUp() }, title = stringResource(Res.string.customize_home_features))
+            PTopAppBar(onNavigateBack = { navController.navigateUp() }, title = stringResource(Res.string.customize_features))
         },
         content = { paddingValues ->
             LazyColumn(

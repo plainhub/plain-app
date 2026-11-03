@@ -69,6 +69,7 @@ kotlin {
             inputs.file(rootProject.file("plain-rs/Cargo.lock"))
             inputs.dir(rootProject.file("plain-rs/src"))
             outputs.file(rustTargetDir.map { it.file("$rustTarget/release/libplain_rust.a") })
+            outputs.upToDateWhen { false }
             webBundleDir?.let {
                 inputs.dir(it).withPropertyName("webBundle")
                 environment("PLAIN_WEB_DIST", it.absolutePath)

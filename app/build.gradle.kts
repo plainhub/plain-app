@@ -158,6 +158,7 @@ android {
     )
     if (providers.gradleProperty("plainUiTest").orNull == "true") {
         sourceSets.getByName("androidTest").kotlin.srcDir("../../plainapp-test/ui-test/android")
+        sourceSets.getByName("androidTest").assets.srcDir("../../plainapp-test/fixtures/acceptance")
     }
     if (providers.gradleProperty("plainAcceptance").orNull == "true") {
         sourceSets.getByName("androidTest").kotlin.srcDir("../../plainapp-test/android/src/androidTest/kotlin")
@@ -356,8 +357,6 @@ dependencies {
     implementation(libs.media3.dash)
     implementation(libs.media3.hls)
 
-    debugImplementation(libs.leakcanary.android)
-    debugImplementation(libs.androidx.work.multiprocess)
     implementation(kotlin("stdlib", libs.versions.kotlin.get()))
 
 }

@@ -18,12 +18,15 @@ import com.ismartcoding.plain.ui.media.viewer.previewer.MediaPreviewerState
 import com.ismartcoding.plain.ui.editor.markdown.MdEditorViewModel
 import com.ismartcoding.plain.ui.notes.NoteViewModel
 import com.ismartcoding.plain.ui.notes.NotesViewModel
+import com.ismartcoding.plain.ui.components.DialogHelper
+import com.ismartcoding.plain.ui.state.launchSafe
 import com.ismartcoding.plain.ui.tags.TagsViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.plus
 import androidx.compose.runtime.MutableState
 
 @OptIn(FlowPreview::class)
@@ -42,18 +45,24 @@ internal fun NotePageEffects(
         tagsVM.dataType.value = DataType.NOTE
         noteVM.editMode.value = true
         scope.launch(Dispatchers.Default) {
-            if (id.value.isNotEmpty()) {
-                val item = notesVM.api.getById(id.value)
-                noteVM.item.value = item
-                noteVM.content.value = item?.content ?: ""
+            if (!noteVM.editorInitialized.value) {
+                if (id.value.isNotEmpty()) {
+                    val item = notesVM.api.getById(id.value)
+                    noteVM.item.value = item
+                    noteVM.content.value = item?.content ?: ""
+                }
+                mdEditorVM.loadText(noteVM.content.value)
+                noteVM.editorInitialized.value = true
             }
-            mdEditorVM.loadText(noteVM.content.value)
             snapshotFlow { mdEditorVM.text() }.debounce(200).collectLatest { t ->
                 val isNew = id.value.isEmpty()
                 if (noteVM.content.value == t) return@collectLatest
-                scope.launch(Dispatchers.Default) {
+                (scope + Dispatchers.Default).launchSafe(onError = {
+                    DialogHelper.showErrorDialog(it.message ?: it.toString())
+                }) {
                     noteVM.content.value = t
                     val newItem = notesVM.api.save(id = id.value, title = "", content = t)
+                    noteVM.item.value = newItem
                     id.value = newItem.id
                     if (isNew && tagId.isNotEmpty()) {
                         tagsVM.api.edit(DataType.NOTE, listOf(id.value), listOf(tagId), emptyList())

@@ -176,9 +176,10 @@ final class PermissionChecker: NSObject, IosPermissionChecker {
         refreshNotificationStatus()
     }
 
-    func refreshNotificationStatus() {
+    func refreshNotificationStatus(completion: (() -> Void)? = nil) {
         UNUserNotificationCenter.current().getNotificationSettings { settings in
             self.cachedNotificationStatus = settings.authorizationStatus
+            completion?()
         }
     }
 
@@ -226,8 +227,9 @@ final class PermissionChecker: NSObject, IosPermissionChecker {
                 }
             case "POST_NOTIFICATIONS":
                 UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .badge, .sound]) { granted, _ in
-                    self.refreshNotificationStatus()
-                    IosPermissionCallback.shared.onPermissionResult(permissionName: permission, granted: granted)
+                    self.refreshNotificationStatus {
+                        IosPermissionCallback.shared.onPermissionResult(permissionName: permission, granted: granted)
+                    }
                 }
             default:
                 IosPermissionCallback.shared.onPermissionResult(permissionName: permission, granted: true)

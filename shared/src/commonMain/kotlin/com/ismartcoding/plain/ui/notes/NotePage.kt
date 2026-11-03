@@ -29,6 +29,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
@@ -82,7 +83,7 @@ fun NotePage(
     noteVM: NoteViewModel = viewModel { NoteViewModel() }, mdEditorVM: MdEditorViewModel = viewModel { MdEditorViewModel() },
     notesVM: NotesViewModel = NotesViewModel.local,
 ) {
-    val id = remember { mutableStateOf(initId) }
+    val id = rememberSaveable { mutableStateOf(initId) }
     val previewerState = rememberPreviewerState()
     val tagsState by tagsVM.itemsFlow.collectAsState()
     val tagsMapState by tagsVM.tagsMapFlow.collectAsState()

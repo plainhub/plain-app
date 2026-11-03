@@ -810,12 +810,12 @@ class ManagedDeviceUiAcceptanceTest {
             assertEquals(1, MainViewModel.currentRootTab.intValue)
             captureNavigation("local-chat")
             click(text(Res.string.tools), "local tools tab")
-            click(text(Res.string.add), "local tools actions")
-            click(text(Res.string.customize_home_features), "local customization remains available")
-            awaitNode("local customization page") { it.text == text(Res.string.customize_home_features) }
+            click(text(Res.string.more), "local tools actions")
+            click(text(Res.string.customize_features), "local customization remains available")
+            awaitNode("local customization page") { it.text == text(Res.string.customize_features) }
             awaitMainWindowFocus(scenario)
             click(text(Res.string.back), "return from local customization")
-            click(text(Res.string.services), "services tab")
+            click(text(Res.string.settings), "settings tab")
             awaitNode("Remote Access service") { it.text == text(Res.string.home_remote_access) }
             assertEquals(0, MainViewModel.currentRootTab.intValue)
             captureNavigation("local-services")

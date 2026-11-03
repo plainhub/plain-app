@@ -7,4 +7,4 @@
 
 mod bootstrap;
 mod ffi;
-pub use plain_rs::libs::ffi::ble;
+pub use plain_rs::infrastructure::ffi::ble;

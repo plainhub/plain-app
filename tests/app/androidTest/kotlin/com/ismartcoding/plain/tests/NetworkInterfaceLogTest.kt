@@ -54,15 +54,15 @@ class NetworkInterfaceLogTest {
         val before = RustMdnsRuntime.snapshot()
         try {
             val active = RustMdnsRuntime.debugStart(token)
-            assertTrue(active.receiver)
+            assertTrue(active.running)
             assertTrue(active.scanning)
             withTimeout(5_000) {
-                while (RustMdnsRuntime.snapshot().packetsOut.none { it.summary.contains("PTR") }) delay(50)
+                while (RustMdnsRuntime.snapshot(debug = true).packetsOut.none { it.summary.contains("PTR") }) delay(50)
             }
         } finally {
             val after = RustMdnsRuntime.debugStop(token).await()
-            assertEquals(before.manualScanning, after.manualScanning)
-            assertEquals(before.capturing, after.capturing)
+            assertEquals(before.scanning, after.scanning)
+            assertEquals(before.running, after.running)
         }
     }
 

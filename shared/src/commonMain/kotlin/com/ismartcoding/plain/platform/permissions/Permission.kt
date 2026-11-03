@@ -3,7 +3,9 @@ package com.ismartcoding.plain.platform.permissions
 import com.ismartcoding.plain.events.RequestPermissionsEvent
 import com.ismartcoding.plain.lib.sendEvent
 import com.ismartcoding.plain.Prefs
+import kotlinx.serialization.Serializable
 
+@Serializable
 enum class Permission {
     WRITE_EXTERNAL_STORAGE,
     READ_SMS,

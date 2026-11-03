@@ -12,9 +12,13 @@ import com.ismartcoding.plain.ui.components.ActionButtonAddWithMenu
 import com.ismartcoding.plain.ui.components.ActionButtonFolders
 import com.ismartcoding.plain.ui.base.PDropdownMenuItem
 import com.ismartcoding.plain.ui.navigation.DeviceTopAppBar
+import com.ismartcoding.plain.ui.navigation.LocalContentSource
+import com.ismartcoding.plain.ui.navigation.Routing
+import com.ismartcoding.plain.rust.graphql.ContentSource
 import com.ismartcoding.plain.ui.navigation.navigateAppFiles
 import com.ismartcoding.plain.ui.resources.Res as UiRes
 import com.ismartcoding.plain.ui.resources.hash as ui_drawable_hash
+import com.ismartcoding.plain.ui.resources.plus as ui_drawable_plus
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -22,6 +26,7 @@ fun TopBarChat(
     navController: NavHostController,
     onCreateChannel: () -> Unit,
 ) {
+    val local = LocalContentSource.current is ContentSource.Local
     DeviceTopAppBar(
         navController = navController,
         actions = {
@@ -40,6 +45,19 @@ fun TopBarChat(
                     onClick = {
                         dismiss()
                         onCreateChannel()
+                    },
+                )
+                if (local) PDropdownMenuItem(
+                    text = { Text(stringResource(Res.string.pair_device)) },
+                    leadingIcon = {
+                        Icon(
+                            painter = painterResource(UiRes.drawable.ui_drawable_plus),
+                            contentDescription = null,
+                        )
+                    },
+                    onClick = {
+                        dismiss()
+                        navController.navigate(Routing.Nearby)
                     },
                 )
             }
