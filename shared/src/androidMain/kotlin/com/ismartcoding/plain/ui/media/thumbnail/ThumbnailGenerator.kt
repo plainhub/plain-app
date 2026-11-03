@@ -37,7 +37,7 @@ import java.io.File
  *  4. Fallback → Coil (for formats BitmapFactory cannot decode, e.g. AVIF, HEIC).
  *
  * Encoding:
- *  JPEG at quality 85 — ~4-8× faster to encode than WebP, sufficient for thumbnails.
+ *  PNG preserves source PNG alpha; other formats use JPEG at quality 85.
  *
  * Caching:
  *  Root manages thumbnail requests and the disk cache.
@@ -76,7 +76,7 @@ object ThumbnailGenerator {
         // MediaStore thumbnail via ContentResolver.loadThumbnail (API 29+).
         // Covers images, videos, and audio. For images/audio we only attempt this when
         // mediaId is known (path lookup would require a full content-resolver scan).
-        if (isQPlus()) {
+        if (isQPlus() && !effectiveName.endsWith(".png", true)) {
             val isMedia = effectiveName.isVideoFast() || effectiveName.isImageFast() || effectiveName.isAudioFast()
             if (isMedia && (centerCrop || !effectiveName.isImageFast())) {
                 val contentUri = when {
@@ -163,14 +163,14 @@ object ThumbnailGenerator {
         fileName: String,
     ): ByteArray? = DecodeLimiter.withPermit {
         val bitmap = getBitmapAsync(context, file, width, height, centerCrop, mediaId, fileName) ?: return@withPermit null
-        compressToJpeg(bitmap)
+        compressThumbnail(bitmap, file.extension.equals("png", ignoreCase = true))
     }
 
-    /** Compress to JPEG (quality 85 — ~4-8× faster to encode than WebP) and recycle the bitmap. */
-    private fun compressToJpeg(bitmap: Bitmap): ByteArray {
+    private fun compressThumbnail(bitmap: Bitmap, png: Boolean): ByteArray {
         val stream = ByteArrayOutputStream()
         return try {
-            check(bitmap.compress(Bitmap.CompressFormat.JPEG, 85, stream)) { "Thumbnail JPEG encoding failed" }
+            val format = if (png) Bitmap.CompressFormat.PNG else Bitmap.CompressFormat.JPEG
+            check(bitmap.compress(format, 85, stream)) { "Thumbnail encoding failed" }
             stream.toByteArray()
         } finally { bitmap.recycle() }
     }
