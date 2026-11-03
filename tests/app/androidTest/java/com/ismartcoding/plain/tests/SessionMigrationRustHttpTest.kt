@@ -6,6 +6,7 @@ import com.ismartcoding.plain.rust.RustRuntime
 import com.ismartcoding.plain.ui.app.MainViewModel
 import androidx.compose.runtime.snapshotFlow
 
+import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.ismartcoding.plain.Prefs
 import com.ismartcoding.plain.features.sessions.AuthRequest
@@ -44,7 +45,8 @@ class SessionMigrationRustHttpTest {
             Prefs.setLoginRequireApproval(true)
             withIO { RustRuntime.start() }
             val client = generateECDHKeyPair()
-            val digest = MessageDigest.getInstance("SHA-512").digest(Prefs.password.value.encodeToByteArray()).joinToString("") { "%02x".format(it) }
+            val fixturePassword = requireNotNull(InstrumentationRegistry.getArguments().getString("loginPassword")) { "Supply the owned fixture loginPassword argument" }
+            val digest = MessageDigest.getInstance("SHA-512").digest(fixturePassword.encodeToByteArray()).joinToString("") { "%02x".format(it) }
             val passwordKey = digest.take(32).encodeToByteArray()
             val request = AuthRequest(digest, "Fixture", "1", "Android", "1", true,
                 Base64Lenient.encode(client.publicKeyEncoded))

@@ -67,7 +67,7 @@ internal object RustNativeApi {
 
     suspend fun checkAppUpdate(automatic: Boolean): String = nativeCall { RustNativeBindings.checkAppUpdate(automatic) }
 
-    suspend fun resetPassword(): Boolean = nativeCall { RustNativeBindings.resetPassword() }
+    suspend fun resetPassword(): String = nativeCall { RustNativeBindings.resetPassword() }
 
     suspend fun resetUrlToken(): Boolean = nativeCall { RustNativeBindings.resetUrlToken() }
 

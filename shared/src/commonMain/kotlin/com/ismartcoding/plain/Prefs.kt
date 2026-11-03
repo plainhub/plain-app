@@ -27,7 +27,6 @@ import kotlinx.serialization.json.int
 import kotlinx.serialization.json.jsonPrimitive
 
 object Prefs {
-    val password = MutableStateFlow("")
     val passwordType = MutableStateFlow(PasswordType.NONE)
     val loginRequireApproval = MutableStateFlow(false)
     val rotateUrlTokenOnRestart = MutableStateFlow(false)
@@ -111,7 +110,6 @@ object Prefs {
 
     internal fun update(key: String, value: JsonElement) {
         when (key) {
-            PrefKeys.PASSWORD -> password.value = value.jsonPrimitive.content
             PrefKeys.PASSWORD_TYPE -> passwordType.value = PasswordType.valueOf(value.jsonPrimitive.content)
             PrefKeys.LOGIN_REQUIRE_APPROVAL -> loginRequireApproval.value = value.jsonPrimitive.boolean
             PrefKeys.ROTATE_URL_TOKEN_ON_RESTART -> rotateUrlTokenOnRestart.value = value.jsonPrimitive.boolean

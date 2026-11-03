@@ -46,15 +46,14 @@ import kotlinx.coroutines.launch
 fun WebSecurityPage(navController: NavHostController) {
     val scope = rememberCoroutineScope()
     val passwordType = Prefs.passwordType.collectAsStateValue()
-    val password = Prefs.password.collectAsStateValue()
     val loginRequireApproval = Prefs.loginRequireApproval.collectAsStateValue()
     val rotateUrlTokenOnRestart = Prefs.rotateUrlTokenOnRestart.collectAsStateValue()
     val urlToken = Prefs.urlToken.collectAsStateValue()
     var sslSignature by remember { mutableStateOf("") }
     val editPassword = remember { mutableStateOf("") }
+    var passwordSaved by remember { mutableStateOf(true) }
 
-    LaunchedEffect(password) {
-        if (editPassword.value != password) editPassword.value = password
+    LaunchedEffect(Unit) {
         scope.launch(Dispatchers.Default) {
             try {
                 sslSignature = RustNativeApi.tlsCertificateSignature().toSignature()
@@ -89,13 +88,21 @@ fun WebSecurityPage(navController: NavHostController) {
                         }
                         if (passwordType != PasswordType.NONE) {
                             PasswordTextField(
-                                value = editPassword.value, isChanged = { editPassword.value != password },
-                                onValueChange = { editPassword.value = it }, onConfirm = { scope.launch(Dispatchers.Default) { Prefs.setPassword(it )} })
+                                value = editPassword.value, isChanged = { !passwordSaved },
+                                onValueChange = { editPassword.value = it; passwordSaved = false },
+                                onConfirm = { value -> scope.launch {
+                                    Prefs.setPassword(value)
+                                    editPassword.value = ""
+                                    passwordSaved = true
+                                } })
                             PFilledButton(
                                 modifier = Modifier.padding(start = 16.dp, top = 8.dp, bottom = 16.dp),
                                 text = stringResource(Res.string.generate_password),
                                 buttonSize = ButtonSize.MEDIUM,
-                                onClick = { scope.launch(Dispatchers.Default) { Prefs.resetPassword() } })
+                                onClick = { scope.launch {
+                                    editPassword.value = Prefs.resetPassword()
+                                    passwordSaved = true
+                                } })
                         }
                     }
                 }
