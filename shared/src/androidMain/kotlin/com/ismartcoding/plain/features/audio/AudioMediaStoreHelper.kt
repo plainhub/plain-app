@@ -1,5 +1,7 @@
 package com.ismartcoding.plain.features.audio
 
+import com.ismartcoding.plain.platform.system.getDeviceCapabilities
+import com.ismartcoding.plain.platform.system.Capability
 import com.ismartcoding.plain.models.Audio as AudioTrack
 import com.ismartcoding.plain.helpers.ContentWhere
 import android.content.Context
@@ -12,9 +14,7 @@ import com.ismartcoding.plain.lib.extensions.getTimeSecondsValue
 import com.ismartcoding.plain.lib.extensions.map
 import com.ismartcoding.plain.lib.withIO
 import com.ismartcoding.plain.platform.isQPlus
-import com.ismartcoding.plain.platform.system.AppFeatureType
 import com.ismartcoding.plain.features.media.MediaType
-import com.ismartcoding.plain.platform.system.has
 import com.ismartcoding.plain.features.files.FileSortBy
 import com.ismartcoding.plain.features.files.toSortBy
 import com.ismartcoding.plain.platform.media.provider.BaseMediaContentHelper
@@ -38,7 +38,7 @@ object AudioMediaStoreHelper : BaseMediaContentHelper() {
 
         if (isQPlus()) {
             projection.add(MediaStore.Audio.Media.BUCKET_ID)
-            if (AppFeatureType.MEDIA_FAVORITE.has()) {
+            if (Capability.MEDIA_FAVORITE in getDeviceCapabilities()) {
                 projection.add(MediaStore.Audio.Media.IS_FAVORITE)
             }
         }

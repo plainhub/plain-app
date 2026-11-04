@@ -1,5 +1,7 @@
 package com.ismartcoding.plain.ui.media
 
+import com.ismartcoding.plain.platform.system.getDeviceCapabilities
+import com.ismartcoding.plain.platform.system.Capability
 import com.ismartcoding.plain.i18n.*
 
 import androidx.compose.foundation.layout.Column
@@ -23,9 +25,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.ismartcoding.plain.IData
-import com.ismartcoding.plain.platform.system.AppFeatureType
 import com.ismartcoding.plain.platform.system.DataType
-import com.ismartcoding.plain.platform.system.has
 import com.ismartcoding.plain.ui.base.BottomSpace
 import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.components.MediaSidebarBucketItem
@@ -120,7 +120,7 @@ fun <T : IData> MediaSidebarDrawer(
         )
 
         // Trash
-        if (AppFeatureType.MEDIA_TRASH.has()) {
+        if (Capability.MEDIA_TRASH in getDeviceCapabilities()) {
             SidebarItem(
                 label = stringResource(Res.string.trash),
                 icon = UiRes.drawable.ui_drawable_trash_2,

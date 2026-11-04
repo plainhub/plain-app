@@ -22,12 +22,8 @@ enum class AppFeatureType {
     NOTIFICATIONS,
     CHECK_UPDATES,
     MIRROR_AUDIO,
-    MEDIA_TRASH,
-    MEDIA_DELETE,
-    MEDIA_MOVE,
     DONATION,
     DLNA_RECEIVER,
-    MEDIA_FAVORITE,
     IMAGE_EDITOR;
 
     fun getPermission(): FeaturePermission? {

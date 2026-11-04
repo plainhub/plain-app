@@ -17,10 +17,6 @@ private fun AppFeatureType.requiredCapability(): Capability? = when (this) {
         AppFeatureType.CONTACTS -> Capability.CONTACTS
         AppFeatureType.NOTIFICATIONS -> Capability.NOTIFICATIONS
         AppFeatureType.MIRROR_AUDIO -> Capability.MIRROR_AUDIO
-        AppFeatureType.MEDIA_TRASH -> Capability.MEDIA_TRASH
-        AppFeatureType.MEDIA_DELETE -> Capability.MEDIA_DELETE
-        AppFeatureType.MEDIA_MOVE -> Capability.MEDIA_MOVE
-        AppFeatureType.MEDIA_FAVORITE -> Capability.MEDIA_FAVORITE
         AppFeatureType.IMAGE_EDITOR -> Capability.IMAGE_EDITOR
         AppFeatureType.NOTES -> Capability.NOTES
         AppFeatureType.FEEDS -> Capability.FEEDS

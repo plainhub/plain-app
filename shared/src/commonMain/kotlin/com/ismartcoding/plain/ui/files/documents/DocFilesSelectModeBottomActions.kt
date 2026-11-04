@@ -1,5 +1,6 @@
 package com.ismartcoding.plain.ui.files.documents
 
+import com.ismartcoding.plain.platform.system.Capability
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
@@ -9,8 +10,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
-import com.ismartcoding.plain.platform.system.AppFeatureType
-import com.ismartcoding.plain.platform.system.has
 import com.ismartcoding.plain.models.Tag
 import com.ismartcoding.plain.i18n.Res
 import com.ismartcoding.plain.i18n.confirm_to_delete
@@ -68,7 +67,7 @@ fun DocFilesSelectModeBottomActions(
                     docsVM.share(selectedIds.toList())
                 }
             }
-            if (AppFeatureType.MEDIA_TRASH.has(docsVM.source.capabilities)) {
+            if (Capability.MEDIA_TRASH in docsVM.source.capabilities) {
                 if (docsVM.trash.value) {
                     IconTextSmallButtonRestore {
                         docsVM.restore(tagsVM, dragSelectState.selectedIds.toSet())

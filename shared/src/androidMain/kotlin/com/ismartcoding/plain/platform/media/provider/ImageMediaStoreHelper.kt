@@ -1,5 +1,7 @@
 package com.ismartcoding.plain.platform.media.provider
 
+import com.ismartcoding.plain.platform.system.getDeviceCapabilities
+import com.ismartcoding.plain.platform.system.Capability
 import com.ismartcoding.plain.models.Image as MediaImage
 import com.ismartcoding.plain.helpers.ContentWhere
 import android.content.Context
@@ -12,9 +14,7 @@ import com.ismartcoding.plain.lib.extensions.getTimeSecondsValue
 import com.ismartcoding.plain.lib.extensions.map
 import com.ismartcoding.plain.lib.withIO
 import com.ismartcoding.plain.platform.isQPlus
-import com.ismartcoding.plain.platform.system.AppFeatureType
 import com.ismartcoding.plain.features.media.MediaType
-import com.ismartcoding.plain.platform.system.has
 import com.ismartcoding.plain.features.files.FileSortBy
 import com.ismartcoding.plain.features.files.toSortBy
 import kotlin.time.Instant
@@ -37,7 +37,7 @@ object ImageMediaStoreHelper : BaseMediaContentHelper() {
             MediaStore.Images.Media.ORIENTATION,
             MediaStore.Images.Media.BUCKET_ID,
         )
-        if (AppFeatureType.MEDIA_FAVORITE.has()) {
+        if (Capability.MEDIA_FAVORITE in getDeviceCapabilities()) {
             projection.add(MediaStore.Images.Media.IS_FAVORITE)
         }
         return projection.toTypedArray()
@@ -63,7 +63,7 @@ object ImageMediaStoreHelper : BaseMediaContentHelper() {
             val rotation = cursor.getIntValue(MediaStore.Images.Media.ORIENTATION, cache)
             val path = cursor.getStringValue(MediaStore.Images.Media.DATA, cache)
             val bucketId = cursor.getStringValue(MediaStore.Images.Media.BUCKET_ID, cache)
-            val isFavorite = if (AppFeatureType.MEDIA_FAVORITE.has()) cursor.getIntValue(MediaStore.Images.Media.IS_FAVORITE, cache) == 1 else false
+            val isFavorite = if (Capability.MEDIA_FAVORITE in getDeviceCapabilities()) cursor.getIntValue(MediaStore.Images.Media.IS_FAVORITE, cache) == 1 else false
             MediaImage(id = id, title = title, path = path, size = size, width = width, height = height, rotation = rotation, bucketId = bucketId, createdAt = createdAt, updatedAt = updatedAt, takenAt = takenAt, isFavorite = isFavorite)
         } ?: emptyList()
     }

@@ -12,8 +12,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import com.ismartcoding.plain.platform.system.AppFeatureType
-import com.ismartcoding.plain.platform.system.has
 import com.ismartcoding.plain.lib.extensions.getFilenameWithoutExtensionFromPath
 import com.ismartcoding.plain.lib.extensions.isUrl
 import com.ismartcoding.plain.ui.app.MainViewModel
@@ -95,19 +93,19 @@ internal fun ViewImageActionButtons(
                     imagesVM.showRenameDialog.value = true
                 }
             }
-            if (AppFeatureType.MEDIA_TRASH.has(imagesVM.source.capabilities) && !imagesVM.trash.value) {
+            if (Capability.MEDIA_TRASH in imagesVM.source.capabilities && !imagesVM.trash.value) {
                 PSheetPrimaryTrashAction(stringResource(Res.string.trash)) {
                     imagesVM.trash(tagsVM, setOf(m.id))
                     onDismiss()
                 }
             }
-            if (AppFeatureType.MEDIA_TRASH.has(imagesVM.source.capabilities) && imagesVM.trash.value) {
+            if (Capability.MEDIA_TRASH in imagesVM.source.capabilities && imagesVM.trash.value) {
                 PSheetPrimaryAction(UiRes.drawable.ui_drawable_archive_restore, stringResource(Res.string.restore)) {
                     imagesVM.restore(tagsVM, setOf(m.id))
                     onDismiss()
                 }
             }
-            if (!AppFeatureType.MEDIA_TRASH.has(imagesVM.source.capabilities) || imagesVM.trash.value) {
+            if (Capability.MEDIA_TRASH !in imagesVM.source.capabilities || imagesVM.trash.value) {
                 PSheetPrimaryDeleteAction(stringResource(Res.string.delete)) {
                     scope.launch {
                         confirmActionAsync(

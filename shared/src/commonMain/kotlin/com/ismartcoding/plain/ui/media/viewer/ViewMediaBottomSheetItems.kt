@@ -1,5 +1,6 @@
 package com.ismartcoding.plain.ui.media.viewer
 
+import com.ismartcoding.plain.platform.system.Capability
 import com.ismartcoding.plain.ui.state.launchSafe
 import androidx.compose.foundation.layout.Column
 import com.ismartcoding.plain.features.chat.models.MessageFile
@@ -12,8 +13,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.ismartcoding.plain.platform.system.AppFeatureType
-import com.ismartcoding.plain.platform.system.has
 import com.ismartcoding.plain.models.Image
 import com.ismartcoding.plain.models.Video
 import com.ismartcoding.plain.i18n.*
@@ -69,12 +68,12 @@ internal fun ViewMediaActionButtons(
             PSheetPrimaryAction(UiRes.drawable.ui_drawable_cast, stringResource(Res.string.cast)) { onCast() }
         }
         if (isMediaFile) {
-            if (renameInPrimary && AppFeatureType.MEDIA_MOVE.has(m.source.capabilities)) {
+            if (renameInPrimary && Capability.MEDIA_MOVE in m.source.capabilities) {
                 PSheetPrimaryAction(UiRes.drawable.ui_drawable_pen, stringResource(Res.string.rename)) {
                     onShowRenameDialog()
                 }
             }
-            if (AppFeatureType.MEDIA_DELETE.has(m.source.capabilities)) PSheetPrimaryDeleteAction(stringResource(Res.string.delete)) {
+            if (Capability.MEDIA_DELETE in m.source.capabilities) PSheetPrimaryDeleteAction(stringResource(Res.string.delete)) {
                 scope.launch {
                     confirmActionAsync(
                         Res.string.delete,
@@ -89,7 +88,7 @@ internal fun ViewMediaActionButtons(
             }
         }
     }
-    if (!renameInPrimary && AppFeatureType.MEDIA_MOVE.has(m.source.capabilities)) {
+    if (!renameInPrimary && Capability.MEDIA_MOVE in m.source.capabilities) {
         VerticalSpace(16.dp)
         PCard(modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN)) {
             PSheetActionRow(UiRes.drawable.ui_drawable_pen, stringResource(Res.string.rename)) {

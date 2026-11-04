@@ -1,5 +1,6 @@
 package com.ismartcoding.plain.ui.files.documents
 
+import com.ismartcoding.plain.platform.system.Capability
 import androidx.lifecycle.viewModelScope
 import com.ismartcoding.plain.ui.state.launchSafe
 import com.ismartcoding.plain.ui.components.DialogHelper
@@ -15,9 +16,7 @@ import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import com.ismartcoding.plain.lib.withIO
-import com.ismartcoding.plain.platform.system.AppFeatureType
 import com.ismartcoding.plain.platform.system.DataType
-import com.ismartcoding.plain.platform.system.has
 
 class DocsViewModel internal constructor(source: ContentSource = ContentSource.Local) : BaseMediaViewModel<Document>(source) {
     override val dataType = DataType.DOC
@@ -55,7 +54,7 @@ class DocsViewModel internal constructor(source: ContentSource = ContentSource.L
         noMore.value = _itemsFlow.value.size < limit.intValue
         if (!trash.value) {
             val extGroups = source.catalog.docExtGroups(super.getQuery())
-            val trashTabs = if (AppFeatureType.MEDIA_TRASH.has(source.capabilities)) listOf(VTabData(LocaleHelper.getStringAsync(Res.string.trash), "trash", totalTrash.intValue)) else emptyList()
+            val trashTabs = if (Capability.MEDIA_TRASH in source.capabilities) listOf(VTabData(LocaleHelper.getStringAsync(Res.string.trash), "trash", totalTrash.intValue)) else emptyList()
             val extensions = extGroups.map { VTabData(it.first, it.first.lowercase(), it.second) }
             tabs.value = listOf(VTabData(LocaleHelper.getStringAsync(Res.string.all), "", total.intValue)) + trashTabs + extensions
         }

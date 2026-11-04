@@ -19,8 +19,6 @@ import androidx.compose.runtime.remember
 import org.jetbrains.compose.resources.stringResource
 import com.ismartcoding.plain.lib.extensions.getFilenameWithoutExtensionFromPath
 import com.ismartcoding.plain.lib.extensions.isUrl
-import com.ismartcoding.plain.platform.system.AppFeatureType
-import com.ismartcoding.plain.platform.system.has
 import com.ismartcoding.plain.ui.app.MainViewModel
 import com.ismartcoding.plain.platform.system.Capability
 import com.ismartcoding.plain.platform.system.getDeviceCapabilities
@@ -97,19 +95,19 @@ internal fun VideoActionButtons(
                     videosVM.showRenameDialog.value = true
                 }
             }
-            if (AppFeatureType.MEDIA_TRASH.has(videosVM.source.capabilities) && !videosVM.trash.value) {
+            if (Capability.MEDIA_TRASH in videosVM.source.capabilities && !videosVM.trash.value) {
                 PSheetPrimaryTrashAction(stringResource(Res.string.trash)) {
                     videosVM.trash(tagsVM, setOf(m.id))
                     onDismiss()
                 }
             }
-            if (AppFeatureType.MEDIA_TRASH.has(videosVM.source.capabilities) && videosVM.trash.value) {
+            if (Capability.MEDIA_TRASH in videosVM.source.capabilities && videosVM.trash.value) {
                 PSheetPrimaryAction(UiRes.drawable.ui_drawable_archive_restore, stringResource(Res.string.restore)) {
                     videosVM.restore(tagsVM, setOf(m.id))
                     onDismiss()
                 }
             }
-            if (!AppFeatureType.MEDIA_TRASH.has(videosVM.source.capabilities) || videosVM.trash.value) {
+            if (Capability.MEDIA_TRASH !in videosVM.source.capabilities || videosVM.trash.value) {
                 PSheetPrimaryDeleteAction(stringResource(Res.string.delete)) {
                     scope.launch {
                         confirmActionAsync(

@@ -16,8 +16,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
-import com.ismartcoding.plain.platform.system.AppFeatureType
-import com.ismartcoding.plain.platform.system.has
 import com.ismartcoding.plain.models.Tag
 import com.ismartcoding.plain.models.TagRelation
 import com.ismartcoding.plain.i18n.*
@@ -137,20 +135,20 @@ fun ViewDocBottomSheet(
                             PSheetPrimaryAction(UiRes.drawable.ui_drawable_pen, stringResource(Res.string.rename)) {
                                 docsVM.showRenameDialog.value = true
                             }
-                            if (AppFeatureType.MEDIA_TRASH.has(docsVM.source.capabilities)) {
+                            if (Capability.MEDIA_TRASH in docsVM.source.capabilities) {
                                 PSheetPrimaryTrashAction(stringResource(Res.string.trash)) {
                                     docsVM.trash(tagsVM, setOf(m.id))
                                     onDismiss()
                                 }
                             }
                         }
-                        if (AppFeatureType.MEDIA_TRASH.has(docsVM.source.capabilities) && docsVM.trash.value) {
+                        if (Capability.MEDIA_TRASH in docsVM.source.capabilities && docsVM.trash.value) {
                             PSheetPrimaryAction(UiRes.drawable.ui_drawable_archive_restore, stringResource(Res.string.restore)) {
                                 docsVM.restore(tagsVM, setOf(m.id))
                                 onDismiss()
                             }
                         }
-                        if (!AppFeatureType.MEDIA_TRASH.has(docsVM.source.capabilities) || docsVM.trash.value) {
+                        if (Capability.MEDIA_TRASH !in docsVM.source.capabilities || docsVM.trash.value) {
                             PSheetPrimaryDeleteAction(stringResource(Res.string.delete)) {
                                 scope.launch {
                                     confirmActionAsync(

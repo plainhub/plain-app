@@ -1,6 +1,8 @@
 package com.ismartcoding.plain.platform.media.provider
 
 
+import com.ismartcoding.plain.platform.system.getDeviceCapabilities
+import com.ismartcoding.plain.platform.system.Capability
 import com.ismartcoding.plain.models.Video as MediaVideo
 import com.ismartcoding.plain.helpers.ContentWhere
 import android.content.Context
@@ -13,9 +15,7 @@ import com.ismartcoding.plain.lib.extensions.getTimeSecondsValue
 import com.ismartcoding.plain.lib.extensions.map
 import com.ismartcoding.plain.lib.withIO
 import com.ismartcoding.plain.platform.isQPlus
-import com.ismartcoding.plain.platform.system.AppFeatureType
 import com.ismartcoding.plain.features.media.MediaType
-import com.ismartcoding.plain.platform.system.has
 import com.ismartcoding.plain.features.files.FileSortBy
 import com.ismartcoding.plain.features.files.toSortBy
 import kotlin.time.Instant
@@ -41,7 +41,7 @@ object VideoMediaStoreHelper : BaseMediaContentHelper() {
         )
         if (isQPlus()) {
             projection.add(MediaStore.Video.Media.ORIENTATION)
-            if (AppFeatureType.MEDIA_FAVORITE.has()) {
+            if (Capability.MEDIA_FAVORITE in getDeviceCapabilities()) {
                 projection.add(MediaStore.Video.Media.IS_FAVORITE)
             }
         }
@@ -72,7 +72,7 @@ object VideoMediaStoreHelper : BaseMediaContentHelper() {
             val bucketId = cursor.getStringValue(MediaStore.Video.Media.BUCKET_ID, cache)
             val dateTakenMs = cursor.getLongValue(MediaStore.Video.Media.DATE_TAKEN, cache)
             val takenAt = if (dateTakenMs > 0) Instant.fromEpochMilliseconds(dateTakenMs) else null
-            val isFavorite = if (AppFeatureType.MEDIA_FAVORITE.has()) cursor.getIntValue(MediaStore.Video.Media.IS_FAVORITE, cache) == 1 else false
+            val isFavorite = if (Capability.MEDIA_FAVORITE in getDeviceCapabilities()) cursor.getIntValue(MediaStore.Video.Media.IS_FAVORITE, cache) == 1 else false
 
             val video = MediaVideo(id = id, title = title, path = path, durationMs = durationMs, size = size, width = width, height = height, rotation = rotation, bucketId = bucketId, createdAt = createdAt, updatedAt = updatedAt, takenAt = takenAt, isFavorite = isFavorite)
             videos.add(video)

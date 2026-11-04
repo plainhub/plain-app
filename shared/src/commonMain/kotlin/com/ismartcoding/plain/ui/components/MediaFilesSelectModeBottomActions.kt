@@ -1,5 +1,7 @@
 package com.ismartcoding.plain.ui.components
 
+import com.ismartcoding.plain.platform.system.getDeviceCapabilities
+import com.ismartcoding.plain.platform.system.Capability
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
@@ -12,8 +14,6 @@ import com.ismartcoding.plain.IData
 import com.ismartcoding.plain.features.media.MediaCatalogClient
 import com.ismartcoding.plain.lib.withIO
 import com.ismartcoding.plain.ui.state.launchSafe
-import com.ismartcoding.plain.platform.system.AppFeatureType
-import com.ismartcoding.plain.platform.system.has
 import com.ismartcoding.plain.models.Tag
 import com.ismartcoding.plain.i18n.Res
 import com.ismartcoding.plain.i18n.confirm_to_delete
@@ -70,13 +70,13 @@ fun <T : IData> MediaFilesSelectModeBottomActions(
                     shareFiles(uris)
                 }
             }
-            if (AppFeatureType.MEDIA_TRASH.has()) {
+            if (Capability.MEDIA_TRASH in getDeviceCapabilities()) {
                 if (isInTrashMode) {
                     IconTextSmallButtonRestore {
                         vm.restore(tagsVM, dragSelectState.selectedIds.toSet())
                         dragSelectState.exitSelectMode()
                     }
-                    if (AppFeatureType.MEDIA_DELETE.has()) IconTextSmallButtonDelete {
+                    if (Capability.MEDIA_DELETE in getDeviceCapabilities()) IconTextSmallButtonDelete {
                         scope.launch {
                             confirmActionAsync(
                                 Res.string.delete,
@@ -95,7 +95,7 @@ fun <T : IData> MediaFilesSelectModeBottomActions(
                         dragSelectState.exitSelectMode()
                     }
                 }
-            } else if (AppFeatureType.MEDIA_DELETE.has()) {
+            } else if (Capability.MEDIA_DELETE in getDeviceCapabilities()) {
                 IconTextSmallButtonDelete {
                     scope.launch {
                         confirmActionAsync(

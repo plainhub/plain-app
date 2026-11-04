@@ -15,8 +15,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import com.ismartcoding.plain.lib.extensions.isUrl
 import com.ismartcoding.plain.lib.extensions.getFilenameWithoutExtensionFromPath
-import com.ismartcoding.plain.platform.system.AppFeatureType
-import com.ismartcoding.plain.platform.system.has
 import com.ismartcoding.plain.platform.system.DataType
 import com.ismartcoding.plain.i18n.*
 import com.ismartcoding.plain.lib.withIO
@@ -92,20 +90,20 @@ internal fun AudioActionButtons(
                 PSheetPrimaryAction(UiRes.drawable.ui_drawable_pen, stringResource(Res.string.rename)) {
                     audioVM.showRenameDialog.value = true
                 }
-                if (AppFeatureType.MEDIA_TRASH.has(audioVM.source.capabilities)) {
+                if (Capability.MEDIA_TRASH in audioVM.source.capabilities) {
                     PSheetPrimaryTrashAction(stringResource(Res.string.trash)) {
                         audioVM.trash(tagsVM, setOf(m.id))
                         onDismiss()
                     }
                 }
             }
-            if (AppFeatureType.MEDIA_TRASH.has(audioVM.source.capabilities) && audioVM.trash.value) {
+            if (Capability.MEDIA_TRASH in audioVM.source.capabilities && audioVM.trash.value) {
                 PSheetPrimaryAction(UiRes.drawable.ui_drawable_archive_restore, stringResource(Res.string.restore)) {
                     audioVM.restore(tagsVM, setOf(m.id))
                     onDismiss()
                 }
             }
-            if (!AppFeatureType.MEDIA_TRASH.has(audioVM.source.capabilities) || audioVM.trash.value) {
+            if (Capability.MEDIA_TRASH !in audioVM.source.capabilities || audioVM.trash.value) {
                 PSheetPrimaryDeleteAction(stringResource(Res.string.delete)) {
                     scope.launch {
                         confirmActionAsync(
