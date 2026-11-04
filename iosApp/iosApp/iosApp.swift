@@ -31,10 +31,18 @@ struct PlainApp: SwiftUI.App {
         UNUserNotificationCenter.current().delegate = notificationDelegate
         backgroundScheduler.register()
         AppInitializerKt.initializeApp()
+        #if PLAIN_UI_WORKFLOWS
+        NativeWorkflowRuntime.shared.prepare()
+        #endif
     }
 
     var body: some Scene {
         WindowGroup {
+            #if PLAIN_UI_WORKFLOWS
+            WorkflowComposeView()
+                .ignoresSafeArea()
+                .background(Color(uiColor: .systemBackground))
+            #else
             ComposeView()
                 .ignoresSafeArea()
                 // System background fills the gap between the system
@@ -42,6 +50,7 @@ struct PlainApp: SwiftUI.App {
                 // rendering. Matches the LaunchScreenBackground asset so
                 // the transition is visually seamless (no more white flash).
                 .background(Color(uiColor: .systemBackground))
+            #endif
         }
     }
 }
@@ -396,7 +405,11 @@ final class ComposeHostingController: UIViewController, IosSystemUiController {
 /// Wraps the Compose Multiplatform `MainViewController` in a SwiftUI view.
 struct ComposeView: UIViewControllerRepresentable {
     func makeUIViewController(context: UIViewControllerRepresentableContext<ComposeView>) -> UIViewController {
+        #if PLAIN_UI_WORKFLOWS
+        let inner = NativeWorkflowRuntimeKt.WorkflowMainViewController()
+        #else
         let inner = MainViewControllerKt.MainViewController()
+        #endif
         // Use the system background color (adapts to light/dark mode) so it
         // matches the LaunchScreen's LaunchScreenBackground asset and avoids
         // a visible color flash between the system splash screen and the
@@ -409,3 +422,14 @@ struct ComposeView: UIViewControllerRepresentable {
 
     func updateUIViewController(_ uiViewController: UIViewController, context: UIViewControllerRepresentableContext<ComposeView>) {}
 }
+
+#if PLAIN_UI_WORKFLOWS
+private struct WorkflowComposeView: View {
+    @State private var generation = UUID()
+    var body: some View {
+        ComposeView().id(generation).onAppear {
+            NativeWorkflowRuntime.shared.setControllerReset { generation = UUID() }
+        }
+    }
+}
+#endif

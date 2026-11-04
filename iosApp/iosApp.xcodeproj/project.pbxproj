@@ -155,6 +155,7 @@
 			outputFileListPaths = (
 			);
 			outputPaths = (
+				"$(RUST_CORE_LIBRARY)",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;

@@ -17,4 +17,6 @@ data class Mount(
     var alias: String,
     var driveType: DriveType,
     var diskId: String,
+    var label: String,
+    var diskModel: String,
 )

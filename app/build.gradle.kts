@@ -156,15 +156,6 @@ android {
         "../tests/plain-common/testFixtures/kotlin",
         "../tests/shared/androidTestFixtures/kotlin",
     )
-    if (providers.gradleProperty("plainUiTest").orNull == "true") {
-        sourceSets.getByName("androidTest").kotlin.srcDir("../../plainapp-test/ui-test/android")
-        sourceSets.getByName("androidTest").assets.srcDir("../../plainapp-test/fixtures/acceptance")
-    }
-    if (providers.gradleProperty("plainAcceptance").orNull == "true") {
-        sourceSets.getByName("androidTest").kotlin.srcDir("../../plainapp-test/android/src/androidTest/kotlin")
-        sourceSets.getByName("androidTest").manifest.srcFile("../../plainapp-test/android/src/androidTest/AndroidManifest.xml")
-        sourceSets.getByName("androidTest").java.srcDir("../../plainapp-test/android/src/androidTest/java")
-    }
     if (providers.gradleProperty("plainRemoteManagementTest").orNull == "true") {
         val generatedTests = layout.buildDirectory.dir("generated/remote-management-tests")
         val prepareTests = tasks.register<Sync>("prepareRemoteManagementTestSource") {

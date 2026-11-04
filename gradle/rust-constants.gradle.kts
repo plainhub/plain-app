@@ -22,7 +22,8 @@ fun rustPackage(metadata: String, name: String): File {
 }
 
 tasks.withType<org.gradle.api.tasks.testing.Test>().configureEach {
-    val coreDirectory = cargoMetadata.map { rustPackage(it, "plain-rs").parentFile }
+    val coreDirectory = providers.environmentVariable("PLAIN_CORE_DIR").map(::File)
+        .orElse(cargoMetadata.map { rustPackage(it, "plain-rs").parentFile })
     inputs.dir(coreDirectory.map { it.resolve("schema/api") }).withPropertyName("mainSchema")
     doFirst {
         environment("PLAIN_CORE_DIR", coreDirectory.get().absolutePath)
