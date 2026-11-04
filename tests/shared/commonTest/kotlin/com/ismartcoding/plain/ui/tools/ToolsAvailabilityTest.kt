@@ -12,6 +12,6 @@ class ToolsAvailabilityTest {
     }
     @Test fun discoveryAndBackgroundFacilitiesDoNotImplyAToolsPage() {
         assertFalse(hasTools(emptyList()))
-        assertFalse(hasTools(listOf(Capability.PEER_DISCOVERY, Capability.BACKGROUND_WAKE)))
+        assertFalse(hasTools(listOf(Capability.BACKGROUND_WAKE)))
     }
 }

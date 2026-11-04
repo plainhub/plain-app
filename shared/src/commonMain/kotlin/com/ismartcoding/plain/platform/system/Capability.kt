@@ -1,8 +1,7 @@
 package com.ismartcoding.plain.platform.system
 
 enum class Capability {
-    PEER_DISCOVERY,
-    BLE_DISCOVERY,
+    BLE,
     WIFI_AWARE,
     BACKGROUND_SERVICE,
     LAUNCHER_SHORTCUTS,

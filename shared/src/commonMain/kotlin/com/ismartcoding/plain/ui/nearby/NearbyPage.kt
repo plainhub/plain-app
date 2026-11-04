@@ -67,17 +67,14 @@ fun NearbyPage(
     val isDiscovering by NearbyViewModel.isDiscovering
     var isBleScanning by remember { mutableStateOf(false) }
     val bleAvailability by bleAvailabilityFlow.collectAsState()
-    val peerDiscoverySupported = Capability.PEER_DISCOVERY in getDeviceCapabilities()
     val isSearching = isDiscovering || isBleScanning
     val peers by peerVM.peerList.collectAsState()
     LaunchedEffect(peerVM) { peerVM.observe() }
 
-    LaunchedEffect(peerDiscoverySupported) {
-        if (peerDiscoverySupported) {
-            try { RustNearbyDevices.observeDiscovery() }
-            catch (cancelled: CancellationException) { throw cancelled }
-            catch (error: Exception) { LogCat.e("Nearby discovery failed", error) }
-        }
+    LaunchedEffect(Unit) {
+        try { RustNearbyDevices.observeDiscovery() }
+        catch (cancelled: CancellationException) { throw cancelled }
+        catch (error: Exception) { LogCat.e("Nearby discovery failed", error) }
     }
     LaunchedEffect(bleAvailability) {
         if (bleAvailability == BleAvailability.READY) {
@@ -103,7 +100,7 @@ fun NearbyPage(
                 .fillMaxSize()
                 .padding(top = paddingValues.calculateTopPadding())
         ) {
-            if (Capability.BLE_DISCOVERY in getDeviceCapabilities() && bleAvailability != BleAvailability.READY) {
+            if (Capability.BLE in getDeviceCapabilities() && bleAvailability != BleAvailability.READY) {
                 item {
                     val description = when {
                         bleAvailability == BleAvailability.BLUETOOTH_OFF -> stringResource(Res.string.bluetooth_off)

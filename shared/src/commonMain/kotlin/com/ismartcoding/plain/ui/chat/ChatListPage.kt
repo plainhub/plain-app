@@ -86,7 +86,7 @@ fun ChatListPage(
     val awareSupported = Capability.WIFI_AWARE in capabilities
     val awarePermission = remember { wifiAwarePermission() }
     var awareReady by remember(awareSupported, awarePermission) { mutableStateOf(!awareSupported || awarePermission?.isGranted() == true) }
-    val bleReady = Capability.BLE_DISCOVERY !in capabilities || bleAvailability == BleAvailability.READY
+    val bleReady = Capability.BLE !in capabilities || bleAvailability == BleAvailability.READY
     val scope = rememberCoroutineScope()
 
     LaunchedEffect(Unit) {
