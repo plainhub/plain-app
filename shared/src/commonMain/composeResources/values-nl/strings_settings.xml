@@ -21,8 +21,6 @@
     <string name="disable_battery_optimization">Batterijoptimalisatie uitschakelen</string>
     <string name="battery_optimization_disabled">Batterijoptimalisatie is uitgeschakeld</string>
     <string name="battery_optimization_tips">Schakel batterijoptimalisatie uit zodat de webtoegang werkt als het scherm is uitgeschakeld.</string>
-    <string name="keep_awake">Wakker houden</string>
-    <string name="keep_awake_tips">Houdt de webtoegang altijd online (meer batterijverbruik). Zet dit aan als het stopt met werken wanneer uw telefoon in de slaapstand gaat.</string>
     <string name="generate_password">Genereer wachtwoord</string>
     <string name="privacy_policy">Privacybeleid</string>
     <string name="terms_of_use">Gebruiksvoorwaarden</string>

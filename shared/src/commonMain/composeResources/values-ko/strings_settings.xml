@@ -21,8 +21,6 @@
     <string name="disable_battery_optimization">배터리 최적화 비활성화</string>
     <string name="battery_optimization_disabled">배터리 최적화가 비활성화되었습니다</string>
     <string name="battery_optimization_tips">화면이 꺼졌을 때 웹 액세스가 계속 작동하도록 배터리 최적화를 비활성화하세요.</string>
-    <string name="keep_awake">깨어 있게 유지</string>
-    <string name="keep_awake_tips">웹 액세스를 항상 온라인 상태로 유지합니다(배터리 소모 증가). 휴대폰이 잠들면 웹 액세스가 중단될 경우 이 옵션을 켜세요.</string>
     <string name="generate_password">비밀번호 생성</string>
     <string name="privacy_policy">개인 정보 보호 정책</string>
     <string name="terms_of_use">이용 약관</string>

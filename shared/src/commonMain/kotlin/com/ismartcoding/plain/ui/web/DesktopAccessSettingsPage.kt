@@ -58,7 +58,6 @@ fun DesktopAccessSettingsPage(
     webVM: DesktopAccessSettingsViewModel = viewModel { DesktopAccessSettingsViewModel() },
     batterySettings: (@Composable () -> Unit)? = null,
 ) {
-    val keepAwake = Prefs.keepAwake.collectAsStateValue()
     val scope = rememberCoroutineScope()
     val enabledPermissions = Prefs.apiPermissions.collectAsStateValue()
     val permissionList = remember { mutableStateOf(getWebList()) }
@@ -148,15 +147,11 @@ fun DesktopAccessSettingsPage(
                     PListItem(modifier = Modifier.clickable { openAppSettings() }, title = stringResource(Res.string.open_permission_settings), showMore = true)
                 }
             }
-            item {
-                VerticalSpace(dp = 16.dp); PSectionTitle(title = stringResource(Res.string.performance))
-                PCard(modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN)) {
-                    PListItem(modifier = Modifier.clickable { webVM.enableKeepAwake(!keepAwake) }, title = stringResource(Res.string.keep_awake)) {
-                        Switch(checked = keepAwake, onCheckedChange = { enable -> webVM.enableKeepAwake(enable) })
-                    }
+            if (batterySettings != null) {
+                item {
+                    VerticalSpace(dp = 16.dp); PSectionTitle(title = stringResource(Res.string.performance))
+                    batterySettings()
                 }
-                Tips(stringResource(Res.string.keep_awake_tips))
-                batterySettings?.invoke()
             }
             item {
                 VerticalSpace(dp = 16.dp)

@@ -23,8 +23,6 @@
     <string name="disable_battery_optimization">停用電池優化</string>
     <string name="battery_optimization_disabled">電池優化已停用</string>
     <string name="battery_optimization_tips">關閉電池優化以確保螢幕關閉時網頁存取仍能正常運作。</string>
-    <string name="keep_awake">保持喚醒</string>
-    <string name="keep_awake_tips">保持網頁存取始終在線（耗電較多）。若手機休眠後網頁存取停止運作，請開啟此選項。</string>
     <string name="generate_password">生成密碼</string>
     <string name="privacy_policy">隱私政策</string>
     <string name="terms_of_use">使用條款</string>

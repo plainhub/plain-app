@@ -21,8 +21,6 @@
     <string name="disable_battery_optimization">Desativar otimização da bateria</string>
     <string name="battery_optimization_disabled">A otimização da bateria está desativada</string>
     <string name="battery_optimization_tips">Desative a otimização de bateria para manter o acesso à web funcionando quando a tela estiver desligada.</string>
-    <string name="keep_awake">Manter acordado</string>
-    <string name="keep_awake_tips">Mantém o acesso à web sempre online (mais consumo de bateria). Ative isso se parar de funcionar quando seu telefone entrar em modo de suspensão.</string>
     <string name="generate_password">Gerar senha</string>
     <string name="privacy_policy">Política de Privacidade</string>
     <string name="terms_of_use">Termos de Uso</string>

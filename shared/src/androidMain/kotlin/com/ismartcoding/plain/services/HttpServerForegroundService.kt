@@ -18,14 +18,10 @@ import com.ismartcoding.plain.HttpServerManager
 import com.ismartcoding.plain.Prefs
 
 class HttpServerForegroundService : LifecycleService() {
-    private var wakeLock: HttpServerWakeLock? = null
-
     override fun onCreate() {
         super.onCreate()
         instance = this
         NotificationHelper.ensureDefaultChannel()
-
-        wakeLock = HttpServerWakeLock(this).also { it.start() }
     }
 
     @SuppressLint("InlinedApi")
@@ -63,8 +59,6 @@ class HttpServerForegroundService : LifecycleService() {
     override fun onDestroy() {
         instance = null
         super.onDestroy()
-        wakeLock?.stop()
-        wakeLock = null
         stopForeground(STOP_FOREGROUND_REMOVE)
         if (HttpServerManager.foregroundServiceState.value != ServiceState.ERROR) {
             HttpServerManager.foregroundServiceState.value = ServiceState.OFF

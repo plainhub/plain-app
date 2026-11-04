@@ -21,8 +21,6 @@
     <string name="disable_battery_optimization">バッテリーの最適化を無効にする</string>
     <string name="battery_optimization_disabled">バッテリーの最適化が無効になっています</string>
     <string name="battery_optimization_tips">画面がオフのときでもウェブアクセスが動作するよう、バッテリー最適化をオフにしてください。</string>
-    <string name="keep_awake">起きている</string>
-    <string name="keep_awake_tips">ウェブアクセスを常時オンラインに保ちます（バッテリー消費増加）。スリープ時に動作が停止する場合はオンにしてください。</string>
     <string name="generate_password">パスワードを生成</string>
     <string name="privacy_policy">プライバシーポリシー</string>
     <string name="terms_of_use">利用規約</string>

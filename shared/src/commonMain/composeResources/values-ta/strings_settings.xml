@@ -21,8 +21,6 @@
     <string name="disable_battery_optimization">பேட்டரி ஒப்டிமைசேஷனை முடக்கு</string>
     <string name="battery_optimization_disabled">பேட்டரி ஒப்டிமைசேஷன் முடக்கப்பட்டுள்ளது</string>
     <string name="battery_optimization_tips">திரை அணைக்கப்படும்போது வலை அணுகல் செயல்படுவதை உறுதி செய்ய பேட்டரி மேம்படுத்தலை முடக்கவும்.</string>
-    <string name="keep_awake">எழில்கள் செய்யுங்கள்</string>
-    <string name="keep_awake_tips">வலை அணுகலை எப்போதும் இணையத்தில் வைத்திருக்கிறது (அதிக பேட்டரி பயன்பாடு). உங்கள் தொலைபேசி தூங்கும்போது அது செயல்படாவிட்டால் இதை இயக்கவும்.</string>
     <string name="generate_password">கடவுச்சொல் உருவாக்கு</string>
     <string name="privacy_policy">தனியுரிமை கொள்கை</string>
     <string name="terms_of_use">பயன்பாடு விதிகள்</string>

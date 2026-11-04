@@ -21,8 +21,6 @@
     <string name="disable_battery_optimization">Desactivar optimización de batería</string>
     <string name="battery_optimization_disabled">La optimización de batería está desactivada</string>
     <string name="battery_optimization_tips">Desactiva la optimización de batería para que el acceso web siga funcionando cuando la pantalla esté apagada.</string>
-    <string name="keep_awake">Mantener despierto</string>
-    <string name="keep_awake_tips">Mantiene el acceso web siempre en línea (más consumo de batería). Activa esto si deja de funcionar cuando tu teléfono entra en reposo.</string>
     <string name="generate_password">Generar contraseña</string>
     <string name="privacy_policy">Política de privacidad</string>
     <string name="terms_of_use">Términos de uso</string>

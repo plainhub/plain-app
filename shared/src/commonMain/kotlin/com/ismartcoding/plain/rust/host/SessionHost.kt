@@ -5,18 +5,16 @@ import com.ismartcoding.plain.features.sessions.WebLoginCompletedFacts
 import com.ismartcoding.plain.features.sessions.WebLoginRequestFacts
 import com.ismartcoding.plain.lib.JsonHelper
 import com.ismartcoding.plain.platform.notifications.sendWebLoginNotification
-import com.ismartcoding.plain.platform.system.WebActivity
 import com.ismartcoding.plain.ui.app.MainViewModel
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.jsonArray
 
 internal object SessionHost {
-    private val methods = setOf("systemWebActivity", "systemWebLoginRequested", "systemWebLoginClosed", "systemWebLoginCompleted", "systemWebLoginSnapshot")
+    private val methods = setOf("systemWebLoginRequested", "systemWebLoginClosed", "systemWebLoginCompleted", "systemWebLoginSnapshot")
     fun handles(method: String): Boolean = method in methods
 
     fun handle(method: String, params: JsonObject): HostResult {
         when (method) {
-            "systemWebActivity" -> WebActivity.received()
             "systemWebLoginRequested" -> MainViewModel.pendingLoginRequest.value = JsonHelper.jsonDecodeFromElement<WebLoginRequestFacts>(params)
             "systemWebLoginSnapshot" -> MainViewModel.pendingLoginRequest.value = params.getValue("requests").jsonArray.lastOrNull()?.let { JsonHelper.jsonDecodeFromElement<WebLoginRequestFacts>(it) }
             "systemWebLoginClosed" -> {

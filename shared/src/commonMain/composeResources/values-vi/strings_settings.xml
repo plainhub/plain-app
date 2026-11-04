@@ -21,8 +21,6 @@
     <string name="disable_battery_optimization">Vô hiệu hóa tối ưu hóa pin</string>
     <string name="battery_optimization_disabled">Tối ưu hóa pin đã được vô hiệu hóa</string>
     <string name="battery_optimization_tips">Tắt tối ưu hóa pin để giữ cho quyền truy cập web hoạt động khi màn hình tắt.</string>
-    <string name="keep_awake">Giữ tỉnh táo</string>
-    <string name="keep_awake_tips">Duy trì quyền truy cập web luôn trực tuyến (tốn nhiều pin hơn). Bật tùy chọn này nếu nó ngừng hoạt động khi điện thoại của bạn ở trạng thái ngủ.</string>
     <string name="generate_password">Tạo mật khẩu</string>
     <string name="privacy_policy">Chính sách bảo mật</string>
     <string name="terms_of_use">Điều khoản sử dụng</string>

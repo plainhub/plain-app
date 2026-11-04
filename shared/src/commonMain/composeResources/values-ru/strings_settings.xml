@@ -21,8 +21,6 @@
     <string name="disable_battery_optimization">Отключить оптимизацию батареи</string>
     <string name="battery_optimization_disabled">Оптимизация батареи отключена</string>
     <string name="battery_optimization_tips">Отключите оптимизацию батареи, чтобы веб-доступ работал при выключенном экране.</string>
-    <string name="keep_awake">Держать активным</string>
-    <string name="keep_awake_tips">Поддерживает веб-доступ в режиме онлайн (увеличенный расход батареи). Включите это, если доступ перестаёт работать после перехода телефона в режим ожидания.</string>
     <string name="generate_password">Сгенерировать пароль</string>
     <string name="privacy_policy">Политика конфиденциальности</string>
     <string name="terms_of_use">Условия использования</string>

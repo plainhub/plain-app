@@ -21,8 +21,6 @@
     <string name="disable_battery_optimization">Akkuoptimierung deaktivieren</string>
     <string name="battery_optimization_disabled">Akkuoptimierung ist deaktiviert</string>
     <string name="battery_optimization_tips">Deaktiviere die Akkuoptimierung, damit der Webzugang auch bei ausgeschaltetem Bildschirm funktioniert.</string>
-    <string name="keep_awake">Wach halten</string>
-    <string name="keep_awake_tips">Hält den Webzugang dauerhaft online (mehr Akkuverbrauch). Aktiviere dies, wenn der Webzugang nach dem Schlafmodus deines Telefons nicht mehr funktioniert.</string>
     <string name="generate_password">Passwort generieren</string>
     <string name="privacy_policy">Datenschutzrichtlinie</string>
     <string name="terms_of_use">Nutzungsbedingungen</string>

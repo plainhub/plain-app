@@ -23,8 +23,6 @@
     <string name="disable_battery_optimization">禁用电池优化</string>
     <string name="battery_optimization_disabled">电池优化已禁用</string>
     <string name="battery_optimization_tips">关闭电池优化以确保屏幕关闭时网页访问仍能正常工作。</string>
-    <string name="keep_awake">保持唤醒</string>
-    <string name="keep_awake_tips">保持网页访问始终在线（耗电更多）。如果手机休眠后网页访问停止工作，请打开此选项。</string>
     <string name="generate_password">生成密码</string>
     <string name="privacy_policy">隐私政策</string>
     <string name="terms_of_use">用户协议</string>

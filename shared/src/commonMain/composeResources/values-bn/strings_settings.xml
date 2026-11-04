@@ -21,8 +21,6 @@
     <string name="disable_battery_optimization">ব্যাটারি অপ্টিমাইজেশন নিষ্ক্রিয় করুন</string>
     <string name="battery_optimization_disabled">ব্যাটারি অপ্টিমাইজেশন নিষ্ক্রিয় করা হয়েছে</string>
     <string name="battery_optimization_tips">স্ক্রিন বন্ধ থাকলেও ওয়েব অ্যাক্সেস চালু রাখতে ব্যাটারি অপ্টিমাইজেশন বন্ধ করুন।</string>
-    <string name="keep_awake">জাগরিত রাখুন</string>
-    <string name="keep_awake_tips">ওয়েব অ্যাক্সেস সবসময় অনলাইন রাখে (বেশি ব্যাটারি ব্যবহার করে)। আপনার ফোন ঘুমিয়ে গেলে যদি এটি কাজ বন্ধ করে দেয় তাহলে এটি চালু করুন।</string>
     <string name="generate_password">পাসওয়ার্ড তৈরি করুন</string>
     <string name="privacy_policy">গোপনীয়তা নীতি</string>
     <string name="terms_of_use">ব্যবহারের শর্তাবলী</string>

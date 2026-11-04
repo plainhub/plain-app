@@ -21,8 +21,6 @@
     <string name="disable_battery_optimization">बैटरी अनुकूलन निष्क्रिय करें</string>
     <string name="battery_optimization_disabled">बैटरी अनुकूलन निष्क्रिय किया गया है</string>
     <string name="battery_optimization_tips">स्क्रीन बंद होने पर वेब एक्सेस को काम करते रहने के लिए बैटरी ऑप्टिमाइज़ेशन बंद करें।</string>
-    <string name="keep_awake">जागरूक रखें</string>
-    <string name="keep_awake_tips">वेब एक्सेस को हमेशा ऑनलाइन रखता है (अधिक बैटरी उपयोग)। यदि आपका फोन सोने के बाद यह काम करना बंद कर दे तो इसे चालू करें।</string>
     <string name="generate_password">पासवर्ड बनाएं</string>
     <string name="privacy_policy">गोपनीयता नीति</string>
     <string name="terms_of_use">उपयोग की शर्तें</string>

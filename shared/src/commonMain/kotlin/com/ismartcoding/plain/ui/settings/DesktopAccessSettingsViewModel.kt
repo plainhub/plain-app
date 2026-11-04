@@ -5,14 +5,12 @@ import com.ismartcoding.plain.HttpServerManager
 
 import com.ismartcoding.plain.ui.state.launchSafe
 
-import com.ismartcoding.plain.preferences.*
 import com.ismartcoding.plain.ui.i18n.LocaleHelper
 
 import com.ismartcoding.plain.i18n.*
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.ismartcoding.plain.Prefs
 import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.rust.native.RustNativeApi
 import com.ismartcoding.plain.ui.components.DialogHelper
@@ -53,12 +51,6 @@ class DesktopAccessSettingsViewModel : ViewModel() {
             } else {
                 DialogHelper.showConfirmDialog(LocaleHelper.getStringAsync(Res.string.confirm), LocaleHelper.getStringAsync(Res.string.http_server_ok))
             }
-        }
-    }
-
-    fun enableKeepAwake(enable: Boolean) {
-        viewModelScope.launchSafe {
-            Prefs.set(PrefKeys.KEEP_AWAKE, enable)
         }
     }
 }

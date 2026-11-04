@@ -21,8 +21,6 @@
     <string name="disable_battery_optimization">Disattiva ottimizzazione batteria</string>
     <string name="battery_optimization_disabled">L'ottimizzazione della batteria è disattivata</string>
     <string name="battery_optimization_tips">Disattiva l'ottimizzazione della batteria per mantenere l'accesso web attivo quando lo schermo è spento.</string>
-    <string name="keep_awake">Mantieni sveglio</string>
-    <string name="keep_awake_tips">Mantiene l'accesso web sempre online (maggior consumo della batteria). Attivalo se smette di funzionare quando il telefono va in standby.</string>
     <string name="generate_password">Genera password</string>
     <string name="privacy_policy">Informativa sulla privacy</string>
     <string name="terms_of_use">Termini di utilizzo</string>

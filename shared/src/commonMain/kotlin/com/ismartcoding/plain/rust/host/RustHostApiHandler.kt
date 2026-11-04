@@ -138,7 +138,7 @@ internal suspend fun executeHostRequest(
     val method = request.method
     val params = request.params
     return when (method) {
-        "systemWebActivity", "systemWebLoginRequested", "systemWebLoginClosed",
+        "systemWebLoginRequested", "systemWebLoginClosed",
         "systemWebLoginCompleted", "systemWebLoginSnapshot" -> SessionHost.handle(method, params)
         "httpServerStatusChanged" -> {
             httpStatusMutex.withLock {
