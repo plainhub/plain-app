@@ -1,6 +1,8 @@
 package com.ismartcoding.plain.ui.images
 
 import com.ismartcoding.plain.preferences.PrefKeys
+import com.ismartcoding.plain.platform.permissions.imageLibraryPermission
+import com.ismartcoding.plain.rust.graphql.ContentSource
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
@@ -138,7 +140,7 @@ fun ImagesPage(
         }
     }
 
-    MediaPermissionEffects(imagesVM.hasPermission, initialLoadGate, reloadAfterGrant, imagesVM.source)
+    MediaPermissionEffects(imagesVM.hasPermission, initialLoadGate, reloadAfterGrant, imagesVM.source, imageLibraryPermission())
     LaunchedEffect(dragSelectState.selectMode, (previewerState.visible && !isGestureInteractionMode())) {
         if (dragSelectState.selectMode || (previewerState.visible && !isGestureInteractionMode())) {
             scrollBehavior.reset()
@@ -210,7 +212,7 @@ fun ImagesPage(
                 .padding(top = paddingValues.calculateTopPadding())
         ) {
             if (!imagesVM.hasPermission.value) {
-                NeedPermissionColumn(UiRes.drawable.ui_drawable_image, AppFeatureType.FILES.getPermission()!!); return@Column
+                NeedPermissionColumn(UiRes.drawable.ui_drawable_image, if (source is ContentSource.Remote) AppFeatureType.FILES.getPermission()!! else imageLibraryPermission()); return@Column
             }
 
             PullToRefresh(refreshLayoutState = topRefreshLayoutState) {

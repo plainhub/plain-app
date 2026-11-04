@@ -16,6 +16,10 @@ internal object IosPhotoResource {
         val fetched = PHAsset.fetchAssetsWithLocalIdentifiers(listOf(uri.removePrefix("ph://")), null)
         check(fetched.count == 1UL) { "Photo resource unavailable" }
         val asset = fetched.objectAtIndex(0UL) as PHAsset
+        return resource(asset)
+    }
+
+    fun resource(asset: PHAsset): PHAssetResource {
         val resources = PHAssetResource.assetResourcesForAsset(asset).map { it as PHAssetResource }
         return resources[resourceIndex(asset.mediaType, resources.map { it.type })]
     }

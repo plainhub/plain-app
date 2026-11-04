@@ -95,6 +95,7 @@ kotlin {
         }
         tasks.matching { it.name.startsWith("link") && it.name.contains(iosTarget.name.replaceFirstChar { c -> c.uppercase() }) }.configureEach {
             dependsOn(buildPlainRust)
+            inputs.files(buildPlainRust).withPropertyName("plainRustLibrary")
         }
     }
 

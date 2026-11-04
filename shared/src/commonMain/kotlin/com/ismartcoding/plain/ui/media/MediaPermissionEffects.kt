@@ -6,8 +6,10 @@ import androidx.compose.runtime.MutableState
 import com.ismartcoding.plain.events.PermissionsResultEvent
 import com.ismartcoding.plain.lib.Channel
 import com.ismartcoding.plain.platform.system.AppFeatureType
-import com.ismartcoding.plain.platform.system.hasPermission
-import com.ismartcoding.plain.ui.components.StoragePermissionResumeEffect
+import androidx.lifecycle.Lifecycle
+import com.ismartcoding.plain.ui.components.rememberLifecycleEvent
+import com.ismartcoding.plain.features.permissions.allGranted
+import com.ismartcoding.plain.platform.permissions.FeaturePermission
 import com.ismartcoding.plain.ui.components.refreshStoragePermission
 import com.ismartcoding.plain.ui.navigation.NavLoadGate
 
@@ -17,6 +19,7 @@ internal fun MediaPermissionEffects(
     initialLoadGate: NavLoadGate?,
     reload: () -> Unit,
     source: com.ismartcoding.plain.rust.graphql.ContentSource = com.ismartcoding.plain.ui.navigation.LocalContentSource.current,
+    permission: FeaturePermission? = AppFeatureType.FILES.getPermission(),
 ) {
     if (source is com.ismartcoding.plain.rust.graphql.ContentSource.Remote) {
         com.ismartcoding.plain.ui.permissions.RemotePermissionEffects(source, com.ismartcoding.plain.platform.permissions.Permission.WRITE_EXTERNAL_STORAGE, hasPermission) {
@@ -25,17 +28,21 @@ internal fun MediaPermissionEffects(
         }
         return
     }
-    LaunchedEffect(Unit) {
-        hasPermission.value = AppFeatureType.FILES.hasPermission()
+    val granted = { permission?.let { allGranted(it.permissions) } ?: true }
+    LaunchedEffect(permission) {
+        hasPermission.value = granted()
         if (hasPermission.value) {
             initialLoadGate?.await()
             reload()
         }
     }
-    LaunchedEffect(Channel.sharedFlow) {
+    LaunchedEffect(Channel.sharedFlow, permission) {
         Channel.sharedFlow.collect { event ->
-            if (event is PermissionsResultEvent) refreshStoragePermission(hasPermission, reload)
+            if (event is PermissionsResultEvent) refreshStoragePermission(hasPermission, granted, reload)
         }
     }
-    StoragePermissionResumeEffect(hasPermission, reload)
+    val lifecycleEvent = rememberLifecycleEvent()
+    LaunchedEffect(lifecycleEvent, permission) {
+        if (lifecycleEvent == Lifecycle.Event.ON_RESUME) refreshStoragePermission(hasPermission, granted, reload)
+    }
 }

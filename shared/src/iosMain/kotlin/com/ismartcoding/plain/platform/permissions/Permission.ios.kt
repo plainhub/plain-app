@@ -41,3 +41,5 @@ actual suspend fun ensureNotificationPermissionAsync(): Boolean {
     return Permission.POST_NOTIFICATIONS.isGranted()
 }
 
+
+actual fun imageLibraryPermission(): FeaturePermission = FeaturePermission(setOf(Permission.READ_MEDIA_IMAGES), Permission.READ_MEDIA_IMAGES)

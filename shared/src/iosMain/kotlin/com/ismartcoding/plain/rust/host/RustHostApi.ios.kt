@@ -4,4 +4,13 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.serialization.json.JsonObject
 
 internal actual suspend fun executePlatformHostRequest(method: String, params: JsonObject, scope: CoroutineScope): HostResult =
-    error("Unknown Rust host operation: $method")
+    when (method) {
+        "photoCatalogPage" -> {
+            val request = com.ismartcoding.plain.lib.JsonHelper.jsonDecodeFromElement<PhotoCatalogPageRequest>(params)
+            hostResult(com.ismartcoding.plain.platform.media.IosPhotoLibrary.mediaPage(request.revision, request.offset, request.limit))
+        }
+        else -> error("Unknown Rust host operation: $method")
+    }
+
+@kotlinx.serialization.Serializable
+private data class PhotoCatalogPageRequest(val revision: String, val offset: Int, val limit: Int)

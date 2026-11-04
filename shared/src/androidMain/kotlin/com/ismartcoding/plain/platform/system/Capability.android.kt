@@ -21,7 +21,7 @@ actual fun getDeviceCapabilities(): List<Capability> = Capability.entries.filter
         Capability.BACKGROUND_TIMER -> isAppForegrounded()
         Capability.BACKGROUND_WAKE -> true
         Capability.FILE_REVEAL, Capability.FILE_CLIPBOARD -> false
-        Capability.VIDEO_REMUX, Capability.VIDEO_TRANSCODE, Capability.VIDEO_3GP_CONVERT -> false
+        Capability.VIDEO_REMUX, Capability.VIDEO_TRANSCODE -> false
         Capability.MEDIA_SCAN, Capability.LAN_SHARE, Capability.DISK_MANAGER -> false
         Capability.MEDIA_TRASH, Capability.MEDIA_FAVORITE -> Build.VERSION.SDK_INT >= Build.VERSION_CODES.R
         Capability.MEDIA_MOVE, Capability.MIRROR_AUDIO -> Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q

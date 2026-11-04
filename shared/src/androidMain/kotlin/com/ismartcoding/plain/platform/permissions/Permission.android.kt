@@ -54,3 +54,5 @@ actual fun Permission.shouldShowRationale(): Boolean {
 actual suspend fun ensureNotificationPermissionAsync(): Boolean =
     Permissions.ensureNotificationAsync(appContext)
 
+
+actual fun imageLibraryPermission(): FeaturePermission = FeaturePermission(setOf(Permission.WRITE_EXTERNAL_STORAGE), Permission.WRITE_EXTERNAL_STORAGE)

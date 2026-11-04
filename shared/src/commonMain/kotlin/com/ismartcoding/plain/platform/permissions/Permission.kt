@@ -68,3 +68,5 @@ suspend fun Permission.checkEnabledAsync() {
     }
 }
 
+
+expect fun imageLibraryPermission(): FeaturePermission

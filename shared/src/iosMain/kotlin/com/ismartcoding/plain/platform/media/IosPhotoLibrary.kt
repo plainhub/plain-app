@@ -17,6 +17,7 @@ internal object IosPhotoLibrary : ImageCatalog {
     private var epoch = 0L
     private var observing = false
     private var assets: PHFetchResult? = null
+    private var authorization = PHAuthorizationStatusNotDetermined
     private val observer = object : NSObject(), PHPhotoLibraryChangeObserverProtocol {
         override fun photoLibraryDidChange(changeInstance: PHChange) {
             lock.lock()
@@ -38,6 +39,13 @@ internal object IosPhotoLibrary : ImageCatalog {
         lock.lock()
         try {
             val fetched = PHAsset.fetchAssetsWithMediaType(PHAssetMediaTypeImage, null)
+            val status = PHPhotoLibrary.authorizationStatusForAccessLevel(PHAccessLevelReadWrite)
+            val previous = assets
+            val changedSelection = status == PHAuthorizationStatusLimited && (previous == null || previous.count != fetched.count || (0 until fetched.count.toInt()).any { index ->
+                (previous.objectAtIndex(index.toULong()) as PHAsset).localIdentifier != (fetched.objectAtIndex(index.toULong()) as PHAsset).localIdentifier
+            })
+            if (authorization != status || changedSelection) epoch++
+            authorization = status
             assets = fetched
             return JsonHelper.jsonEncodeToElement(ImageCatalogSnapshot(epoch.toString(), fetched.count.toInt()))
         } finally { lock.unlock() }
@@ -64,6 +72,21 @@ internal object IosPhotoLibrary : ImageCatalog {
             return JsonHelper.jsonEncodeToElement(ImageCatalogPage(revision, items, end.toString(), end == fetched.count.toInt()))
         } finally { lock.unlock() }
     }
+    fun mediaPage(revision: String, offset: Int, limit: Int): JsonElement {
+        require(limit in 1..128 && offset >= 0)
+        verify(revision)
+        lock.lock()
+        try {
+            val fetched = checkNotNull(assets)
+            require(offset <= fetched.count.toInt())
+            return JsonHelper.jsonEncodeToElement((offset until minOf(offset + limit, fetched.count.toInt())).map { index ->
+                val asset = fetched.objectAtIndex(index.toULong()) as PHAsset
+                val resource = IosPhotoResource.resource(asset)
+                fun timestamp(date: NSDate?): String = kotlin.time.Instant.fromEpochMilliseconds(((date?.timeIntervalSince1970 ?: 0.0) * 1000).toLong()).toString()
+                PhotoCatalogAsset(asset.localIdentifier, resource.originalFilename, asset.pixelWidth.toInt(), asset.pixelHeight.toInt(), timestamp(asset.creationDate), timestamp(asset.modificationDate ?: asset.creationDate), asset.favorite)
+            })
+        } finally { lock.unlock() }
+    }
     override fun resolve(revision: String, ids: List<String>): JsonElement {
         require(ids.size <= 100)
         verify(revision)
@@ -76,3 +99,6 @@ internal object IosPhotoLibrary : ImageCatalog {
         return JsonHelper.jsonEncodeToElement(items)
     }
 }
+
+@kotlinx.serialization.Serializable
+internal data class PhotoCatalogAsset(val id: String, val name: String, val width: Int, val height: Int, val createdAt: String, val updatedAt: String, val favorite: Boolean)

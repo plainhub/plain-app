@@ -13,12 +13,22 @@ pub(super) fn parts() -> Result<(Handle, NativeGraphqlExecutor), String> {
 fn errors(error: String) -> String {
     serde_json::json!({"errors":[{"message":error}]}).to_string()
 }
+fn execute_on_runtime<F>(runtime: &Handle, operation: F) -> Result<F::Output, String>
+where
+    F: std::future::Future + Send + 'static,
+    F::Output: Send + 'static,
+{
+    runtime
+        .block_on(runtime.spawn(operation))
+        .map_err(|error| error.to_string())
+}
 fn public(request: &str) -> String {
     let result = (|| {
         let (runtime, executor) = parts()?;
         let parsed = serde_json::from_str(request).map_err(|e| e.to_string())?;
-        serde_json::to_string(&runtime.block_on(executor.execute(parsed)))
-            .map_err(|e| e.to_string())
+        execute_on_runtime(&runtime, async move {
+            serde_json::to_string(&executor.execute(parsed).await).map_err(|e| e.to_string())
+        })?
     })();
     result.unwrap_or_else(errors)
 }
@@ -32,7 +42,12 @@ pub extern "C" fn plain_graphql(request: *const c_char) -> *mut c_char {
 #[cfg(target_os = "android")]
 mod android {
     use super::*;
-    use jni::{EnvUnowned, errors::ThrowRuntimeExAndDefault, objects::{JObject, JString}, sys::jstring};
+    use jni::{
+        EnvUnowned,
+        errors::ThrowRuntimeExAndDefault,
+        objects::{JObject, JString},
+        sys::jstring,
+    };
     #[unsafe(no_mangle)]
     pub extern "system" fn Java_com_ismartcoding_plain_rust_native_RustNativeBindings_graphql(
         mut env: EnvUnowned<'_>,
@@ -46,3 +61,7 @@ mod android {
         .into_raw()
     }
 }
+
+#[cfg(test)]
+#[path = "../../tests/unit/ffi/graphql.rs"]
+mod tests;

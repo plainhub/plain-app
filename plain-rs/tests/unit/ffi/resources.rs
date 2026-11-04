@@ -2,7 +2,7 @@ use super::*;
 
 #[test]
 fn unknown_resource_does_not_replace_the_active_host() {
-    let directory = std::env::temp_dir().join(plain_rs::utils::short_uuid::short_uuid());
+    let directory = std::env::temp_dir().join(plain_libs::utils::short_uuid::short_uuid());
     std::fs::create_dir(&directory).unwrap();
     let runtime = tokio::runtime::Builder::new_multi_thread()
         .enable_all()
@@ -15,21 +15,21 @@ fn unknown_resource_does_not_replace_the_active_host() {
         )
         .unwrap()
     });
-    super::super::events::install(&runtime, &core).unwrap();
+    super::super::host::install(&runtime, &core).unwrap();
     let handle = runtime.handle().clone();
     *super::super::server::CORE.lock().unwrap() = Some(super::super::server::Core {
         token: "test".into(),
         server: core,
         runtime,
     });
-    let (_, host) = super::super::events::bridge().unwrap();
+    let (_, host) = super::super::host::bridge().unwrap();
     let entered = handle.enter();
     assert_eq!(
         open("missing-stream").unwrap_err(),
         "resource stream unavailable"
     );
     host.publish_binary("SCREEN_MIRROR_VIDEO", vec![1]).unwrap();
-    super::super::events::clear();
+    super::super::host::clear();
     drop(host);
     drop(entered);
     let core = super::super::server::CORE.lock().unwrap().take().unwrap();

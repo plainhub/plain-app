@@ -24,7 +24,6 @@ enum class Capability {
     MEDIA_FAVORITE,
     VIDEO_REMUX,
     VIDEO_TRANSCODE,
-    VIDEO_3GP_CONVERT,
     APP_UPDATES,
 
     MIRROR_AUDIO,
