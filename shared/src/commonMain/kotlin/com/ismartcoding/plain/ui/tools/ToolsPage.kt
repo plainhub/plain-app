@@ -72,7 +72,7 @@ fun ToolsPage(
     }
     val cast = viewModel(key = "tools-cast:${source.key}") { CastViewModel(source) }
     val currentUri by cast.currentUri.collectAsState()
-    val notesEnabled = AppFeatureType.NOTES.name in enabledFeatures && AppFeatureType.NOTES.has(source.capabilities)
+    val notesEnabled = AppFeatureType.NOTES.name in enabledFeatures
 
     MainNavScaffold(
         selectedIndex = 2,

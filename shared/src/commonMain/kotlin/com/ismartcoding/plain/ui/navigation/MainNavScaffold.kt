@@ -27,9 +27,7 @@ import androidx.compose.material3.WideNavigationRailItemDefaults
 import androidx.compose.material3.WideNavigationRailValue
 import androidx.compose.material3.rememberWideNavigationRailState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import com.ismartcoding.plain.ui.app.MainViewModel
-import com.ismartcoding.plain.ui.tools.LocalManagedDeviceViewModel
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.ismartcoding.plain.i18n.Res
@@ -48,7 +46,6 @@ import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import com.ismartcoding.plain.ui.resources.Res as UiRes
 import com.ismartcoding.plain.i18n.search
-import com.ismartcoding.plain.ui.tools.hasTools
 
 internal data class MainNavItem(
     val index: Int,
@@ -59,22 +56,16 @@ internal data class MainNavItem(
 @Composable
 internal fun mainNavItems(): List<MainNavItem> {
     val selectedDevice = MainViewModel.selectedDevice.value
-    val manager = LocalManagedDeviceViewModel.current
-    val state = manager?.state?.collectAsState()?.value
-    val info = state?.client?.state?.collectAsState()?.value
     val source = LocalContentSource.current
     return mainNavItems(
-        capabilities = if (selectedDevice == null) source.capabilities else info?.capabilities.orEmpty(),
         localOperationsAllowed = selectedDevice == null && source is com.ismartcoding.plain.rust.graphql.ContentSource.Local,
     )
 }
 
-internal fun mainNavItems(capabilities: Collection<com.ismartcoding.plain.platform.system.Capability>, localOperationsAllowed: Boolean): List<MainNavItem> =
+internal fun mainNavItems(localOperationsAllowed: Boolean): List<MainNavItem> =
     buildList {
         add(MainNavItem(1, UiRes.drawable.ui_drawable_message_circle, Res.string.chat))
-        if (hasTools(capabilities, localToolsAllowed = localOperationsAllowed)) {
-            add(MainNavItem(2, UiRes.drawable.ui_drawable_layout_grid, Res.string.tools))
-        }
+        add(MainNavItem(2, UiRes.drawable.ui_drawable_layout_grid, Res.string.tools))
         add(MainNavItem(3, UiRes.drawable.ui_drawable_search, Res.string.search))
         if (localOperationsAllowed) {
             add(MainNavItem(0, UiRes.drawable.ui_drawable_page_info, Res.string.settings))

@@ -19,7 +19,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
-import com.ismartcoding.plain.platform.system.AppFeatureType
 import com.ismartcoding.plain.ui.base.PIconTextActionButton
 import com.ismartcoding.plain.ui.components.reorderable.ReorderableItem
 import com.ismartcoding.plain.ui.components.reorderable.rememberReorderableLazyGridState
@@ -37,8 +36,7 @@ internal fun HomeFeatureItemsGrid(
     val source = com.ismartcoding.plain.ui.navigation.LocalContentSource.current
     val capabilities = source.capabilities
     val allFeatureItems = remember(navController, capabilities) { FeatureItem.getList(navController, capabilities, source is com.ismartcoding.plain.rust.graphql.ContentSource.Local) }
-    val items = enabledIds.filter { it != AppFeatureType.CHAT.name }
-        .mapNotNull { typeName -> allFeatureItems.find { it.type.name == typeName } }
+    val items = enabledIds.mapNotNull { typeName -> allFeatureItems.find { it.type.name == typeName } }
     if (source is com.ismartcoding.plain.rust.graphql.ContentSource.Remote) {
         FeatureItemsGrid(items, modifier, contentPadding, header = header)
         return

@@ -23,6 +23,8 @@ import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.ismartcoding.plain.Prefs
+import com.ismartcoding.plain.buildChannel
+import com.ismartcoding.plain.platform.system.AppChannelType
 import com.ismartcoding.plain.platform.system.AppFeatureType
 import com.ismartcoding.plain.ui.components.ButtonSize
 import com.ismartcoding.plain.platform.system.has
@@ -89,7 +91,7 @@ fun SettingsPage(navController: NavHostController, updateViewModel: UpdateViewMo
                 modifier = Modifier.padding(top = paddingValues.calculateTopPadding()),
             ) {
                 item { TopSpace() }
-                if (AppFeatureType.DONATION.has()) {
+                if (buildChannel != AppChannelType.GOOGLE.name) {
                     item {
                         PDonationBanner(onClick = { WebHelper.open("https://ko-fi.com/ismartcoding") })
                         VerticalSpace(dp = 16.dp)

@@ -739,7 +739,6 @@ class ManagedDeviceUiAcceptanceTest {
             val features = java.util.concurrent.atomic.AtomicReference("NOTES|FILES")
             val failRefresh = java.util.concurrent.atomic.AtomicBoolean(false)
             val source = shareFixtureSource(requests, capabilities = listOf(
-                com.ismartcoding.plain.platform.system.Capability.NOTES,
                 com.ismartcoding.plain.platform.system.Capability.FILE_BROWSER,
             ), readFeatures = { features.get() }, failRead = { failRefresh.get() && "{ prefs }" in it.query })
             scenario.onActivity { activity ->

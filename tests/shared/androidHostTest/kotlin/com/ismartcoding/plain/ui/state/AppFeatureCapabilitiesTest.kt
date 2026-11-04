@@ -11,11 +11,11 @@ import kotlin.test.assertTrue
 class AppFeatureCapabilitiesTest {
     @Test
     fun optionalFeaturesFollowTheAdvertisedCapabilitiesWithoutPlatformChecks() {
-        val capabilities = listOf(Capability.NOTES, Capability.CONTACTS)
-        assertTrue(AppFeatureType.NOTES.has(capabilities))
-        assertTrue(AppFeatureType.CONTACTS.has(capabilities))
-        assertFalse(AppFeatureType.SMS.has(capabilities))
-        assertFalse(AppFeatureType.APPS.has(capabilities))
+        val capabilities = listOf(Capability.PACKAGES)
+        for (feature in listOf(AppFeatureType.NOTES, AppFeatureType.FEEDS, AppFeatureType.POMODORO_TIMER)) {
+            assertTrue(feature.has(emptyList()))
+        }
+        assertTrue(AppFeatureType.APPS.has(capabilities))
         assertFalse(AppFeatureType.NOTIFICATIONS.has(capabilities))
     }
 
@@ -23,8 +23,6 @@ class AppFeatureCapabilitiesTest {
     fun distributionAndFileBrowsingFeaturesUseTheirOwnCapabilities() {
         assertFalse(AppFeatureType.CHECK_UPDATES.has(emptyList()))
         assertTrue(AppFeatureType.CHECK_UPDATES.has(listOf(Capability.APP_UPDATES)))
-        assertFalse(AppFeatureType.DONATION.has(listOf(Capability.APP_UPDATES)))
-        assertTrue(AppFeatureType.DONATION.has(listOf(Capability.DONATION)))
         assertFalse(AppFeatureType.FILES.has(emptyList()))
         assertTrue(AppFeatureType.FILES.has(listOf(Capability.FILE_BROWSER)))
     }

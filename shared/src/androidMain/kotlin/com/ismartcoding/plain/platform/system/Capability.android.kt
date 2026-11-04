@@ -25,12 +25,12 @@ actual fun getDeviceCapabilities(): List<Capability> = Capability.entries.filter
         Capability.MEDIA_SCAN, Capability.LAN_SHARE, Capability.DISK_MANAGER -> false
         Capability.MEDIA_TRASH, Capability.MEDIA_FAVORITE -> Build.VERSION.SDK_INT >= Build.VERSION_CODES.R
         Capability.MEDIA_MOVE, Capability.MIRROR_AUDIO -> Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q
-        Capability.PACKAGES, Capability.SMS, Capability.CALLS, Capability.NOTIFICATIONS, Capability.DONATION -> buildChannel != AppChannelType.GOOGLE.name
+        Capability.PACKAGES, Capability.NOTIFICATIONS -> buildChannel != AppChannelType.GOOGLE.name
         Capability.APP_UPDATES -> buildChannel == AppChannelType.GITHUB.name
         Capability.IMAGE_EDITOR -> isDebugBuild()
         Capability.FILE_EXPORT, Capability.APP_RELAUNCH, Capability.MEDIA_DELETE,
-        Capability.DOC_PREVIEW, Capability.IMAGE_SEARCH, Capability.CALL_PHONE,
-        Capability.CONTACTS, Capability.NOTES, Capability.FEEDS, Capability.SCREEN_MIRROR,
-        Capability.CLIPBOARD, Capability.POMODORO -> true
+        Capability.DOC_PREVIEW, Capability.IMAGE_SEARCH, Capability.TELEPHONY,
+        Capability.SCREEN_MIRROR,
+        Capability.CLIPBOARD -> true
     }
 }

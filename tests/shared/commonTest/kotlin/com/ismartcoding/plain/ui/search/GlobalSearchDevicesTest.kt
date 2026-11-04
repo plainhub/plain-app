@@ -12,7 +12,6 @@ import com.ismartcoding.plain.models.ManagedDeviceInfo
 import com.ismartcoding.plain.models.Note
 import com.ismartcoding.plain.models.Peer
 import com.ismartcoding.plain.models.PeerAddress
-import com.ismartcoding.plain.platform.system.Capability
 import com.ismartcoding.plain.platform.system.DeviceType
 import com.ismartcoding.plain.rust.graphql.ContentSource
 import com.ismartcoding.plain.rust.graphql.GraphqlHttpResponse
@@ -293,7 +292,7 @@ class GlobalSearchDevicesTest {
                 decrypt = { _, encoded, _ ->
                     val operation = JsonHelper.jsonDecode<GraphqlOperation>(Base64.decode(encoded).decodeToString())
                     val data = if ("app {" in operation.query) {
-                        JsonHelper.jsonEncodeToElement(AppData(ManagedDeviceInfo(name, listOf(Capability.NOTES), emptyList(), "app://", "/downloads", "resource-token", null)))
+                        JsonHelper.jsonEncodeToElement(AppData(ManagedDeviceInfo(name, emptyList(), emptyList(), "app://", "/downloads", "resource-token", null)))
                     } else {
                         requests.add(operation)
                         beforeResponse(operation)
