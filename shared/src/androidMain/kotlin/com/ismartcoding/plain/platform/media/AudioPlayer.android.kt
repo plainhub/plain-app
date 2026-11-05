@@ -1,9 +1,15 @@
 package com.ismartcoding.plain.platform.media
 
 
+import com.ismartcoding.plain.i18n.Res
+import com.ismartcoding.plain.i18n.audio_notification_prompt
+import com.ismartcoding.plain.ui.permissions.checkNotificationPermission
 import com.ismartcoding.plain.appContext
 import com.ismartcoding.plain.models.AudioItem
 import kotlinx.coroutines.flow.StateFlow
+
+actual fun checkAudioPlaybackPermission(onGranted: () -> Unit) =
+    checkNotificationPermission(Res.string.audio_notification_prompt, onGranted)
 
 actual fun createAudioPlayer(): AudioPlayer = ExoPlayerAudioPlayer
 

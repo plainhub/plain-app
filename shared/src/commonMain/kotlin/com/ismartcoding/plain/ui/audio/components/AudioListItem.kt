@@ -20,7 +20,7 @@ import androidx.compose.ui.unit.dp
 import com.ismartcoding.plain.models.Audio
 import com.ismartcoding.plain.models.Tag
 import com.ismartcoding.plain.i18n.*
-import com.ismartcoding.plain.ui.permissions.checkNotificationPermission
+import com.ismartcoding.plain.platform.media.checkAudioPlaybackPermission
 import com.ismartcoding.plain.ui.base.HorizontalSpace
 import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.base.dragselect.DragSelectState
@@ -64,7 +64,7 @@ fun AudioListItem(
                     else if (castVM.castMode.value) { castVM.cast(item) }
                     else if (current) { audioQueueVM.audioPlayerVisible.value = true }
                     else {
-                        checkNotificationPermission(Res.string.audio_notification_prompt) {
+                        checkAudioPlaybackPermission {
                             scope.launch(Dispatchers.Default) { audioQueueVM.enqueueAndPlayAsync(item) }
                         }
                     }

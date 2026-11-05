@@ -21,7 +21,7 @@ import com.ismartcoding.plain.lib.withIO
 import com.ismartcoding.plain.features.files.ZipBrowserHelper
 import com.ismartcoding.plain.platform.files.fileToUriString
 import com.ismartcoding.plain.platform.system.openFileExternal
-import com.ismartcoding.plain.platform.media.playAudioWithNotificationCheck
+import com.ismartcoding.plain.platform.media.playAudioWithPermissionCheck
 import com.ismartcoding.plain.ui.media.viewer.previewer.MediaPreviewerState
 import com.ismartcoding.plain.ui.media.viewer.previewer.TransformItemState
 import com.ismartcoding.plain.ui.media.extensions.toPreviewItem
@@ -149,14 +149,14 @@ fun openFileByType(
                 try {
                     if (source is com.ismartcoding.plain.rust.graphql.ContentSource.Remote) {
                         val audio = source.media.audioInfo(path)
-                        com.ismartcoding.plain.platform.media.audioJustPlayWithNotificationCheck(audio, source)
+                        com.ismartcoding.plain.platform.media.audioJustPlayWithPermissionCheck(audio, source)
                         return@coMain
                     }
                     if (audioQueueVM != null) {
                         val audio = MediaClient.audioInfo(path)
                         audioQueueVM.playSingleAsync(audio)
                     }
-                    playAudioWithNotificationCheck(path)
+                    playAudioWithPermissionCheck(path)
                 } catch (ex: CancellationException) {
                     throw ex
                 } catch (ex: Exception) {

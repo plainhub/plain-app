@@ -13,7 +13,7 @@ import com.ismartcoding.plain.lib.extensions.isTextFile
 import com.ismartcoding.plain.lib.extensions.isVideoFast
 import com.ismartcoding.plain.lib.withIO
 import com.ismartcoding.plain.platform.files.fileToUriString
-import com.ismartcoding.plain.platform.media.playAudioWithNotificationCheck
+import com.ismartcoding.plain.platform.media.playAudioWithPermissionCheck
 import com.ismartcoding.plain.ui.media.viewer.PreviewItem
 import com.ismartcoding.plain.ui.media.viewer.previewer.MediaPreviewerState
 import com.ismartcoding.plain.ui.media.viewer.previewer.TransformItemState
@@ -75,7 +75,7 @@ fun openAppFile(
                 try {
                     val audio = withIO { MediaClient.audioInfo(path) }
                     audioQueueVM.playSingleAsync(audio)
-                    playAudioWithNotificationCheck(path)
+                    playAudioWithPermissionCheck(path)
                 } catch (ex: Exception) {
                     DialogHelper.showMessage(Res.string.audio_play_error)
                 }

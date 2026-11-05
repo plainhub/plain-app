@@ -24,6 +24,7 @@ import com.ismartcoding.plain.ui.base.dragselect.DragSelectState
 import com.ismartcoding.plain.ui.audio.AudioQueueViewModel
 import com.ismartcoding.plain.ui.casting.CastViewModel
 import com.ismartcoding.plain.ui.audio.player.AudioQueuePage
+import com.ismartcoding.plain.ui.state.launchSafe
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
@@ -47,7 +48,7 @@ fun AudioPlayerBar(
     val currentPlayingPath = audioQueueVM.selectedPath
 
     LaunchedEffect(currentPlayingPath.value) {
-        scope.launch {
+        launchSafe {
             val path = currentPlayingPath.value
             if (path.isNotEmpty()) {
                 val audio = withIO { audioQueueVM.source.media.audioInfo(path) }

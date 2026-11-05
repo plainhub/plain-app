@@ -13,7 +13,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import com.ismartcoding.plain.models.AudioItem
 import com.ismartcoding.plain.i18n.*
-import com.ismartcoding.plain.platform.media.audioJustPlayWithNotificationCheck
+import com.ismartcoding.plain.platform.media.audioJustPlayWithPermissionCheck
 import com.ismartcoding.plain.ui.base.HorizontalSpace
 import com.ismartcoding.plain.ui.components.PIconButton
 import com.ismartcoding.plain.ui.base.VerticalSpace
@@ -41,7 +41,7 @@ fun ReorderableCollectionItemScope.AudioQueueItemRow(
     Card(
         modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 4.dp)
             .clip(RoundedCornerShape(12.dp))
-            .clickable { audioJustPlayWithNotificationCheck(audio, audioQueueVM.source) },
+            .clickable { audioJustPlayWithPermissionCheck(audio, audioQueueVM.source) },
         colors = CardDefaults.cardColors(containerColor = if (isPlaying) MaterialTheme.colorScheme.cardBackgroundActive else MaterialTheme.colorScheme.cardBackgroundNormal),
     ) {
         Row(modifier = Modifier.fillMaxWidth().padding(12.dp), verticalAlignment = Alignment.CenterVertically) {

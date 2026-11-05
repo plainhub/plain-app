@@ -11,10 +11,8 @@ import androidx.lifecycle.ViewModel
 import com.ismartcoding.plain.lib.withIO
 import com.ismartcoding.plain.features.audio.AudioCommands
 import com.ismartcoding.plain.features.audio.AudioQueueApi
-import com.ismartcoding.plain.i18n.Res
-import com.ismartcoding.plain.i18n.audio_notification_prompt
 import com.ismartcoding.plain.rust.graphql.ContentSource
-import com.ismartcoding.plain.ui.permissions.checkNotificationPermission
+import com.ismartcoding.plain.platform.media.checkAudioPlaybackPermission
 import com.ismartcoding.plain.ui.state.launchSafe
 import kotlinx.coroutines.flow.Flow
 import com.ismartcoding.plain.models.AudioItem
@@ -28,9 +26,7 @@ import com.ismartcoding.plain.lib.logcat.LogCat
 class AudioQueueViewModel internal constructor(
     val source: ContentSource = ContentSource.Local,
     private val queue: AudioQueueApi = source.queue,
-    private val checkPlaybackPermission: (() -> Unit) -> Unit = { onGranted ->
-        checkNotificationPermission(Res.string.audio_notification_prompt, onGranted)
-    },
+    private val checkPlaybackPermission: (() -> Unit) -> Unit = ::checkAudioPlaybackPermission,
     private val startPlayback: suspend (AudioItem) -> Unit = { AudioCommands.play(it, source) },
     sourceChanges: Flow<Unit>? = null,
 ) : ViewModel() {

@@ -38,7 +38,7 @@ import com.ismartcoding.plain.models.AudioItem
 import com.ismartcoding.plain.lib.withIO
 import com.ismartcoding.plain.ui.navigation.PBackHandler
 import com.ismartcoding.plain.platform.media.audioIsPlayingFlow
-import com.ismartcoding.plain.platform.media.audioJustPlayWithNotificationCheck
+import com.ismartcoding.plain.platform.media.audioJustPlayWithPermissionCheck
 import com.ismartcoding.plain.platform.media.audioPause
 import com.ismartcoding.plain.platform.media.audioPlay
 import com.ismartcoding.plain.platform.media.audioPlayerProgress
@@ -48,6 +48,7 @@ import com.ismartcoding.plain.platform.media.audioSkipToPrevious
 import com.ismartcoding.plain.ui.platform.system.exitImmersiveFullscreen
 import com.ismartcoding.plain.ui.base.PModalBottomSheet
 import com.ismartcoding.plain.ui.audio.AudioQueueViewModel
+import com.ismartcoding.plain.ui.state.launchSafe
 import com.ismartcoding.plain.ui.resources.Res as UiRes
 import com.ismartcoding.plain.ui.resources.chevron_left as ui_drawable_chevron_left
 import com.ismartcoding.plain.ui.resources.expand_more as ui_drawable_expand_more
@@ -77,10 +78,12 @@ fun AudioPlayerPage(audioQueueVM: AudioQueueViewModel, onDismissRequest: () -> U
 
     var fallbackItem by remember { mutableStateOf<AudioItem?>(null) }
     LaunchedEffect(currentPlayingPath.value, audioQueueVM.queueItems.value) {
-        fallbackItem = null
-        if (!isDragging) progress = audioPlayerProgress().toFloat()
-        if (currentPlayingPath.value.isNotEmpty() && audioQueueVM.queueItems.value.none { if (it.mediaId != null) it.mediaId == audioQueueVM.selectedMediaId.value else it.path == currentPlayingPath.value }) {
-            fallbackItem = withIO { audioQueueVM.source.media.audioInfo(currentPlayingPath.value) }.copy(mediaId = audioQueueVM.selectedMediaId.value)
+        launchSafe {
+            fallbackItem = null
+            if (!isDragging) progress = audioPlayerProgress().toFloat()
+            if (currentPlayingPath.value.isNotEmpty() && audioQueueVM.queueItems.value.none { if (it.mediaId != null) it.mediaId == audioQueueVM.selectedMediaId.value else it.path == currentPlayingPath.value }) {
+                fallbackItem = withIO { audioQueueVM.source.media.audioInfo(currentPlayingPath.value) }.copy(mediaId = audioQueueVM.selectedMediaId.value)
+            }
         }
     }
     val pages = if (fallbackItem != null) listOfNotNull(fallbackItem) else audioQueueVM.queueItems.value
@@ -93,7 +96,7 @@ fun AudioPlayerPage(audioQueueVM: AudioQueueViewModel, onDismissRequest: () -> U
         snapshotFlow { pagerState.settledPage }.drop(1).collect { page ->
             val item = pages.getOrNull(page) ?: return@collect
             if (currentPlayingPath.value.isNotEmpty() && (if (item.mediaId != null) item.mediaId != audioQueueVM.selectedMediaId.value else item.path != currentPlayingPath.value)) {
-                audioJustPlayWithNotificationCheck(item, audioQueueVM.source)
+                audioJustPlayWithPermissionCheck(item, audioQueueVM.source)
             }
         }
     }

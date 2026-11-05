@@ -13,7 +13,7 @@ import androidx.navigation.NavHostController
 import com.ismartcoding.plain.lib.extensions.isAudioFast
 import com.ismartcoding.plain.lib.coMain
 import com.ismartcoding.plain.lib.withIO
-import com.ismartcoding.plain.platform.media.audioJustPlayWithNotificationCheck
+import com.ismartcoding.plain.platform.media.audioJustPlayWithPermissionCheck
 import com.ismartcoding.plain.ui.navigation.Routing
 import com.ismartcoding.plain.ui.audio.AudioQueueViewModel
 
@@ -31,7 +31,7 @@ fun PlayMediaPage(
             coMain {
                 val audio = withIO { MediaClient.audioInfo(path) }
                 withIO { audioQueueVM.playSingleAsync(audio) }
-                audioJustPlayWithNotificationCheck(audio)
+                audioJustPlayWithPermissionCheck(audio)
                 navController.navigate(Routing.Audio) {
                     popUpTo(Routing.PlayMedia(path)) { inclusive = true }
                 }

@@ -23,7 +23,7 @@ import androidx.compose.ui.platform.SoftwareKeyboardController
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.ismartcoding.plain.ui.platform.media.MediaPreviewer
-import com.ismartcoding.plain.ui.permissions.checkNotificationPermission
+import com.ismartcoding.plain.platform.media.checkAudioPlaybackPermission
 import com.ismartcoding.plain.ui.base.BottomSpace
 import com.ismartcoding.plain.ui.base.PAlert
 import com.ismartcoding.plain.ui.audio.AudioQueueViewModel
@@ -86,7 +86,7 @@ fun GlobalSearchPage(
     val onOpen: (GlobalSearchHit) -> Unit = { hit ->
         when (val action = hit.action) {
             is GlobalSearchAction.Navigate -> MainViewModel.openSearchHit(hit)
-            is GlobalSearchAction.PlayAudio -> checkNotificationPermission(Res.string.audio_notification_prompt) {
+            is GlobalSearchAction.PlayAudio -> checkAudioPlaybackPermission {
                 scope.launch(Dispatchers.Default) { rowContexts.getValue(hit.device).audioQueueVM.enqueueAndPlayAsync(action.audio) }
             }
         }

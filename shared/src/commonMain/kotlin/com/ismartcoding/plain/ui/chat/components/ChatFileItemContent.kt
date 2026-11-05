@@ -34,7 +34,7 @@ import com.ismartcoding.plain.lib.extensions.isZipFile
 import com.ismartcoding.plain.lib.withIO
 import com.ismartcoding.plain.ui.i18n.LocaleHelper
 import com.ismartcoding.plain.platform.files.fileToUriString
-import com.ismartcoding.plain.platform.media.playAudioWithNotificationCheck
+import com.ismartcoding.plain.platform.media.playAudioWithPermissionCheck
 import com.ismartcoding.plain.platform.files.saveFileToDownloads
 import com.ismartcoding.plain.ui.base.PDropdownMenu
 import com.ismartcoding.plain.ui.base.PDropdownMenuItem
@@ -119,7 +119,7 @@ internal fun ChatFileItemContent(
                             )
                         }
                     } else if (fileName.isAudioFast()) {
-                        playAudioWithNotificationCheck(path, source)
+                        playAudioWithPermissionCheck(path, source)
                     } else if (fileName.isTextFile()) {
                         navController.navigateTextFile(path, fileName, mediaId = "", type = TextFileType.CHAT)
                     } else if (fileName.isPdfFile()) {

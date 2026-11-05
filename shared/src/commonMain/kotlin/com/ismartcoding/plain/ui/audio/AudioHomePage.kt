@@ -32,7 +32,7 @@ import com.ismartcoding.plain.lib.coIO
 import com.ismartcoding.plain.lib.withIO
 import com.ismartcoding.plain.ui.navigation.PBackHandler
 import com.ismartcoding.plain.platform.media.audioIsPlayingFlow
-import com.ismartcoding.plain.platform.media.audioJustPlayWithNotificationCheck
+import com.ismartcoding.plain.platform.media.audioJustPlayWithPermissionCheck
 import com.ismartcoding.plain.preferences.*
 import com.ismartcoding.plain.ui.base.AnimatedBottomAction
 import com.ismartcoding.plain.ui.components.NeedPermissionColumn
@@ -228,7 +228,7 @@ fun AudioHomePage(
                                         audioVM.source.queue.add("trash:false")
                                         val start = audioVM.source.queue.resolveNext(isNext = true, shuffle = true)
                                         if (start != null) {
-                                            audioJustPlayWithNotificationCheck(start, audioVM.source)
+                                            audioJustPlayWithPermissionCheck(start, audioVM.source)
                                             audioQueueVM.onStarted(start)
                                         }
                                     }

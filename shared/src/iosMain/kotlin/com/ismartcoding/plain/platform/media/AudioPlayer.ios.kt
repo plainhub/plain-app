@@ -31,6 +31,8 @@ import platform.Foundation.NSNotificationCenter
 import platform.Foundation.NSOperationQueue
 import platform.Foundation.NSURL
 
+actual fun checkAudioPlaybackPermission(onGranted: () -> Unit) = onGranted()
+
 actual fun createAudioPlayer(): AudioPlayer = AVPlayerAudioPlayer
 
 private object AVPlayerAudioPlayer : AudioPlayer {
