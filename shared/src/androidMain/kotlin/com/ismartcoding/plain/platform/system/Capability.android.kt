@@ -12,11 +12,6 @@ actual fun getDeviceCapabilities(): List<Capability> = Capability.entries.filter
         Capability.WIFI_AWARE -> isWifiAwareSupported
         Capability.BACKGROUND_SERVICE,
         Capability.LAUNCHER_SHORTCUTS,
-        Capability.FILE_BROWSER,
-        Capability.IMAGE_LIBRARY,
-        Capability.AUDIO_LIBRARY,
-        Capability.VIDEO_LIBRARY,
-        Capability.DOCUMENT_LIBRARY,
         Capability.SOUND_METER -> true
         Capability.BACKGROUND_TIMER -> isAppForegrounded()
         Capability.BACKGROUND_WAKE -> true

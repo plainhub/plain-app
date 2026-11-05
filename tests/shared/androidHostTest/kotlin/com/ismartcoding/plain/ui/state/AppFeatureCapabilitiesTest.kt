@@ -20,20 +20,9 @@ class AppFeatureCapabilitiesTest {
     }
 
     @Test
-    fun distributionAndFileBrowsingFeaturesUseTheirOwnCapabilities() {
-        assertFalse(AppFeatureType.CHECK_UPDATES.has(emptyList()))
-        assertTrue(AppFeatureType.CHECK_UPDATES.has(listOf(Capability.APP_UPDATES)))
-        assertFalse(AppFeatureType.FILES.has(emptyList()))
-        assertTrue(AppFeatureType.FILES.has(listOf(Capability.FILE_BROWSER)))
-    }
-    @Test
-    fun libraryAndToolEntriesRequireTheirImplementedProviders() {
+    fun optionalDistributionAndToolEntriesUseTheirOwnCapabilities() {
         for ((feature, capability) in listOf(
-            AppFeatureType.FILES to Capability.FILE_BROWSER,
-            AppFeatureType.IMAGES to Capability.IMAGE_LIBRARY,
-            AppFeatureType.VIDEOS to Capability.VIDEO_LIBRARY,
-            AppFeatureType.AUDIO to Capability.AUDIO_LIBRARY,
-            AppFeatureType.DOCS to Capability.DOCUMENT_LIBRARY,
+            AppFeatureType.CHECK_UPDATES to Capability.APP_UPDATES,
             AppFeatureType.SOUND_METER to Capability.SOUND_METER,
         )) {
             assertFalse(feature.has(emptyList()))
@@ -42,4 +31,13 @@ class AppFeatureCapabilitiesTest {
         }
     }
 
+    @Test
+    fun baseFileAndMediaEntriesAreAvailableWithoutCapabilities() {
+        for (feature in listOf(
+            AppFeatureType.FILES, AppFeatureType.IMAGES, AppFeatureType.VIDEOS,
+            AppFeatureType.AUDIO, AppFeatureType.DOCS,
+        )) {
+            assertTrue(feature.has(emptyList()))
+        }
+    }
 }

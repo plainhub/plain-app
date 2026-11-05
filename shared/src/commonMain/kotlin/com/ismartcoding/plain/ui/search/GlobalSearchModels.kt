@@ -108,18 +108,8 @@ internal data class GlobalSearchDevices(
     val errors: List<GlobalSearchDeviceError> = emptyList(),
 )
 
-internal fun GlobalSearchDomain.supportedBy(source: com.ismartcoding.plain.rust.graphql.ContentSource): Boolean {
-    val capability = when (this) {
-        GlobalSearchDomain.AUDIO -> com.ismartcoding.plain.platform.system.Capability.AUDIO_LIBRARY
-        GlobalSearchDomain.IMAGES -> com.ismartcoding.plain.platform.system.Capability.IMAGE_LIBRARY
-        GlobalSearchDomain.VIDEOS -> com.ismartcoding.plain.platform.system.Capability.VIDEO_LIBRARY
-        GlobalSearchDomain.DOCS -> com.ismartcoding.plain.platform.system.Capability.DOCUMENT_LIBRARY
-        GlobalSearchDomain.FILES -> com.ismartcoding.plain.platform.system.Capability.FILE_BROWSER
-        GlobalSearchDomain.NOTES, GlobalSearchDomain.FEEDS, GlobalSearchDomain.CHAT -> return true
-        GlobalSearchDomain.APPS -> com.ismartcoding.plain.platform.system.Capability.PACKAGES
-    }
-    return capability in source.capabilities
-}
+internal fun GlobalSearchDomain.supportedBy(source: com.ismartcoding.plain.rust.graphql.ContentSource): Boolean =
+    this != GlobalSearchDomain.APPS || com.ismartcoding.plain.platform.system.Capability.PACKAGES in source.capabilities
 
 /** Window of [this] around the first occurrence of [q] for a two-line snippet. */
 fun String.snippetAround(q: String, radius: Int = 40): String {
