@@ -51,7 +51,7 @@ import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.stringResource
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
-import com.ismartcoding.plain.helpers.StringHelper
+import com.ismartcoding.plain.lib.generateId
 import com.ismartcoding.plain.ui.components.NavigationBackIcon
 import com.ismartcoding.plain.ui.components.PIconButton
 import com.ismartcoding.plain.ui.base.PScaffold
@@ -135,7 +135,7 @@ fun ImageEditorPage(
                 val p = textInsertPoint ?: Point(50.0, 50.0)
                 vm.addLayer(
                     TextLayer(
-                        id = StringHelper.shortUUID(),
+                        id = generateId(),
                         x = p.x, y = p.y,
                         text = text,
                         fontSize = 48.0,
@@ -290,7 +290,7 @@ fun ImageEditorPage(
                                 tool == ImageEditorTool.FREEHAND -> {
                                     strokePoints.clear()
                                     strokePoints.add(toCanvas(firstPos))
-                                    previewId = StringHelper.shortUUID()
+                                    previewId = generateId()
                                     drawingLayer = FreehandLayer(
                                         id = previewId,
                                         points = strokePoints.toList(),
@@ -303,7 +303,7 @@ fun ImageEditorPage(
                                 }
                                 else -> {
                                     startPoint = toCanvas(firstPos)
-                                    previewId = StringHelper.shortUUID()
+                                    previewId = generateId()
                                     drawingLayer = createShape(
                                         tool = tool,
                                         id = previewId,
@@ -373,7 +373,7 @@ fun ImageEditorPage(
                                         ImageEditorTool.FREEHAND -> {
                                             strokePoints.add(toCanvas(change.position))
                                             drawingLayer = FreehandLayer(
-                                                id = previewId ?: StringHelper.shortUUID(),
+                                                id = previewId ?: generateId(),
                                                 points = strokePoints.toList(),
                                                 color = vm.color.value,
                                                 lineWidth = vm.lineWidth.value,
@@ -385,7 +385,7 @@ fun ImageEditorPage(
                                             val cur = toCanvas(change.position)
                                             drawingLayer = createShape(
                                                 tool = tool,
-                                                id = previewId ?: StringHelper.shortUUID(),
+                                                id = previewId ?: generateId(),
                                                 start = startPoint,
                                                 end = cur,
                                                 color = vm.color.value,

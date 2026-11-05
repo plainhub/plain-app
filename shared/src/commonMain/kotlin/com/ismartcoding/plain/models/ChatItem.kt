@@ -10,7 +10,6 @@ import com.ismartcoding.plain.features.chat.models.MessageType
 import com.ismartcoding.plain.features.chat.ChatStatus
 import com.ismartcoding.plain.lib.JsonHelper
 import com.ismartcoding.plain.lib.TimeHelper
-import com.ismartcoding.plain.lib.generateId
 import kotlin.time.Instant
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.*
@@ -21,7 +20,7 @@ data class ChatItem(
     @Required var fromId: String = "",
     @Required var toId: String = "",
     var channelId: String? = null,
-    @Required var id: String = generateId(),
+    @Required var id: String = "",
     var content: String,
     @Required var createdAt: Instant = TimeHelper.now(),
     @Required var updatedAt: Instant = TimeHelper.now(),

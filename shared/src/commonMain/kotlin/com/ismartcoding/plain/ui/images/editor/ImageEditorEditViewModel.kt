@@ -7,7 +7,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ismartcoding.plain.features.images.editor.ImageEditorProjectsClient
 import com.ismartcoding.plain.helpers.Base64Lenient
-import com.ismartcoding.plain.helpers.StringHelper
+import com.ismartcoding.plain.lib.generateId
 import com.ismartcoding.plain.lib.withIO
 import com.ismartcoding.plain.lib.yjs.ArrowLayer
 import com.ismartcoding.plain.lib.yjs.CanvasSize
@@ -163,7 +163,7 @@ class ImageEditorEditViewModel : ViewModel() {
         stickerColorIdx++
         val cw = canvasSize.value.width.toDouble()
         val layer = StickerLayer(
-            id = StringHelper.shortUUID(),
+            id = generateId(),
             x = x,
             y = y,
             w = cw * 0.18,
@@ -232,7 +232,7 @@ class ImageEditorEditViewModel : ViewModel() {
     fun duplicateLayer(layerId: String) {
         val layer = _layersFlow.value.find { it.id == layerId } ?: return
         pushHistory()
-        val copy = offsetLayer(layer, 20.0, 20.0, StringHelper.shortUUID())
+        val copy = offsetLayer(layer, 20.0, 20.0, generateId())
         _layersFlow.update { it + copy }
         selectedLayerId.value = copy.id
         markDirty()
@@ -286,7 +286,7 @@ class ImageEditorEditViewModel : ViewModel() {
                     images = images.value,
                 )
                 val stateB64 = Base64Lenient.encode(stateBytes)
-                val projectId = if (id.value.isNotEmpty()) id.value else StringHelper.shortUUID()
+                val projectId = id.value
                 val updated = ImageEditorProjectsClient.addOrUpdateAsync(projectId) {
                     this.stateB64 = stateB64
                     this.canvasWidth = canvasSize.value.width

@@ -30,7 +30,7 @@ internal fun AudioPageEffects(
         }
     }
 
-    com.ismartcoding.plain.ui.media.MediaPermissionEffects(audioVM.hasPermission, null, reloadAfterGrant, audioVM.source)
+    com.ismartcoding.plain.ui.media.MediaPermissionEffects(audioVM.hasPermission, null, reloadAfterGrant, audioVM.source, feature = audioVM.accessFeature)
 
     LaunchedEffect(audioState.dragSelectState.selectMode, !isGestureInteractionMode()) {
         if (audioState.dragSelectState.selectMode || !isGestureInteractionMode()) {

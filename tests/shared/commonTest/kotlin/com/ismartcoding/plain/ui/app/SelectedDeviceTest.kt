@@ -84,7 +84,7 @@ class SelectedDeviceTest {
             publicKey = "fixture-key", token = "fixture-token",
             address = PeerAddress("device.test", "Remote", "https://device.test:8443", "", ""),
         )
-        val response = """{"data":{"app":{"deviceName":"Remote","capabilities":[],"permissions":[],"appDir":"app://","downloadsDir":"/downloads","urlToken":"resource-token","tlsCertificateSha256":null}}}"""
+        val response = """{"data":{"app":{"deviceName":"Remote","capabilities":[],"access":[],"appDir":"app://","downloadsDir":"/downloads","urlToken":"resource-token","tlsCertificateSha256":null}}}"""
         val http = PeerHttpClient(peer, peers = { listOf(peer) }, clientId = { "fixture-client" },
             encrypt = { _, _ -> Base64.encode(byteArrayOf(1)) },
             decrypt = { _, _, _ -> Base64.encode(response.encodeToByteArray()) },

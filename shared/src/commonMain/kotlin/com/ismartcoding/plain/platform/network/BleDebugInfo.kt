@@ -24,7 +24,6 @@ data class BleDebugInfo(
     // ---- Runtime Status ----
     /** Whether the local GATT server (advertising) is currently running. */
     val advertisingRunning: Boolean = false,
-    /** This device's clientId (13-char short UUID) advertised in serviceData. */
     val clientId: String = "",
     /** The BLE service UUID used for advertise/scan. */
     val serviceUuid: String = "",

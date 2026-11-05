@@ -28,7 +28,7 @@ object BlePairingHost {
                     Handle(operation).also { handles[generation] = it }
                 }
                 val device = bleTransport().createScanner()
-                    .createClient(request.shortId) ?: return hostResult(false)
+                    .createClient(request.clientId) ?: return hostResult(false)
                 val connection = BlePairConnection(device)
                 val installed = mutex.withLock {
                     if (handles[generation] !== entry) false else { entry.connection = connection; true }
@@ -76,7 +76,7 @@ object BlePairingHost {
 private data class BleGenerationRequest(val generation: String)
 
 @Serializable
-private data class BleConnectRequest(val generation: String, val shortId: String)
+private data class BleConnectRequest(val generation: String, val clientId: String)
 
 @Serializable
 private data class BleSendRequest(val generation: String, val body: String)

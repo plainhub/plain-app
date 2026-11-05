@@ -2,14 +2,10 @@ package com.ismartcoding.plain.platform.network.ble
 
 import com.ismartcoding.plain.platform.network.ble.server.BleGattServer
 import kotlinx.serialization.json.JsonObject
-import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.jsonPrimitive
 import kotlinx.serialization.json.boolean
-import kotlinx.serialization.json.put
-import kotlin.io.encoding.Base64
 import kotlin.test.AfterTest
 import kotlin.test.Test
-import kotlin.test.assertContentEquals
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 import kotlin.test.assertFalse
@@ -24,40 +20,36 @@ class PairingTransportTest {
     }
 
     private class Server : BleGattServer {
-        val starts = mutableListOf<Pair<ByteArray, Long>>()
-        val refreshes = mutableListOf<Pair<ByteArray, Long>>()
+        val starts = mutableListOf<Pair<String, Long>>()
         var stops = 0
         var failStart = false
-        override fun start(payload: ByteArray, revision: Long) {
-            starts += payload.copyOf() to revision
+        override fun start(serviceUuid: String, revision: Long) {
+            starts += serviceUuid to revision
             if (failStart) error("SDK rejected advertising")
         }
-        override fun refreshAdvertising(payload: ByteArray, revision: Long) { refreshes += payload.copyOf() to revision }
         override fun stop() { stops++ }
         override fun sendNotification(mac: String, charUuid: String, value: ByteArray): Boolean = true
         override suspend fun sendNotificationBlocking(mac: String, charUuid: String, value: ByteArray): Boolean = true
     }
 
-    private fun command(revision: Long, active: Boolean = true, payload: ByteArray = if (active) ByteArray(9) { it.toByte() } else byteArrayOf()): JsonObject = buildJsonObject {
-        put("lease", checkNotNull(connection).lease)
-        put("revision", revision)
-        put("active", active)
-        put("bytes", Base64.encode(payload))
-    }
+    @kotlinx.serialization.Serializable
+    private data class Command(val lease: String, val revision: Long, val serviceUuid: String?)
+
+    private fun command(revision: Long, active: Boolean = true, serviceUuid: String = "706c6169-2d74-8e53-9a16-f08b62c591d3"): JsonObject =
+        com.ismartcoding.plain.lib.JsonHelper.jsonEncodeToElement(Command(checkNotNull(connection).lease, revision, serviceUuid.takeIf { active })).let { it as JsonObject }
 
     @Test
-    fun sdkReceivesExactRustBytesAndOldRevisionsNeverRestartIt() {
+    fun sdkReceivesExactRustUuidAndOldRevisionsNeverRestartIt() {
         val sdk = Server()
         val current = PairingTransport.connect { sdk }.also { connection = it }
-        val bytes = ByteArray(9) { (it + 1).toByte() }
-        assertTrue(current.handle(command(1, payload = bytes)).jsonPrimitive.boolean)
-        assertContentEquals(bytes, sdk.starts.single().first)
+        val uuid = "706c6169-2d74-8e53-9a16-f08b62c591d3"
+        assertTrue(current.handle(command(1, serviceUuid = uuid)).jsonPrimitive.boolean)
+        assertEquals(uuid, sdk.starts.single().first)
         assertEquals(1L, sdk.starts.single().second)
         assertFalse(current.handle(command(1)).jsonPrimitive.boolean)
         assertEquals(1, sdk.starts.size)
-        assertTrue(sdk.refreshes.isEmpty())
-        assertTrue(current.handle(command(2, payload = bytes.reversedArray())).jsonPrimitive.boolean)
-        assertContentEquals(bytes.reversedArray(), sdk.refreshes.single().first)
+        assertTrue(current.handle(command(2, serviceUuid = uuid)).jsonPrimitive.boolean)
+        assertEquals(1, sdk.starts.size)
         assertTrue(current.handle(command(3, active = false)).jsonPrimitive.boolean)
         assertFalse(PairingTransport.isAdvertising())
         assertEquals(1, sdk.stops)
@@ -76,7 +68,6 @@ class PairingTransportTest {
         assertEquals(1, firstSdk.stops)
         second.handle(command(2))
         assertFailsWith<IllegalStateException> { second.handle(staleCommand) }
-        assertTrue(secondSdk.refreshes.isEmpty())
         first.close()
         assertEquals(0, secondSdk.stops)
         assertTrue(PairingTransport.isAdvertising())
@@ -94,7 +85,7 @@ class PairingTransportTest {
         var creations = 0
         val replacement = Server()
         val current = PairingTransport.connect { if (creations++ == 0) failed else replacement }.also { connection = it }
-        assertFailsWith<IllegalArgumentException> { current.handle(command(1, payload = byteArrayOf(1))) }
+        assertFailsWith<IllegalArgumentException> { current.handle(command(0)) }
         assertEquals(0, creations)
         assertFailsWith<IllegalStateException> { current.handle(command(1)) }
         assertEquals(1, failed.stops)

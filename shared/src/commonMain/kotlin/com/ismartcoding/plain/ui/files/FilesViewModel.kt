@@ -67,7 +67,7 @@ class FilesViewModel internal constructor(val source: ContentSource = ContentSou
     var type: FilesType = FilesType.INTERNAL_STORAGE
     val hasPermission = mutableStateOf(when (source) {
         ContentSource.Local -> AppFeatureType.FILES.hasPermission()
-        is ContentSource.Remote -> com.ismartcoding.plain.platform.permissions.Permission.WRITE_EXTERNAL_STORAGE in source.info.permissions
+        is ContentSource.Remote -> com.ismartcoding.plain.features.web.AccessFeature.FILES in source.info.access
     })
     var offset = 0
     var limit: Int = 1000

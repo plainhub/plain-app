@@ -6,8 +6,8 @@ import com.ismartcoding.plain.lib.JsonHelper
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.ismartcoding.plain.features.clipboard.ClipboardClient
-import com.ismartcoding.plain.platform.permissions.Permission
-import com.ismartcoding.plain.platform.permissions.isEnabledAsync
+import com.ismartcoding.plain.features.web.AccessFeature
+import com.ismartcoding.plain.Prefs
 import org.junit.Assume.assumeTrue
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.*
@@ -19,7 +19,7 @@ import java.util.UUID
 class ClipboardRustHttpTest {
     @Test
     fun nativeClipboardReportsPersistAndDeduplicateInRust() = runBlocking {
-        assumeTrue(Permission.CLIPBOARD.isEnabledAsync())
+        assumeTrue(AccessFeature.CLIPBOARD in Prefs.apiAccessFeatures.value)
         val marker = "clipboard-rust-${UUID.randomUUID()}"
         val text = "$marker 🌍 100%_ \\ \"quoted\""
         val ids = mutableListOf<String>()

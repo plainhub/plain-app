@@ -66,8 +66,8 @@ object AppSubscriptions {
     val contentChanged =
         subscription<Boolean>("contentChanged")
             .shareIn(scope, SharingStarted.WhileSubscribed())
-    val permissionsUpdated =
-        subscription<Boolean>("permissionsUpdated")
+    val accessUpdated =
+        subscription<Boolean>("accessUpdated")
             .shareIn(scope, SharingStarted.WhileSubscribed(), replay = 1)
     val messagesCreated =
         subscription<List<ChatItemId>>("messagesCreated", "{ id }")
@@ -78,7 +78,7 @@ object AppSubscriptions {
     val messagesDeleted =
         subscription<String>("messagesDeleted")
             .shareIn(scope, SharingStarted.WhileSubscribed())
-    private val storageGranted = permissionsUpdated.changes()
+    private val storageGranted = accessUpdated.changes()
         .map { Permission.WRITE_EXTERNAL_STORAGE.isGranted() }
         .distinctUntilChanged()
     val mediaLibraryUpdated = storageGranted.flatMapLatest { granted ->

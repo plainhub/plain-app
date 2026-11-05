@@ -1,6 +1,5 @@
 package com.ismartcoding.plain.ui.web
 
-import com.ismartcoding.plain.ui.permissions.getText
 
 import com.ismartcoding.plain.ui.media.extensions.collectAsStateValue
 
@@ -9,6 +8,7 @@ import com.ismartcoding.plain.i18n.*
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -25,9 +25,8 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.ismartcoding.plain.platform.system.AppFeatureType
 import com.ismartcoding.plain.platform.system.has
-import com.ismartcoding.plain.ui.permissions.PermissionItem
 import com.ismartcoding.plain.features.permissions.getWebList
-import com.ismartcoding.plain.platform.permissions.Permission
+import com.ismartcoding.plain.features.web.AccessFeature
 import com.ismartcoding.plain.platform.permissions.isGranted
 import com.ismartcoding.plain.ui.base.BottomSpace
 import com.ismartcoding.plain.ui.base.PCard
@@ -59,13 +58,12 @@ fun DesktopAccessSettingsPage(
     batterySettings: (@Composable () -> Unit)? = null,
 ) {
     val scope = rememberCoroutineScope()
-    val enabledPermissions = Prefs.apiPermissions.collectAsStateValue()
-    val permissionList = remember { mutableStateOf(getWebList()) }
-    val systemAlertWindow = remember { mutableStateOf(Permission.SYSTEM_ALERT_WINDOW.isGranted()) }
-    val notificationListenerGranted = remember { mutableStateOf(Permission.NOTIFICATION_LISTENER.isGranted()) }
+    val enabledFeatures = Prefs.apiAccessFeatures.collectAsStateValue()
+    val accessItems = remember { mutableStateOf(getWebList()) }
+    val notificationListenerGranted = remember { mutableStateOf(AccessFeature.NOTIFICATIONS.isGranted()) }
     val notificationsCard = AppFeatureType.NOTIFICATIONS.has()
     val listState = rememberLazyListState()
-    WebSettingsEffects(permissionList, systemAlertWindow, notificationListenerGranted)
+    WebSettingsEffects(accessItems, notificationListenerGranted)
 
     PScaffold(topBar = {
     PTopAppBar(onNavigateBack = { navController.navigateUp() }, title = stringResource(Res.string.access_settings))
@@ -93,48 +91,46 @@ fun DesktopAccessSettingsPage(
                 VerticalSpace(dp = 16.dp)
             }
             item { PSectionTitle(title = stringResource(Res.string.features)) }
-            itemsIndexed(permissionList.value) { index, m ->
-                val permission = m.permission
-                PListItem(
-                    modifier = PlainTheme.getCardModifier(index = index, size = permissionList.value.size)
-                        .clickable { togglePermission(scope, m, !enabledPermissions.contains(permission.name)) },
-                    icon = m.icon, title = permission.getText(),
-                    subtitle = stringResource(if (m.granted) Res.string.system_permission_granted else Res.string.system_permission_not_granted)
-                ) {
-                    Switch(checked = enabledPermissions.contains(permission.name), onCheckedChange = { enable ->
-                        togglePermission(scope, m, enable)
-                    })
+            itemsIndexed(accessItems.value) { index, m ->
+                Column(PlainTheme.getCardModifier(index = index, size = accessItems.value.size)) {
+                    PListItem(
+                        modifier = Modifier.clickable { toggleAccess(scope, m, !m.isEnabled(enabledFeatures)) },
+                        icon = m.icon, title = m.getText(),
+                    ) {
+                        Switch(checked = m.isEnabled(enabledFeatures), onCheckedChange = { enable -> toggleAccess(scope, m, enable) })
+                    }
+                    if (m.isEnabled(enabledFeatures)) AccessIssueNotice(m)
                 }
             }
+
             if (notificationsCard) {
                 item {
                     VerticalSpace(dp = 16.dp)
                     PCard(modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN)) {
-                        val m = PermissionItem.create(UiRes.drawable.ui_drawable_bell, Permission.NOTIFICATION_LISTENER)
-                        val permission = m.permission
-                        val enabled = notificationListenerGranted.value && enabledPermissions.contains(permission.name)
+                        val m = remember(notificationListenerGranted.value) { AccessItem(UiRes.drawable.ui_drawable_bell, setOf(AccessFeature.NOTIFICATIONS)) }
+                        val enabled = m.isEnabled(enabledFeatures)
                         PListItem(
                             modifier = Modifier.clickable { navController.navigate(Routing.NotificationSettings) },
-                            icon = m.icon, title = permission.getText(),
-                            subtitle = stringResource(if (notificationListenerGranted.value) Res.string.system_permission_granted else Res.string.system_permission_not_granted),
+                            icon = m.icon, title = m.getText(),
                             separatedActions = true
                         ) {
-                            Switch(checked = enabled, onCheckedChange = { enable -> togglePermission(scope, m, enable) })
+                            Switch(checked = enabled, onCheckedChange = { enable -> toggleAccess(scope, m, enable) })
                         }
+                        if (enabled) AccessIssueNotice(m)
                     }
                 }
             }
             item {
                 VerticalSpace(dp = 16.dp)
-                val m = remember { PermissionItem.create(UiRes.drawable.ui_drawable_content_paste, Permission.CLIPBOARD) }
-                val clipboardEnabled = enabledPermissions.contains(m.permission.name)
+                val m = remember { AccessItem(UiRes.drawable.ui_drawable_content_paste, setOf(com.ismartcoding.plain.features.web.AccessFeature.CLIPBOARD)) }
+                val clipboardEnabled = m.isEnabled(enabledFeatures)
                 PCard(modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN)) {
                     PListItem(
                         modifier = Modifier.clickable { navController.navigate(Routing.ClipboardHistory) },
                         icon = m.icon, title = stringResource(Res.string.clipboard_sync),
                         separatedActions = true
                     ) {
-                        Switch(checked = clipboardEnabled, onCheckedChange = { enable -> togglePermission(scope, m, enable) })
+                        Switch(checked = clipboardEnabled, onCheckedChange = { enable -> toggleAccess(scope, m, enable) })
                     }
                 }
                 if (clipboardEnabled) {
@@ -153,13 +149,15 @@ fun DesktopAccessSettingsPage(
                     batterySettings()
                 }
             }
-            item {
-                VerticalSpace(dp = 16.dp)
-                PCard(modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN)) {
-                    PListItem(
-                        modifier = Modifier.clickable { navController.navigate(Routing.WebDev) },
-                        icon = UiRes.drawable.ui_drawable_code, title = stringResource(Res.string.adb_automation), showMore = true
-                    )
+            if (com.ismartcoding.plain.platform.system.Capability.ADB in com.ismartcoding.plain.platform.system.getDeviceCapabilities()) {
+                item {
+                    VerticalSpace(dp = 16.dp)
+                    PCard(modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN)) {
+                        PListItem(
+                            modifier = Modifier.clickable { navController.navigate(Routing.WebDev) },
+                            icon = UiRes.drawable.ui_drawable_code, title = stringResource(Res.string.adb_automation), showMore = true
+                        )
+                    }
                 }
             }
             item { BottomSpace(paddingValues) }

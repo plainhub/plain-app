@@ -42,7 +42,6 @@ class ApiContractTest {
         "AppFile", // AppFile.id — content-addressable app file store fileId
         "fileId", // chunk-flow args (uploadedChunks/mergeStatus/deleteChunks/mergeChunks/mergeAppFileChunks)
         "runtimeId",
-        "shortId",
         "clientIds",
     )
 

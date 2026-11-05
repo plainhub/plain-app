@@ -10,7 +10,6 @@ import com.ismartcoding.plain.lib.JsonHelper
 import com.ismartcoding.plain.models.PomodoroSettings
 import com.ismartcoding.plain.models.ScreenMirrorQuality
 import com.ismartcoding.plain.models.UpdateInfo
-import com.ismartcoding.plain.platform.permissions.Permission
 import com.ismartcoding.plain.platform.system.AppFeatureType
 import com.ismartcoding.plain.platform.system.Locale
 import com.ismartcoding.plain.preferences.PrefKeys
@@ -31,7 +30,7 @@ object Prefs {
     val loginRequireApproval = MutableStateFlow(false)
     val rotateUrlTokenOnRestart = MutableStateFlow(false)
     val urlToken = MutableStateFlow("")
-    val apiPermissions = MutableStateFlow(emptySet<String>())
+    val apiAccessFeatures = MutableStateFlow(emptySet<com.ismartcoding.plain.features.web.AccessFeature>())
     val updateInfo = MutableStateFlow(
         UpdateInfo(
             newVersion = "",
@@ -113,7 +112,7 @@ object Prefs {
             PrefKeys.LOGIN_REQUIRE_APPROVAL -> loginRequireApproval.value = value.jsonPrimitive.boolean
             PrefKeys.ROTATE_URL_TOKEN_ON_RESTART -> rotateUrlTokenOnRestart.value = value.jsonPrimitive.boolean
             PrefKeys.URL_TOKEN -> urlToken.value = value.jsonPrimitive.content
-            PrefKeys.API_PERMISSIONS -> apiPermissions.value = JsonHelper.jsonDecodeFromElement(value)
+            PrefKeys.API_PERMISSIONS -> apiAccessFeatures.value = JsonHelper.jsonDecodeFromElement(value)
             PrefKeys.UPDATE_INFO -> updateInfo.value = JsonHelper.jsonDecodeFromElement(value)
             PrefKeys.APP_UPDATE_AVAILABLE -> appUpdateAvailable.value = value.jsonPrimitive.boolean
             PrefKeys.AUTO_CHECK_UPDATE -> autoCheckUpdate.value = value.jsonPrimitive.boolean
@@ -201,12 +200,12 @@ object Prefs {
 
     suspend fun resetAdbToken() = RustNativeApi.resetAdbToken()
 
-    suspend fun setApiPermission(
-        permission: Permission,
+    suspend fun setApiAccess(
+        features: Set<com.ismartcoding.plain.features.web.AccessFeature>,
         enabled: Boolean,
-    ) = set(PrefKeys.API_PERMISSIONS, mapOf(permission.name to enabled))
+    ) = set(PrefKeys.API_PERMISSIONS, features.associateWith { enabled })
 
-    suspend fun setApiPermissions(permissions: Set<String>) = set(PrefKeys.API_PERMISSIONS, permissions)
+    suspend fun setApiAccessFeatures(features: Set<com.ismartcoding.plain.features.web.AccessFeature>) = set(PrefKeys.API_PERMISSIONS, features)
 
     suspend fun completeOnboarding() = RustNativeApi.completeOnboarding()
 

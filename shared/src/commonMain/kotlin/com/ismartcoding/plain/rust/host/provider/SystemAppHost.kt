@@ -1,10 +1,9 @@
 package com.ismartcoding.plain.rust.host.provider
 
 import com.ismartcoding.plain.ui.app.MainViewModel
-import com.ismartcoding.plain.features.web.WebSettingsFeature
+import com.ismartcoding.plain.features.web.AccessFeature
 import com.ismartcoding.plain.lib.JsonHelper
 import com.ismartcoding.plain.platform.network.getNetworkType
-import com.ismartcoding.plain.platform.permissions.Permission
 import com.ismartcoding.plain.platform.permissions.isGranted
 import com.ismartcoding.plain.platform.setClipboardText
 import com.ismartcoding.plain.platform.system.clearMediaCache
@@ -24,20 +23,12 @@ internal object SystemAppHost {
             setClipboardText("plain", JsonHelper.jsonDecodeFromElement<ClipboardTextRequest>(params).text)
             hostResult(true)
         }
-        "systemPermissionFacts" -> run {
-            val request = JsonHelper.jsonDecodeFromElement<PermissionRequest>(params)
-            val granted = request.permissions.associate { name ->
-                name to Permission.valueOf(name).isGranted()
-            }
-            hostResult(PermissionFacts(
-                granted = granted,
-            ))
+        "systemAccessFacts" -> {
+            val request = JsonHelper.jsonDecodeFromElement<AccessFactsRequest>(params)
+            hostResult(AccessFacts(request.features.associate { it.name to it.isGranted() }))
         }
-        "systemOpenWebSettings" -> {
-            val feature = JsonHelper.jsonDecodeFromElement<WebSettingsRequest>(params).feature
-                ?.let { name ->
-                    WebSettingsFeature.entries.firstOrNull { it.name == name }
-                }
+        "systemRequestAccess" -> {
+            val feature = JsonHelper.jsonDecodeFromElement<AccessRequest>(params).feature
             MainViewModel.pendingWebAccessRequest.value = com.ismartcoding.plain.models.WebAccessRequest(feature)
             hostResult(true)
         }
@@ -73,10 +64,10 @@ internal object SystemAppHost {
 private data class ClipboardTextRequest(val text: String)
 
 @Serializable
-private data class PermissionRequest(val permissions: List<String>)
+private data class AccessRequest(val feature: AccessFeature)
 
 @Serializable
-private data class WebSettingsRequest(val feature: String? = null)
+private data class AccessFactsRequest(val features: List<AccessFeature>)
 
 @Serializable
 private data class BackgroundWakeRequest(val atMs: Long? = null)

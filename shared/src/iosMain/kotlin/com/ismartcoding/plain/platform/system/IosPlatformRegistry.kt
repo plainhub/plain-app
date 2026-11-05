@@ -20,6 +20,8 @@ interface IosPermissionChecker {
 }
 
 interface IosFilePicker {
+    fun grantedDirectories(): List<String>
+    fun hasUnavailableDirectories(): Boolean
     fun pickFile(tag: String, type: String, multiple: Boolean)
     fun exportFile(type: String, fileName: String)
 }

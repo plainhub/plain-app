@@ -11,12 +11,30 @@ import kotlinx.cinterop.ExperimentalForeignApi
 import platform.Foundation.NSData
 
 internal object IosPhotoResource {
-    fun resource(uri: String): PHAssetResource {
+    private fun asset(uri: String): PHAsset {
         require(uri.startsWith("ph://") && uri.length > 5) { "Photo resource URI required" }
         val fetched = PHAsset.fetchAssetsWithLocalIdentifiers(listOf(uri.removePrefix("ph://")), null)
         check(fetched.count == 1UL) { "Photo resource unavailable" }
-        val asset = fetched.objectAtIndex(0UL) as PHAsset
-        return resource(asset)
+        return fetched.objectAtIndex(0UL) as PHAsset
+    }
+
+    fun resource(uri: String): PHAssetResource = resource(asset(uri))
+
+    suspend fun playerItem(uri: String): platform.AVFoundation.AVPlayerItem {
+        val asset = asset(uri)
+        val manager = PHImageManager.defaultManager()
+        val options = PHVideoRequestOptions().apply { networkAccessAllowed = false }
+        return kotlinx.coroutines.suspendCancellableCoroutine { continuation ->
+            val request = manager.requestPlayerItemForVideo(asset, options) callback@{ item, info ->
+                if (!continuation.isActive) return@callback
+                val error = info?.get(PHImageErrorKey) as? platform.Foundation.NSError
+                continuation.resumeWith(runCatching {
+                    check(error == null) { "${error?.domain} (${error?.code}): ${error?.localizedDescription}" }
+                    checkNotNull(item) { "Photo video unavailable" }
+                })
+            }
+            continuation.invokeOnCancellation { manager.cancelImageRequest(request) }
+        }
     }
 
     fun resource(asset: PHAsset): PHAssetResource {

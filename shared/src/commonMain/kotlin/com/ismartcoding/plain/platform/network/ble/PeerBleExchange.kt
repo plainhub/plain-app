@@ -23,13 +23,13 @@ object PeerBleExchange {
     suspend fun exchange(params: JsonObject): JsonElement {
         check(isBleReady()) { "BLE not ready" }
         val input = JsonHelper.jsonDecodeFromElement<ExchangeRequest>(params)
-        val shortId = input.shortId
+        val clientId = input.clientId
         val request = Base64Lenient.decode(input.request)
         val scanner = bleTransport().createScanner()
-        val client = scanner.createClient(shortId)
-            ?: withTimeoutOrNull(10_000) { scanner.scan(BleUuids.SERVICE_UUID).first { it.id == shortId }; scanner.createClient(shortId) }
+        val client = scanner.createClient(clientId)
+            ?: withTimeoutOrNull(10_000) { scanner.scan(clientId).first { it.id == clientId }; scanner.createClient(clientId) }
             ?: error("BLE device not found")
-        val mutex = lock.withLock { mutexes.getOrPut(shortId) { Mutex() } }
+        val mutex = lock.withLock { mutexes.getOrPut(clientId) { Mutex() } }
         return mutex.withLock {
             val api = BleDeviceApi(client, RustBleWire)
             scanner.pauseScan()
@@ -43,4 +43,4 @@ object PeerBleExchange {
 }
 
 @Serializable
-private data class ExchangeRequest(val shortId: String, val request: String)
+private data class ExchangeRequest(val clientId: String, val request: String)

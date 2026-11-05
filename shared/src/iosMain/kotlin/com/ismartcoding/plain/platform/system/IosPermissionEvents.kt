@@ -1,23 +1,17 @@
 package com.ismartcoding.plain.platform.system
 
 import com.ismartcoding.plain.events.RequestPermissionsEvent
+import com.ismartcoding.plain.events.PermissionsResultEvent
+import com.ismartcoding.plain.lib.Channel
 import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.lib.receiveEventHandler
+import com.ismartcoding.plain.platform.permissions.isGranted
+import com.ismartcoding.plain.ui.permissions.showPermissionDeniedDialog
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.filterIsInstance
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.onSubscription
 
-/**
- * Registers a handler for [RequestPermissionsEvent] on iOS. When the UI
- * (e.g. [com.ismartcoding.plain.ui.components.NeedPermissionColumn]) requests a
- * permission, this handler delegates to Swift via
- * [IosPlatformRegistry.requestPermission].
- *
- * Swift's implementation is asynchronous — the system permission dialog
- * may take seconds before the user responds. When it does, Swift calls
- * [IosPermissionCallback.onPermissionResult], which sends
- * [com.ismartcoding.plain.events.PermissionsResultEvent] and optionally
- * shows a "go to Settings" dialog if the permission was denied.
- *
- */
 object IosPermissionEvents {
     private var eventJob: Job? = null
 
@@ -26,7 +20,13 @@ object IosPermissionEvents {
         eventJob = receiveEventHandler<RequestPermissionsEvent> { event ->
             val permission = event.permissions.first()
             LogCat.d("IosPermissionEvents: requesting ${permission.name}")
-            IosPlatformRegistry.requestPermission(permission.name)
+            Channel.sharedFlow
+                .onSubscription { IosPlatformRegistry.requestPermission(permission.name) }
+                .filterIsInstance<PermissionsResultEvent>()
+                .first { it.has(permission) }
+            if (!permission.isGranted() && event.showDeniedDialog) {
+                showPermissionDeniedDialog { IosPlatformRegistry.openAppSettings() }
+            }
         }
     }
 }

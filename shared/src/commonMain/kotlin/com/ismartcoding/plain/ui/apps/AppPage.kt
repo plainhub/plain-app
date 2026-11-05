@@ -48,10 +48,10 @@ fun AppPage(
     var remoteItem by remember(id, source) { mutableStateOf<com.ismartcoding.plain.models.Package?>(null) }
     var isShareable by remember(id, source) { mutableStateOf(false) }
     var loading by remember(id, source) { mutableStateOf(true) }
-    val hasPermission = remember(id, source) { mutableStateOf(source is com.ismartcoding.plain.rust.graphql.ContentSource.Local || source is com.ismartcoding.plain.rust.graphql.ContentSource.Remote && com.ismartcoding.plain.platform.permissions.Permission.QUERY_ALL_PACKAGES in source.info.permissions) }
+    val hasPermission = remember(id, source) { mutableStateOf(source is com.ismartcoding.plain.rust.graphql.ContentSource.Local || source is com.ismartcoding.plain.rust.graphql.ContentSource.Remote && com.ismartcoding.plain.features.web.AccessFeature.APPS in source.info.access) }
     val lifecycleEvent = rememberLifecycleEvent()
     if (source is com.ismartcoding.plain.rust.graphql.ContentSource.Remote) {
-        com.ismartcoding.plain.ui.permissions.RemotePermissionEffects(source, com.ismartcoding.plain.platform.permissions.Permission.QUERY_ALL_PACKAGES, hasPermission)
+        com.ismartcoding.plain.ui.permissions.RemotePermissionEffects(source, com.ismartcoding.plain.features.web.AccessFeature.APPS, hasPermission)
     }
     LaunchedEffect(id, source, lifecycleEvent, hasPermission.value) {
         if (lifecycleEvent != Lifecycle.Event.ON_RESUME || !hasPermission.value) return@LaunchedEffect

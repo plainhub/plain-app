@@ -5,16 +5,9 @@ import com.ismartcoding.plain.models.Peer
 import kotlinx.coroutines.flow.Flow
 
 interface BleGattClient {
-    // Rust discovery supplies the stable short ID; Bluetooth MACs can rotate.
     val id: String
     val name: String?
     var rssi: Int
-
-    // Aware flags parsed from the BLE scan response serviceData (byte[0]).
-    // These are a cheap pre-GATT hint — the authoritative values come from the
-    // GATT DISCOVER reply ([com.ismartcoding.plain.features.nearby.NearbyDeviceInfo]).
-    val awareSupported: Boolean get() = false
-    val awareRunning: Boolean get() = false
 
     fun isConnected(): Boolean
 
@@ -34,7 +27,7 @@ interface BleGattClient {
 }
 
 interface BleScanner {
-    fun scan(serviceUuid: String): Flow<BleGattClient>
+    fun scan(clientId: String? = null): Flow<BleGattClient>
 
     /**
      * Pauses an active scan without closing its flow. Scanning shares the
@@ -60,17 +53,7 @@ interface BleScanner {
      */
     fun isScanPaused(): Boolean
 
-    /**
-     * Returns an already-discovered [BleGattClient] for [shortId], or null if
-     * no matching device has been seen in the current scan session. The caller supplies
-     * the shortId obtained from the Rust discovery API.
-     *
-     * On Android, BLE MACs can't be constructed from a clientId alone — the
-     * underlying [android.bluetooth.BluetoothDevice] must come from a scan
-     * result. Callers that need a client for a known clientId should use
-     * a prior [scan] flow.
-     */
-    fun createClient(shortId: String): BleGattClient?
+    fun createClient(clientId: String): BleGattClient?
 
     fun isReadyToUse(): Boolean
 

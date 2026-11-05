@@ -29,7 +29,7 @@ internal class ManagedDeviceClient private constructor(
 ) {
     companion object {
         private fun infoRequest() = GraphqlRequest<ManagedDeviceInfo>(
-            "query { app { deviceName capabilities permissions appDir downloadsDir urlToken tlsCertificateSha256 } }", field = "app",
+            "query { app { deviceName capabilities access appDir downloadsDir urlToken tlsCertificateSha256 } }", field = "app",
         )
 
         suspend fun load(
@@ -57,10 +57,10 @@ internal class ManagedDeviceClient private constructor(
     private val _info = kotlinx.coroutines.flow.MutableStateFlow(initialInfo)
     val state = _info.asStateFlow()
     val currentInfo: ManagedDeviceInfo get() = _info.value
-    val permissions = state.map { it.permissions }.distinctUntilChanged()
+    val access = state.map { it.access }.distinctUntilChanged()
 
-    suspend fun refreshPermissions(): List<com.ismartcoding.plain.platform.permissions.Permission> =
-        api.execute(Query.appPermissions()).also { permissions -> _info.value = _info.value.copy(permissions = permissions) }
+    suspend fun refreshAccess(): List<com.ismartcoding.plain.features.web.AccessFeature> =
+        api.execute(Query.appAccess()).also { access -> _info.value = _info.value.copy(access = access) }
 
     private val uploads = com.ismartcoding.plain.features.files.upload.UploadChunksClient({ id, index, bytes ->
         http.uploadChunk(id, index, bytes, checkNotNull(currentInfo.tlsCertificateSha256) { "peer_https_unavailable" })

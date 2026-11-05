@@ -238,7 +238,7 @@ internal suspend fun executeHostRequest(
         "systemMountFacts" -> hostResult(storageVolumeFacts())
         "imageDecodeBounds" -> hostResult(readImageBounds(JsonHelper.jsonDecodeFromElement<PathRequest>(params).path))
         "systemAudioPlaybackState" -> hostResult(AudioEngineHost.localPlaybackFacts())
-        "systemSetClipboard", "systemPermissionFacts", "systemOpenWebSettings",
+        "systemSetClipboard", "systemAccessFacts", "systemRequestAccess",
         "systemNetworkType", "systemScheduleBackgroundWake", "systemCompleteBackgroundExecution",
         "systemProperties", "systemBatterySample",
         "systemCapabilities", "systemClearMediaCache",

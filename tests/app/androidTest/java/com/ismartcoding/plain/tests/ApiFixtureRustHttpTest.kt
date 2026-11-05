@@ -52,9 +52,9 @@ class ApiFixtureRustHttpTest {
         val oldAccess = Prefs.desktopAccess.value
         Prefs.desktopAccess.value = true
         withIO { RustRuntime.start() }
-        val oldPermissions = Prefs.apiPermissions.value
+        val oldPermissions = Prefs.apiAccessFeatures.value
         try {
-            Prefs.setApiPermissions(setOf(Permission.WRITE_EXTERNAL_STORAGE, Permission.READ_MEDIA_IMAGES, Permission.READ_MEDIA_VIDEOS, Permission.READ_MEDIA_AUDIO, Permission.READ_CONTACTS, Permission.WRITE_CONTACTS, Permission.READ_CALL_LOG, Permission.WRITE_CALL_LOG, Permission.READ_SMS, Permission.SEND_SMS, Permission.QUERY_ALL_PACKAGES, Permission.NOTIFICATION_LISTENER).map { it.name }.toSet())
+            Prefs.setApiAccessFeatures(setOf(com.ismartcoding.plain.features.web.AccessFeature.IMAGES, com.ismartcoding.plain.features.web.AccessFeature.VIDEOS, com.ismartcoding.plain.features.web.AccessFeature.AUDIO, com.ismartcoding.plain.features.web.AccessFeature.DOCS, com.ismartcoding.plain.features.web.AccessFeature.FILES, com.ismartcoding.plain.features.web.AccessFeature.CONTACTS, com.ismartcoding.plain.features.web.AccessFeature.CALL_LOGS, com.ismartcoding.plain.features.web.AccessFeature.SMS, com.ismartcoding.plain.features.web.AccessFeature.APPS, com.ismartcoding.plain.features.web.AccessFeature.NOTIFICATIONS))
             assertTrue(root.mkdirs())
             rootCreated = true
             val session = RustSessionStore.create("API emulator fixture")
@@ -103,7 +103,7 @@ class ApiFixtureRustHttpTest {
             if (channelId.isNotEmpty()) GraphqlApi.execute(GraphqlRequest<JsonObject>("mutation { deleteChatChannel(id: ${JsonPrimitive(channelId)}) }"))
             if (peerCreated) GraphqlApi.execute(GraphqlRequest<JsonObject>("mutation { deletePeer(id: ${JsonPrimitive(peerId)}) }"))
             if (rootCreated) root.deleteRecursively()
-            Prefs.setApiPermissions(oldPermissions)
+            Prefs.setApiAccessFeatures(oldPermissions)
             Prefs.desktopAccess.value = oldAccess
         }
     }

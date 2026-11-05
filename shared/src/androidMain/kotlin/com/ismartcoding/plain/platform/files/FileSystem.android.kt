@@ -15,3 +15,5 @@ actual fun getInternalStorageStats(): StorageStats = FileSystemHelper.getInterna
 actual fun getSDCardStorageStats(): StorageStats = FileSystemHelper.getSDCardStorageStats(appContext)
 
 actual fun getUSBStorageStats(): List<StorageStats> = FileSystemHelper.getUSBStorageStats()
+
+internal actual fun grantedStorageDirectories(): List<String> = emptyList()

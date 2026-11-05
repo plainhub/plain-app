@@ -10,8 +10,8 @@ object BleScanReports {
     suspend fun scanState(id: String, active: Boolean) {
         RustHostReports.bleScanState(JsonHelper.jsonEncode(ScanState(id, active)))
     }
-    suspend fun scanSeen(id: String, shortId: String) {
-        RustHostReports.bleAdvertisement(JsonHelper.jsonEncode(ScanSeen(id, shortId)))
+    suspend fun scanSeen(id: String, clientId: String) {
+        RustHostReports.bleAdvertisement(JsonHelper.jsonEncode(ScanSeen(id, clientId)))
     }
 }
 
@@ -19,4 +19,4 @@ object BleScanReports {
 private data class ScanState(val scanId: String, val active: Boolean)
 
 @Serializable
-private data class ScanSeen(val scanId: String, val shortId: String)
+private data class ScanSeen(val scanId: String, val clientId: String)

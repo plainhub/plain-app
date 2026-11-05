@@ -59,9 +59,9 @@ object Mutation {
         mapOf(variable("ids", ids)), field = "uninstallPackages",
     )
 
-    fun openWebSettings(feature: com.ismartcoding.plain.features.web.WebSettingsFeature?): GraphqlRequest<Boolean> = GraphqlRequest(
-        $$"mutation($feature: WebSettingsFeature) { openWebSettings(feature: $feature) }",
-        mapOf(variable("feature", feature?.name)), field = "openWebSettings",
+    fun requestAccess(feature: com.ismartcoding.plain.features.web.AccessFeature): GraphqlRequest<Boolean> = GraphqlRequest(
+        $$"mutation($feature: AccessFeature!) { requestAccess(feature: $feature) }",
+        mapOf(variable("feature", feature.name)), field = "requestAccess",
     )
 
     fun editChatText(id: String, text: String): GraphqlRequest<ChatTextEdit> = GraphqlRequest(

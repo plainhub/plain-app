@@ -19,10 +19,11 @@ internal fun MediaPermissionEffects(
     initialLoadGate: NavLoadGate?,
     reload: () -> Unit,
     source: com.ismartcoding.plain.rust.graphql.ContentSource = com.ismartcoding.plain.ui.navigation.LocalContentSource.current,
+    feature: com.ismartcoding.plain.features.web.AccessFeature = com.ismartcoding.plain.features.web.AccessFeature.FILES,
     permission: FeaturePermission? = AppFeatureType.FILES.getPermission(),
 ) {
     if (source is com.ismartcoding.plain.rust.graphql.ContentSource.Remote) {
-        com.ismartcoding.plain.ui.permissions.RemotePermissionEffects(source, com.ismartcoding.plain.platform.permissions.Permission.WRITE_EXTERNAL_STORAGE, hasPermission) {
+        com.ismartcoding.plain.ui.permissions.RemotePermissionEffects(source, feature, hasPermission) {
             initialLoadGate?.await()
             reload()
         }

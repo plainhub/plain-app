@@ -61,8 +61,8 @@ import com.ismartcoding.plain.rust.graphql.GraphqlRequest
 import com.ismartcoding.plain.rust.graphql.variable
 
 object Query {
-    fun appPermissions(): GraphqlRequest<List<com.ismartcoding.plain.platform.permissions.Permission>> =
-        GraphqlRequest<com.ismartcoding.plain.models.AppPermissions>("query { app { permissions } }", field = "app").map { it.permissions }
+    fun appAccess(): GraphqlRequest<List<com.ismartcoding.plain.features.web.AccessFeature>> =
+        GraphqlRequest<com.ismartcoding.plain.models.AppAccess>("query { app { access } }", field = "app").map { it.access }
 
     fun chatConversations(): GraphqlRequest<List<ChatConversation>> = GraphqlRequest(
         $$"query { chatConversations { id chat { $${Fragments.CHAT_ITEM} } } }",

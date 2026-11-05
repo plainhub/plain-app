@@ -26,18 +26,9 @@ import kotlinx.coroutines.channels.Channel
 class IosBleGattClient(
     val peripheral: CBPeripheral,
     override var rssi: Int = 0,
-    shortId: String = "",
-    override var awareSupported: Boolean = false,
-    override var awareRunning: Boolean = false,
+    override val id: String,
 ) : BleGattClient {
 
-    /**
-     * Stable peer match key — the 8-byte truncated SHA256 of the peer's full
-     * clientId, rendered as a 16-char hex string. Parsed from the BLE
-     * advertisement serviceData via [com.ismartcoding.plain.platform.network.ble.BleServiceData].
-     * Falls back to [peripheral.identifier] when no serviceData was advertised.
-     */
-    override val id: String = shortId.ifEmpty { peripheral.identifier.UUIDString }
     override val name: String? get() = peripheral.name
 
     private val delegate = PeripheralDelegate(this)
@@ -77,13 +68,13 @@ class IosBleGattClient(
     private suspend fun discoverServicesAndCharacteristics(): Boolean {
         val serviceDeferred = CompletableDeferred<Boolean>()
         serviceDiscoveryDeferred = serviceDeferred
-        peripheral.discoverServices(listOf(CBUUID.UUIDWithString(BleUuids.SERVICE_UUID)))
+        peripheral.discoverServices(listOf(CBUUID.UUIDWithString(id)))
         val serviceOk = withTimeoutOrNull(10_000L.milliseconds) { serviceDeferred.await() } == true
         serviceDiscoveryDeferred = null
         if (!serviceOk) return false
 
         val service = peripheral.services?.firstOrNull {
-            (it as CBService).UUID.UUIDString.equals(BleUuids.SERVICE_UUID, ignoreCase = true)
+            (it as CBService).UUID.UUIDString.equals(id, ignoreCase = true)
         } as? CBService ?: return false
 
         val charDeferred = CompletableDeferred<Boolean>()
@@ -101,7 +92,7 @@ class IosBleGattClient(
     private fun getCharacteristic(service: BleService): CBCharacteristic? {
         characteristics[service.charUuid]?.let { return it }
         val cbService = peripheral.services?.firstOrNull {
-            (it as CBService).UUID.UUIDString.equals(service.serviceUuid, ignoreCase = true)
+            (it as CBService).UUID.UUIDString.equals(id, ignoreCase = true)
         } as? CBService ?: return null
         val char = cbService.characteristics?.firstOrNull {
             (it as CBCharacteristic).UUID.UUIDString.equals(service.charUuid, ignoreCase = true)

@@ -47,6 +47,7 @@ class AndroidBleGattServer : BleGattServer {
     private var advertiseCallback: AdvertiseCallback? = null
     private var advertiser: BluetoothLeAdvertiser? = null
     private var gattServer: BluetoothGattServer? = null
+    private var serviceUuid: String? = null
     private val connectedDevices = ConcurrentHashMap<String, BluetoothDevice>()
 
     /**
@@ -59,15 +60,15 @@ class AndroidBleGattServer : BleGattServer {
     private val mtus = ConcurrentHashMap<String, Int>()
     private val sending = ConcurrentHashMap<String, Mutex>()
 
-    override fun start(payload: ByteArray, revision: Long) {
+    override fun start(serviceUuid: String, revision: Long) {
         synchronized(advertisingLock) {
             check(!closed && revision > advertisingRevision) { "BLE advertiser closed or stale" }
-            require(payload.size == 9)
             advertisingRevision = revision
             val adapter = checkNotNull(bluetoothManager.adapter) { "Bluetooth unavailable" }
             advertiser = checkNotNull(adapter.bluetoothLeAdvertiser) { "BLE advertising unavailable" }
+            this.serviceUuid = serviceUuid
             openGattServer()
-            startAdvertising(payload)
+            startAdvertising(serviceUuid)
         }
     }
 
@@ -89,17 +90,6 @@ class AndroidBleGattServer : BleGattServer {
         pendingNotificationAcks.clear()
     }
 
-    override fun refreshAdvertising(payload: ByteArray, revision: Long) {
-        synchronized(advertisingLock) {
-            check(!closed && revision > advertisingRevision) { "BLE advertiser closed or stale" }
-            require(payload.size == 9)
-            advertisingRevision = revision
-            advertiseCallback?.let { advertiser?.stopAdvertising(it) }
-            advertiseCallback = null
-            startAdvertising(payload)
-        }
-    }
-
     @Suppress("DEPRECATION")
     override fun sendNotification(mac: String, charUuid: String, value: ByteArray): Boolean {
         if (closed) return false
@@ -113,14 +103,13 @@ class AndroidBleGattServer : BleGattServer {
         return true
     }
 
-    private fun startAdvertising(payload: ByteArray) {
+    private fun startAdvertising(serviceUuid: String) {
         val target = checkNotNull(advertiser) { "BLE advertising unavailable" }
         val settings = AdvertiseSettings.Builder()
             .setAdvertiseMode(AdvertiseSettings.ADVERTISE_MODE_LOW_LATENCY)
             .setConnectable(true).setTimeout(0).build()
-        val uuid = ParcelUuid(UUID.fromString(BleUuids.SERVICE_UUID))
+        val uuid = ParcelUuid(UUID.fromString(serviceUuid))
         val data = AdvertiseData.Builder().setIncludeDeviceName(false).addServiceUuid(uuid).build()
-        val scanResponse = AdvertiseData.Builder().addServiceData(uuid, payload.copyOf()).build()
         val callback = object : AdvertiseCallback() {
             override fun onStartSuccess(settingsInEffect: AdvertiseSettings) {
                 synchronized(advertisingLock) {
@@ -137,7 +126,7 @@ class AndroidBleGattServer : BleGattServer {
             }
         }
         advertiseCallback = callback
-        target.startAdvertising(settings, data, scanResponse, callback)
+        target.startAdvertising(settings, data, callback)
     }
 
     private fun openGattServer() {
@@ -150,7 +139,7 @@ class AndroidBleGattServer : BleGattServer {
 
         gattServer = server
         val service = BluetoothGattService(
-            UUID.fromString(BleUuids.SERVICE_UUID),
+            UUID.fromString(serviceUuid),
             BluetoothGattService.SERVICE_TYPE_PRIMARY,
         )
 
@@ -289,7 +278,7 @@ class AndroidBleGattServer : BleGattServer {
         if (closed) return false
         val server = gattServer ?: return false
         val device = connectedDevices[mac] ?: return false
-        val char = server.getService(UUID.fromString(BleUuids.SERVICE_UUID))
+        val char = server.getService(UUID.fromString(serviceUuid))
             ?.getCharacteristic(UUID.fromString(charUuid)) ?: return false
 
         val ack = CompletableDeferred<Boolean>()

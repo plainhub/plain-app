@@ -8,8 +8,7 @@ import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.runtime.mutableStateMapOf
 import com.ismartcoding.plain.platform.system.DataType
 
-class AudioViewModel internal constructor(source: ContentSource = ContentSource.Local) : BaseMediaViewModel<AudioTrack>(source) {
-    override val dataType = DataType.AUDIO
+class AudioViewModel internal constructor(source: ContentSource = ContentSource.Local) : BaseMediaViewModel<AudioTrack>(source, DataType.AUDIO) {
     override val showFoldersAsList = true
     val scrollStateMap = mutableStateMapOf<Int, LazyListState>()
 

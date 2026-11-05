@@ -49,13 +49,13 @@ class ChatViewModel internal constructor(
     internal val sourceChanges = kotlinx.coroutines.flow.MutableSharedFlow<Unit>(extraBufferCapacity = 1)
     internal suspend fun observeSource() {
         val remote = source as? com.ismartcoding.plain.rust.graphql.ContentSource.Remote ?: return
-        remote.client.refreshPermissions()
+        remote.client.refreshAccess()
         downloads.refresh()
-        val fields = listOf("permissionsUpdated", "contentChanged", "messagesCreated { id }", "messagesUpdated { id }", "messagesDeleted", "peersChanged", "channelsChanged { changed }", "downloadsChanged")
+        val fields = listOf("accessUpdated", "contentChanged", "messagesCreated { id }", "messagesUpdated { id }", "messagesDeleted", "peersChanged", "channelsChanged { changed }", "downloadsChanged")
         remote.client.subscriptionUpdates(fields.map { com.ismartcoding.plain.rust.graphql.GraphqlOperation("subscription { $it }") }).collect { update ->
             if (update is com.ismartcoding.plain.rust.graphql.SubscriptionUpdate.Failed) throw update.error
             if (update is com.ismartcoding.plain.rust.graphql.SubscriptionUpdate.Attached ||
-                update is com.ismartcoding.plain.rust.graphql.SubscriptionUpdate.Data && update.value.data?.containsKey("permissionsUpdated") == true) remote.client.refreshPermissions()
+                update is com.ismartcoding.plain.rust.graphql.SubscriptionUpdate.Data && update.value.data?.containsKey("accessUpdated") == true) remote.client.refreshAccess()
             fetchAsync(target.value.toId)
             downloads.refresh()
             sourceChanges.emit(Unit)

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="access_allow">允許存取</string>
+    <string name="access_go_to_settings">前往設定</string>
+    <string name="access_choose_folder">重新選擇資料夾</string>
+    <string name="access_photos_request_help">允許存取後，這裡會顯示系統相簿中的照片和影片。</string>
+    <string name="access_photos_settings_help">請在系統設定中允許 PlainApp 存取照片和影片。</string>
+    <string name="access_photos_restricted_help">螢幕使用時間或裝置管理限制了相簿存取。請聯絡裝置管理員解除限制。</string>
+    <string name="access_photos_limited_help">目前的權限設定僅允許顯示部分照片和影片。如需顯示更多，請在系統設定中允許存取。</string>
+    <string name="access_add_folder_help">選擇資料夾後，其中的音樂、影片和文件會顯示在列表中，無需複製檔案。</string>
+    <string name="access_folder_unavailable_help">資料夾可能已移動或存取已失效，請從「檔案」中重新選擇。</string>
+    <string name="access_files_help">請在系統設定中允許 PlainApp 管理檔案，以顯示圖片、影片、音樂和文件。</string>
+    <string name="access_feature_help">請允許存取以使用上方功能，共用開關會保持開啟。</string>
+</resources>

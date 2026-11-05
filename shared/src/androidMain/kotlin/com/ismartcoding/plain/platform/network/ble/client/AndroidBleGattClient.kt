@@ -25,19 +25,8 @@ class AndroidBleGattClient(
     private val logger: (String, String) -> Unit = { _, _ -> },
     private val onDisconnected: (AndroidBleGattClient) -> Unit = {},
     override var rssi: Int = 0,
-    shortId: String = "",
-    override var awareSupported: Boolean = false,
-    override var awareRunning: Boolean = false,
+    override val id: String,
 ) : BleGattClient {
-
-    /**
-     * Stable peer match key — the 8-byte truncated SHA256 of the peer's full
-     * clientId, rendered as a 16-char hex string. Parsed from the BLE scan
-     * response serviceData via [com.ismartcoding.plain.platform.network.ble.BleServiceData].
-     * NOT the BLE MAC, because Android randomizes BLE MACs every ~15 minutes.
-     * Falls back to the MAC when no serviceData was advertised.
-     */
-    override val id: String = shortId.ifEmpty { device.address }
 
     /**
      * The current BLE MAC of this device, used internally for Android GATT
@@ -267,7 +256,7 @@ class AndroidBleGattClient(
             return false
         }
         val charUuid = UUID.fromString(service.charUuid)
-        val char = gatt.getService(UUID.fromString(service.serviceUuid))?.getCharacteristic(charUuid) ?: run {
+        val char = gatt.getService(UUID.fromString(id))?.getCharacteristic(charUuid) ?: run {
             error("[BLE] writeCharacteristic ${service.name} ${mac}: FAIL characteristic not found, services=${gatt.services?.size ?: 0}")
             return false
         }
@@ -286,7 +275,7 @@ class AndroidBleGattClient(
             return null
         }
         val charUuid = UUID.fromString(service.charUuid)
-        val char = gatt.getService(UUID.fromString(service.serviceUuid))?.getCharacteristic(charUuid) ?: run {
+        val char = gatt.getService(UUID.fromString(id))?.getCharacteristic(charUuid) ?: run {
             error("[BLE] readCharacteristic ${service.name} ${mac}: FAIL characteristic not found, services=${gatt.services?.size ?: 0}")
             return null
         }
@@ -304,7 +293,7 @@ class AndroidBleGattClient(
             return false
         }
         val charUuid = UUID.fromString(service.charUuid)
-        val char = gatt.getService(UUID.fromString(service.serviceUuid))?.getCharacteristic(charUuid) ?: run {
+        val char = gatt.getService(UUID.fromString(id))?.getCharacteristic(charUuid) ?: run {
             error("[BLE] setNotification ${service.name} ${mac}: FAIL characteristic not found, services=${gatt.services?.size ?: 0}")
             return false
         }

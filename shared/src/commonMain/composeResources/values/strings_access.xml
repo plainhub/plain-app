@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="access_allow">Allow access</string>
+    <string name="access_go_to_settings">Open Settings</string>
+    <string name="access_choose_folder">Choose folder again</string>
+    <string name="access_photos_request_help">Allow access to show your system photos and videos here.</string>
+    <string name="access_photos_settings_help">Allow PlainApp to access photos and videos in system settings.</string>
+    <string name="access_photos_restricted_help">Screen Time or device management restricts photo access. Ask the device administrator to allow it.</string>
+    <string name="access_photos_limited_help">PlainApp can only show some of your photos and videos. To show more, allow access in Settings.</string>
+    <string name="access_add_folder_help">Choose a folder to show its music, videos and documents without copying the files.</string>
+    <string name="access_folder_unavailable_help">The folder may have moved or its access may have expired. Choose it again in Files.</string>
+    <string name="access_files_help">Allow PlainApp to manage files in system settings to show images, videos, music and documents.</string>
+    <string name="access_feature_help">Allow access to use the feature above. The sharing switch will stay on.</string>
+</resources>

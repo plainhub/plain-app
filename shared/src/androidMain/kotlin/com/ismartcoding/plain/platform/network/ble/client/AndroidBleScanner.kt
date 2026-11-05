@@ -12,13 +12,12 @@ import android.content.Context
 import android.os.ParcelUuid
 import java.util.concurrent.CopyOnWriteArrayList
 import com.ismartcoding.plain.appContext
-import com.ismartcoding.plain.features.nearby.BleAdvertisement
 import com.ismartcoding.plain.platform.network.ble.BleUuids
-import com.ismartcoding.plain.features.nearby.RustBleServiceData
+import com.ismartcoding.plain.features.nearby.RustBleAdvertisement
 import com.ismartcoding.plain.features.bluetooth.client.BluetoothPermission
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.ensureActive
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.mapNotNull
 import com.ismartcoding.plain.lib.extensions.hasPermission
 import com.ismartcoding.plain.platform.isSPlus
 import com.ismartcoding.plain.lib.logcat.LogCat
@@ -81,33 +80,39 @@ object AndroidBleScanner : BleScanner {
     override suspend fun ensurePermission(): Boolean = BluetoothPermission.ensurePermissionAsync()
 
     @SuppressLint("MissingPermission")
-    override fun scan(serviceUuid: String): Flow<BleGattClient> {
+    override fun scan(clientId: String?): Flow<BleGattClient> {
         return callbackFlow<ScanResult> {
-            LogCat.d("Scan bluetooth devices for $serviceUuid")
-            beginScan(serviceUuid) { result ->
+            LogCat.d("Scan bluetooth devices for $clientId")
+            beginScan(clientId) { result ->
                 trySend(result)
             }
 
             awaitClose {
                 endScan()
             }
-        }.map { result ->
-            val data = result.scanRecord?.serviceData?.get(ParcelUuid.fromString(serviceUuid))
-            val parts = RustBleServiceData.decode(data)
+        }.mapNotNull { result ->
+            val uuids = result.scanRecord?.serviceUuids.orEmpty().map { it.toString() }
+            val id = RustBleAdvertisement.decode(uuids) ?: return@mapNotNull null
             currentCoroutineContext().ensureActive()
-            addDevice(result.device, result.rssi, parts)
+            addDevice(result.device, result.rssi, id)
         }
     }
 
     @SuppressLint("MissingPermission")
     @Synchronized
-    private fun beginScan(serviceUuid: String, onResult: (ScanResult) -> Unit) {
+    private fun beginScan(clientId: String?, onResult: (ScanResult) -> Unit) {
         scanCallback = object : ScanCallback() {
             override fun onScanResult(callbackType: Int, result: ScanResult) {
                 onResult(result)
             }
         }
-        scanFilter = arrayListOf(ScanFilter.Builder().setServiceUuid(ParcelUuid.fromString(serviceUuid)).build())
+        val filter = ScanFilter.Builder()
+        if (clientId == null) {
+            filter.setServiceUuid(ParcelUuid.fromString(BleUuids.DISCOVERY_UUID), ParcelUuid.fromString(BleUuids.DISCOVERY_UUID_MASK))
+        } else {
+            filter.setServiceUuid(ParcelUuid.fromString(clientId))
+        }
+        scanFilter = listOf(filter.build())
         scanSettings = ScanSettings.Builder().build()
         scanFlowActive = true
         pauseCount = 0
@@ -155,50 +160,30 @@ object AndroidBleScanner : BleScanner {
 
 
 
-    @SuppressLint("MissingPermission")
-    override fun createClient(shortId: String): BleGattClient? {
-        // On Android we can't construct a BleGattClient from a clientId alone —
-        // the underlying BluetoothDevice (with its current MAC) must come from
-        // a scan result. Return an already-discovered client if we have one;
-        // otherwise the caller must scan before connecting. Match by shortId.
-        return allDevices.find { it.id.equals(shortId, ignoreCase = true) }
-    }
+    override fun createClient(clientId: String): BleGattClient? = allDevices.find { it.id == clientId }
 
     @SuppressLint("MissingPermission")
-    private fun addDevice(
-        device: BluetoothDevice,
-        rssi: Int,
-        parts: BleAdvertisement?,
-    ): AndroidBleGattClient {
-        // Match by shortId (the stable peer match key parsed from serviceData).
-        // Falls back to the BLE MAC only when the peer hasn't started
-        // advertising yet (parts is null).
-        val key = parts?.shortId ?: device.address
-        var d = allDevices.find { it.id == key }
-        if (d == null) {
-            LogCat.v("Found device: ${device.name}, shortId=${parts?.shortId}, mac=${device.address}, $rssi")
-            d = AndroidBleGattClient(
-                device = device,
-                context = appContext,
-                logger = { level, message ->
-                    when (level) {
-                        "D" -> LogCat.d(message)
-                        "W" -> LogCat.w(message)
-                        else -> LogCat.e(message)
-                    }
-                },
-                onDisconnected = ::teardown,
-                rssi = rssi,
-                shortId = parts?.shortId ?: "",
-                awareSupported = parts?.awareSupported ?: false,
-                awareRunning = parts?.awareRunning ?: false,
-            )
-            allDevices.add(d)
-        } else {
-            d.rssi = rssi
-            parts?.let { d.awareSupported = it.awareSupported; d.awareRunning = it.awareRunning }
+    private fun addDevice(device: BluetoothDevice, rssi: Int, clientId: String): AndroidBleGattClient {
+        val current = allDevices.find { it.id == clientId && it.device.address == device.address }
+        if (current != null) {
+            current.rssi = rssi
+            return current
         }
-        return d
+        allDevices.removeAll { it.id == clientId }
+        return AndroidBleGattClient(
+            device = device,
+            context = appContext,
+            logger = { level, message ->
+                when (level) {
+                    "D" -> LogCat.d(message)
+                    "W" -> LogCat.w(message)
+                    else -> LogCat.e(message)
+                }
+            },
+            onDisconnected = ::teardown,
+            rssi = rssi,
+            id = clientId,
+        ).also { allDevices.add(it) }
     }
 
     override fun teardownConnection(device: BleGattClient) {

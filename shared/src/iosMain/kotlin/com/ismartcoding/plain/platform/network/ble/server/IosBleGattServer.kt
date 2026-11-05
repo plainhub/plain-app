@@ -27,7 +27,6 @@ import platform.CoreBluetooth.CBCharacteristicPropertyNotify
 import platform.CoreBluetooth.CBCharacteristicPropertyRead
 import platform.CoreBluetooth.CBCharacteristicPropertyWrite
 import platform.CoreBluetooth.CBMutableCharacteristic
-import platform.CoreBluetooth.CBMutableDescriptor
 import platform.CoreBluetooth.CBMutableService
 import platform.CoreBluetooth.CBPeripheralManager
 import platform.CoreBluetooth.CBPeripheralManagerDelegateProtocol
@@ -39,7 +38,6 @@ import platform.darwin.NSObject
 import kotlin.time.Duration.Companion.milliseconds
 import com.ismartcoding.plain.platform.system.PlatformLock
 import kotlinx.coroutines.sync.Mutex
-import platform.CoreBluetooth.CBAdvertisementDataServiceDataKey
 import platform.CoreBluetooth.CBAdvertisementDataServiceUUIDsKey
 import platform.CoreBluetooth.CBCharacteristic
 
@@ -55,7 +53,7 @@ class IosBleGattServer : BleGattServer {
     private var advertising = false
     private var servicePending = false
     private var pendingService: CBMutableService? = null
-    private data class Advertising(val revision: Long = 0, val payload: ByteArray? = null, val closed: Boolean = false)
+    private data class Advertising(val revision: Long = 0, val serviceUuid: String? = null, val closed: Boolean = false)
     private val desired = MutableStateFlow(Advertising())
 
     private val centralLock = PlatformLock()
@@ -64,17 +62,12 @@ class IosBleGattServer : BleGattServer {
 
     private val notifyAckTimeoutMs = 10_000L
 
-    override fun start(payload: ByteArray, revision: Long) = setAdvertising(payload, revision)
-
-    override fun refreshAdvertising(payload: ByteArray, revision: Long) = setAdvertising(payload, revision)
-
-    private fun setAdvertising(payload: ByteArray, revision: Long) {
-        require(payload.size == 9)
+    override fun start(serviceUuid: String, revision: Long) {
         var next: Advertising
         while (true) {
             val previous = desired.value
             check(!previous.closed && revision > previous.revision) { "BLE advertiser closed or stale" }
-            next = Advertising(revision, payload.copyOf())
+            next = Advertising(revision, serviceUuid)
             if (desired.compareAndSet(previous, next)) break
         }
         val command = next
@@ -96,7 +89,7 @@ class IosBleGattServer : BleGattServer {
     override fun stop() {
         while (true) {
             val previous = desired.value
-            if (previous.closed || desired.compareAndSet(previous, previous.copy(payload = null, closed = true))) break
+            if (previous.closed || desired.compareAndSet(previous, previous.copy(serviceUuid = null, closed = true))) break
         }
         protocol.clear()
         centralLock.withLock { centrals.clear() }
@@ -166,22 +159,17 @@ class IosBleGattServer : BleGattServer {
     }
 
     private fun setupService(manager: CBPeripheralManager) {
-        val service = CBMutableService(CBUUID.UUIDWithString(BleUuids.SERVICE_UUID), true)
+        val service = CBMutableService(CBUUID.UUIDWithString(checkNotNull(desired.value.serviceUuid)), true)
 
         val charList = mutableListOf<CBMutableCharacteristic>()
         for (handler in protocol.handlers) {
             val charUuid = CBUUID.UUIDWithString(handler.charUuid)
-            val cccDescriptor = CBMutableDescriptor(
-                CBUUID.UUIDWithString(BleUuids.CCC_DESCRIPTOR_UUID),
-                null,
-            )
             val char = CBMutableCharacteristic(
                 charUuid,
                 CBCharacteristicPropertyRead or CBCharacteristicPropertyWrite or CBCharacteristicPropertyNotify,
                 null,
                 CBAttributePermissionsReadable or CBAttributePermissionsWriteable,
             )
-            char.setDescriptors(listOf(cccDescriptor))
             characteristics[handler.charUuid] = char
             charList.add(char)
         }
@@ -194,12 +182,10 @@ class IosBleGattServer : BleGattServer {
     private fun startAdvertising(manager: CBPeripheralManager) {
         val command = desired.value
         if (command.closed || peripheralManager !== manager) return
-        val payload = command.payload ?: return
-        val uuid = CBUUID.UUIDWithString(BleUuids.SERVICE_UUID)
-        val serviceDataMap: Map<Any?, Any?> = mapOf(uuid to payload.toNSData())
+        val serviceUuid = command.serviceUuid ?: return
+        val uuid = CBUUID.UUIDWithString(serviceUuid)
         manager.startAdvertising(mapOf<Any?, Any?>(
             CBAdvertisementDataServiceUUIDsKey to listOf(uuid),
-            CBAdvertisementDataServiceDataKey to serviceDataMap,
         ))
         advertising = true
     }

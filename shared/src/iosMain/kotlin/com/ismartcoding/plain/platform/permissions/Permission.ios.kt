@@ -13,6 +13,7 @@ import kotlinx.coroutines.withTimeoutOrNull
 import kotlin.time.Duration.Companion.seconds
 
 actual fun Permission.isGranted(): Boolean = when (this) {
+    Permission.ADB -> false
     Permission.READ_MEDIA_IMAGES, Permission.READ_MEDIA_VIDEOS, Permission.READ_MEDIA_AUDIO,
     Permission.READ_CONTACTS, Permission.WRITE_CONTACTS,
     Permission.ACCESS_FINE_LOCATION,
@@ -42,4 +43,6 @@ actual suspend fun ensureNotificationPermissionAsync(): Boolean {
 }
 
 
-actual fun imageLibraryPermission(): FeaturePermission = FeaturePermission(setOf(Permission.READ_MEDIA_IMAGES), Permission.READ_MEDIA_IMAGES)
+actual fun imageLibraryPermission(): FeaturePermission = FeaturePermission(
+    com.ismartcoding.plain.features.web.AccessFeature.IMAGES.systemPermissions(), Permission.READ_MEDIA_IMAGES,
+)

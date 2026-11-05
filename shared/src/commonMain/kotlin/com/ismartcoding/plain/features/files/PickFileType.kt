@@ -8,6 +8,7 @@ enum class PickFileType {
 }
 
 enum class PickFileTag {
+    DIRECTORY_ACCESS,
     SEND_MESSAGE,
     SCAN,
     EDITOR,

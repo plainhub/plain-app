@@ -67,7 +67,7 @@ fun GlobalSearchPage(
     }
 
     LaunchedEffect(viewModel, "search-permissions") {
-        AppSubscriptions.permissionsUpdated.changes().collect { if (viewModel.queryText.value.isNotBlank()) viewModel.search() }
+        AppSubscriptions.accessUpdated.changes().collect { if (viewModel.queryText.value.isNotBlank()) viewModel.search() }
     }
 
     LaunchedEffect(viewModel.queryText.value) {

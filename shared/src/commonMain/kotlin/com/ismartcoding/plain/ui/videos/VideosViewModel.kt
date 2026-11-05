@@ -8,7 +8,6 @@ import androidx.compose.foundation.lazy.grid.LazyGridState
 import androidx.compose.runtime.mutableStateMapOf
 import com.ismartcoding.plain.platform.system.DataType
 
-class VideosViewModel internal constructor(source: ContentSource = ContentSource.Local) : BaseMediaViewModel<MediaVideo>(source) {
-    override val dataType = DataType.VIDEO
+class VideosViewModel internal constructor(source: ContentSource = ContentSource.Local) : BaseMediaViewModel<MediaVideo>(source, DataType.VIDEO) {
     val scrollStateMap = mutableStateMapOf<Int, LazyGridState>()
 }

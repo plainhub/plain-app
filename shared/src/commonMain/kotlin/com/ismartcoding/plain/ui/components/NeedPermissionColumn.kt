@@ -49,7 +49,8 @@ import com.ismartcoding.plain.lib.sendEvent
 @Composable
 fun NeedPermissionColumn(
     icon: DrawableResource,
-    permission: FeaturePermission
+    permission: FeaturePermission,
+    feature: com.ismartcoding.plain.features.web.AccessFeature = permission.permission.accessFeatureOf(),
 ) {
     val source = LocalContentSource.current
     val scope = rememberCoroutineScope()
@@ -92,7 +93,7 @@ fun NeedPermissionColumn(
                         if (source is ContentSource.Remote) {
                             requestJob?.cancel()
                             requestJob = scope.launchSafe {
-                                source.api.execute(Mutation.openWebSettings(permission.permission.accessFeatureOf()))
+                                com.ismartcoding.plain.ui.permissions.requestAccess(source.api, feature)
                             }
                         } else sendEvent(RequestPermissionsEvent(*permission.permissions.toTypedArray()))
                     },

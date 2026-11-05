@@ -34,7 +34,7 @@ internal fun FilesPageEffects(
     }
     if (filesVM.source is ContentSource.Local) StoragePermissionResumeEffect(filesVM.hasPermission, reloadAfterGrant)
     else com.ismartcoding.plain.ui.permissions.RemotePermissionEffects(
-        filesVM.source as ContentSource.Remote, com.ismartcoding.plain.platform.permissions.Permission.WRITE_EXTERNAL_STORAGE, filesVM.hasPermission,
+        filesVM.source as ContentSource.Remote, com.ismartcoding.plain.features.web.AccessFeature.FILES, filesVM.hasPermission,
     )
 
     PBackHandler(enabled = previewerState.visible || filesVM.selectMode.value || filesVM.showSearchBar.value || filesVM.showPasteBar.value || filesVM.canNavigateBack()) {

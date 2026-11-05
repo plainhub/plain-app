@@ -36,3 +36,5 @@ expect fun getSDCardStorageStats(): StorageStats
  * Storage stats for each USB storage device.
  */
 expect fun getUSBStorageStats(): List<StorageStats>
+
+internal expect fun grantedStorageDirectories(): List<String>

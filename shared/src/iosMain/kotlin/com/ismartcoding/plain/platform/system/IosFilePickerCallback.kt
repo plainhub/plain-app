@@ -27,6 +27,12 @@ object IosFilePickerCallback {
 
     fun onPickResult(tag: String, type: String, uris: List<String>) {
         LogCat.d("IosFilePickerCallback: pickResult tag=$tag type=$type count=${uris.size}")
+        if (tag == PickFileTag.DIRECTORY_ACCESS.name) {
+            sendEvent(com.ismartcoding.plain.events.PermissionsResultEvent(mapOf(
+                com.ismartcoding.plain.platform.permissions.Permission.WRITE_EXTERNAL_STORAGE.name to uris.isNotEmpty(),
+            )))
+            return
+        }
         if (uris.isEmpty()) return
         val pickTag = runCatching { PickFileTag.valueOf(tag) }.getOrNull() ?: run {
             LogCat.w("IosFilePickerCallback: unknown PickFileTag $tag")
@@ -37,6 +43,13 @@ object IosFilePickerCallback {
             return
         }
         sendEvent(PickFileResultEvent(pickTag, pickType, uris.toSet()))
+    }
+
+    fun onPickError(message: String) {
+        LogCat.e("Directory access failed: $message")
+        com.ismartcoding.plain.lib.coMain {
+            com.ismartcoding.plain.ui.components.DialogHelper.showMessage(message)
+        }
     }
 
     fun onExportResult(type: String, uri: String) {

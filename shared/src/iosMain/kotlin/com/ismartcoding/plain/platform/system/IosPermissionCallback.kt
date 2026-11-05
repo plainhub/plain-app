@@ -1,27 +1,11 @@
 package com.ismartcoding.plain.platform.system
 
 import com.ismartcoding.plain.platform.permissions.Permission
-import com.ismartcoding.plain.platform.permissions.isGranted
-import com.ismartcoding.plain.ui.permissions.showPermissionDeniedDialog
 
 import com.ismartcoding.plain.events.PermissionsResultEvent
 import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.lib.sendEvent
 
-/**
- * Singleton entry point that Swift calls after an iOS permission request
- * completes. Exposed to Swift via the PlainShared framework header.
- *
- * Swift's [IosPermissionChecker.requestPermission] is asynchronous — the
- * system permission dialog may take seconds before the user responds. When
- * it does, Swift calls [onPermissionResult] with the final granted state.
- *
- * This object then:
- *  1. Sends [PermissionsResultEvent] so UI composables re-check
- *     [Permission.isGranted] and update their state.
- *  2. If the permission was denied, shows a confirm dialog offering to
- *     open the iOS Settings app via [IosPlatformRegistry.openAppSettings].
- */
 object IosPermissionCallback {
 
     fun onPermissionResult(permissionName: String, granted: Boolean) {
@@ -29,8 +13,5 @@ object IosPermissionCallback {
         val permission = runCatching { Permission.valueOf(permissionName) }.getOrNull()
         val key = permission?.toSysPermission() ?: permissionName
         sendEvent(PermissionsResultEvent(mapOf(key to granted)))
-        if (!granted) {
-            showPermissionDeniedDialog { IosPlatformRegistry.openAppSettings() }
-        }
     }
 }

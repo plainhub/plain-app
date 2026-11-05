@@ -37,14 +37,14 @@ internal object HttpServerResources {
     private var httpStarted: Boolean? = null
 
     val shouldEnableNotificationListener: Boolean
-        get() = httpStarted == true && Prefs.desktopAccess.value && Permission.NOTIFICATION_LISTENER.name in Prefs.apiPermissions.value
+        get() = httpStarted == true && Prefs.desktopAccess.value && com.ismartcoding.plain.features.web.AccessFeature.NOTIFICATIONS in Prefs.apiAccessFeatures.value
 
     fun observe() = scope.launch(start = CoroutineStart.UNDISPATCHED) {
         val httpUpdates = HttpServerManager.httpServerState.map { HttpStatusUpdate(it == ServiceState.ON) }
         merge(
             httpUpdates,
             combine(
-                Prefs.apiPermissions.map { Permission.NOTIFICATION_LISTENER.name in it }.distinctUntilChanged(),
+                Prefs.apiAccessFeatures.map { com.ismartcoding.plain.features.web.AccessFeature.NOTIFICATIONS in it }.distinctUntilChanged(),
                 Prefs.desktopAccess,
             ) { _, _ -> NotificationSettingUpdate },
             Channel.sharedFlow.filter { it is PermissionsResultEvent && it.has(Permission.NOTIFICATION_LISTENER) }

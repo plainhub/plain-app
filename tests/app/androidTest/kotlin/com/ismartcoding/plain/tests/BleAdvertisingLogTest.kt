@@ -21,7 +21,7 @@ class BleAdvertisingLogTest {
         val server = AndroidBleGattServer()
         val marker = "ble-advertising-log-${UUID.randomUUID()}"
         try {
-            server.start(byteArrayOf(0xf0.toByte(), 1, 2, 3, 4, 5, 6, 7, 8), 1)
+            server.start("706c6169-2d74-8e53-9a16-f08b62c591d3", 1)
             val field = AndroidBleGattServer::class.java.getDeclaredField("advertiseCallback").apply { isAccessible = true }
             val callback = field.get(server) as AdvertiseCallback
             server.stop()

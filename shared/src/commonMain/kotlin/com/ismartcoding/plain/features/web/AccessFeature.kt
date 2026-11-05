@@ -1,6 +1,13 @@
 package com.ismartcoding.plain.features.web
 
-enum class WebSettingsFeature {
+import kotlinx.serialization.Serializable
+
+@Serializable
+enum class AccessFeature {
+    IMAGES,
+    VIDEOS,
+    AUDIO,
+    DOCS,
     FILES,
     CONTACTS,
     SMS,
@@ -10,4 +17,5 @@ enum class WebSettingsFeature {
     APPS,
     NOTIFICATIONS,
     CLIPBOARD,
+    ADB,
 }

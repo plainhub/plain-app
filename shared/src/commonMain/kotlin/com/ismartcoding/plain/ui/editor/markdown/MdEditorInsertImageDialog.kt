@@ -50,9 +50,9 @@ fun MdEditorInsertImageDialog(
     val permission = Permission.WRITE_EXTERNAL_STORAGE
     val canUpload = remember(source) { mutableStateOf(when (source) {
         ContentSource.Local -> true
-        is ContentSource.Remote -> permission in source.client.currentInfo.permissions
+        is ContentSource.Remote -> com.ismartcoding.plain.features.web.AccessFeature.FILES in source.client.currentInfo.access
     }) }
-    if (source is ContentSource.Remote) RemotePermissionEffects(source, permission, canUpload)
+    if (source is ContentSource.Remote) RemotePermissionEffects(source, com.ismartcoding.plain.features.web.AccessFeature.FILES, canUpload)
     val imageUrlState = remember { mutableStateOf("") }
     var imageUrl by imageUrlState
     var description by remember { mutableStateOf("") }
@@ -109,7 +109,7 @@ fun MdEditorInsertImageDialog(
                         buttonSize = ButtonSize.MEDIUM,
                         onClick = {
                             if (source is ContentSource.Remote && !canUpload.value) {
-                                scope.launchSafe { source.api.execute(Mutation.openWebSettings(permission.accessFeatureOf())) }
+                                scope.launchSafe { com.ismartcoding.plain.ui.permissions.requestAccess(source.api, permission.accessFeatureOf()) }
                             } else sendEvent(PickFileEvent(PickFileTag.EDITOR, PickFileType.IMAGE, multiple = false))
                         },
                         modifier = Modifier

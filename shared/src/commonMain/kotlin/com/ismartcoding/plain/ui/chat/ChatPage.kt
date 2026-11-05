@@ -89,14 +89,14 @@ fun ChatPage(
     id: String = "",
 ) {
     val remote = chatVM.source as? com.ismartcoding.plain.rust.graphql.ContentSource.Remote
-    val filesAllowed = remote == null || com.ismartcoding.plain.platform.permissions.Permission.WRITE_EXTERNAL_STORAGE in remote.client.state.collectAsState().value.permissions
+    val filesAllowed = remote == null || com.ismartcoding.plain.features.web.AccessFeature.FILES in remote.client.state.collectAsState().value.access
     val itemsState = chatVM.itemsFlow.collectAsState()
     val chatTarget = chatVM.target.collectAsState()
     val channelsState = channelVM.channels.collectAsState()
     val peers by peerVM.peersMap.collectAsState()
     val scope = rememberCoroutineScope()
     val requestFilePermission = {
-        scope.launchSafe { chatVM.source.api.execute(com.ismartcoding.plain.graphql.Mutation.openWebSettings(com.ismartcoding.plain.features.web.WebSettingsFeature.FILES)) }
+        scope.launchSafe { com.ismartcoding.plain.ui.permissions.requestAccess(chatVM.source.api, com.ismartcoding.plain.features.web.AccessFeature.FILES) }
         Unit
     }
     var inputValue by remember { mutableStateOf("") }

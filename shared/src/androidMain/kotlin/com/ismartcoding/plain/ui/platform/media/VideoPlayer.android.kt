@@ -363,7 +363,7 @@ class ExoPlayerVideoController(
         exoPlayer.release()
     }
 
-    override fun setMediaItem(path: String, tlsCertificateSha256: String?) {
+    override suspend fun setMediaItem(path: String, tlsCertificateSha256: String?) {
         resource.set(tlsCertificateSha256?.let { com.ismartcoding.plain.models.ManagedResource(path, it) })
         exoPlayer.setMediaItem(MediaItem.fromUri(path.pathToUri()))
     }

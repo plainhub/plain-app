@@ -2,14 +2,13 @@ package com.ismartcoding.plain.models
 
 import com.ismartcoding.plain.IData
 import com.ismartcoding.plain.lib.TimeHelper
-import com.ismartcoding.plain.lib.generateId
 import kotlin.time.Instant
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Required
 
 @Serializable
 data class Bookmark(
-    @Required override var id: String = generateId(),
+    @Required override var id: String = "",
     @Required var url: String = "",
     @Required var title: String = "",
     @Required var faviconPath: String = "",

@@ -170,7 +170,7 @@ fun AudioAllPage(
         ) {
             Column(modifier = Modifier.fillMaxSize()) {
                 if (!audioVM.hasPermission.value) {
-                    NeedPermissionColumn(UiRes.drawable.ui_drawable_music, AppFeatureType.FILES.getPermission()!!); return@Column
+                    NeedPermissionColumn(UiRes.drawable.ui_drawable_music, AppFeatureType.FILES.getPermission()!!, feature = com.ismartcoding.plain.features.web.AccessFeature.AUDIO); return@Column
                 }
 
                 AudioPageList(

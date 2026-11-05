@@ -38,3 +38,6 @@ actual fun getInternalStorageStats(): StorageStats {
 actual fun getSDCardStorageStats(): StorageStats = StorageStats(0, 0)
 
 actual fun getUSBStorageStats(): List<StorageStats> = emptyList()
+
+internal actual fun grantedStorageDirectories(): List<String> =
+    checkNotNull(com.ismartcoding.plain.platform.system.IosPlatformRegistry.filePicker()).grantedDirectories()

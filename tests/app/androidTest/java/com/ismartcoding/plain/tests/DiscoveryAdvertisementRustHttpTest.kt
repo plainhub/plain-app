@@ -1,32 +1,30 @@
 package com.ismartcoding.plain.tests
 
+import android.bluetooth.le.ScanFilter
+import android.os.ParcelUuid
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.ismartcoding.plain.features.nearby.RustBleServiceData
-import kotlinx.coroutines.runBlocking
+import com.ismartcoding.plain.features.nearby.RustBleAdvertisement
+import com.ismartcoding.plain.platform.network.ble.BleUuids
 import org.junit.Assert.*
 import org.junit.Test
 import org.junit.runner.RunWith
-import java.security.MessageDigest
 
 @RunWith(AndroidJUnit4::class)
 class DiscoveryAdvertisementRustHttpTest {
     @Test
-    fun rawBleScanHeaderUsesRustForDecodeAndPeerMatching() = runBlocking {
-        val bytes = byteArrayOf(0xf3.toByte(), 0, 1, 2, 3, 4, 0x80.toByte(), 0xfe.toByte(), 0xff.toByte())
-        val parts = RustBleServiceData.decode(bytes)!!
-        assertEquals("000102030480feff", parts.shortId)
-        assertTrue(parts.awareSupported)
-        assertTrue(parts.awareRunning)
-        assertEquals(parts, RustBleServiceData.decode(bytes + byteArrayOf(42)))
-        assertNull(RustBleServiceData.decode(null))
-        for (size in 0 until 9) assertNull(RustBleServiceData.decode(bytes.copyOf(size)))
-        assertEquals("f16d05ec6b29248d", expectedShortId("fixture"))
+    fun advertisedUuidsUseRustFilteringWithoutServiceData() {
+        val id = "706c6169-2d74-8e53-9a16-f08b62c591d3"
+        assertEquals(id, RustBleAdvertisement.decode(listOf("180D", id.uppercase())))
+        assertNull(RustBleAdvertisement.decode(emptyList()))
+        assertNull(RustBleAdvertisement.decode(listOf("180D")))
+        assertNull(RustBleAdvertisement.decode(listOf(id.replace("8e53", "4e53"))))
+        val uuid = ParcelUuid.fromString(id).uuid
+        val target = ParcelUuid.fromString(BleUuids.DISCOVERY_UUID).uuid
+        val mask = ParcelUuid.fromString(BleUuids.DISCOVERY_UUID_MASK).uuid
+        assertEquals(target.mostSignificantBits, uuid.mostSignificantBits and mask.mostSignificantBits)
+        assertEquals(target.leastSignificantBits, uuid.leastSignificantBits and mask.leastSignificantBits)
+        val filter = ScanFilter.Builder().setServiceUuid(ParcelUuid(target), ParcelUuid(mask)).build()
+        assertEquals(ParcelUuid(target), filter.serviceUuid)
+        assertEquals(ParcelUuid(mask), filter.serviceUuidMask)
     }
-
-    private fun expectedShortId(clientId: String): String =
-        MessageDigest.getInstance("SHA-256")
-            .digest(clientId.toByteArray(Charsets.UTF_8))
-            .take(8)
-            .joinToString("") { (it.toInt() and 0xff).toString(16).padStart(2, '0') }
-
 }

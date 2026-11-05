@@ -1,6 +1,5 @@
 package com.ismartcoding.plain.features.permissions
 
-import com.ismartcoding.plain.ui.permissions.PermissionItem
 
 import com.ismartcoding.plain.platform.permissions.isGranted
 import com.ismartcoding.plain.platform.permissions.Permission
@@ -17,52 +16,50 @@ import com.ismartcoding.plain.ui.resources.folder as ui_drawable_folder
 import com.ismartcoding.plain.ui.resources.message_square_text as ui_drawable_message_square_text
 import com.ismartcoding.plain.ui.resources.package2 as ui_drawable_package2
 import com.ismartcoding.plain.ui.resources.phone_call as ui_drawable_phone_call
-import com.ismartcoding.plain.Prefs
 
-suspend fun checkEnabledAsync(permissions: Set<Permission>) {
-    val enabled = Prefs.apiPermissions.value
-    val missing = permissions.map { it.name }.filterNot { it in enabled }
-    if (missing.isNotEmpty()) {
-        throw Exception("no_permission")
-    }
-}
+import com.ismartcoding.plain.ui.resources.image as access_image
+import com.ismartcoding.plain.ui.resources.video as access_video
+import com.ismartcoding.plain.ui.resources.music as access_music
+import com.ismartcoding.plain.ui.resources.file_text as access_document
+import com.ismartcoding.plain.ui.resources.bell as access_bell
+import com.ismartcoding.plain.ui.resources.content_paste as access_clipboard
+import com.ismartcoding.plain.ui.resources.code as access_code
 
 fun allGranted(permissions: Set<Permission>): Boolean {
     return permissions.all { it.isGranted() }
 }
 
-fun getWebList(): List<PermissionItem> {
-    val list = mutableListOf<PermissionItem>()
-    list.add(PermissionItem.create(UiRes.drawable.ui_drawable_folder, Permission.WRITE_EXTERNAL_STORAGE))
-    if (Capability.TELEPHONY in getDeviceCapabilities()) {
-        list.add(PermissionItem.create(UiRes.drawable.ui_drawable_contact_round, Permission.WRITE_CONTACTS, setOf(Permission.READ_CONTACTS, Permission.WRITE_CONTACTS)))
-        list.add(PermissionItem.create(UiRes.drawable.ui_drawable_message_square_text, Permission.READ_SMS, setOf(Permission.READ_SMS)))
-        list.add(PermissionItem.create(UiRes.drawable.ui_drawable_message_square_text, Permission.SEND_SMS, setOf(Permission.SEND_SMS)))
-        list.add(PermissionItem.create(UiRes.drawable.ui_drawable_call_log, Permission.WRITE_CALL_LOG, setOf(Permission.READ_CALL_LOG, Permission.WRITE_CALL_LOG)))
-        list.add(PermissionItem.create(UiRes.drawable.ui_drawable_phone_call, Permission.CALL_PHONE))
-        list.add(PermissionItem.create(UiRes.drawable.ui_drawable_file_digit, Permission.READ_PHONE_NUMBERS, setOf(Permission.READ_PHONE_STATE, Permission.READ_PHONE_NUMBERS)))
+internal fun getWebList(): List<com.ismartcoding.plain.ui.web.AccessItem> = buildList {
+    val capabilities = getDeviceCapabilities()
+    add(com.ismartcoding.plain.ui.web.AccessItem(UiRes.drawable.ui_drawable_folder, com.ismartcoding.plain.ui.web.managedFileAccessFeatures))
+    for (feature in com.ismartcoding.plain.features.web.AccessFeature.entries.filterNot { it in com.ismartcoding.plain.ui.web.managedFileAccessFeatures || it == com.ismartcoding.plain.features.web.AccessFeature.NOTIFICATIONS || it == com.ismartcoding.plain.features.web.AccessFeature.CLIPBOARD }) {
+        val supported = when (feature) {
+            com.ismartcoding.plain.features.web.AccessFeature.CONTACTS,
+            com.ismartcoding.plain.features.web.AccessFeature.SMS,
+            com.ismartcoding.plain.features.web.AccessFeature.CALL_LOGS,
+            com.ismartcoding.plain.features.web.AccessFeature.CALL_PHONE -> Capability.TELEPHONY in capabilities
+            com.ismartcoding.plain.features.web.AccessFeature.PHONE_NUMBER -> Capability.TELEPHONY in capabilities
+            com.ismartcoding.plain.features.web.AccessFeature.APPS -> AppFeatureType.APPS.has()
+            com.ismartcoding.plain.features.web.AccessFeature.NOTIFICATIONS -> AppFeatureType.NOTIFICATIONS.has()
+            com.ismartcoding.plain.features.web.AccessFeature.ADB -> Capability.ADB in capabilities
+            else -> true
+        }
+        val icon = when (feature) {
+            com.ismartcoding.plain.features.web.AccessFeature.IMAGES -> UiRes.drawable.access_image
+            com.ismartcoding.plain.features.web.AccessFeature.VIDEOS -> UiRes.drawable.access_video
+            com.ismartcoding.plain.features.web.AccessFeature.AUDIO -> UiRes.drawable.access_music
+            com.ismartcoding.plain.features.web.AccessFeature.DOCS -> UiRes.drawable.access_document
+            com.ismartcoding.plain.features.web.AccessFeature.CONTACTS -> UiRes.drawable.ui_drawable_contact_round
+            com.ismartcoding.plain.features.web.AccessFeature.SMS -> UiRes.drawable.ui_drawable_message_square_text
+            com.ismartcoding.plain.features.web.AccessFeature.CALL_LOGS -> UiRes.drawable.ui_drawable_call_log
+            com.ismartcoding.plain.features.web.AccessFeature.CALL_PHONE -> UiRes.drawable.ui_drawable_phone_call
+            com.ismartcoding.plain.features.web.AccessFeature.PHONE_NUMBER -> UiRes.drawable.ui_drawable_file_digit
+            com.ismartcoding.plain.features.web.AccessFeature.APPS -> UiRes.drawable.ui_drawable_package2
+            com.ismartcoding.plain.features.web.AccessFeature.NOTIFICATIONS -> UiRes.drawable.access_bell
+            com.ismartcoding.plain.features.web.AccessFeature.CLIPBOARD -> UiRes.drawable.access_clipboard
+            com.ismartcoding.plain.features.web.AccessFeature.ADB -> UiRes.drawable.access_code
+            com.ismartcoding.plain.features.web.AccessFeature.FILES -> UiRes.drawable.ui_drawable_folder
+        }
+        if (supported) add(com.ismartcoding.plain.ui.web.AccessItem(icon, setOf(feature)))
     }
-    if (AppFeatureType.APPS.has()) {
-        list.add(PermissionItem.create(UiRes.drawable.ui_drawable_package2, Permission.QUERY_ALL_PACKAGES))
-    }
-    return list
-}
-
-/**
- * The authoritative web-facing permission snapshot — the same list the
- * `app.permissions` GraphQL field returns. PERMISSIONS_UPDATED websocket
- * events carry this shape: a state snapshot, not a change set — clients
- * converge to it and derive enable/disable by diffing with their previous
- * snapshot.
- */
-suspend fun getGrantedWebPermissionsAsync(): List<Permission> {
-    val apiPermissions = Prefs.apiPermissions.value
-    val granted = Permission.entries.filter { apiPermissions.contains(it.name) && it.isGranted() }.toMutableList()
-    if (Permission.RECORD_AUDIO.isGranted() && !granted.contains(Permission.RECORD_AUDIO)) {
-        granted.add(Permission.RECORD_AUDIO)
-    }
-    if (Permission.ADB.isGranted() && !granted.contains(Permission.ADB)) {
-        granted.add(Permission.ADB)
-    }
-    return granted
 }

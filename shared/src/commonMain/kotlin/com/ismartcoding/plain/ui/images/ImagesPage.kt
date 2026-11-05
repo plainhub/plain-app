@@ -140,7 +140,7 @@ fun ImagesPage(
         }
     }
 
-    MediaPermissionEffects(imagesVM.hasPermission, initialLoadGate, reloadAfterGrant, imagesVM.source, imageLibraryPermission())
+    MediaPermissionEffects(imagesVM.hasPermission, initialLoadGate, reloadAfterGrant, imagesVM.source, imagesVM.accessFeature, imageLibraryPermission())
     LaunchedEffect(dragSelectState.selectMode, (previewerState.visible && !isGestureInteractionMode())) {
         if (dragSelectState.selectMode || (previewerState.visible && !isGestureInteractionMode())) {
             scrollBehavior.reset()
@@ -212,7 +212,7 @@ fun ImagesPage(
                 .padding(top = paddingValues.calculateTopPadding())
         ) {
             if (!imagesVM.hasPermission.value) {
-                NeedPermissionColumn(UiRes.drawable.ui_drawable_image, if (source is ContentSource.Remote) AppFeatureType.FILES.getPermission()!! else imageLibraryPermission()); return@Column
+                NeedPermissionColumn(UiRes.drawable.ui_drawable_image, if (source is ContentSource.Remote) AppFeatureType.FILES.getPermission()!! else imageLibraryPermission(), feature = imagesVM.accessFeature); return@Column
             }
 
             PullToRefresh(refreshLayoutState = topRefreshLayoutState) {

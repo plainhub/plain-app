@@ -55,4 +55,6 @@
     <string name="app_files">App Files</string>
     <string name="app_files_desc">Files shared in chat</string>
     <string name="no_app_files">No files yet</string>
+    <string name="add_folder">Add folder</string>
+    <string name="manage_files">Manage Files</string>
 </resources>

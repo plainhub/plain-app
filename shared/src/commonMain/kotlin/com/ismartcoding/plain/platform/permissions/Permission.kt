@@ -2,7 +2,6 @@ package com.ismartcoding.plain.platform.permissions
 
 import com.ismartcoding.plain.events.RequestPermissionsEvent
 import com.ismartcoding.plain.lib.sendEvent
-import com.ismartcoding.plain.Prefs
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -55,18 +54,5 @@ fun Permission.grant(): Boolean {
     sendEvent(RequestPermissionsEvent(this))
     return false
 }
-
-suspend fun Permission.isEnabledAsync(): Boolean =
-    name in Prefs.apiPermissions.value
-
-/** Enabled for the web client *and* granted by the OS. Both answers are local. */
-suspend fun Permission.enabledAndIsGrantedAsync(): Boolean = isEnabledAsync() && isGranted()
-
-suspend fun Permission.checkEnabledAsync() {
-    if (!isEnabledAsync()) {
-        throw Exception("no_permission")
-    }
-}
-
 
 expect fun imageLibraryPermission(): FeaturePermission

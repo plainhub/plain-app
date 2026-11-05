@@ -32,7 +32,7 @@ class FileTaskRustHttpTest {
     fun fileTasksCopyMoveTrackActualTargetsAndReportRealFailures() = runBlocking {
         val root = File(InstrumentationRegistry.getInstrumentation().targetContext.cacheDir,"file-task-${UUID.randomUUID()}").apply { mkdirs() }
         val external = File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS),"file-task-${UUID.randomUUID()}")
-        val originalPermissions = Prefs.apiPermissions.value
+        val originalPermissions = Prefs.apiAccessFeatures.value
         try {
             val source = File(root,"source.txt").apply { writeText("synthetic") }
             val target = File(root,"target.txt").apply { writeText("existing") }
@@ -75,7 +75,7 @@ class FileTaskRustHttpTest {
             assertTrue(rejected)
             val spoofedCaller = runCatching { GraphqlApi.execute(GraphqlRequest<JsonObject>("query { " + "fileTasks(clientId: ${JsonPrimitive("foreign-${UUID.randomUUID()}")}, query: \"\", offset: 0, limit: 1) { id }" + " }")) }
             assertTrue(spoofedCaller.isFailure)
-            Prefs.setApiPermissions(originalPermissions + "WRITE_EXTERNAL_STORAGE")
+            Prefs.setApiAccessFeatures(originalPermissions + com.ismartcoding.plain.features.web.AccessFeature.FILES)
             assertEquals(true, GraphqlApi.execute(GraphqlRequest<JsonObject>("mutation { " + """copyFile(src: "${source.path}", dst: "${File(root,"public-copy.txt").path}", overwrite: false)""" + " }")).getValue("copyFile").jsonPrimitive.boolean)
             assertEquals("synthetic",File(root,"public-copy.txt").readText())
             var publicFailed = false
@@ -83,7 +83,7 @@ class FileTaskRustHttpTest {
             catch (_: Exception) { publicFailed = true }
             assertTrue(publicFailed)
         } finally {
-            Prefs.setApiPermissions(originalPermissions)
+            Prefs.setApiAccessFeatures(originalPermissions)
             root.deleteRecursively()
             external.deleteRecursively()
             scanFileTaskPaths(listOf(File(external,"source.txt").path,File(external,"moved.txt").path))

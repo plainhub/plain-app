@@ -1,7 +1,6 @@
 package com.ismartcoding.plain.features.settings
 
 import com.ismartcoding.plain.platform.network.wifiAwareAttached
-import com.ismartcoding.plain.platform.network.ble.BleUuids
 import com.ismartcoding.plain.platform.network.ble.PairingTransport
 import com.ismartcoding.plain.features.dlna.DlnaRendererState
 import com.ismartcoding.plain.HttpServerManager
@@ -58,7 +57,7 @@ fun getServiceDebugInfo(): ServiceDebugInfo {
 
         bleRunning = bleRunning,
         bleClientId = Prefs.clientId.value,
-        bleServiceUuid = BleUuids.SERVICE_UUID,
+        bleServiceUuid = Prefs.clientId.value,
 
         awareRunning = awareRunning,
         awareAttachStatus = when {

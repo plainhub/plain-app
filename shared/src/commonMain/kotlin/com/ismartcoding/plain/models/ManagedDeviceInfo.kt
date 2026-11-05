@@ -7,7 +7,7 @@ import kotlinx.serialization.Serializable
 data class ManagedDeviceInfo(
     val deviceName: String,
     val capabilities: List<Capability>,
-    val permissions: List<com.ismartcoding.plain.platform.permissions.Permission>,
+    val access: List<com.ismartcoding.plain.features.web.AccessFeature>,
     val appDir: String,
     val downloadsDir: String,
     val urlToken: String,

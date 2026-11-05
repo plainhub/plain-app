@@ -170,11 +170,19 @@ private fun SearchDeviceError(viewModel: GlobalSearchViewModel, domain: GlobalSe
         GlobalSearchDomain.APPS -> com.ismartcoding.plain.platform.permissions.Permission.QUERY_ALL_PACKAGES
         else -> com.ismartcoding.plain.platform.permissions.Permission.WRITE_EXTERNAL_STORAGE
     }
+    val feature = when (domain) {
+        GlobalSearchDomain.IMAGES -> com.ismartcoding.plain.features.web.AccessFeature.IMAGES
+        GlobalSearchDomain.VIDEOS -> com.ismartcoding.plain.features.web.AccessFeature.VIDEOS
+        GlobalSearchDomain.AUDIO -> com.ismartcoding.plain.features.web.AccessFeature.AUDIO
+        GlobalSearchDomain.DOCS -> com.ismartcoding.plain.features.web.AccessFeature.DOCS
+        GlobalSearchDomain.APPS -> com.ismartcoding.plain.features.web.AccessFeature.APPS
+        else -> com.ismartcoding.plain.features.web.AccessFeature.FILES
+    }
     val scope = androidx.compose.runtime.rememberCoroutineScope()
     val requested = androidx.compose.runtime.remember(state) { androidx.compose.runtime.mutableStateOf(false) }
     val granted = androidx.compose.runtime.remember(state) { androidx.compose.runtime.mutableStateOf(false) }
     if (requested.value && permission != null && state.device is com.ismartcoding.plain.rust.graphql.ContentSource.Remote) {
-        com.ismartcoding.plain.ui.permissions.RemotePermissionEffects(state.device, permission, granted) { viewModel.search() }
+        com.ismartcoding.plain.ui.permissions.RemotePermissionEffects(state.device, feature, granted) { viewModel.search() }
     }
     Column(Modifier.padding(horizontal = 16.dp, vertical = 8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
         if (error == "no_permission" && permission != null) {
@@ -182,7 +190,7 @@ private fun SearchDeviceError(viewModel: GlobalSearchViewModel, domain: GlobalSe
             POutlinedButton(text = stringResource(Res.string.request_permission), onClick = {
                 requested.value = true
                 if (state.device is com.ismartcoding.plain.rust.graphql.ContentSource.Remote) {
-                    scope.launchSafe { state.device.api.execute(com.ismartcoding.plain.graphql.Mutation.openWebSettings(permission.accessFeatureOf())) }
+                    scope.launchSafe { com.ismartcoding.plain.ui.permissions.requestAccess(state.device.api, feature) }
                 } else com.ismartcoding.plain.lib.sendEvent(com.ismartcoding.plain.events.RequestPermissionsEvent(permission))
             })
         } else {

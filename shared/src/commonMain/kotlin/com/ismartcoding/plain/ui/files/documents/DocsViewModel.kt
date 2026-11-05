@@ -18,8 +18,7 @@ import androidx.compose.runtime.mutableStateOf
 import com.ismartcoding.plain.lib.withIO
 import com.ismartcoding.plain.platform.system.DataType
 
-class DocsViewModel internal constructor(source: ContentSource = ContentSource.Local) : BaseMediaViewModel<Document>(source) {
-    override val dataType = DataType.DOC
+class DocsViewModel internal constructor(source: ContentSource = ContentSource.Local) : BaseMediaViewModel<Document>(source, DataType.DOC) {
     override val showFoldersAsList = true
     val scrollStateMap = mutableStateMapOf<Int, LazyListState>()
     val fileType = mutableStateOf("")

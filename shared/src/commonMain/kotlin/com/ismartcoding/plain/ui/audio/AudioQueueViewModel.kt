@@ -61,7 +61,7 @@ class AudioQueueViewModel internal constructor(
             try {
                 val changes = sourceChanges ?: if (source is com.ismartcoding.plain.rust.graphql.ContentSource.Local) AppSubscriptions.contentChanged.changes()
                     else kotlinx.coroutines.flow.merge(
-                        (source as com.ismartcoding.plain.rust.graphql.ContentSource.Remote).client.changes(listOf(com.ismartcoding.plain.rust.graphql.GraphqlOperation("subscription { contentChanged }"), com.ismartcoding.plain.rust.graphql.GraphqlOperation("subscription { permissionsUpdated }"))),
+                        (source as com.ismartcoding.plain.rust.graphql.ContentSource.Remote).client.changes(listOf(com.ismartcoding.plain.rust.graphql.GraphqlOperation("subscription { contentChanged }"), com.ismartcoding.plain.rust.graphql.GraphqlOperation("subscription { accessUpdated }"))),
                         com.ismartcoding.plain.features.audio.AudioCommands.changed.filter { com.ismartcoding.plain.features.audio.AudioCommands.output.value.source.key == source.key },
                     )
                 changes.collect {

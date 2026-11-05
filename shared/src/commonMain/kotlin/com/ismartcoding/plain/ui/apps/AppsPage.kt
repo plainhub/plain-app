@@ -57,7 +57,7 @@ fun AppsPage(navController: NavHostController, source: com.ismartcoding.plain.ru
         scope.launch { appsVM.loadAsync(); setRefreshState(RefreshContentState.Finished) }
     }
     if (source is com.ismartcoding.plain.rust.graphql.ContentSource.Remote) {
-        com.ismartcoding.plain.ui.permissions.RemotePermissionEffects(source, com.ismartcoding.plain.platform.permissions.Permission.QUERY_ALL_PACKAGES, appsVM.hasPermission) {
+        com.ismartcoding.plain.ui.permissions.RemotePermissionEffects(source, com.ismartcoding.plain.features.web.AccessFeature.APPS, appsVM.hasPermission) {
             appsVM.loadAsync()
         }
     }

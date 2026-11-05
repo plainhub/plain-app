@@ -24,7 +24,7 @@ class FileBrowseRustHttpTest {
     @Test
     fun sharedBrowserAndPublicQueriesUseRustFiltersPagesCountsAndZipAdapter() = runBlocking {
         val root = File(InstrumentationRegistry.getInstrumentation().targetContext.cacheDir, "file-browse-${UUID.randomUUID()}").apply { mkdirs() }
-        val permissions = Prefs.apiPermissions.value
+        val permissions = Prefs.apiAccessFeatures.value
         try {
             val dir = File(root, "NeedleDir").apply { mkdirs() }
             File(dir, "NEEDLE 中文.txt").writeText("four")
@@ -49,7 +49,7 @@ class FileBrowseRustHttpTest {
             val zipped = FilesClient.search("file_size:>4", "${archive.path}!zip!/", FileSortBy.NAME_ASC)
             assertEquals(listOf("large.txt"), zipped.map { it.name })
             assertEquals("folder", FilesClient.search("", "${archive.path}!zip!/", FileSortBy.NAME_ASC).first().name)
-            Prefs.setApiPermissions(permissions + "WRITE_EXTERNAL_STORAGE")
+            Prefs.setApiAccessFeatures(permissions + com.ismartcoding.plain.features.web.AccessFeature.FILES)
             suspend fun field(selection: String): JsonElement =
                 GraphqlApi.execute(GraphqlRequest<JsonObject>("query { $selection }")).values.first()
             assertEquals(true, field("""pathExists(path: "${root.path}")""").jsonPrimitive.boolean)
@@ -65,7 +65,7 @@ class FileBrowseRustHttpTest {
             assertEquals(2, field("""fileCount(root: "${root.path}", query: "text:needle")""").jsonPrimitive.int)
             assertEquals(0, field("""fileCount(root: "${File(root, "missing").path}", query: "")""").jsonPrimitive.int)
         } finally {
-            Prefs.setApiPermissions(permissions)
+            Prefs.setApiAccessFeatures(permissions)
             root.deleteRecursively()
         }
     }

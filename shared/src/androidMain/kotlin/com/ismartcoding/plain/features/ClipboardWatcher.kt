@@ -1,6 +1,8 @@
 package com.ismartcoding.plain.features
 
 
+import com.ismartcoding.plain.Prefs
+import com.ismartcoding.plain.features.web.AccessFeature
 import android.content.ClipDescription
 import android.content.ClipboardManager
 import android.content.Context
@@ -12,8 +14,6 @@ import com.ismartcoding.plain.events.ClipboardReportData
 import com.ismartcoding.plain.events.WindowFocusChangedEvent
 import com.ismartcoding.plain.lib.Channel
 import com.ismartcoding.plain.lib.logcat.LogCat
-import com.ismartcoding.plain.platform.permissions.Permission
-import com.ismartcoding.plain.platform.permissions.isEnabledAsync
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -60,7 +60,7 @@ object ClipboardWatcher {
             LogCat.e("ClipboardWatcher start failed: ${e.message}")
         }
         eventJob = scope.launch(Dispatchers.IO) {
-            if (Permission.CLIPBOARD.isEnabledAsync()) startLogcat()
+            if ((AccessFeature.CLIPBOARD in Prefs.apiAccessFeatures.value)) startLogcat()
             Channel.sharedFlow.collect { event ->
                 when (event) {
                     is WindowFocusChangedEvent -> if (event.hasFocus) handleFocusGained()
@@ -146,7 +146,7 @@ object ClipboardWatcher {
     }
 
     private suspend fun handleClipboardChange() {
-        if (!Permission.CLIPBOARD.isEnabledAsync()) return
+        if (AccessFeature.CLIPBOARD !in Prefs.apiAccessFeatures.value) return
         val clip = clipboardManager.primaryClip ?: return
         if (clip.itemCount == 0) return
         val text = clip.getItemAt(0).coerceToText(appContext)?.toString() ?: return

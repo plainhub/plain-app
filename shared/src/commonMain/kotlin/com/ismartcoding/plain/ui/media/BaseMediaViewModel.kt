@@ -23,7 +23,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 
-abstract class BaseMediaViewModel<T : IData> internal constructor(val source: ContentSource = ContentSource.Local) : ISearchableViewModel<T>, ViewModel() {
+abstract class BaseMediaViewModel<T : IData> internal constructor(val source: ContentSource = ContentSource.Local, val dataType: DataType) : ISearchableViewModel<T>, ViewModel() {
     internal var onMediaChanged: (suspend () -> Unit)? = null
 
     internal val _itemsFlow = MutableStateFlow<List<T>>(emptyList())
@@ -32,7 +32,15 @@ abstract class BaseMediaViewModel<T : IData> internal constructor(val source: Co
     var trash = mutableStateOf(false)
     var bucketId = mutableStateOf("")
     var showLoading = mutableStateOf(true)
-    var hasPermission = mutableStateOf(source is ContentSource.Remote && com.ismartcoding.plain.platform.permissions.Permission.WRITE_EXTERNAL_STORAGE in source.info.permissions)
+    val accessFeature: com.ismartcoding.plain.features.web.AccessFeature
+        get() = when (dataType) {
+            DataType.IMAGE -> com.ismartcoding.plain.features.web.AccessFeature.IMAGES
+            DataType.VIDEO -> com.ismartcoding.plain.features.web.AccessFeature.VIDEOS
+            DataType.AUDIO -> com.ismartcoding.plain.features.web.AccessFeature.AUDIO
+            DataType.DOC -> com.ismartcoding.plain.features.web.AccessFeature.DOCS
+            else -> error("Unsupported media type: $dataType")
+        }
+    var hasPermission = mutableStateOf(source is ContentSource.Remote && accessFeature in source.info.access)
     var total = mutableIntStateOf(0)
     var totalTrash = mutableIntStateOf(0)
     val noMore = mutableStateOf(false)
@@ -51,7 +59,6 @@ abstract class BaseMediaViewModel<T : IData> internal constructor(val source: Co
     override val searchActive = mutableStateOf(false)
     override val queryText = mutableStateOf("")
 
-    abstract val dataType: DataType
 
     internal open fun getTotalQuery(): String {
         var query = "${SearchHelper.buildTextFilter(queryText.value)} trash:false"

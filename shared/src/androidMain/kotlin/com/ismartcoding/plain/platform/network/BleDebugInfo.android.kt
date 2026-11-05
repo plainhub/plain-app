@@ -5,7 +5,6 @@ import com.ismartcoding.plain.platform.isSPlus
 import android.Manifest
 import com.ismartcoding.plain.Prefs
 import com.ismartcoding.plain.appContext
-import com.ismartcoding.plain.platform.network.ble.BleUuids
 import com.ismartcoding.plain.platform.network.ble.PairingTransport
 import com.ismartcoding.plain.lib.extensions.hasPermission
 
@@ -42,6 +41,6 @@ actual fun getBleDebugInfo(): BleDebugInfo {
         advertiseReady = advertiseReady,
         advertisingRunning = advertisingRunning,
         clientId = Prefs.clientId.value,
-        serviceUuid = BleUuids.SERVICE_UUID,
+        serviceUuid = Prefs.clientId.value,
     )
 }

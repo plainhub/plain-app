@@ -40,7 +40,7 @@ internal fun DocsPageEffects(
     }
 
     com.ismartcoding.plain.ui.media.MediaPermissionEffects(
-        docsVM.hasPermission, initialLoadGate, reloadAfterGrant, docsVM.source,
+        docsVM.hasPermission, initialLoadGate, reloadAfterGrant, docsVM.source, feature = docsVM.accessFeature,
     )
 
     LaunchedEffect(docsState.dragSelectState.selectMode, !isGestureInteractionMode()) {

@@ -24,7 +24,7 @@ class FileWritesRustHttpTest {
     fun sharedAndPublicFileWritesUseRustAndPreserveExistingContent() = runBlocking {
         val root = File(InstrumentationRegistry.getInstrumentation().targetContext.cacheDir, "file-writes-${UUID.randomUUID()}")
         val external = File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), "file-writes-${UUID.randomUUID()}")
-        val originalPermissions = Prefs.apiPermissions.value
+        val originalPermissions = Prefs.apiAccessFeatures.value
         try {
             val dir = FilesClient.createDirectory(File(root, "nested/child").path)
             assertTrue(dir.isDir)
@@ -47,7 +47,7 @@ class FileWritesRustHttpTest {
             assertTrue(runCatching { FilesClient.createFile(File(root, "missing/never.txt").path) }.isFailure)
             assertFalse(File(root, "missing/never.txt").exists())
             assertTrue(runCatching { FilesClient.createDirectory("/system/plain-synthetic-${UUID.randomUUID()}") }.isFailure)
-            Prefs.setApiPermissions(originalPermissions + "WRITE_EXTERNAL_STORAGE")
+            Prefs.setApiAccessFeatures(originalPermissions + com.ismartcoding.plain.features.web.AccessFeature.FILES)
             val publicDir = File(root, "public")
             GraphqlApi.execute(GraphqlRequest<JsonObject>("mutation { " + """createDir(path: "${publicDir.path}")""" + " }"))
             assertTrue(publicDir.isDirectory)
@@ -61,7 +61,7 @@ class FileWritesRustHttpTest {
             FilesClient.writeText(externalFile.path, content, false)
             assertEquals(content, externalFile.readText())
         } finally {
-            Prefs.setApiPermissions(originalPermissions)
+            Prefs.setApiAccessFeatures(originalPermissions)
             root.deleteRecursively()
             external.deleteRecursively()
             scanFileTaskPaths(listOf(File(external, "synthetic.txt").path, external.path))

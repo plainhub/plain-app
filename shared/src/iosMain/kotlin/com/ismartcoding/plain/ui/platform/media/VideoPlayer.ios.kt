@@ -103,21 +103,21 @@ private class AVPlayerVideoController : VideoPlayerController {
         eventListener = null
     }
 
-    override fun setMediaItem(path: String, tlsCertificateSha256: String?) {
-        firstFrameReported = false
-        val url = if (path.startsWith("http")) {
-            NSURL.URLWithString(path)
+    override suspend fun setMediaItem(path: String, tlsCertificateSha256: String?) {
+        stopPolling()
+        player?.pause()
+        player?.replaceCurrentItemWithPlayerItem(null)
+        val item = if (path.startsWith("ph://")) {
+            com.ismartcoding.plain.platform.media.IosPhotoResource.playerItem(path)
         } else {
-            NSURL.fileURLWithPath(path)
-        } ?: return
-        val item = AVPlayerItem(uRL = url)
-        val existing = player
-        if (existing != null) {
-            existing.replaceCurrentItemWithPlayerItem(item)
-        } else {
-            val newPlayer = AVPlayer(playerItem = item)
-            player = newPlayer
+            val url = if (path.startsWith("http")) NSURL.URLWithString(path) else NSURL.fileURLWithPath(path)
+            checkNotNull(url) { "Video resource URL required" }
+            AVPlayerItem(uRL = url)
         }
+        firstFrameReported = false
+        val existing = player
+        if (existing != null) existing.replaceCurrentItemWithPlayerItem(item)
+        else player = AVPlayer(playerItem = item)
     }
 
     override fun setEventListener(listener: (VideoPlayerEvent) -> Unit) {

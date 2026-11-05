@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="access_allow">允许访问</string>
+    <string name="access_go_to_settings">前往设置</string>
+    <string name="access_choose_folder">重新选择文件夹</string>
+    <string name="access_photos_request_help">允许访问后，这里会显示系统相册中的照片和视频。</string>
+    <string name="access_photos_settings_help">请在系统设置中允许 PlainApp 访问照片和视频。</string>
+    <string name="access_photos_restricted_help">屏幕使用时间或设备管理限制了相册访问。请联系设备管理员解除限制。</string>
+    <string name="access_photos_limited_help">当前权限设置仅允许显示部分照片和视频。如需显示更多，请在系统设置中允许访问。</string>
+    <string name="access_add_folder_help">选择文件夹后，其中的音乐、视频和文档会显示在列表中，无需复制文件。</string>
+    <string name="access_folder_unavailable_help">文件夹可能已移动或访问已失效，请从“文件”中重新选择。</string>
+    <string name="access_files_help">请在系统设置中允许 PlainApp 管理文件，以显示图片、视频、音乐和文档。</string>
+    <string name="access_feature_help">请允许访问以使用上方功能，共享开关会保持打开。</string>
+</resources>

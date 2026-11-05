@@ -8,6 +8,8 @@ import com.ismartcoding.plain.platform.network.isWifiAwareSupported
 
 actual fun getDeviceCapabilities(): List<Capability> = Capability.entries.filter { capability ->
     when (capability) {
+        Capability.ADB -> true
+        Capability.DIRECTORY_ACCESS -> false
         Capability.BLE -> isBluetoothSupported()
         Capability.WIFI_AWARE -> isWifiAwareSupported
         Capability.BACKGROUND_SERVICE,

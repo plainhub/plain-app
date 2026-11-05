@@ -5,7 +5,6 @@ import com.ismartcoding.plain.rust.native.RustHostReports
 import com.ismartcoding.plain.lib.JsonHelper
 import kotlinx.serialization.Serializable
 
-import com.ismartcoding.plain.platform.network.wifiAwareAttached
 import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.platform.network.BleAvailability
 import com.ismartcoding.plain.platform.network.bleAvailabilityFlow
@@ -13,9 +12,7 @@ import com.ismartcoding.plain.platform.network.ble.server.BleGattServer
 import com.ismartcoding.plain.platform.network.bleTransport
 import com.ismartcoding.plain.platform.system.PlatformLock
 import kotlinx.coroutines.CancellationException
-import kotlinx.coroutines.flow.combine
 import kotlinx.serialization.json.*
-import kotlin.io.encoding.Base64
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
 
@@ -43,15 +40,14 @@ object PairingTransport {
 
         fun handle(params: JsonObject): JsonElement {
             val request = JsonHelper.jsonDecodeFromElement<AdvertisingRequest>(params)
-            val active = request.active
             val nextRevision = request.revision
-            val bytes = Base64.decode(request.bytes)
-            require(nextRevision > 0 && if (active) bytes.size == 9 else bytes.isEmpty())
+            val serviceUuid = request.serviceUuid
+            require(nextRevision > 0)
             return lock.withLock {
                 check(!closed && current === this && request.lease == lease) { "BLE advertising connection replaced" }
                 if (nextRevision <= revision) return@withLock JsonPrimitive(false)
                 revision = nextRevision
-                if (!active) {
+                if (serviceUuid == null) {
                     val running = server
                     server = null
                     running?.stop()
@@ -59,11 +55,8 @@ object PairingTransport {
                     val running = server
                     if (running == null) {
                         val created = createServer()
-                        try { created.start(bytes, nextRevision); server = created }
+                        try { created.start(serviceUuid, nextRevision); server = created }
                         catch (error: Exception) { created.stop(); throw error }
-                    } else {
-                        try { running.refreshAdvertising(bytes, nextRevision) }
-                        catch (error: Exception) { server = null; running.stop(); throw error }
                     }
                 }
                 JsonPrimitive(true)
@@ -71,9 +64,8 @@ object PairingTransport {
         }
 
         suspend fun observeFacts() {
-            combine(bleAvailabilityFlow, wifiAwareAttached) { available, aware ->
-                AdvertisingFacts(available == BleAvailability.READY, aware, lease)
-            }.collect { facts ->
+            bleAvailabilityFlow.collect { available ->
+                val facts = AdvertisingFacts(available == BleAvailability.READY, lease)
                 if (!lock.withLock { !closed && current === this }) return@collect
                 try { RustHostReports.bleAdvertisingFacts(JsonHelper.jsonEncode(facts)) }
                 catch (cancelled: CancellationException) { throw cancelled }
@@ -97,7 +89,7 @@ object PairingTransport {
 }
 
 @Serializable
-private data class AdvertisingRequest(val active: Boolean, val revision: Long, val bytes: String, val lease: String)
+private data class AdvertisingRequest(val serviceUuid: String?, val revision: Long, val lease: String)
 
 @Serializable
-private data class AdvertisingFacts(val available: Boolean, val awareRunning: Boolean, val lease: String)
+private data class AdvertisingFacts(val available: Boolean, val lease: String)

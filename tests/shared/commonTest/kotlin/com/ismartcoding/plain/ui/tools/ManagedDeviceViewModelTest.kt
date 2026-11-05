@@ -124,7 +124,7 @@ class ManagedDeviceViewModelTest {
                 val response = if ("updateDeviceName(" in operation.query) {
                     name = operation.variables.getValue("name").let { (it as kotlinx.serialization.json.JsonPrimitive).content }
                     """{"data":{"updateDeviceName":true}}"""
-                } else """{"data":{"app":{"deviceName":"$name","capabilities":[],"permissions":[],"appDir":"app://","downloadsDir":"/downloads","urlToken":"fixture-resource","tlsCertificateSha256":null}}}"""
+                } else """{"data":{"app":{"deviceName":"$name","capabilities":[],"access":[],"appDir":"app://","downloadsDir":"/downloads","urlToken":"fixture-resource","tlsCertificateSha256":null}}}"""
                 Base64.encode(response.encodeToByteArray())
             },
             transport = object : GraphqlHttpTransport {

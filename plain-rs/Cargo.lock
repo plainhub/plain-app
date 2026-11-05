@@ -95,12 +95,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "allocator-api2"
-version = "0.2.21"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "683d7910e743518b0e34f1186f92494becacb047c7b6bf616c96772180fef923"
-
-[[package]]
 name = "android_system_properties"
 version = "0.1.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -193,79 +187,6 @@ dependencies = [
  "proc-macro2",
  "quote",
  "syn 2.0.119",
-]
-
-[[package]]
-name = "async-graphql"
-version = "8.0.0-rc.5"
-source = "git+https://github.com/plainhub/plain-core.git?branch=main#9b42591dd8197c107f9ce2852cf96d7a86b7a5a8"
-dependencies = [
- "async-graphql-derive",
- "async-graphql-parser",
- "async-graphql-value",
- "async-trait",
- "asynk-strim",
- "base64 0.22.1",
- "bytes",
- "futures-channel",
- "futures-util",
- "http",
- "indexmap",
- "lru",
- "mime",
- "multer",
- "num-traits",
- "pin-project-lite",
- "regex",
- "rustc-hash",
- "scc",
- "serde",
- "serde_json",
- "serde_urlencoded",
- "static_assertions_next",
- "thiserror 2.0.21",
- "tokio",
-]
-
-[[package]]
-name = "async-graphql-derive"
-version = "8.0.0-rc.5"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "cdaa2cb6cc70518033cf543e6b735ed03daa71c1ec81eac5ad09fa05e61faa9f"
-dependencies = [
- "async-graphql-parser",
- "darling 0.23.0",
- "heck",
- "proc-macro-crate",
- "proc-macro2",
- "quote",
- "strum",
- "syn 2.0.119",
- "thiserror 2.0.21",
-]
-
-[[package]]
-name = "async-graphql-parser"
-version = "8.0.0-rc.5"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "3ae405016a111a09cd484a973024dcc139ac398a89cb1f4602bebab817298276"
-dependencies = [
- "async-graphql-value",
- "pest",
- "serde",
- "serde_json",
-]
-
-[[package]]
-name = "async-graphql-value"
-version = "8.0.0-rc.5"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "15eb1573843563b4518cc43001002512c206d119974b17476a3cbf62d9a1ae61"
-dependencies = [
- "bytes",
- "indexmap",
- "serde",
- "serde_json",
 ]
 
 [[package]]
@@ -1566,17 +1487,6 @@ dependencies = [
 
 [[package]]
 name = "hashbrown"
-version = "0.16.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "841d1cc9bed7f9236f321df977030373f4a4163ae1a7dbfe1a51a2c1a51d9100"
-dependencies = [
- "allocator-api2",
- "equivalent",
- "foldhash",
-]
-
-[[package]]
-name = "hashbrown"
 version = "0.17.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "ed5909b6e89a2db4456e54cd5f673791d7eca6732202bbf2a9cc504fe2f9b84a"
@@ -1590,7 +1500,7 @@ version = "0.12.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "a596f1b20ed2cc5ecac41a164aaebc7258057060f06c0cf7a2ba3991ee7990fb"
 dependencies = [
- "hashbrown 0.17.1",
+ "hashbrown",
 ]
 
 [[package]]
@@ -1913,7 +1823,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "cc4e190f5d26ca7051642629da2c52fc03bde85a03197c99408dcd291734c855"
 dependencies = [
  "equivalent",
- "hashbrown 0.17.1",
+ "hashbrown",
  "serde",
  "serde_core",
 ]
@@ -2078,15 +1988,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "kamadak-exif"
-version = "0.6.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "1130d80c7374efad55a117d715a3af9368f0fa7a2c54573afc15a188cd984837"
-dependencies = [
- "mutate_once",
-]
-
-[[package]]
 name = "kqueue"
 version = "1.2.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2217,15 +2118,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "0fae87c125b03c1d2c0150c90365d7d6bcc53fb73a9acaef207d2d065860f062"
 dependencies = [
  "imgref",
-]
-
-[[package]]
-name = "lru"
-version = "0.16.4"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "7f66e8d5d03f609abc3a39e6f08e4164ebf1447a732906d39eb9b99b7919ef39"
-dependencies = [
- "hashbrown 0.16.1",
 ]
 
 [[package]]
@@ -2370,12 +2262,6 @@ name = "multiversion_no_op"
 version = "1.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "743fb55ba31b18fb1ecef6bdc9aa2743314978ac084044301a7eee33fb99a20d"
-
-[[package]]
-name = "mutate_once"
-version = "0.1.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "13d2233c9842d08cfe13f9eac96e207ca6a2ea10b80259ebe8ad0268be27d2af"
 
 [[package]]
 name = "new_debug_unreachable"
@@ -2718,9 +2604,40 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "f6b464fbc74e149a392436b17d523f769e057cb6877f6a5c4618bc6f11800548"
 
 [[package]]
+name = "plain-graphql"
+version = "0.1.0"
+source = "git+https://github.com/plainhub/plain-core.git?branch=main#9db1ffb812ff134f9e5440477d8a1bad0cba5d56"
+dependencies = [
+ "asynk-strim",
+ "bytes",
+ "futures-util",
+ "indexmap",
+ "pest",
+ "plain-graphql-macros",
+ "rustc-hash",
+ "serde",
+ "serde_json",
+ "static_assertions_next",
+]
+
+[[package]]
+name = "plain-graphql-macros"
+version = "0.1.0"
+source = "git+https://github.com/plainhub/plain-core.git?branch=main#9db1ffb812ff134f9e5440477d8a1bad0cba5d56"
+dependencies = [
+ "darling 0.23.0",
+ "heck",
+ "proc-macro-crate",
+ "proc-macro2",
+ "quote",
+ "syn 2.0.119",
+ "thiserror 2.0.21",
+]
+
+[[package]]
 name = "plain-libs"
 version = "0.1.0"
-source = "git+https://github.com/plainhub/plain-core.git?branch=main#9b42591dd8197c107f9ce2852cf96d7a86b7a5a8"
+source = "git+https://github.com/plainhub/plain-core.git?branch=main#9db1ffb812ff134f9e5440477d8a1bad0cba5d56"
 dependencies = [
  "anyhow",
  "bytes",
@@ -2731,13 +2648,13 @@ dependencies = [
  "der 0.8.2",
  "des",
  "ed25519-dalek",
+ "encoding_rs",
  "fast_image_resize",
  "flate2",
  "futures-core",
  "hmac",
  "image",
  "jpeg-decoder",
- "kamadak-exif",
  "libc",
  "lofty",
  "log",
@@ -2759,11 +2676,9 @@ dependencies = [
  "sha1 0.11.0",
  "sha2 0.10.9",
  "sha2 0.11.0",
- "sysinfo",
  "tempfile",
  "tokenizers",
  "tokio",
- "uuid",
  "x509-parser",
  "zip",
 ]
@@ -2771,10 +2686,9 @@ dependencies = [
 [[package]]
 name = "plain-rs"
 version = "0.1.0"
-source = "git+https://github.com/plainhub/plain-core.git?branch=main#9b42591dd8197c107f9ce2852cf96d7a86b7a5a8"
+source = "git+https://github.com/plainhub/plain-core.git?branch=main#9db1ffb812ff134f9e5440477d8a1bad0cba5d56"
 dependencies = [
  "anyhow",
- "async-graphql",
  "bytes",
  "chrono",
  "futures-core",
@@ -2789,6 +2703,7 @@ dependencies = [
  "log",
  "notify",
  "parking_lot",
+ "plain-graphql",
  "plain-libs",
  "rand 0.8.8",
  "regex",
@@ -2824,15 +2739,15 @@ dependencies = [
 [[package]]
 name = "plain-server"
 version = "0.1.0"
-source = "git+https://github.com/plainhub/plain-core.git?branch=main#9b42591dd8197c107f9ce2852cf96d7a86b7a5a8"
+source = "git+https://github.com/plainhub/plain-core.git?branch=main#9db1ffb812ff134f9e5440477d8a1bad0cba5d56"
 dependencies = [
  "anyhow",
- "async-graphql",
  "axum",
  "axum-server",
  "chrono",
  "futures-util",
  "log",
+ "plain-graphql",
  "plain-libs",
  "plain-rs",
  "reqwest",
@@ -3528,12 +3443,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "9774ba4a74de5f7b1c1451ed6cd5285a32eddb5cccb8cc655a4e50009e06477f"
 
 [[package]]
-name = "saa"
-version = "5.6.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "bd85992a680de788217d9c70b74aa7685b108cf1aba02f728fb27f1b27199ad1"
-
-[[package]]
 name = "safe_arch"
 version = "0.7.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3562,16 +3471,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "scc"
-version = "3.8.8"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "5d5f8ca67c4f6208caf824037a6a9df0211b4e0937fccc4f543441f294d04511"
-dependencies = [
- "saa",
- "sdd",
-]
-
-[[package]]
 name = "scopeguard"
 version = "1.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3587,15 +3486,6 @@ dependencies = [
  "pbkdf2",
  "salsa20",
  "sha2 0.11.0",
-]
-
-[[package]]
-name = "sdd"
-version = "4.8.11"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a31877eee03686b905845993b5d9809a220c9dd5a10e9d6021d7ca67384c9070"
-dependencies = [
- "saa",
 ]
 
 [[package]]
@@ -3910,27 +3800,6 @@ name = "strsim"
 version = "0.11.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "7da8b5736845d9f2fcb837ea5d9e2628564b3b043a70948a3f0b778838c5fb4f"
-
-[[package]]
-name = "strum"
-version = "0.28.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "9628de9b8791db39ceda2b119bbe13134770b56c138ec1d3af810d045c04f9bd"
-dependencies = [
- "strum_macros",
-]
-
-[[package]]
-name = "strum_macros"
-version = "0.28.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ab85eea0270ee17587ed4156089e10b9e6880ee688791d45a905f5b1ca36f664"
-dependencies = [
- "heck",
- "proc-macro2",
- "quote",
- "syn 2.0.119",
-]
 
 [[package]]
 name = "subtle"

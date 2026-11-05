@@ -140,7 +140,7 @@ fun VideosPage(
         }
     }
 
-    MediaPermissionEffects(videosVM.hasPermission, initialLoadGate, reloadAfterGrant, videosVM.source)
+    MediaPermissionEffects(videosVM.hasPermission, initialLoadGate, reloadAfterGrant, videosVM.source, feature = videosVM.accessFeature)
     LaunchedEffect(dragSelectState.selectMode, (previewerState.visible && !isGestureInteractionMode())) {
         if (dragSelectState.selectMode || (previewerState.visible && !isGestureInteractionMode())) scrollBehavior.reset()
     }
@@ -198,7 +198,7 @@ fun VideosPage(
                 .padding(top = paddingValues.calculateTopPadding())
         ) {
             if (!videosVM.hasPermission.value) {
-                NeedPermissionColumn(UiRes.drawable.ui_drawable_video, AppFeatureType.FILES.getPermission()!!); return@Column
+                NeedPermissionColumn(UiRes.drawable.ui_drawable_video, AppFeatureType.FILES.getPermission()!!, feature = videosVM.accessFeature); return@Column
             }
 
             PullToRefresh(refreshLayoutState = topRefreshLayoutState) {

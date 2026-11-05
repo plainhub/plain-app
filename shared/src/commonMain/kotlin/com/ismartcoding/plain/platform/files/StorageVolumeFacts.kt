@@ -13,6 +13,9 @@ import com.ismartcoding.plain.ui.i18n.LocaleHelper
 internal fun storageVolumeFacts(): List<MountFacts> = buildList {
     val internal = getInternalStorageStats()
     add(MountFacts(getInternalStorageName(), getInternalStoragePath(), internal.totalBytes, internal.freeBytes, DriveType.INTERNAL_STORAGE))
+    for (path in grantedStorageDirectories()) {
+        add(MountFacts(path.substringAfterLast('/'), path, 0, 0, DriveType.INTERNAL_STORAGE))
+    }
     val sdPath = getSDCardPath()
     if (sdPath.isNotEmpty()) {
         val stats = getSDCardStorageStats()

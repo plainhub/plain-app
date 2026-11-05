@@ -8,7 +8,6 @@ import androidx.compose.foundation.lazy.grid.LazyGridState
 import androidx.compose.runtime.mutableStateMapOf
 import com.ismartcoding.plain.platform.system.DataType
 
-class ImagesViewModel internal constructor(source: ContentSource = ContentSource.Local) : BaseMediaViewModel<MediaImage>(source) {
-    override val dataType = DataType.IMAGE
+class ImagesViewModel internal constructor(source: ContentSource = ContentSource.Local) : BaseMediaViewModel<MediaImage>(source, DataType.IMAGE) {
     val scrollStateMap = mutableStateMapOf<Int, LazyGridState>()
 }

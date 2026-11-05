@@ -4,10 +4,8 @@ import com.ismartcoding.plain.rust.native.RustHostReports
 import com.ismartcoding.plain.features.files.ExportFileType
 import com.ismartcoding.plain.features.files.PickFileTag
 import com.ismartcoding.plain.features.files.PickFileType
-import com.ismartcoding.plain.features.permissions.getGrantedWebPermissionsAsync
 import com.ismartcoding.plain.lib.Channel
 import com.ismartcoding.plain.lib.ChannelEvent
-import com.ismartcoding.plain.lib.JsonHelper.jsonEncode
 import com.ismartcoding.plain.lib.coIO
 import com.ismartcoding.plain.lib.coMain
 import com.ismartcoding.plain.platform.media.restartAudioIfPlaying
@@ -23,12 +21,15 @@ object AppEvents {
     fun register() = coMain {
         Channel.sharedFlow.collect { event ->
             when (event) {
+                is WindowFocusChangedEvent -> if (event.hasFocus) {
+                    coIO { RustHostReports.permissions("true") }
+                }
                 is PermissionsResultEvent -> {
                     if (event.map.containsKey(Permission.POST_NOTIFICATIONS.toSysPermission())) {
                         coMain { restartAudioIfPlaying() }
                     }
                     coIO {
-                        RustHostReports.permissions(jsonEncode(getGrantedWebPermissionsAsync()))
+                        RustHostReports.permissions("true")
                     }
                 }
             }

@@ -10,6 +10,7 @@
         E6A140F6251F4AC994B73B10 /* VideoFrameObserver.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6A140F6251F4AC994B73B11 /* VideoFrameObserver.swift */; };
 		AA0000010000000000000001 /* iosApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000020000000000000001 /* iosApp.swift */; };
 		AA0000030000000000000001 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = AA0000040000000000000001 /* Assets.xcassets */; };
+		DA0000020000000000000001 /* DirectoryAccess.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA0000010000000000000001 /* DirectoryAccess.swift */; };
 		CC0000020000000000000001 /* FilePickerController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC0000010000000000000001 /* FilePickerController.swift */; };
 		DD0000020000000000000001 /* ShareController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD0000010000000000000001 /* ShareController.swift */; };
 		FF0000010000000000000001 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = FF0000050000000000000001 /* LaunchScreen.storyboard */; };
@@ -24,6 +25,7 @@
 		AA0000060000000000000001 /* iosApp.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = iosApp.entitlements; sourceTree = "<group>"; };
 		AA0000100000000000000001 /* PlainShared.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = PlainShared.framework; path = "../shared/build/xcode-frameworks/PlainShared.framework"; sourceTree = "<group>"; };
 		AA0000200000000000000001 /* iosApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = iosApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		DA0000010000000000000001 /* DirectoryAccess.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DirectoryAccess.swift; sourceTree = "<group>"; };
 		CC0000010000000000000001 /* FilePickerController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FilePickerController.swift; sourceTree = "<group>"; };
 		DD0000010000000000000001 /* ShareController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareController.swift; sourceTree = "<group>"; };
 		FF0000050000000000000001 /* LaunchScreen.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = LaunchScreen.storyboard; sourceTree = "<group>"; };
@@ -54,6 +56,7 @@
 			children = (
 				AA0000020000000000000001 /* iosApp.swift */,
 				CC0000010000000000000001 /* FilePickerController.swift */,
+				DA0000010000000000000001 /* DirectoryAccess.swift */,
                 E6A140F6251F4AC994B73B11 /* VideoFrameObserver.swift */,
 				DD0000010000000000000001 /* ShareController.swift */,
 				FF0001010000000000000001 /* SoundMeter.swift */,
@@ -189,6 +192,7 @@
 			files = (
 				AA0000010000000000000001 /* iosApp.swift in Sources */,
 				CC0000020000000000000001 /* FilePickerController.swift in Sources */,
+				DA0000020000000000000001 /* DirectoryAccess.swift in Sources */,
                 E6A140F6251F4AC994B73B10 /* VideoFrameObserver.swift in Sources */,
 				DD0000020000000000000001 /* ShareController.swift in Sources */,
 				FF0001020000000000000001 /* SoundMeter.swift in Sources */,

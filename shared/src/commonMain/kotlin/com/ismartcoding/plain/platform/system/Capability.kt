@@ -1,6 +1,8 @@
 package com.ismartcoding.plain.platform.system
 
 enum class Capability {
+    ADB,
+    DIRECTORY_ACCESS,
     BLE,
     WIFI_AWARE,
     BACKGROUND_SERVICE,

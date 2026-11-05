@@ -4,7 +4,7 @@ import com.ismartcoding.plain.features.nearby.PeerStatus
 import com.ismartcoding.plain.lib.JsonHelper
 import com.ismartcoding.plain.models.Peer
 import com.ismartcoding.plain.models.PeerAddress
-import com.ismartcoding.plain.platform.permissions.Permission
+import com.ismartcoding.plain.features.web.AccessFeature
 import com.ismartcoding.plain.platform.system.DeviceType
 import com.ismartcoding.plain.rust.graphql.ContentSource
 import com.ismartcoding.plain.rust.graphql.GraphqlHttpResponse
@@ -31,7 +31,7 @@ import kotlin.time.Instant
 
 class ManagedDeviceLoadTest {
     @Test
-    fun entry_loads_permissions_once_and_media_starts_with_the_authoritative_grant() = runTest {
+    fun entry_loads_access_once_and_media_starts_with_the_authoritative_grant() = runTest {
         val peer = Peer(
             id = "fixture-peer", name = "Device", ip = "", status = PeerStatus.PAIRED, port = 8443,
             deviceType = DeviceType.PHONE, createdAt = Instant.fromEpochMilliseconds(0), updatedAt = Instant.fromEpochMilliseconds(0),
@@ -40,7 +40,7 @@ class ManagedDeviceLoadTest {
         )
         var currentPeer = peer
         val requests = mutableListOf<GraphqlOperation>()
-        var response = """{"data":{"app":{"deviceName":"Device","capabilities":[],"permissions":["WRITE_EXTERNAL_STORAGE","QUERY_ALL_PACKAGES"],"appDir":"app://","downloadsDir":"/downloads","urlToken":"resource-token","tlsCertificateSha256":"fixture-certificate"}}}"""
+        var response = """{"data":{"app":{"deviceName":"Device","capabilities":[],"access":["IMAGES","AUDIO","VIDEOS","APPS"],"appDir":"app://","downloadsDir":"/downloads","urlToken":"resource-token","tlsCertificateSha256":"fixture-certificate"}}}"""
         val http = PeerHttpClient(peer, peers = { listOf(currentPeer) }, clientId = { "fixture-client" },
             encryptResourceReference = { token, path ->
                 assertEquals("resource-token", token)
@@ -64,9 +64,9 @@ class ManagedDeviceLoadTest {
         assertTrue(AudioViewModel(source).hasPermission.value)
         assertTrue(VideosViewModel(source).hasPermission.value)
         assertTrue(AppsViewModel(source).hasPermission.value)
-        assertEquals(listOf(Permission.WRITE_EXTERNAL_STORAGE, Permission.QUERY_ALL_PACKAGES), client.permissions.first())
+        assertEquals(listOf(AccessFeature.IMAGES, AccessFeature.AUDIO, AccessFeature.VIDEOS, AccessFeature.APPS), client.access.first())
         assertEquals(1, requests.size)
-        assertTrue(requests.single().query.contains("permissions"))
+        assertTrue(requests.single().query.contains("access"))
         repeat(2) {
             val resource = client.resource("/target.mp3")
             assertEquals("https://device.test:8443/fs?id=encrypted-resource", resource.url)
@@ -77,14 +77,14 @@ class ManagedDeviceLoadTest {
         assertEquals("peer_identity_changed", assertFailsWith<IllegalStateException> { client.resource("/target.mp3") }.message)
         assertEquals(1, requests.size)
         currentPeer = peer
-        response = """{"data":{"app":{"permissions":[]}}}"""
-        client.refreshPermissions()
-        assertTrue(client.currentInfo.permissions.isEmpty())
+        response = """{"data":{"app":{"access":[]}}}"""
+        client.refreshAccess()
+        assertTrue(client.currentInfo.access.isEmpty())
         assertFalse(ImagesViewModel(source).hasPermission.value)
         assertFalse(AudioViewModel(source).hasPermission.value)
         assertFalse(VideosViewModel(source).hasPermission.value)
         assertFalse(AppsViewModel(source).hasPermission.value)
-        assertTrue(client.permissions.first().isEmpty())
+        assertTrue(client.access.first().isEmpty())
         assertEquals(2, requests.size)
         assertFalse(ImagesViewModel().hasPermission.value)
         val received = mutableListOf<GraphqlResponse>()

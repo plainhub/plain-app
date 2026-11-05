@@ -557,7 +557,7 @@ class ManagedDeviceUiAcceptanceTest {
                     val response = when {
                         operation.query.contains("app {") -> JsonHelper.jsonEncode(com.ismartcoding.plain.rust.graphql.GraphqlResponse(
                             data = JsonHelper.jsonEncodeToElement(ManagedFixtureApp(com.ismartcoding.plain.models.ManagedDeviceInfo(
-                                "Target fixture", capabilities, listOf(Permission.WRITE_EXTERNAL_STORAGE), "/target-share-root", "/target-downloads", "fixture-resource-token", "fixture-certificate",
+                                "Target fixture", capabilities, listOf(com.ismartcoding.plain.features.web.AccessFeature.FILES), "/target-share-root", "/target-downloads", "fixture-resource-token", "fixture-certificate",
                             ))).jsonObject,
                         ))
                         operation.query.contains("{ prefs }") -> JsonHelper.jsonEncode(com.ismartcoding.plain.rust.graphql.GraphqlResponse(
@@ -738,9 +738,7 @@ class ManagedDeviceUiAcceptanceTest {
             val requests = java.util.Collections.synchronizedList(mutableListOf<com.ismartcoding.plain.rust.graphql.GraphqlOperation>())
             val features = java.util.concurrent.atomic.AtomicReference("NOTES|FILES")
             val failRefresh = java.util.concurrent.atomic.AtomicBoolean(false)
-            val source = shareFixtureSource(requests, capabilities = listOf(
-                com.ismartcoding.plain.platform.system.Capability.FILE_BROWSER,
-            ), readFeatures = { features.get() }, failRead = { failRefresh.get() && "{ prefs }" in it.query })
+            val source = shareFixtureSource(requests, readFeatures = { features.get() }, failRead = { failRefresh.get() && "{ prefs }" in it.query })
             scenario.onActivity { activity ->
                 activity.setContent {
                     com.ismartcoding.plain.ui.theme.AppTheme(useDarkTheme = false) {
@@ -1232,12 +1230,12 @@ class ManagedDeviceUiAcceptanceTest {
     fun configuresAnAuthorizedTestApiPermission() = runBlocking {
         ActivityScenario.launch(MainActivity::class.java).use {
             val args = InstrumentationRegistry.getArguments()
-            val permission = Permission.valueOf(checkNotNull(args.getString("managedPermission")))
+            val permission = com.ismartcoding.plain.features.web.AccessFeature.valueOf(checkNotNull(args.getString("managedAccessFeature")))
             val enabled = checkNotNull(args.getString("managedPermissionEnabled")).toBooleanStrict()
-            report("permission_before", (permission.name in Prefs.apiPermissions.value).toString())
-            Prefs.setApiPermission(permission, enabled)
-            awaitValue("updated API permission state") { if ((permission.name in Prefs.apiPermissions.value) == enabled) true else null }
-            assertEquals(enabled, permission.name in Prefs.apiPermissions.value)
+            report("permission_before", (permission in Prefs.apiAccessFeatures.value).toString())
+            Prefs.setApiAccess(setOf(permission), enabled)
+            awaitValue("updated API permission state") { if ((permission in Prefs.apiAccessFeatures.value) == enabled) true else null }
+            assertEquals(enabled, permission in Prefs.apiAccessFeatures.value)
         }
     }
 
@@ -1245,17 +1243,17 @@ class ManagedDeviceUiAcceptanceTest {
     fun answersRemotePermissionRequestWithoutOpeningAccessSettings() = runBlocking {
         ActivityScenario.launch(MainActivity::class.java).use {
             val args = InstrumentationRegistry.getArguments()
-            val permission = Permission.valueOf(checkNotNull(args.getString("managedPermission")))
-            val feature = com.ismartcoding.plain.features.web.WebSettingsFeature.valueOf(checkNotNull(args.getString("managedPermissionFeature")))
+            val permission = com.ismartcoding.plain.features.web.AccessFeature.valueOf(checkNotNull(args.getString("managedAccessFeature")))
+            val feature = permission
             val decision = checkNotNull(args.getString("managedAccessDecision"))
-            val previous = permission.name in Prefs.apiPermissions.value
+            val previous = permission in Prefs.apiAccessFeatures.value
             try {
-                Prefs.setApiPermission(permission, false)
-                awaitValue("disabled test permission") { if (permission.name !in Prefs.apiPermissions.value) true else null }
+                Prefs.setApiAccess(setOf(permission), false)
+                awaitValue("disabled test permission") { if (permission !in Prefs.apiAccessFeatures.value) true else null }
                 report("permission_request_ready", feature.name)
                 awaitNode("direct access confirmation") { it.text == text(Res.string.web_access_request) }
                 assertEquals(feature, com.ismartcoding.plain.ui.app.MainViewModel.pendingWebAccessRequest.value?.feature)
-                assertFalse(permission.name in Prefs.apiPermissions.value)
+                assertFalse(permission in Prefs.apiAccessFeatures.value)
                 when (decision) {
                     "APPROVE" -> click(text(Res.string.grant_access), "approve remote permission")
                     "REJECT" -> click(text(Res.string.reject), "reject remote permission")
@@ -1266,13 +1264,13 @@ class ManagedDeviceUiAcceptanceTest {
                     if (com.ismartcoding.plain.ui.app.MainViewModel.pendingWebAccessRequest.value == null) true else null
                 }
                 if (decision == "APPROVE") {
-                    awaitValue("confirmed API permission") { if (permission.name in Prefs.apiPermissions.value) true else null }
-                } else assertFalse(permission.name in Prefs.apiPermissions.value)
+                    awaitValue("confirmed API permission") { if (permission in Prefs.apiAccessFeatures.value) true else null }
+                } else assertFalse(permission in Prefs.apiAccessFeatures.value)
                 report("permission_request_result", decision + "_verified")
                 delay(args.getString("managedHoldMillis")?.toLong() ?: 3000L)
             } finally {
-                Prefs.setApiPermission(permission, previous)
-                awaitValue("restored original API permission") { if ((permission.name in Prefs.apiPermissions.value) == previous) true else null }
+                Prefs.setApiAccess(setOf(permission), previous)
+                awaitValue("restored original API permission") { if ((permission in Prefs.apiAccessFeatures.value) == previous) true else null }
                 report("permission_request_restored", previous.toString())
             }
         }
@@ -1283,18 +1281,18 @@ class ManagedDeviceUiAcceptanceTest {
         ActivityScenario.launch(MainActivity::class.java).use {
             val args = InstrumentationRegistry.getArguments()
             val peerId = checkNotNull(args.getString("managedPeerId"))
-            val permission = Permission.valueOf(checkNotNull(args.getString("managedPermission")))
-            val feature = com.ismartcoding.plain.features.web.WebSettingsFeature.valueOf(checkNotNull(args.getString("managedPermissionFeature")))
+            val permission = com.ismartcoding.plain.features.web.AccessFeature.valueOf(checkNotNull(args.getString("managedAccessFeature")))
+            val feature = permission
             val decision = checkNotNull(args.getString("managedAccessDecision"))
             val peer = checkNotNull(GraphqlApi.execute(Query.peers()).find { it.id == peerId })
             val remote = GraphqlApi.forPeer(peer)
             awaitValue("target permission fixture ready") {
-                if (permission !in remote.execute(Query.appPermissions())) true else null
+                if (permission !in remote.execute(Query.appAccess())) true else null
             }
-            assertTrue(remote.execute(Mutation.openWebSettings(feature)))
+            assertTrue(remote.execute(Mutation.requestAccess(feature)))
             if (decision == "APPROVE") {
-                awaitValue("effective remote permission") { if (permission in remote.execute(Query.appPermissions())) true else null }
-            } else assertFalse(permission in remote.execute(Query.appPermissions()))
+                awaitValue("effective remote permission") { if (permission in remote.execute(Query.appAccess())) true else null }
+            } else assertFalse(permission in remote.execute(Query.appAccess()))
             report("permission_request_sent", feature.name + "_" + decision)
         }
     }
@@ -1388,7 +1386,7 @@ class ManagedDeviceUiAcceptanceTest {
             awaitNode("localized chat navigation") { it.contentDescription == text(Res.string.chat) }
             val args = InstrumentationRegistry.getArguments()
             val peerId = checkNotNull(args.getString("managedPeerId"))
-            val permission = Permission.valueOf(checkNotNull(args.getString("managedPermission")))
+            val permission = com.ismartcoding.plain.features.web.AccessFeature.valueOf(checkNotNull(args.getString("managedAccessFeature")))
             val decision = checkNotNull(args.getString("managedAccessDecision"))
             val title = text(when (args.getString("managedContentFeature") ?: "FILES") {
                 "FILES" -> Res.string.files
@@ -1401,7 +1399,7 @@ class ManagedDeviceUiAcceptanceTest {
             })
             val peer = checkNotNull(GraphqlApi.execute(Query.peers()).find { it.id == peerId })
             val remote = GraphqlApi.forPeer(peer)
-            awaitValue("target permission disabled") { if (permission !in remote.execute(Query.appPermissions())) true else null }
+            awaitValue("target permission disabled") { if (permission !in remote.execute(Query.appAccess())) true else null }
             openRemoteTools(peer.name)
             click(title, "remote content requiring access")
             awaitNode("remote request permission button") { it.text == text(Res.string.request_permission) }
@@ -1410,12 +1408,12 @@ class ManagedDeviceUiAcceptanceTest {
             assertFalse(allText().any { it.contains("no_permission") })
             click(text(Res.string.request_permission), "request target permission")
             if (decision == "APPROVE") {
-                awaitValue("granted target permission") { if (permission in remote.execute(Query.appPermissions())) true else null }
+                awaitValue("granted target permission") { if (permission in remote.execute(Query.appAccess())) true else null }
                 awaitValue("permission action replaced by content") {
                     if (uiNodes().none { it.isVisible && it.text == text(Res.string.request_permission) }) true else null
                 }
             } else {
-                assertFalse(permission in remote.execute(Query.appPermissions()))
+                assertFalse(permission in remote.execute(Query.appAccess()))
                 awaitNode("permission request remains available") { it.text == text(Res.string.request_permission) }
             }
             assertFalse(allText().any { it.contains("no_permission") })
@@ -2029,7 +2027,7 @@ class ManagedDeviceUiAcceptanceTest {
             awaitNode("local tools navigation") { it.contentDescription == text(Res.string.tools) }
             val marker = "managed-local-image-${UUID.randomUUID()}"
             val paths = GraphqlApi.execute(GraphqlRequest<ManagedAcceptancePaths>("query { app { appDir deviceName } }", field = "app"))
-            val permissionSnapshot = Prefs.apiPermissions.value
+            val permissionSnapshot = Prefs.apiAccessFeatures.value
             val picked = java.io.File(instrumentation.targetContext.cacheDir, "$marker.png")
             val bitmap = android.graphics.Bitmap.createBitmap(64, 64, android.graphics.Bitmap.Config.ARGB_8888)
             bitmap.eraseColor(android.graphics.Color.MAGENTA)
@@ -2061,7 +2059,7 @@ class ManagedDeviceUiAcceptanceTest {
                 awaitValue("native note image saved") { GraphqlApi.execute(Query.note(note.id))?.takeIf { it.content.contains(imageReference) } }
                 val localPath = paths.appDir.trimEnd('/') + "/" + imageReference.removePrefix("app://")
                 assertEquals(picked.length(), java.io.File(localPath).length())
-                assertEquals(permissionSnapshot, Prefs.apiPermissions.value)
+                assertEquals(permissionSnapshot, Prefs.apiAccessFeatures.value)
                 click(text(Res.string.view), "view local note image")
                 assertNoteImageRendered(scenario)
                 com.ismartcoding.plain.platform.media.savePreviewMedia(
@@ -2090,8 +2088,8 @@ class ManagedDeviceUiAcceptanceTest {
             val args = InstrumentationRegistry.getArguments()
             val peer = checkNotNull(GraphqlApi.execute(Query.peers()).find { it.id == args.getString("managedPeerId") })
             val remote = GraphqlApi.forPeer(peer)
-            val permission = Permission.WRITE_EXTERNAL_STORAGE
-            awaitValue("target storage access disabled") { if (permission !in remote.execute(Query.appPermissions())) true else null }
+            val permission = com.ismartcoding.plain.features.web.AccessFeature.FILES
+            awaitValue("target storage access disabled") { if (permission !in remote.execute(Query.appAccess())) true else null }
             val marker = "managed-image-permission-${UUID.randomUUID()}"
             val note = remote.execute(Mutation.saveNote("", marker, "Initial $marker"))
             try {
@@ -2101,10 +2099,10 @@ class ManagedDeviceUiAcceptanceTest {
                 click(text(Res.string.request_permission), "request image upload access")
                 if (args.getString("managedAccessDecision") == "APPROVE") {
                     awaitNode("image browse restored after consent") { it.text == text(Res.string.browse) }
-                    assertTrue(permission in remote.execute(Query.appPermissions()))
+                    assertTrue(permission in remote.execute(Query.appAccess()))
                 } else {
                     awaitNode("permission remains available after rejection") { it.text == text(Res.string.request_permission) }
-                    assertFalse(permission in remote.execute(Query.appPermissions()))
+                    assertFalse(permission in remote.execute(Query.appAccess()))
                 }
                 assertTrue(allText().contains(text(Res.string.insert_image)))
                 assertFalse(allText().any { it.contains("no_permission") })

@@ -1,5 +1,11 @@
 package com.ismartcoding.plain.ui.media
 
+import com.ismartcoding.plain.rust.graphql.ContentSource
+import com.ismartcoding.plain.platform.system.Capability
+import com.ismartcoding.plain.features.web.AccessFeature
+import com.ismartcoding.plain.platform.permissions.requestSystemAccess
+import com.ismartcoding.plain.ui.resources.folder_plus as ui_drawable_folder_plus
+
 import com.ismartcoding.plain.ui.components.ActionButtonSearch
 import com.ismartcoding.plain.ui.components.DrawerEdgeSwipeStrip
 import com.ismartcoding.plain.ui.components.LocalDrawerState
@@ -115,6 +121,12 @@ fun <T : IData> MediaTopBar(
                 PSheetActionRow(UiRes.drawable.ui_drawable_cast, stringResource(Res.string.cast_mode)) {
                     dismiss()
                     castVM.showCastDialog.value = true
+                }
+            }
+            if (mediaVM.source == ContentSource.Local && Capability.DIRECTORY_ACCESS in mediaVM.source.capabilities) {
+                PSheetActionRow(UiRes.drawable.ui_drawable_folder_plus, stringResource(Res.string.add_folder)) {
+                    dismiss()
+                    scope.launch { setOf(AccessFeature.FILES).requestSystemAccess() }
                 }
             }
             moreMenu(dismiss)

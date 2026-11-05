@@ -1,5 +1,10 @@
 package com.ismartcoding.plain.ui.files
 
+import com.ismartcoding.plain.rust.graphql.ContentSource
+import com.ismartcoding.plain.platform.system.Capability
+import com.ismartcoding.plain.features.web.AccessFeature
+import com.ismartcoding.plain.platform.permissions.requestSystemAccess
+
 import com.ismartcoding.plain.preferences.*
 
 import com.ismartcoding.plain.i18n.*
@@ -82,6 +87,12 @@ fun FilesMoreActionsSheet(filesVM: FilesViewModel, onDismiss: () -> Unit) {
             if (!isZip) {
                 VerticalSpace(16.dp)
                 PSheetActionCard {
+                    if (filesVM.source == ContentSource.Local && Capability.DIRECTORY_ACCESS in filesVM.source.capabilities) {
+                        PSheetActionRow(UiRes.drawable.ui_drawable_folder_plus, stringResource(Res.string.add_folder)) {
+                            onDismiss()
+                            scope.launch { setOf(AccessFeature.FILES).requestSystemAccess() }
+                        }
+                    }
                     PSheetActionRow(UiRes.drawable.ui_drawable_folder_plus, stringResource(Res.string.create_folder)) {
                         onDismiss()
                         filesVM.showCreateFolderDialog.value = true

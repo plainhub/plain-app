@@ -26,6 +26,10 @@ final class FilePickerController: NSObject, IosFilePicker {
     private var currentType: String = ""
     private var photoDelegate: PhotoPickerDelegate?
     private var documentDelegate: DocumentPickerDelegate?
+    private let directoryAccess = DirectoryAccess()
+
+    func grantedDirectories() -> [String] { directoryAccess.directories() }
+    func hasUnavailableDirectories() -> Bool { directoryAccess.hasUnavailableDirectories() }
 
     func pickFile(tag: String, type: String, multiple: Bool) {
         DispatchQueue.main.async {
@@ -72,13 +76,21 @@ final class FilePickerController: NSObject, IosFilePicker {
     }
 
     private func presentDocumentPicker(contentTypes: [UTType], multiple: Bool, from rootVC: UIViewController) {
-        let picker = UIDocumentPickerViewController(forOpeningContentTypes: contentTypes, asCopy: true)
+        let picker = UIDocumentPickerViewController(forOpeningContentTypes: contentTypes, asCopy: currentType != "FOLDER")
         picker.allowsMultipleSelection = multiple
         let delegate = DocumentPickerDelegate()
         delegate.onComplete = { [weak self] uris in
             guard let self = self else { return }
-            if !uris.isEmpty {
+            do {
+                if self.currentType == "FOLDER" {
+                    for uri in uris {
+                        guard let url = URL(string: uri) else { throw CocoaError(.fileReadUnsupportedScheme) }
+                        try self.directoryAccess.add(url)
+                    }
+                }
                 IosFilePickerCallback.shared.onPickResult(tag: self.currentTag, type: self.currentType, uris: uris)
+            } catch {
+                IosFilePickerCallback.shared.onPickError(message: error.localizedDescription)
             }
             self.documentDelegate = nil
         }
@@ -146,8 +158,6 @@ private final class PhotoPickerDelegate: NSObject, PHPickerViewControllerDelegat
     }
 }
 
-/// UIDocumentPicker delegate. With `asCopy: true` the picked URLs already live
-/// in the app temp directory and need no security-scope handling.
 private final class DocumentPickerDelegate: NSObject, UIDocumentPickerDelegate {
     var onComplete: ([String]) -> Void = { _ in }
 

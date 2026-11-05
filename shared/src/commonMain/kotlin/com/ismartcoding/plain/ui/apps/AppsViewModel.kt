@@ -23,7 +23,7 @@ import kotlinx.coroutines.flow.update
 class AppsViewModel internal constructor(val source: ContentSource = ContentSource.Local) : ISearchableViewModel<AppPackage>, ViewModel() {
     private val _itemsFlow = MutableStateFlow<List<AppPackage>>(emptyList())
     val itemsFlow: StateFlow<List<AppPackage>> = _itemsFlow
-    val hasPermission = mutableStateOf(source is ContentSource.Local || source is ContentSource.Remote && com.ismartcoding.plain.platform.permissions.Permission.QUERY_ALL_PACKAGES in source.info.permissions)
+    val hasPermission = mutableStateOf(source is ContentSource.Local || source is ContentSource.Remote && com.ismartcoding.plain.features.web.AccessFeature.APPS in source.info.access)
     var showLoading = mutableStateOf(true)
     var offset = mutableIntStateOf(0)
     var limit = mutableIntStateOf(50)

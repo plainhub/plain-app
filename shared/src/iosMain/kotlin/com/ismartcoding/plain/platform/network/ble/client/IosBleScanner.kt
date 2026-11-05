@@ -1,15 +1,13 @@
 package com.ismartcoding.plain.platform.network.ble.client
 
-import com.ismartcoding.plain.features.nearby.RustBleServiceData
-import com.ismartcoding.plain.platform.network.ble.BleUuids
-import com.ismartcoding.plain.lib.toByteArray
+import com.ismartcoding.plain.features.nearby.RustBleAdvertisement
 import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.platform.system.IosBluetoothMonitor
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.ensureActive
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
@@ -21,13 +19,13 @@ import platform.CoreBluetooth.CBManagerStatePoweredOn
 import platform.CoreBluetooth.CBPeripheral
 import platform.CoreBluetooth.CBUUID
 import platform.Foundation.NSError
-import platform.Foundation.NSData
 import platform.Foundation.NSLock
 import platform.Foundation.NSNumber
 import platform.darwin.NSObject
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.concurrent.Volatile
-import platform.CoreBluetooth.CBAdvertisementDataServiceDataKey
+import platform.CoreBluetooth.CBAdvertisementDataOverflowServiceUUIDsKey
+import platform.CoreBluetooth.CBAdvertisementDataServiceUUIDsKey
 
 object IosBleScanner : BleScanner {
 
@@ -87,7 +85,7 @@ object IosBleScanner : BleScanner {
         return withTimeoutOrNull(60_000L.milliseconds) { deferred.await() } ?: false
     }
 
-    override fun scan(serviceUuid: String): Flow<BleGattClient> = callbackFlow<Triple<CBPeripheral, Int, ByteArray?>> {
+    override fun scan(clientId: String?): Flow<BleGattClient> = callbackFlow<Triple<CBPeripheral, Int, List<String>>> {
         val manager = ensureCentralManager()
         if (manager.state != CBManagerStatePoweredOn) {
             LogCat.e("BLE scanner not ready, state=${manager.state}")
@@ -95,35 +93,32 @@ object IosBleScanner : BleScanner {
             return@callbackFlow
         }
 
-        beginScan(serviceUuid) { peripheral, rssi, advertisementData ->
-            trySend(Triple(peripheral, rssi.intValue, serviceDataBytes(advertisementData, serviceUuid)))
+        beginScan(clientId) { peripheral, rssi, advertisementData ->
+            trySend(Triple(peripheral, rssi.intValue, serviceUuids(advertisementData)))
         }
-        LogCat.d("BLE scan started for $serviceUuid")
+        LogCat.d("BLE scan started for $clientId")
 
         awaitClose {
             endScan()
             LogCat.d("BLE scan stopped")
         }
-    }.map { (peripheral, rssi, data) ->
-        val parts = RustBleServiceData.decode(data)
+    }.mapNotNull { (peripheral, rssi, uuids) ->
+        val id = RustBleAdvertisement.decode(uuids) ?: return@mapNotNull null
         currentCoroutineContext().ensureActive()
-        val key = parts?.shortId ?: peripheral.identifier.UUIDString
-        val client = allDevices.getOrPut(key) {
-            IosBleGattClient(peripheral = peripheral, rssi = rssi,
-                shortId = parts?.shortId ?: "", awareSupported = parts?.awareSupported ?: false,
-                awareRunning = parts?.awareRunning ?: false)
+        val existing = allDevices[id]
+        val client = if (existing?.peripheral === peripheral) existing else {
+            IosBleGattClient(peripheral = peripheral, rssi = rssi, id = id).also { allDevices[id] = it }
         }
         client.rssi = rssi
-        parts?.let { client.awareSupported = it.awareSupported; client.awareRunning = it.awareRunning }
         client
     }.flowOn(Dispatchers.Main)
 
     private fun beginScan(
-        serviceUuid: String,
+        clientId: String?,
         onResult: (CBPeripheral, NSNumber, Map<Any?, *>) -> Unit,
     ) = withScanLock {
         scanCallback = onResult
-        scanServiceUuid = serviceUuid
+        scanServiceUuid = clientId
         scanFlowActive = true
         pauseCount = 0
         startRadio()
@@ -137,8 +132,8 @@ object IosBleScanner : BleScanner {
     }
 
     private fun startRadio() {
-        val uuid = scanServiceUuid ?: return
-        ensureCentralManager().scanForPeripheralsWithServices(listOf(CBUUID.UUIDWithString(uuid)), null)
+        val services = scanServiceUuid?.let { listOf(CBUUID.UUIDWithString(it)) }
+        ensureCentralManager().scanForPeripheralsWithServices(services, null)
         isScanning = true
     }
 
@@ -157,33 +152,12 @@ object IosBleScanner : BleScanner {
 
     override fun isScanPaused(): Boolean = withScanLock { pauseCount > 0 }
 
-    private fun serviceDataBytes(
-        advertisementData: Map<Any?, *>,
-        serviceUuid: String,
-    ): ByteArray? {
-        val serviceDataKey = CBAdvertisementDataServiceDataKey
-            ?: return null
-        @Suppress("UNCHECKED_CAST")
-        val serviceDataMap = advertisementData[serviceDataKey] as? Map<Any?, *>
-            ?: return null
-        val targetUuid = CBUUID.UUIDWithString(serviceUuid)
-        val nsData = serviceDataMap.entries.firstOrNull { (k, _) ->
-            (k as? CBUUID)?.UUIDString.equals(targetUuid.UUIDString, ignoreCase = true)
-        }?.value as? NSData ?: return null
-        return nsData.toByteArray()
-    }
+    private fun serviceUuids(advertisementData: Map<Any?, *>): List<String> =
+        listOf(CBAdvertisementDataServiceUUIDsKey, CBAdvertisementDataOverflowServiceUUIDsKey)
+            .flatMap { (advertisementData[it] as? List<*>).orEmpty() }
+            .mapNotNull { (it as? CBUUID)?.UUIDString }
 
-
-
-    /**
-     * On iOS we can't construct a client from a clientId alone — the underlying
-     * [CBPeripheral] must come from a scan result. Return an already-discovered
-     * client if we have one; otherwise the caller must scan before connecting.
-     * Match by shortId.
-     */
-    override fun createClient(shortId: String): BleGattClient? {
-        return allDevices[shortId]
-    }
+    override fun createClient(clientId: String): BleGattClient? = allDevices[clientId]
 
     suspend fun connectPeripheral(client: IosBleGattClient): Boolean {
         if (client.isConnected()) return true
@@ -225,7 +199,7 @@ object IosBleScanner : BleScanner {
     internal fun onPeripheralDisconnected(peripheral: CBPeripheral) {
         val id = peripheral.identifier.UUIDString
         pendingConnections[id]?.complete(false)
-        allDevices[id]?.onDisconnected()
+        allDevices.values.filter { it.peripheral.identifier.UUIDString == id }.forEach { it.onDisconnected() }
     }
 }
 

@@ -5,7 +5,6 @@ import kotlinx.serialization.Serializable
 
 import com.ismartcoding.plain.platform.network.ble.RustBleWire
 import com.ismartcoding.plain.platform.network.ble.BleServices
-import com.ismartcoding.plain.platform.network.ble.BleUuids
 import com.ismartcoding.plain.platform.network.ble.client.BleDeviceApi
 import com.ismartcoding.plain.platform.network.ble.client.BleGattClient
 import com.ismartcoding.plain.platform.network.ble.client.BleScanner
@@ -33,10 +32,10 @@ object BleScanDriver {
         val scan = Uuid.random().toString()
         try {
             BleScanReports.scanState(scan, true)
-            forEachAdvertisement { shortId ->
-                try { BleScanReports.scanSeen(scan, shortId) }
+            forEachAdvertisement { clientId ->
+                try { BleScanReports.scanSeen(scan, clientId) }
                 catch (cancelled: CancellationException) { throw cancelled }
-                catch (error: Exception) { LogCat.d("[BLE] scanSeen $shortId: ${error.message}") }
+                catch (error: Exception) { LogCat.d("[BLE] scanSeen $clientId: ${error.message}") }
             }
         } finally {
             withContext(NonCancellable) { BleScanReports.scanState(scan, false) }
@@ -44,17 +43,18 @@ object BleScanDriver {
     }
 
     private suspend fun forEachAdvertisement(onSeen: suspend (String) -> Unit) {
-        bleTransport().createScanner().scan(BleUuids.SERVICE_UUID).collect { device ->
+        bleTransport().createScanner().scan().collect { device ->
             onSeen(device.id)
         }
     }
 
     suspend fun read(params: JsonObject): JsonElement {
         val input = JsonHelper.jsonDecodeFromElement<ScanReadRequest>(params)
-        val shortId = input.shortId
+        val clientId = input.clientId
         val request = Base64.decode(input.request)
         val scanner = bleTransport().createScanner()
-        val device = scanner.createClient(shortId) ?: return JsonObject(emptyMap())
+        val device = scanner.createClient(clientId)
+            ?: return JsonHelper.jsonEncodeToElement(ScanReadReply(null))
         val payload = readReply(scanner, device, request)
         return JsonHelper.jsonEncodeToElement(ScanReadReply(payload))
     }
@@ -81,7 +81,7 @@ object BleScanDriver {
 }
 
 @Serializable
-private data class ScanReadRequest(val shortId: String, val request: String)
+private data class ScanReadRequest(val clientId: String, val request: String)
 
 @Serializable
 private data class ScanReadReply(val payload: String?)

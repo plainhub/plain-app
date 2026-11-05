@@ -19,7 +19,6 @@ import com.ismartcoding.plain.platform.system.AppFeatureType
 import com.ismartcoding.plain.platform.system.HttpServerResources
 import com.ismartcoding.plain.platform.system.has
 import com.ismartcoding.plain.extensions.toAppNotification
-import com.ismartcoding.plain.features.permissions.getGrantedWebPermissionsAsync
 import com.ismartcoding.plain.features.notifications.NotificationChange
 import com.ismartcoding.plain.features.notifications.RustNotificationEvents
 import java.util.concurrent.ConcurrentHashMap
@@ -127,7 +126,7 @@ class PNotificationListenerService : NotificationListenerService() {
         // in-app toggle involved, so no PermissionsResultEvent ever fires. Push
         // the fresh snapshot so web clients drop their no-permission state.
         coIO {
-            RustHostReports.permissions(JsonHelper.jsonEncode(getGrantedWebPermissionsAsync()))
+            RustHostReports.permissions("true")
         }
     }
 
