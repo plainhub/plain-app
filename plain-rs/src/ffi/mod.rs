@@ -1,5 +1,4 @@
 pub(crate) mod assets;
-mod background_execution;
 #[cfg(target_os = "android")]
 mod ble;
 pub(crate) mod host;

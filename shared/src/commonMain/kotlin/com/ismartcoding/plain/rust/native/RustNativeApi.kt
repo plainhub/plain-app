@@ -12,14 +12,6 @@ import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonObject
 
 internal object RustNativeApi {
-    suspend fun grantBackgroundExecution(id: String, deadlineMs: Long): Boolean =
-        nativeCall { RustNativeBindings.grantBackgroundExecution(id, deadlineMs) }
-
-    suspend fun revokeBackgroundExecution(id: String): Boolean =
-        nativeCall { RustNativeBindings.revokeBackgroundExecution(id) }
-
-    suspend fun executionStateChanged(): Boolean = nativeCall { RustNativeBindings.executionStateChanged() }
-
     suspend fun restartHttpServer(): Boolean = nativeCall { RustNativeBindings.restartHttpServer() }
 
     suspend fun lanIpv4Addresses(): List<String> = nativeCall { RustNativeBindings.lanIpv4Addresses() }

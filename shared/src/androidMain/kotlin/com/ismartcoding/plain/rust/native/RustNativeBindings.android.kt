@@ -39,9 +39,6 @@ internal actual object RustNativeBindings {
     actual external fun hostNext(): String
     actual external fun hostReply(message: String): String
     actual external fun submitThumbnail(token: String, bytes: ByteArray): String
-    actual external fun grantBackgroundExecution(id: String, deadlineMs: Long): String
-    actual external fun revokeBackgroundExecution(id: String): String
-    actual external fun executionStateChanged(): String
     actual external fun uploadChunk(id: String, index: Long, bytes: ByteArray): String
     actual external fun resourceOpen(id: String): String
     actual external fun resourceWrite(id: String, bytes: ByteArray): String

@@ -34,7 +34,6 @@ okhttpVersion="5.5.0"
 shizukuVersion = "13.1.5"
 runtimeVersion="1.12.2"
 uiVersion="1.12.2"
-workRuntimeKtxVersion = "2.12.0"
 tinkAndroidVersion = "1.24.0"
 playPublisherVersion = "4.1.1"
 pdfiumAndroidVersion = "1.9.5-beta01"
@@ -91,7 +90,6 @@ ui = { module = "org.jetbrains.compose.ui:ui", version.ref = "uiVersion" }
 zxing-core = { module = "com.google.zxing:core", version.ref = "coreVersion" }
 
 
-androidx-work-runtime-ktx = { module = "androidx.work:work-runtime-ktx", version.ref = "workRuntimeKtxVersion" }
 
 # compose
 compose-ui = { module = "androidx.compose.ui:ui", version.ref = "compose" }

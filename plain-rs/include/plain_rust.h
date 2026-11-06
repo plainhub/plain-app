@@ -56,9 +56,6 @@ char *plain_report_screen_mirror_audio(const uint8_t *data, size_t len);
 char *plain_host_next(void);
 char *plain_host_reply(const char *message);
 char *plain_submit_thumbnail(const char *token, const uint8_t *bytes, size_t len);
-char *plain_grant_background_execution(const char *id, int64_t deadline_ms);
-char *plain_revoke_background_execution(const char *id);
-char *plain_execution_state_changed(void);
 
 char *plain_restart_http_server(void);
 // BLE bytes on success (status 1), UTF-8 error bytes on failure (status -1).

@@ -1,5 +1,4 @@
 import Darwin
-import BackgroundTasks
 import SwiftUI
 import PlainShared
 import Photos
@@ -12,7 +11,6 @@ import Network
 @main
 struct PlainApp: SwiftUI.App {
     @UIApplicationDelegateAdaptor(ShortcutAppDelegate.self) private var appDelegate
-    private let backgroundScheduler = BackgroundScheduler()
     private let networkInfo = NetworkInfoProvider()
     private let permissionChecker = PermissionChecker()
     private let filePicker = FilePickerController()
@@ -22,7 +20,6 @@ struct PlainApp: SwiftUI.App {
     private let notificationDelegate = NotificationDelegate()
 
     init() {
-        IosPlatformRegistry.shared.setBackgroundScheduler(scheduler: backgroundScheduler)
         IosPlatformRegistry.shared.setNetworkInfoProvider(provider: networkInfo)
         IosPlatformRegistry.shared.setPermissionChecker(checker: permissionChecker)
         IosPlatformRegistry.shared.setFilePicker(picker: filePicker)
@@ -30,7 +27,6 @@ struct PlainApp: SwiftUI.App {
         IosPlatformRegistry.shared.setSoundMeter(meter: soundMeter)
         IosPlatformRegistry.shared.setVideoFrameObserver(observer: videoFrameObserver)
         UNUserNotificationCenter.current().delegate = notificationDelegate
-        backgroundScheduler.register()
         AppInitializerKt.initializeApp()
         #if PLAIN_UI_WORKFLOWS
         NativeWorkflowRuntime.shared.prepare()
@@ -97,38 +93,6 @@ final class NotificationDelegate: NSObject, UNUserNotificationCenterDelegate {
     }
 }
 
-final class BackgroundScheduler: NSObject, IosBackgroundScheduler {
-    private static let identifier = "com.ismartcoding.plain.background.refresh"
-
-    func register() {
-        let registered = BGTaskScheduler.shared.register(forTaskWithIdentifier: Self.identifier, using: nil) { task in
-            let lock = NSLock()
-            lock.lock()
-            var executionId: String?
-            task.expirationHandler = {
-                lock.lock()
-                let id = executionId
-                lock.unlock()
-                if let id { BackgroundExecution.shared.cancel(id: id) }
-            }
-            executionId = BackgroundExecution.shared.begin(deadlineMs: Int64(Date().timeIntervalSince1970 * 1000) + 30_000) { success in
-                task.setTaskCompleted(success: success.boolValue)
-            }
-            lock.unlock()
-        }
-        precondition(registered, "Background task registration failed")
-    }
-
-    func schedule(atMillis: Double) -> String {
-        BGTaskScheduler.shared.cancel(taskRequestWithIdentifier: Self.identifier)
-        if atMillis <= 0 { return "" }
-        let request = BGAppRefreshTaskRequest(identifier: Self.identifier)
-        request.earliestBeginDate = Date(timeIntervalSince1970: atMillis / 1000)
-        do { try BGTaskScheduler.shared.submit(request); return "" }
-        catch { return error.localizedDescription }
-    }
-}
-
 final class NetworkInfoProvider: NSObject, IosNetworkInfoProvider {
     private let monitor = NWPathMonitor()
     private let networkLock = NSLock()
@@ -147,7 +111,6 @@ final class NetworkInfoProvider: NSObject, IosNetworkInfoProvider {
             self.networkLock.lock()
             self.networkType = type
             self.networkLock.unlock()
-            BackgroundExecution.shared.executionStateChanged()
             NetworkEvents.shared.changed()
         }
         monitor.start(queue: DispatchQueue(label: "plain.network.facts"))

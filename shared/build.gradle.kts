@@ -177,9 +177,6 @@ kotlin {
             // LifecycleService (HttpServerForegroundService)
             implementation(libs.androidx.lifecycle.service)
 
-            // WorkManager (FeedFetchWorker, ImageEmbedWorker)
-            implementation(libs.androidx.work.runtime.ktx)
-
             // Splash screen (MainActivity)
             implementation(libs.androidx.core.splashscreen)
 

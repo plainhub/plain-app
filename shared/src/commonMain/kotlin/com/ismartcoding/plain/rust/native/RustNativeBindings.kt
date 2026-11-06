@@ -37,9 +37,6 @@ internal expect object RustNativeBindings {
     fun hostNext(): String
     fun hostReply(message: String): String
     fun submitThumbnail(token: String, bytes: ByteArray): String
-    fun grantBackgroundExecution(id: String, deadlineMs: Long): String
-    fun revokeBackgroundExecution(id: String): String
-    fun executionStateChanged(): String
     fun uploadChunk(id: String, index: Long, bytes: ByteArray): String
     fun resourceOpen(id: String): String
     fun resourceWrite(id: String, bytes: ByteArray): String

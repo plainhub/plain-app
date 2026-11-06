@@ -48,9 +48,6 @@ import com.ismartcoding.plain.rustprefs.plain_graphql
 import com.ismartcoding.plain.rustprefs.plain_encrypt_http_request
 import com.ismartcoding.plain.rustprefs.plain_encrypt_resource_reference
 import com.ismartcoding.plain.rustprefs.plain_decrypt_http_response
-import com.ismartcoding.plain.rustprefs.plain_grant_background_execution
-import com.ismartcoding.plain.rustprefs.plain_revoke_background_execution
-import com.ismartcoding.plain.rustprefs.plain_execution_state_changed
 import com.ismartcoding.plain.rustprefs.plain_http_status
 import com.ismartcoding.plain.rustprefs.plain_import_note_image
 import com.ismartcoding.plain.rustprefs.plain_import_pomodoro_sound
@@ -165,16 +162,6 @@ internal actual object RustNativeBindings {
             readString(plain_submit_thumbnail(token.cstr.ptr, if (bytes.isEmpty()) null else pinned.addressOf(0).reinterpret(), bytes.size.toULong()))
         }
     }
-
-    actual fun grantBackgroundExecution(id: String, deadlineMs: Long): String = memScoped {
-        readString(plain_grant_background_execution(id.cstr.ptr, deadlineMs))
-    }
-
-    actual fun revokeBackgroundExecution(id: String): String = memScoped {
-        readString(plain_revoke_background_execution(id.cstr.ptr))
-    }
-
-    actual fun executionStateChanged(): String = readString(plain_execution_state_changed())
 
     actual fun uploadChunk(id: String, index: Long, bytes: ByteArray): String = memScoped {
         bytes.usePinned { pinned ->

@@ -7,11 +7,9 @@ import com.ismartcoding.plain.platform.network.getNetworkType
 import com.ismartcoding.plain.platform.permissions.isGranted
 import com.ismartcoding.plain.platform.setClipboardText
 import com.ismartcoding.plain.platform.system.clearMediaCache
-import com.ismartcoding.plain.platform.system.BackgroundExecution
 import com.ismartcoding.plain.platform.system.getDeviceCapabilities
 import com.ismartcoding.plain.platform.system.readBatterySample
 import com.ismartcoding.plain.platform.system.readSystemProperties
-import com.ismartcoding.plain.platform.system.scheduleBackgroundWake
 import com.ismartcoding.plain.rust.host.*
 import com.ismartcoding.plain.lib.coMain
 import kotlinx.serialization.Serializable
@@ -33,15 +31,6 @@ internal object SystemAppHost {
             hostResult(true)
         }
         "systemNetworkType" -> hostResult(getNetworkType().name)
-        "systemScheduleBackgroundWake" -> {
-            scheduleBackgroundWake(JsonHelper.jsonDecodeFromElement<BackgroundWakeRequest>(params).atMs)
-            hostResult(true)
-        }
-        "systemCompleteBackgroundExecution" -> {
-            val result = JsonHelper.jsonDecodeFromElement<BackgroundExecutionResult>(params)
-            BackgroundExecution.complete(result.id, result.success)
-            hostResult(true)
-        }
         "systemProperties" -> hostResult(readSystemProperties(
             JsonHelper.jsonDecodeFromElement<SystemPropertiesRequest>(params).names,
         ))
@@ -68,12 +57,6 @@ private data class AccessRequest(val feature: AccessFeature)
 
 @Serializable
 private data class AccessFactsRequest(val features: List<AccessFeature>)
-
-@Serializable
-private data class BackgroundWakeRequest(val atMs: Long? = null)
-
-@Serializable
-private data class BackgroundExecutionResult(val id: String, val success: Boolean)
 
 @Serializable
 private data class SystemPropertiesRequest(val names: List<String>)

@@ -42,7 +42,6 @@ import com.ismartcoding.plain.ui.pomodoro.PomodoroViewModel
 import com.ismartcoding.plain.lib.sendEvent
 import java.lang.ref.WeakReference
 import android.Manifest
-import com.ismartcoding.plain.platform.system.BackgroundExecution
 import com.ismartcoding.plain.ui.app.ActivityUiState
 
 class MainActivity : AppCompatActivity() {
@@ -118,19 +117,8 @@ class MainActivity : AppCompatActivity() {
     }
     private val networkStateReceiver = NetworkStateReceiver()
 
-    override fun onStart() {
-        super.onStart()
-        BackgroundExecution.executionStateChanged()
-    }
-
-    override fun onStop() {
-        super.onStop()
-        BackgroundExecution.executionStateChanged()
-    }
-
     override fun onWindowFocusChanged(hasFocus: Boolean) {
         sendEvent(WindowFocusChangedEvent(hasFocus))
-        BackgroundExecution.executionStateChanged()
     }
 
     @SuppressLint("ClickableViewAccessibility", "DiscouragedPrivateApi")

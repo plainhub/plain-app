@@ -41,9 +41,6 @@ object IosPlatformRegistry {
     fun setVideoFrameObserver(observer: IosVideoFrameObserver) { videoFrameObserver = observer }
     fun observeVideoFrame(layer: AVPlayerLayer, onReady: () -> Unit): IosVideoFrameObservation =
         videoFrameObserver.observe(layer, onReady)
-    private var backgroundScheduler: IosBackgroundScheduler? = null
-    fun setBackgroundScheduler(scheduler: IosBackgroundScheduler) { backgroundScheduler = scheduler }
-    fun scheduleBackgroundWake(atMillis: Double): String = checkNotNull(backgroundScheduler).schedule(atMillis)
     fun networkType(): String = _networkInfoProvider?.getNetworkType() ?: "NONE"
     fun vpnActive(): Boolean = _networkInfoProvider?.isVpnActive() ?: false
 
