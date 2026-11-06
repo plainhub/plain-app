@@ -52,7 +52,7 @@ object Prefs {
     val pdfFollowDarkTheme = MutableStateFlow(false)
     val locale = MutableStateFlow("")
     val backgroundServiceEnabled = MutableStateFlow(false)
-    val desktopAccess = MutableStateFlow(false)
+    val remoteAccess = MutableStateFlow(false)
     val dlna = MutableStateFlow(false)
     val developerMode = MutableStateFlow(false)
     val allowAnyHost = MutableStateFlow(false)
@@ -124,7 +124,7 @@ object Prefs {
             PrefKeys.PDF_FOLLOW_DARK_THEME -> pdfFollowDarkTheme.value = value.jsonPrimitive.boolean
             PrefKeys.LOCALE -> locale.value = value.jsonPrimitive.content
             PrefKeys.BACKGROUND_SERVICE_ENABLED -> backgroundServiceEnabled.value = value.jsonPrimitive.boolean
-            PrefKeys.DESKTOP_ACCESS -> desktopAccess.value = value.jsonPrimitive.boolean
+            PrefKeys.REMOTE_ACCESS -> remoteAccess.value = value.jsonPrimitive.boolean
             PrefKeys.DLNA -> dlna.value = value.jsonPrimitive.boolean
             PrefKeys.DEVELOPER_MODE -> developerMode.value = value.jsonPrimitive.boolean
             PrefKeys.ALLOW_ANY_HOST -> allowAnyHost.value = value.jsonPrimitive.boolean

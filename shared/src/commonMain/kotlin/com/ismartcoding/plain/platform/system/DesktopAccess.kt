@@ -4,6 +4,6 @@ import com.ismartcoding.plain.preferences.PrefKeys
 
 import com.ismartcoding.plain.Prefs
 
-suspend fun setDesktopAccessEnabled(enabled: Boolean) {
-    Prefs.set(PrefKeys.DESKTOP_ACCESS, enabled)
+suspend fun setRemoteAccessEnabled(enabled: Boolean) {
+    Prefs.set(PrefKeys.REMOTE_ACCESS, enabled)
 }

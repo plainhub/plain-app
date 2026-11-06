@@ -29,9 +29,9 @@ class WebBundleAssetsTest {
                 }
             }
         }
-        val oldAccess = Prefs.desktopAccess.value
+        val oldAccess = Prefs.remoteAccess.value
         try {
-            Prefs.desktopAccess.value = true
+            Prefs.remoteAccess.value = true
             withIO { RustRuntime.start() }
             val base = "http://127.0.0.1:${Prefs.httpPort.value}"
             val shell = get("$base/", "text/html")
@@ -42,7 +42,7 @@ class WebBundleAssetsTest {
             assertTrue(get("$base$script", "application/javascript").isNotEmpty())
             assertTrue(get("$base/settings", "text/html").contains("window.__SERVER_TIME__="))
         } finally {
-            Prefs.desktopAccess.value = oldAccess
+            Prefs.remoteAccess.value = oldAccess
         }
     }
 

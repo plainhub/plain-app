@@ -23,7 +23,7 @@ import com.ismartcoding.plain.i18n.access_settings
 import com.ismartcoding.plain.i18n.desktop_access_desc
 import com.ismartcoding.plain.i18n.desktop_access_instructions
 import com.ismartcoding.plain.i18n.home_remote_access
-import com.ismartcoding.plain.platform.system.setDesktopAccessEnabled
+import com.ismartcoding.plain.platform.system.setRemoteAccessEnabled
 import com.ismartcoding.plain.ui.base.PListItem
 import com.ismartcoding.plain.ui.base.PTextButton
 import com.ismartcoding.plain.ui.media.extensions.collectAsStateValue
@@ -39,20 +39,20 @@ import com.ismartcoding.plain.ui.resources.chevron_right as ui_drawable_chevron_
 
 @Composable
 fun DesktopAccessSection(navController: NavHostController) {
-    val desktopAccessEnabled = Prefs.desktopAccess.collectAsStateValue()
+    val remoteAccessEnabled = Prefs.remoteAccess.collectAsStateValue()
     val scope = rememberCoroutineScope()
     val onlineCount by onlineClientIds.map { it.size }.collectAsState(0)
 
     Column {
         PListItem(
             title = stringResource(Res.string.home_remote_access),
-            subtitle = stringResource(if (desktopAccessEnabled) Res.string.desktop_access_instructions else Res.string.desktop_access_desc)
+            subtitle = stringResource(if (remoteAccessEnabled) Res.string.desktop_access_instructions else Res.string.desktop_access_desc)
         ) {
-            Switch(checked = desktopAccessEnabled, onCheckedChange = { enable ->
-                scope.launchSafe { setDesktopAccessEnabled(enable) }
+            Switch(checked = remoteAccessEnabled, onCheckedChange = { enable ->
+                scope.launchSafe { setRemoteAccessEnabled(enable) }
             })
         }
-        if (desktopAccessEnabled) {
+        if (remoteAccessEnabled) {
             val webVM: DesktopAccessSettingsViewModel = viewModel { DesktopAccessSettingsViewModel() }
             val lanIpv4Addresses by webVM.lanIpv4Addresses.collectAsState()
             LaunchedEffect(webVM) { webVM.observeNetworkAddresses() }
@@ -68,7 +68,7 @@ fun DesktopAccessSection(navController: NavHostController) {
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Box(Modifier.weight(1f)) {
-                if (desktopAccessEnabled && onlineCount > 0) {
+                if (remoteAccessEnabled && onlineCount > 0) {
                     OnlineSessionsIndicator(
                         count = onlineCount,
                         onClick = { navController.navigate(Routing.Connections) },

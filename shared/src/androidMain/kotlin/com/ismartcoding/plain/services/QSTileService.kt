@@ -9,7 +9,7 @@ import kotlinx.coroutines.CancellationException
 import com.ismartcoding.plain.i18n.Res
 import com.ismartcoding.plain.i18n.desktop_access
 import com.ismartcoding.plain.ui.i18n.LocaleHelper
-import com.ismartcoding.plain.platform.system.setDesktopAccessEnabled
+import com.ismartcoding.plain.platform.system.setRemoteAccessEnabled
 import com.ismartcoding.plain.Prefs
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -41,7 +41,7 @@ class QSTileService : TileService() {
         super.onStartListening()
         stateEventJob?.cancel()
         stateEventJob = serviceScope.launch {
-            Prefs.desktopAccess.collect { updateTile(it) }
+            Prefs.remoteAccess.collect { updateTile(it) }
         }
     }
 
@@ -64,14 +64,14 @@ class QSTileService : TileService() {
             toggleJob = serviceScope.launch {
                 try {
                     withContext(Dispatchers.IO) {
-                        setDesktopAccessEnabled(!Prefs.desktopAccess.value)
+                        setRemoteAccessEnabled(!Prefs.remoteAccess.value)
                     }
                 } catch (cancelled: CancellationException) {
                     throw cancelled
                 } catch (error: Exception) {
                     LogCat.e("Desktop access tile failed: ${error.message}")
                 } finally {
-                    updateTile(Prefs.desktopAccess.value)
+                    updateTile(Prefs.remoteAccess.value)
                 }
             }
         }

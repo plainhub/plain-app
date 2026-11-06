@@ -25,12 +25,12 @@ class MainGraphqlRustHttpTest {
     fun jniAndAuthenticatedHttpUseOneSchemaAndKeepCredentialReadsLocal() = runBlocking {
         val name = "main-contract-${UUID.randomUUID()}"
         val oldService = Prefs.backgroundServiceEnabled.value
-        val oldAccess = Prefs.desktopAccess.value
+        val oldAccess = Prefs.remoteAccess.value
         var id: String? = null
         val httpClient = createTestHttpClient(TestHttpClientSpec.Local())
         try {
             Prefs.backgroundServiceEnabled.value = true
-            Prefs.desktopAccess.value = true
+            Prefs.remoteAccess.value = true
             val created = RustSessionStore.create(name)
             val clientId = created.clientId
             id = clientId
@@ -71,7 +71,7 @@ class MainGraphqlRustHttpTest {
             httpClient.close()
             id?.let { RustSessionStore.delete(it) }
             Prefs.backgroundServiceEnabled.value = oldService
-            Prefs.desktopAccess.value = oldAccess
+            Prefs.remoteAccess.value = oldAccess
         }
     }
 

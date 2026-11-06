@@ -49,8 +49,8 @@ class ApiFixtureRustHttpTest {
         var clientId = ""
         var peerCreated = false
         var rootCreated = false
-        val oldAccess = Prefs.desktopAccess.value
-        Prefs.desktopAccess.value = true
+        val oldAccess = Prefs.remoteAccess.value
+        Prefs.remoteAccess.value = true
         withIO { RustRuntime.start() }
         val oldPermissions = Prefs.apiAccessFeatures.value
         try {
@@ -104,7 +104,7 @@ class ApiFixtureRustHttpTest {
             if (peerCreated) GraphqlApi.execute(GraphqlRequest<JsonObject>("mutation { deletePeer(id: ${JsonPrimitive(peerId)}) }"))
             if (rootCreated) root.deleteRecursively()
             Prefs.setApiAccessFeatures(oldPermissions)
-            Prefs.desktopAccess.value = oldAccess
+            Prefs.remoteAccess.value = oldAccess
         }
     }
 }

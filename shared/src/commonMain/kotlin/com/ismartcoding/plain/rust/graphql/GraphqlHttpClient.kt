@@ -49,7 +49,7 @@ internal class PeerHttpClient(
         } ?: error("connection_timeout")
         when (response.status) {
             401 -> error("unauthorized")
-            403 -> error("desktop_access_disabled")
+            403 -> error("remote_access_disabled")
             in 200..299 -> Unit
             else -> throw GraphqlHttpException(response.status)
         }

@@ -178,7 +178,7 @@ class GlobalSearchViewModel internal constructor(
 }
 
 private fun Exception.isRemoteAccessDisabled(): Boolean =
-    this is GraphqlHttpException && status == 404 || message == "desktop_access_disabled"
+    this is GraphqlHttpException && status == 404 || message == "remote_access_disabled"
 
 internal suspend fun searchDevices(
     readPeers: suspend () -> List<Peer> = { GraphqlApi.execute(Query.peers()) },

@@ -30,7 +30,7 @@ class PublicRustHttpTest {
     @Test
     fun rustPublicListenerServesTlsUploadsRangesAndPortal() = runBlocking {
         val oldService = Prefs.backgroundServiceEnabled.value
-        val oldDesktop = Prefs.desktopAccess.value
+        val oldDesktop = Prefs.remoteAccess.value
         val oldHttp = Prefs.httpPort.value
         val oldHttps = Prefs.httpsPort.value
         val fixtureName = "synthetic-http-${UUID.randomUUID()}"
@@ -40,7 +40,7 @@ class PublicRustHttpTest {
         val payload = ByteArray(512 * 1024 + 17) { (it % 251).toByte() }
         try {
             Prefs.backgroundServiceEnabled.value = true
-            Prefs.desktopAccess.value = true
+            Prefs.remoteAccess.value = true
             withIO { RustRuntime.start() }
             assertTrue(RustNativeApi.checkHttp())
             val port = Prefs.httpPort.value
@@ -100,7 +100,7 @@ class PublicRustHttpTest {
                     assertEquals(206, it.status.value)
                     assertArrayEquals(payload.copyOfRange(19, 40), it.bodyAsBytes())
                 }
-                Prefs.desktopAccess.value = false
+                Prefs.remoteAccess.value = false
                 client.get("http://127.0.0.1:$port/health").use { assertEquals(200, it.status.value) }
                 client.post("http://127.0.0.1:$port/graphql", "{}".encodeToByteArray(), "application/json").use { assertEquals(404, it.status.value) }
             }
@@ -108,7 +108,7 @@ class PublicRustHttpTest {
             if (clientId.isNotEmpty()) RustSessionStore.delete(clientId)
             root.deleteRecursively()
             Prefs.backgroundServiceEnabled.value = oldService
-            Prefs.desktopAccess.value = oldDesktop
+            Prefs.remoteAccess.value = oldDesktop
             Prefs.httpPort.value = oldHttp
             Prefs.httpsPort.value = oldHttps
         }

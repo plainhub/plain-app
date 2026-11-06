@@ -11,7 +11,7 @@ internal fun ManagedError(message: String, modifier: Modifier = Modifier) {
     val description = when {
         message == "connection_timeout" -> stringResource(Res.string.feed_err_timeout)
         message in setOf("unauthorized", "peer_identity_changed", "peer_removed") -> stringResource(Res.string.managed_authorization_changed)
-        message in setOf("no_permission", "desktop_access_disabled") -> stringResource(Res.string.managed_permission_denied)
+        message in setOf("no_permission", "remote_access_disabled") -> stringResource(Res.string.managed_permission_denied)
         message.startsWith("HTTP ") && message.removePrefix("HTTP ").toIntOrNull() in 500..599 -> stringResource(Res.string.feed_err_server)
         else -> message
     }

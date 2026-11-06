@@ -4,7 +4,7 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import com.ismartcoding.plain.app.AppIntents
-import com.ismartcoding.plain.platform.system.setDesktopAccessEnabled
+import com.ismartcoding.plain.platform.system.setRemoteAccessEnabled
 import com.ismartcoding.plain.lib.coIO
 import com.ismartcoding.plain.lib.logcat.LogCat
 import kotlinx.coroutines.CancellationException
@@ -21,7 +21,7 @@ class DesktopAccessCommandReceiver : BroadcastReceiver() {
         coIO {
             try {
                 if (!Prefs.verifyAdbToken(intent.getStringExtra("token").orEmpty())) return@coIO
-                setDesktopAccessEnabled(enabled)
+                setRemoteAccessEnabled(enabled)
             } catch (cancelled: CancellationException) {
                 throw cancelled
             } catch (error: Exception) {

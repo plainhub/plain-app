@@ -33,11 +33,11 @@ class BrowserVideoInstrumentedTest {
             .getValue("capabilities").jsonArray.map { it.jsonPrimitive.content }
         assumeTrue("HEVC transcoding is unavailable", "VIDEO_TRANSCODE" in capabilities)
         val service = Prefs.backgroundServiceEnabled.value
-        val desktop = Prefs.desktopAccess.value
+        val desktop = Prefs.remoteAccess.value
         val output = File(appContext.cacheDir, "browser-video-${UUID.randomUUID()}.mp4")
         try {
             Prefs.backgroundServiceEnabled.value = true
-            Prefs.desktopAccess.value = true
+            Prefs.remoteAccess.value = true
             withIO { RustRuntime.start() }
             val base = "http://127.0.0.1:${Prefs.httpPort.value}"
             fun resource(file: File) = "$base/fs?id=${URLEncoder.encode(ResourceCrypto.encrypt(file.absolutePath), "UTF-8")}"
@@ -63,7 +63,7 @@ class BrowserVideoInstrumentedTest {
             }
         } finally {
             output.delete()
-            Prefs.desktopAccess.value = desktop
+            Prefs.remoteAccess.value = desktop
             Prefs.backgroundServiceEnabled.value = service
         }
     }

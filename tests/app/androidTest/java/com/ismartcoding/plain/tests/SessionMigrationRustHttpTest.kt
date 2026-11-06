@@ -34,14 +34,14 @@ class SessionMigrationRustHttpTest {
     @Test
     fun encryptedLoginConfirmationSessionUiAndRevocationUseRust() = runBlocking {
         val oldService = Prefs.backgroundServiceEnabled.value
-        val oldDesktop = Prefs.desktopAccess.value
+        val oldDesktop = Prefs.remoteAccess.value
         val oldTwoFactor = Prefs.loginRequireApproval.value
         val id = "session-fixture-${UUID.randomUUID()}"
         var pendingId = ""
         val http = createTestHttpClient(TestHttpClientSpec.HttpHost)
         try {
             Prefs.backgroundServiceEnabled.value = true
-            Prefs.desktopAccess.value = true
+            Prefs.remoteAccess.value = true
             Prefs.setLoginRequireApproval(true)
             withIO { RustRuntime.start() }
             val client = generateECDHKeyPair()
@@ -85,7 +85,7 @@ class SessionMigrationRustHttpTest {
             if (pendingId.isNotEmpty()) RustWebLogin.cancel(pendingId)
             RustSessionStore.delete(id)
             Prefs.setLoginRequireApproval(oldTwoFactor)
-            Prefs.desktopAccess.value = oldDesktop
+            Prefs.remoteAccess.value = oldDesktop
             Prefs.backgroundServiceEnabled.value = oldService
         }
     }
