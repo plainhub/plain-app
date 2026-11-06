@@ -179,4 +179,9 @@
     <string name="saved_to_x">Opgeslagen in %1$s</string>
     <string name="confirm_unpair_device">Koppeling met %1$s verbreken? Als je de chatgeschiedenis verwijdert, verdwijnt dit apparaat ook uit de chatlijst. Dit kan niet ongedaan worden gemaakt.</string>
     <string name="delete_chat_history">Chatgeschiedenis verwijderen</string>
+    <string name="nearby_my_devices">Mijn apparaten</string>
+    <string name="nearby_current_device">Huidig apparaat</string>
+    <string name="nearby_switch_device">Wisselen</string>
+    <string name="pair_full_control">Volledige controle</string>
+    <string name="nearby_enable_remote_access">Schakel externe toegang in op het andere apparaat</string>
 </resources>

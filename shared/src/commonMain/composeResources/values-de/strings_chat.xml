@@ -179,4 +179,9 @@
     <string name="saved_to_x">Gespeichert in %1$s</string>
     <string name="confirm_unpair_device">Kopplung mit %1$s aufheben? Das Löschen des Chatverlaufs entfernt dieses Gerät auch aus der Chatliste und kann nicht rückgängig gemacht werden.</string>
     <string name="delete_chat_history">Chatverlauf löschen</string>
+    <string name="nearby_my_devices">Meine Geräte</string>
+    <string name="nearby_current_device">Aktuelles Gerät</string>
+    <string name="nearby_switch_device">Wechseln</string>
+    <string name="pair_full_control">Vollzugriff</string>
+    <string name="nearby_enable_remote_access">Remotezugriff auf dem anderen Gerät aktivieren</string>
 </resources>

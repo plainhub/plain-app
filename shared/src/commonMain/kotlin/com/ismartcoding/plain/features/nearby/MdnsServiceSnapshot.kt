@@ -11,6 +11,6 @@ data class MdnsServiceSnapshot(
     val port: Int,
     val txtRecords: List<String>,
     val ips: List<String>,
-    val ipv6: List<String>,
+    val ip6s: List<String>,
     val complete: Boolean,
 )

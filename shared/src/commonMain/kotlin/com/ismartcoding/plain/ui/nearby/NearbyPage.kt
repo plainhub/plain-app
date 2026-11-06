@@ -29,7 +29,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
-import com.ismartcoding.plain.models.Peer
 import com.ismartcoding.plain.ui.components.ButtonSize
 import com.ismartcoding.plain.i18n.*
 import com.ismartcoding.plain.lib.extensions.toSortName
@@ -45,9 +44,27 @@ import com.ismartcoding.plain.ui.base.PScaffold
 import com.ismartcoding.plain.ui.base.PTextButton
 import com.ismartcoding.plain.ui.base.PTopAppBar
 import com.ismartcoding.plain.ui.base.VerticalSpace
-import com.ismartcoding.plain.ui.nearby.NearbyViewModel
 import com.ismartcoding.plain.ui.chat.PeerViewModel
 import com.ismartcoding.plain.ui.chat.components.NearbyDeviceItem
+import com.ismartcoding.plain.ui.chat.components.NearbyPairedDeviceItem
+import com.ismartcoding.plain.ui.chat.components.PeerIconWithStatus
+import com.ismartcoding.plain.ui.base.PListItem
+import com.ismartcoding.plain.ui.base.POutlinedButton
+import com.ismartcoding.plain.ui.base.PSectionTitle
+import com.ismartcoding.plain.ui.navigation.Routing
+import com.ismartcoding.plain.ui.app.MainViewModel
+import com.ismartcoding.plain.Prefs
+import com.ismartcoding.plain.platform.system.getDeviceName
+import com.ismartcoding.plain.platform.system.getDeviceType
+import com.ismartcoding.plain.platform.network.NetworkEvents
+import com.ismartcoding.plain.ui.platform.system.getIcon
+import com.ismartcoding.plain.ui.tools.LocalManagedDeviceViewModel
+import com.ismartcoding.plain.ui.components.DeviceRenameDialog
+import com.ismartcoding.plain.ui.components.PIconButton
+import com.ismartcoding.plain.graphql.Mutation
+import com.ismartcoding.plain.rust.graphql.GraphqlApi
+import com.ismartcoding.plain.ui.resources.Res as UiRes
+import com.ismartcoding.plain.ui.resources.pen as ui_drawable_pen
 import org.jetbrains.compose.resources.stringResource
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -68,7 +85,26 @@ fun NearbyPage(
     var isBleScanning by remember { mutableStateOf(false) }
     val bleAvailability by bleAvailabilityFlow.collectAsState()
     val isSearching = isDiscovering || isBleScanning
-    val peers by peerVM.peerList.collectAsState()
+    val peersMap by peerVM.peersMap.collectAsState()
+    val peers = peersMap.values.filter { it.isPaired() }.sortedBy { it.name.toSortName() }
+    val newDevices = nearbyDevices.filter { device -> peers.none { it.id == device.id } }
+    val localName by Prefs.deviceName.collectAsState()
+    val network by NetworkEvents.snapshot.collectAsState()
+    val selectedDevice by MainViewModel.selectedDevice
+    val manager = LocalManagedDeviceViewModel.current
+    val managedState = manager?.state?.collectAsState()?.value
+    val managedInfo = managedState?.client?.state?.collectAsState()?.value
+    val currentName = if (selectedDevice == null) localName.ifEmpty { getDeviceName() }
+        else managedInfo?.deviceName ?: peersMap[selectedDevice?.peerId]?.name.orEmpty()
+    var showRename by remember { mutableStateOf(false) }
+    if (showRename) DeviceRenameDialog(currentName, onDismiss = { showRename = false }) { name ->
+        if (manager == null) GraphqlApi.execute(Mutation.updateDeviceName(name)) else manager.rename(name)
+    }
+    LaunchedEffect(Unit) {
+        try { NetworkEvents.refresh() }
+        catch (cancelled: CancellationException) { throw cancelled }
+        catch (error: Exception) { LogCat.e("Load local addresses", error) }
+    }
     LaunchedEffect(peerVM) { peerVM.observe() }
 
     LaunchedEffect(Unit) {
@@ -92,6 +128,9 @@ fun NearbyPage(
                     NavigationBackIcon { navController.navigateUp() }
                 },
                 title = stringResource(Res.string.nearby_devices),
+                actions = {
+                    PIconButton(UiRes.drawable.ui_drawable_pen, contentDescription = stringResource(Res.string.rename), click = { showRename = true })
+                },
             )
         }
     ) { paddingValues ->
@@ -134,9 +173,30 @@ fun NearbyPage(
                     }
                 }
             }
+            item { PSectionTitle(stringResource(Res.string.nearby_my_devices)) }
+            item {
+                PListItem(
+                    title = localName.ifEmpty { getDeviceName() },
+                    subtitle = network.lanIpv4Addresses.orEmpty().joinToString(", "),
+                    titleTrailing = {
+                        Text(stringResource(if (selectedDevice == null) Res.string.nearby_current_device else Res.string.this_device), color = MaterialTheme.colorScheme.primary)
+                    },
+                    start = { PeerIconWithStatus(getDeviceType().getIcon(), null) },
+                    action = {
+                        if (selectedDevice != null) POutlinedButton(
+                            text = stringResource(Res.string.nearby_switch_device),
+                            buttonSize = ButtonSize.SMALL,
+                            onClick = { MainViewModel.selectDevice(null) },
+                        )
+                    },
+                )
+            }
+            items(peers, key = { "paired:${it.id}" }) { peer ->
+                NearbyPairedDeviceItem(peer, nearbyDevices.find { it.id == peer.id })
+            }
             nearbySearchingItem(isSearching)
-            nearbyDeviceListItems(nearbyDevices, peers)
-            if (nearbyDevices.isEmpty() && !isSearching) {
+            nearbyDeviceListItems(newDevices)
+            if (newDevices.isEmpty() && !isSearching) {
                 item {
                     Box(
                         modifier = Modifier.fillMaxWidth().padding(vertical = 48.dp),
@@ -155,6 +215,13 @@ fun NearbyPage(
                 }
             }
             item {
+                POutlinedButton(
+                    text = stringResource(Res.string.scan_qrcode),
+                    modifier = Modifier.padding(horizontal = 16.dp),
+                    onClick = { navController.navigate(Routing.Scan) },
+                )
+            }
+            item {
                 BottomSpace(paddingValues)
             }
         }
@@ -163,12 +230,10 @@ fun NearbyPage(
 
 internal fun LazyListScope.nearbyDeviceListItems(
     nearbyDevices: List<NearbyDevice>,
-    peers: List<Peer>,
 ) {
     val sortedDevices = nearbyDevices.sortedBy { it.name.toSortName() }
     items(sortedDevices, key = { it.id }) { item ->
-        val isPaired = peers.any { it.id == item.id && it.isPaired() }
-        val status = NearbyViewModel.getStatus(item.id, isPaired)
+        val status = NearbyViewModel.getStatus(item.id, false)
         NearbyDeviceItem(
             item = item,
             status = status,
@@ -179,14 +244,13 @@ internal fun LazyListScope.nearbyDeviceListItems(
 }
 
 internal fun LazyListScope.nearbySearchingItem(isLoading: Boolean) {
-    if (!isLoading) return
     item {
         Box(
             modifier = Modifier.fillMaxWidth().padding(16.dp),
             contentAlignment = Alignment.Center
         ) {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                CircularProgressIndicator(
+                if (isLoading) CircularProgressIndicator(
                     modifier = Modifier.size(16.dp),
                     strokeWidth = 2.dp,
                     color = MaterialTheme.colorScheme.primary

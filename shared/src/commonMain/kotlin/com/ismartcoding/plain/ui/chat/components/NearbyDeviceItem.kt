@@ -1,145 +1,58 @@
 package com.ismartcoding.plain.ui.chat.components
 
-import com.ismartcoding.plain.models.NearbyDevice
-import androidx.compose.foundation.layout.size
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.unit.dp
-import com.ismartcoding.plain.i18n.*
-import org.jetbrains.compose.resources.painterResource
-import org.jetbrains.compose.resources.stringResource
-import com.ismartcoding.plain.ui.components.ButtonSize
-import com.ismartcoding.plain.ui.components.ButtonType
 import com.ismartcoding.plain.features.nearby.PairingPhase
-import com.ismartcoding.plain.features.nearby.DiscoveryMethod
-import com.ismartcoding.plain.ui.platform.system.getIcon
-import com.ismartcoding.plain.ui.base.HorizontalSpace
+import com.ismartcoding.plain.i18n.*
+import com.ismartcoding.plain.models.NearbyDevice
 import com.ismartcoding.plain.ui.base.PListItem
 import com.ismartcoding.plain.ui.base.POutlinedButton
+import com.ismartcoding.plain.ui.components.ButtonSize
 import com.ismartcoding.plain.ui.nearby.NearbyItemStatus
 import com.ismartcoding.plain.ui.nearby.NearbyViewModel
-import com.ismartcoding.plain.ui.theme.PlainTheme
-import com.ismartcoding.plain.ui.resources.Res as UiRes
-import com.ismartcoding.plain.ui.resources.bluetooth as ui_drawable_bluetooth
-import com.ismartcoding.plain.ui.resources.wifi as ui_drawable_wifi
-import com.ismartcoding.plain.i18n.bluetooth
 import com.ismartcoding.plain.ui.nearby.PairPeerDialog
-import com.ismartcoding.plain.ui.components.ConfirmDialogCheckbox
-import com.ismartcoding.plain.ui.components.DialogHelper
+import com.ismartcoding.plain.ui.platform.system.getIcon
+import org.jetbrains.compose.resources.stringResource
 
 @Composable
-fun NearbyDeviceItem(
-    item: NearbyDevice,
-    status: NearbyItemStatus,
-    bestIp: String,
-) {
-    var showPair by remember { mutableStateOf(false) }
-    val unpairText = stringResource(Res.string.unpair)
-    val unpairMessage = stringResource(Res.string.confirm_unpair_device, item.name)
-    val deleteChatsText = stringResource(Res.string.delete_chat_history)
-    val cancelText = stringResource(Res.string.cancel)
-    val verificationCode = NearbyViewModel.pairingStates.values.firstOrNull {
-        it.deviceId == item.id && it.phase !in setOf(PairingPhase.SUCCEEDED, PairingPhase.FAILED, PairingPhase.CANCELLED)
-    }?.verificationCode
-    if (showPair) PairPeerDialog(item) { showPair = false }
-    Surface(
-        modifier = PlainTheme.getCardModifier().testTag("nearby-device:${item.id}"),
-        color = Color.Unspecified,
-    ) {
-        PListItem(
-            title = item.name,
-            titleSuffix = {
-                if (DiscoveryMethod.BLE in item.discoveryMethods) {
-                    Icon(
-                        painter = painterResource(UiRes.drawable.ui_drawable_bluetooth),
-                        contentDescription = "Bluetooth",
-                        modifier = Modifier.size(16.dp),
-                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                    )
-                }
-                if (DiscoveryMethod.LAN in item.discoveryMethods) {
-                    if (DiscoveryMethod.BLE in item.discoveryMethods) HorizontalSpace(4.dp)
-                    Icon(
-                        painter = painterResource(UiRes.drawable.ui_drawable_wifi),
-                        contentDescription = "Wi-Fi",
-                        modifier = Modifier.size(16.dp),
-                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                    )
-                }
-            },
-            subtitle = verificationCode ?: bestIp,
-            icon = item.deviceType.getIcon(),
-            action = {
-                when (status) {
-                    NearbyItemStatus.PAIRING -> {
-                        POutlinedButton(
-                            text = stringResource(Res.string.cancel),
-                            onClick = {
-                                NearbyViewModel.cancelPairing(item.id)
-                            },
-                            type = ButtonType.DANGER,
-                            buttonSize = ButtonSize.SMALL,
-                        )
-                    }
-
-                    NearbyItemStatus.UNPAIRING -> {
-                        POutlinedButton(
-                            text = stringResource(Res.string.unpair),
-                            onClick = {},
-                            type = ButtonType.DANGER,
-                            buttonSize = ButtonSize.SMALL,
-                            isLoading = true,
-                            enabled = false,
-                        )
-                    }
-
-                    NearbyItemStatus.PAIRED -> {
-                        POutlinedButton(
-                            text = stringResource(Res.string.unpair),
-                            onClick = {
-                                val checkbox = ConfirmDialogCheckbox(deleteChatsText)
-                                DialogHelper.showConfirmDialog(
-                                    title = unpairText,
-                                    message = unpairMessage,
-                                    confirmButton = Pair(unpairText) {
-                                        NearbyViewModel.unpairDevice(item.id, checkbox.checked)
-                                    },
-                                    dismissButton = Pair(cancelText) {},
-                                    danger = true,
-                                    checkbox = checkbox,
-                                )
-                            },
-                            type = ButtonType.DANGER,
-                            buttonSize = ButtonSize.SMALL,
-                        )
-                    }
-
-                    NearbyItemStatus.UNPAIRED -> {
-                        POutlinedButton(
-                            text = stringResource(Res.string.pair),
-                            onClick = {
-                                showPair = true
-                            },
-                            buttonSize = ButtonSize.SMALL,
-                        )
-                    }
-
-                    NearbyItemStatus.STARTING -> {
-                        POutlinedButton(
-                            text = stringResource(Res.string.pair),
-                            onClick = {},
-                            buttonSize = ButtonSize.SMALL,
-                            isLoading = true,
-                            enabled = false,
-                        )
-                    }
-                }
-            }
-        )
+fun NearbyDeviceItem(item: NearbyDevice, status: NearbyItemStatus, bestIp: String) {
+    var showPair by remember(item.id) { mutableStateOf(false) }
+    if (showPair) {
+        PairPeerDialog(item) {
+            showPair = false
+        }
     }
+    PListItem(
+        modifier = Modifier.testTag("nearby-device:${item.id}"),
+        title = item.name,
+        subtitle = bestIp,
+        start = { PeerIconWithStatus(item.deviceType.getIcon(), null) },
+        action = {
+            NearbyPairButton(item.id, status, if (item.remoteAccess == true) Res.string.pair else Res.string.pair_chat_only) {
+                showPair = true
+            }
+        },
+    )
+}
+
+@Composable
+internal fun NearbyPairButton(
+    deviceId: String,
+    status: NearbyItemStatus,
+    label: org.jetbrains.compose.resources.StringResource,
+    enabled: Boolean = true,
+    onPair: () -> Unit,
+) {
+    val active = NearbyViewModel.pairingStates.values.any {
+        it.deviceId == deviceId && it.phase !in setOf(PairingPhase.SUCCEEDED, PairingPhase.FAILED, PairingPhase.CANCELLED)
+    }
+    val cancelling = active || status == NearbyItemStatus.PAIRING
+    POutlinedButton(
+        text = stringResource(if (cancelling) Res.string.cancel else label),
+        buttonSize = ButtonSize.SMALL,
+        isLoading = status == NearbyItemStatus.STARTING || status == NearbyItemStatus.UNPAIRING,
+        enabled = cancelling || enabled,
+        onClick = { if (cancelling) NearbyViewModel.cancelPairing(deviceId) else onPair() },
+    )
 }

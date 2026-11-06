@@ -179,4 +179,9 @@
     <string name="saved_to_x">Đã lưu vào %1$s</string>
     <string name="confirm_unpair_device">Hủy ghép đôi với %1$s? Xóa lịch sử trò chuyện cũng sẽ xóa thiết bị này khỏi danh sách trò chuyện và không thể hoàn tác.</string>
     <string name="delete_chat_history">Xóa lịch sử trò chuyện</string>
+    <string name="nearby_my_devices">Thiết bị của tôi</string>
+    <string name="nearby_current_device">Thiết bị hiện tại</string>
+    <string name="nearby_switch_device">Chuyển đổi</string>
+    <string name="pair_full_control">Toàn quyền điều khiển</string>
+    <string name="nearby_enable_remote_access">Bật truy cập từ xa trên thiết bị kia</string>
 </resources>

@@ -679,34 +679,18 @@ class ManagedDeviceUiAcceptanceTest {
         }
         ActivityScenario.launch(MainActivity::class.java).use { scenario ->
             awaitNode("Chat settings action") { it.contentDescription == text(Res.string.settings) }
-            click(text(Res.string.select_a_device), "device sheet without pairs")
-            val rename = awaitNode("empty device sheet rename") { it.overlay && it.contentDescription == text(Res.string.rename) }
-            val renameItem = generateSequence(rename) { it.parent }.first { it.isClickable }
-            val sheetTitle = awaitNode("device sheet title") { it.overlay && it.text == text(Res.string.select_a_device) }
-            assertTrue(renameItem.boundsInWindow.left > sheetTitle.boundsInWindow.right)
-            assertTrue(kotlin.math.abs(renameItem.boundsInWindow.center.y - sheetTitle.boundsInWindow.center.y) < renameItem.boundsInWindow.height)
-            assertFalse(uiNodes().any { it.overlay && it.contentDescription == text(Res.string.close) })
-            val display = instrumentation.targetContext.resources.displayMetrics
-            assertTrue(renameItem.boundsInWindow.left > 0)
-            assertTrue(renameItem.boundsInWindow.right < display.widthPixels)
-            assertTrue(renameItem.boundsInWindow.top > display.heightPixels / 2)
-            awaitNode("device pairing guidance") { it.overlay && it.text == text(Res.string.no_paired_devices_hint) }
-            val deviceName = Prefs.deviceName.value.ifEmpty { com.ismartcoding.plain.platform.system.getDeviceName() }
-            assertFalse(uiNodes().any { it.overlay && it.text == deviceName })
-            captureNavigation("device-empty-state")
-            assertFalse(allText().contains(text(Res.string.this_device)))
-            click(text(Res.string.pair_device), "pair from empty device selector")
+            click(text(Res.string.select_a_device), "open nearby devices")
             awaitNode("nearby devices page") { it.text == text(Res.string.nearby_devices) }
+            awaitNode("my devices section") { it.text == text(Res.string.nearby_my_devices) }
+            awaitNode("current device indicator") { it.text == text(Res.string.nearby_current_device) }
+            val deviceName = Prefs.deviceName.value.ifEmpty { com.ismartcoding.plain.platform.system.getDeviceName() }
+            awaitNode("local device") { it.text == deviceName }
             assertFalse(uiNodes().any { it.overlay && it.text == text(Res.string.select_a_device) })
-            awaitValue("nearby navigation transition finished") {
-                if (uiNodes().none { it.contentDescription == text(Res.string.settings) }) true else null
-            }
-            captureNavigation("device-empty-nearby")
-            click(text(Res.string.back), "return from nearby devices")
-            click(text(Res.string.select_a_device), "reopen empty device selector")
+            captureNavigation("nearby-local-device")
             click(text(Res.string.rename), "rename selected device")
             awaitNode("rename input") { it.isEditable }
             click(text(Res.string.cancel), "cancel rename")
+            click(text(Res.string.back), "return from nearby devices")
             awaitMainWindowFocus(scenario)
             assertEquals(1, MainViewModel.currentRootTab.intValue)
             captureNavigation("local-chat")
@@ -1173,7 +1157,7 @@ class ManagedDeviceUiAcceptanceTest {
                         Box(Modifier.fillMaxSize().background(androidx.compose.material3.MaterialTheme.colorScheme.background)) {
                             if (show.value) com.ismartcoding.plain.ui.nearby.PairPeerDialog(
                                 com.ismartcoding.plain.models.NearbyDevice(
-                                    id = "pair-dialog-ui-fixture", name = "Nearby device", port = 8443,
+                                    id = "pair-dialog-ui-fixture", name = "Nearby device", port = 8443, remoteAccess = true,
                                     deviceType = com.ismartcoding.plain.platform.system.DeviceType.PHONE,
                                     version = "fixture", platform = "fixture", lastSeen = "",
                                     status = com.ismartcoding.plain.features.nearby.PeerStatus.UNPAIRED,
@@ -1183,7 +1167,7 @@ class ManagedDeviceUiAcceptanceTest {
                     }
                 }
             }
-            val manage = text(Res.string.pair_manage_device)
+            val manage = text(Res.string.pair_full_control)
             val chat = text(Res.string.pair_chat_only)
             awaitNode("default manage option") { it.isCheckable && it.isChecked && nodes(it).any { child -> child.text?.contains(manage) == true } }
             click(chat, "select chat access")
@@ -1637,8 +1621,12 @@ class ManagedDeviceUiAcceptanceTest {
                 activity.setContent {
                     com.ismartcoding.plain.ui.theme.AppTheme(useDarkTheme = false) {
                         Box(Modifier.fillMaxSize().padding(32.dp)) {
-                            com.ismartcoding.plain.ui.chat.components.NearbyDeviceItem(
-                                device, com.ismartcoding.plain.ui.nearby.NearbyItemStatus.PAIRED, "",
+                            com.ismartcoding.plain.ui.chat.components.NearbyPairedDeviceItem(
+                                com.ismartcoding.plain.models.Peer(
+                                    id = device.id, name = device.name, ip = "", status = device.status,
+                                    port = device.port, deviceType = device.deviceType,
+                                    createdAt = kotlin.time.Instant.fromEpochMilliseconds(0), updatedAt = kotlin.time.Instant.fromEpochMilliseconds(0),
+                                ), device,
                             )
                         }
                         com.ismartcoding.plain.ui.navigation.MainDialogs()
@@ -1648,6 +1636,7 @@ class ManagedDeviceUiAcceptanceTest {
             try {
                 awaitMainWindowFocus(scenario)
                 repeat(2) { opening ->
+                    performClick(awaitNode("paired device actions") { it.contentDescription == text(Res.string.unpair) }, "open paired device actions")
                     click(text(Res.string.unpair), "request unpair confirmation")
                     val checkbox = awaitNode("delete chat history checkbox") { it.isCheckable }
                     assertFalse("Delete history must default to off", checkbox.isChecked)
@@ -1698,7 +1687,7 @@ class ManagedDeviceUiAcceptanceTest {
                     val row = current.firstOrNull {
                         it.isVisible && it.semantic.config.getOrNull(SemanticsProperties.TestTag) == "nearby-device:$targetId"
                     }
-                    candidate = row?.let { nodes(it).firstOrNull { child -> child.isVisible && child.text == text(Res.string.pair) } }
+                    candidate = row?.let { nodes(it).firstOrNull { child -> child.isVisible && child.text == text(if (nearby.remoteAccess == true) Res.string.pair else Res.string.pair_chat_only) } }
                 }
                 candidate
             }
@@ -1706,16 +1695,21 @@ class ManagedDeviceUiAcceptanceTest {
             while (pairAction.semantic.config.getOrNull(SemanticsProperties.Role) != androidx.compose.ui.semantics.Role.Button && pairAction.parent != null) pairAction = checkNotNull(pairAction.parent)
             assertEquals(androidx.compose.ui.semantics.Role.Button, pairAction.semantic.config.getOrNull(SemanticsProperties.Role))
             assertTrue(pairAction.performAction(AccessibilityNodeInfo.ACTION_CLICK))
-            awaitNode("pairing access title") { it.text == text(Res.string.pair_device) }
-            awaitNode("pair dialog belongs to the expected device") { it.text == nearby.name }
-            val label = text(if (mode == PairingMode.CHAT) Res.string.pair_chat_only else Res.string.pair_manage_device)
-            var choices = awaitNode("access choice") { it.text?.toString()?.contains(label) == true }
-            while (!choices.isCheckable && choices.parent != null) choices = checkNotNull(choices.parent)
-            assertTrue(choices.isCheckable)
-            val radioId = choices.semantic.id
-            performClick(choices, "access radio")
-            awaitNode("selected access radio") { it.semantic.id == radioId && it.isChecked }
-            click(text(Res.string.pair), "confirm pairing")
+            if (nearby.remoteAccess == true) {
+                awaitNode("pairing access title") { it.text == text(Res.string.pair_device) }
+                awaitNode("pair dialog belongs to the expected device") { it.text == nearby.name }
+                val label = text(if (mode == PairingMode.CHAT) Res.string.pair_chat_only else Res.string.pair_full_control)
+                var choices = awaitNode("access choice") { it.text?.toString()?.contains(label) == true }
+                while (!choices.isCheckable && choices.parent != null) choices = checkNotNull(choices.parent)
+                assertTrue(choices.isCheckable)
+                val radioId = choices.semantic.id
+                performClick(choices, "access radio")
+                awaitNode("selected access radio") { it.semantic.id == radioId && it.isChecked }
+                click(text(Res.string.pair), "confirm pairing")
+            } else {
+                assertEquals("Remote access must be enabled for full control", PairingMode.CHAT, mode)
+                assertFalse(uiNodes().any { it.overlay && it.text == text(Res.string.pair_full_control) })
+            }
             awaitNode("waiting for the other device to confirm pairing") {
                 it.overlay && it.text == text(Res.string.waiting_for_confirmation)
             }
@@ -1913,7 +1907,11 @@ class ManagedDeviceUiAcceptanceTest {
     private fun openRemoteTools(peerName: String) {
         click(text(Res.string.chat), "chat navigation")
         click(text(Res.string.select_a_device), "device selector")
-        click(peerName, "selected device")
+        val peer = awaitNode("paired device") { it.text == peerName }
+        val row = generateSequence(peer) { it.parent }.first { node ->
+            nodes(node).any { it.text == text(Res.string.nearby_switch_device) }
+        }
+        performClick(nodes(row).first { it.text == text(Res.string.nearby_switch_device) }, "switch to paired device")
         click(text(Res.string.tools), "selected device tools")
     }
 

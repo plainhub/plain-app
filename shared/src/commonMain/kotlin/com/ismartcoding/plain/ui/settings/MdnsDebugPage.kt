@@ -247,7 +247,7 @@ private fun MdnsDeviceCard(snapshot: MdnsServiceSnapshot) {
             )
             PListItem(
                 title = stringResource(Res.string.mdns_ips),
-                value = (snapshot.ips + snapshot.ipv6).joinToString(", ").ifEmpty { null }
+                value = (snapshot.ips + snapshot.ip6s).joinToString(", ").ifEmpty { null }
                     ?: stringResource(Res.string.not_available),
             )
             PListItem(

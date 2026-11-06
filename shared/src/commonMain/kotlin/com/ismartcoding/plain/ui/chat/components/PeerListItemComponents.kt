@@ -30,8 +30,7 @@ internal fun PeerIconWithStatus(
 ) {
     Box(
         modifier = Modifier
-            .size(48.dp)
-            .background(MaterialTheme.colorScheme.surfaceContainer, CircleShape),
+            .size(48.dp),
         contentAlignment = Alignment.Center
     ) {
         Icon(

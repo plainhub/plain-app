@@ -179,4 +179,9 @@
     <string name="saved_to_x">%1$s-এ সংরক্ষিত</string>
     <string name="confirm_unpair_device">%1$s-এর সাথে পেয়ারিং বাতিল করবেন? চ্যাটের ইতিহাস মুছে ফেললে এই ডিভাইসটিও চ্যাট তালিকা থেকে সরে যাবে এবং এটি আর ফিরিয়ে আনা যাবে না।</string>
     <string name="delete_chat_history">চ্যাটের ইতিহাস মুছুন</string>
+    <string name="nearby_my_devices">আমার ডিভাইস</string>
+    <string name="nearby_current_device">বর্তমান ডিভাইস</string>
+    <string name="nearby_switch_device">পরিবর্তন</string>
+    <string name="pair_full_control">সম্পূর্ণ নিয়ন্ত্রণ</string>
+    <string name="nearby_enable_remote_access">অন্য ডিভাইসে রিমোট অ্যাক্সেস চালু করুন</string>
 </resources>

@@ -2,9 +2,8 @@ package com.ismartcoding.plain.features.nearby
 
 import kotlinx.serialization.Serializable
 
-@Serializable(with = PairingPhaseSerializer::class)
+@Serializable
 enum class PairingPhase {
-    UNKNOWN,
     STARTING,
     PASSWORD_REQUIRED,
     AUTHENTICATING,

@@ -179,4 +179,9 @@
     <string name="saved_to_x">Сохранено в %1$s</string>
     <string name="confirm_unpair_device">Отменить сопряжение с %1$s? Удаление истории чата также удалит это устройство из списка чатов. Это действие нельзя отменить.</string>
     <string name="delete_chat_history">Удалить историю чата</string>
+    <string name="nearby_my_devices">Мои устройства</string>
+    <string name="nearby_current_device">Текущее устройство</string>
+    <string name="nearby_switch_device">Переключить</string>
+    <string name="pair_full_control">Полный контроль</string>
+    <string name="nearby_enable_remote_access">Включите удалённый доступ на другом устройстве</string>
 </resources>

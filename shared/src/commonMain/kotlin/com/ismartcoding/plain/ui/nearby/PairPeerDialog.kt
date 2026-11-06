@@ -9,7 +9,7 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import com.ismartcoding.plain.ui.base.PTextButton
-import com.ismartcoding.plain.ui.base.PFilledButton
+import com.ismartcoding.plain.ui.base.POutlinedButton
 import com.ismartcoding.plain.ui.base.PDialogRadioRow
 import com.ismartcoding.plain.ui.theme.dialogSheetBackground
 import androidx.compose.ui.Modifier
@@ -28,16 +28,36 @@ import com.ismartcoding.plain.ui.components.TextFieldDialog
 import com.ismartcoding.plain.ui.components.ToastManager
 
 @Composable
-fun PairPeerDialog(device: NearbyDevice, onDismiss: () -> Unit) {
+fun PairPeerDialog(device: NearbyDevice, initialMode: PairingMode? = null, onDismiss: () -> Unit) {
     val scope = rememberCoroutineScope()
     val failureText = stringResource(Res.string.pairing_failed)
-    var mode by remember { mutableStateOf(PairingMode.MANAGE) }
+    val directMode = initialMode ?: if (device.remoteAccess == true) null else PairingMode.CHAT
+    var mode by remember { mutableStateOf(directMode ?: PairingMode.MANAGE) }
     var generation by remember { mutableStateOf<String?>(null) }
     var submitting by remember { mutableStateOf(false) }
     var disposed by remember { mutableStateOf(false) }
     var error by remember { mutableStateOf<String?>(null) }
     val state = generation?.let { NearbyViewModel.pairingStates[it] }
     val phase = state?.phase
+    fun startPairing() {
+        submitting = true
+        error = null
+        scope.launch {
+            try {
+                withContext(NonCancellable) {
+                    if (generation == null) {
+                        val result = RustPairingRuntime.start(device, mode)
+                        val value = result.generation
+                        generation = value
+                        if (disposed) RustPairingRuntime.cancelGeneration(value)
+                    }
+                }
+            } catch (cancelled: CancellationException) { throw cancelled }
+            catch (_: Exception) { error = failureText }
+            finally { submitting = false }
+        }
+    }
+    LaunchedEffect(Unit) { if (directMode != null) startPairing() }
     DisposableEffect(Unit) {
         onDispose {
             disposed = true
@@ -85,9 +105,9 @@ fun PairPeerDialog(device: NearbyDevice, onDismiss: () -> Unit) {
                     state?.verificationCode?.takeIf { it.isNotEmpty() }?.let { code ->
                         RequestVerificationCodeCard(code, stringResource(Res.string.pairing_compare_code))
                     }
-                } else Column(Modifier.selectableGroup(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                } else if (directMode == null) Column(Modifier.selectableGroup(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     listOf(
-                        PairingMode.MANAGE to Res.string.pair_manage_device,
+                        PairingMode.MANAGE to Res.string.pair_full_control,
                         PairingMode.CHAT to Res.string.pair_chat_only,
                     ).forEach { (value, label) ->
                         PDialogRadioRow(
@@ -102,26 +122,11 @@ fun PairPeerDialog(device: NearbyDevice, onDismiss: () -> Unit) {
             }
         },
         confirmButton = {
-            if (!waiting) PFilledButton(
+            if (!waiting) POutlinedButton(
                 text = stringResource(Res.string.pair),
                 isLoading = submitting,
                 onClick = {
-                    submitting = true
-                    error = null
-                    scope.launch {
-                        try {
-                            withContext(NonCancellable) {
-                                if (generation == null) {
-                                    val result = RustPairingRuntime.start(device, mode)
-                                    val value = result.generation
-                                    generation = value
-                                    if (disposed) RustPairingRuntime.cancelGeneration(value)
-                                }
-                            }
-                        } catch (cancelled: CancellationException) { throw cancelled }
-                        catch (_: Exception) { error = failureText }
-                        finally { submitting = false }
-                    }
+                    startPairing()
                 },
             )
         },

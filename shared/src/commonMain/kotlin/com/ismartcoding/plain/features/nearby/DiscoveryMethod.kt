@@ -2,11 +2,10 @@ package com.ismartcoding.plain.features.nearby
 
 import kotlinx.serialization.Serializable
 
-@Serializable(with = DiscoveryMethodSerializer::class)
+@Serializable
 enum class DiscoveryMethod {
     LAN,
     DNS_SD,
     BLE,
     QR,
-    UNKNOWN,
 }

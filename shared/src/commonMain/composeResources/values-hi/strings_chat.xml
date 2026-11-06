@@ -179,4 +179,9 @@
     <string name="saved_to_x">%1$s में सहेजा गया</string>
     <string name="confirm_unpair_device">%1$s के साथ पेयरिंग हटाएँ? चैट इतिहास हटाने से यह डिवाइस चैट सूची से भी हट जाएगा और इसे वापस नहीं लाया जा सकता।</string>
     <string name="delete_chat_history">चैट इतिहास हटाएँ</string>
+    <string name="nearby_my_devices">मेरे डिवाइस</string>
+    <string name="nearby_current_device">वर्तमान डिवाइस</string>
+    <string name="nearby_switch_device">बदलें</string>
+    <string name="pair_full_control">पूर्ण नियंत्रण</string>
+    <string name="nearby_enable_remote_access">दूसरे डिवाइस पर रिमोट एक्सेस चालू करें</string>
 </resources>

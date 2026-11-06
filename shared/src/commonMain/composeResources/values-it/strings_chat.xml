@@ -179,4 +179,9 @@
     <string name="saved_to_x">Salvato in %1$s</string>
     <string name="confirm_unpair_device">Annullare l’abbinamento con %1$s? Eliminare la cronologia chat rimuove anche questo dispositivo dall’elenco delle chat e non può essere annullato.</string>
     <string name="delete_chat_history">Elimina cronologia chat</string>
+    <string name="nearby_my_devices">I miei dispositivi</string>
+    <string name="nearby_current_device">Dispositivo attuale</string>
+    <string name="nearby_switch_device">Cambia</string>
+    <string name="pair_full_control">Controllo completo</string>
+    <string name="nearby_enable_remote_access">Attiva l’accesso remoto sull’altro dispositivo</string>
 </resources>

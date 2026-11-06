@@ -179,4 +179,9 @@
     <string name="saved_to_x">Salvo em %1$s</string>
     <string name="confirm_unpair_device">Desemparelhar %1$s? Excluir o histórico de conversas também remove este dispositivo da lista de conversas e não pode ser desfeito.</string>
     <string name="delete_chat_history">Excluir histórico de conversas</string>
+    <string name="nearby_my_devices">Meus dispositivos</string>
+    <string name="nearby_current_device">Dispositivo atual</string>
+    <string name="nearby_switch_device">Alternar</string>
+    <string name="pair_full_control">Controle total</string>
+    <string name="nearby_enable_remote_access">Ative o acesso remoto no outro dispositivo</string>
 </resources>

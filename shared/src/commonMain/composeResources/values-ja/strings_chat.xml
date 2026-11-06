@@ -179,4 +179,9 @@
     <string name="saved_to_x">%1$s に保存しました</string>
     <string name="confirm_unpair_device">%1$s とのペアリングを解除しますか？チャット履歴を削除すると、このデバイスもチャット一覧から削除されます。この操作は取り消せません。</string>
     <string name="delete_chat_history">チャット履歴を削除</string>
+    <string name="nearby_my_devices">自分のデバイス</string>
+    <string name="nearby_current_device">現在のデバイス</string>
+    <string name="nearby_switch_device">切り替え</string>
+    <string name="pair_full_control">完全なコントロール</string>
+    <string name="nearby_enable_remote_access">相手のデバイスでリモートアクセスを有効にしてください</string>
 </resources>

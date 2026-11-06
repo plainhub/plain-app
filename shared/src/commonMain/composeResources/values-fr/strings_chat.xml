@@ -179,4 +179,9 @@
     <string name="saved_to_x">Enregistré dans %1$s</string>
     <string name="confirm_unpair_device">Dissocier %1$s ? La suppression de l’historique retire aussi cet appareil de la liste des discussions et est irréversible.</string>
     <string name="delete_chat_history">Supprimer l’historique des discussions</string>
+    <string name="nearby_my_devices">Mes appareils</string>
+    <string name="nearby_current_device">Appareil actuel</string>
+    <string name="nearby_switch_device">Changer</string>
+    <string name="pair_full_control">Contrôle total</string>
+    <string name="nearby_enable_remote_access">Activez l’accès à distance sur l’autre appareil</string>
 </resources>

@@ -36,7 +36,7 @@ object PairingProjection {
         val generation = state.generation
         val previous = NearbyViewModel.pairingStates[generation]?.phase
         val next = state.phase
-        if (previous != null && next != PairingPhase.UNKNOWN && previous.ordinal > next.ordinal) return
+        if (previous != null && previous.ordinal > next.ordinal) return
         NearbyViewModel.pairingStates[generation] = state
         val active = NearbyViewModel.pairingStates.values.firstOrNull {
             it.deviceId == id && it.phase !in terminalPhases

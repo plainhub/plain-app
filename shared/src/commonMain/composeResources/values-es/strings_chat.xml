@@ -179,4 +179,9 @@
     <string name="saved_to_x">Guardado en %1$s</string>
     <string name="confirm_unpair_device">¿Desvincular %1$s? Eliminar el historial de chat también elimina este dispositivo de la lista de chats y no se puede deshacer.</string>
     <string name="delete_chat_history">Eliminar historial de chat</string>
+    <string name="nearby_my_devices">Mis dispositivos</string>
+    <string name="nearby_current_device">Dispositivo actual</string>
+    <string name="nearby_switch_device">Cambiar</string>
+    <string name="pair_full_control">Control total</string>
+    <string name="nearby_enable_remote_access">Activa el acceso remoto en el otro dispositivo</string>
 </resources>

@@ -1,5 +1,8 @@
 package com.ismartcoding.plain.models
 
+import com.ismartcoding.plain.features.sessions.SessionType
+import com.ismartcoding.plain.features.images.search.ImageSearchStatusType
+import com.ismartcoding.plain.features.feeds.FeedWorkerStatus
 import com.ismartcoding.plain.features.nearby.DiscoveryMethod
 import com.ismartcoding.plain.features.nearby.MdnsPacketDirection
 import com.ismartcoding.plain.features.nearby.MdnsSnapshot
@@ -16,6 +19,8 @@ import com.ismartcoding.plain.platform.system.DataType
 import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.jsonObject
 import kotlin.test.Test
+import kotlinx.serialization.SerializationException
+import kotlin.test.assertFailsWith
 import kotlin.test.assertEquals
 
 class ClientContractModelsTest {
@@ -40,12 +45,42 @@ class ClientContractModelsTest {
     }
 
     @Test
-    fun unknown_nearby_metadata_preserves_the_existing_display_behavior() {
-        val device = JsonHelper.jsonDecode<NearbyDevice>(
-            """{"id":"device","name":"Device","port":8080,"deviceType":"FUTURE_DEVICE","version":"1","platform":"platform","lastSeen":"2026-01-01T00:00:00Z","status":"UNPAIRED","discoveryMethods":["FUTURE_METHOD"]}""",
+    fun nearby_discovery_methods_reject_unknown_values() {
+        assertFailsWith<SerializationException> {
+            JsonHelper.jsonDecode<NearbyDevice>(
+                """{"id":"device","name":"Device","port":8080,"deviceType":"OTHER","version":"1","platform":"platform","lastSeen":"2026-01-01T00:00:00Z","status":"UNPAIRED","discoveryMethods":["FUTURE_METHOD"]}""",
+            )
+        }
+    }
+
+    @Test
+    fun nearby_device_types_use_the_enum_contract() {
+        val payload = """{"id":"device","name":"Device","port":8080,"deviceType":"%s","version":"1","platform":"platform","lastSeen":"2026-01-01T00:00:00Z","status":"UNPAIRED"}"""
+        for (type in DeviceType.entries) {
+            val device = JsonHelper.jsonDecode<NearbyDevice>(payload.replace("%s", type.name))
+            assertEquals(type, device.deviceType)
+            assertEquals(device, JsonHelper.jsonDecode<NearbyDevice>(JsonHelper.jsonEncode(device)))
+        }
+        assertFailsWith<SerializationException> {
+            JsonHelper.jsonDecode<NearbyDevice>(payload.replace("%s", "FUTURE_DEVICE"))
+        }
+    }
+
+    @Test
+    fun fixed_enum_values_reject_unknown_names() {
+        val unknown = "\"FUTURE_VALUE\""
+        assertFailsWith<SerializationException> { JsonHelper.jsonDecode<PeerStatus>(unknown) }
+        assertFailsWith<SerializationException> { JsonHelper.jsonDecode<DiscoveryMethod>(unknown) }
+        assertFailsWith<SerializationException> { JsonHelper.jsonDecode<PairingPhase>(unknown) }
+        assertFailsWith<SerializationException> { JsonHelper.jsonDecode<MdnsPacketDirection>(unknown) }
+        assertFailsWith<SerializationException> { JsonHelper.jsonDecode<SessionType>(unknown) }
+        assertFailsWith<SerializationException> { JsonHelper.jsonDecode<ImageSearchStatusType>(unknown) }
+        assertFailsWith<SerializationException> { JsonHelper.jsonDecode<FeedWorkerStatus>(unknown) }
+        assertEquals(listOf("LAN", "DNS_SD", "BLE", "QR"), DiscoveryMethod.entries.map { it.name })
+        assertEquals(
+            listOf("STARTING", "PASSWORD_REQUIRED", "AUTHENTICATING", "PAIRING", "WAITING_CONFIRMATION", "COMMITTING", "SUCCEEDED", "FAILED", "CANCELLED"),
+            PairingPhase.entries.map { it.name },
         )
-        assertEquals(DeviceType.OTHER, device.deviceType)
-        assertEquals(listOf(DiscoveryMethod.UNKNOWN), device.discoveryMethods)
     }
 
     @Test
@@ -87,11 +122,11 @@ class ClientContractModelsTest {
     @Test
     fun mdns_snapshots_preserve_addresses_packet_directions_and_large_revisions() {
         val snapshot = JsonHelper.jsonDecode<MdnsSnapshot>(
-            """{"runtimeId":"runtime","revision":3000000123,"running":true,"scanning":false,"services":[{"serviceType":"service","instanceName":"instance","instanceFqdn":"instance.local","hostname":"host.local","port":8080,"txtRecords":[],"ips":["ipv4"],"ipv6":["ipv6"],"complete":true}],"packetsIn":[],"packetsOut":[{"time":3000000123,"direction":"OUT","srcIp":"source","srcPort":5353,"dstIp":"destination","dstPort":5353,"size":64,"summary":"summary","detail":"detail"}]}""",
+            """{"runtimeId":"runtime","revision":3000000123,"running":true,"scanning":false,"services":[{"serviceType":"service","instanceName":"instance","instanceFqdn":"instance.local","hostname":"host.local","port":8080,"txtRecords":[],"ips":["ipv4"],"ip6s":["ipv6"],"complete":true}],"packetsIn":[],"packetsOut":[{"time":3000000123,"direction":"OUT","srcIp":"source","srcPort":5353,"dstIp":"destination","dstPort":5353,"size":64,"summary":"summary","detail":"detail"}]}""",
         )
         assertEquals(3_000_000_123, snapshot.revision)
         assertEquals(listOf("ipv4"), snapshot.services.single().ips)
-        assertEquals(listOf("ipv6"), snapshot.services.single().ipv6)
+        assertEquals(listOf("ipv6"), snapshot.services.single().ip6s)
         assertEquals(MdnsPacketDirection.OUT, snapshot.packetsOut.single().direction)
         assertEquals(snapshot, JsonHelper.jsonDecode<MdnsSnapshot>(JsonHelper.jsonEncode(snapshot)))
     }

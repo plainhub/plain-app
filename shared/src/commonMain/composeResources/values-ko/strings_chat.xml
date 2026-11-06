@@ -179,4 +179,9 @@
     <string name="saved_to_x">%1$s에 저장됨</string>
     <string name="confirm_unpair_device">%1$s의 페어링을 해제하시겠습니까? 채팅 기록을 삭제하면 이 기기도 채팅 목록에서 제거되며 되돌릴 수 없습니다.</string>
     <string name="delete_chat_history">채팅 기록 삭제</string>
+    <string name="nearby_my_devices">내 기기</string>
+    <string name="nearby_current_device">현재 기기</string>
+    <string name="nearby_switch_device">전환</string>
+    <string name="pair_full_control">전체 제어</string>
+    <string name="nearby_enable_remote_access">상대 기기에서 원격 액세스를 켜세요</string>
 </resources>

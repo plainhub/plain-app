@@ -177,7 +177,6 @@
     <string name="no_finished_downloads">暂无已完成的下载</string>
     <string name="saved_n_of_m">已保存 %1$d/%2$d 项</string>
     <string name="saved_to_x">已保存到 %1$s</string>
-    <string name="pair_manage_device">可管理</string>
     <string name="pair_chat_only">仅聊天</string>
     <string name="peer_manage_access">可管理</string>
     <string name="remote_management">远程管理</string>
@@ -190,4 +189,9 @@
     <string name="pairing_failed">配对失败</string>
     <string name="confirm_unpair_device">要与 %1$s 解除配对吗？删除聊天记录也会将此设备从聊天列表中移除，此操作无法撤销。</string>
     <string name="delete_chat_history">删除聊天记录</string>
+    <string name="nearby_my_devices">我的设备</string>
+    <string name="nearby_current_device">当前设备</string>
+    <string name="nearby_switch_device">切换</string>
+    <string name="pair_full_control">完全控制</string>
+    <string name="nearby_enable_remote_access">请在对方设备开启远程访问</string>
 </resources>

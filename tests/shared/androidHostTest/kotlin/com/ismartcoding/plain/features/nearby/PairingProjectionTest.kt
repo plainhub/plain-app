@@ -6,6 +6,8 @@ import kotlinx.coroutines.runBlocking
 import com.ismartcoding.plain.lib.JsonHelper
 import kotlin.test.AfterTest
 import kotlin.test.Test
+import kotlin.test.assertFailsWith
+import kotlinx.serialization.SerializationException
 import kotlin.test.assertEquals
 
 class PairingProjectionTest {
@@ -29,12 +31,14 @@ class PairingProjectionTest {
     }
 
     @Test
-    fun unknownPhasesRemainPendingAndOlderSnapshotsCannotRegressKnownProgress() {
+    fun unknownPhasesAreRejectedAndOlderSnapshotsCannotRegressKnownProgress() {
         PairingProjection.applyState(state("first", "COMMITTING"))
         PairingProjection.applyState(state("first", "STARTING"))
         assertEquals(PairingPhase.COMMITTING, NearbyViewModel.pairingStates["first"]?.phase)
-        PairingProjection.applyState(state("other", "FUTURE_PHASE"))
-        assertEquals(PairingPhase.UNKNOWN, NearbyViewModel.pairingStates["other"]?.phase)
+        assertFailsWith<SerializationException> {
+            state("other", "FUTURE_PHASE")
+        }
+        assertEquals(null, NearbyViewModel.pairingStates["other"])
         assertEquals(NearbyItemStatus.PAIRING, NearbyViewModel.itemStatus["peer"])
     }
     @Test

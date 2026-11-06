@@ -30,11 +30,9 @@ internal fun DeviceTopAppBar(
     val info = state?.client?.state?.collectAsState()?.value
     val deviceName = if (selectedDevice == null) localName.ifEmpty { getDeviceName() }
         else info?.deviceName ?: LocalPeerViewModel.current.peersMap.collectAsState().value[selectedDevice.peerId]?.name.orEmpty()
-    var showDevices by remember { mutableStateOf(false) }
-    if (showDevices) DeviceSelectionSheet(navController, onDismiss = { showDevices = false })
     PTopAppBar(
         title = deviceName,
-        onTitleClick = { showDevices = true },
+        onTitleClick = { navController.navigate(Routing.Nearby) { launchSingleTop = true } },
         titleTrailing = {
             Icon(
                 painterResource(UiRes.drawable.ui_drawable_chevron_down),

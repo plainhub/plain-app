@@ -52,7 +52,10 @@ object NearbyViewModel {
         scope.launchSafe(onDone = {
             itemStatus.remove(deviceId)
         }) {
-            if (deleteChats) PeerManager.deletePeer(deviceId) else PeerManager.markUnpaired(deviceId)
+            val removed = if (deleteChats) PeerManager.deletePeer(deviceId) else PeerManager.markUnpaired(deviceId)
+            if (removed && com.ismartcoding.plain.ui.app.MainViewModel.selectedDevice.value?.peerId == deviceId) {
+                com.ismartcoding.plain.ui.app.MainViewModel.selectDevice(null)
+            }
         }
     }
 

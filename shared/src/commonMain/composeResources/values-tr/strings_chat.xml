@@ -179,4 +179,9 @@
     <string name="saved_to_x">%1$s konumuna kaydedildi</string>
     <string name="confirm_unpair_device">%1$s ile eşleştirme kaldırılsın mı? Sohbet geçmişini silmek bu cihazı sohbet listesinden de kaldırır ve geri alınamaz.</string>
     <string name="delete_chat_history">Sohbet geçmişini sil</string>
+    <string name="nearby_my_devices">Cihazlarım</string>
+    <string name="nearby_current_device">Geçerli cihaz</string>
+    <string name="nearby_switch_device">Değiştir</string>
+    <string name="pair_full_control">Tam kontrol</string>
+    <string name="nearby_enable_remote_access">Diğer cihazda uzaktan erişimi etkinleştirin</string>
 </resources>
