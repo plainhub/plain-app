@@ -30,7 +30,6 @@ import com.ismartcoding.plain.i18n.more_info
 import com.ismartcoding.plain.i18n.rotate
 import com.ismartcoding.plain.i18n.save
 import com.ismartcoding.plain.lib.extensions.getFilenameFromPath
-import com.ismartcoding.plain.platform.media.canSavePreviewMedia
 import com.ismartcoding.plain.platform.media.savePreviewMedia
 import com.ismartcoding.plain.ui.components.ControlChipIconButton
 import com.ismartcoding.plain.ui.base.HorizontalSpace
@@ -71,7 +70,7 @@ fun ImagePreviewActions(
                     }
                 }
             }
-            if (canSavePreviewMedia(m.source) && m.data !is MediaImage && m.data !is FileEntry) {
+            if (m.data !is MediaImage && m.data !is FileEntry) {
                 HorizontalSpace(dp = 20.dp)
                 ControlChipIconButton(icon = UiRes.drawable.ui_drawable_save, contentDescription = stringResource(Res.string.save)) {
                     showSaveSheet = true

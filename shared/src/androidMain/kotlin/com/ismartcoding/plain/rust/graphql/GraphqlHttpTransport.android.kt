@@ -35,34 +35,36 @@ internal val peerHttpClient: OkHttpClient by lazy {
         .build()
 }
 
-internal actual fun createGraphqlHttpTransport(): GraphqlHttpTransport {
-    return object : GraphqlHttpTransport {
-        override suspend fun post(url: String, clientId: String, body: ByteArray, contentType: String, tlsCertificateSha256: String?): GraphqlHttpResponse = suspendCancellableCoroutine { continuation ->
-            val request = Request.Builder().url(url).header("c-id", clientId)
-                .post(body.toRequestBody(contentType.toMediaType())).build()
-            val client = if (tlsCertificateSha256 == null) peerHttpClient else {
-                createPeerResourceHttpClient(com.ismartcoding.plain.models.ManagedResource(url, tlsCertificateSha256))
-                    .newBuilder().callTimeout(30, TimeUnit.SECONDS).build()
-            }
-            val call = client.newCall(request)
-            continuation.invokeOnCancellation { call.cancel() }
-            call.enqueue(object : Callback {
-                override fun onFailure(call: Call, e: IOException) {
-                    if (continuation.isActive) continuation.resumeWithException(e)
-                }
-                override fun onResponse(call: Call, response: Response) {
-                    try {
-                        val result = response.use {
-                            val source = it.body.source()
-                            check(!source.request(32L * 1024 * 1024 + 1)) { "GraphQL response exceeds 32 MiB" }
-                            GraphqlHttpResponse(it.code, source.readByteArray())
-                        }
-                        if (continuation.isActive) continuation.resume(result)
-                    } catch (error: Exception) {
-                        if (continuation.isActive) continuation.resumeWithException(error)
-                    }
-                }
-            })
-        }
+internal actual fun createGraphqlHttpTransport(): GraphqlHttpTransport = object : GraphqlHttpTransport {
+    override suspend fun post(url: String, clientId: String, body: ByteArray, contentType: String, tlsCertificateSha256: String?): GraphqlHttpResponse =
+        executeHttpRequest(Request.Builder().url(url).header("c-id", clientId).post(body.toRequestBody(contentType.toMediaType())).build(), tlsCertificateSha256)
+}
+
+internal actual suspend fun readHttpResource(resource: com.ismartcoding.plain.models.ManagedResource): GraphqlHttpResponse =
+    executeHttpRequest(Request.Builder().url(resource.url).get().build(), resource.tlsCertificateSha256)
+
+private suspend fun executeHttpRequest(request: Request, tlsCertificateSha256: String?): GraphqlHttpResponse = suspendCancellableCoroutine { continuation ->
+    val client = if (tlsCertificateSha256 == null) peerHttpClient else {
+        createPeerResourceHttpClient(com.ismartcoding.plain.models.ManagedResource(request.url.toString(), tlsCertificateSha256))
+            .newBuilder().callTimeout(30, TimeUnit.SECONDS).build()
     }
+    val call = client.newCall(request)
+    continuation.invokeOnCancellation { call.cancel() }
+    call.enqueue(object : Callback {
+        override fun onFailure(call: Call, e: IOException) {
+            if (continuation.isActive) continuation.resumeWithException(e)
+        }
+        override fun onResponse(call: Call, response: Response) {
+            try {
+                val result = response.use {
+                    val source = it.body.source()
+                    check(!source.request(32L * 1024 * 1024 + 1)) { "HTTP response exceeds 32 MiB" }
+                    GraphqlHttpResponse(it.code, source.readByteArray())
+                }
+                if (continuation.isActive) continuation.resume(result)
+            } catch (error: Exception) {
+                if (continuation.isActive) continuation.resumeWithException(error)
+            }
+        }
+    })
 }

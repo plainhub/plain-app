@@ -2,15 +2,9 @@ package com.ismartcoding.plain.platform.system
 
 enum class Capability {
     ADB,
-    DIRECTORY_ACCESS,
     BLE,
     WIFI_AWARE,
-    BACKGROUND_SERVICE,
-    SOUND_METER,
 
-    FILE_EXPORT,
-    FILE_REVEAL,
-    FILE_CLIPBOARD,
     APP_RELAUNCH,
     MEDIA_TRASH,
     MEDIA_DELETE,
@@ -21,16 +15,13 @@ enum class Capability {
     APP_UPDATES,
 
     MIRROR_AUDIO,
-    DOC_PREVIEW,
-    IMAGE_SEARCH,
     MEDIA_SCAN,
     TELEPHONY,
     PACKAGES,
     SCREEN_MIRROR,
-    IMAGE_EDITOR,
     NOTIFICATIONS,
     CLIPBOARD,
-    LAN_SHARE,
+    SMB_SERVER,
     DISK_MANAGER,
 }
 

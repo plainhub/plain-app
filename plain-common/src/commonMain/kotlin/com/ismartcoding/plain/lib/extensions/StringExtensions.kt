@@ -57,6 +57,8 @@ fun String.isTextFile(): Boolean {
     return list.contains(getFilenameExtension())
 }
 
+fun String.isOfficeFile() = getFilenameExtension().lowercase() in setOf("doc", "docx", "xls", "xlsx", "ppt", "pptx")
+
 fun String.isPdfFile() = getFilenameExtension().equals("pdf", true)
 
 fun String.isZipFile() = getFilenameExtension().equals("zip", true)

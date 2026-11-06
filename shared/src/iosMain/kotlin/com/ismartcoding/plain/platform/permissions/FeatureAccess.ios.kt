@@ -9,6 +9,8 @@ import kotlinx.coroutines.flow.onSubscription
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.first
 
+actual val supportsDirectorySelection: Boolean = true
+
 actual fun AccessFeature.systemPermissions(): Set<Permission> = when (this) {
     AccessFeature.FILES -> setOf(Permission.WRITE_EXTERNAL_STORAGE)
     AccessFeature.IMAGES, AccessFeature.VIDEOS -> if (grantedStorageDirectories().isEmpty()) setOf(Permission.READ_MEDIA_IMAGES) else emptySet()

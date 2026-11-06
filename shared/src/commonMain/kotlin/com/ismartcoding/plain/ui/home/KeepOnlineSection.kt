@@ -16,8 +16,7 @@ import androidx.compose.ui.unit.dp
 import com.ismartcoding.plain.HttpServerManager
 import com.ismartcoding.plain.features.settings.ServiceState
 import com.ismartcoding.plain.i18n.*
-import com.ismartcoding.plain.platform.system.Capability
-import com.ismartcoding.plain.platform.system.getDeviceCapabilities
+import com.ismartcoding.plain.platform.system.supportsBackgroundService
 import com.ismartcoding.plain.ui.base.AlertType
 import com.ismartcoding.plain.ui.base.PAlert
 import com.ismartcoding.plain.ui.base.PExpandableSection
@@ -37,7 +36,6 @@ fun PlainAppServiceSection(
     onRetry: (() -> Unit)?,
     onStayOnline: () -> Unit,
 ) {
-    val supportsBackgroundService = Capability.BACKGROUND_SERVICE in getDeviceCapabilities()
     Column {
         if (supportsBackgroundService) {
             PListItem(

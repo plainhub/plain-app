@@ -2,6 +2,8 @@ package com.ismartcoding.plain.platform.permissions
 
 import com.ismartcoding.plain.features.web.AccessFeature
 
+expect val supportsDirectorySelection: Boolean
+
 expect fun AccessFeature.systemPermissions(): Set<Permission>
 fun AccessFeature.isGranted(): Boolean = systemPermissions().all { it.isGranted() }
 

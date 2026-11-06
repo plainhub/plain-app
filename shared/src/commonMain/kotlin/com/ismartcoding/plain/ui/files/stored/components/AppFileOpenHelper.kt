@@ -9,6 +9,7 @@ import com.ismartcoding.plain.lib.coMain
 import com.ismartcoding.plain.lib.extensions.isAudioFast
 import com.ismartcoding.plain.lib.extensions.isImageFast
 import com.ismartcoding.plain.lib.extensions.isPdfFile
+import com.ismartcoding.plain.lib.extensions.isOfficeFile
 import com.ismartcoding.plain.lib.extensions.isTextFile
 import com.ismartcoding.plain.lib.extensions.isVideoFast
 import com.ismartcoding.plain.lib.withIO
@@ -82,7 +83,7 @@ fun openAppFile(
             }
         }
 
-        fileName.isTextFile() -> {
+        fileName.isTextFile() || fileName.isOfficeFile() -> {
             navController.navigateTextFile(path, fileName)
         }
 

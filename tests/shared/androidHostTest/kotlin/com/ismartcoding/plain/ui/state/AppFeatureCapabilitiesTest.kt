@@ -20,14 +20,17 @@ class AppFeatureCapabilitiesTest {
     }
 
     @Test
-    fun optionalDistributionAndToolEntriesUseTheirOwnCapabilities() {
-        for ((feature, capability) in listOf(
-            AppFeatureType.CHECK_UPDATES to Capability.APP_UPDATES,
-            AppFeatureType.SOUND_METER to Capability.SOUND_METER,
-        )) {
-            assertFalse(feature.has(emptyList()))
-            assertTrue(feature.has(listOf(capability)))
-            assertFalse(feature.has(Capability.entries.filter { it != capability }))
+    fun optionalDistributionEntriesUseTheirOwnCapabilities() {
+        assertFalse(AppFeatureType.CHECK_UPDATES.has(emptyList()))
+        assertTrue(AppFeatureType.CHECK_UPDATES.has(listOf(Capability.APP_UPDATES)))
+        assertFalse(AppFeatureType.CHECK_UPDATES.has(Capability.entries.filter { it != Capability.APP_UPDATES }))
+    }
+
+    @Test
+    fun imageEditorVisibilityFollowsDebugInsteadOfDeviceCapabilities() {
+        for (capabilities in listOf(emptyList(), Capability.entries)) {
+            assertTrue(AppFeatureType.IMAGE_EDITOR.has(capabilities, debug = true))
+            assertFalse(AppFeatureType.IMAGE_EDITOR.has(capabilities, debug = false))
         }
     }
 
@@ -35,7 +38,7 @@ class AppFeatureCapabilitiesTest {
     fun baseFileAndMediaEntriesAreAvailableWithoutCapabilities() {
         for (feature in listOf(
             AppFeatureType.FILES, AppFeatureType.IMAGES, AppFeatureType.VIDEOS,
-            AppFeatureType.AUDIO, AppFeatureType.DOCS,
+            AppFeatureType.AUDIO, AppFeatureType.DOCS, AppFeatureType.SOUND_METER,
         )) {
             assertTrue(feature.has(emptyList()))
         }

@@ -4,7 +4,6 @@ import com.ismartcoding.plain.features.files.FilesClient
 
 import com.ismartcoding.plain.platform.files.deleteFileAt
 import com.ismartcoding.plain.platform.files.saveFileToDownloads
-import com.ismartcoding.plain.platform.system.Capability
 import com.ismartcoding.plain.ui.i18n.LocaleHelper
 import com.ismartcoding.plain.rust.graphql.ContentSource
 
@@ -20,10 +19,7 @@ import com.ismartcoding.plain.ui.media.viewer.PreviewItem
 import com.ismartcoding.plain.ui.components.DialogHelper
 import kotlinx.coroutines.CancellationException
 
-fun canSavePreviewMedia(source: ContentSource): Boolean = Capability.FILE_EXPORT in source.capabilities
-
 suspend fun savePreviewMedia(m: PreviewItem, dir: String?) {
-    check(canSavePreviewMedia(m.source)) { "Unsupported capability FILE_EXPORT" }
     val name = (m.data as? MessageFile)?.fileName?.takeIf { it.isNotEmpty() }
         ?: m.path.getFilenameFromPath()
     if (m.source is ContentSource.Remote) {

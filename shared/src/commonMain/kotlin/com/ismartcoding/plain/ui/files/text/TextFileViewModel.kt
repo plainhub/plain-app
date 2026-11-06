@@ -33,6 +33,8 @@ class TextFileViewModel internal constructor(
                 source.files.writeChunks(path, chunks).also { if (it) cachedPath = source.fileForOpen(path) }
             } else filesWriteByteChunksStreaming(path, chunks)
     })
+    val documentPreview = mutableStateOf<String?>(null)
+    val documentError = mutableStateOf("")
     val showMoreActions = mutableStateOf(false)
     val file = mutableStateOf<FileEntry?>(null)
     val isExternalFile = mutableStateOf(false)
@@ -45,6 +47,18 @@ class TextFileViewModel internal constructor(
             controller.wrapContent.value = Prefs.editorWrapContent.value
             controller.fontSizeSp.value = Prefs.editorFontSize.value
             controller.statusBarVisible.value = Prefs.editorStatusBar.value
+        }
+    }
+
+    suspend fun loadDocumentAsync(path: String) {
+        documentPreview.value = null
+        documentError.value = ""
+        try {
+            documentPreview.value = com.ismartcoding.plain.features.files.DocumentPreviewClient.read(source, path)
+        } catch (cancelled: kotlinx.coroutines.CancellationException) {
+            throw cancelled
+        } catch (error: Exception) {
+            documentError.value = error.message ?: error.toString()
         }
     }
 

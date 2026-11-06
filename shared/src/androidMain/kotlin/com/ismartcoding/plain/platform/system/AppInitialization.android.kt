@@ -12,6 +12,8 @@ import com.ismartcoding.plain.ui.components.DialogHelper
 import java.io.File
 import kotlin.system.exitProcess
 
+internal actual val supportsBackgroundService: Boolean = true
+
 internal actual fun initializePlatformApp() {
     MainViewModel.relaunchApp = {
         try {

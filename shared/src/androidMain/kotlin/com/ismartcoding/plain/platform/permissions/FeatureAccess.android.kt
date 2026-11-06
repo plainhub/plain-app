@@ -3,6 +3,8 @@ package com.ismartcoding.plain.platform.permissions
 import com.ismartcoding.plain.features.web.AccessFeature
 import com.ismartcoding.plain.i18n.*
 
+actual val supportsDirectorySelection: Boolean = false
+
 actual fun AccessFeature.systemPermissions(): Set<Permission> = when (this) {
     AccessFeature.FILES -> setOf(Permission.WRITE_EXTERNAL_STORAGE)
     AccessFeature.IMAGES -> setOf(Permission.WRITE_EXTERNAL_STORAGE)

@@ -4,6 +4,8 @@ import com.ismartcoding.plain.ui.navigation.LocalContentSource
 import com.ismartcoding.plain.rust.graphql.ContentSource
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -22,6 +24,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
+import com.ismartcoding.plain.lib.extensions.isOfficeFile
 import com.ismartcoding.plain.lib.extensions.getFilenameFromPath
 import com.ismartcoding.plain.features.files.TextFileType
 import com.ismartcoding.plain.i18n.*
@@ -48,6 +51,7 @@ fun TextFilePage(
     source: ContentSource = LocalContentSource.current,
     textFileVM: TextFileViewModel = viewModel { TextFileViewModel(source) },
 ) {
+    val isDocument = (title.ifEmpty { path.getFilenameFromPath() }).isOfficeFile()
     var isSaving by remember { mutableStateOf(false) }
     // Close affordances in edit mode (X / back) exit edit mode, not the page.
     fun requestClose() {
@@ -70,7 +74,8 @@ fun TextFilePage(
 
     LaunchedEffect(Unit) {
         textFileVM.loadConfigAsync()
-        textFileVM.loadFileAsync(path, mediaId, gotoEnd = type == TextFileType.APP_LOG.name)
+        if (isDocument) textFileVM.loadDocumentAsync(path)
+        else textFileVM.loadFileAsync(path, mediaId, gotoEnd = type == TextFileType.APP_LOG.name)
     }
 
     if (textFileVM.showMoreActions.value) {
@@ -98,6 +103,7 @@ fun TextFilePage(
                 actions = {
                     TextFilePageActions(
                         textFileVM = textFileVM,
+                        documentPreview = isDocument,
                         type = type,
                         path = path,
                         isSaving = isSaving,
@@ -115,7 +121,18 @@ fun TextFilePage(
                     .padding(bottom = paddingValues.calculateBottomPadding())
                     .fillMaxSize(),
             ) {
-                if (loadState is EditorLoadState.Error) {
+                if (isDocument) {
+                    val markdown = textFileVM.documentPreview.value
+                    val error = textFileVM.documentError.value
+                    when {
+                        error.isNotEmpty() -> Text(text = error, modifier = Modifier.align(Alignment.Center).padding(16.dp))
+                        markdown != null -> com.ismartcoding.plain.ui.editor.markdown.MarkdownText(
+                            text = markdown,
+                            modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(16.dp),
+                        )
+                        else -> CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
+                    }
+                } else if (loadState is EditorLoadState.Error) {
                     Text(
                         text = loadState.message,
                         modifier = Modifier.align(Alignment.Center).padding(16.dp),

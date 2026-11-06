@@ -35,12 +35,17 @@ import com.ismartcoding.plain.ui.components.codeeditor.EditorLoadState
 @Composable
 internal fun RowScope.TextFilePageActions(
     textFileVM: TextFileViewModel,
+    documentPreview: Boolean,
     type: String,
     path: String,
     isSaving: Boolean,
     rotation: Float,
     onSavingChanged: (Boolean) -> Unit,
 ) {
+    if (documentPreview) {
+        PIconButton(icon = UiRes.drawable.ui_drawable_share_2, contentDescription = stringResource(Res.string.share)) { textFileVM.share(path) }
+        return
+    }
     val controller = textFileVM.controller
     if (controller.loadState.value !is EditorLoadState.Ready) return
 

@@ -11,7 +11,7 @@ import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 
 internal actual fun createGraphqlHttpTransport(): GraphqlHttpTransport = object : GraphqlHttpTransport {
-    override suspend fun post(url: String, clientId: String, body: ByteArray, contentType: String, tlsCertificateSha256: String?): GraphqlHttpResponse = suspendCancellableCoroutine { continuation ->
+    override suspend fun post(url: String, clientId: String, body: ByteArray, contentType: String, tlsCertificateSha256: String?): GraphqlHttpResponse {
         val request = NSMutableURLRequest.requestWithURL(NSURL(string = url)).apply {
             HTTPMethod = "POST"
             HTTPBody = body.toNSData()
@@ -19,59 +19,68 @@ internal actual fun createGraphqlHttpTransport(): GraphqlHttpTransport = object 
             setValue(contentType, forHTTPHeaderField = "Content-Type")
             setValue(clientId, forHTTPHeaderField = "c-id")
         }
-        val chunks = mutableListOf<ByteArray>()
-        var length = 0
-        var status = 0
-        val delegate = object : NSObject(), NSURLSessionDataDelegateProtocol {
-            override fun URLSession(session: NSURLSession, dataTask: NSURLSessionDataTask, didReceiveResponse: NSURLResponse, completionHandler: (NSURLSessionResponseDisposition) -> Unit) {
-                status = (didReceiveResponse as NSHTTPURLResponse).statusCode.toInt()
-                completionHandler(NSURLSessionResponseAllow)
-            }
-            override fun URLSession(session: NSURLSession, dataTask: NSURLSessionDataTask, didReceiveData: NSData) {
-                if (length.toLong() + didReceiveData.length.toLong() > 32L * 1024 * 1024) {
-                    if (continuation.isActive) continuation.resumeWithException(IllegalStateException("GraphQL response exceeds 32 MiB"))
-                    session.invalidateAndCancel()
-                } else {
-                    val bytes = didReceiveData.toByteArray()
-                    chunks.add(bytes)
-                    length += bytes.size
-                }
-            }
-            override fun URLSession(session: NSURLSession, task: NSURLSessionTask, didCompleteWithError: NSError?) {
-                if (continuation.isActive) {
-                    if (didCompleteWithError != null) continuation.resumeWithException(IllegalStateException(didCompleteWithError.localizedDescription))
-                    else {
-                        val bytes = ByteArray(length)
-                        var offset = 0
-                        chunks.forEach { it.copyInto(bytes, offset); offset += it.size }
-                        continuation.resume(GraphqlHttpResponse(status, bytes))
-                    }
-                }
-                session.finishTasksAndInvalidate()
-            }
-            override fun URLSession(session: NSURLSession, task: NSURLSessionTask, didReceiveChallenge: NSURLAuthenticationChallenge, completionHandler: (NSURLSessionAuthChallengeDisposition, NSURLCredential?) -> Unit) {
-                if (tlsCertificateSha256 != null) {
-                    val credential = peerResourceCredential(didReceiveChallenge, request.URL?.host, tlsCertificateSha256)
-                    if (credential == null) completionHandler(NSURLSessionAuthChallengeCancelAuthenticationChallenge, null)
-                    else completionHandler(NSURLSessionAuthChallengeUseCredential, credential)
-                    return
-                }
-                val trust = didReceiveChallenge.protectionSpace.serverTrust
-                if (didReceiveChallenge.protectionSpace.authenticationMethod == NSURLAuthenticationMethodServerTrust && trust != null && didReceiveChallenge.protectionSpace.host == request.URL?.host) {
-                    completionHandler(NSURLSessionAuthChallengeUseCredential, NSURLCredential.credentialForTrust(trust))
-                } else completionHandler(NSURLSessionAuthChallengePerformDefaultHandling, null)
-            }
-            override fun URLSession(session: NSURLSession, task: NSURLSessionTask, willPerformHTTPRedirection: NSHTTPURLResponse, newRequest: NSURLRequest, completionHandler: (NSURLRequest?) -> Unit) {
-                completionHandler(null)
-            }
-        }
-        val configuration = NSURLSessionConfiguration.ephemeralSessionConfiguration.apply {
-            HTTPCookieStorage = null
-            URLCache = null
-        }
-        val session = NSURLSession.sessionWithConfiguration(configuration, delegate, null)
-        val task = session.dataTaskWithRequest(request)
-        continuation.invokeOnCancellation { session.invalidateAndCancel() }
-        task.resume()
+        return executeHttpRequest(request, tlsCertificateSha256)
     }
+}
+
+internal actual suspend fun readHttpResource(resource: com.ismartcoding.plain.models.ManagedResource): GraphqlHttpResponse {
+    val request = NSMutableURLRequest.requestWithURL(NSURL(string = resource.url)).apply { setTimeoutInterval(30.0) }
+    return executeHttpRequest(request, resource.tlsCertificateSha256)
+}
+
+private suspend fun executeHttpRequest(request: NSURLRequest, tlsCertificateSha256: String?): GraphqlHttpResponse = suspendCancellableCoroutine { continuation ->
+    val chunks = mutableListOf<ByteArray>()
+    var length = 0
+    var status = 0
+    val delegate = object : NSObject(), NSURLSessionDataDelegateProtocol {
+        override fun URLSession(session: NSURLSession, dataTask: NSURLSessionDataTask, didReceiveResponse: NSURLResponse, completionHandler: (NSURLSessionResponseDisposition) -> Unit) {
+            status = (didReceiveResponse as NSHTTPURLResponse).statusCode.toInt()
+            completionHandler(NSURLSessionResponseAllow)
+        }
+        override fun URLSession(session: NSURLSession, dataTask: NSURLSessionDataTask, didReceiveData: NSData) {
+            if (length.toLong() + didReceiveData.length.toLong() > 32L * 1024 * 1024) {
+                if (continuation.isActive) continuation.resumeWithException(IllegalStateException("HTTP response exceeds 32 MiB"))
+                session.invalidateAndCancel()
+            } else {
+                val bytes = didReceiveData.toByteArray()
+                chunks.add(bytes)
+                length += bytes.size
+            }
+        }
+        override fun URLSession(session: NSURLSession, task: NSURLSessionTask, didCompleteWithError: NSError?) {
+            if (continuation.isActive) {
+                if (didCompleteWithError != null) continuation.resumeWithException(IllegalStateException(didCompleteWithError.localizedDescription))
+                else {
+                    val bytes = ByteArray(length)
+                    var offset = 0
+                    chunks.forEach { it.copyInto(bytes, offset); offset += it.size }
+                    continuation.resume(GraphqlHttpResponse(status, bytes))
+                }
+            }
+            session.finishTasksAndInvalidate()
+        }
+        override fun URLSession(session: NSURLSession, task: NSURLSessionTask, didReceiveChallenge: NSURLAuthenticationChallenge, completionHandler: (NSURLSessionAuthChallengeDisposition, NSURLCredential?) -> Unit) {
+            if (tlsCertificateSha256 != null) {
+                val credential = peerResourceCredential(didReceiveChallenge, request.URL?.host, tlsCertificateSha256)
+                if (credential == null) completionHandler(NSURLSessionAuthChallengeCancelAuthenticationChallenge, null)
+                else completionHandler(NSURLSessionAuthChallengeUseCredential, credential)
+                return
+            }
+            val trust = didReceiveChallenge.protectionSpace.serverTrust
+            if (didReceiveChallenge.protectionSpace.authenticationMethod == NSURLAuthenticationMethodServerTrust && trust != null && didReceiveChallenge.protectionSpace.host == request.URL?.host) {
+                completionHandler(NSURLSessionAuthChallengeUseCredential, NSURLCredential.credentialForTrust(trust))
+            } else completionHandler(NSURLSessionAuthChallengePerformDefaultHandling, null)
+        }
+        override fun URLSession(session: NSURLSession, task: NSURLSessionTask, willPerformHTTPRedirection: NSHTTPURLResponse, newRequest: NSURLRequest, completionHandler: (NSURLRequest?) -> Unit) {
+            completionHandler(null)
+        }
+    }
+    val configuration = NSURLSessionConfiguration.ephemeralSessionConfiguration.apply {
+        HTTPCookieStorage = null
+        URLCache = null
+    }
+    val session = NSURLSession.sessionWithConfiguration(configuration, delegate, null)
+    val task = session.dataTaskWithRequest(request)
+    continuation.invokeOnCancellation { session.invalidateAndCancel() }
+    task.resume()
 }

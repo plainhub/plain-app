@@ -19,6 +19,8 @@ internal interface GraphqlHttpTransport {
     suspend fun post(url: String, clientId: String, body: ByteArray, contentType: String = "application/octet-stream", tlsCertificateSha256: String? = null): GraphqlHttpResponse
 }
 
+internal expect suspend fun readHttpResource(resource: com.ismartcoding.plain.models.ManagedResource): GraphqlHttpResponse
+
 internal expect fun createGraphqlHttpTransport(): GraphqlHttpTransport
 
 internal class PeerHttpClient(

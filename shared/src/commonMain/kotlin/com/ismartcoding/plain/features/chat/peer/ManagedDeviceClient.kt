@@ -1,5 +1,6 @@
 package com.ismartcoding.plain.features.chat.peer
 
+import com.ismartcoding.plain.features.files.FileAction
 import com.ismartcoding.plain.features.notes.NotesApi
 import com.ismartcoding.plain.graphql.Mutation
 import com.ismartcoding.plain.graphql.Query
@@ -97,17 +98,17 @@ internal class ManagedDeviceClient private constructor(
         }
     }
 
-    suspend fun resource(path: String, size: ResourceSize? = null): com.ismartcoding.plain.models.ManagedResource {
+    suspend fun resource(path: String, size: ResourceSize? = null, action: FileAction = FileAction.PREVIEW): com.ismartcoding.plain.models.ManagedResource {
         val info = currentInfo
         val current = http.current()
         val fileId = http.encryptResourceReference(info.urlToken, path)
         val base = current.address?.baseUrl ?: error("peer_address_unavailable")
-        val url = managedResourceUrl(base, fileId, size)
+        val url = managedResourceUrl(base, fileId, size, action)
         return com.ismartcoding.plain.models.ManagedResource(url, checkNotNull(info.tlsCertificateSha256) { "peer_https_unavailable" })
     }
 
     suspend fun downloadFile(path: String, name: String): String {
-        val request = resource(path)
+        val request = resource(path, action = FileAction.DOWNLOAD)
         val downloaded = com.ismartcoding.plain.features.files.RemoteFiles.download(request.url, name, request.tlsCertificateSha256)
         val latest = GraphqlApi.execute(Query.peers()).find { it.id == peer.id }
         check(latest?.isPaired() == true && latest.publicKey == peer.publicKey && latest.token == peer.token) { "peer_identity_changed" }
@@ -115,8 +116,9 @@ internal class ManagedDeviceClient private constructor(
     }
 }
 
-internal fun managedResourceUrl(base: String, fileId: String, size: ResourceSize?): String =
+internal fun managedResourceUrl(base: String, fileId: String, size: ResourceSize?, action: FileAction = FileAction.PREVIEW): String =
     URLBuilder(base.trimEnd('/') + "/fs").apply {
         parameters.append("id", fileId)
-        size?.let { parameters.append("s", it.queryValue) }
+        parameters.append("action", action.queryValue)
+        size?.let { parameters.append("size", it.queryValue) }
     }.buildString()

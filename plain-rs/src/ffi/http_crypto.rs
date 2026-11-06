@@ -17,22 +17,13 @@ fn encrypt(token: &str, payload: &str) -> String {
 }
 
 fn reference(token: &str, payload: &str) -> String {
-    let result = (|| -> Result<String, String> {
-        let input: serde_json::Value = serde_json::from_str(payload).map_err(|e| e.to_string())?;
-        let client_id = input["clientId"]
-            .as_str()
-            .ok_or("Missing resource client")?;
-        let path = input["path"].as_str().ok_or("Missing resource path")?;
-        plain_rs::features::files::resource_link::seal(
-            &plain_rs::features::files::resource_link::Scope::Session(client_id.into()),
-            &plain_libs::utils::base64::base64_decode(token),
-            &plain_rs::features::files::resource_link::Resource::reference(path),
-        )
-        .map_err(|e| e.to_string())
-    })();
+    let result = plain_rs::features::files::resource_link::seal_reference(
+        &plain_libs::utils::base64::base64_decode(token),
+        payload,
+    );
     match result {
         Ok(value) => serde_json::json!({"value":value}).to_string(),
-        Err(error) => serde_json::json!({"error":error}).to_string(),
+        Err(error) => serde_json::json!({"error":error.to_string()}).to_string(),
     }
 }
 
