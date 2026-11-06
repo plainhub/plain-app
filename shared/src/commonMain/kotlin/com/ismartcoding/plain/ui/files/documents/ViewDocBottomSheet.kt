@@ -25,7 +25,6 @@ import com.ismartcoding.plain.lib.extensions.getFilenameWithoutExtensionFromPath
 import com.ismartcoding.plain.lib.extensions.getMimeType
 import com.ismartcoding.plain.ui.app.MainViewModel
 import com.ismartcoding.plain.platform.system.Capability
-import com.ismartcoding.plain.platform.system.getDeviceCapabilities
 import com.ismartcoding.plain.platform.system.formatDateTime
 import com.ismartcoding.plain.ui.media.fileIconData
 import com.ismartcoding.plain.platform.system.openFileExternal
@@ -73,16 +72,16 @@ fun ViewDocBottomSheet(
 ) {
     val scope = rememberCoroutineScope()
     var showAddToHomeDialog by remember { mutableStateOf(false) }
-    val canAddToHome = docsVM.source is com.ismartcoding.plain.rust.graphql.ContentSource.Local && Capability.LAUNCHER_SHORTCUTS in getDeviceCapabilities()
+    val addMediaShortcut = if (docsVM.source is com.ismartcoding.plain.rust.graphql.ContentSource.Local) MainViewModel.addMediaShortcut else null
     val m = docsVM.selectedItem.value ?: return
     val onDismiss = {
         docsVM.selectedItem.value = null
     }
 
-    if (showAddToHomeDialog && canAddToHome) {
+    if (showAddToHomeDialog && addMediaShortcut != null) {
         AddToHomeDialog(
             defaultLabel = remember(m.path) { m.path.getFilenameWithoutExtensionFromPath() },
-            onAddToHome = { label -> MainViewModel.addMediaShortcut(m.path, label) },
+            onAddToHome = { label -> addMediaShortcut(m.path, label) },
             onDismiss = {
                 showAddToHomeDialog = false
                 onDismiss()
@@ -169,7 +168,7 @@ fun ViewDocBottomSheet(
                     VerticalSpace(12.dp)
                     PCard(modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN)) {
                         Column {
-                            if (canAddToHome) {
+                            if (addMediaShortcut != null) {
                                 PSheetActionRow(
                                     title = stringResource(Res.string.add_to_home),
                                     start = {

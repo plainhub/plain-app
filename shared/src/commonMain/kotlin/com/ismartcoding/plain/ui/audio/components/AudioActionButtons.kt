@@ -20,7 +20,6 @@ import com.ismartcoding.plain.i18n.*
 import com.ismartcoding.plain.lib.withIO
 import com.ismartcoding.plain.ui.app.MainViewModel
 import com.ismartcoding.plain.platform.system.Capability
-import com.ismartcoding.plain.platform.system.getDeviceCapabilities
 import com.ismartcoding.plain.platform.media.getMediaItemUriString
 import com.ismartcoding.plain.platform.system.openFileExternal
 import com.ismartcoding.plain.platform.system.shareFiles
@@ -65,7 +64,7 @@ internal fun AudioActionButtons(
 ) {
     val scope = rememberCoroutineScope()
     var showAddToHomeDialog by remember { mutableStateOf(false) }
-    val canAddToHome = audioVM.source is com.ismartcoding.plain.rust.graphql.ContentSource.Local && Capability.LAUNCHER_SHORTCUTS in getDeviceCapabilities()
+    val addMediaShortcut = if (audioVM.source is com.ismartcoding.plain.rust.graphql.ContentSource.Local) MainViewModel.addMediaShortcut else null
     PCard(modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN)) {
         PSheetHeader(
             thumbnail = {
@@ -136,7 +135,7 @@ internal fun AudioActionButtons(
                     }
                 }
                 if (!audioVM.trash.value && !m.path.isUrl()) {
-                    if (canAddToHome) {
+                    if (addMediaShortcut != null) {
                         PSheetActionRow(UiRes.drawable.ui_drawable_smartphone, stringResource(Res.string.add_to_home), trailing = { AddToHomeHelpAction() }) {
                             showAddToHomeDialog = true
                         }
@@ -148,10 +147,10 @@ internal fun AudioActionButtons(
             }
         }
     }
-    if (showAddToHomeDialog && canAddToHome) {
+    if (showAddToHomeDialog && addMediaShortcut != null) {
         AddToHomeDialog(
             defaultLabel = remember(m.path) { m.path.getFilenameWithoutExtensionFromPath() },
-            onAddToHome = { label -> MainViewModel.addMediaShortcut(m.path, label) },
+            onAddToHome = { label -> addMediaShortcut(m.path, label) },
             onDismiss = {
                 showAddToHomeDialog = false
                 onDismiss()

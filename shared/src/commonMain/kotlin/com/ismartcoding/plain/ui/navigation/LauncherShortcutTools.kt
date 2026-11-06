@@ -24,6 +24,18 @@ object LauncherShortcutTools {
     )
     const val MAX_SELECTED = 4
 
+    fun route(type: AppFeatureType): Any = when (type) {
+        AppFeatureType.NOTES -> Routing.Notes
+        AppFeatureType.DOCS -> Routing.Docs
+        AppFeatureType.FEEDS -> Routing.FeedEntries("")
+        AppFeatureType.POMODORO_TIMER -> Routing.PomodoroTimer
+        AppFeatureType.IMAGES -> Routing.Images
+        AppFeatureType.VIDEOS -> Routing.Videos
+        AppFeatureType.AUDIO -> Routing.Audio
+        AppFeatureType.FILES -> Routing.Files()
+        else -> error("Unsupported launcher shortcut: $type")
+    }
+
     fun featureItem(type: AppFeatureType): FeatureItem = when (type) {
         AppFeatureType.NOTES -> FeatureItem(type, Res.string.notes, UiRes.drawable.ui_drawable_notebook_pen) {}
         AppFeatureType.DOCS -> FeatureItem(type, Res.string.docs, UiRes.drawable.ui_drawable_file_text) {}

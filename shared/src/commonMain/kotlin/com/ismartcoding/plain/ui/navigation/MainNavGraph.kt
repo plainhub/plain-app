@@ -68,6 +68,7 @@ import com.ismartcoding.plain.platform.files.fileToUriString
 import com.ismartcoding.plain.ui.settings.UpdateViewModel
 import com.ismartcoding.plain.ui.state.launchSafe
 import com.ismartcoding.plain.ui.tags.TagsViewModel
+import com.ismartcoding.plain.ui.tools.LauncherShortcutsPage
 import com.ismartcoding.plain.ui.tools.SoundMeterPage
 
 private class DeviceNavigationStore(initialDevice: DeviceIdentity?) : ViewModel(), ViewModelStoreOwner {
@@ -162,6 +163,9 @@ fun MainNavGraph(
                     popExitTransition = { navPopExitTransition(PRESENTED_ROUTES) },
                 ) {
                     platformPages?.invoke(this, navController)
+                    if (selectedDevice == null) composable<Routing.LauncherShortcuts> {
+                        LauncherShortcutsPage(navController)
+                    }
                     addDeviceContentRoutes(navController, audioQueueVM, peerVM, channelVM, noteTagsVM, source)
                     addMainSettingsPages(navController, updateVM, peerVM, batterySettings)
                     composable<Routing.Home> { owner ->

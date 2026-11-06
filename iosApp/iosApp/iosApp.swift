@@ -11,6 +11,7 @@ import Network
 
 @main
 struct PlainApp: SwiftUI.App {
+    @UIApplicationDelegateAdaptor(ShortcutAppDelegate.self) private var appDelegate
     private let backgroundScheduler = BackgroundScheduler()
     private let networkInfo = NetworkInfoProvider()
     private let permissionChecker = PermissionChecker()
@@ -54,6 +55,38 @@ struct PlainApp: SwiftUI.App {
         }
     }
 }
+final class ShortcutAppDelegate: NSObject, UIApplicationDelegate {
+    func application(
+        _ application: UIApplication,
+        configurationForConnecting connectingSceneSession: UISceneSession,
+        options: UIScene.ConnectionOptions
+    ) -> UISceneConfiguration {
+        let configuration = connectingSceneSession.configuration
+        configuration.delegateClass = ShortcutSceneDelegate.self
+        return configuration
+    }
+}
+
+final class ShortcutSceneDelegate: NSObject, UIWindowSceneDelegate {
+    func scene(
+        _ scene: UIScene,
+        willConnectTo session: UISceneSession,
+        options connectionOptions: UIScene.ConnectionOptions
+    ) {
+        if let shortcut = connectionOptions.shortcutItem {
+            _ = LauncherShortcuts.shared.open(type: shortcut.type)
+        }
+    }
+
+    func windowScene(
+        _ windowScene: UIWindowScene,
+        performActionFor shortcutItem: UIApplicationShortcutItem,
+        completionHandler: @escaping (Bool) -> Void
+    ) {
+        completionHandler(LauncherShortcuts.shared.open(type: shortcutItem.type))
+    }
+}
+
 final class NotificationDelegate: NSObject, UNUserNotificationCenterDelegate {
     func userNotificationCenter(
         _ center: UNUserNotificationCenter,

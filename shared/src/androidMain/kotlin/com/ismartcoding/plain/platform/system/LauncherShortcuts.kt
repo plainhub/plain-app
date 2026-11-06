@@ -11,7 +11,7 @@ private val mainActivityClass: Class<*> by lazy {
     Class.forName("com.ismartcoding.plain.MainActivity")
 }
 
-fun publishLauncherShortcuts(tools: List<AppFeatureType>) {
+internal actual suspend fun publishLauncherShortcuts(tools: List<AppFeatureType>) {
     val context = appContext
     val shortcuts = tools.map { type ->
         // Resource names (drawable shortcut_*, string shortcut_*) are the

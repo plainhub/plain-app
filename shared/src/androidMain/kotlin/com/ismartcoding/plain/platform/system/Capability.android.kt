@@ -13,7 +13,6 @@ actual fun getDeviceCapabilities(): List<Capability> = Capability.entries.filter
         Capability.BLE -> isBluetoothSupported()
         Capability.WIFI_AWARE -> isWifiAwareSupported
         Capability.BACKGROUND_SERVICE,
-        Capability.LAUNCHER_SHORTCUTS,
         Capability.SOUND_METER -> true
         Capability.BACKGROUND_TIMER -> isAppForegrounded()
         Capability.BACKGROUND_WAKE -> true

@@ -10,10 +10,17 @@ import com.ismartcoding.plain.ui.app.MainViewModel
 
 @Composable
 internal fun MainRequestNavigation(navController: NavHostController) {
+    val launcherShortcut by MainViewModel.pendingLauncherShortcut
     val loginRequest by MainViewModel.pendingLoginRequest
     val pairingRequest by MainViewModel.pendingPairingRequest
     val channelInvite by MainViewModel.pendingChannelInvite
     com.ismartcoding.plain.ui.web.WebAccessRequestDialog()
+
+    LaunchedEffect(navController, launcherShortcut) {
+        val type = launcherShortcut ?: return@LaunchedEffect
+        navController.navigate(LauncherShortcutTools.route(type)) { launchSingleTop = true }
+        MainViewModel.pendingLauncherShortcut.value = null
+    }
 
     LaunchedEffect(loginRequest) {
         if (loginRequest == null) {

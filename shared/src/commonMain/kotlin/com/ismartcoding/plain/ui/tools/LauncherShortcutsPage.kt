@@ -33,7 +33,6 @@ import com.ismartcoding.plain.ui.components.reorderable.rememberReorderableLazyL
 import com.ismartcoding.plain.ui.media.extensions.collectAsStateValue
 import com.ismartcoding.plain.ui.components.DialogHelper
 import com.ismartcoding.plain.ui.navigation.LauncherShortcutTools
-import com.ismartcoding.plain.platform.system.publishLauncherShortcuts
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -49,7 +48,6 @@ fun LauncherShortcutsPage(navController: NavHostController) {
 
     val stored = Prefs.launcherShortcuts.collectAsStateValue()
 
-    // Selected list order = shortcut display order (rank).
     var selected by remember(stored) {
         mutableStateOf(Prefs.selectedLauncherShortcuts(stored))
     }
@@ -58,7 +56,6 @@ fun LauncherShortcutsPage(navController: NavHostController) {
         selected = newTools
         scope.launch(Dispatchers.Default) {
             Prefs.set(PrefKeys.LAUNCHER_SHORTCUTS, Prefs.formatLauncherShortcuts(newTools))
-            publishLauncherShortcuts(newTools)
         }
     }
 

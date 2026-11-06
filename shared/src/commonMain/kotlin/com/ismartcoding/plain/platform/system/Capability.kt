@@ -6,7 +6,6 @@ enum class Capability {
     BLE,
     WIFI_AWARE,
     BACKGROUND_SERVICE,
-    LAUNCHER_SHORTCUTS,
     SOUND_METER,
 
     BACKGROUND_TIMER,

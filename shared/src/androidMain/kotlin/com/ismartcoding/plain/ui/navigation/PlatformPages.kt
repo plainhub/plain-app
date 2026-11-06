@@ -8,7 +8,6 @@ import com.ismartcoding.plain.platform.system.Capability
 import com.ismartcoding.plain.platform.system.getDeviceCapabilities
 import com.ismartcoding.plain.platform.system.has
 import com.ismartcoding.plain.ui.settings.WifiAwareDebugPage
-import com.ismartcoding.plain.ui.tools.LauncherShortcutsPage
 import com.ismartcoding.plain.ui.web.NotificationSettingsPage
 
 internal fun NavGraphBuilder.addPlatformPages(navController: NavHostController) {
@@ -18,8 +17,5 @@ internal fun NavGraphBuilder.addPlatformPages(navController: NavHostController) 
     val capabilities = getDeviceCapabilities()
     if (Capability.WIFI_AWARE in capabilities) {
         composable<Routing.WifiAwareDebug> { WifiAwareDebugPage(navController) }
-    }
-    if (Capability.LAUNCHER_SHORTCUTS in capabilities) {
-        composable<Routing.LauncherShortcuts> { LauncherShortcutsPage(navController) }
     }
 }

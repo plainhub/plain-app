@@ -1,5 +1,6 @@
 package com.ismartcoding.plain.ui.app
 
+import com.ismartcoding.plain.platform.system.AppFeatureType
 import com.ismartcoding.plain.models.PairingRequestNotice
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -31,8 +32,17 @@ object MainViewModel {
         internal set
     lateinit var installAppUpdate: (String) -> Unit
         internal set
-    lateinit var addMediaShortcut: (String, String) -> Unit
+    var addMediaShortcut: ((String, String) -> Unit)? = null
         internal set
+
+    internal val pendingLauncherShortcut = mutableStateOf<AppFeatureType?>(null)
+
+    internal fun openLauncherShortcut(type: AppFeatureType) {
+        selectDevice(null)
+        pendingSearchHit.value = null
+        currentRootTab.intValue = 2
+        pendingLauncherShortcut.value = type
+    }
 
     val shortcutMediaPath = mutableStateOf<String?>(null)
     val currentRootTab = mutableIntStateOf(1)

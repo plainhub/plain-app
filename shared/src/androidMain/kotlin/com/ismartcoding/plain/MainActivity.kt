@@ -18,7 +18,6 @@ import androidx.core.content.ContextCompat
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsControllerCompat
-import androidx.lifecycle.lifecycleScope
 import com.ismartcoding.plain.platform.isTPlus
 import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.features.files.ExportFileType
@@ -32,7 +31,6 @@ import com.ismartcoding.plain.platform.permissions.Permission
 import com.ismartcoding.plain.ui.permissions.Permissions
 import com.ismartcoding.plain.features.bluetooth.client.BluetoothPermission
 import com.ismartcoding.plain.platform.permissions.isGranted
-import com.ismartcoding.plain.platform.system.publishLauncherShortcuts
 import com.ismartcoding.plain.receivers.NetworkStateReceiver
 import com.ismartcoding.plain.services.PlainAccessibilityService
 import com.ismartcoding.plain.services.ScreenMirrorService
@@ -42,8 +40,6 @@ import com.ismartcoding.plain.ui.chat.ChannelViewModel
 import com.ismartcoding.plain.ui.chat.PeerViewModel
 import com.ismartcoding.plain.ui.pomodoro.PomodoroViewModel
 import com.ismartcoding.plain.lib.sendEvent
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import java.lang.ref.WeakReference
 import android.Manifest
 import com.ismartcoding.plain.platform.system.BackgroundExecution
@@ -157,9 +153,6 @@ class MainActivity : AppCompatActivity() {
             registerReceiver(networkStateReceiver, IntentFilter(WifiManager.NETWORK_STATE_CHANGED_ACTION))
         }
         installComposeUi()
-        lifecycleScope.launch(Dispatchers.Default) {
-            publishLauncherShortcuts(Prefs.selectedLauncherShortcuts(Prefs.launcherShortcuts.value))
-        }
     }
 
     override fun onDestroy() {
