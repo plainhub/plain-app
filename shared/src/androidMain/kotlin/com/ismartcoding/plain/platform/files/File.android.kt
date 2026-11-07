@@ -20,6 +20,7 @@ import com.ismartcoding.plain.ui.media.thumbnail.DecodeLimiter
 import com.ismartcoding.plain.lib.DecodePolicy
 import java.io.ByteArrayOutputStream
 import java.io.File
+import java.net.URI
 import android.graphics.ImageDecoder
 import android.os.Environment
 import com.ismartcoding.plain.helpers.PathHelper
@@ -59,6 +60,8 @@ actual suspend fun saveFileToDownloads(path: String, fileName: String): String =
 }
 
 actual fun fileToUriString(path: String): String = File(path).toUri().toString()
+
+internal actual fun fileUriPath(uri: String): String = requireNotNull(URI(uri).path) { "Invalid file URI" }
 
 
 actual fun fileExists(path: String): Boolean = File(path).exists()

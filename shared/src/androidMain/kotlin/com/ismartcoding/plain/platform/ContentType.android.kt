@@ -9,5 +9,5 @@ actual fun getContentTypeForPath(path: String): String? {
     if (path.startsWith("content://")) return appContext.contentResolver.getType(Uri.parse(path))
     val file = File(path)
     if (!file.exists()) return null
-    return file.name.getContentType().toString()
+    return file.name.getContentType()
 }

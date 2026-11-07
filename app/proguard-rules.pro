@@ -17,8 +17,7 @@
 # otherwise the stack traces are pretty useless
 
 # ===== R8 missing rules (classes not available on Android) =====
-# JVM-desktop-only classes pulled in transitively. Netty's own rules went
-# away with the Ktor server engine.
+# JVM-desktop-only classes pulled in transitively.
 -dontwarn java.lang.management.**
 -dontwarn javax.naming.ldap.**
 -dontwarn jdk.jfr.**

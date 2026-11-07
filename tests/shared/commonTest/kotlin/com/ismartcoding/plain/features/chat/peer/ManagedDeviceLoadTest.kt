@@ -69,7 +69,7 @@ class ManagedDeviceLoadTest {
         assertTrue(requests.single().query.contains("access"))
         repeat(2) {
             val resource = client.resource("/target.mp3")
-            assertEquals("https://device.test:8443/fs?id=encrypted-resource", resource.url)
+            assertEquals("https://device.test:8443/fs?id=encrypted-resource&action=preview", resource.url)
             assertEquals("fixture-certificate", resource.tlsCertificateSha256)
         }
         assertEquals(1, requests.size, "Resources reuse the authenticated entry metadata")

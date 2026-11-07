@@ -2,18 +2,11 @@
 
 package com.ismartcoding.plain.platform.system
 
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.IO
-
 import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.lib.toByteArray
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.cancel
+import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.trySendBlocking
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.suspendCancellableCoroutine
 import platform.Foundation.NSURLAuthenticationChallenge
 import platform.Foundation.NSURLCredential
 import platform.Foundation.NSURLSessionAuthChallengePerformDefaultHandling
@@ -39,11 +32,6 @@ import platform.Foundation.create
 import platform.Foundation.setHTTPMethod
 import platform.Foundation.setAllHTTPHeaderFields
 import platform.darwin.NSObject
-import io.ktor.utils.io.ByteChannel
-import io.ktor.utils.io.ByteReadChannel
-import io.ktor.utils.io.close
-import io.ktor.utils.io.writeFully
-import kotlin.coroutines.resume
 import kotlinx.cinterop.BetaInteropApi
 import kotlinx.cinterop.ExperimentalForeignApi
 
@@ -52,7 +40,6 @@ import coil3.network.NetworkHeaders
 import coil3.network.NetworkRequest
 import coil3.network.NetworkResponse
 import coil3.network.NetworkResponseBody
-import io.ktor.utils.io.readAvailable
 import okio.BufferedSink
 import okio.FileSystem
 import okio.Path
@@ -65,10 +52,7 @@ internal class IosImageNetworkClient(private val tlsCertificateSha256: String? =
         val nativeRequest = request.toImageRequest()
         if (tlsCertificateSha256 != null) require(nativeRequest.URL?.scheme == "https") { "Peer resources require HTTPS" }
         val chunks = Channel<ByteArray>(capacity = 8)
-        var status = 0
-        var responseHeaders: Map<String, List<String>> = emptyMap()
-        var headerContinuation: (() -> Unit)? = null
-        var failure: Throwable? = null
+        val response = CompletableDeferred<NetworkResponse>()
 
         val delegate = object : NSObject(), NSURLSessionDataDelegateProtocol {
             override fun URLSession(
@@ -78,9 +62,13 @@ internal class IosImageNetworkClient(private val tlsCertificateSha256: String? =
                 completionHandler: (NSURLSessionResponseDisposition) -> Unit,
             ) {
                 val http = didReceiveResponse as? NSHTTPURLResponse
-                status = http?.statusCode?.toInt() ?: 0
-                responseHeaders = headerMap(http)
-                headerContinuation?.invoke()
+                val status = http?.statusCode?.toInt() ?: 0
+                response.complete(NetworkResponse(
+                    code = status,
+                    headers = imageResponseHeaders(http),
+                    body = ImageResponseBody(chunks),
+                    delegate = dataTask,
+                ))
                 completionHandler(NSURLSessionResponseAllow)
             }
 
@@ -103,12 +91,11 @@ internal class IosImageNetworkClient(private val tlsCertificateSha256: String? =
                 didReceiveData: NSData,
             ) {
                 try {
-                    chunks.trySendBlocking(didReceiveData.toByteArray())
+                    if (chunks.trySendBlocking(didReceiveData.toByteArray()).isFailure) dataTask.cancel()
                 } catch (error: Exception) {
-                    failure = error
                     chunks.close(error)
+                    response.completeExceptionally(error)
                     dataTask.cancel()
-                    headerContinuation?.invoke()
                 }
             }
 
@@ -117,17 +104,12 @@ internal class IosImageNetworkClient(private val tlsCertificateSha256: String? =
                 task: NSURLSessionTask,
                 didCompleteWithError: NSError?,
             ) {
-                val error = didCompleteWithError
-                if (error != null) {
-                    val ex = Exception("${error.domain} ${error.code} ${error.localizedDescription}")
-                    failure = failure ?: ex
-                    chunks.close(failure)
-                } else {
-                    chunks.close()
+                val error = didCompleteWithError?.let { Exception("${it.domain} ${it.code} ${it.localizedDescription}") }
+                chunks.close(error)
+                if (!response.isCompleted) {
+                    response.completeExceptionally(error ?: IllegalStateException("Image request completed without a response"))
                 }
-                headerContinuation?.invoke()
             }
-
         }
 
         val session = NSURLSession.sessionWithConfiguration(
@@ -136,61 +118,25 @@ internal class IosImageNetworkClient(private val tlsCertificateSha256: String? =
             delegateQueue = null,
         )
         val task = session.dataTaskWithRequest(nativeRequest)
-        val channel = ByteChannel(autoFlush = true)
-        val scope = CoroutineScope(Dispatchers.IO + SupervisorJob())
-        scope.launch {
-            try {
-                for (chunk in chunks) channel.writeFully(chunk)
-                channel.flush()
-                channel.close()
-            } catch (e: Exception) {
-                channel.close(e)
-            }
-        }
-
-        val released = {
-            chunks.close()
-            channel.cancel(null)
-            scope.cancel()
-            task.cancel()
-            session.invalidateAndCancel()
-        }
-        try {
-            suspendCancellableCoroutine<Unit> { cont ->
-                headerContinuation = { if (cont.isActive) cont.resume(Unit) }
-                task.resume()
-                cont.invokeOnCancellation { task.cancel() }
-            }
-        } catch (e: Exception) {
-            released()
-            throw e
-        }
-        failure?.let { released(); throw it }
-        LogCat.v("HTTP ${request.method} ${request.url} -> $status")
         return try {
-            block(NetworkResponse(
-                code = status,
-                headers = responseHeaders.entries.fold(NetworkHeaders.Builder()) { builder, (name, values) ->
-                    builder.apply { values.forEach { add(name, it) } }
-                }.build(),
-                body = ImageResponseBody(channel),
-                delegate = task,
-            ))
+            task.resume()
+            val result = response.await()
+            LogCat.v("HTTP ${request.method} ${request.url} -> ${result.code}")
+            block(result)
         } finally {
-            released()
+            chunks.cancel()
+            session.invalidateAndCancel()
         }
     }
 }
 
-private fun headerMap(response: NSHTTPURLResponse?): Map<String, List<String>> {
-    if (response == null) return emptyMap()
-    val fields = response.allHeaderFields
-    val out = HashMap<String, List<String>>()
-    fields.forEach { (key, value) ->
+private fun imageResponseHeaders(response: NSHTTPURLResponse?): NetworkHeaders {
+    val headers = NetworkHeaders.Builder()
+    response?.allHeaderFields?.forEach { (key, value) ->
         val name = key as? String ?: return@forEach
-        out[name] = listOf(value as? String ?: value.toString())
+        headers.add(name, value as? String ?: value.toString())
     }
-    return out
+    return headers.build()
 }
 
 private fun NetworkRequest.toImageRequest(): NSMutableURLRequest {
@@ -213,14 +159,9 @@ private fun imageSessionConfiguration(): NSURLSessionConfiguration =
 private const val IMAGE_USER_AGENT =
     "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
 
-private class ImageResponseBody(private val channel: ByteReadChannel) : NetworkResponseBody {
+private class ImageResponseBody(private val chunks: Channel<ByteArray>) : NetworkResponseBody {
     override suspend fun writeTo(sink: BufferedSink) {
-        val buffer = ByteArray(64 * 1024)
-        while (true) {
-            val size = channel.readAvailable(buffer)
-            if (size <= 0) break
-            sink.write(buffer, 0, size)
-        }
+        for (chunk in chunks) sink.write(chunk)
     }
 
     override suspend fun writeTo(fileSystem: FileSystem, path: Path) {
@@ -228,6 +169,6 @@ private class ImageResponseBody(private val channel: ByteReadChannel) : NetworkR
     }
 
     override fun close() {
-        channel.cancel(null)
+        chunks.cancel()
     }
 }

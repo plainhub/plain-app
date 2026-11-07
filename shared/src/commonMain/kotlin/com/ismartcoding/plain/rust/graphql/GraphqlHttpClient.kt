@@ -3,12 +3,12 @@ package com.ismartcoding.plain.rust.graphql
 import com.ismartcoding.plain.Prefs
 import com.ismartcoding.plain.graphql.Query
 import com.ismartcoding.plain.lib.JsonHelper
+import com.ismartcoding.plain.lib.extensions.isUrl
 import com.ismartcoding.plain.models.Peer
 import com.ismartcoding.plain.models.UploadChunkInfo
 import com.ismartcoding.plain.rust.native.RustNativeBindings
 import com.ismartcoding.plain.rust.native.nativeCall
 import kotlinx.coroutines.withTimeoutOrNull
-import io.ktor.http.Url
 import kotlin.io.encoding.Base64
 
 internal class GraphqlHttpException(val status: Int) : IllegalStateException("HTTP $status")
@@ -44,10 +44,10 @@ internal class PeerHttpClient(
     }
 
     private suspend fun post(peer: Peer, endpoint: String, body: ByteArray, contentType: String = "application/octet-stream", tlsCertificateSha256: String? = null): GraphqlHttpResponse {
-        val base = Url(peer.address?.baseUrl ?: error("peer_address_unavailable"))
-        require(base.protocol.name == "https" && base.host.isNotEmpty()) { "Invalid management address" }
+        val base = peer.address?.baseUrl ?: error("peer_address_unavailable")
+        require(base.startsWith("https://", ignoreCase = true) && base.isUrl()) { "Invalid management address" }
         val response = withTimeoutOrNull(30_000) {
-            transport.post(base.toString().trimEnd('/') + endpoint, clientId(), body, contentType, tlsCertificateSha256)
+            transport.post(base.trimEnd('/') + endpoint, clientId(), body, contentType, tlsCertificateSha256)
         } ?: error("connection_timeout")
         when (response.status) {
             401 -> error("unauthorized")

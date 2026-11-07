@@ -41,7 +41,6 @@ kotlin {
             api(libs.kotlinx.coroutines.core)
             api(libs.atomicfu)
             api(libs.kotlinx.serialization.json)
-            api(libs.ktor.http)
             api(libs.runtime)
             api(libs.ui)
             api(libs.foundation)

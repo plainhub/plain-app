@@ -4,6 +4,7 @@ import com.ismartcoding.plain.features.files.FileAction
 import com.ismartcoding.plain.features.notes.NotesApi
 import com.ismartcoding.plain.graphql.Mutation
 import com.ismartcoding.plain.graphql.Query
+import com.ismartcoding.plain.lib.extensions.urlEncode
 import com.ismartcoding.plain.models.ManagedDeviceInfo
 import com.ismartcoding.plain.models.Peer
 import com.ismartcoding.plain.rust.graphql.changes
@@ -15,7 +16,6 @@ import com.ismartcoding.plain.rust.graphql.SubscriptionUpdate
 import com.ismartcoding.plain.rust.graphql.RustGraphqlSubscriptions
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.transform
-import io.ktor.http.URLBuilder
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -117,8 +117,11 @@ internal class ManagedDeviceClient private constructor(
 }
 
 internal fun managedResourceUrl(base: String, fileId: String, size: ResourceSize?, action: FileAction = FileAction.PREVIEW): String =
-    URLBuilder(base.trimEnd('/') + "/fs").apply {
-        parameters.append("id", fileId)
-        parameters.append("action", action.queryValue)
-        size?.let { parameters.append("size", it.queryValue) }
-    }.buildString()
+    buildString {
+        append(base.trimEnd('/'))
+        append("/fs?id=")
+        append(fileId.urlEncode())
+        append("&action=")
+        append(action.queryValue)
+        size?.let { append("&size=").append(it.queryValue) }
+    }

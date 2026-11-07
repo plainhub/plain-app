@@ -29,6 +29,7 @@ import platform.Foundation.NSFileSize
 import platform.Foundation.NSNumber
 import platform.Foundation.NSString
 import platform.Foundation.NSURL
+import platform.Foundation.NSURLComponents
 import platform.Foundation.NSUTF8StringEncoding
 import platform.Foundation.create
 import platform.Foundation.writeToFile
@@ -92,6 +93,8 @@ actual suspend fun copyFileToUri(path: String, uriStr: String): Boolean = withIO
 }
 
 actual fun fileToUriString(path: String): String = path
+
+internal actual fun fileUriPath(uri: String): String = requireNotNull(NSURLComponents.componentsWithString(uri)?.path) { "Invalid file URI" }
 
 
 @OptIn(ExperimentalForeignApi::class)

@@ -1,43 +1,39 @@
 package com.ismartcoding.plain.features.chat.peer
 
-import io.ktor.http.Url
+import com.ismartcoding.plain.features.files.FileAction
 import kotlin.test.Test
 import kotlin.test.assertEquals
-import kotlin.test.assertNull
 
 class ManagedResourceUrlTest {
     @Test
     fun thumbnailUsesNamedSizeAndKeepsOpaqueReference() {
-        val url = Url(managedResourceUrl("https://device.invalid:8443/", "opaque+/=reference", ResourceSize.SM))
-        assertEquals("/fs", url.encodedPath)
-        assertEquals("preview", url.parameters["action"])
-        assertEquals("opaque+/=reference", url.parameters["id"])
-        assertEquals("sm", url.parameters["size"])
-        assertNull(url.parameters["w"])
-        assertNull(url.parameters["h"])
-        assertNull(url.parameters["cc"])
+        assertEquals(
+            "https://[2001:db8::1]:8443/fs?id=opaque%2B%2F%3D%26%25%F0%9F%94%91&action=preview&size=sm",
+            managedResourceUrl("https://[2001:db8::1]:8443/", "opaque+/=&%🔑", ResourceSize.SM),
+        )
     }
 
     @Test
     fun largePreviewUsesNamedSize() {
-        val url = Url(managedResourceUrl("https://device.invalid", "opaque", ResourceSize.LG))
-        assertEquals("lg", url.parameters["size"])
+        assertEquals(
+            "https://device.invalid/fs?id=opaque&action=preview&size=lg",
+            managedResourceUrl("https://device.invalid", "opaque", ResourceSize.LG),
+        )
     }
 
     @Test
     fun downloadsRequestOriginalBytesExplicitly() {
-        val url = Url(managedResourceUrl("https://device.invalid", "opaque", null, com.ismartcoding.plain.features.files.FileAction.DOWNLOAD))
-        assertEquals("download", url.parameters["action"])
-        assertNull(url.parameters["size"])
+        assertEquals(
+            "https://device.invalid/fs?id=opaque&action=download",
+            managedResourceUrl("https://device.invalid", "opaque", null, FileAction.DOWNLOAD),
+        )
     }
 
     @Test
     fun fullResourceDoesNotRequestAThumbnail() {
-        val url = Url(managedResourceUrl("https://device.invalid:8443", "opaque", null))
-        assertEquals("opaque", url.parameters["id"])
-        assertNull(url.parameters["size"])
-        assertNull(url.parameters["w"])
-        assertNull(url.parameters["h"])
-        assertNull(url.parameters["cc"])
+        assertEquals(
+            "https://device.invalid:8443/fs?id=opaque&action=preview",
+            managedResourceUrl("https://device.invalid:8443", "opaque", null),
+        )
     }
 }

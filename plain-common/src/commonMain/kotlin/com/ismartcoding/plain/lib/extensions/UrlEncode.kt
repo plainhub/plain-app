@@ -37,18 +37,17 @@ fun String.urlDecode(): String {
 }
 
 fun String.urlEncode(): String {
+    val bytes = encodeToByteArray()
     return buildString {
-        for (ch in this@urlEncode) {
-            when (ch) {
-                in 'a'..'z', in 'A'..'Z', in '0'..'9', '-', '_', '.', '~' -> append(ch)
+        for (byte in bytes) {
+            val value = byte.toInt() and 0xFF
+            val character = value.toChar()
+            when (character) {
+                in 'a'..'z', in 'A'..'Z', in '0'..'9', '-', '_', '.', '~' -> append(character)
                 else -> {
-                    val bytes = ch.toString().encodeToByteArray()
-                    for (b in bytes) {
-                        append('%')
-                        val hex = (b.toInt() and 0xFF).toString(16).uppercase()
-                        if (hex.length == 1) append('0')
-                        append(hex)
-                    }
+                    append('%')
+                    append("0123456789ABCDEF"[value shr 4])
+                    append("0123456789ABCDEF"[value and 0x0F])
                 }
             }
         }

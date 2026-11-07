@@ -26,6 +26,8 @@ expect suspend fun saveFileToDownloads(path: String, fileName: String): String
  */
 expect fun fileToUriString(path: String): String
 
+internal expect fun fileUriPath(uri: String): String
+
 /**
  * Returns the asset path for the icon representing the given file extension.
  */

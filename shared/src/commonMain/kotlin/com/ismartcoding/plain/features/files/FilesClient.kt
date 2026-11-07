@@ -6,8 +6,7 @@ import com.ismartcoding.plain.graphql.Query
 import com.ismartcoding.plain.models.File as FileEntry
 import com.ismartcoding.plain.rust.graphql.GraphqlClient
 import com.ismartcoding.plain.rust.graphql.GraphqlApi
-import io.ktor.http.Url
-import io.ktor.http.decodeURLPart
+import com.ismartcoding.plain.platform.files.fileUriPath
 import kotlinx.coroutines.CancellationException
 
 object FilesClient : FilesApi(GraphqlApi, RustUploadChunks::replace)
@@ -118,7 +117,7 @@ open class FilesApi internal constructor(
         content: String = "",
         overwrite: Boolean = false,
     ): FileEntry {
-        val target = if (path.startsWith("file://")) Url(path).encodedPath.decodeURLPart() else path
+        val target = if (path.startsWith("file://")) fileUriPath(path) else path
         val operation = Mutation.fileWrite(action, target, content, overwrite)
         return api.execute(operation)
     }

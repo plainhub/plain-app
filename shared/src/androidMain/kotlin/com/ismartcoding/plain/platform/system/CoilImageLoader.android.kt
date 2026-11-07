@@ -39,7 +39,7 @@ import com.ismartcoding.plain.activityManager
 import com.ismartcoding.plain.network.OkHttpClientFactory
 import kotlin.math.roundToInt
 import android.util.Size as AndroidSize
-import kotlinx.io.IOException
+import java.io.IOException
 
 /**
  * A Coil3 [Decoder] that extracts a thumbnail frame from a video file using

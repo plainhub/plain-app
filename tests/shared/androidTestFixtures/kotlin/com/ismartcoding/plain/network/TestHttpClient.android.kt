@@ -1,17 +1,11 @@
 package com.ismartcoding.plain.network
 
-import io.ktor.utils.io.ByteChannel
-import io.ktor.utils.io.ByteReadChannel
-import io.ktor.utils.io.close
-import io.ktor.utils.io.writeFully
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.channels.trySendBlocking
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
+import kotlinx.coroutines.withContext
 import okhttp3.Call
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.OkHttpClient
@@ -23,10 +17,7 @@ import okhttp3.WebSocket
 import okhttp3.WebSocketListener
 import okio.ByteString
 import okio.ByteString.Companion.toByteString
-import java.io.ByteArrayInputStream
-import java.io.InputStream
 import java.util.concurrent.TimeUnit
-import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 import java.io.IOException
 import okhttp3.Callback
@@ -39,13 +30,11 @@ internal class OkHttpTestClient(
         val call = client.newCall(req.toOkHttpRequest())
         val response = call.await()
         val headers = response.headers.toMultimap()
-        val stream = response.body?.byteStream() ?: emptyStream()
-        val channel = stream.toByteReadChannel { response.close() }
         return TestHttpResponse(
             status = HttpStatusCode(response.code),
             url = req.url,
             headers = headers,
-            channel = channel,
+            readBody = { withContext(Dispatchers.IO) { response.body.bytes() } },
             onClose = { response.close() },
         )
     }
@@ -68,7 +57,6 @@ internal class OkHttpTestClient(
     override fun close() {
     }
 
-    private fun emptyStream(): InputStream = ByteArrayInputStream(ByteArray(0))
 }
 
 private suspend fun Call.await(): Response =
@@ -76,7 +64,7 @@ private suspend fun Call.await(): Response =
         enqueue(
             object : Callback {
                 override fun onResponse(call: Call, response: Response) {
-                    if (cont.isActive) cont.resume(response)
+                    cont.resume(response) { _, value, _ -> value.close() }
                 }
 
                 override fun onFailure(call: Call, e: IOException) {
@@ -86,28 +74,6 @@ private suspend fun Call.await(): Response =
         )
         cont.invokeOnCancellation { cancel() }
     }
-
-private fun InputStream.toByteReadChannel(onClose: () -> Unit): ByteReadChannel {
-    val input = this
-    val channel = ByteChannel(autoFlush = true)
-    CoroutineScope(Dispatchers.IO + SupervisorJob()).launch {
-        val buf = ByteArray(STREAM_BUFFER_SIZE)
-        try {
-            while (true) {
-                val n = input.read(buf)
-                if (n <= 0) break
-                channel.writeFully(buf, 0, n)
-            }
-            channel.flush()
-            channel.close()
-        } catch (e: Exception) {
-            channel.close(e)
-        } finally {
-            onClose()
-        }
-    }
-    return channel
-}
 
 internal class OkHttpWsSession(
     client: OkHttpClient,

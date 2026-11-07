@@ -19,7 +19,6 @@ kotlinxDatetimeVersion="0.8.0"
 atomicfu = "0.33.0"
 kotlinxSerializationJsonVersion="1.11.0"
 kotlinxCoroutinesVersion ="1.11.0"
-ktor = "3.6.0"
 lifecycleViewmodelKtxVersion="2.11.0"
 jetbrainsLifecycleViewmodel = "2.11.0"
 jetbrainsMarkdown = "0.7.18"
@@ -114,11 +113,6 @@ kotlinx-coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutine
 kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlinxCoroutinesVersion" }
 kotlinx-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "kotlinxCoroutinesVersion" }
 
-# ktor — data types only (HttpMethod/Cookie, ByteReadChannel streaming).
-# The server stack was vendored under plain-common/lib/ktorserver and has
-# been removed along with the Ktor engine; Rust owns every HTTP route.
-ktor-http = { module = "io.ktor:ktor-http", version.ref = "ktor" }
-ktor-io = { module = "io.ktor:ktor-io", version.ref = "ktor" }
 atomicfu = { module = "org.jetbrains.kotlinx:atomicfu", version.ref = "atomicfu" }
 
 

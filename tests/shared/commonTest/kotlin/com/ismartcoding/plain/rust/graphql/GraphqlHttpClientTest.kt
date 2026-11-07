@@ -58,6 +58,22 @@ class GraphqlHttpClientTest {
     }
 
     @Test
+    fun rejects_management_addresses_without_https_or_a_host() = runTest {
+        for (base in listOf("http://device.test:8443", "https://", "https:///path")) {
+            val original = peer()
+            val peer = original.copy(address = checkNotNull(original.address).copy(baseUrl = base))
+            val client = PeerHttpClient(peer, peers = { listOf(peer) },
+                encrypt = { _, _ -> Base64.encode(byteArrayOf(1)) },
+                transport = object : GraphqlHttpTransport {
+                    override suspend fun post(url: String, clientId: String, body: ByteArray, contentType: String, tlsCertificateSha256: String?): GraphqlHttpResponse =
+                        error("Invalid management addresses must not reach the transport")
+                },
+            )
+            assertFailsWith<IllegalArgumentException> { client.graphql.execute(request) }
+        }
+    }
+
+    @Test
     fun rejects_chat_only_removed_and_changed_credentials_before_network_effects() = runTest {
         val peer = peer()
         val cases = listOf(emptyList(), listOf(peer.copy(token = "")), listOf(peer.copy(status = PeerStatus.UNPAIRED)), listOf(peer.copy(publicKey = "changed")), listOf(peer.copy(token = "changed")))

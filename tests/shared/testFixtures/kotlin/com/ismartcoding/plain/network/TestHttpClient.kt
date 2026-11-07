@@ -1,22 +1,6 @@
 package com.ismartcoding.plain.network
 
-import io.ktor.utils.io.ByteReadChannel
-import io.ktor.utils.io.readAvailable
 import kotlinx.coroutines.channels.ReceiveChannel
-
-internal const val STREAM_BUFFER_SIZE = 64 * 1024
-
-suspend fun ByteReadChannel.copyTo(write: suspend (buffer: ByteArray, length: Int) -> Unit): Long {
-    val buffer = ByteArray(STREAM_BUFFER_SIZE)
-    var total = 0L
-    while (true) {
-        val read = readAvailable(buffer)
-        if (read <= 0) break
-        write(buffer, read)
-        total += read
-    }
-    return total
-}
 
 class TestHttpRequest(
     val method: String,
@@ -42,24 +26,14 @@ class TestHttpResponse(
     val status: HttpStatusCode,
     val url: String,
     val headers: Map<String, List<String>>,
-    val channel: ByteReadChannel,
+    private val readBody: suspend () -> ByteArray,
     private val onClose: (() -> Unit)? = null,
 ) : AutoCloseable {
     fun isOk(): Boolean = status == HttpStatusCode.OK
 
     fun isSuccess(): Boolean = status.isSuccess
 
-    suspend fun bodyAsBytes(): ByteArray {
-        val chunks = ArrayList<ByteArray>()
-        channel.copyTo { buffer, length -> chunks.add(buffer.copyOf(length)) }
-        val out = ByteArray(chunks.sumOf { it.size })
-        var pos = 0
-        for (chunk in chunks) {
-            chunk.copyInto(out, pos)
-            pos += chunk.size
-        }
-        return out
-    }
+    suspend fun bodyAsBytes(): ByteArray = readBody()
 
     suspend fun bodyAsText(): String = bodyAsBytes().decodeToString()
 

@@ -3,7 +3,6 @@ package com.ismartcoding.plain.platform.system
 import com.ismartcoding.plain.network.HttpStatusCode
 import com.ismartcoding.plain.network.TestHttpResponse
 
-import io.ktor.utils.io.ByteReadChannel
 import kotlinx.coroutines.runBlocking
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -22,7 +21,7 @@ class TestHttpResponseTest {
         status = HttpStatusCode(status),
         url = url,
         headers = headers,
-        channel = ByteReadChannel(body),
+        readBody = { body },
     )
 
     // ── header() lookup ───
@@ -80,7 +79,7 @@ class TestHttpResponseTest {
     }
 
     @Test
-    fun `bodyAsText decodes the streamed body`() {
+    fun `bodyAsText decodes the response bytes`() {
         assertEquals("hello", runBlocking { response(body = "hello".encodeToByteArray()).bodyAsText() })
     }
 
@@ -89,7 +88,7 @@ class TestHttpResponseTest {
     @Test
     fun `close invokes onClose`() {
         var closed = 0
-        val r = TestHttpResponse(HttpStatusCode(200), "https://example.com", emptyMap(), ByteReadChannel(ByteArray(0))) { closed++ }
+        val r = TestHttpResponse(HttpStatusCode(200), "https://example.com", emptyMap(), { ByteArray(0) }) { closed++ }
         r.close()
         assertEquals(1, closed)
     }

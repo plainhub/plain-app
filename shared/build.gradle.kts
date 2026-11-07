@@ -114,7 +114,6 @@ kotlin {
             api(project(":plain-common"))
             api(libs.atomicfu)
             api(libs.kotlinx.serialization.json)
-            api(libs.ktor.http)
             api(libs.coil)
 
             implementation(libs.runtime)
@@ -126,8 +125,6 @@ kotlin {
             implementation(libs.jetbrains.lifecycle.viewmodel.compose)
             implementation(libs.compose.lifecycle.runtime)
             implementation(libs.kotlinx.datetime)
-            // ktor-io only (ByteReadChannel streaming) — no HTTP client dependency from ktor
-            implementation(libs.ktor.io)
             implementation(libs.coil.compose)
             implementation(libs.coil.svg)
 

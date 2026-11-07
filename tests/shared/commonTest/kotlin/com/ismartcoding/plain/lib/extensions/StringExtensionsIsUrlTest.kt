@@ -111,10 +111,8 @@ class StringExtensionsIsUrlTest {
 
     @Test
     fun `string starting with http but not a valid URL returns false`() {
-        // "http://" alone — URLBuilder can parse it but it has no host
-        // The key test is that it doesn't crash; behavior depends on URLBuilder
-        // Just ensure no exception is thrown
-        "http://".isUrl()
+        assertFalse("http://".isUrl())
+        assertFalse("https:///file".isUrl())
     }
 
     @Test

@@ -1,9 +1,6 @@
 package com.ismartcoding.plain.lib.extensions
 
 import com.ismartcoding.plain.lib.Constants
-import io.ktor.http.ContentType
-import io.ktor.http.URLBuilder
-import io.ktor.http.URLProtocol
 import kotlin.math.ceil
 import kotlin.text.iterator
 
@@ -691,13 +688,7 @@ fun String.getMimeType(): String {
 }
 
 
-fun String.getContentType(): ContentType {
-    return try {
-        ContentType.parse(getMimeType())
-    } catch (e: Exception) {
-        ContentType.Application.OctetStream
-    }
-}
+fun String.getContentType(): String = getMimeType().ifEmpty { "*/*" }
 
 fun String.indexOf(anyOfTheseChars: Array<Char>): Int {
     for (element in anyOfTheseChars) {
@@ -747,14 +738,10 @@ fun String.isUrl(): Boolean {
     if (!startsWith("http://", ignoreCase = true) && !startsWith("https://", ignoreCase = true)) {
         return false
     }
-    return try {
-        val builder = URLBuilder(this)
-        builder.protocol == URLProtocol.HTTP || builder.protocol == URLProtocol.HTTPS
-    } catch (e: Exception) {
-        false
-    }
+    return hasUrlHost()
 }
 
+internal expect fun String.hasUrlHost(): Boolean
 
 private val NUMERIC_CHAR_REF = Regex("&#([0-9]+);|&#[xX]([0-9a-fA-F]+);")
 
