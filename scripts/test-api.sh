@@ -75,7 +75,7 @@ ROUTES="about apps audios calls chat chat/app-files contacts developer
 developer/database developer/device-info developer/logs developer/prefs
 docs feeds files files/recent image-editor images login markdown-preview
 media-preview messages messages/archived notes screen-mirror
-settings/lan-share setup text-edit text-file ux videos"
+setup text-edit text-file ux videos"
 BAD=""
 N=0
 for route in $ROUTES; do

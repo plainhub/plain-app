@@ -21,7 +21,6 @@ enum class Capability {
     SCREEN_MIRROR,
     NOTIFICATIONS,
     CLIPBOARD,
-    SMB_SERVER,
     DISK_MANAGER,
 }
 
