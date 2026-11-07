@@ -687,9 +687,6 @@ class ManagedDeviceUiAcceptanceTest {
             awaitNode("local device") { it.text == deviceName }
             assertFalse(uiNodes().any { it.overlay && it.text == text(Res.string.select_a_device) })
             captureNavigation("nearby-local-device")
-            click(text(Res.string.rename), "rename selected device")
-            awaitNode("rename input") { it.isEditable }
-            click(text(Res.string.cancel), "cancel rename")
             click(text(Res.string.back), "return from nearby devices")
             awaitMainWindowFocus(scenario)
             assertEquals(1, MainViewModel.currentRootTab.intValue)

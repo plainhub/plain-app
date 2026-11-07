@@ -51,20 +51,12 @@ import com.ismartcoding.plain.ui.chat.components.PeerIconWithStatus
 import com.ismartcoding.plain.ui.base.PListItem
 import com.ismartcoding.plain.ui.base.POutlinedButton
 import com.ismartcoding.plain.ui.base.PSectionTitle
-import com.ismartcoding.plain.ui.navigation.Routing
 import com.ismartcoding.plain.ui.app.MainViewModel
 import com.ismartcoding.plain.Prefs
 import com.ismartcoding.plain.platform.system.getDeviceName
 import com.ismartcoding.plain.platform.system.getDeviceType
 import com.ismartcoding.plain.platform.network.NetworkEvents
 import com.ismartcoding.plain.ui.platform.system.getIcon
-import com.ismartcoding.plain.ui.tools.LocalManagedDeviceViewModel
-import com.ismartcoding.plain.ui.components.DeviceRenameDialog
-import com.ismartcoding.plain.ui.components.PIconButton
-import com.ismartcoding.plain.graphql.Mutation
-import com.ismartcoding.plain.rust.graphql.GraphqlApi
-import com.ismartcoding.plain.ui.resources.Res as UiRes
-import com.ismartcoding.plain.ui.resources.pen as ui_drawable_pen
 import org.jetbrains.compose.resources.stringResource
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -91,15 +83,6 @@ fun NearbyPage(
     val localName by Prefs.deviceName.collectAsState()
     val network by NetworkEvents.snapshot.collectAsState()
     val selectedDevice by MainViewModel.selectedDevice
-    val manager = LocalManagedDeviceViewModel.current
-    val managedState = manager?.state?.collectAsState()?.value
-    val managedInfo = managedState?.client?.state?.collectAsState()?.value
-    val currentName = if (selectedDevice == null) localName.ifEmpty { getDeviceName() }
-        else managedInfo?.deviceName ?: peersMap[selectedDevice?.peerId]?.name.orEmpty()
-    var showRename by remember { mutableStateOf(false) }
-    if (showRename) DeviceRenameDialog(currentName, onDismiss = { showRename = false }) { name ->
-        if (manager == null) GraphqlApi.execute(Mutation.updateDeviceName(name)) else manager.rename(name)
-    }
     LaunchedEffect(Unit) {
         try { NetworkEvents.refresh() }
         catch (cancelled: CancellationException) { throw cancelled }
@@ -128,9 +111,6 @@ fun NearbyPage(
                     NavigationBackIcon { navController.navigateUp() }
                 },
                 title = stringResource(Res.string.nearby_devices),
-                actions = {
-                    PIconButton(UiRes.drawable.ui_drawable_pen, contentDescription = stringResource(Res.string.rename), click = { showRename = true })
-                },
             )
         }
     ) { paddingValues ->
@@ -213,13 +193,6 @@ fun NearbyPage(
                         }
                     }
                 }
-            }
-            item {
-                POutlinedButton(
-                    text = stringResource(Res.string.scan_qrcode),
-                    modifier = Modifier.padding(horizontal = 16.dp),
-                    onClick = { navController.navigate(Routing.Scan) },
-                )
             }
             item {
                 BottomSpace(paddingValues)
