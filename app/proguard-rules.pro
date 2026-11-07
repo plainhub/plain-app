@@ -81,7 +81,6 @@
 
 # Enum names consumed by JSON serializers at platform/Rust boundaries.
 -keepclassmembers,allowoptimization enum com.ismartcoding.plain.features.images.search.ImageSearchStatusType { public static final com.ismartcoding.plain.features.images.search.ImageSearchStatusType *; }
--keepclassmembers,allowoptimization enum com.ismartcoding.plain.platform.system.DevicePlatform { public static final com.ismartcoding.plain.platform.system.DevicePlatform *; }
 -keepclassmembers,allowoptimization enum com.ismartcoding.plain.features.screenmirror.ScreenMirrorControlAction { public static final com.ismartcoding.plain.features.screenmirror.ScreenMirrorControlAction *; }
 -keepclassmembers,allowoptimization enum com.ismartcoding.plain.features.files.DriveType { public static final com.ismartcoding.plain.features.files.DriveType *; }
 -keepclassmembers,allowoptimization enum com.ismartcoding.plain.features.telephony.PhoneType { public static final com.ismartcoding.plain.features.telephony.PhoneType *; }

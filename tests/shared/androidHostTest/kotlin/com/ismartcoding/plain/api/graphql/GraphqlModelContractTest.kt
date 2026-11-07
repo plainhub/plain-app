@@ -6,7 +6,6 @@ import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import com.ismartcoding.plain.models.ActionResult
-import com.ismartcoding.plain.models.AndroidExtras
 import com.ismartcoding.plain.models.App
 import com.ismartcoding.plain.models.AppFile
 import com.ismartcoding.plain.models.Audio
@@ -33,16 +32,9 @@ import com.ismartcoding.plain.models.ContactImInput
 import com.ismartcoding.plain.models.ContactInput
 import com.ismartcoding.plain.models.ContactPhoneInput
 import com.ismartcoding.plain.models.ContactPhoneNumber
-import com.ismartcoding.plain.models.ContactSource
 import com.ismartcoding.plain.models.ContactWebsite
 import com.ismartcoding.plain.models.ContactWebsiteInput
-import com.ismartcoding.plain.models.DbTableColumn
-import com.ismartcoding.plain.models.DbTableInfo
-import com.ismartcoding.plain.models.DeviceInfo
-import com.ismartcoding.plain.models.DeviceStatus
-import com.ismartcoding.plain.models.DisplayInfo
 import com.ismartcoding.plain.models.Doc
-import com.ismartcoding.plain.models.DocExtGroup
 import com.ismartcoding.plain.models.FavoriteFolder
 import com.ismartcoding.plain.models.Feed
 import com.ismartcoding.plain.models.FeedEntry
@@ -51,26 +43,19 @@ import com.ismartcoding.plain.models.FeedError
 import com.ismartcoding.plain.models.FeedPreview
 import com.ismartcoding.plain.models.FeedSyncState
 import com.ismartcoding.plain.models.File
-import com.ismartcoding.plain.models.FileInfo
 import com.ismartcoding.plain.models.Image
 import com.ismartcoding.plain.models.ImageEditorProject
 import com.ismartcoding.plain.models.ImageEditorProjectInput
 import com.ismartcoding.plain.models.ImageEditorProjectSummary
 import com.ismartcoding.plain.models.ImageFileInfo
-import com.ismartcoding.plain.models.ImageSearchStatus
-import com.ismartcoding.plain.models.KeyValuePair
 import com.ismartcoding.plain.models.Location
 import com.ismartcoding.plain.models.MediaBucket
-import com.ismartcoding.plain.models.MergeTask
-import com.ismartcoding.plain.models.Mount
 import com.ismartcoding.plain.models.Note
 import com.ismartcoding.plain.models.NoteInput
 import com.ismartcoding.plain.models.Notification
 import com.ismartcoding.plain.models.Organization
 import com.ismartcoding.plain.models.OrganizationInput
 import com.ismartcoding.plain.models.Package
-import com.ismartcoding.plain.models.PackageInstallPending
-import com.ismartcoding.plain.models.PackageStatus
 import com.ismartcoding.plain.models.PairingDeviceInput
 import com.ismartcoding.plain.models.PairingRequestInput
 import com.ismartcoding.plain.models.Peer
@@ -81,11 +66,8 @@ import com.ismartcoding.plain.models.ScreenMirrorQuality
 import com.ismartcoding.plain.models.ScreenMirrorVideoCodec
 import com.ismartcoding.plain.models.Sim
 import com.ismartcoding.plain.models.Sms
-import com.ismartcoding.plain.models.SmsConversation
-import com.ismartcoding.plain.models.SmsCounts
 import com.ismartcoding.plain.models.Tag
 import com.ismartcoding.plain.models.TagRelation
-import com.ismartcoding.plain.models.Temperature
 import com.ismartcoding.plain.models.Video
 import com.ismartcoding.plain.models.VideoFileInfo
 import kotlinx.serialization.ExperimentalSerializationApi
@@ -98,7 +80,6 @@ class GraphqlModelContractTest {
             .replace(Regex("\"\"\"[\\s\\S]*?\"\"\""), "")
         val models: Map<String, SerialDescriptor> = mapOf(
             "ActionResult" to ActionResult.serializer().descriptor,
-            "AndroidExtras" to AndroidExtras.serializer().descriptor,
             "App" to App.serializer().descriptor,
             "AppFile" to AppFile.serializer().descriptor,
             "Audio" to Audio.serializer().descriptor,
@@ -125,16 +106,9 @@ class GraphqlModelContractTest {
             "ContactInput" to ContactInput.serializer().descriptor,
             "ContactPhoneInput" to ContactPhoneInput.serializer().descriptor,
             "ContactPhoneNumber" to ContactPhoneNumber.serializer().descriptor,
-            "ContactSource" to ContactSource.serializer().descriptor,
             "ContactWebsite" to ContactWebsite.serializer().descriptor,
             "ContactWebsiteInput" to ContactWebsiteInput.serializer().descriptor,
-            "DbTableColumn" to DbTableColumn.serializer().descriptor,
-            "DbTableInfo" to DbTableInfo.serializer().descriptor,
-            "DeviceInfo" to DeviceInfo.serializer().descriptor,
-            "DeviceStatus" to DeviceStatus.serializer().descriptor,
-            "DisplayInfo" to DisplayInfo.serializer().descriptor,
             "Doc" to Doc.serializer().descriptor,
-            "DocExtGroup" to DocExtGroup.serializer().descriptor,
             "FavoriteFolder" to FavoriteFolder.serializer().descriptor,
             "Feed" to Feed.serializer().descriptor,
             "FeedPreview" to FeedPreview.serializer().descriptor,
@@ -143,26 +117,19 @@ class GraphqlModelContractTest {
             "FeedError" to FeedError.serializer().descriptor,
             "FeedSyncState" to FeedSyncState.serializer().descriptor,
             "File" to File.serializer().descriptor,
-            "FileInfo" to FileInfo.serializer().descriptor,
             "Image" to Image.serializer().descriptor,
             "ImageEditorProject" to ImageEditorProject.serializer().descriptor,
             "ImageEditorProjectInput" to ImageEditorProjectInput.serializer().descriptor,
             "ImageEditorProjectSummary" to ImageEditorProjectSummary.serializer().descriptor,
             "ImageFileInfo" to ImageFileInfo.serializer().descriptor,
-            "ImageSearchStatus" to ImageSearchStatus.serializer().descriptor,
-            "KeyValuePair" to KeyValuePair.serializer().descriptor,
             "Location" to Location.serializer().descriptor,
             "MediaBucket" to MediaBucket.serializer().descriptor,
-            "MergeTask" to MergeTask.serializer().descriptor,
-            "Mount" to Mount.serializer().descriptor,
             "Note" to Note.serializer().descriptor,
             "NoteInput" to NoteInput.serializer().descriptor,
             "Notification" to Notification.serializer().descriptor,
             "Organization" to Organization.serializer().descriptor,
             "OrganizationInput" to OrganizationInput.serializer().descriptor,
             "Package" to Package.serializer().descriptor,
-            "PackageInstallPending" to PackageInstallPending.serializer().descriptor,
-            "PackageStatus" to PackageStatus.serializer().descriptor,
             "PairingDeviceInput" to PairingDeviceInput.serializer().descriptor,
             "PairingRequestInput" to PairingRequestInput.serializer().descriptor,
             "Peer" to Peer.serializer().descriptor,
@@ -174,12 +141,9 @@ class GraphqlModelContractTest {
             "Sim" to Sim.serializer().descriptor,
             "Sms" to Sms.serializer().descriptor,
             "SmsAttachment" to SmsAttachment.serializer().descriptor,
-            "SmsConversation" to SmsConversation.serializer().descriptor,
-            "SmsCounts" to SmsCounts.serializer().descriptor,
             "Tag" to Tag.serializer().descriptor,
             "TagRelation" to TagRelation.serializer().descriptor,
 
-            "Temperature" to Temperature.serializer().descriptor,
             "Video" to Video.serializer().descriptor,
             "VideoFileInfo" to VideoFileInfo.serializer().descriptor,
         )

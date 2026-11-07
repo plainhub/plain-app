@@ -6,7 +6,12 @@ import com.ismartcoding.plain.platform.files.copyFileToUri
 import com.ismartcoding.plain.platform.files.readTextFile
 import com.ismartcoding.plain.platform.files.writeBytesToPath
 
+import com.ismartcoding.plain.lib.JsonHelper
 import com.ismartcoding.plain.lib.toByteArray
+import com.ismartcoding.plain.rust.RustStartupConfig
+import com.ismartcoding.plain.rust.RustStartupResult
+import com.ismartcoding.plain.rust.native.RustNativeBindings
+import com.ismartcoding.plain.rustprefs.plain_core_stop
 import kotlinx.coroutines.test.runTest
 import platform.Foundation.NSFileManager
 import platform.Foundation.NSTemporaryDirectory
@@ -49,9 +54,26 @@ class FileExportTest {
         val manager = NSFileManager.defaultManager
         assertTrue(manager.createDirectoryAtPath(root, true, null, null))
         try {
-            val source = "$root/source.zip"
-            val target = "$root/export.zip"
-            val alias = "$root/source-alias.zip"
+            val dataDir = "$root/data"
+            val config = RustStartupConfig(
+                debug = true,
+                cacheDir = "$root/cache",
+                name = "File Export Fixture",
+                deviceType = "PHONE",
+                buildChannel = "GITHUB",
+                downloadsDir = "$dataDir/downloads",
+                wifiAwareSupported = false,
+                recentFilesCatalog = false,
+                systemMediaCatalog = false,
+                supportedAbis = emptyList(),
+            )
+            val startup = JsonHelper.jsonDecode<RustStartupResult>(
+                RustNativeBindings.startCore(dataDir, generateChaCha20Key(), JsonHelper.jsonEncode(config)),
+            )
+            assertEquals("", startup.errorCode, startup.error)
+            val source = "$dataDir/source.zip"
+            val target = "$dataDir/export.zip"
+            val alias = "$dataDir/source-alias.zip"
             val bytes = byteArrayOf(0, 1, 127, -1)
             assertTrue(writeBytesToPath(source, bytes))
             assertTrue(copyFileToUri(source, NSURL.fileURLWithPath(target).absoluteString!!))
@@ -61,6 +83,7 @@ class FileExportTest {
             assertContentEquals(bytes, manager.contentsAtPath(source)!!.toByteArray())
             assertFalse(copyFileToUri(source, "https://example.invalid/export.zip"))
         } finally {
+            plain_core_stop()
             manager.removeItemAtPath(root, null)
         }
     }
