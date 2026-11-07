@@ -8,17 +8,16 @@ Simulates the Kotlin algorithm (BitmapFactory path) in Python:
   3. Apply the same matrix transform as applyExifOrientation()
   4. Compare with PIL's exif_transpose (ground truth)
 
-Usage:
-  python3 tests/shared/manual/test_thumbnail_exif.py ~/Downloads/IMG_1423.JPG
-  python3 tests/shared/manual/test_thumbnail_exif.py  # tests all JPEGs in ~/Downloads/
+Usage (requires Pillow):
+  python3 tests/shared/manual/test_thumbnail_exif.py
 """
 
 import sys
-import os
-import hashlib
 from pathlib import Path
-from PIL import Image, ImageOps, ImageChops
-import piexif
+from tempfile import TemporaryDirectory
+from PIL import Image, ImageOps
+
+EXIF_ORIENTATION = 274
 
 # ---------------------------------------------------------------------------
 # Mirror of Kotlin applyExifOrientation() using PIL operations
@@ -95,15 +94,7 @@ def decode_sampled_bitmap(path: str, req_w: int, req_h: int, center_crop: bool =
     img_raw = Image.open(path)
     src_w, src_h = img_raw.size
 
-    # Read EXIF orientation (raw; do NOT call exif_transpose on this image)
-    orient = ORIENTATION_NORMAL
-    try:
-        exif_bytes = img_raw.info.get("exif", b"")
-        if exif_bytes:
-            exif = piexif.load(exif_bytes)
-            orient = exif.get("0th", {}).get(piexif.ImageIFD.Orientation, ORIENTATION_NORMAL)
-    except Exception:
-        pass
+    orient = img_raw.getexif().get(EXIF_ORIENTATION, ORIENTATION_NORMAL)
 
     swap_dims = orient in (ORIENTATION_ROTATE_90, ORIENTATION_ROTATE_270,
                            ORIENTATION_TRANSPOSE, ORIENTATION_TRANSVERSE)
@@ -153,7 +144,7 @@ def ground_truth_thumb(path: str, req_w: int, req_h: int) -> Image.Image:
     return crop_center(img, req_w, req_h)
 
 
-def run_test(path: str, req_sizes=None):
+def run_test(path: Path, req_sizes=None):
     if req_sizes is None:
         req_sizes = [(1024, 1024), (512, 512), (200, 200), (300, 200), (200, 300)]
 
@@ -163,15 +154,7 @@ def run_test(path: str, req_sizes=None):
     img_raw = Image.open(path)
     src_w, src_h = img_raw.size
 
-    # Get EXIF orientation
-    orient = ORIENTATION_NORMAL
-    try:
-        exif_bytes = img_raw.info.get("exif", b"")
-        if exif_bytes:
-            exif = piexif.load(exif_bytes)
-            orient = exif.get("0th", {}).get(piexif.ImageIFD.Orientation, ORIENTATION_NORMAL)
-    except Exception:
-        pass
+    orient = img_raw.getexif().get(EXIF_ORIENTATION, ORIENTATION_NORMAL)
 
     orient_names = {
         1: "NORMAL", 2: "FLIP_H", 3: "ROT_180", 4: "FLIP_V",
@@ -220,42 +203,37 @@ def run_test(path: str, req_sizes=None):
             extra = ""
         print(f"  req={req_w}×{req_h}  →  thumb={thumb.size[0]}×{thumb.size[1]}  {status}{extra}")
 
-        # Save for visual inspection
-        out_path = f"/tmp/thumb_exif_{Path(path).stem}_{req_w}x{req_h}.jpg"
-        thumb.save(out_path)
-        gt_path = f"/tmp/thumb_gt_{Path(path).stem}_{req_w}x{req_h}.jpg"
-        gt.save(gt_path)
-
     print(f"Overall: {'✓ ALL PASS' if all_ok else '✗ SOME FAILED'}")
     return all_ok
 
 
 def main():
-    # Install piexif if needed
-    try:
-        import piexif  # noqa
-    except ImportError:
-        print("Installing piexif...")
-        os.system("pip3 install piexif -q")
-        import piexif  # noqa
+    if len(sys.argv) != 1:
+        sys.exit("This test generates its own JPEGs and accepts no input paths.")
 
-    if len(sys.argv) > 1:
-        paths = [os.path.expanduser(p) for p in sys.argv[1:]]
-    else:
-        dl = os.path.expanduser("~/Downloads")
-        paths = list(Path(dl).glob("*.JPG")) + list(Path(dl).glob("*.jpg"))
-        if not paths:
-            print("No JPEG files found in ~/Downloads/. Pass a path as argument.")
-            sys.exit(1)
+    width, height = 1600, 1200
+    sample = Image.frombytes(
+        "RGB",
+        (width, height),
+        bytes(
+            channel
+            for y in range(height)
+            for x in range(width)
+            for channel in (x * 255 // width, y * 255 // height, (x + y) * 255 // (width + height))
+        ),
+    )
+    with TemporaryDirectory(prefix="plain-exif-test-") as directory:
+        root = Path(directory)
+        results = []
+        for orientation in range(ORIENTATION_NORMAL, ORIENTATION_ROTATE_270 + 1):
+            path = root / f"orientation-{orientation}.jpg"
+            exif = sample.getexif()
+            exif[EXIF_ORIENTATION] = orientation
+            sample.save(path, exif=exif)
+            results.append(run_test(path))
 
-    all_pass = True
-    for p in paths:
-        ok = run_test(str(p))
-        all_pass = all_pass and ok
-
-    print(f"\n{'='*60}")
-    print(f"FINAL: {'ALL TESTS PASSED ✓' if all_pass else 'SOME TESTS FAILED ✗'}")
-    print(f"Visual thumbnails saved to /tmp/thumb_exif_*.jpg")
+    all_pass = all(results)
+    print(f"\nFINAL: {'ALL TESTS PASSED' if all_pass else 'SOME TESTS FAILED'}")
     sys.exit(0 if all_pass else 1)
 
 

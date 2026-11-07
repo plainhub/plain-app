@@ -57,7 +57,7 @@ class StringExtensionsIsUrlTest {
 
     @Test
     fun `absolute file path is not URL`() {
-        assertFalse("/storage/emulated/0/DCIM/Camera/PXL_20260604_060547429.TS.mp4".isUrl())
+        assertFalse("/storage/emulated/0/DCIM/Camera/fixture-001.TS.mp4".isUrl())
     }
 
     @Test
@@ -77,7 +77,7 @@ class StringExtensionsIsUrlTest {
 
     @Test
     fun `path with double extension TS mp4 is not URL`() {
-        assertFalse("/data/media/PXL_20260604_060547429.TS.mp4".isUrl())
+        assertFalse("/data/media/fixture-001.TS.mp4".isUrl())
     }
 
     // ── Other non-URL schemes ──────────────────────────────────────
