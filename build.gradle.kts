@@ -7,6 +7,14 @@ buildscript {
     dependencies {
         classpath(libs.gradle)
         classpath(libs.kotlin.gradle.plugin)
+        // AGP 9.5.0's default Bouncy Castle predates fixes for CVE-2026-8763 and CVE-2026-13506.
+        constraints {
+            for (module in listOf("bcpkix", "bcprov", "bcutil")) {
+                add("classpath", "org.bouncycastle:$module-jdk18on") {
+                    version { strictly("1.86") }
+                }
+            }
+        }
     }
 }
 

@@ -147,15 +147,19 @@ android {
         }
     }
     sourceSets.getByName("androidTest") {
-        java.setSrcDirs(listOf("../tests/app/androidTest/java"))
-        kotlin.setSrcDirs(listOf("../tests/app/androidTest/kotlin", "../tests/app/androidTest/java"))
-        resources.setSrcDirs(listOf("../tests/app/androidTest/resources"))
+        java.directories.clear()
+        java.directories.add("../tests/app/androidTest/java")
+        kotlin.directories.clear()
+        kotlin.directories.addAll(listOf(
+            "../tests/app/androidTest/kotlin",
+            "../tests/app/androidTest/java",
+            "../tests/shared/testFixtures/kotlin",
+            "../tests/plain-common/testFixtures/kotlin",
+            "../tests/shared/androidTestFixtures/kotlin",
+        ))
+        resources.directories.clear()
+        resources.directories.add("../tests/app/androidTest/resources")
     }
-    sourceSets.getByName("androidTest").kotlin.srcDirs(
-        "../tests/shared/testFixtures/kotlin",
-        "../tests/plain-common/testFixtures/kotlin",
-        "../tests/shared/androidTestFixtures/kotlin",
-    )
     if (providers.gradleProperty("plainRemoteManagementTest").orNull == "true") {
         val generatedTests = layout.buildDirectory.dir("generated/remote-management-tests")
         val prepareTests = tasks.register<Sync>("prepareRemoteManagementTestSource") {
@@ -164,8 +168,11 @@ android {
             }
             into(generatedTests)
         }
-        sourceSets.getByName("androidTest").java.setSrcDirs(emptyList<String>())
-        sourceSets.getByName("androidTest").kotlin.setSrcDirs(listOf(generatedTests.get().asFile))
+        sourceSets.getByName("androidTest") {
+            java.directories.clear()
+            kotlin.directories.clear()
+            kotlin.directories.add(generatedTests.get().asFile.absolutePath)
+        }
         tasks.matching { it.name.contains("AndroidTest") }.configureEach { dependsOn(prepareTests) }
     }
     namespace = "com.ismartcoding.plain"
@@ -201,7 +208,6 @@ val clangTarget = when (rustAndroidTarget) {
     else -> rustAndroidTarget
 }
 val androidClang = File(ndkHost, "bin/${clangTarget}28-clang")
-val libcxxTarget = if (rustAbi == "armeabi-v7a") "arm-linux-androideabi" else rustAndroidTarget
 
 // The Gradle daemon inherits the PATH of whatever shell first started it, which
 // often lacks ~/.cargo/bin, and the daemon cannot fix that after startup. Call
@@ -271,8 +277,8 @@ val rustPackages = listOf("debug" to "dev", "release" to "release").associate { 
     }
     val packageRust = tasks.register<PackageNativeFiles>("packagePlainRustAndroid$suffix") {
         dependsOn(buildRust)
-        nativeFiles.from(library, runtimeDirectory.map { it.file("libonnxruntime.so") },
-            File(ndkHost, "sysroot/usr/lib/$libcxxTarget/libc++_shared.so"))
+        // PDFium supplies the shared C++ runtime used by ONNX Runtime.
+        nativeFiles.from(library, runtimeDirectory.map { it.file("libonnxruntime.so") })
         relativeDirectory.set(rustAbi)
         outputDirectory.set(layout.buildDirectory.dir("generated/rustJniLibs/$buildType"))
     }
