@@ -2,15 +2,9 @@ package com.ismartcoding.plain.platform.system
 
 import com.ismartcoding.plain.ui.i18n.LocaleHelper
 import com.ismartcoding.plain.ui.navigation.LauncherShortcutTools
-import kotlinx.cinterop.ExperimentalForeignApi
-import platform.UIKit.UIApplication
-import platform.UIKit.UIApplicationShortcutIcon
-import platform.UIKit.UIApplicationShortcutItem
-import platform.UIKit.shortcutItems
 
-@OptIn(ExperimentalForeignApi::class)
 internal actual suspend fun publishLauncherShortcuts(tools: List<AppFeatureType>) {
-    UIApplication.sharedApplication.shortcutItems = tools.map { type ->
+    val shortcuts = tools.map { type ->
         val symbol = when (type) {
             AppFeatureType.NOTES -> "note.text"
             AppFeatureType.DOCS -> "doc.text"
@@ -22,12 +16,11 @@ internal actual suspend fun publishLauncherShortcuts(tools: List<AppFeatureType>
             AppFeatureType.FILES -> "folder"
             else -> error("Unsupported launcher shortcut: $type")
         }
-        UIApplicationShortcutItem(
+        IosLauncherShortcut(
             type = type.name,
-            localizedTitle = LocaleHelper.getStringAsync(LauncherShortcutTools.featureItem(type).titleRes),
-            localizedSubtitle = null,
-            icon = UIApplicationShortcutIcon.iconWithSystemImageName(symbol),
-            userInfo = null,
+            title = LocaleHelper.getStringAsync(LauncherShortcutTools.featureItem(type).titleRes),
+            symbol = symbol,
         )
     }
+    IosPlatformRegistry.publishLauncherShortcuts(shortcuts)
 }

@@ -30,6 +30,12 @@ interface IosSystemUiController {
     fun setImmersive(enabled: Boolean)
 }
 
+data class IosLauncherShortcut(val type: String, val title: String, val symbol: String)
+
+interface IosLauncherShortcutPublisher {
+    fun publish(shortcuts: List<IosLauncherShortcut>)
+}
+
 interface IosSoundMeter {
     fun start(): Boolean
     fun stop()
@@ -37,6 +43,16 @@ interface IosSoundMeter {
 }
 
 object IosPlatformRegistry {
+    private lateinit var launcherShortcutPublisher: IosLauncherShortcutPublisher
+
+    fun setLauncherShortcutPublisher(publisher: IosLauncherShortcutPublisher) {
+        launcherShortcutPublisher = publisher
+    }
+
+    internal fun publishLauncherShortcuts(shortcuts: List<IosLauncherShortcut>) {
+        launcherShortcutPublisher.publish(shortcuts)
+    }
+
     private lateinit var videoFrameObserver: IosVideoFrameObserver
     fun setVideoFrameObserver(observer: IosVideoFrameObserver) { videoFrameObserver = observer }
     fun observeVideoFrame(layer: AVPlayerLayer, onReady: () -> Unit): IosVideoFrameObservation =

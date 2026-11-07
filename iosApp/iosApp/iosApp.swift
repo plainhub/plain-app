@@ -26,6 +26,7 @@ struct PlainApp: SwiftUI.App {
         IosPlatformRegistry.shared.setShareController(controller: shareController)
         IosPlatformRegistry.shared.setSoundMeter(meter: soundMeter)
         IosPlatformRegistry.shared.setVideoFrameObserver(observer: videoFrameObserver)
+        IosPlatformRegistry.shared.setLauncherShortcutPublisher(publisher: LauncherShortcutPublisher())
         UNUserNotificationCenter.current().delegate = notificationDelegate
         AppInitializerKt.initializeApp()
         #if PLAIN_UI_WORKFLOWS
@@ -51,6 +52,23 @@ struct PlainApp: SwiftUI.App {
         }
     }
 }
+
+final class LauncherShortcutPublisher: NSObject, IosLauncherShortcutPublisher {
+    func publish(shortcuts: [IosLauncherShortcut]) {
+        DispatchQueue.main.async {
+            UIApplication.shared.shortcutItems = shortcuts.map { shortcut in
+                UIApplicationShortcutItem(
+                    type: shortcut.type,
+                    localizedTitle: shortcut.title,
+                    localizedSubtitle: nil,
+                    icon: UIApplicationShortcutIcon(systemImageName: shortcut.symbol),
+                    userInfo: nil
+                )
+            }
+        }
+    }
+}
+
 final class ShortcutAppDelegate: NSObject, UIApplicationDelegate {
     func application(
         _ application: UIApplication,
