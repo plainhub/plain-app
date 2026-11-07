@@ -6,6 +6,7 @@ import kotlinx.cinterop.ExperimentalForeignApi
 import platform.UIKit.UIApplication
 import platform.UIKit.UIApplicationShortcutIcon
 import platform.UIKit.UIApplicationShortcutItem
+import platform.UIKit.shortcutItems
 
 @OptIn(ExperimentalForeignApi::class)
 internal actual suspend fun publishLauncherShortcuts(tools: List<AppFeatureType>) {
