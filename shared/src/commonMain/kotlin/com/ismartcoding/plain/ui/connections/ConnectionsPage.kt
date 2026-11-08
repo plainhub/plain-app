@@ -56,9 +56,9 @@ fun ConnectionsPage(
     val scope = rememberCoroutineScope()
     val pagerState = rememberPagerState(pageCount = { 2 })
     val sessions = remember(itemsState, onlineIds) {
-        itemsState.filter { !it.isCustom }.sortedByDescending { onlineIds.contains(it.clientId) }
+        itemsState.filter { !it.isApiToken }.sortedByDescending { onlineIds.contains(it.clientId) }
     }
-    val apiTokens = remember(itemsState) { itemsState.filter { it.isCustom } }
+    val apiTokens = remember(itemsState) { itemsState.filter { it.isApiToken } }
     val tabTitles = listOf(stringResource(Res.string.sessions), stringResource(Res.string.api_tokens))
 
     val refreshState = rememberRefreshLayoutState {

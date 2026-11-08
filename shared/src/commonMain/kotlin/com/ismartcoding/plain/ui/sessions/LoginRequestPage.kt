@@ -23,8 +23,8 @@ internal fun LoginRequestPage(
     val request = loginRequest.request
     val descRes = if (request.peer != null) Res.string.allow_remote_chat_access_desc else Res.string.allow_remote_access_desc
     val device = listOf(
-        request.browserName.capitalize().trim(),
-        request.osName.capitalize().trim(),
+        request.appName.capitalize().trim(),
+        request.osName.trim(),
     ).filter { it.isNotEmpty() }.joinToString(" · ")
     val requester = listOf(device, loginRequest.clientIp).filter { it.isNotEmpty() }.joinToString("   ")
 

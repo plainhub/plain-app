@@ -54,8 +54,8 @@ internal fun SessionListItem(
     val scope = rememberCoroutineScope()
     val onlineIds by onlineClientIds.collectAsState()
     val isOnline = onlineIds.contains(m.clientId)
-    val osDisplay = (m.osName.capitalize() + " " + m.osVersion).trim()
-    val browserDisplay = (m.browserName.capitalize() + " " + m.browserVersion).trim()
+    val osDisplay = (m.osName + " " + m.osVersion).trim()
+    val appDisplay = (m.appName.capitalize() + " " + m.appVersion).trim()
     var showFullTime by remember { mutableStateOf(false) }
     var showRenameDialog by remember { mutableStateOf(false) }
     val lastActiveText = if (showFullTime) m.lastActiveAt?.formatDateTime() else m.lastActiveAt?.timeAgo()
@@ -81,12 +81,12 @@ internal fun SessionListItem(
             SessionMainListItem(
                 title = m.name.ifEmpty { osDisplay },
                 subtitle = if (m.name.isEmpty()) "" else osDisplay,
-                icon = if (m.isCustom) UiRes.drawable.ui_drawable_lock else UiRes.drawable.ui_drawable_laptop,
+                icon = if (m.isApiToken) UiRes.drawable.ui_drawable_lock else UiRes.drawable.ui_drawable_laptop,
                 onEditTitle = {
                     showRenameDialog = true
                 },
                 action = {
-                    if (m.isCustom) {
+                    if (m.isApiToken) {
                         POutlinedButton(
                             text = stringResource(Res.string.how_to_use),
                             buttonSize = ButtonSize.SMALL, onClick = onHowToUse
@@ -97,7 +97,7 @@ internal fun SessionListItem(
                 },
             )
 
-            if (m.isCustom || Prefs.developerMode.value) {
+            if (m.isApiToken || Prefs.developerMode.value) {
                 PListItem(
                     title = stringResource(Res.string.client_id),
                     subtitle = m.clientId, action = {
@@ -118,12 +118,12 @@ internal fun SessionListItem(
             if (m.clientIp.isNotEmpty()) {
                 PListItem(title = stringResource(Res.string.ip_address), value = m.clientIp)
             }
-            if (browserDisplay.isNotEmpty()) {
-                PListItem(title = stringResource(Res.string.browser), value = browserDisplay)
+            if (appDisplay.isNotEmpty()) {
+                PListItem(title = stringResource(Res.string.browser), value = appDisplay)
             }
             PListItem(title = stringResource(Res.string.created_at), value = m.createdAt.formatDateTime())
             Text(
-                text = stringResource(if (m.isCustom) Res.string.revoke_api_token else Res.string.revoke_session),
+                text = stringResource(if (m.isApiToken) Res.string.revoke_api_token else Res.string.revoke_session),
                 style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.SemiBold),
                 color = MaterialTheme.colorScheme.error,
                 textAlign = TextAlign.Center,

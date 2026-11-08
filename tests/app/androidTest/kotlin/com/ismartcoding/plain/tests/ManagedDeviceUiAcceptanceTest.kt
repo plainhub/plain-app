@@ -95,8 +95,8 @@ private data class ManagedAcceptanceSession(
     val clientId: String,
     val osName: String,
     val osVersion: String,
-    val browserName: String,
-    val browserVersion: String,
+    val appName: String,
+    val appVersion: String,
 )
 
 @Serializable
@@ -1592,15 +1592,15 @@ class ManagedDeviceUiAcceptanceTest {
         ActivityScenario.launch(MainActivity::class.java).use {
             val controller = checkNotNull(InstrumentationRegistry.getArguments().getString("managedPeerId"))
             val request = GraphqlRequest<List<ManagedAcceptanceSession>>(
-                "query { sessions { clientId osName osVersion browserName browserVersion } }", field = "sessions",
+                "query { sessions { clientId osName osVersion appName appVersion } }", field = "sessions",
             )
             val session = awaitValue("management login session") {
                 GraphqlApi.execute(request).find { it.clientId == controller }
             }
             assertEquals("Android", session.osName)
             assertTrue(session.osVersion.isNotBlank())
-            assertEquals("PlainApp", session.browserName)
-            assertTrue(session.browserVersion.isNotBlank())
+            assertEquals("PlainApp", session.appName)
+            assertTrue(session.appVersion.isNotBlank())
             report("management_session_os", "controller_os_and_app_metadata_present")
         }
     }

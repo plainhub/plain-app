@@ -11,12 +11,12 @@ data class VSession(
     val clientIp: String,
     val osName: String,
     val osVersion: String,
-    val browserName: String,
-    val browserVersion: String,
+    val appName: String,
+    val appVersion: String,
     val createdAt: Instant,
     val updatedAt: Instant,
     val lastActiveAt: Instant?,
 ) {
-    val isCustom: Boolean
-        get() = type == SessionType.CUSTOM
+    val isApiToken: Boolean
+        get() = type == SessionType.API_TOKEN
 }

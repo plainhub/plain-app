@@ -101,8 +101,8 @@ async function login(host, port, clientId) {
   const request = Buffer.from(
     JSON.stringify({
       password: passwordHash,
-      browserName: 'plain-api-test',
-      browserVersion: '1',
+      appName: 'plain-api-test',
+      appVersion: '1',
       osName: process.platform,
       osVersion: process.version,
       isMobile: false,

@@ -5,12 +5,12 @@ import com.ismartcoding.plain.i18n.client_connected
 import com.ismartcoding.plain.ui.i18n.LocaleHelper
 
 fun sendWebLoginNotification(
-    browserName: String,
+    appName: String,
     osName: String,
     clientIp: String,
 ) {
-    val browserDisplay = browserName.replaceFirstChar { it.uppercase() }
-    val description = listOf(clientIp, browserDisplay, osName)
+    val appDisplay = appName.replaceFirstChar { it.uppercase() }
+    val description = listOf(clientIp, appDisplay, osName)
         .filter { it.isNotBlank() }.joinToString(" · ")
     postWebLoginNotification(LocaleHelper.getString(Res.string.client_connected), description)
 }

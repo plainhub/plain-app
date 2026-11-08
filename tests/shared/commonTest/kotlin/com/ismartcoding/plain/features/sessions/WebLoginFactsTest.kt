@@ -6,7 +6,7 @@ import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 
 class WebLoginFactsTest {
-    private val metadata = """"browserName":"Fixture","browserVersion":"1","osName":"Fixture","osVersion":"1","isMobile":false"""
+    private val metadata = """"appName":"Fixture","appVersion":"1","osName":"Fixture","osVersion":"1","isMobile":false"""
 
     @Test
     fun passwordlessApprovalKeepsTheServerVerificationCodeWithoutRequiringAPassword() {

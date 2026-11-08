@@ -24,7 +24,7 @@ internal object SessionHost {
             "systemWebLoginCompleted" -> {
                 val facts = JsonHelper.jsonDecodeFromElement<WebLoginCompletedFacts>(params)
                 val request = facts.request
-                sendWebLoginNotification(request.browserName, request.osName, facts.clientIp)
+                sendWebLoginNotification(request.appName, request.osName, facts.clientIp)
             }
             else -> error("Unsupported session host method")
         }

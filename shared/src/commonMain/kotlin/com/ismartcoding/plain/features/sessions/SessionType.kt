@@ -4,6 +4,6 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 enum class SessionType {
-    WEB,
-    CUSTOM;
+    LOGIN,
+    API_TOKEN;
 }

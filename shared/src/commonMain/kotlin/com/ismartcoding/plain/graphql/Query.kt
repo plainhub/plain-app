@@ -237,7 +237,7 @@ object Query {
     )
 
     internal fun sessions(): GraphqlRequest<List<SessionFacts>> = GraphqlRequest(
-        $$"query { sessions { clientId clientName type token clientIp osName osVersion browserName browserVersion createdAt updatedAt lastSeenAt } }",
+        $$"query { sessions { clientId clientName type token clientIp osName osVersion appName appVersion createdAt updatedAt lastSeenAt } }",
         field = "sessions",
     )
 
