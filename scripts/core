@@ -1,4 +1,4 @@
 #!/bin/sh
 set -eu
 cd "$(dirname "$0")/.."
-exec python3 ../plain-core/scripts/core-dependencies.py "$@"
+exec node ../plain-core/scripts/core-dependencies.mjs "$@"
