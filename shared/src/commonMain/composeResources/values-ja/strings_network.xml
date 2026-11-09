@@ -2,7 +2,6 @@
 <resources>
     <string name="vpn_web_conflict_warning">VPNが有効になっています。VPN IPまたはWi-Fi IPを使用して電話にアクセスできます。Wi-Fi IPが機能しない場合は、VPN設定で「LANトラフィックを許可」を有効にするか、VPNを無効にしてください。</string>
     <string name="ssl_certificate_reset">SSL証明書がリセットされました</string>
-    <string name="the_token_is_reset">トークンがリセットされました</string>
     <string name="reset_ssl_certificate">SSL証明書をリセット</string>
     <string name="device_name">デバイス名</string>
     <string name="open_in_web">ウェブブラウザで開く</string>
@@ -22,10 +21,6 @@
     <string name="http_port_conflict_errors">ポート %1$s は使用中です。「アプリを再起動」して自動的に修正します。</string>
     <string name="fix">修正</string>
     <string name="security">セキュリティ</string>
-    <string name="url_token">URLトークン</string>
-    <string name="url_token_tips">URLトークンはURL内のデータを暗号化します。リセットされると、古いトークンで暗号化されたURLはアクセスできなくなります。</string>
-    <string name="rotate_url_token_on_restart">再起動時にURLトークンを更新</string>
-    <string name="rotate_url_token_on_restart_tips">有効にすると、アプリ起動のたびに新しいURLトークンが生成されます。これにより、以前に生成されたすべてのファイルURLが無効になります。セキュリティを強化したい上級ユーザーにお勧めします。</string>
     <string name="http_server_ok">HTTPサーバーが起動しました</string>
     <string name="http_server_error">HTTPサーバーが起動していません。PlainAppを再起動して、もう一度試してみてください。HTTPまたはHTTPSポートを占有している他のアプリケーションがないことを確認してください。問題が解決しない場合は、support@plainapp.app に連絡して問題の詳細を提供してください。</string>
     <string name="relaunch_app">アプリを再起動</string>

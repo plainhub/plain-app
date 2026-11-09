@@ -61,7 +61,6 @@ internal object RustNativeApi {
 
     suspend fun resetPassword(): String = nativeCall { RustNativeBindings.resetPassword() }
 
-    suspend fun resetUrlToken(): Boolean = nativeCall { RustNativeBindings.resetUrlToken() }
 
     suspend fun resetAdbToken(): Boolean = nativeCall { RustNativeBindings.resetAdbToken() }
 

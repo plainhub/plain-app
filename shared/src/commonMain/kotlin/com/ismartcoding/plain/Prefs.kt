@@ -28,8 +28,6 @@ import kotlinx.serialization.json.jsonPrimitive
 object Prefs {
     val passwordType = MutableStateFlow(PasswordType.NONE)
     val loginRequireApproval = MutableStateFlow(false)
-    val rotateUrlTokenOnRestart = MutableStateFlow(false)
-    val urlToken = MutableStateFlow("")
     val apiAccessFeatures = MutableStateFlow(emptySet<com.ismartcoding.plain.features.web.AccessFeature>())
     val updateInfo = MutableStateFlow(
         UpdateInfo(
@@ -110,8 +108,6 @@ object Prefs {
         when (key) {
             PrefKeys.PASSWORD_TYPE -> passwordType.value = PasswordType.valueOf(value.jsonPrimitive.content)
             PrefKeys.LOGIN_REQUIRE_APPROVAL -> loginRequireApproval.value = value.jsonPrimitive.boolean
-            PrefKeys.ROTATE_URL_TOKEN_ON_RESTART -> rotateUrlTokenOnRestart.value = value.jsonPrimitive.boolean
-            PrefKeys.URL_TOKEN -> urlToken.value = value.jsonPrimitive.content
             PrefKeys.API_PERMISSIONS -> apiAccessFeatures.value = JsonHelper.jsonDecodeFromElement(value)
             PrefKeys.UPDATE_INFO -> updateInfo.value = JsonHelper.jsonDecodeFromElement(value)
             PrefKeys.APP_UPDATE_AVAILABLE -> appUpdateAvailable.value = value.jsonPrimitive.boolean
@@ -192,11 +188,9 @@ object Prefs {
 
     suspend fun setLoginRequireApproval(enabled: Boolean) = set(PrefKeys.LOGIN_REQUIRE_APPROVAL, enabled)
 
-    suspend fun setRotateUrlToken(enabled: Boolean) = set(PrefKeys.ROTATE_URL_TOKEN_ON_RESTART, enabled)
 
     suspend fun resetPassword() = RustNativeApi.resetPassword()
 
-    suspend fun resetUrlToken() = RustNativeApi.resetUrlToken()
 
     suspend fun resetAdbToken() = RustNativeApi.resetAdbToken()
 

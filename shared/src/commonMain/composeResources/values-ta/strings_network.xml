@@ -2,7 +2,6 @@
 <resources>
     <string name="vpn_web_conflict_warning">VPN செல்லுபடி உள்ளது. உங்கள் கணினியிலிருந்து செல்லுபடி உள்ளது. உங்கள் VPN அமைப்புகளை LAN பரிமாறத்தை அனுமதிக்க அல்லது உங்கள் VPN முடக்குதலை கொண்டுவிடுவதை பரிந்துரைக்கிறோம்.</string>
     <string name="ssl_certificate_reset">SSL சான்றியம் மீளமைக்கப்பட்டது</string>
-    <string name="the_token_is_reset">டோக்கன் மீளமைக்கப்பட்டது</string>
     <string name="reset_ssl_certificate">SSL சான்றியம் மீளமைக்க</string>
     <string name="device_name">சாதன பெயர்</string>
     <string name="open_in_web">வலையில் திறக்க</string>
@@ -22,10 +21,6 @@
     <string name="http_port_conflict_errors">போர்டுகள் %1$s பயன்படுத்தப்படுகின்றன. "ஆப் மீண்டும் துவக்கம்" ஐ தட்டவும், இது தன்னிச்சையாக சரிசெய்யப்படும்.</string>
     <string name="fix">பிக்ஸ்</string>
     <string name="security">பாதுகாப்பு</string>
-    <string name="url_token">URL டோக்கன்</string>
-    <string name="url_token_tips">URL டோக்கன் தரவை குறியாக்குகின்றது. அது மீண்டும் அமைந்தால், பழைய டோக்கன்-குறியாக்கப்பட்ட URL கள் அணுகவில்லை.</string>
-    <string name="rotate_url_token_on_restart">மறுதொடக்கத்தில் URL டோக்கனை சுழற்று</string>
-    <string name="rotate_url_token_on_restart_tips">இயக்கப்படும்போது, ஒவ்வொரு முறையும் பயன்பாடு திறக்கும்போது புதிய URL டோக்கன் உருவாக்கப்படும். இது முன்பு உருவாக்கப்பட்ட அனைத்து கோப்பு URL களையும் செல்லாமல் ஆக்கும். அதிக பாதுகாப்பு விரும்பும் மேம்பட்ட பயனர்களுக்கு பரிந்துரைக்கப்படுகிறது.</string>
     <string name="http_server_ok">Http சேவையகம் நலமாக பயன்படுகின்றது.</string>
     <string name="http_server_error">Http சேவையகம் ஆரம்பிக்கப்படவில்லை. PlainApp ஐ மீண்டும் தொடங்கி முயற்சிக்கவும். HTTP அல்லது HTTPS போர்ட்களை பயன்படுகின்ற பிற பயன்பாடுகள் இல்லையெனில் உள்ளிட்ட பிரச்சினைக்கு மேலும் விவரங்களை support@plainapp.app உடைகளுக்கு அனுப்புக.</string>
     <string name="relaunch_app">புதுப்பிக்க APP</string>

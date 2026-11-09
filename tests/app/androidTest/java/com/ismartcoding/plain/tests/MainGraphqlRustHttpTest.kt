@@ -13,6 +13,7 @@ import com.ismartcoding.plain.network.createTestHttpClient
 import com.ismartcoding.plain.network.postText
 import com.ismartcoding.plain.rust.graphql.GraphqlRequest
 import kotlinx.coroutines.runBlocking
+import kotlin.io.encoding.Base64
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.*
 import org.junit.Assert.*
@@ -55,7 +56,7 @@ class MainGraphqlRustHttpTest {
             assertEquals(GraphqlApi.execute(GraphqlRequest<JsonObject>("query { $schema }")), httpQuery(schema))
             assertEquals(app.getValue("urlToken"), httpQuery("app { urlToken }").getValue("app").jsonObject.getValue("urlToken"))
             Prefs.load()
-            assertEquals(app.getValue("urlToken").jsonPrimitive.content, Prefs.urlToken.value)
+            assertEquals(32, Base64.decode(app.getValue("urlToken").jsonPrimitive.content).size)
             for (selection in listOf("systemPrefs", "systemSettings { password }", "userSettings { service }")) {
                 for (useHttp in listOf(false, true)) {
                     val failure = runCatching { if (useHttp) httpQuery(selection) else GraphqlApi.execute(GraphqlRequest<JsonObject>("query { $selection }")) }.exceptionOrNull()

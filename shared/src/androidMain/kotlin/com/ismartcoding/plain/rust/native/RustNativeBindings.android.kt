@@ -67,7 +67,6 @@ internal actual object RustNativeBindings {
     actual external fun cancelAppUpdateDownload(): String
     actual external fun checkAppUpdate(automatic: Boolean): String
     actual external fun resetPassword(): String
-    actual external fun resetUrlToken(): String
     actual external fun resetAdbToken(): String
     actual external fun setNotificationFilterMode(mode: String): String
     actual external fun clearNotificationFilterApps(): String

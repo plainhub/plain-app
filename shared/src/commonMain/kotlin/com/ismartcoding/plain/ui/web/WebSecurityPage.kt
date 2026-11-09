@@ -47,8 +47,6 @@ fun WebSecurityPage(navController: NavHostController) {
     val scope = rememberCoroutineScope()
     val passwordType = Prefs.passwordType.collectAsStateValue()
     val loginRequireApproval = Prefs.loginRequireApproval.collectAsStateValue()
-    val rotateUrlTokenOnRestart = Prefs.rotateUrlTokenOnRestart.collectAsStateValue()
-    val urlToken = Prefs.urlToken.collectAsStateValue()
     var sslSignature by remember { mutableStateOf("") }
     val editPassword = remember { mutableStateOf("") }
     var passwordSaved by remember { mutableStateOf(true) }
@@ -150,37 +148,6 @@ fun WebSecurityPage(navController: NavHostController) {
                             .fillMaxWidth(),
                         text = stringResource(Res.string.replace_ssl_certificate),
                         onClick = { navController.navigate(Routing.ReplaceSslCertificate) })
-                    VerticalSpace(dp = 24.dp)
-                    PSectionTitle(title = stringResource(Res.string.url_token))
-                    CornerCopyCard(
-                        label = stringResource(Res.string.url_token),
-                        modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN),
-                        text = urlToken
-                    )
-                    Tips(text = stringResource(Res.string.url_token_tips))
-                    VerticalSpace(dp = 16.dp)
-                    PCard(modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN)) {
-                        PListItem(modifier = Modifier.clickable {
-                            scope.launch(Dispatchers.Default) { Prefs.setRotateUrlToken(!rotateUrlTokenOnRestart )}
-                        }, title = stringResource(Res.string.rotate_url_token_on_restart)) {
-                            Switch(checked = rotateUrlTokenOnRestart, onCheckedChange = {
-                                scope.launch(Dispatchers.Default) { Prefs.setRotateUrlToken(it )}
-                            })
-                        }
-                    }
-                    Tips(text = stringResource(Res.string.rotate_url_token_on_restart_tips)); VerticalSpace(dp = 16.dp)
-                    PFilledButton(
-                        modifier = Modifier
-                            .padding(horizontal = 16.dp)
-                            .fillMaxWidth(),
-                        text = stringResource(Res.string.reset_token),
-                        type = ButtonType.DANGER,
-                        onClick = {
-                            scope.launch(Dispatchers.Default) {
-                                Prefs.resetUrlToken()
-                                DialogHelper.showMessage(Res.string.the_token_is_reset)
-                            }
-                        })
                     BottomSpace(paddingValues)
                 }
             }

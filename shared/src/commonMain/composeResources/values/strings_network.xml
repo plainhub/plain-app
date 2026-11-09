@@ -2,7 +2,6 @@
 <resources>
     <string name="vpn_web_conflict_warning">VPN is on. If this page does not work, turn VPN off and try again.</string>
     <string name="ssl_certificate_reset">SSL certificate is reset</string>
-    <string name="the_token_is_reset">The token is reset</string>
     <string name="reset_ssl_certificate">Reset SSL certificate</string>
     <string name="replace_ssl_certificate">Replace SSL certificate</string>
     <string name="https_certificate">HTTPS Certificate</string>
@@ -65,10 +64,6 @@
     <string name="http_port_conflict_errors">Ports %1$s are occupied. Tap "Restart App" to fix it automatically.</string>
     <string name="fix">Fix</string>
     <string name="security">Security</string>
-    <string name="url_token">URL token</string>
-    <string name="url_token_tips">The URL token encrypts data in URLs. If it's reset, old token-encrypted URLs become inaccessible.</string>
-    <string name="rotate_url_token_on_restart">Rotate URL token on restart</string>
-    <string name="rotate_url_token_on_restart_tips">When enabled, a new URL token is generated every time the app starts. This invalidates all previously generated file URLs. Recommended for advanced users who want stronger security.</string>
     <string name="http_server_ok">HTTP server is running well.</string>
     <string name="http_server_error">Service failed to start. Please restart the app.</string>
     <string name="http_server_health_check_failed">Service started but cannot be reached. A firewall or VPN app may be blocking localhost connections. Please check your network settings and restart the app.</string>

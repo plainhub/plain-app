@@ -15,19 +15,6 @@ pub extern "C" fn plain_reset_password() -> *mut c_char {
     c_string(reset_password())
 }
 
-fn reset_url_token() -> String {
-    reply!((|| {
-        let (runtime, management) = parts()?;
-        let _ = runtime;
-        management.reset_url_token()
-    })())
-}
-
-#[unsafe(no_mangle)]
-pub extern "C" fn plain_reset_url_token() -> *mut c_char {
-    c_string(reset_url_token())
-}
-
 fn reset_adb_token() -> String {
     reply!((|| {
         let (runtime, management) = parts()?;
@@ -126,16 +113,6 @@ mod android {
         _: JObject<'_>,
     ) -> jstring {
         env.with_env(|env| -> jni::errors::Result<_> { env.new_string(reset_password()) })
-            .resolve::<ThrowRuntimeExAndDefault>()
-            .into_raw()
-    }
-
-    #[unsafe(no_mangle)]
-    pub extern "system" fn Java_com_ismartcoding_plain_rust_native_RustNativeBindings_resetUrlToken(
-        mut env: EnvUnowned<'_>,
-        _: JObject<'_>,
-    ) -> jstring {
-        env.with_env(|env| -> jni::errors::Result<_> { env.new_string(reset_url_token()) })
             .resolve::<ThrowRuntimeExAndDefault>()
             .into_raw()
     }
