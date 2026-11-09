@@ -2,7 +2,7 @@ use super::*;
 
 #[test]
 fn unknown_resource_does_not_replace_the_active_host() {
-    let directory = std::env::temp_dir().join(plain_libs::utils::short_uuid::short_uuid());
+    let directory = std::env::temp_dir().join(plain_libs::utils::uuid::Uuid::new_v4().to_string());
     std::fs::create_dir(&directory).unwrap();
     let runtime = tokio::runtime::Builder::new_multi_thread()
         .enable_all()
