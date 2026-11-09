@@ -19,6 +19,7 @@ data class Peer(
     var updatedAt: Instant,
     var token: String = "",
     var online: Boolean = false,
+    var managed: Boolean = false,
     var address: PeerAddress? = null,
 ) {
     fun isPaired(): Boolean = status == PeerStatus.PAIRED

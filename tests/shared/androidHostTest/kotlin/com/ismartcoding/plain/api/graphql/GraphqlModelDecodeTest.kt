@@ -2,6 +2,7 @@ package com.ismartcoding.plain.api.graphql
 
 import com.ismartcoding.plain.features.chat.models.*
 import com.ismartcoding.plain.features.chat.ChatStatus
+import com.ismartcoding.plain.graphql.Query
 import com.ismartcoding.plain.models.*
 import com.ismartcoding.plain.lib.JsonHelper
 import kotlinx.serialization.json.jsonObject
@@ -103,13 +104,23 @@ class GraphqlModelDecodeTest {
     }
     @Test
     fun peerFieldsUseMainCamelCaseFieldsAndKeepDerivedAddress() {
-        val peer = JsonHelper.jsonDecode<Peer>("""{"id":"peer-1","name":"Peer","ip":"127.0.0.1","key":"key","publicKey":"public","status":"PAIRED","port":8080,"deviceType":"PHONE","token":"","createdAt":"2026-10-12T00:00:00Z","updatedAt":"2026-10-12T00:00:00Z","address":{"bestIp":"127.0.0.1","name":"Peer","baseUrl":"https://127.0.0.1:8080","apiUrl":"https://127.0.0.1:8080/peer_graphql","statusWsUrl":"wss://127.0.0.1:8080/peer_status"}}""")
+        val peer = JsonHelper.jsonDecode<Peer>("""{"id":"peer-1","name":"Peer","ip":"127.0.0.1","key":"key","publicKey":"public","status":"PAIRED","port":8080,"deviceType":"PHONE","token":"","managed":true,"createdAt":"2026-10-12T00:00:00Z","updatedAt":"2026-10-12T00:00:00Z","address":{"bestIp":"127.0.0.1","name":"Peer","baseUrl":"https://127.0.0.1:8080","apiUrl":"https://127.0.0.1:8080/peer_graphql","statusWsUrl":"wss://127.0.0.1:8080/peer_status"}}""")
         assertEquals("public", peer.publicKey)
         assertEquals("127.0.0.1", peer.address?.bestIp)
+        assertTrue(peer.managed)
         val encoded = JsonHelper.jsonEncodeToElement(peer).jsonObject
-        for (field in listOf("publicKey", "deviceType", "createdAt", "updatedAt")) assertTrue(field in encoded)
+        for (field in listOf("publicKey", "deviceType", "createdAt", "updatedAt", "managed")) assertTrue(field in encoded)
         for (field in listOf("public_key", "device_type", "created_at", "updated_at")) assertFalse(field in encoded)
         assertEquals(peer, JsonHelper.jsonDecodeFromElement<Peer>(JsonHelper.jsonEncodeToElement(peer)))
+        assertFalse(JsonHelper.jsonDecodeFromElement<Peer>(JsonHelper.jsonEncodeToElement(peer.copy(managed = false))).managed)
+    }
+
+    @Test
+    fun peerQueriesIncludeManagementStatus() {
+        val requests = listOf(Query.peers(), Query.chatDownloadQueue(), Query.chatDownloadQueue(includePeerCredentials = false))
+        requests.forEach { request ->
+            assertTrue(Regex("\\bmanaged\\b").containsMatchIn(request.operation.query), request.operation.query)
+        }
     }
 
     @Test
