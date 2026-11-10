@@ -13,6 +13,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
@@ -60,6 +61,7 @@ fun DesktopAccessSection(navController: NavHostController) {
                 WebAddressPager(
                     lanIpv4Addresses = it,
                     modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+                    containerColor = Color.Transparent,
                 )
             }
         }
