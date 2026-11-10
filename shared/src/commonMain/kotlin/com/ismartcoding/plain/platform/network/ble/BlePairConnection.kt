@@ -31,14 +31,14 @@ internal class BlePairConnection(private val device: BleGattClient) {
         return api.ensureConnected() && api.isConnected()
     }
 
-    suspend fun send(body: String): Boolean {
+    suspend fun send(packet: ByteArray): Boolean {
         mutex.withLock {
             check(!closed) { "BLE handle closed" }
             job = currentCoroutineContext()[Job]
             notifications = true
         }
         requestId = RustBleWire.nextRequestId()
-        return api.sendRequest(BleServices.nearby, RustBleWire.nearby(body.encodeToByteArray()), requestId)
+        return api.sendRequest(BleServices.nearby, packet, requestId)
     }
 
     suspend fun wait(timeoutMs: Long): JsonObject {

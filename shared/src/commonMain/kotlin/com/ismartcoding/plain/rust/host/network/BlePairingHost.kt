@@ -10,6 +10,7 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.*
+import kotlin.io.encoding.Base64
 
 object BlePairingHost {
     private class Handle(val job: Job?) { var connection: BlePairConnection? = null }
@@ -38,7 +39,7 @@ object BlePairingHost {
             }
             "blePairSend" -> {
                 val request = JsonHelper.jsonDecodeFromElement<BleSendRequest>(params)
-                hostResult(connection(request.generation).send(request.body))
+                hostResult(connection(request.generation).send(Base64.decode(request.packet)))
             }
             "blePairWait" -> {
                 val request = JsonHelper.jsonDecodeFromElement<BleWaitRequest>(params)
@@ -79,7 +80,7 @@ private data class BleGenerationRequest(val generation: String)
 private data class BleConnectRequest(val generation: String, val clientId: String)
 
 @Serializable
-private data class BleSendRequest(val generation: String, val body: String)
+private data class BleSendRequest(val generation: String, val packet: String)
 
 @Serializable
 private data class BleWaitRequest(val generation: String, val timeoutMs: Long)
