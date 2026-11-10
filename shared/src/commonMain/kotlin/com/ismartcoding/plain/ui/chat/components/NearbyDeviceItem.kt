@@ -1,7 +1,6 @@
 package com.ismartcoding.plain.ui.chat.components
 
 import androidx.compose.runtime.*
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import com.ismartcoding.plain.features.nearby.PairingPhase
 import com.ismartcoding.plain.i18n.*
@@ -13,6 +12,7 @@ import com.ismartcoding.plain.ui.nearby.NearbyItemStatus
 import com.ismartcoding.plain.ui.nearby.NearbyViewModel
 import com.ismartcoding.plain.ui.nearby.PairPeerDialog
 import com.ismartcoding.plain.ui.platform.system.getIcon
+import com.ismartcoding.plain.ui.theme.PlainTheme
 import org.jetbrains.compose.resources.stringResource
 
 @Composable
@@ -24,7 +24,7 @@ fun NearbyDeviceItem(item: NearbyDevice, status: NearbyItemStatus, bestIp: Strin
         }
     }
     PListItem(
-        modifier = Modifier.testTag("nearby-device:${item.id}"),
+        modifier = PlainTheme.getCardModifier().testTag("nearby-device:${item.id}"),
         title = item.name,
         subtitle = bestIp,
         start = { PeerIconWithStatus(item.deviceType.getIcon(), null) },

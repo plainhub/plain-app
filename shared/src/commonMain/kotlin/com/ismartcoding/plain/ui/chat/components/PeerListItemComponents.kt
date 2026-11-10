@@ -4,6 +4,7 @@ import org.jetbrains.compose.resources.DrawableResource
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentSize
@@ -30,7 +31,7 @@ internal fun PeerIconWithStatus(
 ) {
     Box(
         modifier = Modifier
-            .size(48.dp),
+            .size(24.dp),
         contentAlignment = Alignment.Center
     ) {
         Icon(
@@ -44,6 +45,7 @@ internal fun PeerIconWithStatus(
                 modifier = Modifier
                     .size(16.dp)
                     .align(Alignment.BottomEnd)
+                    .offset(x = 8.dp, y = 8.dp)
                     .clip(CircleShape)
                     .background(MaterialTheme.colorScheme.surface)
                     .padding(4.dp)

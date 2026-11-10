@@ -22,6 +22,7 @@ import com.ismartcoding.plain.ui.extensions.timeAgo
 import com.ismartcoding.plain.models.ChatItem
 import com.ismartcoding.plain.i18n.*
 import com.ismartcoding.plain.ui.base.PListItem
+import com.ismartcoding.plain.ui.theme.PlainTheme
 import com.ismartcoding.plain.ui.theme.listItemSubtitle
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.stringResource
@@ -53,7 +54,7 @@ fun PeerListItem(
     }
     Box {
         PListItem(
-            modifier = modifier.semantics {
+            modifier = modifier.then(PlainTheme.getCardModifier()).semantics {
                 onlineDescription?.let { stateDescription = it }
             }.combinedClickable(
                 onClick = onClick,

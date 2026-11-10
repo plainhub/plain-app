@@ -43,6 +43,7 @@ import com.ismartcoding.plain.ui.base.BottomSpace
 import com.ismartcoding.plain.ui.base.PAlert
 import com.ismartcoding.plain.ui.base.PTextButton
 import com.ismartcoding.plain.ui.base.TopSpace
+import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.base.pullrefresh.PullToRefresh
 import com.ismartcoding.plain.ui.base.pullrefresh.RefreshContentState
 import com.ismartcoding.plain.ui.base.pullrefresh.rememberRefreshLayoutState
@@ -151,6 +152,7 @@ fun ChatListPage(
                         icon = UiRes.drawable.ui_drawable_bot,
                         latestChat = latestChats["local"],
                         onClick = { navController.navigate(Routing.Chat("peer:local")) })
+                    VerticalSpace(8.dp)
                 }
                 if (channels.isNotEmpty()) {
                     items(items = channels, key = { it.id }) { channel ->
@@ -163,6 +165,7 @@ fun ChatListPage(
                                 navController.navigate(Routing.Chat("channel:${channel.id}"))
                             },
                         )
+                        VerticalSpace(8.dp)
                     }
                 }
                 if (allPeers.isNotEmpty()) {
@@ -177,6 +180,7 @@ fun ChatListPage(
                             onDelete = { peerVM.removePeer(it) },
                             onClick = { navController.navigate(Routing.Chat("peer:${peer.id}")) },
                         )
+                        VerticalSpace(8.dp)
                     }
                 }
                 item { BottomSpace(paddingValues) }

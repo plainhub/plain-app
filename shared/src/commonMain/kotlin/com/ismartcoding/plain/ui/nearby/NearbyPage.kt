@@ -57,6 +57,7 @@ import com.ismartcoding.plain.platform.system.getDeviceName
 import com.ismartcoding.plain.platform.system.getDeviceType
 import com.ismartcoding.plain.platform.network.NetworkEvents
 import com.ismartcoding.plain.ui.platform.system.getIcon
+import com.ismartcoding.plain.ui.theme.PlainTheme
 import org.jetbrains.compose.resources.stringResource
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -156,11 +157,9 @@ fun NearbyPage(
             item { PSectionTitle(stringResource(Res.string.nearby_my_devices)) }
             item {
                 PListItem(
+                    modifier = PlainTheme.getCardModifier(),
                     title = localName.ifEmpty { getDeviceName() },
                     subtitle = network.lanIpv4Addresses.orEmpty().joinToString(", "),
-                    titleTrailing = {
-                        Text(stringResource(if (selectedDevice == null) Res.string.nearby_current_device else Res.string.this_device), color = MaterialTheme.colorScheme.primary)
-                    },
                     start = { PeerIconWithStatus(getDeviceType().getIcon(), null) },
                     action = {
                         if (selectedDevice != null) POutlinedButton(
@@ -170,9 +169,11 @@ fun NearbyPage(
                         )
                     },
                 )
+                VerticalSpace(8.dp)
             }
             items(peers, key = { "paired:${it.id}" }) { peer ->
                 NearbyPairedDeviceItem(peer, nearbyDevices.find { it.id == peer.id })
+                VerticalSpace(8.dp)
             }
             nearbySearchingItem(isSearching)
             nearbyDeviceListItems(newDevices)

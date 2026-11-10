@@ -5,7 +5,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import com.ismartcoding.plain.features.nearby.PairingMode
 import com.ismartcoding.plain.i18n.*
@@ -24,6 +23,7 @@ import com.ismartcoding.plain.ui.components.PIconButton
 import com.ismartcoding.plain.ui.nearby.NearbyViewModel
 import com.ismartcoding.plain.ui.nearby.PairPeerDialog
 import com.ismartcoding.plain.ui.platform.system.getIcon
+import com.ismartcoding.plain.ui.theme.PlainTheme
 import com.ismartcoding.plain.ui.resources.Res as UiRes
 import com.ismartcoding.plain.ui.resources.more_horiz as ui_drawable_more_horiz
 import org.jetbrains.compose.resources.stringResource
@@ -40,7 +40,7 @@ fun NearbyPairedDeviceItem(peer: Peer, device: NearbyDevice?) {
     val cancelText = stringResource(Res.string.cancel)
     if (showPair && device != null) PairPeerDialog(device, initialMode = PairingMode.MANAGE) { showPair = false }
     PListItem(
-        modifier = Modifier.testTag("nearby-device:${peer.id}"),
+        modifier = PlainTheme.getCardModifier().testTag("nearby-device:${peer.id}"),
         title = peer.name,
         subtitle = listOfNotNull(
             device?.bestIp?.takeIf { it.isNotEmpty() } ?: peer.address?.bestIp ?: peer.ip,
