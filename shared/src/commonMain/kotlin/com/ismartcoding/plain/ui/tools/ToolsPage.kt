@@ -45,6 +45,7 @@ import com.ismartcoding.plain.ui.resources.Res as UiRes
 import com.ismartcoding.plain.ui.resources.tune as ui_drawable_tune
 import com.ismartcoding.plain.ui.resources.square_arrow_out_up_right as ui_drawable_square_arrow_out_up_right
 import com.ismartcoding.plain.ui.resources.more_horiz as ui_drawable_more_horiz
+import com.ismartcoding.plain.ui.theme.PlainTheme
 import com.ismartcoding.plain.ui.theme.greenText
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
@@ -122,9 +123,14 @@ fun ToolsPage(
                 navController = navController,
                 viewModel = tools,
                 modifier = Modifier.fillMaxSize(),
-                contentPadding = PaddingValues(top = 8.dp, bottom = 40.dp + paddingValues.calculateBottomPadding()),
+                contentPadding = PaddingValues(
+                    start = PlainTheme.PAGE_HORIZONTAL_MARGIN,
+                    end = PlainTheme.PAGE_HORIZONTAL_MARGIN,
+                    top = 8.dp,
+                    bottom = 40.dp + paddingValues.calculateBottomPadding(),
+                ),
                 header = {
-                    Column(Modifier.fillMaxWidth().padding(start = 16.dp, end = 16.dp, bottom = 16.dp)) {
+                    Column(Modifier.fillMaxWidth().padding(bottom = 8.dp)) {
                         if (currentUri.isNotEmpty() && source.cast.currentDevice != null) {
                             val deviceName = source.cast.currentDevice?.getDeviceName() ?: ""
                             StatusIndicator(

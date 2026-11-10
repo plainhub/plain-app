@@ -34,6 +34,7 @@ import com.ismartcoding.plain.platform.permissions.isGranted
 import com.ismartcoding.plain.ui.base.AlertType
 import com.ismartcoding.plain.ui.base.BottomSpace
 import com.ismartcoding.plain.ui.base.PAlert
+import com.ismartcoding.plain.ui.base.PCard
 import com.ismartcoding.plain.ui.base.PTextButton
 import com.ismartcoding.plain.ui.base.TopSpace
 import com.ismartcoding.plain.ui.base.VerticalSpace
@@ -42,6 +43,7 @@ import com.ismartcoding.plain.ui.base.pullrefresh.RefreshContentState
 import com.ismartcoding.plain.ui.base.pullrefresh.rememberRefreshLayoutState
 import com.ismartcoding.plain.ui.base.pullrefresh.setRefreshState
 import com.ismartcoding.plain.ui.media.extensions.collectAsStateValue
+import com.ismartcoding.plain.ui.theme.PlainTheme
 import com.ismartcoding.plain.ui.theme.onWarningContainer
 import com.ismartcoding.plain.ui.settings.UpdateViewModel
 import com.ismartcoding.plain.ui.navigation.MainNavScaffold
@@ -139,19 +141,25 @@ fun HomePage(
                     }
                 }
                 item {
-                    DesktopAccessSection(navController)
+                    PCard(modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN)) {
+                        DesktopAccessSection(navController)
+                    }
                     VerticalSpace(16.dp)
-                    PlainAppServiceSection(
-                        backgroundServiceEnabled = backgroundServiceEnabled,
-                        foregroundServiceState = foregroundServiceState,
-                        errorMessage = httpServerError.ifEmpty { httpServerResourcesError }.ifEmpty { foregroundServiceError },
-                        onRetry = if (httpServerError.isNotEmpty() || httpServerResourcesError.isNotEmpty()) {
-                            { HttpServerManager.restartHttpServer() }
-                        } else null,
-                        onStayOnline = { showStayOnlineOverlay = true },
-                    )
+                    PCard(modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN)) {
+                        PlainAppServiceSection(
+                            backgroundServiceEnabled = backgroundServiceEnabled,
+                            foregroundServiceState = foregroundServiceState,
+                            errorMessage = httpServerError.ifEmpty { httpServerResourcesError }.ifEmpty { foregroundServiceError },
+                            onRetry = if (httpServerError.isNotEmpty() || httpServerResourcesError.isNotEmpty()) {
+                                { HttpServerManager.restartHttpServer() }
+                            } else null,
+                            onStayOnline = { showStayOnlineOverlay = true },
+                        )
+                    }
                     VerticalSpace(16.dp)
-                    DlnaReceiverSection(navController)
+                    PCard(modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN)) {
+                        DlnaReceiverSection(navController)
+                    }
                     VerticalSpace(16.dp)
                 }
                 item {

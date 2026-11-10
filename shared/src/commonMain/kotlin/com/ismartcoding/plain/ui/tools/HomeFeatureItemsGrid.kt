@@ -1,5 +1,6 @@
 package com.ismartcoding.plain.ui.tools
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
@@ -19,6 +20,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import com.ismartcoding.plain.ui.base.PCard
 import com.ismartcoding.plain.ui.base.PIconTextActionButton
 import com.ismartcoding.plain.ui.components.reorderable.ReorderableItem
 import com.ismartcoding.plain.ui.components.reorderable.rememberReorderableLazyGridState
@@ -71,6 +73,8 @@ internal fun FeatureItemsGrid(
     LazyVerticalGrid(
         columns = GridCells.Adaptive(104.dp), state = gridState,
         modifier = modifier, contentPadding = contentPadding,
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp),
     ) {
         item(key = "header", span = { GridItemSpan(maxLineSpan) }) { header() }
         items(features, key = { it.type.name }) { item -> itemContent(item) }
@@ -79,8 +83,10 @@ internal fun FeatureItemsGrid(
 
 @Composable
 private fun FeatureItemAction(item: FeatureItem, modifier: Modifier = Modifier) {
-    PIconTextActionButton(
-        icon = item.iconRes, text = stringResource(item.titleRes),
-        modifier = modifier.fillMaxWidth().heightIn(min = 88.dp), onClick = item.click,
-    )
+    PCard {
+        PIconTextActionButton(
+            icon = item.iconRes, text = stringResource(item.titleRes),
+            modifier = modifier.fillMaxWidth().heightIn(min = 88.dp), onClick = item.click,
+        )
+    }
 }
