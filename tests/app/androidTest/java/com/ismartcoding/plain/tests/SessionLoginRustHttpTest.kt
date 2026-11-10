@@ -1,9 +1,11 @@
 package com.ismartcoding.plain.tests
 
 import androidx.compose.runtime.snapshotFlow
+import androidx.test.core.app.ActivityScenario
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.ismartcoding.plain.Prefs
+import com.ismartcoding.plain.MainActivity
 import com.ismartcoding.plain.features.sessions.RustSessionStore
 import com.ismartcoding.plain.features.sessions.RustWebLogin
 import com.ismartcoding.plain.helpers.Base64Lenient
@@ -32,6 +34,7 @@ class SessionLoginRustHttpTest {
         var pendingId = ""
         val http = createTestHttpClient(TestHttpClientSpec.HttpHost)
         var browser: PasswordLoginFixture? = null
+        val activity = ActivityScenario.launch(MainActivity::class.java)
         try {
             Prefs.backgroundServiceEnabled.value = true
             Prefs.remoteAccess.value = true
@@ -81,6 +84,7 @@ class SessionLoginRustHttpTest {
             Prefs.setLoginRequireApproval(oldTwoFactor)
             Prefs.remoteAccess.value = oldDesktop
             Prefs.backgroundServiceEnabled.value = oldService
+            activity.close()
         }
     }
 }
