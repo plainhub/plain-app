@@ -28,7 +28,7 @@ import com.ismartcoding.plain.ui.components.TextFieldDialog
 import com.ismartcoding.plain.ui.components.ToastManager
 
 @Composable
-fun PairPeerDialog(device: NearbyDevice, initialMode: PairingMode? = null, onDismiss: () -> Unit) {
+fun PairPeerDialog(device: NearbyDevice, initialMode: PairingMode? = null, qrCode: String? = null, onDismiss: () -> Unit) {
     val scope = rememberCoroutineScope()
     val failureText = stringResource(Res.string.pairing_failed)
     val directMode = initialMode ?: if (device.remoteAccess == true) null else PairingMode.CHAT
@@ -46,7 +46,7 @@ fun PairPeerDialog(device: NearbyDevice, initialMode: PairingMode? = null, onDis
             try {
                 withContext(NonCancellable) {
                     if (generation == null) {
-                        val result = RustPairingRuntime.start(device, mode)
+                        val result = RustPairingRuntime.start(device, mode, qrCode)
                         val value = result.generation
                         generation = value
                         if (disposed) RustPairingRuntime.cancelGeneration(value)
@@ -66,7 +66,8 @@ fun PairPeerDialog(device: NearbyDevice, initialMode: PairingMode? = null, onDis
     }
     LaunchedEffect(phase) {
         when (phase) {
-            PairingPhase.SUCCEEDED, PairingPhase.CANCELLED -> onDismiss()
+            PairingPhase.SUCCEEDED -> if (qrCode == null) onDismiss()
+            PairingPhase.CANCELLED -> onDismiss()
             PairingPhase.FAILED -> {
                 ToastManager.showErrorToast(failureText)
                 onDismiss()
@@ -97,7 +98,11 @@ fun PairPeerDialog(device: NearbyDevice, initialMode: PairingMode? = null, onDis
     AlertDialog(
         onDismissRequest = onDismiss,
         containerColor = MaterialTheme.colorScheme.dialogSheetBackground,
-        title = { Text(stringResource(if (waiting) Res.string.waiting_for_confirmation else Res.string.pair_device)) },
+        title = { Text(stringResource(when {
+            phase == PairingPhase.SUCCEEDED -> Res.string.paired
+            waiting && qrCode == null -> Res.string.waiting_for_confirmation
+            else -> Res.string.pair_device
+        })) },
         text = {
             Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
                 Text(device.name, style = MaterialTheme.typography.bodyLarge, color = MaterialTheme.colorScheme.onSurfaceVariant)
@@ -144,6 +149,6 @@ fun PairPeerDialog(device: NearbyDevice, initialMode: PairingMode? = null, onDis
                 },
             )
         },
-        dismissButton = { PTextButton(text = stringResource(Res.string.cancel), onClick = onDismiss) },
+        dismissButton = { PTextButton(text = stringResource(if (phase == PairingPhase.SUCCEEDED) Res.string.close else Res.string.cancel), onClick = onDismiss) },
     )
 }

@@ -2,6 +2,18 @@ use super::management::{parts, reply};
 use super::values::{c_string, input};
 use std::ffi::c_char;
 
+fn pairing_code() -> String {
+    reply!((|| {
+        let (runtime, management) = parts()?;
+        runtime.block_on(management.pairing_code())
+    })())
+}
+
+#[unsafe(no_mangle)]
+pub extern "C" fn plain_pairing_code() -> *mut c_char {
+    c_string(pairing_code())
+}
+
 fn is_pairing_request_current(id: String, signature: String) -> String {
     reply!((|| {
         let (runtime, management) = parts()?;
@@ -39,6 +51,16 @@ pub extern "C" fn plain_reconnect_peers() -> *mut c_char {
 mod android {
     use super::*;
     use jni::{EnvUnowned, errors::ThrowRuntimeExAndDefault, objects::{JObject, JString}, sys::jstring};
+    #[unsafe(no_mangle)]
+    pub extern "system" fn Java_com_ismartcoding_plain_rust_native_RustNativeBindings_pairingCode(
+        mut env: EnvUnowned<'_>,
+        _: JObject<'_>,
+    ) -> jstring {
+        env.with_env(|env| -> jni::errors::Result<_> { env.new_string(pairing_code()) })
+            .resolve::<ThrowRuntimeExAndDefault>()
+            .into_raw()
+    }
+
     #[unsafe(no_mangle)]
     pub extern "system" fn Java_com_ismartcoding_plain_rust_native_RustNativeBindings_isPairingRequestCurrent(
         mut env: EnvUnowned<'_>,

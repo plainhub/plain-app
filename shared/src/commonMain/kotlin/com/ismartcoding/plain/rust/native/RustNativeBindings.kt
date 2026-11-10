@@ -68,6 +68,7 @@ internal expect object RustNativeBindings {
     fun resetAdbToken(): String
     fun setNotificationFilterMode(mode: String): String
     fun clearNotificationFilterApps(): String
+    fun pairingCode(): String
     fun isPairingRequestCurrent(id: String, signature: String): String
     fun reconnectPeers(): String
     fun filePaths(paths: String): String

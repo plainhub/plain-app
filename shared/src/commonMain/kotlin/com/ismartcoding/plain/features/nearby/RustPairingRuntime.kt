@@ -12,11 +12,9 @@ import com.ismartcoding.plain.rust.native.RustNativeApi
 object RustPairingRuntime {
     suspend fun states(): List<PairingState> = GraphqlApi.execute(Query.pairingStates())
 
-    suspend fun start(device: NearbyDevice, mode: PairingMode = PairingMode.CHAT): PairingState {
-        val ip = if (DiscoveryMethod.QR in device.discoveryMethods) device.bestIp.takeIf { it.isNotBlank() } ?: device.ips.firstOrNull() else null
-        val host = ip?.let { "${if (':' in it) "[$it]" else it}:${device.port}" }
+    suspend fun start(device: NearbyDevice, mode: PairingMode = PairingMode.CHAT, qrCode: String? = null): PairingState {
         val state = GraphqlApi.execute(
-            Mutation.pairDevice(PairingDeviceInput(id = device.id, host = host, mode = mode)),
+            Mutation.pairDevice(PairingDeviceInput(id = device.id, host = qrCode, mode = mode)),
         )
         PairingProjection.reconcile()
         return state

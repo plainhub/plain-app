@@ -70,6 +70,7 @@ internal actual object RustNativeBindings {
     actual external fun resetAdbToken(): String
     actual external fun setNotificationFilterMode(mode: String): String
     actual external fun clearNotificationFilterApps(): String
+    actual external fun pairingCode(): String
     actual external fun isPairingRequestCurrent(id: String, signature: String): String
     actual external fun reconnectPeers(): String
     actual external fun filePaths(paths: String): String

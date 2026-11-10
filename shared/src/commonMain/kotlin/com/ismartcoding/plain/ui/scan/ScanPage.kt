@@ -17,7 +17,9 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
-import com.ismartcoding.plain.features.nearby.PairingInitiator
+import com.ismartcoding.plain.features.nearby.PairingMode
+import com.ismartcoding.plain.models.NearbyDevice
+import com.ismartcoding.plain.ui.nearby.PairPeerDialog
 import com.ismartcoding.plain.features.nearby.RustPairingCode
 import com.ismartcoding.plain.features.files.PickFileTag
 import com.ismartcoding.plain.features.files.PickFileType
@@ -26,7 +28,6 @@ import com.ismartcoding.plain.events.PickFileEvent
 import com.ismartcoding.plain.events.PickFileResultEvent
 import com.ismartcoding.plain.events.RequestPermissionsEvent
 import com.ismartcoding.plain.lib.Channel
-import com.ismartcoding.plain.lib.coIO
 import com.ismartcoding.plain.lib.sendEvent
 import com.ismartcoding.plain.ui.i18n.LocaleHelper
 import com.ismartcoding.plain.platform.permissions.Permission
@@ -46,6 +47,8 @@ import com.ismartcoding.plain.ui.resources.history as ui_drawable_history
 import com.ismartcoding.plain.ui.resources.close as ui_drawable_close
 import kotlinx.coroutines.CancellationException
 
+private data class ScannedPairing(val device: NearbyDevice, val code: String, val resume: () -> Unit)
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ScanPage(navController: NavHostController) {
@@ -57,6 +60,14 @@ fun ScanPage(navController: NavHostController) {
     var scannerHasCloseAction by remember { mutableStateOf(false) }
     var closeScannerRequest by remember { mutableStateOf(0) }
     var resumeScannerAfterResult by remember { mutableStateOf<(() -> Unit)?>(null) }
+
+    var pairing by remember { mutableStateOf<ScannedPairing?>(null) }
+    pairing?.let { scan ->
+        PairPeerDialog(scan.device, initialMode = PairingMode.CHAT, qrCode = scan.code) {
+            pairing = null
+            scan.resume()
+        }
+    }
 
     LaunchedEffect(Channel.sharedFlow) {
         Channel.sharedFlow.collect { event ->
@@ -139,22 +150,7 @@ fun ScanPage(navController: NavHostController) {
                 if (payload == null) {
                     false
                 } else {
-                    scope.launch {
-                        val title = LocaleHelper.getStringFAsync(Res.string.pair_with_device, payload.name)
-                        val message = LocaleHelper.getStringFAsync(Res.string.confirm_pair_with_device, payload.name)
-                        DialogHelper.showConfirmDialog(
-                            title = title,
-                            message = message,
-                            confirmButton = Pair(LocaleHelper.getStringAsync(Res.string.confirm)) {
-                                onFinished()
-                                coIO {
-                                    PairingInitiator.start(payload)
-                                    DialogHelper.showSuccess(Res.string.qr_pair_request_sent)
-                                }
-                            },
-                            dismissButton = Pair(LocaleHelper.getStringAsync(Res.string.cancel), onFinished),
-                        )
-                    }
+                    pairing = ScannedPairing(payload, text, onFinished)
                     true
                 }
             },

@@ -54,6 +54,7 @@ import com.ismartcoding.plain.rustprefs.plain_import_pomodoro_sound
 import com.ismartcoding.plain.rustprefs.plain_import_tls_certificate_pem
 import com.ismartcoding.plain.rustprefs.plain_import_tls_certificate_pkcs12
 import com.ismartcoding.plain.rustprefs.plain_is_pairing_request_current
+import com.ismartcoding.plain.rustprefs.plain_pairing_code
 import com.ismartcoding.plain.rustprefs.plain_lan_ipv4_addresses
 import com.ismartcoding.plain.rustprefs.plain_load_preferences
 import com.ismartcoding.plain.rustprefs.plain_prefs_string_free
@@ -287,6 +288,7 @@ internal actual object RustNativeBindings {
 
     actual fun clearNotificationFilterApps(): String = readString(plain_clear_notification_filter_apps())
 
+    actual fun pairingCode(): String = readString(plain_pairing_code())
     actual fun isPairingRequestCurrent(id: String, signature: String): String = memScoped {
         readString(plain_is_pairing_request_current(id.cstr.ptr, signature.cstr.ptr))
     }

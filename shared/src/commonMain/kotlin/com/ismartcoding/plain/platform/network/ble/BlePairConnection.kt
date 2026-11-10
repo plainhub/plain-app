@@ -37,7 +37,7 @@ internal class BlePairConnection(private val device: BleGattClient) {
             job = currentCoroutineContext()[Job]
             notifications = true
         }
-        requestId = RustBleWire.nextRequestId()
+        if (requestId == 0) requestId = RustBleWire.nextRequestId()
         return api.sendRequest(BleServices.nearby, packet, requestId)
     }
 

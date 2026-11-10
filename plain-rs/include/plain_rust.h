@@ -89,6 +89,7 @@ char *plain_reset_password(void);
 char *plain_reset_adb_token(void);
 char *plain_set_notification_filter_mode(const char *mode);
 char *plain_clear_notification_filter_apps(void);
+char *plain_pairing_code(void);
 char *plain_is_pairing_request_current(const char *id, const char *signature);
 char *plain_reconnect_peers(void);
 char *plain_file_paths(const char *paths);

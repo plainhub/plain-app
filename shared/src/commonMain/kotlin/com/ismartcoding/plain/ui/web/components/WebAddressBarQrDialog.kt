@@ -19,12 +19,14 @@ import com.ismartcoding.plain.ui.qrcode.generateQrCode
 import androidx.compose.ui.graphics.FilterQuality
 import com.ismartcoding.plain.ui.base.PTextButton
 import com.ismartcoding.plain.ui.components.ButtonSize
+import com.ismartcoding.plain.ui.components.RequestVerificationCodeCard
 import com.ismartcoding.plain.lib.extensions.toBreakableUrl
 import com.ismartcoding.plain.ui.theme.dialogSheetBackground
 
 @Composable
 fun WebAddressBarQrDialog(
     url: String,
+    verificationCode: String? = null,
     onClose: () -> Unit,
 ) {
     val qrCode = remember(url) { generateQrCode(url, 300, 300) }
@@ -41,7 +43,7 @@ fun WebAddressBarQrDialog(
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
                 Text(
-                    text = stringResource(Res.string.scan_qrcode_to_access_web),
+                    text = stringResource(if (verificationCode == null) Res.string.scan_qrcode_to_access_web else Res.string.qrcode),
                     style = MaterialTheme.typography.titleMedium,
                     color = MaterialTheme.colorScheme.onSurface,
                 )
@@ -51,11 +53,11 @@ fun WebAddressBarQrDialog(
                     contentDescription = stringResource(Res.string.qrcode),
                     modifier = Modifier.size(300.dp),
                 )
-                Text(
+                if (verificationCode == null) Text(
                     text = url.toBreakableUrl(),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
+                ) else RequestVerificationCodeCard(verificationCode, stringResource(Res.string.pairing_compare_code))
             }
         },
     )

@@ -8,8 +8,12 @@ import com.ismartcoding.plain.lib.JsonHelper
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
 import kotlinx.coroutines.withContext
+import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonObject
+
+@Serializable
+internal data class PairingQr(val payload: String, val requestId: String, val verificationCode: String)
 
 internal object RustNativeApi {
     suspend fun restartHttpServer(): Boolean = nativeCall { RustNativeBindings.restartHttpServer() }
@@ -67,6 +71,8 @@ internal object RustNativeApi {
     suspend fun setNotificationFilterMode(mode: NotificationFilterMode): Boolean = nativeCall { RustNativeBindings.setNotificationFilterMode(mode.name.lowercase()) }
 
     suspend fun clearNotificationFilterApps(): Boolean = nativeCall { RustNativeBindings.clearNotificationFilterApps() }
+
+    suspend fun pairingCode(): PairingQr = nativeCall { RustNativeBindings.pairingCode() }
 
     suspend fun isPairingRequestCurrent(id: String, signature: String): Boolean =
         nativeCall { RustNativeBindings.isPairingRequestCurrent(id, signature) }

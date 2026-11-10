@@ -7,6 +7,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 
 import com.ismartcoding.plain.models.NearbyDevice
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -61,6 +62,12 @@ import com.ismartcoding.plain.ui.theme.PlainTheme
 import org.jetbrains.compose.resources.stringResource
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import com.ismartcoding.plain.rust.native.PairingQr
+import com.ismartcoding.plain.rust.native.RustNativeApi
+import com.ismartcoding.plain.ui.components.DialogHelper
+import com.ismartcoding.plain.ui.web.components.WebAddressBarQrDialog
+import kotlinx.coroutines.launch
 import com.ismartcoding.plain.features.nearby.BleScanDriver
 import com.ismartcoding.plain.features.nearby.RustNearbyDevices
 import com.ismartcoding.plain.lib.logcat.LogCat
@@ -84,6 +91,11 @@ fun NearbyPage(
     val localName by Prefs.deviceName.collectAsState()
     val network by NetworkEvents.snapshot.collectAsState()
     val selectedDevice by MainViewModel.selectedDevice
+    val scope = rememberCoroutineScope()
+    var pairingCode by remember { mutableStateOf<PairingQr?>(null) }
+    pairingCode?.let { code ->
+        WebAddressBarQrDialog(code.payload, verificationCode = code.verificationCode) { pairingCode = null }
+    }
     LaunchedEffect(Unit) {
         try { NetworkEvents.refresh() }
         catch (cancelled: CancellationException) { throw cancelled }
@@ -162,11 +174,24 @@ fun NearbyPage(
                     subtitle = network.lanIpv4Addresses.orEmpty().joinToString(", "),
                     start = { PeerIconWithStatus(getDeviceType().getIcon(), null) },
                     action = {
-                        if (selectedDevice != null) POutlinedButton(
-                            text = stringResource(Res.string.nearby_switch_device),
-                            buttonSize = ButtonSize.SMALL,
-                            onClick = { MainViewModel.selectDevice(null) },
-                        )
+                        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                            POutlinedButton(
+                                text = stringResource(Res.string.qrcode),
+                                buttonSize = ButtonSize.SMALL,
+                                onClick = {
+                                    scope.launch {
+                                        try { pairingCode = RustNativeApi.pairingCode() }
+                                        catch (cancelled: CancellationException) { throw cancelled }
+                                        catch (error: Exception) { DialogHelper.showErrorDialog(error.message.orEmpty()) }
+                                    }
+                                },
+                            )
+                            if (selectedDevice != null) POutlinedButton(
+                                text = stringResource(Res.string.nearby_switch_device),
+                                buttonSize = ButtonSize.SMALL,
+                                onClick = { MainViewModel.selectDevice(null) },
+                            )
+                        }
                     },
                 )
                 VerticalSpace(8.dp)
