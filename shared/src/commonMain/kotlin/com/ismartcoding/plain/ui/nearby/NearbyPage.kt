@@ -154,7 +154,7 @@ fun NearbyPage(
                     }
                 }
             }
-            item { PSectionTitle(stringResource(Res.string.nearby_my_devices)) }
+            item { PSectionTitle(stringResource(Res.string.paired_devices)) }
             item {
                 PListItem(
                     modifier = PlainTheme.getCardModifier(),
