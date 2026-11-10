@@ -184,4 +184,6 @@
     <string name="nearby_switch_device">Değiştir</string>
     <string name="pair_full_control">Tam kontrol</string>
     <string name="nearby_enable_remote_access">Diğer cihazda uzaktan erişimi etkinleştirin</string>
+    <string name="pairing_identity_changed">Cihazın açık anahtarı değişti. Uygulama yeniden yüklenmiş olabilir. Güvenmeden önce parmak izinin tamamını karşılaştırın.</string>
+    <string name="pairing_trust">Güven</string>
 </resources>

@@ -10,4 +10,5 @@ data class PairingDeviceInput(
     val mode: PairingMode? = null,
     val password: String? = null,
     val generation: String? = null,
+    val confirm: Boolean? = null,
 )

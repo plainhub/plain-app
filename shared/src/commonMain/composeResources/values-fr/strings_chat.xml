@@ -184,4 +184,6 @@
     <string name="nearby_switch_device">Changer</string>
     <string name="pair_full_control">Contrôle total</string>
     <string name="nearby_enable_remote_access">Activez l’accès à distance sur l’autre appareil</string>
+    <string name="pairing_identity_changed">La clé publique de cet appareil a changé, peut-être après une réinstallation. Vérifiez son empreinte complète avant de lui faire confiance.</string>
+    <string name="pairing_trust">Faire confiance</string>
 </resources>

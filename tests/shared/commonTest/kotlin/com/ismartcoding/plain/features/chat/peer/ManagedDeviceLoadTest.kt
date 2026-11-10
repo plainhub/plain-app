@@ -47,7 +47,7 @@ class ManagedDeviceLoadTest {
                 assertEquals("/target.mp3", path)
                 "encrypted-resource"
             },
-            encrypt = { _, payload -> requests.add(JsonHelper.jsonDecode(payload)); Base64.encode(byteArrayOf(1)) },
+            encrypt = { _, _, payload -> requests.add(JsonHelper.jsonDecode(payload)); Base64.encode(byteArrayOf(1)) },
             decrypt = { _, _, _ -> Base64.encode(response.encodeToByteArray()) },
             transport = object : GraphqlHttpTransport {
                 override suspend fun post(url: String, clientId: String, body: ByteArray, contentType: String, tlsCertificateSha256: String?) = GraphqlHttpResponse(200, byteArrayOf(2))

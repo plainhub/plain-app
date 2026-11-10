@@ -27,7 +27,7 @@ internal class PeerHttpClient(
     peer: Peer,
     private val transport: GraphqlHttpTransport = createGraphqlHttpTransport(),
     private val peers: suspend () -> List<Peer> = { GraphqlApi.execute(Query.peers()) },
-    private val encrypt: suspend (String, String) -> String = { token, payload -> nativeCall { RustNativeBindings.encryptHttpRequest(token, payload) } },
+    private val encrypt: suspend (String, String, String) -> String = { token, endpoint, payload -> nativeCall { RustNativeBindings.encryptHttpRequest(token, endpoint, payload) } },
     private val decrypt: suspend (String, String, String) -> String = { token, request, response ->
         nativeCall { RustNativeBindings.decryptHttpResponse(token, "/graphql", request, response) }
     },
@@ -61,7 +61,7 @@ internal class PeerHttpClient(
 
     val graphql = GraphqlClient("http") { operation ->
         val peer = current()
-        val encoded = encrypt(peer.token, JsonHelper.jsonEncode(operation))
+        val encoded = encrypt(peer.token, "/graphql", JsonHelper.jsonEncode(operation))
         val response = post(peer, "/graphql", Base64.decode(encoded))
         val plain = decrypt(peer.token, encoded, Base64.encode(response.body))
         current()
@@ -70,7 +70,7 @@ internal class PeerHttpClient(
 
     suspend fun uploadChunk(id: String, index: Long, bytes: ByteArray, tlsCertificateSha256: String): String {
         val peer = current()
-        val info = Base64.decode(encrypt(peer.token, JsonHelper.jsonEncode(UploadChunkInfo(id, index, bytes.size.toLong()))))
+        val info = Base64.decode(encrypt(peer.token, "/upload_chunk", JsonHelper.jsonEncode(UploadChunkInfo(id, index, bytes.size.toLong()))))
         val boundary = "plain-upload-$id-$index"
         val segments = listOf(
             "--$boundary\r\nContent-Disposition: form-data; name=\"info\"; filename=\"info\"\r\nContent-Type: application/octet-stream\r\n\r\n".encodeToByteArray(),

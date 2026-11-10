@@ -547,7 +547,7 @@ class ManagedDeviceUiAcceptanceTest {
         val downloads = java.util.concurrent.atomic.AtomicReference(com.ismartcoding.plain.models.SharedDownloadSnapshot("fixture-runtime", 0, emptyList()))
         val http = com.ismartcoding.plain.rust.graphql.PeerHttpClient(
             peer, peers = { listOf(peer) }, clientId = { "fixture-client" },
-            encrypt = { _, payload -> kotlin.io.encoding.Base64.encode(payload.encodeToByteArray()) },
+            encrypt = { _, _, payload -> kotlin.io.encoding.Base64.encode(payload.encodeToByteArray()) },
             decrypt = { _, _, response -> response },
             transport = object : com.ismartcoding.plain.rust.graphql.GraphqlHttpTransport {
                 override suspend fun post(url: String, clientId: String, body: ByteArray, contentType: String, tlsCertificateSha256: String?): com.ismartcoding.plain.rust.graphql.GraphqlHttpResponse {
@@ -1155,6 +1155,7 @@ class ManagedDeviceUiAcceptanceTest {
                             if (show.value) com.ismartcoding.plain.ui.nearby.PairPeerDialog(
                                 com.ismartcoding.plain.models.NearbyDevice(
                                     id = "pair-dialog-ui-fixture", name = "Nearby device", port = 8443, remoteAccess = true,
+                                    signaturePublicKey = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=",
                                     deviceType = com.ismartcoding.plain.platform.system.DeviceType.PHONE,
                                     version = "fixture", platform = "fixture", lastSeen = "",
                                     status = com.ismartcoding.plain.features.nearby.PeerStatus.UNPAIRED,
@@ -1609,6 +1610,7 @@ class ManagedDeviceUiAcceptanceTest {
     fun unpairRequiresConfirmationAndResetsTheDeleteHistoryCheckbox() = runBlocking {
         val device = com.ismartcoding.plain.models.NearbyDevice(
             id = "unpair-confirmation-${UUID.randomUUID()}", name = "Confirmation device", port = 8443,
+            signaturePublicKey = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=",
             deviceType = com.ismartcoding.plain.platform.system.DeviceType.PHONE,
             version = "4.0.0", platform = "Android", lastSeen = "",
             status = com.ismartcoding.plain.features.nearby.PeerStatus.PAIRED,

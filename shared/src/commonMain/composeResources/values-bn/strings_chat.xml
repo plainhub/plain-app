@@ -184,4 +184,6 @@
     <string name="nearby_switch_device">পরিবর্তন</string>
     <string name="pair_full_control">সম্পূর্ণ নিয়ন্ত্রণ</string>
     <string name="nearby_enable_remote_access">অন্য ডিভাইসে রিমোট অ্যাক্সেস চালু করুন</string>
+    <string name="pairing_identity_changed">ডিভাইসের পাবলিক কী বদলেছে। অ্যাপটি আবার ইনস্টল করা হয়ে থাকতে পারে। বিশ্বাস করার আগে সম্পূর্ণ ফিঙ্গারপ্রিন্ট মিলিয়ে নিন।</string>
+    <string name="pairing_trust">বিশ্বাস করুন</string>
 </resources>

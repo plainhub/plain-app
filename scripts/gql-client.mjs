@@ -1,22 +1,13 @@
 #!/usr/bin/env node
-// Wire-protocol client for the phone's main listener: logs in over the
-// WebSocket `auth=1` handshake and speaks token-mode GraphQL. This is the
-// same exchange the web client performs in `login-handshake.ts` /
-// `gql-client.ts`, written out in Node so the API suite can drive it from a
-// shell without a browser.
-//
-// Zero dependencies on purpose: Node's built-in crypto already covers P-256
-// ECDH, Ed25519 and ChaCha20-Poly1305. The only piece missing is HChaCha20,
-// which XChaCha20 needs to stretch the 24-byte nonce down to the 12 bytes
-// ChaCha20-Poly1305 takes.
-//
-//   node scripts/gql-client.mjs --host <ip> --port <port> --queries <tsv>
-//
-// Queries file is `name<TAB>query` per line; one TSV result line comes back
-// per query: `name<TAB>ok|http<TAB>detail`.
+// OPAQUE password login and encrypted GraphQL using the shared Rust WASM client.
+// Run plain-core/scripts/build-auth-wasm.sh in the sibling checkout first.
+// Set PLAIN_TEST_PASSWORD_FILE (raw password bytes, no trailing newline) or PLAIN_TEST_PASSWORD.
+// --base-url preserves HTTP/HTTPS; HTTPS always uses Node's normal certificate validation.
+// HTTP authenticates the API through OPAQUE but does not authenticate downloaded webpage code.
 
 import crypto from 'node:crypto'
 import { execSync } from 'node:child_process'
+import { readFileSync } from 'node:fs'
 
 // ---- XChaCha20-Poly1305 ----------------------------------------------------
 
@@ -56,130 +47,140 @@ function hchacha20(key, nonce16) {
   return out
 }
 
-function xchachaSeal(key32, plaintext) {
+function xchachaSeal(key32, plaintext, aad) {
   const nonce = crypto.randomBytes(24)
   const cipher = crypto.createCipheriv('chacha20-poly1305', hchacha20(key32, nonce.subarray(0, 16)), Buffer.concat([Buffer.alloc(4), nonce.subarray(16)]), { authTagLength: 16 })
+  if (aad) cipher.setAAD(aad, { plaintextLength: plaintext.length })
   const body = Buffer.concat([cipher.update(plaintext), cipher.final(), cipher.getAuthTag()])
   return Buffer.concat([nonce, body])
 }
 
-function xchachaOpen(key32, blob) {
-  if (blob.length < 24) throw new Error(`ciphertext too short (${blob.length})`)
+function xchachaOpen(key32, blob, aad) {
+  if (blob.length < 40) throw new Error(`ciphertext too short (${blob.length})`)
   const nonce = blob.subarray(0, 24)
   const decipher = crypto.createDecipheriv('chacha20-poly1305', hchacha20(key32, nonce.subarray(0, 16)), Buffer.concat([Buffer.alloc(4), nonce.subarray(16)]), { authTagLength: 16 })
+  if (aad) decipher.setAAD(aad, { plaintextLength: blob.length - 40 })
   decipher.setAuthTag(blob.subarray(blob.length - 16))
   return Buffer.concat([decipher.update(blob.subarray(24, blob.length - 16)), decipher.final()])
 }
 
-// ---- handshake primitives --------------------------------------------------
-
-const sha512hex = (text) => crypto.createHash('sha512').update(text, 'utf8').digest('hex')
-
-// DER SPKI prefix for a raw 32-byte Ed25519 public key.
-const ED25519_SPKI = Buffer.from('302a300506032b6570032100', 'hex')
-
-function ed25519Verify(publicKeyB64, message, signatureB64) {
-  const key = crypto.createPublicKey({ key: Buffer.concat([ED25519_SPKI, Buffer.from(publicKeyB64, 'base64')]), format: 'der', type: 'spki' })
-  return crypto.verify(null, Buffer.from(message, 'utf8'), key, Buffer.from(signatureB64, 'base64'))
-}
-
 // ---- login -----------------------------------------------------------------
 
-async function login(host, port, clientId) {
-  const initRes = await fetch(`http://${host}:${port}/init`, { method: 'POST', headers: { 'c-id': clientId } })
-  if (!initRes.ok) throw new Error(`/init -> HTTP ${initRes.status}`)
-  const { password, signaturePublicKey } = await initRes.json()
-  if (!password) throw new Error('/init returned no password — is a password configured on the device?')
-
-  const passwordHash = sha512hex(password)
-  const key = Buffer.from(passwordHash.slice(0, 32), 'ascii')
-
-  const ecdh = crypto.createECDH('prime256v1')
-  ecdh.generateKeys()
-  const clientPub = ecdh.getPublicKey() // uncompressed X9.63, what the server decodes
-
-  const request = Buffer.from(
-    JSON.stringify({
-      password: passwordHash,
-      appName: 'plain-api-test',
-      appVersion: '1',
-      osName: process.platform,
-      osVersion: process.version,
-      isMobile: false,
-      ecdhPublicKey: clientPub.toString('base64'),
-    }),
-    'utf8',
-  )
-
-  // The server answers PENDING first whenever 2FA is on (the Rust default).
-  // It then delivers the real response on this same socket, but only after the
-  // app's confirmation prompt is accepted — so `onPending` is where the caller
-  // taps that prompt, and the socket has to stay open until then.
-  let approved = false
-  const response = await new Promise((resolve, reject) => {
-    const ws = new WebSocket(`ws://${host}:${port}/auth?cid=${encodeURIComponent(clientId)}&auth=1`)
-    const timer = setTimeout(() => {
-      ws.close()
-      reject(new Error(approved ? 'the device never answered after the approval — nobody accepted the prompt' : 'login handshake timed out'))
-    }, 90000)
-    ws.binaryType = 'arraybuffer'
-    ws.onopen = () => ws.send(xchachaSeal(key, request))
-    ws.onmessage = async (event) => {
-      const frame = xchachaOpen(key, Buffer.from(new Uint8Array(event.data)))
-      if (JSON.parse(frame.toString('utf8')).status === 'PENDING' && !approved) {
-        approved = true
-        console.error('PENDING — run the on-pending command, waiting for the app to confirm')
-        // Its stdout goes to our stderr so it cannot corrupt the result stream.
-        // A failing approval is not fatal to the process: the socket stays
-        // open and the dialog can still be accepted, so report it and keep
-        // waiting rather than throwing out of the message handler.
-        if (opts['on-pending']) {
-          try {
-            execSync(opts['on-pending'], { stdio: ['inherit', 2, 2] })
-          } catch (e) {
-            console.error(`approval command failed: ${e.message.split('\n')[0]}`)
-          }
-        }
-        return
-      }
-      clearTimeout(timer)
-      ws.close()
-      resolve(frame)
-    }
-    ws.onerror = () => {
-      clearTimeout(timer)
-      reject(new Error('login websocket error — wrong password or desktop access disabled?'))
-    }
-    ws.onclose = (event) => {
-      clearTimeout(timer)
-      if (!approved) reject(new Error(`login closed: ${event.code} ${event.reason || '(no reason)'}`))
-    }
+async function login(clientId) {
+  const initRes = await fetch(new URL('/init', baseUrl), {
+    method: 'POST', headers: { 'c-id': clientId },
   })
-
-  const result = JSON.parse(response.toString('utf8'))
-  if (result.status !== 'COMPLETED') throw new Error(`unexpected login status: ${result.status}`)
-
-  const signed = `${result.clientId}|${result.status}|${result.ecdhPublicKey}|${result.timestamp}`
-  if (!ed25519Verify(signaturePublicKey, signed, result.signature)) {
-    throw new Error('login response signature did not verify against the /init key')
+  if (!initRes.ok) throw new Error(`/init -> HTTP ${initRes.status}`)
+  const init = await initRes.json()
+  if (init.passwordRequired !== true) throw new Error('This test client requires password login enabled on the server')
+  const publicKey = (value) => {
+    const key = Buffer.from(value ?? '', 'base64')
+    if (key.length !== 32 || key.toString('base64') !== value) throw new Error('Invalid /init public key')
+    return key
   }
+  const signingKey = publicKey(init.signaturePublicKey)
+  const opaqueKey = publicKey(init.opaquePublicKey)
+  const passwordFile = opts['password-file'] || process.env.PLAIN_TEST_PASSWORD_FILE
+  const password = passwordFile ? readFileSync(passwordFile) : Buffer.from(process.env.PLAIN_TEST_PASSWORD ?? '', 'utf8')
+  delete process.env.PLAIN_TEST_PASSWORD
+  if (!password.length) throw new Error('Set PLAIN_TEST_PASSWORD_FILE or PLAIN_TEST_PASSWORD; /init never supplies a password')
+  const moduleUrl = new URL('../../plain-desktop/src/lib/opaque/pkg/plain_auth.js', import.meta.url)
+  let module
+  try {
+    module = await import(moduleUrl.href)
+    module.initSync({ module: readFileSync(new URL('plain_auth_bg.wasm', moduleUrl)) })
+  } catch (error) {
+    password.fill(0)
+    throw new Error('OPAQUE client artifacts unavailable; run plain-core/scripts/build-auth-wasm.sh', { cause: error })
+  }
+  let login
+  try { login = module.OpaqueLogin.start(password) }
+  finally { password.fill(0) }
+  let key
+  let responseAad
+  let approved = false
+  try {
+    const result = await new Promise((resolve, reject) => {
+      const url = new URL('/auth', baseUrl)
+      url.protocol = url.protocol === 'https:' ? 'wss:' : 'ws:'
+      url.searchParams.set('cid', clientId)
+      const ws = new WebSocket(url)
+      let settled = false
+      const finish = (error, result) => {
+        if (settled) return
+        settled = true
+        clearTimeout(timer)
+        ws.close()
+        if (error) reject(error)
+        else resolve(result)
+      }
+      const timer = setTimeout(() => finish(new Error('Login timed out')), 90000)
+      ws.binaryType = 'arraybuffer'
+      ws.onopen = () => ws.send(login.request())
+      ws.onmessage = (event) => {
+        try {
+          if (!(event.data instanceof ArrayBuffer)) throw new Error('Expected binary login frame')
+          const frame = Buffer.from(event.data)
+          if (login) {
+            const state = login
+            login = undefined
+            const completed = state.finish(frame, clientId, signingKey)
+            let requestAad
+            let ke3
+            try {
+              if (!crypto.timingSafeEqual(Buffer.from(completed.serverPublicKey), opaqueKey)) throw new Error('Server OPAQUE key changed')
+              const apiKey = completed.apiKey
+              key = Buffer.from(apiKey.buffer, apiKey.byteOffset, apiKey.byteLength)
+              requestAad = completed.requestAad
+              responseAad = completed.responseAad
+              ke3 = completed.ke3
+            } finally { completed.free() }
+            const details = Buffer.from(JSON.stringify({
+              appName: 'plain-api-test', appVersion: '1', osName: process.platform,
+              osVersion: process.version, isMobile: false,
+            }))
+            ws.send(Buffer.concat([Buffer.from(ke3), xchachaSeal(key, details, requestAad)]))
+            return
+          }
+          const reply = JSON.parse(xchachaOpen(key, frame, responseAad).toString('utf8'))
+          if (reply.status === 'PENDING') {
+            if (!approved && opts['on-pending']) {
+              approved = true
+              try { execSync(opts['on-pending'], { stdio: ['inherit', 2, 2] }) }
+              catch (error) { console.error(`approval command failed: ${error.message.split('\n')[0]}`) }
+            }
+            return
+          }
+          if (reply.status !== 'COMPLETED' || typeof reply.clientId !== 'string' || !reply.clientId) throw new Error('Invalid completed login response')
+          finish(undefined, reply)
+        } catch (error) { finish(error) }
+      }
+      ws.onerror = () => finish(new Error('Login websocket failed; verify server availability and trusted TLS certificate'))
+      ws.onclose = event => finish(new Error(`Login closed: ${event.code} ${event.reason}`))
+    })
+    // The reply clientId identifies the server device; API requests retain our session cid.
+    return { clientId, token: key.toString('base64') }
+  } finally {
+    login?.free()
+    key?.fill(0)
+  }
+}
 
-  const shared = ecdh.computeSecret(Buffer.from(result.ecdhPublicKey, 'base64'))
-  const token = crypto.createHash('sha256').update(shared).digest('base64')
-  return { clientId, token }
+function graphqlResponseAad(request) {
+  return Buffer.concat([Buffer.from("plain-http-response-v1\0/graphql\0"), crypto.createHash("sha256").update(request).digest()])
 }
 
 // ---- graphql ---------------------------------------------------------------
 
-async function graphql(host, port, clientId, token, query) {
-  const body = xchachaSeal(Buffer.from(token, 'base64'), Buffer.from(`${Date.now()}|${crypto.randomBytes(16).toString('hex')}|${JSON.stringify({ query })}`, 'utf8'))
-  const res = await fetch(`http://${host}:${port}/graphql`, {
+async function graphql(clientId, token, query) {
+  const body = xchachaSeal(Buffer.from(token, 'base64'), Buffer.from(`${Date.now()}|${crypto.randomBytes(16).toString('hex')}|${JSON.stringify({ query })}`, 'utf8'), Buffer.from('http-request\0POST\0/graphql'))
+  const res = await fetch(new URL('/graphql', baseUrl), {
     method: 'POST',
     headers: { 'c-id': clientId, 'content-type': 'application/octet-stream' },
     body,
   })
   if (res.status !== 200) return { ok: false, detail: `HTTP ${res.status}` }
-  const text = xchachaOpen(Buffer.from(token, 'base64'), Buffer.from(await res.arrayBuffer())).toString('utf8')
+  const text = xchachaOpen(Buffer.from(token, 'base64'), Buffer.from(await res.arrayBuffer()), graphqlResponseAad(body)).toString('utf8')
   if (text.includes('"errors"')) {
     let detail = text.slice(0, 200)
     try {
@@ -194,15 +195,15 @@ async function graphql(host, port, clientId, token, query) {
 
 // Prints the decrypted body verbatim — for introspection and other queries
 // whose payload is the point.
-async function rawQuery(host, port, clientId, token, query) {
-  const body = xchachaSeal(Buffer.from(token, 'base64'), Buffer.from(`${Date.now()}|${crypto.randomBytes(16).toString('hex')}|${JSON.stringify({ query })}`, 'utf8'))
-  const res = await fetch(`http://${host}:${port}/graphql`, {
+async function rawQuery(clientId, token, query) {
+  const body = xchachaSeal(Buffer.from(token, 'base64'), Buffer.from(`${Date.now()}|${crypto.randomBytes(16).toString('hex')}|${JSON.stringify({ query })}`, 'utf8'), Buffer.from('http-request\0POST\0/graphql'))
+  const res = await fetch(new URL('/graphql', baseUrl), {
     method: 'POST',
     headers: { 'c-id': clientId, 'content-type': 'application/octet-stream' },
     body,
   })
   if (res.status !== 200) return `HTTP ${res.status}`
-  return xchachaOpen(Buffer.from(token, 'base64'), Buffer.from(await res.arrayBuffer())).toString('utf8')
+  return xchachaOpen(Buffer.from(token, 'base64'), Buffer.from(await res.arrayBuffer()), graphqlResponseAad(body)).toString('utf8')
 }
 
 // ---- cli -------------------------------------------------------------------
@@ -220,24 +221,26 @@ const host = opts.host
 const port = opts.port
 const clientId = opts['client-id'] || `plain-api-test-${crypto.randomBytes(4).toString('hex')}`
 
-if (!host || (!opts.queries && !opts.raw)) {
-  console.error('usage: gql-client.mjs --host <ip> --port <port> (--queries <tsv> | --raw <query-file>) [--client-id <id>] [--on-pending <cmd>]')
+if ((!opts['base-url'] && (!host || !port)) || (!opts.queries && !opts.raw)) {
+  console.error('usage: gql-client.mjs --base-url <http[s]://host:port> (--queries <tsv> | --raw <query-file>) [--client-id <id>] [--password-file <path>] [--on-pending <cmd>]')
   process.exit(2)
 }
 
-const { readFileSync } = await import('node:fs')
+const baseUrl = new URL(opts['base-url'] || `http://${host}:${port}`)
+if (!['http:', 'https:'].includes(baseUrl.protocol) || baseUrl.username || baseUrl.password || baseUrl.pathname !== '/' || baseUrl.search || baseUrl.hash) throw new Error('Expected an HTTP(S) origin without credentials or a path')
+if (process.env.NODE_TLS_REJECT_UNAUTHORIZED === '0') throw new Error('TLS certificate validation must not be disabled')
 
 let session
 try {
-  session = await login(host, port, clientId)
+  session = await login(clientId)
 } catch (e) {
-  console.error(`LOGIN FAILED: ${e.message}`)
+  console.error(`LOGIN FAILED: ${e instanceof Error ? e.message : String(e)}`)
   process.exit(1)
 }
 console.error(`logged in as ${session.clientId}`)
 
 if (opts.raw) {
-  const body = await rawQuery(host, port, session.clientId, session.token, readFileSync(opts.raw, 'utf8'))
+  const body = await rawQuery(session.clientId, session.token, readFileSync(opts.raw, 'utf8'))
   process.stdout.write(body)
   process.exit(0)
 }
@@ -256,16 +259,16 @@ for (const [name, query] of queries) {
     // must be sent ONCE. Sending it twice would replay the document, which is
     // harmless for a query and unacceptable for a mutation.
     if (raw) {
-      const detail = await rawQuery(host, port, session.clientId, session.token, query)
+      const detail = await rawQuery(session.clientId, session.token, query)
       const failed = /"errors"/.test(detail)
       result = failed
         ? { ok: false, detail: `GraphQL errors: ${detail.slice(0, 200)}` }
         : { ok: true, detail }
     } else {
-      result = await graphql(host, port, session.clientId, session.token, query)
+      result = await graphql(session.clientId, session.token, query)
     }
   } catch (e) {
-    result = { ok: false, detail: e.message }
+    result = { ok: false, detail: e instanceof Error ? e.message : String(e) }
   }
   console.log([name, result.ok ? 'ok' : 'fail', result.detail.replace(/[\t\n]/g, ' ')].join('\t'))
 }

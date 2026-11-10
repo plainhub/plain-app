@@ -184,4 +184,6 @@
     <string name="nearby_switch_device">Wisselen</string>
     <string name="pair_full_control">Volledige controle</string>
     <string name="nearby_enable_remote_access">Schakel externe toegang in op het andere apparaat</string>
+    <string name="pairing_identity_changed">De openbare apparaatsleutel is gewijzigd, mogelijk door een herinstallatie. Vergelijk de volledige vingerafdruk voordat je het apparaat vertrouwt.</string>
+    <string name="pairing_trust">Vertrouwen</string>
 </resources>

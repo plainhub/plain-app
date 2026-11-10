@@ -1,15 +1,16 @@
 #!/bin/bash
 # GraphQL query surface, run against a phone's main listener the same way the
-# web client talks to it: log in over the WebSocket `auth=1` handshake, then
+# web client talks to it: log in over the WebSocket login handshake, then
 # send xchacha-encrypted token-mode queries. `gql-client.mjs` speaks the
 # protocol; this script owns the query list and the pass/fail accounting.
 #
 #   ./scripts/test-graphql-api.sh <base-url> [client-id]
 #
-# 2FA is on by default (`ws_login.rs`: `auth_two_factor` defaults to true), so
-# the first login comes back PENDING and the phone shows "Allow Desktop
-# Access". Nothing here can tap that dialog — the caller passes a command to
-# run at that moment in PLAIN_APPROVE_CMD, e.g. `approve_desktop_access <serial>`.
+# Enable password login on the test server and set PLAIN_TEST_PASSWORD_FILE
+# (raw password bytes, no trailing newline) or PLAIN_TEST_PASSWORD. Build the
+# shared client with ../plain-core/scripts/build-auth-wasm.sh. No password is
+# fetched from /init. PLAIN_APPROVE_CMD is optional if the server requests
+# additional confirmation. HTTPS certificate validation remains enabled.
 #
 # The base url must name the build under test. `verify_app_under_test` refuses
 # to let a request out until the package answering on that port is the one this
@@ -179,9 +180,11 @@ echo ""
 # password, rate limited, prompt never accepted) — kept beside the results, and
 # printed when one fails. Kept out of $OUT on purpose: it is progress chatter,
 # not `name<TAB>status<TAB>detail` rows, and mixing them invents fake failures.
-if node "$CLIENT" --host "$(printf '%s' "$BASE_URL" | sed -e 's#^[a-z]*://##' -e 's#:.*##')" \
-  --port "$(printf '%s' "$BASE_URL" | sed -n 's#.*:\([0-9][0-9]*\)\(/\{0,1\}\).*#\1#p')" \
-  --client-id "$CLIENT_ID" --queries "$QFILE" ${PLAIN_APPROVE_CMD:+--on-pending "$PLAIN_APPROVE_CMD"} \
+client_args=(--base-url "$BASE_URL" --client-id "$CLIENT_ID" --queries "$QFILE")
+if [ -n "${PLAIN_APPROVE_CMD:-}" ]; then
+  client_args+=(--on-pending "$PLAIN_APPROVE_CMD")
+fi
+if node "$CLIENT" "${client_args[@]}" \
   >"$OUT" 2>"$ERR"; then
   :
 else

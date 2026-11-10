@@ -15,7 +15,7 @@ import com.ismartcoding.plain.ui.state.launchSafe
 import org.jetbrains.compose.resources.stringResource
 
 @Composable
-fun RowScope.RequestDecisionActions(onDeny: suspend () -> Unit, onAllow: suspend () -> Unit) {
+fun RowScope.RequestDecisionActions(onDeny: suspend () -> Unit, onAllow: suspend () -> Unit, allowText: String = stringResource(Res.string.allow)) {
     var pendingDecision by remember { mutableStateOf<Boolean?>(null) }
     val scope = rememberCoroutineScope()
     POutlinedButton(
@@ -32,7 +32,7 @@ fun RowScope.RequestDecisionActions(onDeny: suspend () -> Unit, onAllow: suspend
     )
     PFilledButton(
         modifier = Modifier.weight(1f),
-        text = stringResource(Res.string.allow),
+        text = allowText,
         buttonSize = ButtonSize.LARGE,
         isLoading = pendingDecision == true,
         enabled = pendingDecision == null,

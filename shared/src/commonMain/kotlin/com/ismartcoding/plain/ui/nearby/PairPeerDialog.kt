@@ -104,6 +104,7 @@ fun PairPeerDialog(device: NearbyDevice, initialMode: PairingMode? = null, onDis
                 if (waiting) {
                     state?.verificationCode?.takeIf { it.isNotEmpty() }?.let { code ->
                         RequestVerificationCodeCard(code, stringResource(Res.string.pairing_compare_code))
+                        if (state.identityChanged) Text(stringResource(Res.string.pairing_identity_changed), color = MaterialTheme.colorScheme.error)
                     }
                 } else if (directMode == null) Column(Modifier.selectableGroup(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     listOf(
@@ -122,7 +123,20 @@ fun PairPeerDialog(device: NearbyDevice, initialMode: PairingMode? = null, onDis
             }
         },
         confirmButton = {
-            if (!waiting) POutlinedButton(
+            if (phase == PairingPhase.TRUST_REQUIRED && !state.verificationCode.isNullOrEmpty()) POutlinedButton(
+                text = stringResource(if (state.identityChanged) Res.string.pairing_trust else Res.string.confirm),
+                isLoading = submitting,
+                onClick = {
+                    val confirmedGeneration = generation ?: return@POutlinedButton
+                    submitting = true
+                    scope.launch {
+                        try { RustPairingRuntime.confirm(confirmedGeneration) }
+                        catch (cancelled: CancellationException) { throw cancelled }
+                        catch (_: Exception) { error = failureText }
+                        finally { submitting = false }
+                    }
+                },
+            ) else if (!waiting) POutlinedButton(
                 text = stringResource(Res.string.pair),
                 isLoading = submitting,
                 onClick = {

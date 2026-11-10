@@ -5,8 +5,8 @@ import com.ismartcoding.plain.platform.system.DataType
 internal object Fragments {
     const val CHAT_ITEM = "id fromId toId channelId content status statusData createdAt updatedAt"
     const val CONTACT = "id prefix firstName middleName lastName suffix nickname photoId phoneNumbers { value type typeCode label normalizedNumber } emails { value type typeCode label } addresses { value type typeCode label } events { value type typeCode label } websites { value type typeCode label } ims { value protocol customProtocol typeCode } source starred contactId thumbnailId notes groups { id name } organization { company title } ringtone updatedAt"
-    const val PAIRING_STATE = "deviceId generation mode phase error verificationCode"
-    const val NEARBY_DEVICE_FIELDS = "id name ips port deviceType version platform lastSeen discoveryMethods bestIp status remoteAccess"
+    const val PAIRING_STATE = "deviceId generation mode phase error verificationCode identityChanged"
+    const val NEARBY_DEVICE_FIELDS = "id name signaturePublicKey ips port deviceType version platform lastSeen discoveryMethods bestIp status remoteAccess"
     const val MDNS_STATUS = "runtimeId revision running scanning"
     const val MDNS_DEBUG = "services { serviceType instanceName instanceFqdn hostname port txtRecords ips ip6s complete } packetsIn { time direction srcIp srcPort dstIp dstPort size summary detail } packetsOut { time direction srcIp srcPort dstIp dstPort size summary detail }"
     const val TAG_FIELDS = "id name type count"

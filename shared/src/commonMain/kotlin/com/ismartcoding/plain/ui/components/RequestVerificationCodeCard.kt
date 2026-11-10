@@ -26,7 +26,7 @@ fun RequestVerificationCodeCard(code: String, hint: String, modifier: Modifier =
             verticalArrangement = Arrangement.spacedBy(8.dp),
         ) {
             Text(
-                text = code,
+                text = code.chunked(8).joinToString(" "),
                 modifier = Modifier.fillMaxWidth(),
                 style = MaterialTheme.typography.headlineLarge.copy(
                     fontFamily = FontFamily.Monospace,
@@ -34,8 +34,7 @@ fun RequestVerificationCodeCard(code: String, hint: String, modifier: Modifier =
                 ),
                 color = MaterialTheme.colorScheme.onPrimaryContainer,
                 textAlign = TextAlign.Center,
-                maxLines = 1,
-                softWrap = false,
+                softWrap = true,
                 autoSize = TextAutoSize.StepBased(
                     minFontSize = MaterialTheme.typography.titleMedium.fontSize,
                     maxFontSize = MaterialTheme.typography.headlineLarge.fontSize,

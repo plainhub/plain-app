@@ -184,4 +184,6 @@
     <string name="nearby_switch_device">மாற்று</string>
     <string name="pair_full_control">முழுக் கட்டுப்பாடு</string>
     <string name="nearby_enable_remote_access">மற்ற சாதனத்தில் தொலைநிலை அணுகலை இயக்கவும்</string>
+    <string name="pairing_identity_changed">சாதனத்தின் பொதுச் சாவி மாறியுள்ளது. செயலி மீண்டும் நிறுவப்பட்டிருக்கலாம். நம்புவதற்கு முன் முழு கைரேகையையும் ஒப்பிடவும்.</string>
+    <string name="pairing_trust">நம்பு</string>
 </resources>

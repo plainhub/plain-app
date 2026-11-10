@@ -194,4 +194,6 @@
     <string name="nearby_switch_device">切換</string>
     <string name="pair_full_control">完全控制</string>
     <string name="nearby_enable_remote_access">請在對方裝置開啟遠端存取</string>
+    <string name="pairing_identity_changed">對方公鑰已改變，可能重新安裝了應用程式。請核對完整指紋後再信任。</string>
+    <string name="pairing_trust">信任</string>
 </resources>

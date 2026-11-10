@@ -184,4 +184,6 @@
     <string name="nearby_switch_device">Chuyển đổi</string>
     <string name="pair_full_control">Toàn quyền điều khiển</string>
     <string name="nearby_enable_remote_access">Bật truy cập từ xa trên thiết bị kia</string>
+    <string name="pairing_identity_changed">Khóa công khai của thiết bị đã thay đổi, có thể do cài đặt lại ứng dụng. Hãy đối chiếu toàn bộ dấu vân tay trước khi tin cậy.</string>
+    <string name="pairing_trust">Tin cậy</string>
 </resources>

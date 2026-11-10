@@ -6,6 +6,8 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class PairingRequestNotice(
     val fromId: String,
+    val toId: String,
+    val targetPublicKey: String,
     val fromName: String,
     val port: Int,
     val deviceType: DeviceType,
@@ -17,9 +19,10 @@ data class PairingRequestNotice(
     val fromIp: String,
     val awareSupported: Boolean,
     val verificationCode: String,
+    val identityChanged: Boolean,
 ) {
     fun requestInput() = PairingRequestInput(
-        fromId, fromName, port, deviceType, ecdhPublicKey, signaturePublicKey,
+        fromId, toId, targetPublicKey, fromName, port, deviceType, ecdhPublicKey, signaturePublicKey,
         timestamp, ips, signature, fromIp, awareSupported,
     )
 }

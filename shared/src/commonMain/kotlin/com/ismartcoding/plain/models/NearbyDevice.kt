@@ -9,6 +9,7 @@ import kotlinx.serialization.Serializable
 data class NearbyDevice(
     val id: String,
     val name: String,
+    val signaturePublicKey: String,
     val ips: List<String> = emptyList(),
     val port: Int,
     val remoteAccess: Boolean? = null,

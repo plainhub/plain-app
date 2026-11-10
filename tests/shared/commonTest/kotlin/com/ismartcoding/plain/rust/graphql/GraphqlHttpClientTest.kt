@@ -32,8 +32,9 @@ class GraphqlHttpClientTest {
         val ciphertext = Base64.encode("request ciphertext".encodeToByteArray())
         val client = PeerHttpClient(peer,
             peers = { listOf(peer.copy()) }, clientId = { "local-client" },
-            encrypt = { token, payload ->
+            encrypt = { token, endpoint, payload ->
                 assertEquals(peer.token, token)
+                assertEquals("/graphql", endpoint)
                 assertEquals(request.operation, JsonHelper.jsonDecode<GraphqlOperation>(payload))
                 ciphertext
             },
@@ -63,7 +64,7 @@ class GraphqlHttpClientTest {
             val original = peer()
             val peer = original.copy(address = checkNotNull(original.address).copy(baseUrl = base))
             val client = PeerHttpClient(peer, peers = { listOf(peer) },
-                encrypt = { _, _ -> Base64.encode(byteArrayOf(1)) },
+                encrypt = { _, _, _ -> Base64.encode(byteArrayOf(1)) },
                 transport = object : GraphqlHttpTransport {
                     override suspend fun post(url: String, clientId: String, body: ByteArray, contentType: String, tlsCertificateSha256: String?): GraphqlHttpResponse =
                         error("Invalid management addresses must not reach the transport")
@@ -79,7 +80,7 @@ class GraphqlHttpClientTest {
         val cases = listOf(emptyList(), listOf(peer.copy(token = "")), listOf(peer.copy(status = PeerStatus.UNPAIRED)), listOf(peer.copy(publicKey = "changed")), listOf(peer.copy(token = "changed")))
         for (rows in cases) {
             val client = PeerHttpClient(peer, peers = { rows },
-                encrypt = { _, _ -> error("Encryption must not start") },
+                encrypt = { _, _, _ -> error("Encryption must not start") },
                 transport = object : GraphqlHttpTransport {
                     override suspend fun post(url: String, clientId: String, body: ByteArray, contentType: String, tlsCertificateSha256: String?): GraphqlHttpResponse = error("No network effects")
                 },
@@ -94,7 +95,7 @@ class GraphqlHttpClientTest {
         var current = expected.copy()
         var posts = 0
         val client = PeerHttpClient(expected, peers = { listOf(current) }, clientId = { "local-client" },
-            encrypt = { _, _ -> Base64.encode(byteArrayOf(1)) }, decrypt = { _, _, _ -> encodedResult() },
+            encrypt = { _, _, _ -> Base64.encode(byteArrayOf(1)) }, decrypt = { _, _, _ -> encodedResult() },
             transport = object : GraphqlHttpTransport {
                 override suspend fun post(url: String, clientId: String, body: ByteArray, contentType: String, tlsCertificateSha256: String?): GraphqlHttpResponse {
                     posts++
@@ -112,7 +113,7 @@ class GraphqlHttpClientTest {
         val peer = peer()
         var current = peer.copy()
         val client = PeerHttpClient(peer, peers = { listOf(current) },
-            encrypt = { _, _ -> Base64.encode(byteArrayOf(1)) }, decrypt = { _, _, _ -> encodedResult() },
+            encrypt = { _, _, _ -> Base64.encode(byteArrayOf(1)) }, decrypt = { _, _, _ -> encodedResult() },
             transport = object : GraphqlHttpTransport {
                 override suspend fun post(url: String, clientId: String, body: ByteArray, contentType: String, tlsCertificateSha256: String?): GraphqlHttpResponse {
                     current = current.copy(publicKey = "different-device")
@@ -129,7 +130,7 @@ class GraphqlHttpClientTest {
         for (status in listOf(301, 401, 403, 404, 500)) {
             var posts = 0
             val client = PeerHttpClient(peer, peers = { listOf(peer) },
-                encrypt = { _, _ -> Base64.encode(byteArrayOf(1)) },
+                encrypt = { _, _, _ -> Base64.encode(byteArrayOf(1)) },
                 decrypt = { _, _, _ -> error("Rejected response must not be decoded") },
                 transport = object : GraphqlHttpTransport {
                     override suspend fun post(url: String, clientId: String, body: ByteArray, contentType: String, tlsCertificateSha256: String?): GraphqlHttpResponse {
@@ -150,7 +151,7 @@ class GraphqlHttpClientTest {
     fun reports_a_request_timeout_as_a_recoverable_error() = runTest {
         val peer = peer()
         val client = PeerHttpClient(peer, peers = { listOf(peer) },
-            encrypt = { _, _ -> Base64.encode(byteArrayOf(1)) },
+            encrypt = { _, _, _ -> Base64.encode(byteArrayOf(1)) },
             transport = object : GraphqlHttpTransport {
                 override suspend fun post(url: String, clientId: String, body: ByteArray, contentType: String, tlsCertificateSha256: String?): GraphqlHttpResponse {
                     delay(60_000)
@@ -168,8 +169,9 @@ class GraphqlHttpClientTest {
         val encrypted = byteArrayOf(8, 0, -2)
         var posts = 0
         val client = PeerHttpClient(peer, peers = { listOf(peer) }, clientId = { "local-client" },
-            encrypt = { token, payload ->
+            encrypt = { token, endpoint, payload ->
                 assertEquals(peer.token, token)
+                assertEquals("/upload_chunk", endpoint)
                 assertEquals(com.ismartcoding.plain.models.UploadChunkInfo("fixture-upload", 3, 5), JsonHelper.jsonDecode(payload))
                 Base64.encode(encrypted)
             },
@@ -197,7 +199,7 @@ class GraphqlHttpClientTest {
         for ((status, acknowledgement) in listOf(200 to "0:1", 201 to "1:1", 201 to "0:2", 403 to "0:1")) {
             var posts = 0
             val client = PeerHttpClient(peer, peers = { listOf(peer) },
-                encrypt = { _, _ -> Base64.encode(byteArrayOf(1)) },
+                encrypt = { _, _, _ -> Base64.encode(byteArrayOf(1)) },
                 transport = object : GraphqlHttpTransport {
                     override suspend fun post(url: String, clientId: String, body: ByteArray, contentType: String, tlsCertificateSha256: String?): GraphqlHttpResponse {
                         posts++

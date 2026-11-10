@@ -6,6 +6,8 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class PairingRequestInput(
     var fromId: String,
+    var toId: String,
+    var targetPublicKey: String,
     var fromName: String,
     var port: Int,
     var deviceType: DeviceType,

@@ -9,4 +9,5 @@ data class PairingState(
     val phase: PairingPhase,
     val error: String? = null,
     val verificationCode: String? = null,
+    val identityChanged: Boolean = false,
 )

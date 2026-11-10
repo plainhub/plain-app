@@ -115,7 +115,7 @@ class ManagedDeviceViewModelTest {
         val requests = mutableListOf<GraphqlOperation>()
         private lateinit var operation: GraphqlOperation
         val http = PeerHttpClient(peer, peers = { listOf(currentPeer) }, clientId = { "fixture-client" },
-            encrypt = { _, payload ->
+            encrypt = { _, _, payload ->
                 operation = JsonHelper.jsonDecode(payload)
                 requests.add(operation)
                 Base64.encode(byteArrayOf(1))

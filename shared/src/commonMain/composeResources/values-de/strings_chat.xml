@@ -184,4 +184,6 @@
     <string name="nearby_switch_device">Wechseln</string>
     <string name="pair_full_control">Vollzugriff</string>
     <string name="nearby_enable_remote_access">Remotezugriff auf dem anderen Gerät aktivieren</string>
+    <string name="pairing_identity_changed">Der öffentliche Geräteschlüssel hat sich geändert, möglicherweise durch eine Neuinstallation. Vor dem Vertrauen den vollständigen Fingerabdruck vergleichen.</string>
+    <string name="pairing_trust">Vertrauen</string>
 </resources>

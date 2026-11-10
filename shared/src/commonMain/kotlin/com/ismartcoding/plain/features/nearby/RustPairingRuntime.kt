@@ -28,6 +28,9 @@ object RustPairingRuntime {
     ): PairingState =
         GraphqlApi.execute(Mutation.pairDevice(PairingDeviceInput(generation = generation, password = password)))
 
+    suspend fun confirm(generation: String): PairingState =
+        GraphqlApi.execute(Mutation.pairDevice(PairingDeviceInput(generation = generation, confirm = true)))
+
     suspend fun cancelGeneration(generation: String): Boolean =
         GraphqlApi.execute(Mutation.cancelPairing(generation))
 

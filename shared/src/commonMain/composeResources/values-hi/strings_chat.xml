@@ -184,4 +184,6 @@
     <string name="nearby_switch_device">बदलें</string>
     <string name="pair_full_control">पूर्ण नियंत्रण</string>
     <string name="nearby_enable_remote_access">दूसरे डिवाइस पर रिमोट एक्सेस चालू करें</string>
+    <string name="pairing_identity_changed">डिवाइस की सार्वजनिक कुंजी बदल गई है। ऐप फिर से इंस्टॉल किया गया हो सकता है। भरोसा करने से पहले पूरे फ़िंगरप्रिंट का मिलान करें।</string>
+    <string name="pairing_trust">भरोसा करें</string>
 </resources>

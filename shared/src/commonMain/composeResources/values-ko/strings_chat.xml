@@ -184,4 +184,6 @@
     <string name="nearby_switch_device">전환</string>
     <string name="pair_full_control">전체 제어</string>
     <string name="nearby_enable_remote_access">상대 기기에서 원격 액세스를 켜세요</string>
+    <string name="pairing_identity_changed">기기의 공개 키가 변경되었습니다. 앱을 재설치했을 수 있습니다. 전체 지문을 확인한 후 신뢰하세요.</string>
+    <string name="pairing_trust">신뢰</string>
 </resources>

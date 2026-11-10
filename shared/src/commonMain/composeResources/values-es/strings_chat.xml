@@ -184,4 +184,6 @@
     <string name="nearby_switch_device">Cambiar</string>
     <string name="pair_full_control">Control total</string>
     <string name="nearby_enable_remote_access">Activa el acceso remoto en el otro dispositivo</string>
+    <string name="pairing_identity_changed">La clave pública del dispositivo ha cambiado. Puede haberse reinstalado. Compara la huella completa antes de confiar.</string>
+    <string name="pairing_trust">Confiar</string>
 </resources>

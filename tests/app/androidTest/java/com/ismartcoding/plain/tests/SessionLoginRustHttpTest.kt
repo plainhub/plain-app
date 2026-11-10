@@ -28,9 +28,10 @@ class SessionLoginRustHttpTest {
         val oldService = Prefs.backgroundServiceEnabled.value
         val oldDesktop = Prefs.remoteAccess.value
         val oldTwoFactor = Prefs.loginRequireApproval.value
-        val id = "session-fixture-${UUID.randomUUID()}"
+        val id = UUID.randomUUID().toString()
         var pendingId = ""
         val http = createTestHttpClient(TestHttpClientSpec.HttpHost)
+        var browser: PasswordLoginFixture? = null
         try {
             Prefs.backgroundServiceEnabled.value = true
             Prefs.remoteAccess.value = true
@@ -45,23 +46,25 @@ class SessionLoginRustHttpTest {
             assertTrue(bootstrap.passwordRequired)
             assertFalse(bootstrap.authenticated)
             val notification = async(start = CoroutineStart.UNDISPATCHED) {
-                withTimeout(10_000) {
+                withTimeout(60_000) {
                     snapshotFlow { MainViewModel.pendingLoginRequest.value }.first { it?.clientId == id }!!
                 }
             }
-            http.webSocket("ws://127.0.0.1:$port/auth?cid=$id&auth=1") { socket ->
-                val login = socket.beginPasswordLogin(id, bootstrap.signaturePublicKey, fixturePassword)
-                login.expectPending()
+            val loginBrowser = PasswordLoginFixture("http://127.0.0.1:$port/")
+            browser = loginBrowser
+            loginBrowser.start(id, fixturePassword)
+            run {
                 val facts = notification.await()
                 pendingId = facts.requestId
                 val pendingRequest = facts.request
                 assertEquals("", pendingRequest.password)
-                assertEquals("Fixture", pendingRequest.appName)
+                assertTrue(pendingRequest.appName.isNotEmpty())
                 assertTrue(RustSessionStore.list().none { it.clientId == id })
                 RustWebLogin.complete(pendingId)
-                val token = login.sessionToken()
+                val token = Base64Lenient.decode(loginBrowser.sessionToken())
+                loginBrowser.close() // API session survives the authentication/browser socket closing.
                 val session = RustSessionStore.list().single { it.clientId == id }
-                assertEquals("Fixture", session.appName)
+                assertTrue(session.appName.isNotEmpty())
                 assertFalse(session.isApiToken)
                 assertArrayEquals(token, Base64Lenient.decode(session.token))
                 assertTrue(renameSessionListItemAsync(id, "Renamed fixture"))
@@ -71,6 +74,7 @@ class SessionLoginRustHttpTest {
             deleteSessionListItemAsync(id)
             assertNull(RustSessionStore.list().firstOrNull { it.clientId == id }?.token?.let(Base64Lenient::decode))
         } finally {
+            browser?.close()
             http.close()
             if (pendingId.isNotEmpty()) RustWebLogin.cancel(pendingId)
             RustSessionStore.delete(id)

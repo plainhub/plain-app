@@ -194,4 +194,6 @@
     <string name="nearby_switch_device">Switch</string>
     <string name="pair_full_control">Full control</string>
     <string name="nearby_enable_remote_access">Enable remote access on the other device</string>
+    <string name="pairing_identity_changed">The device public key has changed. It may have been reinstalled. Compare the full fingerprint before trusting it.</string>
+    <string name="pairing_trust">Trust</string>
 </resources>

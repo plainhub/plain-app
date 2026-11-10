@@ -52,8 +52,8 @@ object AppSubscriptions {
     internal val pairingRequested =
         subscription<com.ismartcoding.plain.models.PairingRequestNotice>(
             "pairingRequested",
-            "{ fromId fromName port deviceType ecdhPublicKey signaturePublicKey " +
-                "timestamp ips signature fromIp awareSupported verificationCode }",
+            "{ fromId toId targetPublicKey fromName port deviceType ecdhPublicKey signaturePublicKey " +
+                "timestamp ips signature fromIp awareSupported verificationCode identityChanged }",
         )
             .shareIn(scope, SharingStarted.WhileSubscribed())
     internal val pomodoroAction =

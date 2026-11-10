@@ -101,8 +101,8 @@ internal actual object RustNativeBindings {
     actual fun graphql(request: String): String = memScoped {
         readString(plain_graphql(request.cstr.ptr))
     }
-    actual fun encryptHttpRequest(token: String, payload: String): String = memScoped {
-        readString(plain_encrypt_http_request(token.cstr.ptr, payload.cstr.ptr))
+    actual fun encryptHttpRequest(token: String, endpoint: String, payload: String): String = memScoped {
+        readString(plain_encrypt_http_request(token.cstr.ptr, endpoint.cstr.ptr, payload.cstr.ptr))
     }
     actual fun encryptResourceReference(token: String, payload: String): String = memScoped {
         readString(plain_encrypt_resource_reference(token.cstr.ptr, payload.cstr.ptr))

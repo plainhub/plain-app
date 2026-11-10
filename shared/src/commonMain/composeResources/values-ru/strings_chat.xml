@@ -184,4 +184,6 @@
     <string name="nearby_switch_device">Переключить</string>
     <string name="pair_full_control">Полный контроль</string>
     <string name="nearby_enable_remote_access">Включите удалённый доступ на другом устройстве</string>
+    <string name="pairing_identity_changed">Открытый ключ устройства изменился, возможно после переустановки. Сравните полный отпечаток, прежде чем доверять устройству.</string>
+    <string name="pairing_trust">Доверять</string>
 </resources>

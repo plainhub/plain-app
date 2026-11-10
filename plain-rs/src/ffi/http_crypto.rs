@@ -9,9 +9,10 @@ fn reply(result: Result<Vec<u8>, &str>) -> String {
     }
 }
 
-fn encrypt(token: &str, payload: &str) -> String {
+fn encrypt(token: &str, endpoint: &str, payload: &str) -> String {
     reply(plain_rs::infrastructure::transport::http_request::encrypt(
         &plain_libs::utils::base64::base64_decode(token),
+        endpoint,
         payload,
     ))
 }
@@ -52,10 +53,11 @@ fn decrypt(token: &str, endpoint: &str, request: &str, response: &str) -> String
 #[unsafe(no_mangle)]
 pub extern "C" fn plain_encrypt_http_request(
     token: *const c_char,
+    endpoint: *const c_char,
     payload: *const c_char,
 ) -> *mut c_char {
-    c_string(match (input(token), input(payload)) {
-        (Ok(token), Ok(payload)) => encrypt(&token, &payload),
+    c_string(match (input(token), input(endpoint), input(payload)) {
+        (Ok(token), Ok(endpoint), Ok(payload)) => encrypt(&token, &endpoint, &payload),
         _ => reply(Err("Invalid HTTP encryption input")),
     })
 }
@@ -111,10 +113,15 @@ mod android {
         mut env: EnvUnowned<'_>,
         _: JObject<'_>,
         token: JString<'_>,
+        endpoint: JString<'_>,
         payload: JString<'_>,
     ) -> jstring {
         env.with_env(|env| -> jni::errors::Result<_> {
-            env.new_string(encrypt(&token.to_string(), &payload.to_string()))
+            env.new_string(encrypt(
+                &token.to_string(),
+                &endpoint.to_string(),
+                &payload.to_string(),
+            ))
         })
         .resolve::<ThrowRuntimeExAndDefault>()
         .into_raw()

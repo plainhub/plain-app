@@ -25,12 +25,13 @@ fun PairingRequestPage(
 
     RequestPageLayout(
         title = stringResource(Res.string.pairing_request),
-        description = stringResource(Res.string.pairing_request_hint),
+        description = stringResource(if (notice.identityChanged) Res.string.pairing_identity_changed else Res.string.pairing_request_hint),
         icon = painterResource(request.deviceType.getIcon()),
         requester = requester,
         content = { item { RequestVerificationCodeCard(notice.verificationCode, stringResource(Res.string.pairing_compare_code)) } },
         actions = {
             RequestDecisionActions(
+                allowText = stringResource(if (notice.identityChanged) Res.string.pairing_trust else Res.string.allow),
                 onDeny = { PairingResponder.respond(request, false); onClose() },
                 onAllow = { PairingResponder.respond(request, true); onClose() },
             )
