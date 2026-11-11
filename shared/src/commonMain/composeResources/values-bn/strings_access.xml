@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="access_feature_help">সিস্টেমের অনুমতি প্রয়োজন। অনুমতি দিতে সুইচ চালু করুন।</string>
+    <string name="access_settings_title">দূরবর্তী অ্যাক্সেস সেটিংস</string>
+    <string name="access_settings_description">দূরবর্তী ক্লায়েন্ট ফোনের কোন ডেটা ও বৈশিষ্ট্য ব্যবহার করতে পারবে তা বেছে নিন।</string>
+    <string name="access_remote_permissions">দূরবর্তী অ্যাক্সেসের অনুমতি দিন</string>
+    <string name="access_files_description">ফোনের ফাইল ব্রাউজ ও পরিচালনা করুন</string>
+    <string name="access_contacts_description">পরিচিতি দেখুন ও সম্পাদনা করুন</string>
+    <string name="access_sms_description">SMS দেখুন, পাঠান ও মুছুন</string>
+    <string name="access_call_logs_description">কল লগ দেখুন ও পরিচালনা করুন</string>
+    <string name="access_call_phone_description">এই ফোনের মাধ্যমে কল করুন</string>
+    <string name="access_phone_number_description">এই ফোনের নম্বর পড়ুন</string>
+    <string name="access_apps_description">অ্যাপ দেখুন, ইনস্টল ও আনইনস্টল করুন</string>
+    <string name="access_notifications_description">ফোনের বিজ্ঞপ্তি দেখুন, উত্তর দিন ও সরান</string>
+    <string name="access_clipboard_description">এই ফোন ও দূরবর্তী ক্লায়েন্টের মধ্যে কপি করা টেক্সট সিঙ্ক করুন</string>
+    <string name="access_permission_denied">সিস্টেমের অনুমতি পাওয়া যায়নি। দূরবর্তী অ্যাক্সেস চালু হয়নি।</string>
+    <string name="access_permission_unavailable">সিস্টেমের অনুমতি নেই। দূরবর্তী অ্যাক্সেস উপলভ্য নয়।</string>
+    <string name="access_contacts">পরিচিতি</string>
+    <string name="access_sms">টেক্সট মেসেজ</string>
+    <string name="access_call_logs">কল লগ</string>
+    <string name="access_phone_number">ফোন নম্বর</string>
+    <string name="access_go_to_settings">সিস্টেম সেটিংস খুলুন</string>
+    <string name="access_allow">অ্যাক্সেসের অনুমতি দিন</string>
+</resources>

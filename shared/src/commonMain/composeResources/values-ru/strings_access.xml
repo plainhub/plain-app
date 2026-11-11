@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="access_feature_help">Требуется системное разрешение. Включите переключатель, чтобы предоставить его.</string>
+    <string name="access_settings_title">Настройки удалённого доступа</string>
+    <string name="access_settings_description">Выберите данные и функции телефона, доступные удалённым клиентам.</string>
+    <string name="access_remote_permissions">Разрешить удалённый доступ</string>
+    <string name="access_files_description">Просмотр и управление файлами телефона</string>
+    <string name="access_contacts_description">Просмотр и редактирование контактов</string>
+    <string name="access_sms_description">Просмотр, отправка и удаление SMS</string>
+    <string name="access_call_logs_description">Просмотр и управление журналом вызовов</string>
+    <string name="access_call_phone_description">Совершение звонков через этот телефон</string>
+    <string name="access_phone_number_description">Чтение номеров этого телефона</string>
+    <string name="access_apps_description">Просмотр, установка и удаление приложений</string>
+    <string name="access_notifications_description">Просмотр уведомлений телефона, ответы на них и их закрытие</string>
+    <string name="access_clipboard_description">Синхронизация скопированного текста между телефоном и удалёнными клиентами</string>
+    <string name="access_permission_denied">Системное разрешение не предоставлено. Удалённый доступ не включён.</string>
+    <string name="access_permission_unavailable">Нет системного разрешения. Удалённый доступ недоступен.</string>
+    <string name="access_contacts">Контакты</string>
+    <string name="access_sms">SMS</string>
+    <string name="access_call_logs">Журнал вызовов</string>
+    <string name="access_phone_number">Номера телефона</string>
+    <string name="access_go_to_settings">Открыть системные настройки</string>
+    <string name="access_allow">Разрешить доступ</string>
+</resources>

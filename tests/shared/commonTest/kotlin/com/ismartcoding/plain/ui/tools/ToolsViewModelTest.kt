@@ -37,8 +37,8 @@ class ToolsViewModelTest {
         secondNotes.writeDraft("updated second draft")
         assertEquals("first draft", first.draft)
         assertEquals("updated second draft", second.draft)
-        assertEquals(listOf("prefs", "setPref", "savedValue"), first.requests.map { operation ->
-            when { "setPref(" in operation.query -> "setPref"; "savedValue(" in operation.query -> "savedValue"; else -> "prefs" }
+        assertEquals(listOf("prefs", "setPref", "keyValue"), first.requests.map { operation ->
+            when { "setPref(" in operation.query -> "setPref"; "keyValue(" in operation.query -> "keyValue"; else -> "prefs" }
         })
     }
 
@@ -78,7 +78,7 @@ class ToolsViewModelTest {
         assertTrue(first.requests.isEmpty())
     }
 
-    @Serializable private data class DraftData(val savedValue: String)
+    @Serializable private data class DraftData(val keyValue: String)
     @Serializable private data class PrefsData(val prefs: Map<String, String>)
 
     private class Device(var features: String, var draft: String) {
@@ -94,12 +94,12 @@ class ToolsViewModelTest {
                     features = operation.variables.getValue("value").jsonPrimitive.content
                     JsonHelper.jsonDecode<GraphqlResponse>("""{"data":{"setPref":true}}""")
                 }
-                "setSavedValue(" in operation.query -> {
+                "setKeyValue(" in operation.query -> {
                     assertEquals("quick_note_draft", operation.variables.getValue("key").jsonPrimitive.content)
                     draft = operation.variables.getValue("value").jsonPrimitive.content
-                    JsonHelper.jsonDecode<GraphqlResponse>("""{"data":{"setSavedValue":true}}""")
+                    JsonHelper.jsonDecode<GraphqlResponse>("""{"data":{"setKeyValue":true}}""")
                 }
-                "savedValue(" in operation.query -> GraphqlResponse(data = JsonHelper.jsonEncodeToElement(DraftData(draft)).jsonObject)
+                "keyValue(" in operation.query -> GraphqlResponse(data = JsonHelper.jsonEncodeToElement(DraftData(draft)).jsonObject)
                 "updateDeviceName(" in operation.query -> {
                     name = operation.variables.getValue("name").jsonPrimitive.content
                     JsonHelper.jsonDecode<GraphqlResponse>("""{"data":{"updateDeviceName":true}}""")

@@ -11,6 +11,8 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.layout
+import androidx.compose.ui.unit.offset
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -60,11 +62,15 @@ fun PBottomSheetTopAppBar(
                 )
             }
         }
-        HorizontalSpace(16.dp)
         Row(
+            modifier = Modifier.layout { measurable, constraints ->
+                val gap = 16.dp.roundToPx()
+                val child = measurable.measure(constraints.offset(horizontal = -gap))
+                val start = if (child.width == 0) 0 else gap
+                layout(child.width + start, child.height) { child.placeRelative(start, 0) }
+            },
             verticalAlignment = Alignment.CenterVertically,
-        ) {
-            actions()
-        }
+            content = actions,
+        )
     }
 }

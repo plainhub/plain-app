@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="access_feature_help">Une autorisation système est nécessaire. Activez l’interrupteur pour l’accorder.</string>
+    <string name="access_settings_title">Paramètres d’accès à distance</string>
+    <string name="access_settings_description">Choisissez les données et fonctions du téléphone accessibles aux clients distants.</string>
+    <string name="access_remote_permissions">Autoriser l’accès à distance</string>
+    <string name="access_files_description">Parcourir et gérer les fichiers du téléphone</string>
+    <string name="access_contacts_description">Consulter et modifier les contacts</string>
+    <string name="access_sms_description">Consulter, envoyer et supprimer des SMS</string>
+    <string name="access_call_logs_description">Consulter et gérer le journal d’appels</string>
+    <string name="access_call_phone_description">Passer des appels avec ce téléphone</string>
+    <string name="access_phone_number_description">Lire les numéros de ce téléphone</string>
+    <string name="access_apps_description">Consulter, installer et désinstaller des applications</string>
+    <string name="access_notifications_description">Consulter les notifications du téléphone, y répondre et les effacer</string>
+    <string name="access_clipboard_description">Synchroniser le texte copié entre ce téléphone et les clients distants</string>
+    <string name="access_permission_denied">L’autorisation système n’a pas été accordée. L’accès à distance n’a pas été activé.</string>
+    <string name="access_permission_unavailable">L’autorisation système est manquante. L’accès à distance est indisponible.</string>
+    <string name="access_contacts">Contacts</string>
+    <string name="access_sms">SMS</string>
+    <string name="access_call_logs">Journal d’appels</string>
+    <string name="access_phone_number">Numéros de téléphone</string>
+    <string name="access_go_to_settings">Ouvrir les paramètres système</string>
+    <string name="access_allow">Autoriser l’accès</string>
+</resources>

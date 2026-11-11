@@ -65,7 +65,7 @@ import com.ismartcoding.plain.rustprefs.plain_release_mdns_debug_session
 import com.ismartcoding.plain.rustprefs.plain_remove_dlna_rule
 import com.ismartcoding.plain.rustprefs.plain_remove_scan_history
 import com.ismartcoding.plain.rustprefs.plain_reset_adb_token
-import com.ismartcoding.plain.rustprefs.plain_reset_password
+import com.ismartcoding.plain.rustprefs.plain_generate_password
 import com.ismartcoding.plain.rustprefs.plain_resource_close
 import com.ismartcoding.plain.rustprefs.plain_resource_file
 import com.ismartcoding.plain.rustprefs.plain_resource_open
@@ -277,7 +277,7 @@ internal actual object RustNativeBindings {
 
     actual fun checkAppUpdate(automatic: Boolean): String = readString(plain_check_app_update(automatic))
 
-    actual fun resetPassword(): String = readString(plain_reset_password())
+    actual fun generatePassword(): String = readString(plain_generate_password())
 
 
     actual fun resetAdbToken(): String = readString(plain_reset_adb_token())

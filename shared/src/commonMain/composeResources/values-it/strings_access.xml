@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="access_feature_help">È necessaria un’autorizzazione di sistema. Attiva l’interruttore per concederla.</string>
+    <string name="access_settings_title">Impostazioni di accesso remoto</string>
+    <string name="access_settings_description">Scegli a quali dati e funzioni del telefono possono accedere i client remoti.</string>
+    <string name="access_remote_permissions">Consenti accesso remoto</string>
+    <string name="access_files_description">Sfoglia e gestisci i file del telefono</string>
+    <string name="access_contacts_description">Visualizza e modifica i contatti</string>
+    <string name="access_sms_description">Visualizza, invia ed elimina SMS</string>
+    <string name="access_call_logs_description">Visualizza e gestisci il registro chiamate</string>
+    <string name="access_call_phone_description">Effettua chiamate tramite questo telefono</string>
+    <string name="access_phone_number_description">Leggi i numeri di questo telefono</string>
+    <string name="access_apps_description">Visualizza, installa e disinstalla app</string>
+    <string name="access_notifications_description">Visualizza le notifiche del telefono, rispondi e rimuovile</string>
+    <string name="access_clipboard_description">Sincronizza il testo copiato tra questo telefono e i client remoti</string>
+    <string name="access_permission_denied">L’autorizzazione di sistema non è stata concessa. L’accesso remoto non è stato attivato.</string>
+    <string name="access_permission_unavailable">Manca l’autorizzazione di sistema. L’accesso remoto non è disponibile.</string>
+    <string name="access_contacts">Contatti</string>
+    <string name="access_sms">SMS</string>
+    <string name="access_call_logs">Registro chiamate</string>
+    <string name="access_phone_number">Numeri di telefono</string>
+    <string name="access_go_to_settings">Apri le impostazioni di sistema</string>
+    <string name="access_allow">Consenti accesso</string>
+</resources>

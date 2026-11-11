@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="access_allow">允許存取</string>
-    <string name="access_go_to_settings">前往設定</string>
+    <string name="access_go_to_settings">前往系統設定</string>
     <string name="access_choose_folder">重新選擇資料夾</string>
     <string name="access_photos_request_help">允許存取後，這裡會顯示系統相簿中的照片和影片。</string>
     <string name="access_photos_settings_help">請在系統設定中允許 PlainApp 存取照片和影片。</string>
@@ -10,5 +10,23 @@
     <string name="access_add_folder_help">選擇資料夾後，其中的音樂、影片和文件會顯示在列表中，無需複製檔案。</string>
     <string name="access_folder_unavailable_help">資料夾可能已移動或存取已失效，請從「檔案」中重新選擇。</string>
     <string name="access_files_help">請在系統設定中允許 PlainApp 管理檔案，以顯示圖片、影片、音樂和文件。</string>
-    <string name="access_feature_help">請允許存取以使用上方功能，共用開關會保持開啟。</string>
+    <string name="access_feature_help">需要系統權限，請開啟開關進行授權。</string>
+    <string name="access_settings_title">遠端存取設定</string>
+    <string name="access_settings_description">選擇允許遠端用戶端存取的手機資料和功能。</string>
+    <string name="access_remote_permissions">允許遠端存取</string>
+    <string name="access_files_description">瀏覽和管理手機檔案</string>
+    <string name="access_contacts_description">檢視和編輯聯絡人</string>
+    <string name="access_sms_description">檢視、傳送和刪除簡訊</string>
+    <string name="access_call_logs_description">檢視和管理通話記錄</string>
+    <string name="access_call_phone_description">透過手機撥打電話</string>
+    <string name="access_phone_number_description">讀取本機電話號碼</string>
+    <string name="access_apps_description">檢視、安裝和解除安裝應用程式</string>
+    <string name="access_notifications_description">檢視、回覆和清除手機通知</string>
+    <string name="access_clipboard_description">在手機和遠端用戶端間同步複製的文字</string>
+    <string name="access_permission_denied">未取得系統權限，遠端存取未開啟。</string>
+    <string name="access_permission_unavailable">缺少系統權限，遠端存取暫時無法使用。</string>
+    <string name="access_contacts">聯絡人</string>
+    <string name="access_sms">簡訊</string>
+    <string name="access_call_logs">通話記錄</string>
+    <string name="access_phone_number">電話號碼</string>
 </resources>

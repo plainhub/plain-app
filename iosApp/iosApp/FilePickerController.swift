@@ -90,6 +90,9 @@ final class FilePickerController: NSObject, IosFilePicker {
                 }
                 IosFilePickerCallback.shared.onPickResult(tag: self.currentTag, type: self.currentType, uris: uris)
             } catch {
+                if self.currentTag == "DIRECTORY_ACCESS" {
+                    IosFilePickerCallback.shared.onPickResult(tag: self.currentTag, type: self.currentType, uris: [])
+                }
                 IosFilePickerCallback.shared.onPickError(message: error.localizedDescription)
             }
             self.documentDelegate = nil

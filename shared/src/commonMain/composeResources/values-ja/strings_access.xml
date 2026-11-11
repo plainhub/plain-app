@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="access_feature_help">システム権限が必要です。スイッチをオンにして許可してください。</string>
+    <string name="access_settings_title">リモートアクセス設定</string>
+    <string name="access_settings_description">リモートクライアントがアクセスできるスマートフォンのデータと機能を選択します。</string>
+    <string name="access_remote_permissions">リモートアクセスを許可</string>
+    <string name="access_files_description">スマートフォンのファイルを閲覧・管理</string>
+    <string name="access_contacts_description">連絡先を表示・編集</string>
+    <string name="access_sms_description">SMSを表示・送信・削除</string>
+    <string name="access_call_logs_description">通話履歴を表示・管理</string>
+    <string name="access_call_phone_description">このスマートフォンから電話を発信</string>
+    <string name="access_phone_number_description">このスマートフォンの電話番号を読み取り</string>
+    <string name="access_apps_description">アプリを表示・インストール・アンインストール</string>
+    <string name="access_notifications_description">スマートフォンの通知を表示・返信・消去</string>
+    <string name="access_clipboard_description">スマートフォンとリモートクライアント間でコピーしたテキストを同期</string>
+    <string name="access_permission_denied">システム権限が許可されなかったため、リモートアクセスは有効になっていません。</string>
+    <string name="access_permission_unavailable">システム権限がないため、リモートアクセスは利用できません。</string>
+    <string name="access_contacts">連絡先</string>
+    <string name="access_sms">SMS</string>
+    <string name="access_call_logs">通話履歴</string>
+    <string name="access_phone_number">電話番号</string>
+    <string name="access_go_to_settings">システム設定を開く</string>
+    <string name="access_allow">アクセスを許可</string>
+</resources>

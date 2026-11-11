@@ -2,17 +2,17 @@ use super::management::{parts, reply};
 use super::values::{c_string, input};
 use std::ffi::c_char;
 
-fn reset_password() -> String {
+fn generate_password() -> String {
     reply!((|| {
         let (runtime, management) = parts()?;
         let _ = runtime;
-        management.reset_password()
+        management.generate_password()
     })())
 }
 
 #[unsafe(no_mangle)]
-pub extern "C" fn plain_reset_password() -> *mut c_char {
-    c_string(reset_password())
+pub extern "C" fn plain_generate_password() -> *mut c_char {
+    c_string(generate_password())
 }
 
 fn reset_adb_token() -> String {
@@ -108,11 +108,11 @@ mod android {
     use super::*;
     use jni::{EnvUnowned, errors::ThrowRuntimeExAndDefault, objects::{JObject, JString}, sys::jstring};
     #[unsafe(no_mangle)]
-    pub extern "system" fn Java_com_ismartcoding_plain_rust_native_RustNativeBindings_resetPassword(
+    pub extern "system" fn Java_com_ismartcoding_plain_rust_native_RustNativeBindings_generatePassword(
         mut env: EnvUnowned<'_>,
         _: JObject<'_>,
     ) -> jstring {
-        env.with_env(|env| -> jni::errors::Result<_> { env.new_string(reset_password()) })
+        env.with_env(|env| -> jni::errors::Result<_> { env.new_string(generate_password()) })
             .resolve::<ThrowRuntimeExAndDefault>()
             .into_raw()
     }

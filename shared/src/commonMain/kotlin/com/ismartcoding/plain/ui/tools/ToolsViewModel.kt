@@ -37,7 +37,7 @@ internal class ToolsViewModel(
     }
 
     suspend fun load() {
-        val values = api.execute(Query.prefs())
+        val values = api.execute(Query.prefs(listOf(PrefKeys.APP_HOME_FEATURES)))
         features.value = Prefs.parseFeatures(values.getValue(PrefKeys.APP_HOME_FEATURES).jsonPrimitive.content)
     }
 

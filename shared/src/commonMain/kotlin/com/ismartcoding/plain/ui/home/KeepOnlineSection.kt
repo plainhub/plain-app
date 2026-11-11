@@ -78,7 +78,6 @@ fun PlainAppServiceSection(
         if (supportsBackgroundService) {
             var expanded by rememberSaveable { mutableStateOf(false) }
             PExpandableSection(
-                toggleModifier = Modifier.padding(horizontal = 16.dp),
                 text = stringResource(Res.string.connection_keeps_dropping),
                 expanded = expanded,
                 stateDescription = stringResource(if (expanded) Res.string.expanded else Res.string.collapsed),

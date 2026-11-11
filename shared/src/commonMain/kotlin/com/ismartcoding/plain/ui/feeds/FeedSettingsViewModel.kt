@@ -63,7 +63,7 @@ class FeedSettingsViewModel internal constructor(val source: ContentSource = Con
     }
 
     private suspend fun loadRemoteSettings() {
-        val values = source.api.execute(com.ismartcoding.plain.graphql.Query.prefs())
+        val values = source.api.execute(com.ismartcoding.plain.graphql.Query.prefs(listOf(PrefKeys.FEED_AUTO_REFRESH, PrefKeys.FEED_AUTO_REFRESH_INTERVAL, PrefKeys.FEED_AUTO_REFRESH_ONLY_WIFI)))
         autoRefresh.value = values[PrefKeys.FEED_AUTO_REFRESH]?.let { com.ismartcoding.plain.lib.JsonHelper.jsonDecodeFromElement<Boolean>(it) } ?: true
         autoRefreshInterval.intValue = values[PrefKeys.FEED_AUTO_REFRESH_INTERVAL]?.let { com.ismartcoding.plain.lib.JsonHelper.jsonDecodeFromElement<Int>(it) } ?: 7200
         autoRefreshOnlyWifi.value = values[PrefKeys.FEED_AUTO_REFRESH_ONLY_WIFI]?.let { com.ismartcoding.plain.lib.JsonHelper.jsonDecodeFromElement<Boolean>(it) } ?: false

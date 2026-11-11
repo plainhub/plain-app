@@ -14,21 +14,22 @@ fun LazyColumnScrollbar(
     indicatorContent: (@Composable (index: Int, isThumbSelected: Boolean) -> Unit)? = null,
     content: @Composable () -> Unit
 ) {
-    if (!settings.enabled) content()
-    else Box(modifier) {
+    Box(modifier) {
         content()
-        val controller = rememberLazyListStateController(
-            state = state,
-            thumbMinLength = settings.thumbMinLength,
-            alwaysShowScrollBar = settings.alwaysShowScrollbar,
-            selectionMode = settings.selectionMode
-        )
+        if (settings.enabled) {
+            val controller = rememberLazyListStateController(
+                state = state,
+                thumbMinLength = settings.thumbMinLength,
+                alwaysShowScrollBar = settings.alwaysShowScrollbar,
+                selectionMode = settings.selectionMode
+            )
 
-        ElementScrollbar(
-            stateController = controller,
-            modifier = modifier,
-            settings = settings,
-            indicatorContent = indicatorContent,
-        )
+            ElementScrollbar(
+                stateController = controller,
+                modifier = Modifier.matchParentSize(),
+                settings = settings,
+                indicatorContent = indicatorContent,
+            )
+        }
     }
 }

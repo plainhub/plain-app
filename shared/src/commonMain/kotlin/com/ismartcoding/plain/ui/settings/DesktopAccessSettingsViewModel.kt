@@ -18,6 +18,7 @@ import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.MutableStateFlow
 
 class DesktopAccessSettingsViewModel : ViewModel() {
+    internal val accessSettings = com.ismartcoding.plain.ui.web.AccessSettingsState()
     val lanIpv4Addresses = MutableStateFlow<List<String>?>(null)
 
     suspend fun observeNetworkAddresses() {

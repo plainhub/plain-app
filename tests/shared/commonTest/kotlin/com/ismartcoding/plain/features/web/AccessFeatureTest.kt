@@ -23,7 +23,7 @@ class AccessFeatureTest {
     fun manageFilesUsesOneSwitchForAllFiveFeatures() {
         val features = com.ismartcoding.plain.ui.web.managedFileAccessFeatures
         assertEquals(setOf(AccessFeature.IMAGES, AccessFeature.VIDEOS, AccessFeature.AUDIO, AccessFeature.DOCS, AccessFeature.FILES), features)
-        val item = com.ismartcoding.plain.ui.web.AccessItem(null, features, issues = emptyList())
+        val item = com.ismartcoding.plain.ui.web.AccessItem(features, issues = emptyList())
         kotlin.test.assertFalse(item.isEnabled(features - AccessFeature.VIDEOS))
         kotlin.test.assertFalse(item.isEnabled(emptySet()))
         kotlin.test.assertTrue(item.isEnabled(features + AccessFeature.CLIPBOARD))

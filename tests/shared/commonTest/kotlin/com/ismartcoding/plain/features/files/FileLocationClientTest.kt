@@ -18,10 +18,10 @@ class FileLocationClientTest {
         return FileLocationApi(GraphqlClient { operation ->
             val key = operation.variables.getValue("key").jsonPrimitive.content
             assertTrue(key in setOf("last_file_path", "recent_save_dirs"))
-            val result = if ("setSavedValue" in operation.query) {
+            val result = if ("setKeyValue" in operation.query) {
                 values[key] = operation.variables.getValue("value")
-                "setSavedValue" to JsonPrimitive(true)
-            } else "savedValue" to (values[key] ?: JsonNull)
+                "setKeyValue" to JsonPrimitive(true)
+            } else "keyValue" to (values[key] ?: JsonNull)
             GraphqlResponse(data = JsonObject(mapOf(result)))
         })
     }

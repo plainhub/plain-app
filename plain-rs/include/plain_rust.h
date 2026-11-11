@@ -85,7 +85,7 @@ char *plain_start_app_update_download(void);
 char *plain_cancel_app_update_download(void);
 char *plain_check_app_update(bool automatic);
 
-char *plain_reset_password(void);
+char *plain_generate_password(void);
 char *plain_reset_adb_token(void);
 char *plain_set_notification_filter_mode(const char *mode);
 char *plain_clear_notification_filter_apps(void);

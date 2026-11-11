@@ -16,10 +16,10 @@ object ChatClient : ChatApi()
 
 open class ChatApi internal constructor(private val api: com.ismartcoding.plain.rust.graphql.GraphqlClient = GraphqlApi) {
     val records = ChatStoreClient(api)
-    suspend fun readDraft(id: String): String = api.execute(com.ismartcoding.plain.graphql.Query.savedValue(draftKey(id), ""))
+    suspend fun readDraft(id: String): String = api.execute(com.ismartcoding.plain.graphql.Query.keyValue(draftKey(id), ""))
 
     suspend fun writeDraft(id: String, value: String) {
-        api.execute(Mutation.setSavedValue(draftKey(id), com.ismartcoding.plain.lib.JsonHelper.jsonEncodeToElement(value)))
+        api.execute(Mutation.setKeyValue(draftKey(id), com.ismartcoding.plain.lib.JsonHelper.jsonEncodeToElement(value)))
     }
 
     private fun draftKey(id: String) = "chat_input_text:${ChatTarget.parseId(id).encodedToId}"

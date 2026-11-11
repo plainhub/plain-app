@@ -29,7 +29,7 @@ object IosFilePickerCallback {
         LogCat.d("IosFilePickerCallback: pickResult tag=$tag type=$type count=${uris.size}")
         if (tag == PickFileTag.DIRECTORY_ACCESS.name) {
             sendEvent(com.ismartcoding.plain.events.PermissionsResultEvent(mapOf(
-                com.ismartcoding.plain.platform.permissions.Permission.WRITE_EXTERNAL_STORAGE.name to uris.isNotEmpty(),
+                com.ismartcoding.plain.platform.permissions.Permission.WRITE_EXTERNAL_STORAGE.toSysPermission() to uris.isNotEmpty(),
             )))
             return
         }

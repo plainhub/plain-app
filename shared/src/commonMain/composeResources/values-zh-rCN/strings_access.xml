@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="access_allow">允许访问</string>
-    <string name="access_go_to_settings">前往设置</string>
+    <string name="access_go_to_settings">前往系统设置</string>
     <string name="access_choose_folder">重新选择文件夹</string>
     <string name="access_photos_request_help">允许访问后，这里会显示系统相册中的照片和视频。</string>
     <string name="access_photos_settings_help">请在系统设置中允许 PlainApp 访问照片和视频。</string>
@@ -10,5 +10,23 @@
     <string name="access_add_folder_help">选择文件夹后，其中的音乐、视频和文档会显示在列表中，无需复制文件。</string>
     <string name="access_folder_unavailable_help">文件夹可能已移动或访问已失效，请从“文件”中重新选择。</string>
     <string name="access_files_help">请在系统设置中允许 PlainApp 管理文件，以显示图片、视频、音乐和文档。</string>
-    <string name="access_feature_help">请允许访问以使用上方功能，共享开关会保持打开。</string>
+    <string name="access_feature_help">需要系统权限，请打开开关进行授权。</string>
+    <string name="access_settings_title">远程访问设置</string>
+    <string name="access_settings_description">选择允许远程客户端访问的手机数据和功能。</string>
+    <string name="access_remote_permissions">允许远程访问</string>
+    <string name="access_files_description">浏览和管理手机文件</string>
+    <string name="access_contacts_description">查看和编辑联系人</string>
+    <string name="access_sms_description">查看、发送和删除短信</string>
+    <string name="access_call_logs_description">查看和管理通话记录</string>
+    <string name="access_call_phone_description">通过手机发起通话</string>
+    <string name="access_phone_number_description">读取本机电话号码</string>
+    <string name="access_apps_description">查看、安装和卸载应用</string>
+    <string name="access_notifications_description">查看、回复和清除手机通知</string>
+    <string name="access_clipboard_description">在手机和远程客户端间同步复制的文字</string>
+    <string name="access_permission_denied">未获得系统权限，远程访问未开启。</string>
+    <string name="access_permission_unavailable">缺少系统权限，远程访问暂不可用。</string>
+    <string name="access_contacts">联系人</string>
+    <string name="access_sms">短信</string>
+    <string name="access_call_logs">通话记录</string>
+    <string name="access_phone_number">电话号码</string>
 </resources>

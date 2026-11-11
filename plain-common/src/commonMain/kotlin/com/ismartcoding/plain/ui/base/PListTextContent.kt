@@ -1,7 +1,6 @@
 package com.ismartcoding.plain.ui.base
 
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -30,12 +29,14 @@ internal fun RowScope.PListTextContent(
     action: (@Composable () -> Unit)? = null,
     contentColor: Color? = null,
 ) {
-    Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+    Column(Modifier.weight(1f)) {
         ProvideTextStyle(MaterialTheme.typography.listItemTitle().contentColored(contentColor), content = title)
         subtitle?.let {
+            VerticalSpace(4.dp)
             ProvideTextStyle(MaterialTheme.typography.listItemSubtitle().contentColored(contentColor), content = it)
         }
         description?.let {
+            VerticalSpace(if (subtitle == null) 4.dp else 8.dp)
             ProvideTextStyle(MaterialTheme.typography.listItemDescription().contentColored(contentColor), content = it)
         }
     }

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="access_feature_help">Sistem izni gerekiyor. İzin vermek için anahtarı açın.</string>
+    <string name="access_settings_title">Uzaktan erişim ayarları</string>
+    <string name="access_settings_description">Uzaktaki istemcilerin erişebileceği telefon verilerini ve özelliklerini seçin.</string>
+    <string name="access_remote_permissions">Uzaktan erişime izin ver</string>
+    <string name="access_files_description">Telefon dosyalarına göz at ve yönet</string>
+    <string name="access_contacts_description">Kişileri görüntüle ve düzenle</string>
+    <string name="access_sms_description">SMS görüntüle, gönder ve sil</string>
+    <string name="access_call_logs_description">Arama kayıtlarını görüntüle ve yönet</string>
+    <string name="access_call_phone_description">Bu telefon üzerinden arama yap</string>
+    <string name="access_phone_number_description">Bu telefonun numaralarını oku</string>
+    <string name="access_apps_description">Uygulamaları görüntüle, yükle ve kaldır</string>
+    <string name="access_notifications_description">Telefon bildirimlerini görüntüle, yanıtla ve temizle</string>
+    <string name="access_clipboard_description">Kopyalanan metni bu telefon ile uzaktaki istemciler arasında eşitle</string>
+    <string name="access_permission_denied">Sistem izni verilmedi. Uzaktan erişim açılmadı.</string>
+    <string name="access_permission_unavailable">Sistem izni eksik. Uzaktan erişim kullanılamıyor.</string>
+    <string name="access_contacts">Kişiler</string>
+    <string name="access_sms">Kısa mesajlar</string>
+    <string name="access_call_logs">Arama kayıtları</string>
+    <string name="access_phone_number">Telefon numaraları</string>
+    <string name="access_go_to_settings">Sistem ayarlarını aç</string>
+    <string name="access_allow">Erişime izin ver</string>
+</resources>

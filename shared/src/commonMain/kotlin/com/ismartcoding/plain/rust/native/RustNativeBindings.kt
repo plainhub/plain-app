@@ -64,7 +64,7 @@ internal expect object RustNativeBindings {
     fun startAppUpdateDownload(): String
     fun cancelAppUpdateDownload(): String
     fun checkAppUpdate(automatic: Boolean): String
-    fun resetPassword(): String
+    fun generatePassword(): String
     fun resetAdbToken(): String
     fun setNotificationFilterMode(mode: String): String
     fun clearNotificationFilterApps(): String

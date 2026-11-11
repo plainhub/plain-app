@@ -8,8 +8,6 @@ import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.withResumed
 import com.ismartcoding.plain.features.permissions.getWebList
 import com.ismartcoding.plain.i18n.*
-import com.ismartcoding.plain.platform.system.AppFeatureType
-import com.ismartcoding.plain.platform.system.has
 import com.ismartcoding.plain.ui.app.MainViewModel
 import com.ismartcoding.plain.ui.components.ConfirmDialog
 import com.ismartcoding.plain.ui.components.DialogHelper
@@ -25,10 +23,7 @@ internal fun WebAccessRequestDialog() {
     val dismissRequest = {
         if (MainViewModel.pendingWebAccessRequest.value === request) MainViewModel.pendingWebAccessRequest.value = null
     }
-    val options = getWebList() + buildList {
-        if (AppFeatureType.NOTIFICATIONS.has()) add(AccessItem(null, setOf(com.ismartcoding.plain.features.web.AccessFeature.NOTIFICATIONS)))
-        add(AccessItem(null, setOf(com.ismartcoding.plain.features.web.AccessFeature.CLIPBOARD)))
-    }
+    val options = getWebList()
     val selected = options.find { request.feature in it.features }
     val message = selected?.let { stringResource(Res.string.web_access_request_message, it.getText()) }
         ?: stringResource(Res.string.not_supported_error)

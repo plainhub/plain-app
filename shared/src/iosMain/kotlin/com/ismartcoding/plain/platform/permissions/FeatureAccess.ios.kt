@@ -27,7 +27,8 @@ actual fun AccessFeature.systemPermissions(): Set<Permission> = when (this) {
     AccessFeature.ADB -> setOf(Permission.ADB)
 }
 
-internal actual suspend fun Set<AccessFeature>.requestSystemAccess() {
+internal actual suspend fun Set<AccessFeature>.requestSystemAccess(): Boolean {
+    if (accessIssues().none { it.isError || it.action == AccessAction.FOLDER }) return true
     val permissions = flatMap {
         if (it == AccessFeature.IMAGES || it == AccessFeature.VIDEOS) setOf(Permission.READ_MEDIA_IMAGES) else it.systemPermissions()
     }.distinct().filter { !it.isGranted() }
@@ -36,14 +37,21 @@ internal actual suspend fun Set<AccessFeature>.requestSystemAccess() {
             .onSubscription { com.ismartcoding.plain.lib.sendEvent(com.ismartcoding.plain.events.RequestPermissionsEvent(permission, showDeniedDialog = false)) }
             .filterIsInstance<com.ismartcoding.plain.events.PermissionsResultEvent>()
             .first { it.has(permission) }
+        if (!permission.isGranted()) return false
     }
     if (any { it == AccessFeature.FILES || it == AccessFeature.AUDIO || it == AccessFeature.DOCS }) {
-        com.ismartcoding.plain.lib.sendEvent(com.ismartcoding.plain.events.PickFileEvent(
-            com.ismartcoding.plain.features.files.PickFileTag.DIRECTORY_ACCESS,
-            com.ismartcoding.plain.features.files.PickFileType.FOLDER,
-            multiple = false,
-        ))
+        com.ismartcoding.plain.lib.Channel.sharedFlow
+            .onSubscription {
+                com.ismartcoding.plain.lib.sendEvent(com.ismartcoding.plain.events.PickFileEvent(
+                    com.ismartcoding.plain.features.files.PickFileTag.DIRECTORY_ACCESS,
+                    com.ismartcoding.plain.features.files.PickFileType.FOLDER,
+                    multiple = false,
+                ))
+            }
+            .filterIsInstance<com.ismartcoding.plain.events.PermissionsResultEvent>()
+            .first { it.has(Permission.WRITE_EXTERNAL_STORAGE) }
     }
+    return accessIssues().none { it.isError || it.action == AccessAction.FOLDER }
 }
 
 @OptIn(kotlinx.cinterop.ExperimentalForeignApi::class)

@@ -29,7 +29,10 @@ class FavoriteFoldersRustHttpTest {
             assertEquals(listOf(second,first),updated.map { it.fullPath })
             assertEquals("旅行",updated.last().alias)
             assertEquals(first,updated.last().rootPath)
-            assertFalse(GraphqlApi.execute(GraphqlRequest<JsonObject>("query { prefs }")).getValue("prefs").jsonObject["favorite_folders"]?.toString().orEmpty().contains(root))
+            var preferenceRejected = false
+            try { GraphqlApi.execute(GraphqlRequest<JsonObject>("query { prefs(keys: [\"favorite_folders\"]) }")) }
+            catch (_: Exception) { preferenceRejected = true }
+            assertTrue(preferenceRejected)
             var failed = false
             try { FavoriteFoldersClient.add(root,"$root-outside/folder") }
             catch (_: Exception) { failed = true }

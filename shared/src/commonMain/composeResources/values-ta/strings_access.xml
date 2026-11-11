@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="access_feature_help">கணினி அனுமதி தேவை. அனுமதி வழங்க சுவிட்சை இயக்கவும்.</string>
+    <string name="access_settings_title">தொலைநிலை அணுகல் அமைப்புகள்</string>
+    <string name="access_settings_description">தொலைநிலை கிளையன்ட்கள் அணுகக்கூடிய ஃபோன் தரவையும் அம்சங்களையும் தேர்வுசெய்யவும்.</string>
+    <string name="access_remote_permissions">தொலைநிலை அணுகலை அனுமதி</string>
+    <string name="access_files_description">ஃபோன் கோப்புகளை உலாவி நிர்வகிக்கவும்</string>
+    <string name="access_contacts_description">தொடர்புகளைப் பார்த்துத் திருத்தவும்</string>
+    <string name="access_sms_description">SMS பார்க்கவும், அனுப்பவும், நீக்கவும்</string>
+    <string name="access_call_logs_description">அழைப்புப் பதிவுகளைப் பார்த்து நிர்வகிக்கவும்</string>
+    <string name="access_call_phone_description">இந்த ஃபோன் மூலம் அழைக்கவும்</string>
+    <string name="access_phone_number_description">இந்த ஃபோனின் எண்களைப் படிக்கவும்</string>
+    <string name="access_apps_description">செயலிகளைப் பார்க்கவும், நிறுவவும், நிறுவல் நீக்கவும்</string>
+    <string name="access_notifications_description">ஃபோன் அறிவிப்புகளைப் பார்க்கவும், பதிலளிக்கவும், அகற்றவும்</string>
+    <string name="access_clipboard_description">இந்த ஃபோனுக்கும் தொலைநிலை கிளையன்ட்களுக்கும் இடையில் நகலெடுத்த உரையை ஒத்திசைக்கவும்</string>
+    <string name="access_permission_denied">கணினி அனுமதி வழங்கப்படவில்லை. தொலைநிலை அணுகல் இயக்கப்படவில்லை.</string>
+    <string name="access_permission_unavailable">கணினி அனுமதி இல்லை. தொலைநிலை அணுகல் கிடைக்கவில்லை.</string>
+    <string name="access_contacts">தொடர்புகள்</string>
+    <string name="access_sms">குறுஞ்செய்திகள்</string>
+    <string name="access_call_logs">அழைப்புப் பதிவுகள்</string>
+    <string name="access_phone_number">ஃபோன் எண்கள்</string>
+    <string name="access_go_to_settings">கணினி அமைப்புகளைத் திறக்கவும்</string>
+    <string name="access_allow">அணுகலை அனுமதி</string>
+</resources>

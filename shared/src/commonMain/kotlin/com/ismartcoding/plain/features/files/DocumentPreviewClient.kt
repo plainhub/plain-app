@@ -15,10 +15,10 @@ internal object DocumentPreviewClient {
         val resource = when (source) {
             ContentSource.Local -> {
                 val access = source.api.execute(GraphqlRequest<PreviewAccess>(
-                    "query { app { urlToken httpsPort tlsCertificateSha256 } }", field = "app",
+                    "query { app { clientId urlToken httpsPort tlsCertificateSha256 } }", field = "app",
                 ))
                 val id = nativeCall<String> {
-                    RustNativeBindings.encryptResourceReference(access.urlToken, JsonHelper.jsonEncode(FileReference(path)))
+                    RustNativeBindings.encryptResourceReference(access.urlToken, JsonHelper.jsonEncode(FileReference(access.clientId, path)))
                 }
                 val url = managedResourceUrl("https://127.0.0.1:${access.httpsPort}", id, size = null)
                 ManagedResource(url, checkNotNull(access.tlsCertificateSha256) { "HTTP server is unavailable" })
@@ -32,7 +32,7 @@ internal object DocumentPreviewClient {
 }
 
 @Serializable
-private data class PreviewAccess(val urlToken: String, val httpsPort: Int, val tlsCertificateSha256: String?)
+private data class PreviewAccess(val clientId: String, val urlToken: String, val httpsPort: Int, val tlsCertificateSha256: String?)
 
 @Serializable
-private data class FileReference(val path: String)
+private data class FileReference(val clientId: String, val path: String)

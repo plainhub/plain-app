@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="access_feature_help">Eine Systemberechtigung ist erforderlich. Aktiviere den Schalter, um sie zu erteilen.</string>
+    <string name="access_settings_title">Fernzugriffseinstellungen</string>
+    <string name="access_settings_description">Wähle, auf welche Telefondaten und Funktionen entfernte Clients zugreifen dürfen.</string>
+    <string name="access_remote_permissions">Fernzugriff erlauben</string>
+    <string name="access_files_description">Dateien auf dem Telefon durchsuchen und verwalten</string>
+    <string name="access_contacts_description">Kontakte ansehen und bearbeiten</string>
+    <string name="access_sms_description">SMS ansehen, senden und löschen</string>
+    <string name="access_call_logs_description">Anruflisten ansehen und verwalten</string>
+    <string name="access_call_phone_description">Anrufe über dieses Telefon tätigen</string>
+    <string name="access_phone_number_description">Telefonnummern dieses Telefons lesen</string>
+    <string name="access_apps_description">Apps ansehen, installieren und deinstallieren</string>
+    <string name="access_notifications_description">Telefonbenachrichtigungen ansehen, beantworten und entfernen</string>
+    <string name="access_clipboard_description">Kopierten Text zwischen diesem Telefon und entfernten Clients synchronisieren</string>
+    <string name="access_permission_denied">Die Systemberechtigung wurde nicht erteilt. Der Fernzugriff wurde nicht aktiviert.</string>
+    <string name="access_permission_unavailable">Die Systemberechtigung fehlt. Der Fernzugriff ist nicht verfügbar.</string>
+    <string name="access_contacts">Kontakte</string>
+    <string name="access_sms">SMS</string>
+    <string name="access_call_logs">Anruflisten</string>
+    <string name="access_phone_number">Telefonnummern</string>
+    <string name="access_go_to_settings">Systemeinstellungen öffnen</string>
+    <string name="access_allow">Zugriff erlauben</string>
+</resources>

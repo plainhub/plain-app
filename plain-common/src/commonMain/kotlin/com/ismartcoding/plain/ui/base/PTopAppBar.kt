@@ -25,13 +25,14 @@ import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.layout
+import androidx.compose.ui.unit.offset
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.ismartcoding.plain.ui.base.HorizontalSpace
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -100,8 +101,18 @@ fun PTopAppBar(
                 }
             },
             actions = {
-                actions?.invoke(this)
-                HorizontalSpace(8.dp)
+                if (actions != null) {
+                    Row(
+                        modifier = Modifier.layout { measurable, constraints ->
+                            val gap = 8.dp.roundToPx()
+                            val child = measurable.measure(constraints.offset(horizontal = -gap))
+                            val end = if (child.width == 0) 0 else gap
+                            layout(child.width + end, child.height) { child.placeRelative(0, 0) }
+                        },
+                        verticalAlignment = Alignment.CenterVertically,
+                        content = actions,
+                    )
+                }
             },
             colors = TopAppBarDefaults.topAppBarColors(
                 containerColor = Color.Transparent,

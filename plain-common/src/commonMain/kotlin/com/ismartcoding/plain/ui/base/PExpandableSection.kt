@@ -11,6 +11,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.size
@@ -46,6 +47,7 @@ fun PExpandableSection(
                 .clickable(role = Role.Button, onClick = onClick)
                 .semantics { this.stateDescription = stateDescription }
                 .heightIn(min = 48.dp)
+                .padding(horizontal = 16.dp)
                 .then(toggleModifier),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(8.dp),
@@ -62,7 +64,6 @@ fun PExpandableSection(
                 tint = MaterialTheme.colorScheme.primary,
                 modifier = Modifier.size(16.dp),
             )
-            HorizontalSpace(8.dp)
         }
         AnimatedVisibility(
             visible = expanded,

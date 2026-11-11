@@ -148,6 +148,7 @@ object ClipboardWatcher {
     private suspend fun handleClipboardChange() {
         if (AccessFeature.CLIPBOARD !in Prefs.apiAccessFeatures.value) return
         val clip = clipboardManager.primaryClip ?: return
+        if (clip.description.extras?.getBoolean(ClipDescription.EXTRA_IS_SENSITIVE, false) == true) return
         if (clip.itemCount == 0) return
         val text = clip.getItemAt(0).coerceToText(appContext)?.toString() ?: return
         if (text.isBlank()) return
@@ -155,8 +156,6 @@ object ClipboardWatcher {
             LogCat.d("ClipboardWatcher: clip too large (${text.length} chars), skipped")
             return
         }
-        val sensitive = Build.VERSION.SDK_INT >= 33 &&
-            clip.description.extras?.getBoolean(ClipDescription.EXTRA_IS_SENSITIVE, false) == true
-        report?.invoke(ClipboardReportData(text, sensitive))
+        report?.invoke(ClipboardReportData(text, sensitive = false))
     }
 }

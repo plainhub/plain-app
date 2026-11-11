@@ -13,10 +13,10 @@ open class NotesApi internal constructor(
     private val api: GraphqlClient = GraphqlApi,
 ) {
 
-    suspend fun readDraft(): String = api.execute(Query.savedValue("quick_note_draft", ""))
+    suspend fun readDraft(): String = api.execute(Query.keyValue("quick_note_draft", ""))
 
     suspend fun writeDraft(value: String) {
-        api.execute(Mutation.setSavedValue("quick_note_draft", com.ismartcoding.plain.lib.JsonHelper.jsonEncodeToElement(value)))
+        api.execute(Mutation.setKeyValue("quick_note_draft", com.ismartcoding.plain.lib.JsonHelper.jsonEncodeToElement(value)))
     }
 
     suspend fun count(query: String): Int =

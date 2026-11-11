@@ -26,6 +26,7 @@ fun DlnaReceiverSection(navController: NavHostController) {
         modifier = Modifier.clickable { navController.navigate(Routing.DlnaReceiver) },
         title = stringResource(Res.string.dlna_receiver),
         subtitle = stringResource(Res.string.dlna_receiver_desc),
+        separatedActions = true,
     ) {
         Switch(checked = dlnaReceiverEnabled, onCheckedChange = { enable ->
             scope.launchSafe { Prefs.set(PrefKeys.DLNA, enable) }

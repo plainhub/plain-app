@@ -17,7 +17,7 @@ class ApiContractTest {
     @Test
     fun localManagementOperationsAreNotGraphqlRoots() {
         for (name in listOf("cacheRemoteFile", "systemPrefs", "systemSettings", "userSettings", "toggleNotificationApp", "cycleAudioPlayMode",
-            "tlsCertificateSignature", "resetPassword", "resetUrlToken", "resetAdbToken",
+            "tlsCertificateSignature", "resetPassword", "generatePassword", "passwordConfigured", "resetUrlToken", "resetAdbToken",
             "setNotificationFilterMode", "clearNotificationFilterApps", "pairingCode", "isPairingRequestCurrent",
             "logoutPeer", "controlPeerStatus", "filePaths", "importNoteImage", "importPomodoroSound",
             "dlnaReceiver", "controlDlnaReceiver", "scanHistory", "addScanHistory", "removeScanHistory",

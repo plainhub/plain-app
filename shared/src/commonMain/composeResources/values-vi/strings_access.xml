@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="access_feature_help">Cần có quyền hệ thống. Bật công tắc để cấp quyền.</string>
+    <string name="access_settings_title">Cài đặt truy cập từ xa</string>
+    <string name="access_settings_description">Chọn dữ liệu và tính năng trên điện thoại mà máy khách từ xa được phép truy cập.</string>
+    <string name="access_remote_permissions">Cho phép truy cập từ xa</string>
+    <string name="access_files_description">Duyệt và quản lý tệp trên điện thoại</string>
+    <string name="access_contacts_description">Xem và chỉnh sửa danh bạ</string>
+    <string name="access_sms_description">Xem, gửi và xóa SMS</string>
+    <string name="access_call_logs_description">Xem và quản lý nhật ký cuộc gọi</string>
+    <string name="access_call_phone_description">Thực hiện cuộc gọi qua điện thoại này</string>
+    <string name="access_phone_number_description">Đọc số điện thoại của điện thoại này</string>
+    <string name="access_apps_description">Xem, cài đặt và gỡ cài đặt ứng dụng</string>
+    <string name="access_notifications_description">Xem, trả lời và xóa thông báo trên điện thoại</string>
+    <string name="access_clipboard_description">Đồng bộ văn bản đã sao chép giữa điện thoại này và máy khách từ xa</string>
+    <string name="access_permission_denied">Chưa được cấp quyền hệ thống. Truy cập từ xa chưa được bật.</string>
+    <string name="access_permission_unavailable">Thiếu quyền hệ thống. Không thể truy cập từ xa.</string>
+    <string name="access_contacts">Danh bạ</string>
+    <string name="access_sms">Tin nhắn SMS</string>
+    <string name="access_call_logs">Nhật ký cuộc gọi</string>
+    <string name="access_phone_number">Số điện thoại</string>
+    <string name="access_go_to_settings">Mở cài đặt hệ thống</string>
+    <string name="access_allow">Cho phép truy cập</string>
+</resources>

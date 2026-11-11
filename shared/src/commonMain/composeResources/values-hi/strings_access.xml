@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="access_feature_help">सिस्टम की अनुमति ज़रूरी है। अनुमति देने के लिए स्विच चालू करें।</string>
+    <string name="access_settings_title">रिमोट ऐक्सेस सेटिंग</string>
+    <string name="access_settings_description">चुनें कि रिमोट क्लाइंट फ़ोन के किन डेटा और सुविधाओं का उपयोग कर सकते हैं।</string>
+    <string name="access_remote_permissions">रिमोट ऐक्सेस की अनुमति दें</string>
+    <string name="access_files_description">फ़ोन की फ़ाइलें ब्राउज़ और प्रबंधित करें</string>
+    <string name="access_contacts_description">संपर्क देखें और संपादित करें</string>
+    <string name="access_sms_description">SMS देखें, भेजें और मिटाएँ</string>
+    <string name="access_call_logs_description">कॉल लॉग देखें और प्रबंधित करें</string>
+    <string name="access_call_phone_description">इस फ़ोन से कॉल करें</string>
+    <string name="access_phone_number_description">इस फ़ोन के नंबर पढ़ें</string>
+    <string name="access_apps_description">ऐप देखें, इंस्टॉल करें और अनइंस्टॉल करें</string>
+    <string name="access_notifications_description">फ़ोन की सूचनाएँ देखें, उनका जवाब दें और उन्हें हटाएँ</string>
+    <string name="access_clipboard_description">इस फ़ोन और रिमोट क्लाइंट के बीच कॉपी किए गए टेक्स्ट को सिंक करें</string>
+    <string name="access_permission_denied">सिस्टम की अनुमति नहीं मिली। रिमोट ऐक्सेस चालू नहीं हुआ।</string>
+    <string name="access_permission_unavailable">सिस्टम की अनुमति नहीं है। रिमोट ऐक्सेस उपलब्ध नहीं है।</string>
+    <string name="access_contacts">संपर्क</string>
+    <string name="access_sms">टेक्स्ट संदेश</string>
+    <string name="access_call_logs">कॉल लॉग</string>
+    <string name="access_phone_number">फ़ोन नंबर</string>
+    <string name="access_go_to_settings">सिस्टम सेटिंग खोलें</string>
+    <string name="access_allow">ऐक्सेस की अनुमति दें</string>
+</resources>

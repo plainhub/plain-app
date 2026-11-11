@@ -7,4 +7,4 @@ expect val supportsDirectorySelection: Boolean
 expect fun AccessFeature.systemPermissions(): Set<Permission>
 fun AccessFeature.isGranted(): Boolean = systemPermissions().all { it.isGranted() }
 
-internal expect suspend fun Set<AccessFeature>.requestSystemAccess()
+internal expect suspend fun Set<AccessFeature>.requestSystemAccess(): Boolean

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="access_allow">Allow access</string>
-    <string name="access_go_to_settings">Open Settings</string>
+    <string name="access_go_to_settings">Open system settings</string>
     <string name="access_choose_folder">Choose folder again</string>
     <string name="access_photos_request_help">Allow access to show your system photos and videos here.</string>
     <string name="access_photos_settings_help">Allow PlainApp to access photos and videos in system settings.</string>
@@ -10,5 +10,23 @@
     <string name="access_add_folder_help">Choose a folder to show its music, videos and documents without copying the files.</string>
     <string name="access_folder_unavailable_help">The folder may have moved or its access may have expired. Choose it again in Files.</string>
     <string name="access_files_help">Allow PlainApp to manage files in system settings to show images, videos, music and documents.</string>
-    <string name="access_feature_help">Allow access to use the feature above. The sharing switch will stay on.</string>
+    <string name="access_feature_help">System permission is required. Turn on the switch to grant it.</string>
+    <string name="access_settings_title">Remote Access Settings</string>
+    <string name="access_settings_description">Choose which phone data and features remote clients can access.</string>
+    <string name="access_remote_permissions">Allow remote access</string>
+    <string name="access_files_description">Browse and manage phone files</string>
+    <string name="access_contacts_description">View and edit contacts</string>
+    <string name="access_sms_description">View, send and delete SMS</string>
+    <string name="access_call_logs_description">View and manage call logs</string>
+    <string name="access_call_phone_description">Make calls through this phone</string>
+    <string name="access_phone_number_description">Read this phone’s numbers</string>
+    <string name="access_apps_description">View, install and uninstall apps</string>
+    <string name="access_notifications_description">View, reply to and dismiss phone notifications</string>
+    <string name="access_clipboard_description">Sync copied text between this phone and remote clients</string>
+    <string name="access_permission_denied">System permission was not granted. Remote access was not enabled.</string>
+    <string name="access_permission_unavailable">System permission is missing. Remote access is unavailable.</string>
+    <string name="access_contacts">Contacts</string>
+    <string name="access_sms">SMS</string>
+    <string name="access_call_logs">Call logs</string>
+    <string name="access_phone_number">Phone numbers</string>
 </resources>

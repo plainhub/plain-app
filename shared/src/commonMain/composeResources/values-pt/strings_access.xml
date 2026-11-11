@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="access_feature_help">É necessária uma permissão do sistema. Ative o interruptor para a conceder.</string>
+    <string name="access_settings_title">Definições de acesso remoto</string>
+    <string name="access_settings_description">Escolha os dados e funções do telefone a que os clientes remotos podem aceder.</string>
+    <string name="access_remote_permissions">Permitir acesso remoto</string>
+    <string name="access_files_description">Explorar e gerir ficheiros do telefone</string>
+    <string name="access_contacts_description">Ver e editar contactos</string>
+    <string name="access_sms_description">Ver, enviar e eliminar SMS</string>
+    <string name="access_call_logs_description">Ver e gerir o registo de chamadas</string>
+    <string name="access_call_phone_description">Fazer chamadas através deste telefone</string>
+    <string name="access_phone_number_description">Ler os números deste telefone</string>
+    <string name="access_apps_description">Ver, instalar e desinstalar aplicações</string>
+    <string name="access_notifications_description">Ver, responder e dispensar notificações do telefone</string>
+    <string name="access_clipboard_description">Sincronizar o texto copiado entre este telefone e os clientes remotos</string>
+    <string name="access_permission_denied">A permissão do sistema não foi concedida. O acesso remoto não foi ativado.</string>
+    <string name="access_permission_unavailable">Falta a permissão do sistema. O acesso remoto não está disponível.</string>
+    <string name="access_contacts">Contactos</string>
+    <string name="access_sms">Mensagens de texto</string>
+    <string name="access_call_logs">Registo de chamadas</string>
+    <string name="access_phone_number">Números de telefone</string>
+    <string name="access_go_to_settings">Abrir definições do sistema</string>
+    <string name="access_allow">Permitir acesso</string>
+</resources>

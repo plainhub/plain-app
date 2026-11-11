@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="access_feature_help">시스템 권한이 필요합니다. 스위치를 켜서 권한을 허용하세요.</string>
+    <string name="access_settings_title">원격 접근 설정</string>
+    <string name="access_settings_description">원격 클라이언트가 접근할 수 있는 휴대전화 데이터와 기능을 선택하세요.</string>
+    <string name="access_remote_permissions">원격 접근 허용</string>
+    <string name="access_files_description">휴대전화 파일 탐색 및 관리</string>
+    <string name="access_contacts_description">연락처 보기 및 편집</string>
+    <string name="access_sms_description">SMS 보기, 보내기 및 삭제</string>
+    <string name="access_call_logs_description">통화 기록 보기 및 관리</string>
+    <string name="access_call_phone_description">이 휴대전화로 전화 걸기</string>
+    <string name="access_phone_number_description">이 휴대전화의 전화번호 읽기</string>
+    <string name="access_apps_description">앱 보기, 설치 및 제거</string>
+    <string name="access_notifications_description">휴대전화 알림 보기, 답장 및 지우기</string>
+    <string name="access_clipboard_description">휴대전화와 원격 클라이언트 간에 복사한 텍스트 동기화</string>
+    <string name="access_permission_denied">시스템 권한이 허용되지 않아 원격 접근이 켜지지 않았습니다.</string>
+    <string name="access_permission_unavailable">시스템 권한이 없어 원격 접근을 사용할 수 없습니다.</string>
+    <string name="access_contacts">연락처</string>
+    <string name="access_sms">문자 메시지</string>
+    <string name="access_call_logs">통화 기록</string>
+    <string name="access_phone_number">전화번호</string>
+    <string name="access_go_to_settings">시스템 설정 열기</string>
+    <string name="access_allow">접근 허용</string>
+</resources>

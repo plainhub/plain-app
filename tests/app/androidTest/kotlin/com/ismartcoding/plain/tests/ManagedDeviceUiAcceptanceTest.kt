@@ -560,10 +560,10 @@ class ManagedDeviceUiAcceptanceTest {
                                 "Target fixture", capabilities, listOf(com.ismartcoding.plain.features.web.AccessFeature.FILES), "/target-share-root", "/target-downloads", "fixture-resource-token", "fixture-certificate",
                             ))).jsonObject,
                         ))
-                        operation.query.contains("{ prefs }") -> JsonHelper.jsonEncode(com.ismartcoding.plain.rust.graphql.GraphqlResponse(
+                        operation.query.contains("prefs(keys:") -> JsonHelper.jsonEncode(com.ismartcoding.plain.rust.graphql.GraphqlResponse(
                             data = JsonHelper.jsonEncodeToElement(ManagedFixturePrefs(mapOf("app_home_features" to readFeatures()))).jsonObject,
                         ))
-                        operation.query.contains("setSavedValue(") -> """{"data":{"setSavedValue":true}}"""
+                        operation.query.contains("setKeyValue(") -> """{"data":{"setKeyValue":true}}"""
                         operation.query.contains("shareRecord(") -> """{"data":{"shareRecord":{"id":"share-ui-fixture","name":"Target fixture share","password":"","urlToken":"fixture-resource-token","readOnly":true,"expiresAt":null,"createdAt":"2026-01-01T00:00:00Z","updatedAt":"2026-01-01T00:00:00Z","roots":[{"relativePath":"root","realPath":"/target-share-root/existing.txt","isDir":false}]}}}"""
                         operation.query.contains("shareLink(") -> """{"data":{"shareLink":{"host":"device.test","port":8443,"sharedId":"share-ui-fixture","token":"fixture-share-token","pageUrl":"https://device.test:8443/share/fixture"}}}"""
                         operation.query.contains("sendShare(") -> """{"data":{"sendShare":[]}}"""
@@ -572,7 +572,7 @@ class ManagedDeviceUiAcceptanceTest {
                         operation.query.contains("chatItem(") -> JsonHelper.jsonEncode(mapOf("data" to mapOf("chatItem" to JsonHelper.jsonEncodeToElement(chat))))
                         operation.query.contains("browseSharedLink(") -> JsonHelper.jsonEncode(mapOf("data" to mapOf("browseSharedLink" to JsonHelper.jsonEncodeToElement(browsed))))
                         operation.query.contains("sharedDownloadQueue") -> JsonHelper.jsonEncode(mapOf("data" to mapOf("sharedDownloadQueue" to JsonHelper.jsonEncodeToElement(downloads.get()))))
-                        operation.query.contains("savedValue(") -> """{"data":{"savedValue":null}}"""
+                        operation.query.contains("keyValue(") -> """{"data":{"keyValue":null}}"""
                         operation.query.contains("enqueueSharedDownload(") -> {
                             val input = JsonHelper.jsonDecodeFromElement<com.ismartcoding.plain.features.shares.SharedDownloadInput>(operation.variables.getValue("input"))
                             downloads.updateAndGet { current -> current.copy(revision = current.revision + 1, tasks = listOf(com.ismartcoding.plain.models.SharedDownloadRow(
@@ -715,11 +715,11 @@ class ManagedDeviceUiAcceptanceTest {
     @Test
     fun sharedToolsPageRefreshesPreferencesAndWritesDraftOnlyToTheSelectedDevice() = runBlocking<Unit> {
         ActivityScenario.launch(MainActivity::class.java).use { scenario ->
-            val localBefore = GraphqlApi.execute(Query.savedValue("quick_note_draft", ""))
+            val localBefore = GraphqlApi.execute(Query.keyValue("quick_note_draft", ""))
             val requests = java.util.Collections.synchronizedList(mutableListOf<com.ismartcoding.plain.rust.graphql.GraphqlOperation>())
             val features = java.util.concurrent.atomic.AtomicReference("NOTES|FILES")
             val failRefresh = java.util.concurrent.atomic.AtomicBoolean(false)
-            val source = shareFixtureSource(requests, readFeatures = { features.get() }, failRead = { failRefresh.get() && "{ prefs }" in it.query })
+            val source = shareFixtureSource(requests, readFeatures = { features.get() }, failRead = { failRefresh.get() && "prefs(keys:" in it.query })
             scenario.onActivity { activity ->
                 activity.setContent {
                     com.ismartcoding.plain.ui.theme.AppTheme(useDarkTheme = false) {
@@ -741,10 +741,10 @@ class ManagedDeviceUiAcceptanceTest {
             }))
             awaitValue("selected device draft save") {
                 synchronized(requests) {
-                    requests.firstOrNull { "setSavedValue(" in it.query && it.variables["value"]?.jsonPrimitive?.content == draft }
+                    requests.firstOrNull { "setKeyValue(" in it.query && it.variables["value"]?.jsonPrimitive?.content == draft }
                 }
             }
-            assertEquals(localBefore, GraphqlApi.execute(Query.savedValue("quick_note_draft", "")))
+            assertEquals(localBefore, GraphqlApi.execute(Query.keyValue("quick_note_draft", "")))
             features.set("FILES")
             pullToolsDown()
             awaitValue("refreshed selected-device tools") {
@@ -756,7 +756,7 @@ class ManagedDeviceUiAcceptanceTest {
             failRefresh.set(true)
             pullToolsDown()
             awaitValue("failed refresh reached the selected device") {
-                if (synchronized(requests) { requests.count { "{ prefs }" in it.query } } == 3) true else null
+                if (synchronized(requests) { requests.count { "prefs(keys:" in it.query } } == 3) true else null
             }
             awaitNode("failed tools refresh indicator") { it.text == text(com.ismartcoding.plain.ui.resources.Res.string.srl_header_failed) }
             awaitToolsRefreshFinished()
@@ -766,9 +766,9 @@ class ManagedDeviceUiAcceptanceTest {
             pullToolsDown()
             awaitNode("notes restored after refresh recovery") { it.text == text(Res.string.notes) }
             assertEquals(draft, awaitNode("draft preserved across refresh") { it.isEditable }.text)
-            assertEquals(4, synchronized(requests) { requests.count { "{ prefs }" in it.query } })
+            assertEquals(4, synchronized(requests) { requests.count { "prefs(keys:" in it.query } })
             assertTrue(synchronized(requests) { requests.none { "setPref(" in it.query } })
-            assertEquals(localBefore, GraphqlApi.execute(Query.savedValue("quick_note_draft", "")))
+            assertEquals(localBefore, GraphqlApi.execute(Query.keyValue("quick_note_draft", "")))
             captureNavigation("selected-tools")
         }
     }

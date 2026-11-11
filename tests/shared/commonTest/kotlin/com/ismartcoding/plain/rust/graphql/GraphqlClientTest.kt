@@ -147,21 +147,21 @@ class GraphqlClientTest {
     }
 
     @Test
-    fun saved_values_infer_the_result_from_the_default_and_only_default_on_null() = runTest {
+    fun key_values_infer_the_result_from_the_default_and_only_default_on_null() = runTest {
         val api = GraphqlClient {
-            JsonHelper.jsonDecode<GraphqlResponse>("""{"data":{"savedValue":3000000123}}""")
+            JsonHelper.jsonDecode<GraphqlResponse>("""{"data":{"keyValue":3000000123}}""")
         }
-        val value = api.execute(Query.savedValue("key", 0L))
+        val value = api.execute(Query.keyValue("key", 0L))
         assertEquals(3_000_000_123L, value)
         val absent = GraphqlClient {
-            JsonHelper.jsonDecode<GraphqlResponse>("""{"data":{"savedValue":null}}""")
+            JsonHelper.jsonDecode<GraphqlResponse>("""{"data":{"keyValue":null}}""")
         }
-        assertEquals(7L, absent.execute(Query.savedValue("key", 7L)))
+        assertEquals(7L, absent.execute(Query.keyValue("key", 7L)))
         for (value in listOf("{}", "[]", "true", "\"not-a-number\"")) {
             val invalid = GraphqlClient {
-                GraphqlResponse(data = JsonObject(mapOf("savedValue" to JsonHelper.jsonDecode(value))))
+                GraphqlResponse(data = JsonObject(mapOf("keyValue" to JsonHelper.jsonDecode(value))))
             }
-            assertFailsWith<Exception> { invalid.execute(Query.savedValue("key", 7L)) }
+            assertFailsWith<Exception> { invalid.execute(Query.keyValue("key", 7L)) }
         }
     }
 

@@ -13,6 +13,6 @@ import com.ismartcoding.plain.ui.theme.PlainTheme
 fun PSheetPrimaryActionsCard(modifier: Modifier = Modifier, content: @Composable () -> Unit) {
     // No card background: this area holds icon buttons only, no header.
     Box(modifier.fillMaxWidth().padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN)) {
-        PSheetActionsFlowLayout(modifier.fillMaxWidth().padding(vertical = 12.dp), content = content)
+        PSheetActionsFlowLayout(Modifier.fillMaxWidth().padding(vertical = 12.dp), content = content)
     }
 }

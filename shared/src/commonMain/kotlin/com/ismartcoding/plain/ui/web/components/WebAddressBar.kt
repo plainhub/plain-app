@@ -87,7 +87,6 @@ fun WebAddressBar(
                 scope.launch { Prefs.set(PrefKeys.WEB_ADDRESS_BAR_EXPANDED, !expanded.value) }
             }
             PExpandableSection(
-                toggleModifier = Modifier.padding(start = 16.dp, end = 8.dp),
                 text = text,
                 expanded = expanded.value,
                 stateDescription = expansion,

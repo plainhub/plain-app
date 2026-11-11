@@ -32,7 +32,10 @@ internal actual suspend fun observeClipboardChanges(report: suspend (ClipboardRe
                 changes.consumeAsFlow(),
                 active = { UIApplication.sharedApplication.applicationState == UIApplicationState.UIApplicationStateActive },
                 revision = { UIPasteboard.generalPasteboard.changeCount },
-                read = { UIPasteboard.generalPasteboard.string },
+                read = {
+                    val pasteboard = UIPasteboard.generalPasteboard
+                    if (pasteboard.containsPasteboardTypes(listOf(SENSITIVE_PASTEBOARD_TYPE))) null else pasteboard.string
+                },
                 report = report,
             )
         } finally {

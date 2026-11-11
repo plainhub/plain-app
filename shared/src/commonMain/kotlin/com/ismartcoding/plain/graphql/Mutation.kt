@@ -739,10 +739,10 @@ object Mutation {
         field = "setPref",
     )
 
-    fun setSavedValue(key: String, value: JsonElement): GraphqlRequest<Unit> = GraphqlRequest(
-        $$"mutation($key: String!, $value: JSON!) { setSavedValue(key: $key, value: $value) }",
+    fun setKeyValue(key: String, value: JsonElement): GraphqlRequest<Unit> = GraphqlRequest(
+        $$"mutation($key: String!, $value: JSON!) { setKeyValue(key: $key, value: $value) }",
         mapOf(variable("key", key), variable("value", value)),
-        field = "setSavedValue",
+        field = "setKeyValue",
     )
 
     fun syncFeedEntryContent(id: String): GraphqlRequest<FeedEntry> = GraphqlRequest(

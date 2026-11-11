@@ -22,7 +22,7 @@ open class AudioQueueApi internal constructor(private val api: GraphqlClient = G
         api.execute(Query.audioPlaybackSettings())
 
     suspend fun playbackSpeed(): Float =
-        com.ismartcoding.plain.models.audioPlaybackSpeed(api.execute(Query.prefs()))
+        com.ismartcoding.plain.models.audioPlaybackSpeed(api.execute(Query.prefs(listOf("audio_playback_speed"))))
 
     suspend fun playback(): AudioPlayback =
         api.execute(Query.audioPlayback())

@@ -2,6 +2,13 @@ package com.ismartcoding.plain.platform.permissions
 
 import com.ismartcoding.plain.features.web.AccessFeature
 import com.ismartcoding.plain.i18n.*
+import com.ismartcoding.plain.events.PermissionsResultEvent
+import com.ismartcoding.plain.events.RequestPermissionsEvent
+import com.ismartcoding.plain.lib.Channel
+import com.ismartcoding.plain.lib.sendEvent
+import kotlinx.coroutines.flow.filterIsInstance
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.onSubscription
 
 actual val supportsDirectorySelection: Boolean = false
 
@@ -22,11 +29,15 @@ actual fun AccessFeature.systemPermissions(): Set<Permission> = when (this) {
     AccessFeature.ADB -> setOf(Permission.ADB)
 }
 
-internal actual suspend fun Set<AccessFeature>.requestSystemAccess() {
+internal actual suspend fun Set<AccessFeature>.requestSystemAccess(): Boolean {
     val permissions = flatMap { it.systemPermissions() }.distinct().filter { !it.isGranted() }
-    if (permissions.isNotEmpty()) com.ismartcoding.plain.lib.sendEvent(
-        com.ismartcoding.plain.events.RequestPermissionsEvent(*permissions.toTypedArray(), showDeniedDialog = false),
-    )
+    if (permissions.isNotEmpty()) {
+        Channel.sharedFlow
+            .onSubscription { sendEvent(RequestPermissionsEvent(*permissions.toTypedArray(), showDeniedDialog = false)) }
+            .filterIsInstance<PermissionsResultEvent>()
+            .first { result -> permissions.all { result.has(it) } }
+    }
+    return all { it.isGranted() }
 }
 
 internal actual fun Set<AccessFeature>.accessIssues(): List<AccessIssue> {

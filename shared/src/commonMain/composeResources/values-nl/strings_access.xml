@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="access_feature_help">Systeemtoestemming is nodig. Zet de schakelaar aan om toestemming te geven.</string>
+    <string name="access_settings_title">Instellingen voor externe toegang</string>
+    <string name="access_settings_description">Kies welke telefoongegevens en functies externe clients mogen gebruiken.</string>
+    <string name="access_remote_permissions">Externe toegang toestaan</string>
+    <string name="access_files_description">Bestanden op de telefoon bekijken en beheren</string>
+    <string name="access_contacts_description">Contacten bekijken en bewerken</string>
+    <string name="access_sms_description">Sms-berichten bekijken, versturen en verwijderen</string>
+    <string name="access_call_logs_description">Oproeplogboeken bekijken en beheren</string>
+    <string name="access_call_phone_description">Bellen via deze telefoon</string>
+    <string name="access_phone_number_description">Telefoonnummers van deze telefoon lezen</string>
+    <string name="access_apps_description">Apps bekijken, installeren en verwijderen</string>
+    <string name="access_notifications_description">Telefoonmeldingen bekijken, beantwoorden en wissen</string>
+    <string name="access_clipboard_description">Gekopieerde tekst synchroniseren tussen deze telefoon en externe clients</string>
+    <string name="access_permission_denied">De systeemtoestemming is niet verleend. Externe toegang is niet ingeschakeld.</string>
+    <string name="access_permission_unavailable">De systeemtoestemming ontbreekt. Externe toegang is niet beschikbaar.</string>
+    <string name="access_contacts">Contacten</string>
+    <string name="access_sms">Sms-berichten</string>
+    <string name="access_call_logs">Oproeplogboeken</string>
+    <string name="access_phone_number">Telefoonnummers</string>
+    <string name="access_go_to_settings">Systeeminstellingen openen</string>
+    <string name="access_allow">Toegang toestaan</string>
+</resources>
