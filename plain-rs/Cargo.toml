@@ -35,7 +35,7 @@ opt-level = 3
 opt-level = 1
 
 [profile.dev.package.plain-libs]
-opt-level = 1
+opt-level = 3
 
 [profile.dev.package.plain-rs]
 opt-level = 1
