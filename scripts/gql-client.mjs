@@ -167,7 +167,7 @@ async function login(clientId) {
 }
 
 function graphqlResponseAad(request) {
-  return Buffer.concat([Buffer.from("plain-http-response-v1\0/graphql\0"), crypto.createHash("sha256").update(request).digest()])
+  return Buffer.concat([Buffer.from("r\0"), crypto.createHash("sha256").update(request).digest()])
 }
 
 // ---- graphql ---------------------------------------------------------------

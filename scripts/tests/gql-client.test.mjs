@@ -53,7 +53,7 @@ test(`actual GraphQL script ${wrongPassword ? 'rejects a wrong password' : 'inte
       const first = text.indexOf('|')
       const second = text.indexOf('|', first + 1)
       assert.equal(JSON.parse(text.slice(second + 1)).query, '{ __typename }')
-      const aad = Buffer.concat([Buffer.from('plain-http-response-v1\0/graphql\0'), createHash('sha256').update(request).digest()])
+      const aad = Buffer.concat([Buffer.from('r\0'), createHash('sha256').update(request).digest()])
       res.end(seal(key, Buffer.from(JSON.stringify({ data: { __typename: 'Query' } })), aad))
     } catch (error) { serverError = error; res.writeHead(500).end() }
   })

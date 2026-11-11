@@ -29,7 +29,7 @@ internal class PeerHttpClient(
     private val peers: suspend () -> List<Peer> = { GraphqlApi.execute(Query.peers()) },
     private val encrypt: suspend (String, String, String) -> String = { token, endpoint, payload -> nativeCall { RustNativeBindings.encryptHttpRequest(token, endpoint, payload) } },
     private val decrypt: suspend (String, String, String) -> String = { token, request, response ->
-        nativeCall { RustNativeBindings.decryptHttpResponse(token, "/graphql", request, response) }
+        nativeCall { RustNativeBindings.decryptHttpResponse(token, request, response) }
     },
     private val clientId: () -> String = { Prefs.clientId.value },
     internal val encryptResourceReference: suspend (String, String) -> String = { token, path -> nativeCall { RustNativeBindings.encryptResourceReference(token, JsonHelper.jsonEncode(mapOf("clientId" to clientId(), "path" to path))) } },

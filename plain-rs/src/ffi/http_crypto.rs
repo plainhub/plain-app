@@ -39,11 +39,10 @@ pub extern "C" fn plain_encrypt_resource_reference(
     })
 }
 
-fn decrypt(token: &str, endpoint: &str, request: &str, response: &str) -> String {
+fn decrypt(token: &str, request: &str, response: &str) -> String {
     reply(
         plain_rs::infrastructure::transport::http_request::decrypt_response(
             &plain_libs::utils::base64::base64_decode(token),
-            endpoint,
             &plain_libs::utils::base64::base64_decode(request),
             &plain_libs::utils::base64::base64_decode(response),
         ),
@@ -65,23 +64,13 @@ pub extern "C" fn plain_encrypt_http_request(
 #[unsafe(no_mangle)]
 pub extern "C" fn plain_decrypt_http_response(
     token: *const c_char,
-    endpoint: *const c_char,
     request: *const c_char,
     response: *const c_char,
 ) -> *mut c_char {
-    c_string(
-        match (
-            input(token),
-            input(endpoint),
-            input(request),
-            input(response),
-        ) {
-            (Ok(token), Ok(endpoint), Ok(request), Ok(response)) => {
-                decrypt(&token, &endpoint, &request, &response)
-            }
-            _ => reply(Err("Invalid HTTP decryption input")),
-        },
-    )
+    c_string(match (input(token), input(request), input(response)) {
+        (Ok(token), Ok(request), Ok(response)) => decrypt(&token, &request, &response),
+        _ => reply(Err("Invalid HTTP decryption input")),
+    })
 }
 
 #[cfg(target_os = "android")]
@@ -132,14 +121,12 @@ mod android {
         mut env: EnvUnowned<'_>,
         _: JObject<'_>,
         token: JString<'_>,
-        endpoint: JString<'_>,
         request: JString<'_>,
         response: JString<'_>,
     ) -> jstring {
         env.with_env(|env| -> jni::errors::Result<_> {
             env.new_string(decrypt(
                 &token.to_string(),
-                &endpoint.to_string(),
                 &request.to_string(),
                 &response.to_string(),
             ))
@@ -148,3 +135,7 @@ mod android {
         .into_raw()
     }
 }
+
+#[cfg(test)]
+#[path = "../../tests/unit/ffi/http_crypto.rs"]
+mod tests;

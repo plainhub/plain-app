@@ -108,8 +108,8 @@ internal actual object RustNativeBindings {
     actual fun encryptResourceReference(token: String, payload: String): String = memScoped {
         readString(plain_encrypt_resource_reference(token.cstr.ptr, payload.cstr.ptr))
     }
-    actual fun decryptHttpResponse(token: String, endpoint: String, request: String, response: String): String = memScoped {
-        readString(plain_decrypt_http_response(token.cstr.ptr, endpoint.cstr.ptr, request.cstr.ptr, response.cstr.ptr))
+    actual fun decryptHttpResponse(token: String, request: String, response: String): String = memScoped {
+        readString(plain_decrypt_http_response(token.cstr.ptr, request.cstr.ptr, response.cstr.ptr))
     }
     actual fun graphqlSubscriptionOpen(target: String?): Long = memScoped {
         val reply = JsonHelper.jsonDecode<NativeSubscriptionReply>(readString(plain_graphql_subscription_open(target?.cstr?.ptr)))

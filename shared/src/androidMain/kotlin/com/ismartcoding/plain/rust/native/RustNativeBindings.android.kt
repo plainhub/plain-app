@@ -8,7 +8,7 @@ internal actual object RustNativeBindings {
     actual external fun graphql(request: String): String
     actual external fun encryptHttpRequest(token: String, endpoint: String, payload: String): String
     actual external fun encryptResourceReference(token: String, payload: String): String
-    actual external fun decryptHttpResponse(token: String, endpoint: String, request: String, response: String): String
+    actual external fun decryptHttpResponse(token: String, request: String, response: String): String
     actual external fun graphqlSubscriptionOpen(target: String?): Long
     actual external fun graphqlSubscriptionSend(handle: Long, message: String)
     actual external fun graphqlSubscriptionRead(handle: Long): String

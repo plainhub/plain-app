@@ -6,7 +6,7 @@ internal expect object RustNativeBindings {
     fun graphql(request: String): String
     fun encryptHttpRequest(token: String, endpoint: String, payload: String): String
     fun encryptResourceReference(token: String, payload: String): String
-    fun decryptHttpResponse(token: String, endpoint: String, request: String, response: String): String
+    fun decryptHttpResponse(token: String, request: String, response: String): String
     fun graphqlSubscriptionOpen(target: String? = null): Long
     fun graphqlSubscriptionSend(handle: Long, message: String)
     fun graphqlSubscriptionRead(handle: Long): String
