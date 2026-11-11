@@ -6,6 +6,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.platform.testTag
+import com.ismartcoding.plain.features.nearby.PairingPhase
 import com.ismartcoding.plain.features.nearby.PairingMode
 import com.ismartcoding.plain.i18n.*
 import com.ismartcoding.plain.models.NearbyDevice
@@ -20,12 +21,13 @@ import com.ismartcoding.plain.ui.components.ButtonSize
 import com.ismartcoding.plain.ui.components.ConfirmDialogCheckbox
 import com.ismartcoding.plain.ui.components.DialogHelper
 import com.ismartcoding.plain.ui.components.PIconButton
+import com.ismartcoding.plain.ui.nearby.NearbyItemStatus
 import com.ismartcoding.plain.ui.nearby.NearbyViewModel
 import com.ismartcoding.plain.ui.nearby.PairPeerDialog
 import com.ismartcoding.plain.ui.platform.system.getIcon
 import com.ismartcoding.plain.ui.theme.PlainTheme
 import com.ismartcoding.plain.ui.resources.Res as UiRes
-import com.ismartcoding.plain.ui.resources.more_horiz as ui_drawable_more_horiz
+import com.ismartcoding.plain.ui.resources.ellipsis_vertical as ui_drawable_ellipsis_vertical
 import org.jetbrains.compose.resources.stringResource
 
 @Composable
@@ -33,6 +35,10 @@ fun NearbyPairedDeviceItem(peer: Peer, device: NearbyDevice?) {
     var showPair by remember(peer.id) { mutableStateOf(false) }
     var showMenu by remember(peer.id) { mutableStateOf(false) }
     val status = NearbyViewModel.getStatus(peer.id, true)
+    val active = NearbyViewModel.pairingStates.values.any {
+        it.deviceId == peer.id && it.phase !in setOf(PairingPhase.SUCCEEDED, PairingPhase.FAILED, PairingPhase.CANCELLED)
+    }
+    val cancelling = active || status == NearbyItemStatus.PAIRING
     val selected = MainViewModel.selectedDevice.value?.peerId == peer.id
     val unpairText = stringResource(Res.string.unpair)
     val unpairMessage = stringResource(Res.string.confirm_unpair_device, peer.name)
@@ -59,19 +65,23 @@ fun NearbyPairedDeviceItem(peer: Peer, device: NearbyDevice?) {
                         enabled = peer.online && device?.remoteAccess != false,
                         onClick = { MainViewModel.selectDevice(DeviceIdentity(peer.id, peer.publicKey)) },
                     )
-                } else {
-                    NearbyPairButton(
-                        peer.id, status, Res.string.pair_full_control,
-                        enabled = peer.online && device?.remoteAccess == true,
-                    ) { showPair = true }
                 }
                 Box {
                     PIconButton(
-                        UiRes.drawable.ui_drawable_more_horiz,
-                        contentDescription = unpairText,
+                        UiRes.drawable.ui_drawable_ellipsis_vertical,
+                        contentDescription = stringResource(Res.string.more),
                         click = { showMenu = true },
                     )
                     PDropdownMenu(expanded = showMenu, onDismissRequest = { showMenu = false }) {
+                        if (peer.token.isEmpty()) PDropdownMenuItem(
+                            text = { Text(stringResource(if (cancelling) Res.string.cancel else Res.string.pair_full_control)) },
+                            enabled = status != NearbyItemStatus.STARTING && status != NearbyItemStatus.UNPAIRING &&
+                                (cancelling || (peer.online && device?.remoteAccess == true)),
+                            onClick = {
+                                showMenu = false
+                                if (cancelling) NearbyViewModel.cancelPairing(peer.id) else showPair = true
+                            },
+                        )
                         PDropdownMenuItem(text = { Text(unpairText) }, onClick = {
                             showMenu = false
                             val checkbox = ConfirmDialogCheckbox(deleteChatsText)

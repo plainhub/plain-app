@@ -27,7 +27,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.ismartcoding.plain.i18n.Res
 import com.ismartcoding.plain.ui.resources.arrow_left as ui_drawable_arrow_left
-import com.ismartcoding.plain.ui.resources.ellipsis as ui_drawable_ellipsis
+import com.ismartcoding.plain.ui.resources.ellipsis_vertical as ui_drawable_ellipsis_vertical
 import com.ismartcoding.plain.i18n.more_info
 import com.ismartcoding.plain.i18n.unknown
 import com.ismartcoding.plain.lib.extensions.formatMinSec
@@ -127,7 +127,7 @@ fun VideoOverlayScaffold(
                     ) {
                         IconButton(onClick = onMore, modifier = Modifier.fillMaxSize()) {
                             Icon(
-                                painter = painterResource(UiRes.drawable.ui_drawable_ellipsis),
+                                painter = painterResource(UiRes.drawable.ui_drawable_ellipsis_vertical),
                                 contentDescription = stringResource(Res.string.more_info),
                                 tint = PreviewerSoftWhite,
                                 modifier = Modifier.size(22.dp),

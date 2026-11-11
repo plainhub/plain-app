@@ -27,7 +27,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.ismartcoding.plain.i18n.Res
-import com.ismartcoding.plain.ui.resources.ellipsis as ui_drawable_ellipsis
+import com.ismartcoding.plain.ui.resources.ellipsis_vertical as ui_drawable_ellipsis_vertical
 import com.ismartcoding.plain.i18n.more_info
 import com.ismartcoding.plain.lib.extensions.formatMinSec
 import com.ismartcoding.plain.ui.platform.system.hasPipMode
@@ -150,7 +150,7 @@ private fun MoreIconButton(onClick: () -> Unit) {
     ) {
         Icon(
             modifier = Modifier.size(18.dp),
-            painter = painterResource(UiRes.drawable.ui_drawable_ellipsis),
+            painter = painterResource(UiRes.drawable.ui_drawable_ellipsis_vertical),
             contentDescription = stringResource(Res.string.more_info),
             tint = PreviewerSoftWhite,
         )

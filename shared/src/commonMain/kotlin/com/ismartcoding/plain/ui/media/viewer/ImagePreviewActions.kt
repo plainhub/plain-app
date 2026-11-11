@@ -37,7 +37,7 @@ import com.ismartcoding.plain.ui.components.SaveToSheet
 import com.ismartcoding.plain.ui.media.viewer.previewer.MediaPreviewerState
 import com.ismartcoding.plain.ui.casting.CastViewModel
 import com.ismartcoding.plain.ui.resources.Res as UiRes
-import com.ismartcoding.plain.ui.resources.ellipsis as ui_drawable_ellipsis
+import com.ismartcoding.plain.ui.resources.ellipsis_vertical as ui_drawable_ellipsis_vertical
 import com.ismartcoding.plain.ui.resources.rotate_cw_square as ui_drawable_rotate_cw_square
 import com.ismartcoding.plain.ui.resources.save as ui_drawable_save
 import kotlinx.coroutines.launch
@@ -77,7 +77,7 @@ fun ImagePreviewActions(
                 }
             }
             HorizontalSpace(dp = 20.dp)
-            ControlChipIconButton(icon = UiRes.drawable.ui_drawable_ellipsis, contentDescription = stringResource(Res.string.more_info)) {
+            ControlChipIconButton(icon = UiRes.drawable.ui_drawable_ellipsis_vertical, contentDescription = stringResource(Res.string.more_info)) {
                 state.showMediaInfo = true
             }
         }

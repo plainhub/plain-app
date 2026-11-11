@@ -44,7 +44,7 @@ import com.ismartcoding.plain.ui.navigation.MainNavScaffold
 import com.ismartcoding.plain.ui.resources.Res as UiRes
 import com.ismartcoding.plain.ui.resources.tune as ui_drawable_tune
 import com.ismartcoding.plain.ui.resources.square_arrow_out_up_right as ui_drawable_square_arrow_out_up_right
-import com.ismartcoding.plain.ui.resources.more_horiz as ui_drawable_more_horiz
+import com.ismartcoding.plain.ui.resources.ellipsis_vertical as ui_drawable_ellipsis_vertical
 import com.ismartcoding.plain.ui.theme.PlainTheme
 import com.ismartcoding.plain.ui.theme.greenText
 import org.jetbrains.compose.resources.painterResource
@@ -82,7 +82,7 @@ fun ToolsPage(
                 navController = navController,
                 actions = {
                     if (source is com.ismartcoding.plain.rust.graphql.ContentSource.Local) ActionButtonMoreWithMenu(
-                        icon = UiRes.drawable.ui_drawable_more_horiz,
+                        icon = UiRes.drawable.ui_drawable_ellipsis_vertical,
                     ) { dismiss ->
                         PDropdownMenuItem(
                             text = { Text(stringResource(Res.string.customize_features)) },

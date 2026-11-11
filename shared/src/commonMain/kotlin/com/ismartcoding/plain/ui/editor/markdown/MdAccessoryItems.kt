@@ -35,7 +35,7 @@ import com.ismartcoding.plain.ui.resources.image as ui_drawable_image
 import com.ismartcoding.plain.ui.resources.info as ui_drawable_info
 import com.ismartcoding.plain.ui.resources.link as ui_drawable_link
 import com.ismartcoding.plain.ui.resources.match_case as ui_drawable_match_case
-import com.ismartcoding.plain.ui.resources.more_horiz as ui_drawable_more_horiz
+import com.ismartcoding.plain.ui.resources.ellipsis_vertical as ui_drawable_ellipsis_vertical
 import com.ismartcoding.plain.ui.resources.select_all as ui_drawable_select_all
 import com.ismartcoding.plain.ui.resources.strikethrough_s as ui_drawable_strikethrough_s
 import com.ismartcoding.plain.ui.resources.subscript as ui_drawable_subscript
@@ -135,7 +135,7 @@ val mdToolbarCategories = listOf(
         ),
     ),
     MdToolbarCategory(
-        key = "more", tip = Res.string.more, icon = UiRes.drawable.ui_drawable_more_horiz,
+        key = "more", tip = Res.string.more, icon = UiRes.drawable.ui_drawable_ellipsis_vertical,
         items = listOf(
             MdToolbarItem(Res.string.md_quote, caption = Res.string.md_quote, icon = UiRes.drawable.ui_drawable_format_quote, click = { it.toggleLinePrefix("> ") }),
             MdToolbarItem(Res.string.md_callout, caption = Res.string.md_callout, icon = UiRes.drawable.ui_drawable_info, click = { it.toggleLinePrefix("> [!note] ") }),

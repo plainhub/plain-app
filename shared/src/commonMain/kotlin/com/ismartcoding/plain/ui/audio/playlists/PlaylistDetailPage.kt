@@ -62,7 +62,7 @@ import com.ismartcoding.plain.ui.audio.playlists.components.pruneTrashedRows
 import com.ismartcoding.plain.ui.audio.playlists.components.toAudioTrack
 import com.ismartcoding.plain.ui.resources.Res as UiRes
 import com.ismartcoding.plain.ui.resources.cast as ui_drawable_cast
-import com.ismartcoding.plain.ui.resources.more_horiz as ui_drawable_more_horiz
+import com.ismartcoding.plain.ui.resources.ellipsis_vertical as ui_drawable_ellipsis_vertical
 import com.ismartcoding.plain.ui.resources.sort as ui_drawable_sort
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
@@ -220,7 +220,7 @@ fun PlaylistDetailPage(
                 click = { castVM.showCastDialog.value = true },
             )
             PIconButton(
-                icon = UiRes.drawable.ui_drawable_more_horiz,
+                icon = UiRes.drawable.ui_drawable_ellipsis_vertical,
                 contentDescription = stringResource(Res.string.more),
                 click = { showMore = true },
             )

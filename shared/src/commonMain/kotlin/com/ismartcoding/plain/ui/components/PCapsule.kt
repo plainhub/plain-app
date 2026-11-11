@@ -36,7 +36,7 @@ import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import com.ismartcoding.plain.ui.resources.Res as UiRes
 import com.ismartcoding.plain.ui.resources.circle_dot as ui_drawable_circle_dot
-import com.ismartcoding.plain.ui.resources.more_three_dots as ui_drawable_more_three_dots
+import com.ismartcoding.plain.ui.resources.ellipsis_vertical as ui_drawable_ellipsis_vertical
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -63,7 +63,7 @@ fun PCapsuleMoreClose(
             contentAlignment = Alignment.Center,
         ) {
             Image(
-                painter = painterResource(UiRes.drawable.ui_drawable_more_three_dots),
+                painter = painterResource(UiRes.drawable.ui_drawable_ellipsis_vertical),
                 contentDescription = stringResource(Res.string.more),
                 modifier = Modifier.padding(horizontal = 9.dp).size(24.dp),
                 colorFilter = ColorFilter.tint(tint),
