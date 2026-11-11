@@ -192,6 +192,9 @@ class Routing {
     object ServiceDebug
 
     @Serializable
+    object Events
+
+    @Serializable
     object MdnsDebug
 
     @Serializable

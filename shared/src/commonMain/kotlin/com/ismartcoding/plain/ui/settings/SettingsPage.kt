@@ -140,6 +140,11 @@ fun SettingsPage(navController: NavHostController, updateViewModel: UpdateViewMo
                 }
                 item {
                     VerticalSpace(dp = 16.dp)
+                    PCard(modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN)) {
+                        PListItem(title = stringResource(Res.string.events), showMore = true,
+                            modifier = Modifier.clickable { navController.navigate(Routing.Events) })
+                    }
+                    VerticalSpace(dp = 16.dp)
                     AboutLogsAndCacheCard(
                         navController = navController, scope = scope,
                         fileSize = fileSize, onFileSizeCleared = { fileSize = 0 },

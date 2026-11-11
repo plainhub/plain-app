@@ -3,7 +3,7 @@ package com.ismartcoding.plain.models
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class Organization(
+data class ContactOrganizationInput(
     var company: String,
     var title: String,
 )

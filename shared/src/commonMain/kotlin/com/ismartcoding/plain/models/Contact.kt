@@ -24,7 +24,7 @@ data class Contact(
     var thumbnailId: String,
     var notes: String,
     var groups: List<ContactGroup>,
-    var organization: Organization?,
+    var organization: ContactOrganization?,
     var websites: List<ContactWebsite>,
     var ims: List<ContactIm>,
     var ringtone: String,

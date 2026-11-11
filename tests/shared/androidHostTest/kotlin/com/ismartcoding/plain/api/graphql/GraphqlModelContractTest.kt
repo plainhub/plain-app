@@ -53,8 +53,8 @@ import com.ismartcoding.plain.models.MediaBucket
 import com.ismartcoding.plain.models.Note
 import com.ismartcoding.plain.models.NoteInput
 import com.ismartcoding.plain.models.Notification
-import com.ismartcoding.plain.models.Organization
-import com.ismartcoding.plain.models.OrganizationInput
+import com.ismartcoding.plain.models.ContactOrganization
+import com.ismartcoding.plain.models.ContactOrganizationInput
 import com.ismartcoding.plain.models.Package
 import com.ismartcoding.plain.models.PairingDeviceInput
 import com.ismartcoding.plain.models.PairingRequestInput
@@ -127,8 +127,8 @@ class GraphqlModelContractTest {
             "Note" to Note.serializer().descriptor,
             "NoteInput" to NoteInput.serializer().descriptor,
             "Notification" to Notification.serializer().descriptor,
-            "Organization" to Organization.serializer().descriptor,
-            "OrganizationInput" to OrganizationInput.serializer().descriptor,
+            "ContactOrganization" to ContactOrganization.serializer().descriptor,
+            "ContactOrganizationInput" to ContactOrganizationInput.serializer().descriptor,
             "Package" to Package.serializer().descriptor,
             "PairingDeviceInput" to PairingDeviceInput.serializer().descriptor,
             "PairingRequestInput" to PairingRequestInput.serializer().descriptor,

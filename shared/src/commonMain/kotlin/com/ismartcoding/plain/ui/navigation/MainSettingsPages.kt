@@ -39,6 +39,7 @@ internal fun NavGraphBuilder.addMainSettingsPages(
     peerVM: PeerViewModel,
     batterySettings: (@Composable () -> Unit)?,
 ) {
+    composable<Routing.Events> { com.ismartcoding.plain.ui.settings.EventsPage(navController, viewModel { com.ismartcoding.plain.ui.settings.EventsViewModel() }) }
     composable<Routing.Settings> { SettingsPage(navController, updateVM, peerVM) }
     composable<Routing.DarkTheme> { DarkThemePage(navController) }
     composable<Routing.AutoCheckUpdate> { AutoCheckUpdatePage(navController, updateVM) }

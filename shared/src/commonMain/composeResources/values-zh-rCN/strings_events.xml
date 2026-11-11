@@ -1,0 +1,24 @@
+<resources>
+    <string name="events">事件</string>
+    <string name="event_client">客户端</string>
+    <string name="events_empty">暂无事件</string>
+    <string name="events_load_more">加载更多</string>
+    <string name="event_login">登录成功</string>
+    <string name="event_login_failed">登录失败</string>
+    <string name="event_logout">已退出登录</string>
+    <string name="event_revoke">会话已撤销</string>
+    <string name="event_set_hostname">主机名已更改</string>
+    <string name="event_update_device_name">设备名称已更改</string>
+    <string name="event_mount">磁盘已挂载</string>
+    <string name="event_mount_failed">磁盘挂载失败</string>
+    <string name="event_unmount">磁盘已卸载</string>
+    <string name="event_format_disk">磁盘已格式化</string>
+    <string name="event_format_disk_failed">磁盘格式化失败</string>
+    <string name="event_reason_invalid_password">密码错误</string>
+    <string name="event_reason_invalid_login_request">登录请求无效</string>
+    <string name="event_reason_remote_access_disabled">远程访问已关闭</string>
+    <string name="event_reason_login_expired">登录请求已过期</string>
+    <string name="event_reason_too_many_login_attempts">登录尝试过多</string>
+    <string name="event_reason_rejected">登录请求已拒绝</string>
+    <string name="event_reason_cancelled">登录请求已取消</string>
+</resources>

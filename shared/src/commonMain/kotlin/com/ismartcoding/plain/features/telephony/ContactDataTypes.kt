@@ -8,7 +8,7 @@ package com.ismartcoding.plain.features.telephony
  * the user-visible value, matching Android's own convention).
  */
 
-enum class PhoneType(val androidValue: Int) {
+enum class ContactPhoneType(val androidValue: Int) {
     CUSTOM(0),
     HOME(1),
     MOBILE(2),
@@ -32,11 +32,11 @@ enum class PhoneType(val androidValue: Int) {
     ;
 
     companion object {
-        fun fromInt(value: Int): PhoneType = entries.find { it.androidValue == value } ?: CUSTOM
+        fun fromInt(value: Int): ContactPhoneType = entries.find { it.androidValue == value } ?: CUSTOM
     }
 }
 
-enum class EmailType(val androidValue: Int) {
+enum class ContactEmailType(val androidValue: Int) {
     CUSTOM(0),
     HOME(1),
     WORK(2),
@@ -45,11 +45,11 @@ enum class EmailType(val androidValue: Int) {
     ;
 
     companion object {
-        fun fromInt(value: Int): EmailType = entries.find { it.androidValue == value } ?: CUSTOM
+        fun fromInt(value: Int): ContactEmailType = entries.find { it.androidValue == value } ?: CUSTOM
     }
 }
 
-enum class PostalType(val androidValue: Int) {
+enum class ContactPostalType(val androidValue: Int) {
     CUSTOM(0),
     HOME(1),
     WORK(2),
@@ -57,7 +57,7 @@ enum class PostalType(val androidValue: Int) {
     ;
 
     companion object {
-        fun fromInt(value: Int): PostalType = entries.find { it.androidValue == value } ?: CUSTOM
+        fun fromInt(value: Int): ContactPostalType = entries.find { it.androidValue == value } ?: CUSTOM
     }
 }
 
@@ -73,7 +73,7 @@ enum class ContactDateType(val androidValue: Int) {
     }
 }
 
-enum class WebsiteType(val androidValue: Int) {
+enum class ContactWebsiteType(val androidValue: Int) {
     CUSTOM(0),
     HOMEPAGE(1),
     BLOG(2),
@@ -84,12 +84,12 @@ enum class WebsiteType(val androidValue: Int) {
     ;
 
     companion object {
-        fun fromInt(value: Int): WebsiteType = entries.find { it.androidValue == value } ?: CUSTOM
+        fun fromInt(value: Int): ContactWebsiteType = entries.find { it.androidValue == value } ?: CUSTOM
     }
 }
 
 /** Instant-message network, mirroring ContactsContract.CommonDataKinds.Im.PROTOCOL codes. */
-enum class ImProtocol(val androidValue: Int) {
+enum class ContactImProtocol(val androidValue: Int) {
     CUSTOM(0),
     AIM(1),
     MSN(2),
@@ -103,6 +103,6 @@ enum class ImProtocol(val androidValue: Int) {
     ;
 
     companion object {
-        fun fromInt(value: Int): ImProtocol = entries.find { it.androidValue == value } ?: CUSTOM
+        fun fromInt(value: Int): ContactImProtocol = entries.find { it.androidValue == value } ?: CUSTOM
     }
 }

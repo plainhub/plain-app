@@ -61,6 +61,12 @@ import com.ismartcoding.plain.rust.graphql.GraphqlRequest
 import com.ismartcoding.plain.rust.graphql.variable
 
 object Query {
+    fun events(query: String, offset: Int, limit: Int): GraphqlRequest<List<com.ismartcoding.plain.models.EventRecord>> = GraphqlRequest(
+        "query events(\$query:String!,\$offset:Int!,\$limit:Int!){events(query:\$query,offset:\$offset,limit:\$limit){id type message clientId createdAt}}",
+        mapOf(variable("query", query), variable("offset", offset), variable("limit", limit)),
+        field = "events",
+    )
+
     fun appAccess(): GraphqlRequest<List<com.ismartcoding.plain.features.web.AccessFeature>> =
         GraphqlRequest<com.ismartcoding.plain.models.AppAccess>("query { app { access } }", field = "app").map { it.access }
 
@@ -201,11 +207,11 @@ object Query {
     )
 
     internal fun audioPlaybackSettings(): GraphqlRequest<com.ismartcoding.plain.models.AudioPlaybackSettings> = GraphqlRequest(
-        "query { audioPlayback { mediaId path mode isPlaying positionMs revision } prefs }",
+        "query { audioPlayback { mediaId path mode isPlaying positionMs revision } prefs(keys: [\"audio_playback_speed\"]) }",
     )
 
     internal fun audioQueueSnapshot(limit: Int): GraphqlRequest<com.ismartcoding.plain.models.AudioQueueSnapshot> = GraphqlRequest(
-        $$"query($limit: Int!) { audioPlayback { mediaId path mode isPlaying positionMs revision } prefs count: audioQueueItemCount items: audioQueueItems(query: \"\", offset: 0, limit: $limit) { $${Fragments.AUDIO_TRACK_FIELDS} } queuedIds: audioQueueItems(query: \"\", offset: 0, limit: 2147483647) { mediaId } }",
+        $$"query($limit: Int!) { audioPlayback { mediaId path mode isPlaying positionMs revision } prefs(keys: [\"audio_playback_speed\"]) count: audioQueueItemCount items: audioQueueItems(query: \"\", offset: 0, limit: $limit) { $${Fragments.AUDIO_TRACK_FIELDS} } queuedIds: audioQueueItems(query: \"\", offset: 0, limit: 2147483647) { mediaId } }",
         mapOf(variable("limit", limit)),
     )
 
@@ -548,13 +554,17 @@ object Query {
         return GraphqlRequest($$"query($${definitions}) { $${selections} }", variables)
     }
 
-    fun prefs(): GraphqlRequest<Map<String, kotlinx.serialization.json.JsonElement>> =
-        GraphqlRequest("query { prefs }", field = "prefs")
+    fun prefs(keys: List<String>): GraphqlRequest<Map<String, kotlinx.serialization.json.JsonElement>> =
+        GraphqlRequest(
+            $$"query($keys: [String!]!) { prefs(keys: $keys) }",
+            mapOf(variable("keys", keys)),
+            field = "prefs",
+        )
 
-    inline fun <reified T> savedValue(key: String, default: T): GraphqlRequest<T> = GraphqlRequest<T?>(
-        $$"query($key: String!) { savedValue(key: $key) }",
+    inline fun <reified T> keyValue(key: String, default: T): GraphqlRequest<T> = GraphqlRequest<T?>(
+        $$"query($key: String!) { keyValue(key: $key) }",
         mapOf(variable("key", key)),
-        field = "savedValue",
+        field = "keyValue",
     ).map { it ?: default }
 
     fun feedEntries(query: String, limit: Int, offset: Int): GraphqlRequest<List<FeedEntry>> = GraphqlRequest(

@@ -13,7 +13,7 @@ import com.ismartcoding.plain.features.contacts.ContactEventInput
 import com.ismartcoding.plain.features.contacts.ContactImInput
 import com.ismartcoding.plain.features.contacts.ContactPhoneInput
 import com.ismartcoding.plain.features.contacts.ContactWebsiteInput
-import com.ismartcoding.plain.features.contacts.OrganizationInput
+import com.ismartcoding.plain.features.contacts.ContactOrganizationInput
 import java.util.ArrayList
 import com.ismartcoding.plain.rust.host.provider.ContactDataFacts
 
@@ -151,7 +151,7 @@ internal object ContactDataHelper {
 
     fun newOrgInsert(
         contactId: String,
-        organization: OrganizationInput,
+        organization: ContactOrganizationInput,
     ): ContentProviderOperation {
         val o = ContentProviderOperation.newInsert(ContactsContract.Data.CONTENT_URI)
         o.apply {

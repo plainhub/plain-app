@@ -1,0 +1,24 @@
+<resources>
+    <string name="events">Events</string>
+    <string name="event_client">Client</string>
+    <string name="events_empty">No events</string>
+    <string name="events_load_more">Load more</string>
+    <string name="event_login">Signed in</string>
+    <string name="event_login_failed">Sign-in failed</string>
+    <string name="event_logout">Signed out</string>
+    <string name="event_revoke">Session revoked</string>
+    <string name="event_set_hostname">Hostname changed</string>
+    <string name="event_update_device_name">Device name changed</string>
+    <string name="event_mount">Disk mounted</string>
+    <string name="event_mount_failed">Disk mount failed</string>
+    <string name="event_unmount">Disk unmounted</string>
+    <string name="event_format_disk">Disk formatted</string>
+    <string name="event_format_disk_failed">Disk format failed</string>
+    <string name="event_reason_invalid_password">Incorrect password</string>
+    <string name="event_reason_invalid_login_request">Invalid sign-in request</string>
+    <string name="event_reason_remote_access_disabled">Remote access is disabled</string>
+    <string name="event_reason_login_expired">Sign-in request expired</string>
+    <string name="event_reason_too_many_login_attempts">Too many sign-in attempts</string>
+    <string name="event_reason_rejected">Sign-in request rejected</string>
+    <string name="event_reason_cancelled">Sign-in request cancelled</string>
+</resources>
