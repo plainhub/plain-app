@@ -11,7 +11,7 @@ enum class AccessFeature {
     FILES,
     CONTACTS,
     SMS,
-    CALL_LOGS,
+    CALLS,
     CALL_PHONE,
     PHONE_NUMBER,
     APPS,

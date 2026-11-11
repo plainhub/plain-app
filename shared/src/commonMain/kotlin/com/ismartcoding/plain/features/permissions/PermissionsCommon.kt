@@ -36,7 +36,7 @@ internal fun getWebList(): List<com.ismartcoding.plain.ui.web.AccessItem> = buil
         val supported = when (feature) {
             com.ismartcoding.plain.features.web.AccessFeature.CONTACTS,
             com.ismartcoding.plain.features.web.AccessFeature.SMS,
-            com.ismartcoding.plain.features.web.AccessFeature.CALL_LOGS,
+            com.ismartcoding.plain.features.web.AccessFeature.CALLS,
             com.ismartcoding.plain.features.web.AccessFeature.CALL_PHONE -> Capability.TELEPHONY in capabilities
             com.ismartcoding.plain.features.web.AccessFeature.PHONE_NUMBER -> Capability.TELEPHONY in capabilities
             com.ismartcoding.plain.features.web.AccessFeature.APPS -> AppFeatureType.APPS.has()
@@ -51,7 +51,7 @@ internal fun getWebList(): List<com.ismartcoding.plain.ui.web.AccessItem> = buil
             com.ismartcoding.plain.features.web.AccessFeature.DOCS -> UiRes.drawable.access_document
             com.ismartcoding.plain.features.web.AccessFeature.CONTACTS -> UiRes.drawable.ui_drawable_contact_round
             com.ismartcoding.plain.features.web.AccessFeature.SMS -> UiRes.drawable.ui_drawable_message_square_text
-            com.ismartcoding.plain.features.web.AccessFeature.CALL_LOGS -> UiRes.drawable.ui_drawable_call_log
+            com.ismartcoding.plain.features.web.AccessFeature.CALLS -> UiRes.drawable.ui_drawable_call_log
             com.ismartcoding.plain.features.web.AccessFeature.CALL_PHONE -> UiRes.drawable.ui_drawable_phone_call
             com.ismartcoding.plain.features.web.AccessFeature.PHONE_NUMBER -> UiRes.drawable.ui_drawable_file_digit
             com.ismartcoding.plain.features.web.AccessFeature.APPS -> UiRes.drawable.ui_drawable_package2

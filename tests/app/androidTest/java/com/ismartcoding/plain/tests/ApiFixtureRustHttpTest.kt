@@ -54,7 +54,7 @@ class ApiFixtureRustHttpTest {
         withIO { RustRuntime.start() }
         val oldPermissions = Prefs.apiAccessFeatures.value
         try {
-            Prefs.setApiAccessFeatures(setOf(com.ismartcoding.plain.features.web.AccessFeature.IMAGES, com.ismartcoding.plain.features.web.AccessFeature.VIDEOS, com.ismartcoding.plain.features.web.AccessFeature.AUDIO, com.ismartcoding.plain.features.web.AccessFeature.DOCS, com.ismartcoding.plain.features.web.AccessFeature.FILES, com.ismartcoding.plain.features.web.AccessFeature.CONTACTS, com.ismartcoding.plain.features.web.AccessFeature.CALL_LOGS, com.ismartcoding.plain.features.web.AccessFeature.SMS, com.ismartcoding.plain.features.web.AccessFeature.APPS, com.ismartcoding.plain.features.web.AccessFeature.NOTIFICATIONS))
+            Prefs.setApiAccessFeatures(setOf(com.ismartcoding.plain.features.web.AccessFeature.IMAGES, com.ismartcoding.plain.features.web.AccessFeature.VIDEOS, com.ismartcoding.plain.features.web.AccessFeature.AUDIO, com.ismartcoding.plain.features.web.AccessFeature.DOCS, com.ismartcoding.plain.features.web.AccessFeature.FILES, com.ismartcoding.plain.features.web.AccessFeature.CONTACTS, com.ismartcoding.plain.features.web.AccessFeature.CALLS, com.ismartcoding.plain.features.web.AccessFeature.SMS, com.ismartcoding.plain.features.web.AccessFeature.APPS, com.ismartcoding.plain.features.web.AccessFeature.NOTIFICATIONS))
             assertTrue(root.mkdirs())
             rootCreated = true
             val session = RustSessionStore.create("API emulator fixture")

@@ -14,7 +14,7 @@ fun AccessFeature.getText(): String = stringResource(when (this) {
     AccessFeature.FILES -> Res.string.feature_WRITE_EXTERNAL_STORAGE
     AccessFeature.CONTACTS -> Res.string.feature_WRITE_CONTACTS
     AccessFeature.SMS -> Res.string.feature_READ_SMS
-    AccessFeature.CALL_LOGS -> Res.string.feature_WRITE_CALL_LOG
+    AccessFeature.CALLS -> Res.string.feature_WRITE_CALL_LOG
     AccessFeature.CALL_PHONE -> Res.string.feature_CALL_PHONE
     AccessFeature.PHONE_NUMBER -> Res.string.feature_READ_PHONE_NUMBERS
     AccessFeature.APPS -> Res.string.feature_QUERY_ALL_PACKAGES

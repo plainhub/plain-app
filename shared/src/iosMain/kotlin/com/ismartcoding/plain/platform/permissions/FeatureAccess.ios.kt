@@ -18,7 +18,7 @@ actual fun AccessFeature.systemPermissions(): Set<Permission> = when (this) {
     AccessFeature.DOCS -> setOf(Permission.WRITE_EXTERNAL_STORAGE)
     AccessFeature.CONTACTS -> setOf(Permission.READ_CONTACTS, Permission.WRITE_CONTACTS)
     AccessFeature.SMS -> setOf(Permission.READ_SMS, Permission.SEND_SMS)
-    AccessFeature.CALL_LOGS -> setOf(Permission.READ_CALL_LOG, Permission.WRITE_CALL_LOG)
+    AccessFeature.CALLS -> setOf(Permission.READ_CALL_LOG, Permission.WRITE_CALL_LOG)
     AccessFeature.CALL_PHONE -> setOf(Permission.CALL_PHONE)
     AccessFeature.PHONE_NUMBER -> setOf(Permission.READ_PHONE_STATE, Permission.READ_PHONE_NUMBERS)
     AccessFeature.APPS -> setOf(Permission.QUERY_ALL_PACKAGES)
