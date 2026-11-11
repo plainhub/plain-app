@@ -2,7 +2,6 @@ package com.ismartcoding.plain.ui.web.components
 
 import com.ismartcoding.plain.preferences.*
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.heightIn
@@ -26,8 +25,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.snapshotFlow
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.ismartcoding.plain.Prefs
@@ -37,7 +34,6 @@ import kotlinx.coroutines.launch
 fun WebAddressPager(
     lanIpv4Addresses: List<String>,
     modifier: Modifier = Modifier,
-    containerColor: Color = MaterialTheme.colorScheme.surfaceContainer,
 ) {
     val isHttps = Prefs.https.collectAsState()
     val pagerState = rememberPagerState(
@@ -52,8 +48,6 @@ fun WebAddressPager(
     }
     Column(
         modifier = modifier.fillMaxWidth()
-            .clip(MaterialTheme.shapes.large)
-            .background(containerColor)
             .padding(top = 8.dp),
     ) {
         val labelStyle = MaterialTheme.typography.labelLarge
