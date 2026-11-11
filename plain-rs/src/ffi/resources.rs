@@ -111,8 +111,8 @@ fn close(id: &str, failed: bool) -> Result<(), String> {
 }
 fn envelope(result: Result<String, String>) -> String {
     match result {
-        Ok(value) => serde_json::json!({"value":value}).to_string(),
-        Err(error) => serde_json::json!({"error":error}).to_string(),
+        Ok(value) => plain_libs::serde_json::json!({"value":value}).to_string(),
+        Err(error) => plain_libs::serde_json::json!({"error":error}).to_string(),
     }
 }
 #[unsafe(no_mangle)]

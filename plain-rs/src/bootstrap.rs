@@ -6,7 +6,7 @@ use std::sync::Arc;
 pub(crate) fn start(data_dir: &str, token: &str, config: &str) -> Result<String, String> {
     let mut guard = crate::ffi::server::CORE.lock().map_err(|e| e.to_string())?;
     let config: plain_rs::infrastructure::host::startup::StartupConfig =
-        serde_json::from_str(config).map_err(|error| error.to_string())?;
+        plain_libs::serde_json::from_str(config).map_err(|error| error.to_string())?;
     let cache_directory = config
         .cache_dir
         .clone()
@@ -56,7 +56,7 @@ pub(crate) fn start(data_dir: &str, token: &str, config: &str) -> Result<String,
         });
     }
     let core = guard.as_ref().unwrap();
-    Ok(serde_json::json!({
+    Ok(plain_libs::serde_json::json!({
         "logFile":core.server.log_file()?,
         "sharedPreviewDir":core.server.cache_paths().shared_previews()})
     .to_string())

@@ -11,7 +11,6 @@ crate-type = ["cdylib", "staticlib"]
 plain-libs = { git = "https://github.com/plainhub/plain-core.git", branch = "main", default-features = false }
 plain-server = { git = "https://github.com/plainhub/plain-core.git", branch = "main", default-features = false, features = ["core", "http_transport"] }
 plain-rs = { git = "https://github.com/plainhub/plain-core.git", branch = "main", default-features = false, features = ["ble-native", "prefs"] }
-serde_json = "1"
 tokio = { version = "1", features = ["rt-multi-thread", "sync"] }
 
 [target.'cfg(target_os = "ios")'.dependencies]

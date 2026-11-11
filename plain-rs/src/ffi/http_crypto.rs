@@ -3,9 +3,9 @@ use std::ffi::c_char;
 
 fn reply(result: Result<Vec<u8>, &str>) -> String {
     match result {
-        Ok(value) => serde_json::json!({"value":plain_libs::utils::base64::base64_encode(&value)})
+        Ok(value) => plain_libs::serde_json::json!({"value":plain_libs::utils::base64::base64_encode(&value)})
             .to_string(),
-        Err(error) => serde_json::json!({"error":error}).to_string(),
+        Err(error) => plain_libs::serde_json::json!({"error":error}).to_string(),
     }
 }
 
@@ -23,8 +23,8 @@ fn reference(token: &str, payload: &str) -> String {
         payload,
     );
     match result {
-        Ok(value) => serde_json::json!({"value":value}).to_string(),
-        Err(error) => serde_json::json!({"error":error.to_string()}).to_string(),
+        Ok(value) => plain_libs::serde_json::json!({"value":value}).to_string(),
+        Err(error) => plain_libs::serde_json::json!({"error":error.to_string()}).to_string(),
     }
 }
 

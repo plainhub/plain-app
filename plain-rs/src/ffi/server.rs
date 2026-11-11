@@ -44,7 +44,7 @@ pub extern "C" fn plain_core_stop() {
     }
 }
 fn public_error(error: String) -> String {
-    serde_json::json!({"errorCode":"START_FAILED", "error":error}).to_string()
+    plain_libs::serde_json::json!({"errorCode":"START_FAILED", "error":error}).to_string()
 }
 fn public_stop() -> Result<(), String> {
     let core = CORE.lock().map_err(|e| e.to_string())?;

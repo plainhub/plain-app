@@ -14,8 +14,8 @@ pub(super) fn parts() -> Result<(Handle, NativeManagement), String> {
 macro_rules! reply {
     ($result:expr) => {
         match $result {
-            Ok(value) => serde_json::json!({"value":value}).to_string(),
-            Err(error) => serde_json::json!({"error":error}).to_string(),
+            Ok(value) => plain_libs::serde_json::json!({"value":value}).to_string(),
+            Err(error) => plain_libs::serde_json::json!({"error":error}).to_string(),
         }
     };
 }
@@ -39,7 +39,7 @@ pub extern "C" fn plain_restart_http_server() -> *mut c_char {
 }
 
 fn tls_certificate_signature() -> String {
-    reply!((|| -> Result<serde_json::Value, String> {
+    reply!((|| -> Result<plain_libs::serde_json::Value, String> {
         let response = super::server::with_core(|core| {
             core.server.native_management()?;
             let path =
@@ -47,8 +47,8 @@ fn tls_certificate_signature() -> String {
                     .tls_identity();
             plain_rs::infrastructure::tls_identity::action(&path, r#"{"action":"get"}"#)
         })??;
-        let value: serde_json::Value =
-            serde_json::from_str(&response).map_err(|e| e.to_string())?;
+        let value: plain_libs::serde_json::Value =
+            plain_libs::serde_json::from_str(&response).map_err(|e| e.to_string())?;
         value
             .get("signature")
             .cloned()
@@ -266,7 +266,7 @@ pub extern "C" fn plain_load_preferences() -> *mut c_char {
 fn set_pref(key: String, value: String) -> String {
     reply!((|| {
         let (runtime, management) = parts()?;
-        let value = serde_json::from_str(&value).map_err(|e| e.to_string())?;
+        let value = plain_libs::serde_json::from_str(&value).map_err(|e| e.to_string())?;
         runtime.block_on(management.set_pref(&key, value))
     })())
 }

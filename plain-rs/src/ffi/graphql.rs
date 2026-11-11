@@ -11,7 +11,7 @@ pub(super) fn parts() -> Result<(Handle, NativeGraphqlExecutor), String> {
     })?
 }
 fn errors(error: String) -> String {
-    serde_json::json!({"errors":[{"message":error}]}).to_string()
+    plain_libs::serde_json::json!({"errors":[{"message":error}]}).to_string()
 }
 fn execute_on_runtime<F>(runtime: &Handle, operation: F) -> Result<F::Output, String>
 where
@@ -25,9 +25,9 @@ where
 fn public(request: &str) -> String {
     let result = (|| {
         let (runtime, executor) = parts()?;
-        let parsed = serde_json::from_str(request).map_err(|e| e.to_string())?;
+        let parsed = plain_libs::serde_json::from_str(request).map_err(|e| e.to_string())?;
         execute_on_runtime(&runtime, async move {
-            serde_json::to_string(&executor.execute(parsed).await).map_err(|e| e.to_string())
+            plain_libs::serde_json::to_string(&executor.execute(parsed).await).map_err(|e| e.to_string())
         })?
     })();
     result.unwrap_or_else(errors)

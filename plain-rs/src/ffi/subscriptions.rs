@@ -5,7 +5,7 @@ fn open(target: Option<&str>) -> Result<u64, String> {
     let (runtime, executor) = parts()?;
     let _entered = runtime.enter();
     match target {
-        Some(target) => executor.open_peer_subscriptions(serde_json::from_str(target).map_err(|error| error.to_string())?, Default::default()),
+        Some(target) => executor.open_peer_subscriptions(plain_libs::serde_json::from_str(target).map_err(|error| error.to_string())?, Default::default()),
         None => executor.open_subscriptions(Default::default()),
     }
 }
@@ -32,8 +32,8 @@ fn close(handle: u64) -> Result<(), String> {
 pub extern "C" fn plain_graphql_subscription_open(target: *const c_char) -> *mut c_char {
     c_string(
         match (if target.is_null() { Ok(None) } else { input(target).map(Some) }).and_then(|target| open(target.as_deref())) {
-            Ok(handle) => serde_json::json!({"handle":handle}),
-            Err(error) => serde_json::json!({"error":error}),
+            Ok(handle) => plain_libs::serde_json::json!({"handle":handle}),
+            Err(error) => plain_libs::serde_json::json!({"error":error}),
         }
         .to_string(),
     )
@@ -54,8 +54,8 @@ pub extern "C" fn plain_graphql_subscription_send(
 pub extern "C" fn plain_graphql_subscription_read(handle: u64) -> *mut c_char {
     c_string(
         match read(handle) {
-            Ok(value) => serde_json::json!({"value":value}),
-            Err(error) => serde_json::json!({"error":error}),
+            Ok(value) => plain_libs::serde_json::json!({"value":value}),
+            Err(error) => plain_libs::serde_json::json!({"error":error}),
         }
         .to_string(),
     )

@@ -62,7 +62,7 @@ fn next() -> Result<String, String> {
 }
 fn reply(message: &str) -> Result<(), String> {
     let (_, host) = bridge()?;
-    host.reply(serde_json::from_str(message).map_err(|error| error.to_string())?)
+    host.reply(plain_libs::serde_json::from_str(message).map_err(|error| error.to_string())?)
 }
 fn thumbnail(token: &str, bytes: Vec<u8>) -> Result<(), String> {
     let (_, host) = bridge()?;
@@ -72,8 +72,8 @@ fn thumbnail(token: &str, bytes: Vec<u8>) -> Result<(), String> {
 pub extern "C" fn plain_host_next() -> *mut c_char {
     c_string(
         match next() {
-            Ok(value) => serde_json::json!({"value":value}),
-            Err(error) => serde_json::json!({"error":error}),
+            Ok(value) => plain_libs::serde_json::json!({"value":value}),
+            Err(error) => plain_libs::serde_json::json!({"error":error}),
         }
         .to_string(),
     )

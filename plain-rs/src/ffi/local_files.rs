@@ -6,7 +6,7 @@ fn file_paths(paths: String) -> String {
     reply!((|| {
         let (runtime, management) = parts()?;
         let _ = runtime;
-        let paths: Vec<String> = serde_json::from_str(&paths).map_err(|error| error.to_string())?;
+        let paths: Vec<String> = plain_libs::serde_json::from_str(&paths).map_err(|error| error.to_string())?;
         management.file_paths(paths)
     })())
 }

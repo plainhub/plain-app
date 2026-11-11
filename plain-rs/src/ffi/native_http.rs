@@ -70,8 +70,8 @@ fn check_http() -> String {
         runtime.block_on(management.check_http())
     })();
     match result {
-        Ok(value) => serde_json::json!({"value": value}).to_string(),
-        Err(error) => serde_json::json!({"error": error}).to_string(),
+        Ok(value) => plain_libs::serde_json::json!({"value": value}).to_string(),
+        Err(error) => plain_libs::serde_json::json!({"error": error}).to_string(),
     }
 }
 
@@ -82,7 +82,7 @@ pub extern "C" fn plain_check_http() -> *mut c_char {
 
 fn http_status() -> Result<String, String> {
     let status = super::server::with_core(|core| core.server.http_status())?;
-    serde_json::to_string(&status).map_err(|error| error.to_string())
+    plain_libs::serde_json::to_string(&status).map_err(|error| error.to_string())
 }
 
 /// # Safety

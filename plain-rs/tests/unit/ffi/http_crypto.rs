@@ -19,7 +19,7 @@ fn response_ffi_binds_to_the_complete_request_without_an_endpoint_argument() {
         }
         let request = CString::new(base64_encode(&request)).unwrap();
         let pointer = plain_decrypt_http_response(token.as_ptr(), request.as_ptr(), body.as_ptr());
-        let reply: serde_json::Value = serde_json::from_str(&input(pointer).unwrap()).unwrap();
+        let reply: plain_libs::serde_json::Value = plain_libs::serde_json::from_str(&input(pointer).unwrap()).unwrap();
         super::super::values::plain_prefs_string_free(pointer);
         if changed {
             assert_eq!(reply["error"], "Invalid encrypted HTTP response");
