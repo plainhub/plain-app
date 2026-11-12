@@ -60,12 +60,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "atomic-waker"
-version = "1.1.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "1505bd5d3d116872e7271a6d4e16d81d0c8570876c8de68093a09ac269d8aac0"
-
-[[package]]
 name = "autocfg"
 version = "1.5.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -128,7 +122,7 @@ dependencies = [
 [[package]]
 name = "block2"
 version = "0.6.2"
-source = "git+https://github.com/plainhub/plain-core.git?branch=main#a34eb84387129a131e0b8f3f15b9cdf6bc6da63e"
+source = "git+https://github.com/plainhub/plain-core.git?branch=main#b3f5fa2fa41fb0cd5c2e0d78d0a5f5b08af8e0cd"
 dependencies = [
  "objc2",
 ]
@@ -447,7 +441,7 @@ dependencies = [
 [[package]]
 name = "dispatch2"
 version = "0.3.1"
-source = "git+https://github.com/plainhub/plain-core.git?branch=main#a34eb84387129a131e0b8f3f15b9cdf6bc6da63e"
+source = "git+https://github.com/plainhub/plain-core.git?branch=main#b3f5fa2fa41fb0cd5c2e0d78d0a5f5b08af8e0cd"
 dependencies = [
  "objc2",
 ]
@@ -570,15 +564,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "futures-channel"
-version = "0.3.34"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b1f9e3d69d39e4862ffed03ed071a76f9a13ba1d9109d355b0f0aa6b15e393c4"
-dependencies = [
- "futures-core",
-]
-
-[[package]]
 name = "futures-core"
 version = "0.3.34"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -667,7 +652,7 @@ dependencies = [
 [[package]]
 name = "heic-rs"
 version = "0.1.4"
-source = "git+https://github.com/plainhub/plain-core.git?branch=main#a34eb84387129a131e0b8f3f15b9cdf6bc6da63e"
+source = "git+https://github.com/plainhub/plain-core.git?branch=main#b3f5fa2fa41fb0cd5c2e0d78d0a5f5b08af8e0cd"
 
 [[package]]
 name = "hkdf"
@@ -967,7 +952,7 @@ dependencies = [
 [[package]]
 name = "objc2"
 version = "0.6.5"
-source = "git+https://github.com/plainhub/plain-core.git?branch=main#a34eb84387129a131e0b8f3f15b9cdf6bc6da63e"
+source = "git+https://github.com/plainhub/plain-core.git?branch=main#b3f5fa2fa41fb0cd5c2e0d78d0a5f5b08af8e0cd"
 dependencies = [
  "objc2-encode",
 ]
@@ -975,7 +960,7 @@ dependencies = [
 [[package]]
 name = "objc2-av-foundation"
 version = "0.3.2"
-source = "git+https://github.com/plainhub/plain-core.git?branch=main#a34eb84387129a131e0b8f3f15b9cdf6bc6da63e"
+source = "git+https://github.com/plainhub/plain-core.git?branch=main#b3f5fa2fa41fb0cd5c2e0d78d0a5f5b08af8e0cd"
 dependencies = [
  "bitflags",
  "block2",
@@ -990,7 +975,7 @@ dependencies = [
 [[package]]
 name = "objc2-core-foundation"
 version = "0.3.2"
-source = "git+https://github.com/plainhub/plain-core.git?branch=main#a34eb84387129a131e0b8f3f15b9cdf6bc6da63e"
+source = "git+https://github.com/plainhub/plain-core.git?branch=main#b3f5fa2fa41fb0cd5c2e0d78d0a5f5b08af8e0cd"
 dependencies = [
  "bitflags",
  "objc2",
@@ -999,7 +984,7 @@ dependencies = [
 [[package]]
 name = "objc2-core-media"
 version = "0.3.2"
-source = "git+https://github.com/plainhub/plain-core.git?branch=main#a34eb84387129a131e0b8f3f15b9cdf6bc6da63e"
+source = "git+https://github.com/plainhub/plain-core.git?branch=main#b3f5fa2fa41fb0cd5c2e0d78d0a5f5b08af8e0cd"
 dependencies = [
  "bitflags",
  "objc2",
@@ -1009,7 +994,7 @@ dependencies = [
 [[package]]
 name = "objc2-core-video"
 version = "0.3.2"
-source = "git+https://github.com/plainhub/plain-core.git?branch=main#a34eb84387129a131e0b8f3f15b9cdf6bc6da63e"
+source = "git+https://github.com/plainhub/plain-core.git?branch=main#b3f5fa2fa41fb0cd5c2e0d78d0a5f5b08af8e0cd"
 dependencies = [
  "bitflags",
  "objc2",
@@ -1019,12 +1004,12 @@ dependencies = [
 [[package]]
 name = "objc2-encode"
 version = "4.1.0"
-source = "git+https://github.com/plainhub/plain-core.git?branch=main#a34eb84387129a131e0b8f3f15b9cdf6bc6da63e"
+source = "git+https://github.com/plainhub/plain-core.git?branch=main#b3f5fa2fa41fb0cd5c2e0d78d0a5f5b08af8e0cd"
 
 [[package]]
 name = "objc2-foundation"
 version = "0.3.2"
-source = "git+https://github.com/plainhub/plain-core.git?branch=main#a34eb84387129a131e0b8f3f15b9cdf6bc6da63e"
+source = "git+https://github.com/plainhub/plain-core.git?branch=main#b3f5fa2fa41fb0cd5c2e0d78d0a5f5b08af8e0cd"
 dependencies = [
  "bitflags",
  "objc2",
@@ -1171,7 +1156,7 @@ checksum = "f6b464fbc74e149a392436b17d523f769e057cb6877f6a5c4618bc6f11800548"
 [[package]]
 name = "plain-graphql"
 version = "0.1.0"
-source = "git+https://github.com/plainhub/plain-core.git?branch=main#a34eb84387129a131e0b8f3f15b9cdf6bc6da63e"
+source = "git+https://github.com/plainhub/plain-core.git?branch=main#b3f5fa2fa41fb0cd5c2e0d78d0a5f5b08af8e0cd"
 dependencies = [
  "bytes",
  "futures-util",
@@ -1183,7 +1168,7 @@ dependencies = [
 [[package]]
 name = "plain-graphql-macros"
 version = "0.1.0"
-source = "git+https://github.com/plainhub/plain-core.git?branch=main#a34eb84387129a131e0b8f3f15b9cdf6bc6da63e"
+source = "git+https://github.com/plainhub/plain-core.git?branch=main#b3f5fa2fa41fb0cd5c2e0d78d0a5f5b08af8e0cd"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -1193,10 +1178,9 @@ dependencies = [
 [[package]]
 name = "plain-libs"
 version = "0.1.0"
-source = "git+https://github.com/plainhub/plain-core.git?branch=main#a34eb84387129a131e0b8f3f15b9cdf6bc6da63e"
+source = "git+https://github.com/plainhub/plain-core.git?branch=main#b3f5fa2fa41fb0cd5c2e0d78d0a5f5b08af8e0cd"
 dependencies = [
  "argon2",
- "atomic-waker",
  "bitflags",
  "bytes",
  "cbc",
@@ -1208,7 +1192,6 @@ dependencies = [
  "des",
  "ed25519-dalek",
  "form_urlencoded",
- "futures-channel",
  "futures-core",
  "futures-sink",
  "futures-util",
@@ -1248,7 +1231,6 @@ dependencies = [
  "subtle",
  "tokio",
  "tokio-rustls",
- "tokio-util",
  "tracing",
  "url",
  "wasm-bindgen",
@@ -1261,7 +1243,7 @@ dependencies = [
 [[package]]
 name = "plain-rs"
 version = "0.1.0"
-source = "git+https://github.com/plainhub/plain-core.git?branch=main#a34eb84387129a131e0b8f3f15b9cdf6bc6da63e"
+source = "git+https://github.com/plainhub/plain-core.git?branch=main#b3f5fa2fa41fb0cd5c2e0d78d0a5f5b08af8e0cd"
 dependencies = [
  "block2",
  "bytes",
@@ -1305,7 +1287,7 @@ dependencies = [
 [[package]]
 name = "plain-server"
 version = "0.1.0"
-source = "git+https://github.com/plainhub/plain-core.git?branch=main#a34eb84387129a131e0b8f3f15b9cdf6bc6da63e"
+source = "git+https://github.com/plainhub/plain-core.git?branch=main#b3f5fa2fa41fb0cd5c2e0d78d0a5f5b08af8e0cd"
 dependencies = [
  "futures-util",
  "log",
@@ -1429,7 +1411,7 @@ checksum = "63b8176103e19a2643978565ca18b50549f6101881c443590420e4dc998a3c69"
 [[package]]
 name = "rav1d"
 version = "1.1.0"
-source = "git+https://github.com/plainhub/plain-core.git?branch=main#a34eb84387129a131e0b8f3f15b9cdf6bc6da63e"
+source = "git+https://github.com/plainhub/plain-core.git?branch=main#b3f5fa2fa41fb0cd5c2e0d78d0a5f5b08af8e0cd"
 dependencies = [
  "bitflags",
  "cfg-if",
@@ -1855,20 +1837,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "tokio-util"
-version = "0.7.19"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "494815d09bf52b5548659851081238f0ca39ff638363907596da739561c62c52"
-dependencies = [
- "bytes",
- "futures-core",
- "futures-sink",
- "libc",
- "pin-project-lite",
- "tokio",
-]
-
-[[package]]
 name = "tracing"
 version = "0.1.44"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1896,7 +1864,7 @@ checksum = "b6f5e870be6c3b371b77fe0ee0bafb859fa4964b4404c27de1d380043c4dda20"
 [[package]]
 name = "undoc"
 version = "0.27.3"
-source = "git+https://github.com/plainhub/plain-core.git?branch=main#a34eb84387129a131e0b8f3f15b9cdf6bc6da63e"
+source = "git+https://github.com/plainhub/plain-core.git?branch=main#b3f5fa2fa41fb0cd5c2e0d78d0a5f5b08af8e0cd"
 dependencies = [
  "plain-libs",
  "serde",
@@ -2186,7 +2154,7 @@ dependencies = [
 [[package]]
 name = "zerocopy"
 version = "0.7.35"
-source = "git+https://github.com/plainhub/plain-core.git?branch=main#a34eb84387129a131e0b8f3f15b9cdf6bc6da63e"
+source = "git+https://github.com/plainhub/plain-core.git?branch=main#b3f5fa2fa41fb0cd5c2e0d78d0a5f5b08af8e0cd"
 dependencies = [
  "zerocopy-derive",
 ]
@@ -2194,7 +2162,7 @@ dependencies = [
 [[package]]
 name = "zerocopy-derive"
 version = "0.7.35"
-source = "git+https://github.com/plainhub/plain-core.git?branch=main#a34eb84387129a131e0b8f3f15b9cdf6bc6da63e"
+source = "git+https://github.com/plainhub/plain-core.git?branch=main#b3f5fa2fa41fb0cd5c2e0d78d0a5f5b08af8e0cd"
 dependencies = [
  "proc-macro2",
  "quote",
