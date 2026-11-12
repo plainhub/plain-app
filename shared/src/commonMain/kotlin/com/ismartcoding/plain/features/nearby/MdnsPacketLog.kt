@@ -1,10 +1,11 @@
 package com.ismartcoding.plain.features.nearby
 
 import kotlinx.serialization.Serializable
+import kotlin.time.Instant
 
 @Serializable
 data class MdnsPacketLog(
-    val time: Long,
+    val time: Instant,
     val direction: MdnsPacketDirection,
     val srcIp: String,
     val srcPort: Int,

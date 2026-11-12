@@ -6,6 +6,8 @@ import com.ismartcoding.plain.features.feeds.FeedWorkerStatus
 import com.ismartcoding.plain.features.nearby.DiscoveryMethod
 import com.ismartcoding.plain.features.nearby.MdnsPacketDirection
 import com.ismartcoding.plain.features.nearby.MdnsSnapshot
+import com.ismartcoding.plain.features.nearby.MdnsPacketLog
+import com.ismartcoding.plain.features.shares.SharedInfoDto
 import com.ismartcoding.plain.features.nearby.PairingPhase
 import com.ismartcoding.plain.features.nearby.PairingState
 import com.ismartcoding.plain.features.nearby.PeerStatus
@@ -19,6 +21,7 @@ import com.ismartcoding.plain.platform.system.DataType
 import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.jsonObject
 import kotlin.test.Test
+import kotlin.time.Instant
 import kotlinx.serialization.SerializationException
 import kotlin.test.assertFailsWith
 import kotlin.test.assertEquals
@@ -37,6 +40,7 @@ class ClientContractModelsTest {
             """{"id":"device","signaturePublicKey":"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=","name":"Device","port":8080,"deviceType":"PHONE","version":"1","platform":"android","lastSeen":"2026-01-01T00:00:00Z","status":"UNPAIRED","discoveryMethods":["LAN","DNS_SD","BLE","QR"]}""",
         )
         assertEquals(DeviceType.PHONE, device.deviceType)
+        assertEquals(Instant.parse("2026-01-01T00:00:00Z"), device.lastSeen)
         assertEquals(PeerStatus.UNPAIRED, device.status)
         assertEquals(
             listOf(DiscoveryMethod.LAN, DiscoveryMethod.DNS_SD, DiscoveryMethod.BLE, DiscoveryMethod.QR),
@@ -122,12 +126,26 @@ class ClientContractModelsTest {
     @Test
     fun mdns_snapshots_preserve_addresses_packet_directions_and_large_revisions() {
         val snapshot = JsonHelper.jsonDecode<MdnsSnapshot>(
-            """{"runtimeId":"runtime","revision":3000000123,"running":true,"scanning":false,"services":[{"serviceType":"service","instanceName":"instance","instanceFqdn":"instance.local","hostname":"host.local","port":8080,"txtRecords":[],"ips":["ipv4"],"ip6s":["ipv6"],"complete":true}],"packetsIn":[],"packetsOut":[{"time":3000000123,"direction":"OUT","srcIp":"source","srcPort":5353,"dstIp":"destination","dstPort":5353,"size":64,"summary":"summary","detail":"detail"}]}""",
+            """{"runtimeId":"runtime","revision":3000000123,"running":true,"scanning":false,"services":[{"serviceType":"service","instanceName":"instance","instanceFqdn":"instance.local","hostname":"host.local","port":8080,"txtRecords":[],"ips":["ipv4"],"ip6s":["ipv6"],"complete":true}],"packetsIn":[],"packetsOut":[{"time":"2026-11-12T08:09:10.123Z","direction":"OUT","srcIp":"source","srcPort":5353,"dstIp":"destination","dstPort":5353,"size":64,"summary":"summary","detail":"detail"}]}""",
         )
         assertEquals(3_000_000_123, snapshot.revision)
         assertEquals(listOf("ipv4"), snapshot.services.single().ips)
         assertEquals(listOf("ipv6"), snapshot.services.single().ip6s)
         assertEquals(MdnsPacketDirection.OUT, snapshot.packetsOut.single().direction)
+        assertEquals(Instant.parse("2026-11-12T08:09:10.123Z"), snapshot.packetsOut.single().time)
         assertEquals(snapshot, JsonHelper.jsonDecode<MdnsSnapshot>(JsonHelper.jsonEncode(snapshot)))
     }
+    @Test
+    fun mdns_packet_time_requires_an_instant() {
+        val payload = """{"time":1794470950123,"direction":"OUT","srcIp":"source","srcPort":5353,"dstIp":"destination","dstPort":5353,"size":64,"summary":"summary","detail":"detail"}"""
+        assertFailsWith<SerializationException> { JsonHelper.jsonDecode<MdnsPacketLog>(payload) }
+    }
+
+    @Test
+    fun shared_info_expiry_decodes_nullable_instants() {
+        val info = JsonHelper.jsonDecode<SharedInfoDto>("""{"expiresAt":"2026-11-12T08:09:10.123Z"}""")
+        assertEquals(Instant.parse("2026-11-12T08:09:10.123Z"), info.expiresAt)
+        assertEquals(null, JsonHelper.jsonDecode<SharedInfoDto>("""{"expiresAt":null}""").expiresAt)
+    }
+
 }

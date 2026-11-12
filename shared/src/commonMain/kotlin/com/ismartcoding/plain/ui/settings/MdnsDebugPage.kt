@@ -263,8 +263,8 @@ private fun packetKey(log: MdnsPacketLog): String =
     "${log.direction}-${log.time}-${log.srcIp}:${log.srcPort}-${log.dstIp}:${log.dstPort}-${log.size}"
 
 /** Local time as HH:mm:ss.mmm, readable for packet inspection. */
-private fun packetTime(ms: Long): String {
-    val t = Instant.fromEpochMilliseconds(ms).toLocalDateTime(TimeZone.currentSystemDefault())
+private fun packetTime(time: Instant): String {
+    val t = time.toLocalDateTime(TimeZone.currentSystemDefault())
     val h = t.hour.toString().padStart(2, '0')
     val m = t.minute.toString().padStart(2, '0')
     val s = t.second.toString().padStart(2, '0')
