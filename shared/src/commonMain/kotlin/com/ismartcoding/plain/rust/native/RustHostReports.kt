@@ -1,7 +1,7 @@
 package com.ismartcoding.plain.rust.native
 
 object RustHostReports {
-    suspend fun pairingResponse(payload: String): Boolean = nativeCall { RustNativeBindings.reportPairingResponse(payload) }
+    suspend fun pairingReply(payload: String): Boolean = nativeCall { RustNativeBindings.reportPairingReply(payload) }
     suspend fun notification(payload: String): Boolean = nativeCall { RustNativeBindings.reportNotification(payload) }
     suspend fun imageCatalogChanged(payload: String): Boolean = nativeCall { RustNativeBindings.reportImageCatalogChanged(payload) }
     suspend fun networkInterfacesChanged(payload: String): Boolean = nativeCall { RustNativeBindings.reportNetworkInterfacesChanged(payload) }

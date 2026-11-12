@@ -30,7 +30,7 @@ char *plain_resource_open(const char *id);
 char *plain_resource_file(const char *id, int32_t fd, int64_t offset, int64_t length);
 char *plain_resource_write(const char *id, const uint8_t *bytes, size_t len);
 char *plain_resource_close(const char *id, bool failed);
-char *plain_report_pairing_response(const char *payload);
+char *plain_report_pairing_reply(const char *payload);
 char *plain_report_notification(const char *payload);
 char *plain_report_image_catalog_changed(const char *payload);
 char *plain_report_network_interfaces_changed(const char *payload);

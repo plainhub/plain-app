@@ -42,8 +42,8 @@ object RustPairingRuntime {
     suspend fun currentRequest(id: String, signature: String): Boolean =
         RustNativeApi.isPairingRequestCurrent(id, signature)
 
-    suspend fun complete(payload: String) {
-        RustHostReports.pairingResponse(payload)
+    suspend fun complete(reply: String) {
+        RustHostReports.pairingReply(reply)
     }
 
     suspend fun respond(request: PairingRequestInput, accepted: Boolean): Boolean =

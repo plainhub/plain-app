@@ -1,6 +1,6 @@
 package com.ismartcoding.plain.rust.native
 
-import com.ismartcoding.plain.rustprefs.plain_report_pairing_response
+import com.ismartcoding.plain.rustprefs.plain_report_pairing_reply
 import com.ismartcoding.plain.rustprefs.plain_report_notification
 import com.ismartcoding.plain.rustprefs.plain_report_image_catalog_changed
 import com.ismartcoding.plain.rustprefs.plain_report_network_interfaces_changed
@@ -131,7 +131,7 @@ internal actual object RustNativeBindings {
     }
 
 
-    actual fun reportPairingResponse(payload: String): String = memScoped { readString(plain_report_pairing_response(payload.cstr.ptr)) }
+    actual fun reportPairingReply(payload: String): String = memScoped { readString(plain_report_pairing_reply(payload.cstr.ptr)) }
     actual fun reportNotification(payload: String): String = memScoped { readString(plain_report_notification(payload.cstr.ptr)) }
     actual fun reportImageCatalogChanged(payload: String): String = memScoped { readString(plain_report_image_catalog_changed(payload.cstr.ptr)) }
     actual fun reportNetworkInterfacesChanged(payload: String): String = memScoped { readString(plain_report_network_interfaces_changed(payload.cstr.ptr)) }

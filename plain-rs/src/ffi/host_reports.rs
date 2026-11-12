@@ -2,17 +2,17 @@ use super::{host::bridge, management::reply, values::{c_string, input}};
 
 use std::ffi::c_char;
 
-fn pairing_response(payload: String) -> String {
+fn pairing_reply(payload: String) -> String {
     reply!((|| -> Result<bool, String> {
         let (runtime, host) = bridge()?;
-        runtime.block_on(host.report_pairing_response(payload))?;
+        runtime.block_on(host.report_pairing_reply(payload))?;
         Ok(true)
     })())
 }
 #[unsafe(no_mangle)]
-pub extern "C" fn plain_report_pairing_response(payload: *const c_char) -> *mut c_char {
+pub extern "C" fn plain_report_pairing_reply(payload: *const c_char) -> *mut c_char {
     c_string(match input(payload) {
-        Ok(payload) => pairing_response(payload),
+        Ok(payload) => pairing_reply(payload),
         Err(error) => reply!(Err::<bool, String>(error)),
     })
 }
@@ -355,13 +355,13 @@ mod android {
     use jni::{EnvUnowned, errors::ThrowRuntimeExAndDefault, objects::{JByteArray, JObject, JString}, sys::jstring};
 
     #[unsafe(no_mangle)]
-    pub extern "system" fn Java_com_ismartcoding_plain_rust_native_RustNativeBindings_reportPairingResponse(
+    pub extern "system" fn Java_com_ismartcoding_plain_rust_native_RustNativeBindings_reportPairingReply(
         mut env: EnvUnowned<'_>,
         _: JObject<'_>,
         payload: JString<'_>,
     ) -> jstring {
         env.with_env(|env| -> jni::errors::Result<_> {
-            env.new_string(pairing_response(payload.to_string()))
+            env.new_string(pairing_reply(payload.to_string()))
         })
         .resolve::<ThrowRuntimeExAndDefault>()
         .into_raw()

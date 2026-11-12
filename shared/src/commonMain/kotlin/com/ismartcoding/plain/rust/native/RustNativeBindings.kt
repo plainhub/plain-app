@@ -11,7 +11,7 @@ internal expect object RustNativeBindings {
     fun graphqlSubscriptionSend(handle: Long, message: String)
     fun graphqlSubscriptionRead(handle: Long): String
     fun graphqlSubscriptionClose(handle: Long)
-    fun reportPairingResponse(payload: String): String
+    fun reportPairingReply(payload: String): String
     fun reportNotification(payload: String): String
     fun reportImageCatalogChanged(payload: String): String
     fun reportNetworkInterfacesChanged(payload: String): String

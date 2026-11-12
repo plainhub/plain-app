@@ -13,7 +13,7 @@ internal actual object RustNativeBindings {
     actual external fun graphqlSubscriptionSend(handle: Long, message: String)
     actual external fun graphqlSubscriptionRead(handle: Long): String
     actual external fun graphqlSubscriptionClose(handle: Long)
-    actual external fun reportPairingResponse(payload: String): String
+    actual external fun reportPairingReply(payload: String): String
     actual external fun reportNotification(payload: String): String
     actual external fun reportImageCatalogChanged(payload: String): String
     actual external fun reportNetworkInterfacesChanged(payload: String): String
