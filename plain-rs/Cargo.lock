@@ -73,12 +73,6 @@ checksum = "f2032f911046de80f0a198e0901378627c33f59ea0ac00e363d481118bd70a53"
 
 [[package]]
 name = "base16ct"
-version = "0.2.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "4c7f02d4ea65f2c1853089ffd8d2787bdbc63de2f0d29dedbcf8ccdfa0ccd4cf"
-
-[[package]]
-name = "base16ct"
 version = "1.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "fd307490d624467aa6f74b0eabb77633d1f758a7b25f12bceb0b22e08d9726f6"
@@ -134,7 +128,7 @@ dependencies = [
 [[package]]
 name = "block2"
 version = "0.6.2"
-source = "git+https://github.com/plainhub/plain-core.git?branch=main#a3882de2e85b644f294b0ad81c40b35060fb6a6c"
+source = "git+https://github.com/plainhub/plain-core.git?branch=main#a34eb84387129a131e0b8f3f15b9cdf6bc6da63e"
 dependencies = [
  "objc2",
 ]
@@ -302,18 +296,6 @@ dependencies = [
 
 [[package]]
 name = "crypto-bigint"
-version = "0.5.5"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "0dc92fb57ca44df6db8059111ab3af99a63d5d0f8375d9972e319a379c6bab76"
-dependencies = [
- "generic-array",
- "rand_core 0.6.4",
- "subtle",
- "zeroize",
-]
-
-[[package]]
-name = "crypto-bigint"
 version = "0.7.10"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "9c035cb64cba03dad2fb921f3e218785e8cf9a41790da5eb3a1400f62fa2be11"
@@ -431,17 +413,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "derive-where"
-version = "1.7.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "2e2b94854e8576378ccda7c8de8a66ed8b4e8acbd2c50ec3418ea6c8aaf4b567"
-dependencies = [
- "proc-macro2",
- "quote",
- "syn 3.0.6",
-]
-
-[[package]]
 name = "des"
 version = "0.9.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -476,7 +447,7 @@ dependencies = [
 [[package]]
 name = "dispatch2"
 version = "0.3.1"
-source = "git+https://github.com/plainhub/plain-core.git?branch=main#a3882de2e85b644f294b0ad81c40b35060fb6a6c"
+source = "git+https://github.com/plainhub/plain-core.git?branch=main#a34eb84387129a131e0b8f3f15b9cdf6bc6da63e"
 dependencies = [
  "objc2",
 ]
@@ -500,7 +471,7 @@ checksum = "c0681a4fc24c767085329728d8dfba959af91228aa4610cca4f8ce317ba46ae0"
 dependencies = [
  "der 0.8.2",
  "digest 0.11.3",
- "elliptic-curve 0.14.3",
+ "elliptic-curve",
  "signature 3.0.0",
  "spki 0.8.1",
  "zeroize",
@@ -532,39 +503,21 @@ dependencies = [
 
 [[package]]
 name = "elliptic-curve"
-version = "0.13.8"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b5e6043086bf7973472e0c7dff2142ea0b680d30e18d9cc40f267efbf222bd47"
-dependencies = [
- "base16ct 0.2.0",
- "crypto-bigint 0.5.5",
- "digest 0.10.7",
- "ff 0.13.1",
- "generic-array",
- "group 0.13.0",
- "rand_core 0.6.4",
- "sec1 0.7.3",
- "subtle",
- "zeroize",
-]
-
-[[package]]
-name = "elliptic-curve"
 version = "0.14.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "900f37e7e18d74a2347389af6cd69e3a30d5cc9e697f40004865679aa75e9c7c"
 dependencies = [
- "base16ct 1.0.0",
- "crypto-bigint 0.7.10",
+ "base16ct",
+ "crypto-bigint",
  "crypto-common 0.2.2",
  "digest 0.11.3",
- "ff 0.14.0",
- "group 0.14.0",
+ "ff",
+ "group",
  "hkdf 0.13.0",
  "hybrid-array",
  "pkcs8 0.11.0",
  "rand_core 0.10.1",
- "sec1 0.8.1",
+ "sec1",
  "subtle",
  "zeroize",
 ]
@@ -577,16 +530,6 @@ checksum = "39cab71617ae0d63f51a36d69f866391735b51691dbda63cf6f96d042b63efeb"
 dependencies = [
  "libc",
  "windows-sys 0.61.2",
-]
-
-[[package]]
-name = "ff"
-version = "0.13.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c0b50bfb653653f9ca9095b427bed08ab8d75a137839d9ad64eb11810d5b6393"
-dependencies = [
- "rand_core 0.6.4",
- "subtle",
 ]
 
 [[package]]
@@ -674,7 +617,6 @@ checksum = "85649ca51fd72272d7821adaf274ad91c288277713d9c18820d8499a7ff69e9a"
 dependencies = [
  "typenum",
  "version_check",
- "zeroize",
 ]
 
 [[package]]
@@ -713,22 +655,11 @@ dependencies = [
 
 [[package]]
 name = "group"
-version = "0.13.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f0f9ef7462f7c099f518d754361858f86d8a07af53ba9af0fe635bbccb151a63"
-dependencies = [
- "ff 0.13.1",
- "rand_core 0.6.4",
- "subtle",
-]
-
-[[package]]
-name = "group"
 version = "0.14.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "7fd1a1c7a5206c5b7a3f5a0d7ccd3ff85d0c8f5133d62a02680255b0004af5f4"
 dependencies = [
- "ff 0.14.0",
+ "ff",
  "rand_core 0.10.1",
  "subtle",
 ]
@@ -736,7 +667,7 @@ dependencies = [
 [[package]]
 name = "heic-rs"
 version = "0.1.4"
-source = "git+https://github.com/plainhub/plain-core.git?branch=main#a3882de2e85b644f294b0ad81c40b35060fb6a6c"
+source = "git+https://github.com/plainhub/plain-core.git?branch=main#a34eb84387129a131e0b8f3f15b9cdf6bc6da63e"
 
 [[package]]
 name = "hkdf"
@@ -1036,7 +967,7 @@ dependencies = [
 [[package]]
 name = "objc2"
 version = "0.6.5"
-source = "git+https://github.com/plainhub/plain-core.git?branch=main#a3882de2e85b644f294b0ad81c40b35060fb6a6c"
+source = "git+https://github.com/plainhub/plain-core.git?branch=main#a34eb84387129a131e0b8f3f15b9cdf6bc6da63e"
 dependencies = [
  "objc2-encode",
 ]
@@ -1044,7 +975,7 @@ dependencies = [
 [[package]]
 name = "objc2-av-foundation"
 version = "0.3.2"
-source = "git+https://github.com/plainhub/plain-core.git?branch=main#a3882de2e85b644f294b0ad81c40b35060fb6a6c"
+source = "git+https://github.com/plainhub/plain-core.git?branch=main#a34eb84387129a131e0b8f3f15b9cdf6bc6da63e"
 dependencies = [
  "bitflags",
  "block2",
@@ -1059,7 +990,7 @@ dependencies = [
 [[package]]
 name = "objc2-core-foundation"
 version = "0.3.2"
-source = "git+https://github.com/plainhub/plain-core.git?branch=main#a3882de2e85b644f294b0ad81c40b35060fb6a6c"
+source = "git+https://github.com/plainhub/plain-core.git?branch=main#a34eb84387129a131e0b8f3f15b9cdf6bc6da63e"
 dependencies = [
  "bitflags",
  "objc2",
@@ -1068,7 +999,7 @@ dependencies = [
 [[package]]
 name = "objc2-core-media"
 version = "0.3.2"
-source = "git+https://github.com/plainhub/plain-core.git?branch=main#a3882de2e85b644f294b0ad81c40b35060fb6a6c"
+source = "git+https://github.com/plainhub/plain-core.git?branch=main#a34eb84387129a131e0b8f3f15b9cdf6bc6da63e"
 dependencies = [
  "bitflags",
  "objc2",
@@ -1078,7 +1009,7 @@ dependencies = [
 [[package]]
 name = "objc2-core-video"
 version = "0.3.2"
-source = "git+https://github.com/plainhub/plain-core.git?branch=main#a3882de2e85b644f294b0ad81c40b35060fb6a6c"
+source = "git+https://github.com/plainhub/plain-core.git?branch=main#a34eb84387129a131e0b8f3f15b9cdf6bc6da63e"
 dependencies = [
  "bitflags",
  "objc2",
@@ -1088,12 +1019,12 @@ dependencies = [
 [[package]]
 name = "objc2-encode"
 version = "4.1.0"
-source = "git+https://github.com/plainhub/plain-core.git?branch=main#a3882de2e85b644f294b0ad81c40b35060fb6a6c"
+source = "git+https://github.com/plainhub/plain-core.git?branch=main#a34eb84387129a131e0b8f3f15b9cdf6bc6da63e"
 
 [[package]]
 name = "objc2-foundation"
 version = "0.3.2"
-source = "git+https://github.com/plainhub/plain-core.git?branch=main#a3882de2e85b644f294b0ad81c40b35060fb6a6c"
+source = "git+https://github.com/plainhub/plain-core.git?branch=main#a34eb84387129a131e0b8f3f15b9cdf6bc6da63e"
 dependencies = [
  "bitflags",
  "objc2",
@@ -1112,34 +1043,13 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "c08d65885ee38876c4f86fa503fb49d7b507c2b62552df7c70b2fce627e06381"
 
 [[package]]
-name = "opaque-ke"
-version = "4.1.0-pre.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "2c65d1dc9028caf5939b337f655a78dc1bbb5867686e5041cb36f5d5e8b5a9ce"
-dependencies = [
- "argon2",
- "curve25519-dalek",
- "derive-where",
- "digest 0.10.7",
- "displaydoc",
- "elliptic-curve 0.13.8",
- "generic-array",
- "hkdf 0.12.4",
- "hmac 0.12.1",
- "rand 0.8.8",
- "subtle",
- "voprf",
- "zeroize",
-]
-
-[[package]]
 name = "p256"
 version = "0.14.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "d2c9239b2dbc807adbbe147e8cf72ea7450c3a0aabe62cb8e75ff4ec22e1f72a"
 dependencies = [
  "ecdsa",
- "elliptic-curve 0.14.3",
+ "elliptic-curve",
  "primefield",
  "primeorder",
 ]
@@ -1261,7 +1171,7 @@ checksum = "f6b464fbc74e149a392436b17d523f769e057cb6877f6a5c4618bc6f11800548"
 [[package]]
 name = "plain-graphql"
 version = "0.1.0"
-source = "git+https://github.com/plainhub/plain-core.git?branch=main#a3882de2e85b644f294b0ad81c40b35060fb6a6c"
+source = "git+https://github.com/plainhub/plain-core.git?branch=main#a34eb84387129a131e0b8f3f15b9cdf6bc6da63e"
 dependencies = [
  "bytes",
  "futures-util",
@@ -1273,7 +1183,7 @@ dependencies = [
 [[package]]
 name = "plain-graphql-macros"
 version = "0.1.0"
-source = "git+https://github.com/plainhub/plain-core.git?branch=main#a3882de2e85b644f294b0ad81c40b35060fb6a6c"
+source = "git+https://github.com/plainhub/plain-core.git?branch=main#a34eb84387129a131e0b8f3f15b9cdf6bc6da63e"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -1283,8 +1193,9 @@ dependencies = [
 [[package]]
 name = "plain-libs"
 version = "0.1.0"
-source = "git+https://github.com/plainhub/plain-core.git?branch=main#a3882de2e85b644f294b0ad81c40b35060fb6a6c"
+source = "git+https://github.com/plainhub/plain-core.git?branch=main#a34eb84387129a131e0b8f3f15b9cdf6bc6da63e"
 dependencies = [
+ "argon2",
  "atomic-waker",
  "bitflags",
  "bytes",
@@ -1292,6 +1203,7 @@ dependencies = [
  "cc",
  "cfg-if",
  "chacha20poly1305",
+ "curve25519-dalek",
  "der 0.8.2",
  "des",
  "ed25519-dalek",
@@ -1311,7 +1223,6 @@ dependencies = [
  "log",
  "mio",
  "num-traits",
- "opaque-ke",
  "p256",
  "pbkdf2",
  "percent-encoding",
@@ -1319,7 +1230,7 @@ dependencies = [
  "pkcs12",
  "pkcs5",
  "pkcs8 0.11.0",
- "rand 0.10.3",
+ "rand",
  "rand_core 0.6.4",
  "rav1d",
  "rc2",
@@ -1334,6 +1245,7 @@ dependencies = [
  "slab",
  "smallvec",
  "socket2",
+ "subtle",
  "tokio",
  "tokio-rustls",
  "tokio-util",
@@ -1349,7 +1261,7 @@ dependencies = [
 [[package]]
 name = "plain-rs"
 version = "0.1.0"
-source = "git+https://github.com/plainhub/plain-core.git?branch=main#a3882de2e85b644f294b0ad81c40b35060fb6a6c"
+source = "git+https://github.com/plainhub/plain-core.git?branch=main#a34eb84387129a131e0b8f3f15b9cdf6bc6da63e"
 dependencies = [
  "block2",
  "bytes",
@@ -1368,7 +1280,7 @@ dependencies = [
  "parking_lot",
  "plain-graphql",
  "plain-libs",
- "rand 0.10.3",
+ "rand",
  "rustls",
  "serde",
  "sha2 0.10.9",
@@ -1393,7 +1305,7 @@ dependencies = [
 [[package]]
 name = "plain-server"
 version = "0.1.0"
-source = "git+https://github.com/plainhub/plain-core.git?branch=main#a3882de2e85b644f294b0ad81c40b35060fb6a6c"
+source = "git+https://github.com/plainhub/plain-core.git?branch=main#a34eb84387129a131e0b8f3f15b9cdf6bc6da63e"
 dependencies = [
  "futures-util",
  "log",
@@ -1443,9 +1355,9 @@ version = "0.14.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "c555a6e4eb7d4e158fcb028c835c3b8642206ddc279b5c6b202ef9a8bdb592f4"
 dependencies = [
- "crypto-bigint 0.7.10",
+ "crypto-bigint",
  "crypto-common 0.2.2",
- "ff 0.14.0",
+ "ff",
  "rand_core 0.10.1",
  "subtle",
  "zeroize",
@@ -1457,7 +1369,7 @@ version = "0.14.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "5c9f42978c78a00e3d68f69fc03e57a234debae69da4020a4fb588fcdcd07b06"
 dependencies = [
- "elliptic-curve 0.14.3",
+ "elliptic-curve",
  "once_cell",
  "primefield",
  "serdect",
@@ -1490,15 +1402,6 @@ checksum = "f8dcc9c7d52a811697d2151c701e0d08956f92b0e24136cf4cf27b57a6a0d9bf"
 
 [[package]]
 name = "rand"
-version = "0.8.8"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e058c7de0b26af77780c769414d6257830bb240f3c38477dbc2c16e5f54d6d4c"
-dependencies = [
- "rand_core 0.6.4",
-]
-
-[[package]]
-name = "rand"
 version = "0.10.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "65c9fb96cbc91e3478eaae79a69fcd3f1ae4ad052e471fe6732fff548984b4af"
@@ -1526,7 +1429,7 @@ checksum = "63b8176103e19a2643978565ca18b50549f6101881c443590420e4dc998a3c69"
 [[package]]
 name = "rav1d"
 version = "1.1.0"
-source = "git+https://github.com/plainhub/plain-core.git?branch=main#a3882de2e85b644f294b0ad81c40b35060fb6a6c"
+source = "git+https://github.com/plainhub/plain-core.git?branch=main#a34eb84387129a131e0b8f3f15b9cdf6bc6da63e"
 dependencies = [
  "bitflags",
  "cfg-if",
@@ -1655,24 +1558,11 @@ dependencies = [
 
 [[package]]
 name = "sec1"
-version = "0.7.3"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d3e97a565f76233a6003f9f5c54be1d9c5bdfa3eccfb189469f11ec4901c47dc"
-dependencies = [
- "base16ct 0.2.0",
- "der 0.7.10",
- "generic-array",
- "subtle",
- "zeroize",
-]
-
-[[package]]
-name = "sec1"
 version = "0.8.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "d56d437c2f19203ce5f7122e507831de96f3d2d4d3be5af44a0b0a09d8a80e4d"
 dependencies = [
- "base16ct 1.0.0",
+ "base16ct",
  "ctutils",
  "der 0.8.2",
  "hybrid-array",
@@ -1722,7 +1612,7 @@ version = "0.4.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "66cf8fedced2fcf12406bcb34223dffb92eaf34908ede12fed414c82b7f00b3e"
 dependencies = [
- "base16ct 1.0.0",
+ "base16ct",
  "serde",
 ]
 
@@ -2006,7 +1896,7 @@ checksum = "b6f5e870be6c3b371b77fe0ee0bafb859fa4964b4404c27de1d380043c4dda20"
 [[package]]
 name = "undoc"
 version = "0.27.3"
-source = "git+https://github.com/plainhub/plain-core.git?branch=main#a3882de2e85b644f294b0ad81c40b35060fb6a6c"
+source = "git+https://github.com/plainhub/plain-core.git?branch=main#a34eb84387129a131e0b8f3f15b9cdf6bc6da63e"
 dependencies = [
  "plain-libs",
  "serde",
@@ -2073,24 +1963,6 @@ name = "version_check"
 version = "0.9.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "0b928f33d975fc6ad9f86c8f283853ad26bdd5b10b7f1542aa2fa15e2289105a"
-
-[[package]]
-name = "voprf"
-version = "0.5.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "28f59c30c76e2fea54cdece6a054e2662feffa7ab19658a7887524265ee39470"
-dependencies = [
- "curve25519-dalek",
- "derive-where",
- "digest 0.10.7",
- "displaydoc",
- "elliptic-curve 0.13.8",
- "generic-array",
- "rand_core 0.6.4",
- "sha2 0.10.9",
- "subtle",
- "zeroize",
-]
 
 [[package]]
 name = "walkdir"
@@ -2265,8 +2137,8 @@ version = "0.14.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "795ca18b3fdb5e62bf982199278341ddcf7ebf7d32e25e212ad05d496e95f6fa"
 dependencies = [
- "ff 0.14.0",
- "group 0.14.0",
+ "ff",
+ "group",
  "hybrid-array",
  "primefield",
 ]
@@ -2314,7 +2186,7 @@ dependencies = [
 [[package]]
 name = "zerocopy"
 version = "0.7.35"
-source = "git+https://github.com/plainhub/plain-core.git?branch=main#a3882de2e85b644f294b0ad81c40b35060fb6a6c"
+source = "git+https://github.com/plainhub/plain-core.git?branch=main#a34eb84387129a131e0b8f3f15b9cdf6bc6da63e"
 dependencies = [
  "zerocopy-derive",
 ]
@@ -2322,7 +2194,7 @@ dependencies = [
 [[package]]
 name = "zerocopy-derive"
 version = "0.7.35"
-source = "git+https://github.com/plainhub/plain-core.git?branch=main#a3882de2e85b644f294b0ad81c40b35060fb6a6c"
+source = "git+https://github.com/plainhub/plain-core.git?branch=main#a34eb84387129a131e0b8f3f15b9cdf6bc6da63e"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -2355,20 +2227,6 @@ name = "zeroize"
 version = "1.9.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "e13084392c5e4bc371903e2935a5eaeed24905a7511356b883835e18a78f6879"
-dependencies = [
- "zeroize_derive",
-]
-
-[[package]]
-name = "zeroize_derive"
-version = "1.5.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "3c50655cbb0fe3fc43170059e702f1ce5e19b84cec58dc87b037a09935c2f328"
-dependencies = [
- "proc-macro2",
- "quote",
- "syn 2.0.119",
-]
 
 [[package]]
 name = "zerotrie"
