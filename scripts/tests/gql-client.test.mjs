@@ -49,12 +49,12 @@ test(`actual GraphQL script ${wrongPassword ? 'rejects a wrong password' : 'inte
       const chunks = []
       for await (const chunk of req) chunks.push(chunk)
       const request = Buffer.concat(chunks)
-      const text = Buffer.from(open(key, request, Buffer.from('http-request\0POST\0/graphql'))).toString()
-      const first = text.indexOf('|')
-      const second = text.indexOf('|', first + 1)
-      assert.equal(JSON.parse(text.slice(second + 1)).query, '{ __typename }')
-      const aad = Buffer.concat([Buffer.from('r\0'), createHash('sha256').update(request).digest()])
-      res.end(seal(key, Buffer.from(JSON.stringify({ data: { __typename: 'Query' } })), aad))
+      const plain = Buffer.from(open(key, request))
+      const requestBody = JSON.parse(plain.toString())
+      assert.equal(requestBody.query, '{ __typename }')
+      assert.match(requestBody.requestId, /^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/)
+      const binding = Buffer.concat([Buffer.from([0]), createHash('sha256').update(request).digest()])
+      res.end(seal(key, Buffer.concat([binding, Buffer.from(JSON.stringify({ data: { __typename: 'Query' } }))])))
     } catch (error) { serverError = error; res.writeHead(500).end() }
   })
   server.on('upgrade', (req, stream) => {

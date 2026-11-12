@@ -166,21 +166,34 @@ async function login(clientId) {
   }
 }
 
-function graphqlResponseAad(request) {
-  return Buffer.concat([Buffer.from("r\0"), crypto.createHash("sha256").update(request).digest()])
+function graphqlRequest(key, query) {
+  const id = crypto.randomBytes(16)
+  id.writeUIntBE(Date.now(), 0, 6)
+  id[6] = (id[6] & 15) | 0x70
+  id[8] = (id[8] & 63) | 0x80
+  const hex = id.toString('hex')
+  const requestId = `${hex.slice(0, 8)}-${hex.slice(8, 12)}-${hex.slice(12, 16)}-${hex.slice(16, 20)}-${hex.slice(20)}`
+  return xchachaSeal(key, Buffer.from(JSON.stringify({ requestId, query })))
+}
+
+function graphqlResponse(key, request, response) {
+  const plain = xchachaOpen(key, response)
+  const binding = Buffer.concat([Buffer.from([0]), crypto.createHash('sha256').update(request).digest()])
+  if (plain.length < binding.length || !plain.subarray(0, binding.length).equals(binding)) throw new Error('Invalid GraphQL response binding')
+  return plain.subarray(binding.length).toString('utf8')
 }
 
 // ---- graphql ---------------------------------------------------------------
 
 async function graphql(clientId, token, query) {
-  const body = xchachaSeal(Buffer.from(token, 'base64'), Buffer.from(`${Date.now()}|${crypto.randomBytes(16).toString('hex')}|${JSON.stringify({ query })}`, 'utf8'), Buffer.from('http-request\0POST\0/graphql'))
+  const body = graphqlRequest(Buffer.from(token, 'base64'), query)
   const res = await fetch(new URL('/graphql', baseUrl), {
     method: 'POST',
     headers: { 'c-id': clientId, 'content-type': 'application/octet-stream' },
     body,
   })
   if (res.status !== 200) return { ok: false, detail: `HTTP ${res.status}` }
-  const text = xchachaOpen(Buffer.from(token, 'base64'), Buffer.from(await res.arrayBuffer()), graphqlResponseAad(body)).toString('utf8')
+  const text = graphqlResponse(Buffer.from(token, 'base64'), body, Buffer.from(await res.arrayBuffer()))
   if (text.includes('"errors"')) {
     let detail = text.slice(0, 200)
     try {
@@ -196,14 +209,14 @@ async function graphql(clientId, token, query) {
 // Prints the decrypted body verbatim — for introspection and other queries
 // whose payload is the point.
 async function rawQuery(clientId, token, query) {
-  const body = xchachaSeal(Buffer.from(token, 'base64'), Buffer.from(`${Date.now()}|${crypto.randomBytes(16).toString('hex')}|${JSON.stringify({ query })}`, 'utf8'), Buffer.from('http-request\0POST\0/graphql'))
+  const body = graphqlRequest(Buffer.from(token, 'base64'), query)
   const res = await fetch(new URL('/graphql', baseUrl), {
     method: 'POST',
     headers: { 'c-id': clientId, 'content-type': 'application/octet-stream' },
     body,
   })
   if (res.status !== 200) return `HTTP ${res.status}`
-  return xchachaOpen(Buffer.from(token, 'base64'), Buffer.from(await res.arrayBuffer()), graphqlResponseAad(body)).toString('utf8')
+  return graphqlResponse(Buffer.from(token, 'base64'), body, Buffer.from(await res.arrayBuffer()))
 }
 
 // ---- cli -------------------------------------------------------------------
