@@ -34,6 +34,7 @@ opt-level = 3
 opt-level = 1
 
 [profile.dev.package.plain-libs]
+incremental = false
 opt-level = 3
 
 [profile.dev.package.plain-rs]
