@@ -10,7 +10,6 @@ data class AuthRequest(
     val appVersion: String,
     val osName: String,
     val osVersion: String,
-    val isMobile: Boolean,
     val ecdhPublicKey: String = "",
     val peer: AuthPeer? = null,
     val verificationCode: String = "",
