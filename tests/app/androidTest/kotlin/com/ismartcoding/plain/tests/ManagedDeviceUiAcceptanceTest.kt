@@ -44,7 +44,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.onCompletion
 import com.ismartcoding.plain.features.nearby.PairingMode
-import com.ismartcoding.plain.features.nearby.PairingPhase
+import com.ismartcoding.plain.ui.nearby.PairingStep
 import com.ismartcoding.plain.features.nearby.RustPairingRuntime
 import com.ismartcoding.plain.ui.app.MainViewModel
 import android.view.View
@@ -1674,7 +1674,6 @@ class ManagedDeviceUiAcceptanceTest {
             val targetId = checkNotNull(args.getString("managedPeerId"))
             val mode = PairingMode.valueOf(checkNotNull(args.getString("managedPairMode")))
             val expectedName = args.getString("managedExpectedDeviceName")
-            val previous = RustPairingRuntime.states().map { it.generation }.toSet()
             click(text(Res.string.chat), "chat navigation")
             click(text(Res.string.add), "add menu")
             click(text(Res.string.pair_device), "nearby navigation")
@@ -1713,17 +1712,17 @@ class ManagedDeviceUiAcceptanceTest {
                 it.overlay && it.text == text(Res.string.waiting_for_confirmation)
             }
             assertFalse(uiNodes().any { it.overlay && it.text == text(Res.string.pair_device) })
-            var lastPhase: PairingPhase? = null
+            var lastPhase: PairingStep? = null
             val terminal = awaitValue("pairing completion") {
-                val state = RustPairingRuntime.states().lastOrNull { it.deviceId == targetId && it.generation !in previous }
-                if (state?.phase != lastPhase) {
-                    lastPhase = state?.phase
-                    report("pairing_phase", state?.phase?.name.orEmpty())
+                val state = com.ismartcoding.plain.ui.nearby.NearbyViewModel.pairingViews[targetId]
+                if (state?.step != lastPhase) {
+                    lastPhase = state?.step
+                    report("pairing_phase", state?.step?.name.orEmpty())
                     state?.verificationCode?.let { report("pairing_code", it) }
                 }
-                state?.takeIf { it.phase in setOf(PairingPhase.SUCCEEDED, PairingPhase.FAILED, PairingPhase.CANCELLED, PairingPhase.PASSWORD_REQUIRED) }
+                state?.takeIf { it.step in setOf(PairingStep.SUCCEEDED, PairingStep.FAILED, PairingStep.CANCELLED, PairingStep.PASSWORD_REQUIRED) }
             }
-            assertEquals("Pairing error: ${terminal.error}", PairingPhase.SUCCEEDED, terminal.phase)
+            assertEquals("Pairing error: ${terminal.error}", PairingStep.SUCCEEDED, terminal.step)
             val peer = awaitValue("paired record") { GraphqlApi.execute(Query.peers()).find { it.id == targetId && it.isPaired() } }
             assertEquals(mode == PairingMode.MANAGE, peer.token.isNotEmpty())
             if (mode == PairingMode.MANAGE) assertEquals(targetId, GraphqlApi.forPeer(peer).execute(identityRequest).clientId)

@@ -2,7 +2,7 @@ package com.ismartcoding.plain.ui.chat.components
 
 import androidx.compose.runtime.*
 import androidx.compose.ui.platform.testTag
-import com.ismartcoding.plain.features.nearby.PairingPhase
+import com.ismartcoding.plain.ui.nearby.PairingStep
 import com.ismartcoding.plain.i18n.*
 import com.ismartcoding.plain.models.NearbyDevice
 import com.ismartcoding.plain.ui.base.PListItem
@@ -44,8 +44,8 @@ internal fun NearbyPairButton(
     enabled: Boolean = true,
     onPair: () -> Unit,
 ) {
-    val active = NearbyViewModel.pairingStates.values.any {
-        it.deviceId == deviceId && it.phase !in setOf(PairingPhase.SUCCEEDED, PairingPhase.FAILED, PairingPhase.CANCELLED)
+    val active = NearbyViewModel.pairingViews.values.any {
+        it.peerId == deviceId && it.step !in setOf(PairingStep.SUCCEEDED, PairingStep.FAILED, PairingStep.CANCELLED)
     }
     val cancelling = active || status == NearbyItemStatus.PAIRING
     POutlinedButton(

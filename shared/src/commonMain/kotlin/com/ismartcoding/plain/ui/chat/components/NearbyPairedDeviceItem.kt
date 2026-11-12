@@ -6,7 +6,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.platform.testTag
-import com.ismartcoding.plain.features.nearby.PairingPhase
+import com.ismartcoding.plain.ui.nearby.PairingStep
 import com.ismartcoding.plain.features.nearby.PairingMode
 import com.ismartcoding.plain.i18n.*
 import com.ismartcoding.plain.models.NearbyDevice
@@ -35,8 +35,8 @@ fun NearbyPairedDeviceItem(peer: Peer, device: NearbyDevice?) {
     var showPair by remember(peer.id) { mutableStateOf(false) }
     var showMenu by remember(peer.id) { mutableStateOf(false) }
     val status = NearbyViewModel.getStatus(peer.id, true)
-    val active = NearbyViewModel.pairingStates.values.any {
-        it.deviceId == peer.id && it.phase !in setOf(PairingPhase.SUCCEEDED, PairingPhase.FAILED, PairingPhase.CANCELLED)
+    val active = NearbyViewModel.pairingViews.values.any {
+        it.peerId == peer.id && it.step !in setOf(PairingStep.SUCCEEDED, PairingStep.FAILED, PairingStep.CANCELLED)
     }
     val cancelling = active || status == NearbyItemStatus.PAIRING
     val selected = MainViewModel.selectedDevice.value?.peerId == peer.id

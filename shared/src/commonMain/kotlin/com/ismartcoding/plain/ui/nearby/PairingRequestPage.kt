@@ -17,23 +17,22 @@ fun PairingRequestPage(
     notice: PairingRequestNotice,
     onClose: () -> Unit,
 ) {
-    val request = notice.requestInput()
     PBackHandler(onBack = onClose)
 
-    val displayIp = request.fromIp.ifEmpty { request.ips.firstOrNull() ?: "" }
-    val requester = listOf(request.fromName, displayIp).filter { it.isNotEmpty() }.joinToString(" · ")
+    val displayIp = notice.fromIp
+    val requester = listOf(notice.fromName, displayIp).filter { it.isNotEmpty() }.joinToString(" · ")
 
     RequestPageLayout(
         title = stringResource(Res.string.pairing_request),
         description = stringResource(if (notice.identityChanged) Res.string.pairing_identity_changed else Res.string.pairing_request_hint),
-        icon = painterResource(request.deviceType.getIcon()),
+        icon = painterResource(notice.deviceType.getIcon()),
         requester = requester,
         content = { item { RequestVerificationCodeCard(notice.verificationCode, stringResource(Res.string.pairing_compare_code)) } },
         actions = {
             RequestDecisionActions(
                 allowText = stringResource(if (notice.identityChanged) Res.string.pairing_trust else Res.string.allow),
-                onDeny = { PairingResponder.respond(request, false); onClose() },
-                onAllow = { PairingResponder.respond(request, true); onClose() },
+                onDeny = { PairingResponder.respond(notice.fromId, false); onClose() },
+                onAllow = { PairingResponder.respond(notice.fromId, true); onClose() },
             )
         },
     )

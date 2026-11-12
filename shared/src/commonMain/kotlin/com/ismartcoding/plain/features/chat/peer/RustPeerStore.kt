@@ -3,7 +3,6 @@ package com.ismartcoding.plain.features.chat.peer
 import com.ismartcoding.plain.graphql.Mutation
 import com.ismartcoding.plain.graphql.Query
 import com.ismartcoding.plain.models.Peer
-import com.ismartcoding.plain.models.PeerRecordInput
 import com.ismartcoding.plain.rust.graphql.GraphqlApi
 
 object RustPeerStore {
@@ -16,6 +15,6 @@ object RustPeerStore {
     suspend fun unpair(id: String): Boolean = GraphqlApi.execute(Mutation.unpairPeer(id))
 
     suspend fun fileUrl(peer: Peer, fileId: String): String {
-        return GraphqlApi.execute(Query.peerFileUrl(peer.id, PeerRecordInput.from(peer), fileId))
+        return GraphqlApi.execute(Query.peerFileUrl(peer.id, fileId))
     }
 }

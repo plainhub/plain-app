@@ -14,7 +14,6 @@ import com.ismartcoding.plain.features.files.FileTaskOp
 import com.ismartcoding.plain.features.files.FileTaskType
 import com.ismartcoding.plain.features.files.FileWriteAction
 import com.ismartcoding.plain.features.media.actions.MediaAction
-import com.ismartcoding.plain.features.nearby.PairingState
 import com.ismartcoding.plain.features.shares.SharedBrowseResult
 import com.ismartcoding.plain.features.shares.SharedDownloadCommand
 import com.ismartcoding.plain.features.shares.SharedDownloadInput
@@ -38,7 +37,6 @@ import com.ismartcoding.plain.models.ImageEditorProjectInput
 import com.ismartcoding.plain.models.Note
 import com.ismartcoding.plain.models.NoteInput
 import com.ismartcoding.plain.models.PairingDeviceInput
-import com.ismartcoding.plain.models.PairingRequestInput
 import com.ismartcoding.plain.models.PomodoroToday
 import com.ismartcoding.plain.models.ShareRecord
 import com.ismartcoding.plain.models.Tag
@@ -94,21 +92,21 @@ object Mutation {
         field = "deleteChatItem",
     )
 
-    fun pairDevice(input: PairingDeviceInput): GraphqlRequest<PairingState> = GraphqlRequest(
-        $$"mutation($input: PairingDeviceInput!) { pairDevice(input: $input) { $${Fragments.PAIRING_STATE} } }",
+    fun pairDevice(input: PairingDeviceInput): GraphqlRequest<Boolean> = GraphqlRequest(
+        $$"mutation($input: PairingDeviceInput!) { pairDevice(input: $input) }",
         mapOf(variable("input", input)),
         field = "pairDevice",
     )
 
-    fun cancelPairing(generation: String): GraphqlRequest<Boolean> = GraphqlRequest(
-        $$"mutation($generation: String!) { cancelPairing(generation: $generation) }",
-        mapOf(variable("generation", generation)),
+    fun cancelPairing(peerId: String): GraphqlRequest<Boolean> = GraphqlRequest(
+        $$"mutation($peerId: ID!) { cancelPairing(peerId: $peerId) }",
+        mapOf(variable("peerId", peerId)),
         field = "cancelPairing",
     )
 
-    fun respondToPairing(input: PairingRequestInput, accepted: Boolean): GraphqlRequest<Boolean> = GraphqlRequest(
-        $$"mutation($input: PairingRequestInput!, $accepted: Boolean!) { respondToPairing(input: $input, accepted: $accepted) }",
-        mapOf(variable("input", input), variable("accepted", accepted)),
+    fun respondToPairing(peerId: String, accepted: Boolean): GraphqlRequest<Boolean> = GraphqlRequest(
+        $$"mutation($peerId: ID!, $accepted: Boolean!) { respondToPairing(peerId: $peerId, accepted: $accepted) }",
+        mapOf(variable("peerId", peerId), variable("accepted", accepted)),
         field = "respondToPairing",
     )
 

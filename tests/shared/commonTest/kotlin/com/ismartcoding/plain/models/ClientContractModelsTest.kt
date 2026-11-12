@@ -8,8 +8,6 @@ import com.ismartcoding.plain.features.nearby.MdnsPacketDirection
 import com.ismartcoding.plain.features.nearby.MdnsSnapshot
 import com.ismartcoding.plain.features.nearby.MdnsPacketLog
 import com.ismartcoding.plain.features.shares.SharedInfoDto
-import com.ismartcoding.plain.features.nearby.PairingPhase
-import com.ismartcoding.plain.features.nearby.PairingState
 import com.ismartcoding.plain.features.nearby.PeerStatus
 import com.ismartcoding.plain.features.notifications.NotificationFilterData
 import com.ismartcoding.plain.features.notifications.NotificationFilterMode
@@ -75,26 +73,16 @@ class ClientContractModelsTest {
         val unknown = "\"FUTURE_VALUE\""
         assertFailsWith<SerializationException> { JsonHelper.jsonDecode<PeerStatus>(unknown) }
         assertFailsWith<SerializationException> { JsonHelper.jsonDecode<DiscoveryMethod>(unknown) }
-        assertFailsWith<SerializationException> { JsonHelper.jsonDecode<PairingPhase>(unknown) }
         assertFailsWith<SerializationException> { JsonHelper.jsonDecode<MdnsPacketDirection>(unknown) }
         assertFailsWith<SerializationException> { JsonHelper.jsonDecode<SessionType>(unknown) }
         assertFailsWith<SerializationException> { JsonHelper.jsonDecode<ImageSearchStatusType>(unknown) }
         assertFailsWith<SerializationException> { JsonHelper.jsonDecode<FeedWorkerStatus>(unknown) }
-        assertEquals(listOf("LAN", "DNS_SD", "BLE", "QR"), DiscoveryMethod.entries.map { it.name })
-        assertEquals(
-            listOf("STARTING", "PASSWORD_REQUIRED", "AUTHENTICATING", "PAIRING", "TRUST_REQUIRED", "WAITING_CONFIRMATION", "COMMITTING", "SUCCEEDED", "FAILED", "CANCELLED"),
-            PairingPhase.entries.map { it.name },
-        )
+        assertEquals(listOf("LAN", "BLE", "QR"), DiscoveryMethod.entries.map { it.name })
+
     }
 
     @Test
     fun fixed_states_decode_the_existing_wire_names() {
-        for (phase in PairingPhase.entries) {
-            val state = JsonHelper.jsonDecode<PairingState>(
-                """{"generation":"attempt","phase":"${phase.name}"}""",
-            )
-            assertEquals(phase, state.phase)
-        }
         for (status in AppUpdateDownloadStatus.entries) {
             val download = JsonHelper.jsonDecode<AppUpdateDownload>("""{"status":"${status.name}"}""")
             assertEquals(status, download.status)

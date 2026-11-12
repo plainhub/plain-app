@@ -18,7 +18,7 @@ import kotlinx.coroutines.flow.collect
 import com.ismartcoding.plain.features.chat.channel.ChannelSystemMessageReceiver
 import com.ismartcoding.plain.features.chat.download.DownloadQueue
 import com.ismartcoding.plain.features.images.search.RustImageModels
-import com.ismartcoding.plain.features.nearby.PairingProjection
+import com.ismartcoding.plain.ui.nearby.PairingProjection
 import com.ismartcoding.plain.features.nearby.RustMdnsRuntime
 import com.ismartcoding.plain.features.nearby.RustNearbyDevices
 import com.ismartcoding.plain.ui.pomodoro.PomodoroProjection
@@ -28,7 +28,10 @@ internal object SubscriptionObservers {
         scope.observe(AppSubscriptions.mdnsChanged) { RustMdnsRuntime.refresh() }
         scope.observe(AppSubscriptions.nearbyDevicesChanged) { RustNearbyDevices.apply(RustNearbyDevices.snapshot()) }
         scope.observe(AppSubscriptions.downloadsChanged) { DownloadQueue.refresh() }
-        scope.observe(AppSubscriptions.pairingChanged) { PairingProjection.reconcile() }
+        scope.observeData(AppSubscriptions.pairingStarted) { PairingProjection.started(it) }
+        scope.observeData(AppSubscriptions.pairingFailed) { PairingProjection.failed(it) }
+        scope.observeData(AppSubscriptions.pairingCanceled) { PairingProjection.cancelled(it) }
+        scope.observeData(AppSubscriptions.pairingCompleted) { PairingProjection.completed(it) }
         scope.observeData(AppSubscriptions.imageModelsUpdated) { value -> RustImageModels.apply(value) }
         scope.observeData(AppSubscriptions.channelsChanged) { value -> ChannelSystemMessageReceiver.applyCommitted(value) }
         scope.observeData(AppSubscriptions.pairingRequested) { value -> PairingProjection.request(value) }

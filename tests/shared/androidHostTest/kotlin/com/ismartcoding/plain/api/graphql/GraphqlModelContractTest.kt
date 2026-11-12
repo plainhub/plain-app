@@ -57,7 +57,6 @@ import com.ismartcoding.plain.models.ContactOrganization
 import com.ismartcoding.plain.models.ContactOrganizationInput
 import com.ismartcoding.plain.models.Package
 import com.ismartcoding.plain.models.PairingDeviceInput
-import com.ismartcoding.plain.models.PairingRequestInput
 import com.ismartcoding.plain.models.Peer
 import com.ismartcoding.plain.models.PhoneGeo
 import com.ismartcoding.plain.models.PomodoroSettings
@@ -131,7 +130,6 @@ class GraphqlModelContractTest {
             "ContactOrganizationInput" to ContactOrganizationInput.serializer().descriptor,
             "Package" to Package.serializer().descriptor,
             "PairingDeviceInput" to PairingDeviceInput.serializer().descriptor,
-            "PairingRequestInput" to PairingRequestInput.serializer().descriptor,
             "Peer" to Peer.serializer().descriptor,
             "PhoneGeo" to PhoneGeo.serializer().descriptor,
             "PomodoroSettings" to PomodoroSettings.serializer().descriptor,

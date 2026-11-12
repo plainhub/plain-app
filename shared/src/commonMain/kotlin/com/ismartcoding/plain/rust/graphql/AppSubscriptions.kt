@@ -46,16 +46,24 @@ object AppSubscriptions {
                 "isIndexing totalImages indexedImages }",
         )
             .shareIn(scope, SharingStarted.WhileSubscribed())
-    internal val pairingChanged =
-        subscription<Boolean>("pairingChanged")
-            .shareIn(scope, SharingStarted.WhileSubscribed())
     internal val pairingRequested =
         subscription<com.ismartcoding.plain.models.PairingRequestNotice>(
             "pairingRequested",
-            "{ fromId toId targetPublicKey fromName port deviceType ecdhPublicKey signaturePublicKey " +
-                "timestamp ips signature fromIp awareSupported verificationCode identityChanged }",
+            "{ fromId fromName fromIp deviceType verificationCode identityChanged }",
         )
             .shareIn(scope, SharingStarted.WhileSubscribed())
+    internal val pairingStarted = subscription<com.ismartcoding.plain.models.PairingProgressNotice>(
+        "pairingStarted", "{ deviceId deviceName error verificationCode }",
+    ).shareIn(scope, SharingStarted.WhileSubscribed())
+    internal val pairingFailed = subscription<com.ismartcoding.plain.models.PairingProgressNotice>(
+        "pairingFailed", "{ deviceId deviceName error }",
+    ).shareIn(scope, SharingStarted.WhileSubscribed())
+    internal val pairingCanceled = subscription<com.ismartcoding.plain.models.PairingProgressNotice>(
+        "pairingCanceled", "{ deviceId deviceName error }",
+    ).shareIn(scope, SharingStarted.WhileSubscribed())
+    internal val pairingCompleted = subscription<com.ismartcoding.plain.models.PairingProgressNotice>(
+        "pairingCompleted", "{ deviceId deviceName }",
+    ).shareIn(scope, SharingStarted.WhileSubscribed())
     internal val pomodoroAction =
         subscription<PomodoroAction>(
             "pomodoroAction",

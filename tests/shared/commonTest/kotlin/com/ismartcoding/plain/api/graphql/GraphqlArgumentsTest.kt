@@ -56,7 +56,6 @@ class GraphqlArgumentsTest {
             Query.mediaCount(DataType.IMAGE, "") to "imageCount",
             Query.selectedMediaPaths("videos", "ids:=video", 1) to "videos",
             Query.mdnsState() to "mdnsState",
-            Query.pairingStates() to "pairingStates",
             Mutation.saveNote("", "Title", "Content") to "createNote",
             Mutation.saveNote("note", "Title", "Content") to "updateNote",
         )

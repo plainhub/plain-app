@@ -4,7 +4,6 @@ import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import com.ismartcoding.plain.features.chat.peer.PeerManager
 import com.ismartcoding.plain.features.nearby.PairingInitiator
-import com.ismartcoding.plain.features.nearby.PairingState
 import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.models.NearbyDevice
 import com.ismartcoding.plain.platform.network.ensureBlePermissionAsync
@@ -20,7 +19,7 @@ object NearbyViewModel {
 
     val nearbyDevices = MutableStateFlow<List<NearbyDevice>>(emptyList())
     var isDiscovering = mutableStateOf(false)
-    val pairingStates = mutableStateMapOf<String, PairingState>()
+    val pairingViews = mutableStateMapOf<String, PairingView>()
     val itemStatus = mutableStateMapOf<String, NearbyItemStatus>()
 
 
@@ -40,7 +39,7 @@ object NearbyViewModel {
 
     fun startPairing(device: NearbyDevice) {
         if (itemStatus[device.id] != null) return
-        itemStatus[device.id] = NearbyItemStatus.STARTING
+        PairingProjection.starting(device.id)
 
         scope.launchSafe { PairingInitiator.start(device) }
     }

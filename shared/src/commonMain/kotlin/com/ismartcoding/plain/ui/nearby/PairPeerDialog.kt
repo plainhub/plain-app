@@ -1,6 +1,5 @@
 package com.ismartcoding.plain.ui.nearby
 
-import com.ismartcoding.plain.features.nearby.PairingPhase
 import com.ismartcoding.plain.features.nearby.PairingMode
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Arrangement
@@ -33,23 +32,23 @@ fun PairPeerDialog(device: NearbyDevice, initialMode: PairingMode? = null, qrCod
     val failureText = stringResource(Res.string.pairing_failed)
     val directMode = initialMode ?: if (device.remoteAccess == true) null else PairingMode.CHAT
     var mode by remember { mutableStateOf(directMode ?: PairingMode.MANAGE) }
-    var generation by remember { mutableStateOf<String?>(null) }
+    var started by remember { mutableStateOf(false) }
     var submitting by remember { mutableStateOf(false) }
     var disposed by remember { mutableStateOf(false) }
     var error by remember { mutableStateOf<String?>(null) }
-    val state = generation?.let { NearbyViewModel.pairingStates[it] }
-    val phase = state?.phase
+    val state = NearbyViewModel.pairingViews[device.id]
+    val phase = state?.step
     fun startPairing() {
         submitting = true
         error = null
         scope.launch {
             try {
                 withContext(NonCancellable) {
-                    if (generation == null) {
-                        val result = RustPairingRuntime.start(device, mode, qrCode)
-                        val value = result.generation
-                        generation = value
-                        if (disposed) RustPairingRuntime.cancelGeneration(value)
+                    if (!started) {
+                        PairingProjection.starting(device.id)
+                        RustPairingRuntime.start(device, mode)
+                        started = true
+                        if (disposed) RustPairingRuntime.cancel(device.id)
                     }
                 }
             } catch (cancelled: CancellationException) { throw cancelled }
@@ -61,21 +60,21 @@ fun PairPeerDialog(device: NearbyDevice, initialMode: PairingMode? = null, qrCod
     DisposableEffect(Unit) {
         onDispose {
             disposed = true
-            generation?.let { scope.launch(NonCancellable) { RustPairingRuntime.cancelGeneration(it) } }
+            if (started) scope.launch(NonCancellable) { RustPairingRuntime.cancel(device.id) }
         }
     }
     LaunchedEffect(phase) {
         when (phase) {
-            PairingPhase.SUCCEEDED -> if (qrCode == null) onDismiss()
-            PairingPhase.CANCELLED -> onDismiss()
-            PairingPhase.FAILED -> {
+            PairingStep.SUCCEEDED -> if (qrCode == null) onDismiss()
+            PairingStep.CANCELLED -> onDismiss()
+            PairingStep.FAILED -> {
                 ToastManager.showErrorToast(failureText)
                 onDismiss()
             }
             else -> Unit
         }
     }
-    if (phase == PairingPhase.PASSWORD_REQUIRED) {
+    if (phase == PairingStep.PASSWORD_REQUIRED) {
         TextFieldDialog(
             title = stringResource(Res.string.password),
             isPassword = true,
@@ -85,7 +84,7 @@ fun PairPeerDialog(device: NearbyDevice, initialMode: PairingMode? = null, qrCod
             onConfirm = { value ->
                 submitting = true
                 scope.launch {
-                    try { RustPairingRuntime.submit(generation!!, value) }
+                    try { PairingProjection.starting(device.id); RustPairingRuntime.submit(device.id, mode, value) }
                     catch (cancelled: CancellationException) { throw cancelled }
                     catch (_: Exception) { error = failureText }
                     finally { submitting = false }
@@ -94,12 +93,12 @@ fun PairPeerDialog(device: NearbyDevice, initialMode: PairingMode? = null, qrCod
         )
         return
     }
-    val waiting = generation != null || submitting
+    val waiting = started || submitting
     AlertDialog(
         onDismissRequest = onDismiss,
         containerColor = MaterialTheme.colorScheme.dialogSheetBackground,
         title = { Text(stringResource(when {
-            phase == PairingPhase.SUCCEEDED -> Res.string.paired
+            phase == PairingStep.SUCCEEDED -> Res.string.paired
             waiting && qrCode == null -> Res.string.waiting_for_confirmation
             else -> Res.string.pair_device
         })) },
@@ -128,14 +127,13 @@ fun PairPeerDialog(device: NearbyDevice, initialMode: PairingMode? = null, qrCod
             }
         },
         confirmButton = {
-            if (phase == PairingPhase.TRUST_REQUIRED && !state.verificationCode.isNullOrEmpty()) POutlinedButton(
+            if (phase == PairingStep.TRUST_REQUIRED && !state.verificationCode.isNullOrEmpty()) POutlinedButton(
                 text = stringResource(if (state.identityChanged) Res.string.pairing_trust else Res.string.confirm),
                 isLoading = submitting,
                 onClick = {
-                    val confirmedGeneration = generation ?: return@POutlinedButton
                     submitting = true
                     scope.launch {
-                        try { RustPairingRuntime.confirm(confirmedGeneration) }
+                        try { RustPairingRuntime.respond(device.id, true) }
                         catch (cancelled: CancellationException) { throw cancelled }
                         catch (_: Exception) { error = failureText }
                         finally { submitting = false }
@@ -149,6 +147,6 @@ fun PairPeerDialog(device: NearbyDevice, initialMode: PairingMode? = null, qrCod
                 },
             )
         },
-        dismissButton = { PTextButton(text = stringResource(if (phase == PairingPhase.SUCCEEDED) Res.string.close else Res.string.cancel), onClick = onDismiss) },
+        dismissButton = { PTextButton(text = stringResource(if (phase == PairingStep.SUCCEEDED) Res.string.close else Res.string.cancel), onClick = onDismiss) },
     )
 }

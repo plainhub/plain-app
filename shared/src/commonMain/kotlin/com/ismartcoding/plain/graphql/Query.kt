@@ -16,7 +16,6 @@ import com.ismartcoding.plain.models.SharedDownloadSnapshot
 import com.ismartcoding.plain.features.chat.models.MessageShare
 import com.ismartcoding.plain.features.files.FileSortBy
 import com.ismartcoding.plain.features.nearby.MdnsSnapshot
-import com.ismartcoding.plain.features.nearby.PairingState
 import com.ismartcoding.plain.features.sessions.SessionFacts
 import com.ismartcoding.plain.features.shares.SharedLink
 import com.ismartcoding.plain.models.AppFile
@@ -48,7 +47,6 @@ import com.ismartcoding.plain.models.NearbyDevice
 import com.ismartcoding.plain.models.Note
 import com.ismartcoding.plain.models.Package as AppPackage
 import com.ismartcoding.plain.models.Peer
-import com.ismartcoding.plain.models.PeerRecordInput
 import com.ismartcoding.plain.models.PomodoroToday
 import com.ismartcoding.plain.models.ShareRecord
 import com.ismartcoding.plain.models.Sms
@@ -109,10 +107,7 @@ object Query {
         field = "contactCount",
     )
 
-    fun pairingStates(): GraphqlRequest<List<PairingState>> = GraphqlRequest(
-        $$"query { pairingStates { $${Fragments.PAIRING_STATE} } }",
-        field = "pairingStates",
-    )
+
 
     fun nearbyDevices(): GraphqlRequest<List<NearbyDevice>> = GraphqlRequest(
         $$"query { nearbyDevices { $${Fragments.NEARBY_DEVICE_FIELDS} } }",
@@ -456,9 +451,9 @@ object Query {
         field = "peers",
     )
 
-    internal fun peerFileUrl(id: String, expected: PeerRecordInput, fileId: String): GraphqlRequest<String> = GraphqlRequest(
-        $$"query($id: ID!, $expected: PeerRecordInput!, $fileId: String!) { peerFileUrl(id: $id, expected: $expected, fileId: $fileId) }",
-        mapOf(variable("id", id), variable("expected", expected), variable("fileId", fileId)),
+    internal fun peerFileUrl(id: String, fileId: String): GraphqlRequest<String> = GraphqlRequest(
+        $$"query($id: ID!, $fileId: String!) { peerFileUrl(id: $id, fileId: $fileId) }",
+        mapOf(variable("id", id), variable("fileId", fileId)),
         field = "peerFileUrl",
     )
 

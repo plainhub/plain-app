@@ -5,10 +5,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class PairingDeviceInput(
-    val id: String? = null,
-    val host: String? = null,
-    val mode: PairingMode? = null,
+    val peerId: String,
+    val mode: PairingMode,
     val password: String? = null,
-    val generation: String? = null,
-    val confirm: Boolean? = null,
 )
