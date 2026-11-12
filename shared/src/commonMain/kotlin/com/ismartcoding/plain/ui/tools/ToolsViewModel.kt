@@ -53,7 +53,7 @@ internal fun rememberToolsViewModel(): ToolsViewModel {
     val changes = remember(source) {
         when (source) {
             ContentSource.Local -> Prefs.appHomeFeatures.drop(1).map { Unit }
-            is ContentSource.Remote -> source.client.changes(listOf(GraphqlOperation("subscription { preferencesChanged }")))
+            is ContentSource.Remote -> source.client.changes(listOf(GraphqlOperation("subscription { prefsChanged }")))
         }
     }
     val model = viewModel(key = "tools:${source.key}") { ToolsViewModel(source.api, changes) }
