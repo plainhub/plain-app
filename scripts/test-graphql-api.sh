@@ -116,8 +116,7 @@ emit_gated notifications '{ notifications(offset: 0, limit: 5, query: "") { id a
 emit pomodoro_today '{ pomodoroToday { date completedCount isRunning } }'
 emit pomodoro_settings '{ pomodoroSettings { workDurationMin shortBreakDurationMin } }'
 emit image_editor_projects '{ imageEditorProjects { id canvasWidth layerCount } }'
-emit db_tables '{ dbTables }'
-emit db_table_info '{ dbTableInfo(table: "sessions") { idKey } }'
+emit db_tables '{ dbTables { name createSql columns { name dataType notNull defaultValue primaryKey } } }'
 emit prefs '{ prefs }'
 emit app_logs '{ appLogs(offset: 0, limit: 5, query: "") }'
 
