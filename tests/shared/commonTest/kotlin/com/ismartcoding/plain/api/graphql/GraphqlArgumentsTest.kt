@@ -172,7 +172,7 @@ class GraphqlArgumentsTest {
     @Test
     fun variableRequestsOwnNamesAndPreserveDefaultInputFields() {
         val path = "a\"b\\c\n"
-        assertEquals(mapOf("path" to JsonPrimitive(path), "name" to JsonPrimitive("audio.mp3")), Query.audioDuration(path).operation.variables)
+        assertEquals(mapOf("path" to JsonPrimitive(path)), Query.audioDuration(path).operation.variables)
         assertEquals(mapOf("path" to JsonPrimitive(path)), Mutation.cacheAudioCover(path).operation.variables)
         val request = Mutation.createFileTask(FileTaskType.COPY, listOf(FileTaskOp("a", "b")))
         assertEquals(JsonPrimitive(false), request.operation.variables.getValue("ops").jsonArray.single().jsonObject["overwrite"])

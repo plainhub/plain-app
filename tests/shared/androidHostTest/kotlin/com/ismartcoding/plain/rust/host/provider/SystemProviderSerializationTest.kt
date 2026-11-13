@@ -73,7 +73,7 @@ class SystemProviderSerializationTest {
             JsonHelper.jsonEncode(part),
         )
         val candidate = MmsCandidateFacts(
-            1L, emptyList(), listOf(part), "2",
+            1L, emptyList(), listOf(part),
         )
         val json = JsonHelper.jsonEncode(candidate)
         assertTrue(json.contains("\"parts\":"))

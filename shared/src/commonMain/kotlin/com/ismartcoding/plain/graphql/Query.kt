@@ -191,6 +191,15 @@ object Query {
         field = "mediaPlayHistory",
     )
 
+    internal fun audioHomeContent(): GraphqlRequest<com.ismartcoding.plain.models.AudioHomeData> = GraphqlRequest(
+        $$"""query {
+            audioArtists { name itemCount playCount samplePath }
+            mediaPlayHistory(query: "type:AUDIO", offset: 0, limit: 8) {
+                media { __typename ... on Audio { $${Fragments.mediaFields(DataType.AUDIO)} } }
+            }
+        }""",
+    )
+
     fun audioPlaylists(includeCovers: Boolean = false): GraphqlRequest<List<AudioPlaylist>> = GraphqlRequest(
         "query { audioPlaylists { ${Fragments.AUDIO_PLAYLIST_FIELDS} ${if (includeCovers) "coverAlbums { albumId trackCount candidatePaths }" else ""} } }",
         field = "audioPlaylists",

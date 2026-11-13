@@ -52,6 +52,7 @@ import android.view.ViewGroup
 import com.ismartcoding.plain.features.files.FileWriteAction
 import com.ismartcoding.plain.features.files.FileSortBy
 import com.ismartcoding.plain.features.chat.ChatClient
+import com.ismartcoding.plain.features.chat.models.getBaseUrl
 import com.ismartcoding.plain.features.chat.ChatQueries
 import com.ismartcoding.plain.features.chat.ChatStatus
 import com.ismartcoding.plain.features.chat.data.ChatTarget
@@ -1157,7 +1158,7 @@ class ManagedDeviceUiAcceptanceTest {
                                     id = "pair-dialog-ui-fixture", name = "Nearby device", port = 8443, remoteAccess = true,
                                     signaturePublicKey = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=",
                                     deviceType = com.ismartcoding.plain.platform.system.DeviceType.PHONE,
-                                    version = "fixture", platform = "fixture", lastSeen = "",
+                                    version = "fixture", platform = "fixture", lastSeen = kotlin.time.Instant.fromEpochMilliseconds(0),
                                     status = com.ismartcoding.plain.features.nearby.PeerStatus.UNPAIRED,
                                 ),
                             ) { show.value = false; dismissed.set(true) }
@@ -1612,7 +1613,7 @@ class ManagedDeviceUiAcceptanceTest {
             id = "unpair-confirmation-${UUID.randomUUID()}", name = "Confirmation device", port = 8443,
             signaturePublicKey = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=",
             deviceType = com.ismartcoding.plain.platform.system.DeviceType.PHONE,
-            version = "4.0.0", platform = "Android", lastSeen = "",
+            version = "4.0.0", platform = "Android", lastSeen = kotlin.time.Instant.fromEpochMilliseconds(0),
             status = com.ismartcoding.plain.features.nearby.PeerStatus.PAIRED,
         )
         ActivityScenario.launch(MainActivity::class.java).use { scenario ->
@@ -2006,7 +2007,7 @@ class ManagedDeviceUiAcceptanceTest {
                     path, bytes.asSequence().chunked(65537).map { it.toByteArray() }.iterator(),
                 ))
                 assertArrayEquals(bytes, java.io.File(path).readBytes())
-                assertEquals(bytes.size.toLong(), GraphqlApi.execute(Query.fileInfo(path)).size)
+                assertEquals(bytes.size.toLong(), checkNotNull(GraphqlApi.execute(Query.fileInfo(path))).size)
                 report("local_file_chunks", "native_replace_exact_bytes_verified")
             } finally {
                 GraphqlApi.execute(Mutation.deleteFiles(listOf(directory)))
@@ -2213,7 +2214,7 @@ class ManagedDeviceUiAcceptanceTest {
                 report("owned_note_image_reference", imageReference)
                 click(text(Res.string.confirm), "insert target image")
                 awaitValue("remote note image saved") { remote.execute(Query.note(note.id))?.takeIf { it.content.contains(imageReference) } }
-                assertEquals(picked.length(), remote.execute(Query.fileInfo(imageReference)).size)
+                assertEquals(picked.length(), checkNotNull(remote.execute(Query.fileInfo(imageReference))).size)
                 val fileQuery = "text:" + imageReference.substringAfterLast('/')
                 assertEquals(0, remote.execute(Query.appFileCount(fileQuery)))
                 assertEquals(0, GraphqlApi.execute(Query.appFileCount(fileQuery)))
@@ -2230,7 +2231,7 @@ class ManagedDeviceUiAcceptanceTest {
                 remote.execute(Mutation.deleteChatItem(sent.id))
                 messageId = null
                 attachment = null
-                assertEquals(picked.length(), remote.execute(Query.fileInfo(imageReference)).size)
+                assertEquals(picked.length(), checkNotNull(remote.execute(Query.fileInfo(imageReference))).size)
                 assertTrue(checkNotNull(remote.execute(Query.note(note.id))).content.contains(imageReference))
                 assertEquals(beforeImages, imageNames())
                 assertNull(GraphqlApi.execute(Query.note(note.id)))
@@ -2244,16 +2245,16 @@ class ManagedDeviceUiAcceptanceTest {
                 val targetSource = preview.source as com.ismartcoding.plain.rust.graphql.ContentSource.Remote
                 assertEquals(qrValue, com.ismartcoding.plain.ui.platform.media.tryDecodeQrCode(imageReference, preview.source))
                 val output = targetSource.info.downloadsDir.trimEnd('/') + "/" + imageReference.substringAfterLast('/')
-                assertEquals(0L, remote.execute(Query.fileInfo(output)).size)
+                assertEquals(0L, checkNotNull(remote.execute(Query.fileInfo(output))).size)
                 savedImage = output
                 click(text(Res.string.save), "save remote image")
                 click(text(Res.string.download_to_downloads), "save to target Downloads")
                 awaitValue("image saved on the target") {
-                    remote.execute(Query.fileInfo(output)).size.takeIf { it == picked.length() }
+                    checkNotNull(remote.execute(Query.fileInfo(output))).size.takeIf { it == picked.length() }
                 }
                 assertEquals(beforeDownloads, downloaded.list()?.toSet().orEmpty())
                 assertEquals(beforeImages, imageNames())
-                assertEquals(picked.length(), remote.execute(Query.fileInfo(imageReference)).size)
+                assertEquals(picked.length(), checkNotNull(remote.execute(Query.fileInfo(imageReference))).size)
                 report("remote_note_image", "target_store_preview_and_target_save_verified_local_absent")
             } catch (error: Throwable) {
                 failure = error
@@ -2296,7 +2297,10 @@ class ManagedDeviceUiAcceptanceTest {
             val nativePlayback = GraphqlApi.execute(Query.audioPlayback())
             val targetQueue = remote.execute(Query.audioQueueItems(0, 10000, ""))
             val targetPlayback = remote.execute(Query.audioPlayback())
-            assertFalse("Target player must be idle before acceptance", targetPlayback.isPlaying)
+            var controllerPlaying = false
+            instrumentation.runOnMainSync { controllerPlaying = com.ismartcoding.plain.platform.media.AndroidAudioPlayer.isPlaying() }
+            assertFalse("Controller player must be idle before acceptance", controllerPlaying)
+            val targetMode = com.ismartcoding.plain.models.audioPlayMode(remote.execute(Query.prefs(listOf("audio_play_mode"))))
             val historyQuery = "type:AUDIO ids:" + tracks.joinToString(",") { it.id }
             val nativeHistory = GraphqlApi.execute(Query.mediaPlayHistory(historyQuery, 0, 100))
             val previousSelection = targetPlayback.mediaId?.takeIf { id ->
@@ -2325,7 +2329,7 @@ class ManagedDeviceUiAcceptanceTest {
                 }
                 var sdkPath = ""
                 instrumentation.runOnMainSync { sdkPath = com.ismartcoding.plain.platform.media.createAudioPlayer().currentPath }
-                assertTrue("Renderer must read target /fs", sdkPath.startsWith(checkNotNull(peer.address).baseUrl.trimEnd('/') + "/fs?"))
+                assertTrue("Renderer must read target /fs", sdkPath.startsWith(peer.getBaseUrl().trimEnd('/') + "/fs?"))
                 awaitValue("remote playing history") { remote.execute(Query.mediaPlayHistory(historyQuery, 0, 100)).firstOrNull { it.mediaId == tracks.first().id } }
                 remote.execute(Mutation.addAudioToQueue("ids:=" + tracks.last().id))
                 com.ismartcoding.plain.features.audio.AudioCommands.command(com.ismartcoding.plain.models.AudioCommand.NEXT)
@@ -2355,7 +2359,7 @@ class ManagedDeviceUiAcceptanceTest {
                     }
                     tracks.forEach { remote.execute(Mutation.removeAudioFromQueue(it.id)) }
                     remote.execute(Mutation.deleteFiles(tracks.map { it.path }))
-                    remote.execute(Mutation.updateAudioPlayMode(targetPlayback.mode))
+                    remote.execute(Mutation.updateAudioPlayMode(targetMode))
                     previousSelection?.let { remote.execute(Mutation.selectAudio(it)) }
                     assertEquals(targetQueue.map { it.mediaId }, remote.execute(Query.audioQueueItems(0, 10000, "")).map { it.mediaId })
                 } catch (cleanup: Throwable) {

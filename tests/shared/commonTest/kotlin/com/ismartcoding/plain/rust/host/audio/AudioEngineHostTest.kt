@@ -6,6 +6,7 @@ import com.ismartcoding.plain.platform.media.AudioPlayer
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
+import kotlinx.coroutines.withContext
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.*
 import kotlinx.serialization.json.*
@@ -117,8 +118,11 @@ class AudioEngineHostTest {
         try {
             val audio = AudioItem(title = "Remote", artist = "", path = "https://fixture.invalid/fs?id=first", durationMs = 1000)
             AudioEngineHost.renderRemote(audio, 7, 0, 1f) { first += it }
-            val queued = AudioEngineHost.reportProgress(audio.path, 7, 100)
-            AudioEngineHost.renderRemote(audio.copy(path = "https://fixture.invalid/fs?id=second"), 8, 0, 1f) { second += it }
+            val queued = withContext(Dispatchers.Main) {
+                val pending = AudioEngineHost.reportProgress(audio.path, 7, 100)
+                AudioEngineHost.renderRemote(audio.copy(path = "https://fixture.invalid/fs?id=second"), 8, 0, 1f) { second += it }
+                pending
+            }
             queued?.join()
             AudioEngineHost.reportProgress(audio.path, 7, 200)?.join()
             AudioEngineHost.reportProgress(player.currentPath, 8, 300)?.join()
