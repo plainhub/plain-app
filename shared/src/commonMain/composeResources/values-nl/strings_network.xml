@@ -44,7 +44,7 @@
     <string name="token">Token</string>
     <string name="api_url">API URL</string>
     <string name="web_url">Web-URL</string>
-    <string name="auth_dev_token_tips">Clients moeten zowel c-id: &lt;client_id&gt; als Authorization: Bearer &lt;token&gt; in de verzoekkopteksten opnemen, of hetzelfde paar gebruiken om de API-payload te versleutelen. Als het token in de verzoekkopteksten wordt opgegeven, wordt het antwoord als platte tekst geretourneerd.</string>
+    <string name="auth_dev_token_tips">Gebruik HTTPS als u een token in headers verstuurt. Vertrouw het apparaatcertificaat; schakel certificaatverificatie niet uit. Clients moeten zowel c-id: &lt;client_id&gt; als Authorization: Bearer &lt;token&gt; in de verzoekkopteksten opnemen, of hetzelfde paar gebruiken om de API-payload te versleutelen. Als het token in de verzoekkopteksten wordt opgegeven, wordt het antwoord als platte tekst geretourneerd.</string>
     <string name="browser_https_error_tips">Als u de fout "Uw verbinding is niet privé" ziet, klikt u eenvoudig op de knop "Geavanceerd" en vervolgens op de knop "Doorgaan naar …", dan zal Chrome deze URL vertrouwen voor de rest van de browsersessie.</string>
     <string name="screen_mirror_service_is_running">Schermspiegelservice is actief</string>
     <string name="screen_mirror_audio_permission_settings_message">Microfoontoestemming is uitgeschakeld. Schakel deze in bij Instellingen om systeemaudio te spiegelen.</string>

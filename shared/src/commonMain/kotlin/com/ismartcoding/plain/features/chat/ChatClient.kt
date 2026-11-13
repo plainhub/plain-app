@@ -27,7 +27,7 @@ open class ChatApi internal constructor(private val api: com.ismartcoding.plain.
     suspend fun getChatItem(id: String): ChatItem? = records.getById(id)
 
     suspend fun sendContent(target: ChatTarget, content: MessageContent): ChatItem =
-        api.execute(Mutation.sendChatItem(target.encodedToId, content.toJSONString())).single()
+        api.execute(Mutation.sendChatItems(listOf(target.encodedToId), content.toJSONString())).single()
 
     suspend fun sendText(target: ChatTarget, text: String): ChatItem =
         sendContent(target, MessageContent(MessageType.TEXT, MessageText(text)))

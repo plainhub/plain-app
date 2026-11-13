@@ -44,7 +44,7 @@
     <string name="token">Gettone</string>
     <string name="api_url">URL API</string>
     <string name="web_url">URL web</string>
-    <string name="auth_dev_token_tips">I client devono includere sia c-id: &lt;client_id&gt; che Authorization: Bearer &lt;token&gt; nelle intestazioni della richiesta, oppure utilizzare la stessa coppia per crittografare il payload dell'API. Se il token viene fornito nelle intestazioni della richiesta, la risposta verrà restituita in testo normale.</string>
+    <string name="auth_dev_token_tips">Usa HTTPS per inviare un token negli header. Considera attendibile il certificato del dispositivo senza disabilitarne la verifica. I client devono includere sia c-id: &lt;client_id&gt; che Authorization: Bearer &lt;token&gt; nelle intestazioni della richiesta, oppure utilizzare la stessa coppia per crittografare il payload dell'API. Se il token viene fornito nelle intestazioni della richiesta, la risposta verrà restituita in testo normale.</string>
     <string name="browser_https_error_tips">Se visualizzi l'errore "La tua connessione non è privata", clicca semplicemente il pulsante "Avanzate" e poi il pulsante "Procedi a …", così Chrome confiderà questo URL per il resto della sessione del browser.</string>
     <string name="screen_mirror_service_is_running">Il servizio di duplicazione dello schermo è in esecuzione</string>
     <string name="screen_mirror_audio_permission_settings_message">L'autorizzazione del microfono è disattivata. Abilitala nelle Impostazioni per specchiare l'audio di sistema.</string>

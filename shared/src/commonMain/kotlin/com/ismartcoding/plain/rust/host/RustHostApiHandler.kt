@@ -6,7 +6,7 @@ import com.ismartcoding.plain.features.chat.peer.PeerTransportState
 import com.ismartcoding.plain.rust.host.audio.AudioPlaybackState
 import com.ismartcoding.plain.features.audio.AudioQueueClient
 import com.ismartcoding.plain.features.nearby.BleScanDriver
-import com.ismartcoding.plain.features.nearby.PairingProjection
+import com.ismartcoding.plain.ui.nearby.PairingProjection
 import com.ismartcoding.plain.lib.JsonHelper
 import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.platform.files.FileResourceHost

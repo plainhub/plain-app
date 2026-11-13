@@ -1,5 +1,6 @@
 package com.ismartcoding.plain.graphql
 
+import com.ismartcoding.plain.models.PlaybackType
 import com.ismartcoding.plain.features.files.FileSortBy
 
 import com.ismartcoding.plain.models.AdvancedAudioSelection
@@ -66,12 +67,6 @@ object Mutation {
         $$"mutation($id: ID!, $text: String!) { editChatText(id: $id, text: $text) { changed chat { $${Fragments.CHAT_ITEM} } } }",
         mapOf(variable("id", id), variable("text", text)),
         field = "editChatText",
-    )
-
-    fun sendChatItem(target: String, content: String): GraphqlRequest<List<ChatItem>> = GraphqlRequest(
-        $$"mutation($target: String!, $content: String!) { sendChatItem(target: $target, content: $content) { $${Fragments.CHAT_ITEM} } }",
-        mapOf(variable("target", target), variable("content", content)),
-        field = "sendChatItem",
     )
 
     fun forwardChatItems(id: String, targets: Collection<String>): GraphqlRequest<List<ChatItem>> = GraphqlRequest(
@@ -184,14 +179,14 @@ object Mutation {
         field = "exportFeeds",
     )
 
-    fun saveMediaPlayProgress(mediaId: String, type: DataType, positionMs: Long): GraphqlRequest<Unit> = GraphqlRequest(
-        $$"mutation($mediaId: ID!, $type: MediaDataType!, $positionMs: Long!) { saveMediaPlayProgress(mediaId: $mediaId, type: $type, positionMs: $positionMs) }",
+    fun saveMediaPlayProgress(mediaId: String, type: PlaybackType, positionMs: Long): GraphqlRequest<Unit> = GraphqlRequest(
+        $$"mutation($mediaId: ID!, $type: PlaybackType!, $positionMs: Long!) { saveMediaPlayProgress(mediaId: $mediaId, type: $type, positionMs: $positionMs) }",
         mapOf(variable("mediaId", mediaId), variable("type", type.name), variable("positionMs", positionMs)),
         field = "saveMediaPlayProgress",
     )
 
-    fun recordMediaPlay(mediaId: String, type: DataType, positionMs: Long): GraphqlRequest<Unit> = GraphqlRequest(
-        $$"mutation($mediaId: ID!, $type: MediaDataType!, $positionMs: Long!) { recordMediaPlay(mediaId: $mediaId, type: $type, positionMs: $positionMs) }",
+    fun recordMediaPlay(mediaId: String, type: PlaybackType, positionMs: Long): GraphqlRequest<Unit> = GraphqlRequest(
+        $$"mutation($mediaId: ID!, $type: PlaybackType!, $positionMs: Long!) { recordMediaPlay(mediaId: $mediaId, type: $type, positionMs: $positionMs) }",
         mapOf(variable("mediaId", mediaId), variable("type", type.name), variable("positionMs", positionMs)),
         field = "recordMediaPlay",
     )

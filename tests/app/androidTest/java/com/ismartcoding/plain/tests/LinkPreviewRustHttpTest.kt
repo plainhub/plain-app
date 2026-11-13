@@ -35,7 +35,7 @@ class LinkPreviewRustHttpTest {
             hash = image.id
             val content = MessageContent(MessageType.TEXT, MessageText(url,
                 listOf(LinkPreview(url = url, title = id, imageLocalPath = AppFileStore.toFidUri(image))))).toJSONString()
-            val value = GraphqlApi.execute(GraphqlRequest<JsonObject>("mutation(\$content:String!){sendChatItem(target: \"peer:local\", content: \$content) { id fromId toId channelId content status statusData createdAt updatedAt }}", mapOf("content" to JsonPrimitive(content)))).getValue("sendChatItem").jsonArray.single()
+            val value = GraphqlApi.execute(GraphqlRequest<JsonObject>("mutation(\$content:String!){sendChatItems(targets: [\"peer:local\"], content: \$content) { id fromId toId channelId content status statusData createdAt updatedAt }}", mapOf("content" to JsonPrimitive(content)))).getValue("sendChatItems").jsonArray.single()
             val chat = JsonHelper.jsonDecodeFromElement<ChatItem>(value)
             id = chat.id
             val stale = ChatItem(id = id, toId = "stale", content = MessageContent(MessageType.TEXT, MessageText("stale")).toJSONString())

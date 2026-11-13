@@ -4,7 +4,7 @@ import com.ismartcoding.plain.graphql.Mutation
 import com.ismartcoding.plain.models.AudioCommand
 import com.ismartcoding.plain.models.AudioItem
 import com.ismartcoding.plain.models.AudioPlayback
-import com.ismartcoding.plain.platform.system.DataType
+import com.ismartcoding.plain.models.PlaybackType
 import com.ismartcoding.plain.rust.graphql.ContentSource
 import com.ismartcoding.plain.rust.host.audio.AudioEngineHost
 import com.ismartcoding.plain.rust.host.audio.AudioHostReport
@@ -30,8 +30,8 @@ internal class RemoteAudioPlayback(private val source: ContentSource.Remote) {
         AudioCommands.bindRemoteOutput(source, item, resource)
         AudioEngineHost.renderRemote(item.copy(path = resource.url), playback.revision, playback.positionMs, speed) { report ->
             when (report) {
-                is AudioHostReport.Started -> item.mediaId?.let { source.history.recordPlay(it, DataType.AUDIO, 0).join() }
-                is AudioHostReport.Progress -> item.mediaId?.let { source.history.saveProgress(it, DataType.AUDIO, report.positionMs).join() }
+                is AudioHostReport.Started -> item.mediaId?.let { source.history.recordPlay(it, PlaybackType.AUDIO, 0).join() }
+                is AudioHostReport.Progress -> item.mediaId?.let { source.history.saveProgress(it, PlaybackType.AUDIO, report.positionMs).join() }
                 is AudioHostReport.Completed -> AudioCommands.submitRemoteCompletion(source, item.path, playback.revision)
             }
         }

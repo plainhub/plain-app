@@ -6,5 +6,5 @@ import com.ismartcoding.plain.rust.graphql.GraphqlApi
 
 object RustPairingCode {
     suspend fun parse(code: String): NearbyDevice? =
-        GraphqlApi.execute(Query.parsePairingCode(code))
+        GraphqlApi.execute(Query.parsePairingQrCode(code))
 }

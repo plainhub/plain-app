@@ -15,7 +15,6 @@ import com.ismartcoding.plain.i18n.error
 import com.ismartcoding.plain.i18n.already_added
 import kotlinx.coroutines.CancellationException
 import com.ismartcoding.plain.i18n.invalid_url
-import com.ismartcoding.plain.models.FeedPreview
 import com.ismartcoding.plain.ui.i18n.LocaleHelper
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -34,7 +33,7 @@ class FeedsViewModel internal constructor(val source: ContentSource = ContentSou
     var editName = mutableStateOf("")
     var editFetchContent = mutableStateOf(false)
     var editUrlError = mutableStateOf("")
-    var feedPreview = mutableStateOf<FeedPreview?>(null)
+    val feedTitleFetched = mutableStateOf(false)
 
     override var selectMode = mutableStateOf(false)
     override val selectedIds = mutableStateListOf<String>()
@@ -85,10 +84,10 @@ class FeedsViewModel internal constructor(val source: ContentSource = ContentSou
         val url = editUrl.value
         viewModelScope.launchSafe {
             try {
-                val preview = source.feeds.preview(url)
+                val title = source.feeds.fetchTitle(url)
                 if (!showAddDialog.value || editUrl.value != url) return@launchSafe
-                feedPreview.value = preview
-                editName.value = preview.title
+                editName.value = title
+                feedTitleFetched.value = true
             } catch (cancelled: CancellationException) {
                 throw cancelled
             } catch (e: Exception) {
@@ -120,7 +119,7 @@ class FeedsViewModel internal constructor(val source: ContentSource = ContentSou
     }
 
     fun showAddDialog() {
-        feedPreview.value = null
+        feedTitleFetched.value = false
         editUrlError.value = ""
         editUrl.value = ""
         editName.value = ""

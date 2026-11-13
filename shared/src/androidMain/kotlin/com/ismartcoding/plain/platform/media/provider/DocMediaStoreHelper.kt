@@ -66,7 +66,7 @@ object DocMediaStoreHelper : BaseMediaContentHelper() {
             val bucketId = if (isQPlus()) {
                 cursor.getStringValue(MediaStore.MediaColumns.BUCKET_ID, cache)
             } else ""
-            Document(id = id, title = title, path = path, extension = path.substringAfterLast('/').substringAfterLast('.', ""), durationMs = 0, size = size, bucketId = bucketId, createdAt = createdAt, updatedAt = updatedAt)
+            Document(id = id, title = title, path = path, extension = path.substringAfterLast('/').substringAfterLast('.', ""), size = size, bucketId = bucketId, createdAt = createdAt, updatedAt = updatedAt)
         } ?: emptyList()
     }
 

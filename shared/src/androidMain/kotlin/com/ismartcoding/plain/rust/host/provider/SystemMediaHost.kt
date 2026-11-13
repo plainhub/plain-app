@@ -85,7 +85,7 @@ internal object SystemMediaHost {
             durationMs = item.durationMs, takenAt = item.takenAt, isFavorite = item.isFavorite, width = item.width, height = item.height, rotation = item.rotation)
         is Doc -> mediaFacts(
             item.id, item.title, item.path, item.size, item.bucketId, item.createdAt, item.updatedAt,
-            durationMs = item.durationMs, takenAt = null, isFavorite = false)
+            durationMs = 0L, takenAt = null, isFavorite = false)
         else -> error("Unsupported media row ${item::class.simpleName}")
     }
 

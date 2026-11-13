@@ -1,6 +1,5 @@
 package com.ismartcoding.plain.models
 
-import com.ismartcoding.plain.IMedia
 import kotlin.time.Instant
 import kotlinx.serialization.Serializable
 
@@ -14,5 +13,4 @@ data class Doc(
     override var bucketId: String,
     override var createdAt: Instant,
     override var updatedAt: Instant,
-    override var durationMs: Long = 0,
-) : MediaItem, IMedia
+) : MediaItem

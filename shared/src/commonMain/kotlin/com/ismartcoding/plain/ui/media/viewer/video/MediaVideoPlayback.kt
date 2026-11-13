@@ -11,7 +11,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import com.ismartcoding.plain.features.media.MediaPlayHistoryClient
 import com.ismartcoding.plain.platform.media.getVideoMediaId
-import com.ismartcoding.plain.platform.system.DataType
+import com.ismartcoding.plain.models.PlaybackType
 import com.ismartcoding.plain.ui.media.viewer.PreviewItem
 import com.ismartcoding.plain.ui.platform.media.rememberVideoPlayerController
 import com.ismartcoding.plain.ui.state.launchSafe
@@ -39,7 +39,7 @@ internal fun rememberMediaVideoController(
         val id = mediaId
         val positionMs = controller.currentPositionMs
         if (id.isEmpty() || positionMs < 0) return
-        model.source.history.saveProgress(id, DataType.VIDEO, positionMs)
+        model.source.history.saveProgress(id, PlaybackType.VIDEO, positionMs)
     }
 
     controller.setEventListener { event ->
@@ -50,7 +50,7 @@ internal fun rememberMediaVideoController(
                 val id = mediaId
                 val positionMs = controller.currentPositionMs
                 if (event.isPlaying && !playRecorded && id.isNotEmpty() && positionMs >= 0) {
-                    model.source.history.recordPlay(id, DataType.VIDEO, positionMs)
+                    model.source.history.recordPlay(id, PlaybackType.VIDEO, positionMs)
                     playRecorded = true
                 }
                 videoState.isPlaying = event.isPlaying
@@ -81,7 +81,7 @@ internal fun rememberMediaVideoController(
             if (isActive) {
                 if (mediaId.isEmpty() && model.source is com.ismartcoding.plain.rust.graphql.ContentSource.Local) mediaId = getVideoMediaId(model.path).orEmpty()
                 val savedPos = if (mediaId.isNotEmpty()) {
-                    model.source.history.find(mediaId, DataType.VIDEO, Clock.System.now() - 30.days)?.positionMs
+                    model.source.history.find(mediaId, PlaybackType.VIDEO, Clock.System.now() - 30.days)?.positionMs
                 } else null
                 if (!videoState.isPreviewerOpen || pagerState.settledPage != page) return@launchSafe
                 videoState.initData(controller)

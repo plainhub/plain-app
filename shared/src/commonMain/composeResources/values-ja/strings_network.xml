@@ -44,7 +44,7 @@
     <string name="token">トークン</string>
     <string name="api_url">API URL</string>
     <string name="web_url">Web URL</string>
-    <string name="auth_dev_token_tips">クライアントはリクエストヘッダーに c-id: &lt;client_id&gt; と Authorization: Bearer &lt;token&gt; の両方を含めるか、同じペアを使用して API ペイロードを暗号化する必要があります。トークンがリクエストヘッダーで提供された場合、レスポンスはプレーンテキストで返されます。</string>
+    <string name="auth_dev_token_tips">ヘッダーでトークンを送信する場合は HTTPS を使用してください。デバイスの証明書を信頼し、証明書の検証は無効にしないでください。 クライアントはリクエストヘッダーに c-id: &lt;client_id&gt; と Authorization: Bearer &lt;token&gt; の両方を含めるか、同じペアを使用して API ペイロードを暗号化する必要があります。トークンがリクエストヘッダーで提供された場合、レスポンスはプレーンテキストで返されます。</string>
     <string name="browser_https_error_tips">"Your connection is not private"エラーが表示された場合は、「詳細」ボタンをクリックし、「...に進む」ボタンをクリックするだけで、ChromeがこのURLをブラウザセッションの残りの期間信頼します。</string>
     <string name="screen_mirror_service_is_running">スクリーンミラーサービスが実行されています</string>
     <string name="screen_mirror_audio_permission_settings_message">マイクの権限が無効です。システムオーディオをミラーリングするには、設定で有効にしてください。</string>

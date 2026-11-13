@@ -35,10 +35,10 @@ fun ApiTokenTipsPage(
     token: String,
 ) {
     val hostname by Prefs.mdnsHostname.collectAsState()
-    val httpPort = Prefs.httpPort.collectAsState()
+    val httpsPort = Prefs.httpsPort.collectAsState()
 
-    val curlReal = remember(clientId, token, hostname, httpPort.value) {
-        """curl -X POST "${UrlHelper.buildUrl("http", hostname, httpPort.value, "/graphql")}" -H "c-id: $clientId" -H "Authorization: Bearer $token" -H "Content-Type: application/json" --data '{"query":"{ app { appVersion } }"}'"""
+    val curlReal = remember(clientId, token, hostname, httpsPort.value) {
+        """curl -X POST "${UrlHelper.buildUrl("https", hostname, httpsPort.value, "/graphql")}" -H "c-id: $clientId" -H "Authorization: Bearer $token" -H "Content-Type: application/json" --data '{"query":"{ app { appVersion } }"}'"""
     }
 
     PScaffold(

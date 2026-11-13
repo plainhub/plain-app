@@ -40,7 +40,6 @@ import com.ismartcoding.plain.models.Feed
 import com.ismartcoding.plain.models.FeedEntry
 import com.ismartcoding.plain.models.FeedEntryCount
 import com.ismartcoding.plain.models.FeedError
-import com.ismartcoding.plain.models.FeedPreview
 import com.ismartcoding.plain.models.FeedSyncState
 import com.ismartcoding.plain.models.File
 import com.ismartcoding.plain.models.Image
@@ -110,7 +109,6 @@ class GraphqlModelContractTest {
             "Doc" to Doc.serializer().descriptor,
             "FavoriteFolder" to FavoriteFolder.serializer().descriptor,
             "Feed" to Feed.serializer().descriptor,
-            "FeedPreview" to FeedPreview.serializer().descriptor,
             "FeedEntry" to FeedEntry.serializer().descriptor,
             "FeedEntryCount" to FeedEntryCount.serializer().descriptor,
             "FeedError" to FeedError.serializer().descriptor,

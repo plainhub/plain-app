@@ -3,7 +3,6 @@ package com.ismartcoding.plain.features.feeds
 import com.ismartcoding.plain.graphql.Mutation
 import com.ismartcoding.plain.graphql.Query
 import com.ismartcoding.plain.models.Feed
-import com.ismartcoding.plain.models.FeedPreview
 import com.ismartcoding.plain.models.FeedSyncState
 import com.ismartcoding.plain.rust.graphql.GraphqlClient
 import com.ismartcoding.plain.rust.graphql.GraphqlApi
@@ -22,8 +21,8 @@ internal open class FeedsApi(
     suspend fun getById(id: String): Feed? =
         api.execute(Query.feed(id))
 
-    suspend fun preview(url: String): FeedPreview =
-        api.execute(Query.feedPreview(url))
+    suspend fun fetchTitle(url: String): String =
+        api.execute(Query.fetchFeedTitle(url))
 
     suspend fun create(url: String, name: String, fetchContent: Boolean = false): Feed =
         api.execute(Mutation.createFeed(url, name, fetchContent))

@@ -44,7 +44,7 @@
     <string name="token">Belirteç</string>
     <string name="api_url">API URL'si</string>
     <string name="web_url">Web URL'si</string>
-    <string name="auth_dev_token_tips">İstemciler, istek başlıklarına hem c-id: &lt;client_id&gt; hem de Authorization: Bearer &lt;token&gt; dahil etmeli ya da API yükünü şifrelemek için aynı çifti kullanmalıdır. Token istek başlıklarında sağlanırsa, yanıt düz metin olarak döndürülür.</string>
+    <string name="auth_dev_token_tips">Başlıklarda belirteç gönderirken HTTPS kullanın. Cihaz sertifikasına güvenin; sertifika doğrulamasını devre dışı bırakmayın. İstemciler, istek başlıklarına hem c-id: &lt;client_id&gt; hem de Authorization: Bearer &lt;token&gt; dahil etmeli ya da API yükünü şifrelemek için aynı çifti kullanmalıdır. Token istek başlıklarında sağlanırsa, yanıt düz metin olarak döndürülür.</string>
     <string name="browser_https_error_tips">Eğer "Bağlantınız gizli değil" hatası görürseniz, sadece "Gelişmiş" düğmesine tıklayın ve "… devam et" düğmesine tıklayın, sonra Chrome bu URL'ye tarayıcı oturumu boyunca güvenecektir.</string>
     <string name="screen_mirror_service_is_running">Ekran yansıtma hizmeti çalışıyor</string>
     <string name="screen_mirror_audio_permission_settings_message">Mikrofon izni devre dışı. Sistem sesini yansıtmak için Ayarlar bölümünden etkinleştirin.</string>

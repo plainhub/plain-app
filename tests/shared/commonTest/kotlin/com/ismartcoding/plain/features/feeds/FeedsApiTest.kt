@@ -46,20 +46,20 @@ class FeedsApiTest {
     }
 
     @Test
-    fun preview_is_one_query_without_mutations_and_decodes_the_contract_dto() = runTest {
+    fun fetch_title_is_one_query_without_mutations_and_decodes_a_string() = runTest {
         val requests = mutableListOf<GraphqlOperation>()
         val api = FeedsApi(
             api = graphqlClient(
                 query = {
                     requests.add(it)
-                    JsonHelper.jsonDecode<JsonObject>("""{"feedPreview":{"title":"A & B"}}""")
+                    JsonHelper.jsonDecode<JsonObject>("""{"fetchFeedTitle":"A & B"}""")
                 },
                 mutate = { error("Preview must not persist: $it") },
             ),
         )
-        assertEquals("A & B", api.preview("https://example.org/feed").title)
+        assertEquals("A & B", api.fetchTitle("https://example.org/feed"))
         assertEquals(1, requests.size)
-        assertTrue(requests.single().query.contains("feedPreview("))
+        assertTrue(requests.single().query.contains("fetchFeedTitle("))
     }
     @Test
     fun list_and_counts_share_one_request_and_project_the_returned_counts() = runTest {

@@ -15,7 +15,7 @@ class MainModelProjectionTest {
         val item: IData = image
         assertEquals("image", item.id)
         assertEquals(IntSize(480, 640), image.getRotatedSize())
-        val doc = JsonHelper.jsonDecode<Doc>("""{"id":"document","title":"Report","path":"/report","size":99,"bucketId":"documents","createdAt":"2026-10-15T00:00:00Z","updatedAt":"2026-10-15T00:00:00Z","extension":"pdf","durationMs":0}""")
+        val doc = JsonHelper.jsonDecode<Doc>("""{"id":"document","title":"Report","path":"/report","size":99,"bucketId":"documents","createdAt":"2026-10-15T00:00:00Z","updatedAt":"2026-10-15T00:00:00Z","extension":"pdf"}""")
         assertEquals("pdf", doc.extension)
         assertEquals(99L, doc.size)
     }

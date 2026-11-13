@@ -35,13 +35,13 @@ class ClientContractModelsTest {
     @Test
     fun nearby_devices_decode_every_supported_discovery_method() {
         val device = JsonHelper.jsonDecode<NearbyDevice>(
-            """{"id":"device","signaturePublicKey":"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=","name":"Device","port":8080,"deviceType":"PHONE","version":"1","platform":"android","lastSeen":"2026-01-01T00:00:00Z","status":"UNPAIRED","discoveryMethods":["LAN","DNS_SD","BLE","QR"]}""",
+            """{"id":"device","signaturePublicKey":"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=","name":"Device","port":8080,"deviceType":"PHONE","version":"1","platform":"android","lastSeen":"2026-01-01T00:00:00Z","status":"UNPAIRED","discoveryMethods":["LAN","BLE","QR"]}""",
         )
         assertEquals(DeviceType.PHONE, device.deviceType)
         assertEquals(Instant.parse("2026-01-01T00:00:00Z"), device.lastSeen)
         assertEquals(PeerStatus.UNPAIRED, device.status)
         assertEquals(
-            listOf(DiscoveryMethod.LAN, DiscoveryMethod.DNS_SD, DiscoveryMethod.BLE, DiscoveryMethod.QR),
+            listOf(DiscoveryMethod.LAN, DiscoveryMethod.BLE, DiscoveryMethod.QR),
             device.discoveryMethods,
         )
     }

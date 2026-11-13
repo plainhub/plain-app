@@ -44,7 +44,7 @@
     <string name="token">Token</string>
     <string name="api_url">API-URL</string>
     <string name="web_url">Web-URL</string>
-    <string name="auth_dev_token_tips">Clients müssen sowohl c-id: &lt;client_id&gt; als auch Authorization: Bearer &lt;token&gt; in den Anfrage-Headern angeben oder dasselbe Paar zur Verschlüsselung des API-Payloads verwenden. Wenn das Token in den Anfrage-Headern angegeben wird, wird die Antwort im Klartext zurückgegeben.</string>
+    <string name="auth_dev_token_tips">Verwenden Sie HTTPS, wenn Sie ein Token in Headern senden. Vertrauen Sie dem Gerätezertifikat; deaktivieren Sie die Zertifikatsprüfung nicht. Clients müssen sowohl c-id: &lt;client_id&gt; als auch Authorization: Bearer &lt;token&gt; in den Anfrage-Headern angeben oder dasselbe Paar zur Verschlüsselung des API-Payloads verwenden. Wenn das Token in den Anfrage-Headern angegeben wird, wird die Antwort im Klartext zurückgegeben.</string>
     <string name="browser_https_error_tips">Wenn du den Fehler "Deine Verbindung ist nicht privat" siehst, klicke einfach auf die Schaltfläche "Erweitert" und dann auf die Schaltfläche "Zu … fortsetzen", dann vertraut Chrome dieser URL für den Rest der Browsersitzung.</string>
     <string name="screen_mirror_service_is_running">Der Bildschirmspiegelungsdienst läuft</string>
     <string name="screen_mirror_audio_permission_settings_message">Die Mikrofonberechtigung ist deaktiviert. Bitte aktivieren Sie sie in den Einstellungen, um Systemaudio zu spiegeln.</string>

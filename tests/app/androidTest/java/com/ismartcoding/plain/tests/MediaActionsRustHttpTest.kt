@@ -1,6 +1,7 @@
 package com.ismartcoding.plain.tests
 
 
+import com.ismartcoding.plain.models.PlaybackType
 import com.ismartcoding.plain.graphql.Mutation
 import com.ismartcoding.plain.rust.graphql.GraphqlApi
 import com.ismartcoding.plain.graphql.Query
@@ -128,7 +129,7 @@ class MediaActionsRustHttpTest {
             assertFalse(File(path).exists())
             val (videoId,videoPath) = create(DataType.VIDEO)
             videoIds.add(videoId)
-            GraphqlApi.execute(Mutation.saveMediaPlayProgress(videoId, DataType.VIDEO, 5_000_000_001L))
+            GraphqlApi.execute(Mutation.saveMediaPlayProgress(videoId, PlaybackType.VIDEO, 5_000_000_001L))
             TagsClient.editTagRelations(DataType.VIDEO,listOf(videoId),listOf(videoTag),emptyList())
             trashMedia(DataType.VIDEO,setOf(videoId))
             assertTrue(GraphqlApi.execute(Query.mediaPlayHistory("type:VIDEO ids:=$videoId", 0, 20)).none { it.mediaId == videoId })

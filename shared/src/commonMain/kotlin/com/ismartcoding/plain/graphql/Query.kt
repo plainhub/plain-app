@@ -36,7 +36,6 @@ import com.ismartcoding.plain.models.Doc
 import com.ismartcoding.plain.models.FavoriteFolder
 import com.ismartcoding.plain.models.Feed
 import com.ismartcoding.plain.models.FeedEntry
-import com.ismartcoding.plain.models.FeedPreview
 import com.ismartcoding.plain.models.FeedSyncState
 import com.ismartcoding.plain.models.File as FileEntry
 import com.ismartcoding.plain.models.Image
@@ -124,10 +123,10 @@ object Query {
         field = "nearbyDevices",
     )
 
-    fun parsePairingCode(code: String): GraphqlRequest<NearbyDevice?> = GraphqlRequest(
-        $$"query($code: String!) { parsePairingCode(code: $code) { $${Fragments.NEARBY_DEVICE_FIELDS} } }",
+    fun parsePairingQrCode(code: String): GraphqlRequest<NearbyDevice?> = GraphqlRequest(
+        $$"query($code: String!) { parsePairingQrCode(code: $code) { $${Fragments.NEARBY_DEVICE_FIELDS} } }",
         mapOf(variable("code", code)),
-        field = "parsePairingCode",
+        field = "parsePairingQrCode",
     )
 
     fun mdnsState(debug: Boolean = false): GraphqlRequest<MdnsSnapshot> = GraphqlRequest(
@@ -165,10 +164,10 @@ object Query {
         field = "feed",
     )
 
-    fun feedPreview(url: String): GraphqlRequest<FeedPreview> = GraphqlRequest(
-        $$"query($url: String!) { feedPreview(url: $url) { title } }",
+    fun fetchFeedTitle(url: String): GraphqlRequest<String> = GraphqlRequest(
+        $$"query($url: String!) { fetchFeedTitle(url: $url) }",
         mapOf(variable("url", url)),
-        field = "feedPreview",
+        field = "fetchFeedTitle",
     )
 
     fun feedSyncStates(): GraphqlRequest<List<FeedSyncState>> = GraphqlRequest(

@@ -1,5 +1,6 @@
 package com.ismartcoding.plain.tests
 
+import com.ismartcoding.plain.models.PlaybackType
 import android.content.ContentValues
 import android.provider.MediaStore
 import android.util.Base64
@@ -35,14 +36,14 @@ class VideoProgressRustHttpTest {
             values.put(MediaStore.MediaColumns.IS_PENDING, 0)
             assertEquals(1, resolver.update(uri, values, null, null))
             suspend fun current() = GraphqlApi.execute(Query.mediaPlayHistory("type:VIDEO ids:=$id", 0, 1)).single()
-            GraphqlApi.execute(Mutation.saveMediaPlayProgress(id, DataType.VIDEO, 3_000_000_123L))
+            GraphqlApi.execute(Mutation.saveMediaPlayProgress(id, PlaybackType.VIDEO, 3_000_000_123L))
             val row = current()
             assertEquals(3_000_000_123L, row.positionMs)
-            assertTrue(runCatching { GraphqlApi.execute(Mutation.saveMediaPlayProgress(id, DataType.VIDEO, -1)) }.isFailure)
+            assertTrue(runCatching { GraphqlApi.execute(Mutation.saveMediaPlayProgress(id, PlaybackType.VIDEO, -1)) }.isFailure)
             assertEquals(row, current())
-            GraphqlApi.execute(Mutation.recordMediaPlay(id, DataType.VIDEO, 456))
+            GraphqlApi.execute(Mutation.recordMediaPlay(id, PlaybackType.VIDEO, 456))
             assertEquals(456L, current().positionMs)
-            GraphqlApi.execute(Mutation.saveMediaPlayProgress(id, DataType.VIDEO, 0))
+            GraphqlApi.execute(Mutation.saveMediaPlayProgress(id, PlaybackType.VIDEO, 0))
             assertEquals(0L, current().positionMs)
         } finally {
             deleteMedia(DataType.VIDEO, setOf(id), false)
