@@ -15,6 +15,7 @@ import com.ismartcoding.plain.models.SelectedMediaPath
 import com.ismartcoding.plain.models.SharedDownloadSnapshot
 import com.ismartcoding.plain.features.chat.models.MessageShare
 import com.ismartcoding.plain.features.files.FileSortBy
+import com.ismartcoding.plain.features.nearby.NearbyDiscoverySnapshot
 import com.ismartcoding.plain.features.nearby.MdnsSnapshot
 import com.ismartcoding.plain.features.sessions.SessionFacts
 import com.ismartcoding.plain.features.shares.SharedLink
@@ -112,6 +113,10 @@ object Query {
     fun isDiscovering(): GraphqlRequest<Boolean> = GraphqlRequest(
         "query { isDiscovering }",
         field = "isDiscovering",
+    )
+
+    fun nearbyDiscovery(): GraphqlRequest<NearbyDiscoverySnapshot> = GraphqlRequest(
+        $$"query { isDiscovering nearbyDevices { $${Fragments.NEARBY_DEVICE_FIELDS} } }",
     )
 
     fun nearbyDevices(): GraphqlRequest<List<NearbyDevice>> = GraphqlRequest(

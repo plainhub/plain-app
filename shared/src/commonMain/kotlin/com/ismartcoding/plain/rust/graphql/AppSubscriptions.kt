@@ -30,9 +30,6 @@ object AppSubscriptions {
                 "ownerPeerId } }",
         )
             .shareIn(scope, SharingStarted.WhileSubscribed())
-    internal val nearbyDevicesChanged =
-        subscription<Boolean>("nearbyDevicesChanged")
-            .shareIn(scope, SharingStarted.WhileSubscribed())
     internal val downloadsChanged =
         subscription<Boolean>("downloadsChanged")
             .shareIn(scope, SharingStarted.WhileSubscribed())

@@ -6,13 +6,13 @@ import kotlin.test.*
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class DiscoverySessionTest {
-    @Test fun status_is_checked_every_three_seconds_without_restarting_an_active_scan() = runTest {
+    @Test fun status_is_checked_every_two_seconds_without_restarting_an_active_scan() = runTest {
         var checks = 0
         val calls = mutableListOf<String>()
         val job = launch { discoverySession({ calls.add("start") }, { calls.add("stop") }, { checks++; true }) }
         runCurrent()
         assertEquals(1, checks)
-        advanceTimeBy(2999)
+        advanceTimeBy(1999)
         runCurrent()
         assertEquals(1, checks)
         advanceTimeBy(1)
@@ -20,7 +20,7 @@ class DiscoverySessionTest {
         assertEquals(2, checks)
         assertTrue(calls.isEmpty())
         job.cancelAndJoin()
-        advanceTimeBy(9000)
+        advanceTimeBy(6000)
         assertEquals(2, checks)
         assertEquals(listOf("stop"), calls)
     }
@@ -34,10 +34,10 @@ class DiscoverySessionTest {
         runCurrent()
         assertEquals(listOf("start"), calls)
         scanning = false
-        advanceTimeBy(3000)
+        advanceTimeBy(2000)
         runCurrent()
         assertEquals(listOf("start", "start"), calls)
-        advanceTimeBy(3000)
+        advanceTimeBy(2000)
         runCurrent()
         assertEquals(listOf("start", "start"), calls)
         job.cancelAndJoin()
@@ -75,7 +75,7 @@ class DiscoverySessionTest {
         }
         runCurrent()
         assertTrue(calls.isEmpty())
-        advanceTimeBy(3000)
+        advanceTimeBy(2000)
         runCurrent()
         assertEquals(listOf("start"), calls)
         job.cancelAndJoin()
