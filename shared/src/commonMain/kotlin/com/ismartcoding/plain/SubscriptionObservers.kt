@@ -19,13 +19,11 @@ import com.ismartcoding.plain.features.chat.channel.ChannelSystemMessageReceiver
 import com.ismartcoding.plain.features.chat.download.DownloadQueue
 import com.ismartcoding.plain.features.images.search.RustImageModels
 import com.ismartcoding.plain.ui.nearby.PairingProjection
-import com.ismartcoding.plain.features.nearby.RustMdnsRuntime
 import com.ismartcoding.plain.features.nearby.RustNearbyDevices
 import com.ismartcoding.plain.ui.pomodoro.PomodoroProjection
 
 internal object SubscriptionObservers {
     fun start(scope: CoroutineScope) {
-        scope.observe(AppSubscriptions.mdnsChanged) { RustMdnsRuntime.refresh() }
         scope.observe(AppSubscriptions.nearbyDevicesChanged) { RustNearbyDevices.apply(RustNearbyDevices.snapshot()) }
         scope.observe(AppSubscriptions.downloadsChanged) { DownloadQueue.refresh() }
         scope.observeData(AppSubscriptions.pairingStarted) { PairingProjection.started(it) }

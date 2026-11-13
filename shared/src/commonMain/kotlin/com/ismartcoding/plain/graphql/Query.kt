@@ -109,6 +109,11 @@ object Query {
 
 
 
+    fun isDiscovering(): GraphqlRequest<Boolean> = GraphqlRequest(
+        "query { isDiscovering }",
+        field = "isDiscovering",
+    )
+
     fun nearbyDevices(): GraphqlRequest<List<NearbyDevice>> = GraphqlRequest(
         $$"query { nearbyDevices { $${Fragments.NEARBY_DEVICE_FIELDS} } }",
         field = "nearbyDevices",

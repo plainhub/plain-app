@@ -5,20 +5,22 @@ import com.ismartcoding.plain.graphql.Query
 import com.ismartcoding.plain.models.NearbyDevice
 import com.ismartcoding.plain.rust.graphql.GraphqlApi
 import com.ismartcoding.plain.ui.nearby.NearbyViewModel
-import com.ismartcoding.plain.rust.graphql.AppSubscriptions
-import com.ismartcoding.plain.rust.graphql.changes
-import kotlinx.coroutines.flow.map
 
 object RustNearbyDevices {
     suspend fun observeDiscovery() {
+        apply(snapshot())
         discoverySession(
             start = {
                 GraphqlApi.execute(Mutation.startDiscovery())
-                apply(snapshot())
-                RustMdnsRuntime.refresh()
+                NearbyViewModel.isDiscovering.value = true
             },
-            stop = { GraphqlApi.execute(Mutation.stopDiscovery()) },
-            scanning = AppSubscriptions.mdnsChanged.changes().map { RustMdnsRuntime.snapshot().scanning },
+            stop = {
+                GraphqlApi.execute(Mutation.stopDiscovery())
+                NearbyViewModel.isDiscovering.value = false
+            },
+            isDiscovering = {
+                GraphqlApi.execute(Query.isDiscovering()).also { NearbyViewModel.isDiscovering.value = it }
+            },
         )
     }
     /**

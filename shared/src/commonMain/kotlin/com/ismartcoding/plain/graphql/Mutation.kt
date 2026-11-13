@@ -110,16 +110,14 @@ object Mutation {
         field = "respondToPairing",
     )
 
-    fun acquireDiscovery(token: String): GraphqlRequest<Unit> = GraphqlRequest(
-        $$"mutation($token: ID!) { acquireDiscovery(token: $token) }",
-        mapOf(variable("token", token)),
-        field = "acquireDiscovery",
+    fun startDiscovery(): GraphqlRequest<Unit> = GraphqlRequest(
+        "mutation { startDiscovery }",
+        field = "startDiscovery",
     )
 
-    fun releaseDiscovery(token: String): GraphqlRequest<Unit> = GraphqlRequest(
-        $$"mutation($token: ID!) { releaseDiscovery(token: $token) }",
-        mapOf(variable("token", token)),
-        field = "releaseDiscovery",
+    fun stopDiscovery(): GraphqlRequest<Unit> = GraphqlRequest(
+        "mutation { stopDiscovery }",
+        field = "stopDiscovery",
     )
 
     fun createTag(type: DataType, name: String): GraphqlRequest<Tag> = GraphqlRequest(
