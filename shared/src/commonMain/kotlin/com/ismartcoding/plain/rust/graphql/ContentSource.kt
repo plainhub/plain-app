@@ -56,12 +56,11 @@ sealed class ContentSource(val api: GraphqlClient) {
     val history by lazy { com.ismartcoding.plain.features.media.MediaPlayHistoryApi(api) }
     val files: FilesApi by lazy { when (this) {
         Local -> FilesClient
-        is Remote -> FilesApi(api, client::writeChunks)
+        is Remote -> FilesApi(api, client::writeChunks, client::absoluteResourceUrl)
     } }
     val tasks: FileTaskApi by lazy { if (this is Remote) FileTaskApi(api) else FileTaskClient }
     val favorites: FavoriteFoldersApi by lazy { if (this is Remote) FavoriteFoldersApi(api) else FavoriteFoldersClient }
     val locations: FileLocationApi by lazy { if (this is Remote) FileLocationApi(api) else FileLocationClient }
-    val sharedLinks by lazy { if (this is Remote) com.ismartcoding.plain.features.shares.SharedLinkApi(api) else com.ismartcoding.plain.features.shares.SharedLinkClient }
     val shares: SharesApi by lazy { if (this is Remote) SharesApi(api) else SharesClient }
     val appPath: String get() = when (this) {
         Local -> appDir()

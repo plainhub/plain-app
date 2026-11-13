@@ -101,8 +101,8 @@ internal fun FileInfoSecondaryActions(
                 performCutFiles(filesVM, listOf(file), onShowPasteBar) { onDismiss() }
             }
             PSheetActionRow(UiRes.drawable.ui_drawable_link, stringResource(Res.string.share_link)) {
-                filesVM.sharePaths.clear()
-                filesVM.sharePaths.add(file.path)
+                filesVM.shareItems.clear()
+                filesVM.shareItems.add(file)
                 onDismiss()
                 filesVM.showCreateShareDialog.value = true
             }

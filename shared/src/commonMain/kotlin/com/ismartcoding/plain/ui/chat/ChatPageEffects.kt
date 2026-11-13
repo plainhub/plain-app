@@ -9,13 +9,12 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.ismartcoding.plain.events.PickFileResultEvent
-import com.ismartcoding.plain.features.chat.download.DownloadQueue
 import com.ismartcoding.plain.features.chat.data.ChatTargetType
 import com.ismartcoding.plain.features.files.PickFileTag
 import com.ismartcoding.plain.lib.Channel
 import com.ismartcoding.plain.ui.state.launchSafe
 
-internal val LocalChatDownloads = androidx.compose.runtime.staticCompositionLocalOf<com.ismartcoding.plain.features.chat.download.ChatDownloadClient> { DownloadQueue }
+internal val LocalChatDownloads = androidx.compose.runtime.staticCompositionLocalOf<com.ismartcoding.plain.features.downloads.DownloadsClient> { com.ismartcoding.plain.features.downloads.DownloadCenter }
 
 @Composable
 internal fun ChatPageEffects(

@@ -1,5 +1,6 @@
 package com.ismartcoding.plain.ui.chat.components
 
+import com.ismartcoding.plain.features.chat.download.attachmentDownload
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
@@ -13,7 +14,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.ismartcoding.plain.ui.chat.ChatViewModel
-import com.ismartcoding.plain.features.chat.download.DownloadQueue
 import com.ismartcoding.plain.features.chat.models.MessageImages
 import com.ismartcoding.plain.models.Peer
 import com.ismartcoding.plain.ui.media.viewer.previewer.MediaPreviewerState
@@ -32,7 +32,7 @@ fun ChatImages(
 ) {
     val downloads = com.ismartcoding.plain.ui.chat.LocalChatDownloads.current
     val imageItems = (m.value as MessageImages).items
-    val downloadProgressMap by downloads.downloadProgress.collectAsState(mapOf())
+    val downloadTasks by downloads.progress.collectAsState(mapOf())
 
     FlowRow(
         modifier = Modifier
@@ -50,7 +50,7 @@ fun ChatImages(
                     imageWidthDp = imageWidthDp,
                     imageWidthPx = imageWidthPx,
                     previewerState = previewerState,
-                    downloadTask = downloadProgressMap[item.id],
+                    downloadTask = downloadTasks.attachmentDownload(m.id, item.id),
                 )
             }
         },

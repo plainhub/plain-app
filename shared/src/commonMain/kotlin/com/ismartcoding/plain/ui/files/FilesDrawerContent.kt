@@ -26,7 +26,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.ismartcoding.plain.features.files.FilesType
-import com.ismartcoding.plain.models.ShareRecord
+import com.ismartcoding.plain.models.Share
 import com.ismartcoding.plain.i18n.*
 import com.ismartcoding.plain.ui.base.PDropdownMenu
 import com.ismartcoding.plain.ui.base.PDropdownMenuItem
@@ -75,7 +75,7 @@ fun FilesDrawerContent(
     val scope = rememberCoroutineScope()
     val favoriteFolders by filesVM.source.favorites.items.collectAsState()
     val options = remember { mutableStateListOf<FolderOption>() }
-    var shares by remember { mutableStateOf<List<ShareRecord>>(emptyList()) }
+    var shares by remember { mutableStateOf<List<Share>>(emptyList()) }
     var contextMenuPath by remember { mutableStateOf<String?>(null) }
     var contextMenuShareId by remember { mutableStateOf<String?>(null) }
     var renameFavorite by remember { mutableStateOf<FolderOption?>(null) }

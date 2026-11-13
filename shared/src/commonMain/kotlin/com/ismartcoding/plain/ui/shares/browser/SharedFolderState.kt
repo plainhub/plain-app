@@ -7,10 +7,7 @@ import androidx.compose.runtime.setValue
 import androidx.navigation.NavHostController
 import com.ismartcoding.plain.features.chat.models.MessageShare
 import com.ismartcoding.plain.features.downloads.isTerminalDownloadStatus
-import com.ismartcoding.plain.features.shares.SharedFileDto
-import com.ismartcoding.plain.features.shares.SharedFolderDownloadEngine
-import com.ismartcoding.plain.features.shares.SharedInfoDto
-import com.ismartcoding.plain.features.shares.SharedLink
+import com.ismartcoding.plain.models.File as ShareFile
 import com.ismartcoding.plain.i18n.*
 import com.ismartcoding.plain.lib.extensions.isAudioFast
 import com.ismartcoding.plain.lib.extensions.isImageFast
@@ -26,13 +23,12 @@ import com.ismartcoding.plain.ui.components.DialogHelper
 import com.ismartcoding.plain.ui.media.MediaPreviewData
 import com.ismartcoding.plain.ui.files.components.openFileByType
 import com.ismartcoding.plain.rust.graphql.ContentSource
-import com.ismartcoding.plain.features.shares.SharedFolderDownloadClient
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
-/** One visited level of the shared folder tree. Root level has an empty [Crumb.relativePath]. */
-internal data class Crumb(val relativePath: String, val name: String)
+/** One visited level of the shared folder tree. Root level has an empty [Crumb.path]. */
+internal data class Crumb(val path: String, val name: String)
 
 internal class SharedFolderState(
     private val messageId: String,
@@ -40,37 +36,34 @@ internal class SharedFolderState(
     private val scope: CoroutineScope,
     private val previewerState: MediaPreviewerState,
     val source: ContentSource,
+    val downloads: com.ismartcoding.plain.features.downloads.DownloadsClient = com.ismartcoding.plain.features.downloads.DownloadCenter,
 ) {
-    val downloads = if (source is ContentSource.Local) SharedFolderDownloadEngine else SharedFolderDownloadClient(source.api, scope)
     var shareMsg by mutableStateOf<MessageShare?>(null)
         private set
-    var rootInfo by mutableStateOf<SharedInfoDto?>(null)
-        private set
-    var activeLink by mutableStateOf<SharedLink?>(null)
-        private set
+    val rootInfo: List<ShareFile>? get() = dirCache[""]
     private var loadingPath by mutableStateOf<String?>(null)
     private var errorPath by mutableStateOf<String?>(null)
 
     var crumbs by mutableStateOf(listOf<Crumb>())
         private set
     var selectMode by mutableStateOf(false)
-    var selected by mutableStateOf(setOf<SharedFileDto>())
-    var downloadTarget by mutableStateOf<SharedFileDto?>(null)
+    var selected by mutableStateOf(setOf<ShareFile>())
+    var downloadTarget by mutableStateOf<ShareFile?>(null)
     var showSaveSelectedSheet by mutableStateOf(false)
     private var previewLoading by mutableStateOf(setOf<String>())
 
     /** Per-directory content cache: entering a visited directory renders instantly from here. */
-    private val dirCache = mutableStateMapOf<String, SharedInfoDto>()
+    private val dirCache = mutableStateMapOf<String, List<ShareFile>>()
 
     private val previewHandles = mutableListOf<String>()
 
-    val currentPath: String get() = crumbs.lastOrNull()?.relativePath ?: ""
-    val currentInfo: SharedInfoDto? get() = dirCache[currentPath]
+    val currentPath: String get() = crumbs.lastOrNull()?.path ?: ""
+    val currentInfo: List<ShareFile>? get() = dirCache[currentPath]
     val pathLoading: Boolean get() = loadingPath == currentPath
     val pathError: Boolean get() = errorPath == currentPath
-    val entries: List<SharedFileDto>
-        get() = currentInfo?.entries?.sortedWith(
-            compareBy<SharedFileDto> { !it.isDir }.thenBy { it.name.lowercase() },
+    val entries: List<ShareFile>
+        get() = currentInfo?.sortedWith(
+            compareBy<ShareFile> { !it.isDir }.thenBy { it.name.lowercase() },
         ) ?: emptyList()
 
     fun loadMessage() {
@@ -96,7 +89,7 @@ internal class SharedFolderState(
             loadingPath = path
             errorPath = null
             val result = try {
-                source.sharedLinks.browse(messageId, msg, path.takeIf { it.isNotEmpty() })
+                source.files.list(path.ifEmpty { msg.browserUrl() }, false, com.ismartcoding.plain.features.files.FileSortBy.NAME_ASC)
             } catch (cancelled: CancellationException) { throw cancelled }
             catch (error: Exception) {
                 DialogHelper.showMessage(error)
@@ -109,10 +102,10 @@ internal class SharedFolderState(
                 errorPath = path
                 return@launch
             }
-            dirCache[path] = result.info
-            activeLink = result.link
-            if (path.isEmpty()) rootInfo = result.info
-            shareMsg = result.card
+            dirCache[path] = result
+            try { shareMsg = withIO { source.chats.getChatItem(messageId) }?.messageContent?.value as? MessageShare }
+            catch (cancelled: CancellationException) { throw cancelled }
+            catch (error: Exception) { DialogHelper.showMessage(error) }
         }
     }
 
@@ -121,20 +114,20 @@ internal class SharedFolderState(
         crumbs = if (path.isEmpty()) {
             emptyList()
         } else {
-            val index = crumbs.indexOfFirst { it.relativePath == path }
+            val index = crumbs.indexOfFirst { it.path == path }
             if (index >= 0) crumbs.take(index + 1) else crumbs
         }
     }
 
-    fun onEntryClick(entry: SharedFileDto) {
+    fun onEntryClick(entry: ShareFile) {
         when {
             selectMode -> selected = if (selected.contains(entry)) selected - entry else selected + entry
-            entry.isDir -> crumbs = crumbs + Crumb(entry.relativePath, entry.name)
+            entry.isDir -> crumbs = crumbs + Crumb(entry.path, entry.name)
             entry.opensLikeLocal() -> openEntryPreview(entry)
         }
     }
 
-    fun onEntryLongClick(entry: SharedFileDto) {
+    fun onEntryLongClick(entry: ShareFile) {
         if (!selectMode) {
             selectMode = true
             selected = setOf(entry)
@@ -150,50 +143,47 @@ internal class SharedFolderState(
         selected = if (selected.containsAll(entries)) emptySet() else entries.toSet()
     }
 
-    fun isPreviewLoading(entry: SharedFileDto): Boolean = previewLoading.contains(entry.relativePath)
+    fun isPreviewLoading(entry: ShareFile): Boolean = previewLoading.contains(entry.path)
 
     /** True while a batch covering [entry] is queued or downloading. */
-    fun isEntryBusy(entry: SharedFileDto): Boolean = downloads.progress.value.values.any {
-        it.messageId == messageId &&
-            !it.status.isTerminalDownloadStatus() &&
-            it.entries.any { e -> e.relativePath == entry.relativePath }
+    fun isEntryBusy(entry: ShareFile): Boolean = downloads.progress.value.values.any {
+        !it.status.isTerminalDownloadStatus() &&
+            (it.source as? com.ismartcoding.plain.models.ResourceDownloadSource)?.urls?.contains(entry.url) == true
     }
 
     fun withBrowserUrl(action: (String) -> Unit) {
         val msg = shareMsg ?: return
         scope.launch {
             try {
-                val link = activeLink ?: source.sharedLinks.initialLink(messageId, msg)
-                action(link.pageUrl)
+                action(msg.browserUrl())
             } catch (cancelled: CancellationException) { throw cancelled }
             catch (_: Exception) { DialogHelper.showErrorDialog(LocaleHelper.getString(Res.string.cannot_load_share)) }
         }
     }
 
-    fun openEntryPreview(entry: SharedFileDto) {
-        val (link, urlToken) = transferContext() ?: return
-        if (previewLoading.contains(entry.relativePath)) return
-        previewLoading = previewLoading + entry.relativePath
+    fun openEntryPreview(entry: ShareFile) {
+        if (previewLoading.contains(entry.path)) return
+        previewLoading = previewLoading + entry.path
         scope.launch {
             val path = try {
-                source.sharedLinks.cacheFile(link, urlToken, entry)
+                SharePreview.copy(entry)
             } catch (cancelled: CancellationException) { throw cancelled }
             catch (error: Exception) {
                 DialogHelper.showMessage(error)
                 return@launch
             } finally {
-                previewLoading = previewLoading - entry.relativePath
+                previewLoading = previewLoading - entry.path
             }
             val inPagePreview = !(path.isAudioFast() || path.isTextFile() || path.isPdfFile())
-            if (inPagePreview && source is ContentSource.Local) previewHandles.add(path)
+            if (inPagePreview) previewHandles.add(path)
             openFileByType(
                 path = path,
                 navController = navController,
-                source = source,
+                source = ContentSource.Local,
                 name = entry.name,
-                mediaHint = entry.mimeType.startsWith("image/") || entry.mimeType.startsWith("video/"),
+                mediaHint = entry.name.isImageFast() || entry.name.isVideoFast(),
                 onPreviewMedia = {
-                    MediaPreviewData.items = listOf(PreviewItem(id = entry.relativePath, path = path, source = source, size = entry.size))
+                    MediaPreviewData.items = listOf(PreviewItem(id = entry.path, path = path, source = ContentSource.Local, size = entry.size))
                     scope.launch { previewerState.open(0) }
                 },
             )
@@ -201,56 +191,36 @@ internal class SharedFolderState(
     }
 
     /** Enqueue one entry save (file streams, dir mirrors) into [targetDir]; "" = public Downloads. */
-    fun enqueueEntry(target: SharedFileDto, targetDir: String) {
-        val (link, urlToken) = transferContext() ?: return
-        if (target.isDir) {
-            downloads.enqueueDirSync(messageId, link, urlToken, target, targetDir)
-        } else {
-            downloads.enqueueFile(messageId, link, urlToken, target, targetDir)
-        }
+    fun enqueueEntry(target: ShareFile, targetDir: String) {
+        download(listOf(target), targetDir)
     }
 
-    /** Enqueue one directory entry as a single zip archive. */
-    fun enqueueEntryZip(target: SharedFileDto) {
-        val (link, urlToken) = transferContext() ?: return
-        downloads.enqueueZip(messageId, link, urlToken, listOf(target), "${target.name}.zip")
+    fun enqueueEntryZip(target: ShareFile) {
+        download(listOf(target), "", "${target.name}.zip")
     }
 
-    /** Enqueue the current multi-selection into [targetDir]; "" = public Downloads. */
     fun enqueueSelection(targetDir: String) {
-        val (link, urlToken) = transferContext() ?: return
         if (selected.isEmpty()) return
-        downloads.enqueueMulti(messageId, link, urlToken, sortedSelection(), targetDir)
-        clearSelection()
+        if (download(sortedSelection(), targetDir)) clearSelection()
     }
 
-    /** Enqueue the current selection as one zip archive into Downloads/PlainApp. */
     fun enqueueSelectionZip() {
-        val (link, urlToken) = transferContext() ?: return
         if (selected.isEmpty()) return
-        val zipName = (rootInfo?.name ?: "shared") + "_selected.zip"
-        downloads.enqueueZip(messageId, link, urlToken, sortedSelection(), zipName)
-        clearSelection()
+        if (download(sortedSelection(), "", (shareMsg?.name ?: "shared") + "_selected.zip")) clearSelection()
     }
+
+    private fun download(entries: List<ShareFile>, targetDir: String, zipName: String? = null): Boolean =
+        downloads.create(com.ismartcoding.plain.models.DownloadInput(resources = com.ismartcoding.plain.models.ResourceDownloadInput(entries.map { it.url }, targetDir, zipName)))
 
     fun clearPreviewHandles() {
         previewHandles.forEach { deleteFileAt(it) }
         previewHandles.clear()
     }
 
-    /** Working link + url token, or null when the share hasn't resolved yet. */
-    private fun transferContext(): Pair<SharedLink, String>? {
-        val urlToken = rootInfo?.urlToken ?: return null
-        val link = activeLink ?: return null
-        return link to urlToken
-    }
-
-    private fun sortedSelection(): List<SharedFileDto> =
-        selected.sortedWith(compareBy<SharedFileDto> { !it.isDir }.thenBy { it.name.lowercase() })
+    private fun sortedSelection(): List<ShareFile> =
+        selected.sortedWith(compareBy<ShareFile> { !it.isDir }.thenBy { it.name.lowercase() })
 }
 
 /** Entries that open like local FilesPage items (preview/play/text/PDF); the rest keep their download sheet. */
-private fun SharedFileDto.opensLikeLocal(): Boolean =
-    mimeType.startsWith("image/") || mimeType.startsWith("video/") || mimeType.startsWith("audio/") ||
-        mimeType == "application/pdf" ||
-        name.isImageFast() || name.isVideoFast() || name.isAudioFast() || name.isTextFile() || name.isPdfFile()
+private fun ShareFile.opensLikeLocal(): Boolean =
+    name.isImageFast() || name.isVideoFast() || name.isAudioFast() || name.isTextFile() || name.isPdfFile()

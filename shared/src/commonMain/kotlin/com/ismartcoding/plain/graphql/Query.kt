@@ -3,7 +3,7 @@ package com.ismartcoding.plain.graphql
 import com.ismartcoding.plain.IData
 import com.ismartcoding.plain.models.AppFileName
 import com.ismartcoding.plain.models.AudioDuration
-import com.ismartcoding.plain.models.ChatDownloadSnapshot
+import com.ismartcoding.plain.models.Download
 import com.ismartcoding.plain.models.DocExtensionGroup
 import com.ismartcoding.plain.models.FeedsResponse
 import com.ismartcoding.plain.models.FileSize
@@ -12,13 +12,11 @@ import com.ismartcoding.plain.models.MergeResult
 import com.ismartcoding.plain.models.ProjectSummary
 import com.ismartcoding.plain.models.QueuedMediaId
 import com.ismartcoding.plain.models.SelectedMediaPath
-import com.ismartcoding.plain.models.SharedDownloadSnapshot
 import com.ismartcoding.plain.features.chat.models.MessageShare
 import com.ismartcoding.plain.features.files.FileSortBy
 import com.ismartcoding.plain.features.nearby.NearbyDiscoverySnapshot
 import com.ismartcoding.plain.features.nearby.MdnsSnapshot
 import com.ismartcoding.plain.features.sessions.SessionFacts
-import com.ismartcoding.plain.features.shares.SharedLink
 import com.ismartcoding.plain.models.AppFile
 import com.ismartcoding.plain.models.Audio
 import com.ismartcoding.plain.models.AudioItem
@@ -46,7 +44,7 @@ import com.ismartcoding.plain.models.Note
 import com.ismartcoding.plain.models.Package as AppPackage
 import com.ismartcoding.plain.models.Peer
 import com.ismartcoding.plain.models.PomodoroToday
-import com.ismartcoding.plain.models.ShareRecord
+import com.ismartcoding.plain.models.Share
 import com.ismartcoding.plain.models.Sms
 import com.ismartcoding.plain.models.Tag
 import com.ismartcoding.plain.models.TagRelation
@@ -339,26 +337,12 @@ object Query {
         field = "favoriteFolders",
     )
 
-    fun initialSharedLink(messageId: String, expected: MessageShare): GraphqlRequest<SharedLink> = GraphqlRequest(
-        $$"query($messageId: ID!, $expected: SharedMessageCardInput!) { initialSharedLink(messageId: $messageId, expected: $expected) { $${Fragments.SHARE_LINK} } }",
-        mapOf(variable("messageId", messageId), variable("expected", expected)),
-        field = "initialSharedLink",
+    fun shares(): GraphqlRequest<List<Share>> = GraphqlRequest(
+        $$"query { shares { $${Fragments.SHARE} } }", field = "shares",
     )
-
-    fun shareRecords(): GraphqlRequest<List<ShareRecord>> = GraphqlRequest(
-        $$"query { shareRecords { $${Fragments.SHARE} } }",
-        field = "shareRecords",
-    )
-
-    fun shareRecord(id: String): GraphqlRequest<ShareRecord?> = GraphqlRequest(
-        $$"query($id: ID!) { shareRecord(id: $id) { $${Fragments.SHARE} } }",
-        mapOf(variable("id", id)),
-        field = "shareRecord",
-    )
-
-    fun sharedDownloadQueue(): GraphqlRequest<SharedDownloadSnapshot> = GraphqlRequest(
-        $$"query { sharedDownloadQueue { $${Fragments.SHARED_DOWNLOAD_QUEUE} } }",
-        field = "sharedDownloadQueue",
+    fun share(id: String): GraphqlRequest<Share?> = GraphqlRequest(
+        $$"query($id: ID!) { share(id: $id) { $${Fragments.SHARE} } }",
+        mapOf(variable("id", id)), field = "share",
     )
 
     fun docExtGroups(query: String): GraphqlRequest<List<DocExtensionGroup>> = GraphqlRequest(
@@ -478,9 +462,8 @@ object Query {
         field = "chatChannels",
     )
 
-    fun chatDownloadQueue(includePeerCredentials: Boolean = true): GraphqlRequest<ChatDownloadSnapshot> = GraphqlRequest(
-        "query { chatDownloadQueue { ${if (includePeerCredentials) Fragments.CHAT_DOWNLOAD_QUEUE else Fragments.CHAT_DOWNLOAD_QUEUE_SUMMARY} } }",
-        field = "chatDownloadQueue",
+    fun downloads(): GraphqlRequest<List<Download>> = GraphqlRequest(
+        "query { downloads { ${Fragments.DOWNLOAD} } }", field = "downloads",
     )
 
     fun appLogFilesSize(): GraphqlRequest<Long> = GraphqlRequest(
@@ -499,11 +482,7 @@ object Query {
         else GraphqlRequest<List<Feed>>(document, field = "feeds").map { FeedsResponse(it, emptyList()) }
     }
 
-    fun shareLink(id: String, host: String?): GraphqlRequest<SharedLink> = GraphqlRequest(
-        $$"query($id: ID!, $host: String) { shareLink(id: $id, host: $host) { $${Fragments.SHARE_LINK} } }",
-        mapOf(variable("id", id), variable("host", host)),
-        field = "shareLink",
-    )
+
 
     fun mediaRoot(type: DataType): String = when (type) {
         DataType.AUDIO -> "audios"

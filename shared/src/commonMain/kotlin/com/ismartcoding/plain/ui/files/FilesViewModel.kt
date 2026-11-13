@@ -91,7 +91,7 @@ class FilesViewModel internal constructor(val source: ContentSource = ContentSou
     val showCreateFolderDialog = mutableStateOf(false)
     val showCreateFileDialog = mutableStateOf(false)
     val showCreateShareDialog = mutableStateOf(false)
-    val sharePaths = mutableStateListOf<String>()
+    val shareItems = mutableStateListOf<com.ismartcoding.plain.models.File>()
     val isDeleting = mutableStateOf(false)
     val favoriteFoldersVersion = mutableIntStateOf(0)
 

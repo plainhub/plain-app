@@ -166,7 +166,7 @@ fun openFileByType(
             }
         }
         name.isTextFile() || name.isOfficeFile() -> {
-            navController.navigateTextFile(path, name)
+            navController.navigateTextFile(path, name, localSource = source is com.ismartcoding.plain.rust.graphql.ContentSource.Local)
         }
 
         name.isPdfFile() -> coMain {

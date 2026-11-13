@@ -28,7 +28,6 @@ import androidx.core.content.FileProvider
 import com.ismartcoding.plain.app.AppIntents
 import com.ismartcoding.plain.appContext
 import com.ismartcoding.plain.features.chat.sendPickedAttachments
-import com.ismartcoding.plain.features.shares.SharedLinkClient
 import com.ismartcoding.plain.platform.network.ble.server.HttpServiceHandler
 import com.ismartcoding.plain.Prefs
 
@@ -90,7 +89,7 @@ class ChatServiceRustHttpTest {
             assertEquals(2, card.itemCount)
             assertEquals(source.length() + image.length(), card.totalSize)
             assertTrue(SharesClient.getShare(card.shareId)!!.readOnly)
-            assertEquals(SharedLinkClient.ownLink(card.shareId).token, card.urlToken)
+            assertEquals(android.net.Uri.parse(SharesClient.getShare(card.shareId)!!.url).fragment, card.urlToken)
             val staging = File(RustRuntime.dataDir, "chat-picks")
             assertTrue(staging.listFiles().orEmpty().isEmpty())
         } finally {

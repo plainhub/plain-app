@@ -1,5 +1,9 @@
 package com.ismartcoding.plain.api.graphql
 
+import com.ismartcoding.plain.models.Share
+import com.ismartcoding.plain.models.ShareInput
+import com.ismartcoding.plain.models.SharePath
+
 import com.ismartcoding.plain.models.SmsAttachment
 
 import kotlinx.serialization.descriptors.SerialDescriptor
@@ -114,6 +118,10 @@ class GraphqlModelContractTest {
             "FeedError" to FeedError.serializer().descriptor,
             "FeedSyncState" to FeedSyncState.serializer().descriptor,
             "File" to File.serializer().descriptor,
+            "Share" to Share.serializer().descriptor,
+            "ShareInput" to ShareInput.serializer().descriptor,
+            "SharePath" to SharePath.serializer().descriptor,
+            "SharePathInput" to SharePath.serializer().descriptor,
             "Image" to Image.serializer().descriptor,
             "ImageEditorProject" to ImageEditorProject.serializer().descriptor,
             "ImageEditorProjectInput" to ImageEditorProjectInput.serializer().descriptor,

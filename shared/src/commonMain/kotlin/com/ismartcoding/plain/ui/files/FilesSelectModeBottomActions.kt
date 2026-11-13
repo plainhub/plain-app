@@ -73,8 +73,8 @@ fun FilesSelectModeBottomActions(
                 scope.launchSafe { shareFiles(paths.map { filesVM.source.fileForOpen(it) }) }
             }
             IconTextSmallButtonShareLink {
-                filesVM.sharePaths.clear()
-                filesVM.sharePaths.addAll(filesVM.selectedIds)
+                filesVM.shareItems.clear()
+                filesVM.shareItems.addAll(selectedFiles)
                 filesVM.showCreateShareDialog.value = true
             }
             IconTextSmallButtonDelete {

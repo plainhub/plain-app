@@ -17,15 +17,10 @@ internal object Fragments {
     const val NOTE_FIELDS = "id title content deletedAt createdAt updatedAt"
     const val BOOKMARK = "id url title faviconPath groupId pinned clickCount lastClickedAt sortOrder createdAt updatedAt"
     const val POMODORO = "date completedCount currentRound timeLeftSec totalTimeSec isRunning isPaused state"
-    const val FILE = "name path permission createdAt updatedAt size isDir childCount mediaId isSystem"
+    const val FILE = "name path url permission createdAt updatedAt size isDir childCount mediaId isSystem"
     const val FAVORITE_FOLDER = "rootPath fullPath alias"
     const val FILE_TASK = "id clientId type status title error totalBytes doneBytes totalItems doneItems createdAt updatedAt completedOps { src dst }"
-    const val SHARE_LINK = "host port sharedId token pageUrl"
-    const val SHARED_ENTRY = "name relativePath isDir size mimeType hasThumb"
-    const val SHARED_INFO = $$"name readOnly requiresPassword expiresAt urlToken entries { $${SHARED_ENTRY} }"
-    const val SHARED_CARD = "shareId urlToken peerInfo { id ip port } name itemCount totalSize expiresAt"
-    const val SHARE = "id name password urlToken readOnly expiresAt createdAt updatedAt roots { relativePath realPath isDir }"
-    const val SHARED_DOWNLOAD_QUEUE = "runtimeId revision tasks { id messageId type title targetDir link { host port sharedId token pageUrl } urlToken entries { name relativePath isDir size mimeType hasThumb } zipName generation status error downloadedSize totalSize downloadSpeed totalFiles doneFiles failedFiles currentFile packing failures { path error } }"
+    const val SHARE = "id name password readOnly expiresAt data { virtualPath realPath isDir } url"
     const val MEDIA_COMMON = "id title path size bucketId createdAt updatedAt"
     const val CLIPBOARD_ITEM = "id text source label sensitive createdAt"
     const val APP_FILE = "id size mimeType realPath createdAt updatedAt fileName"
@@ -36,9 +31,7 @@ internal object Fragments {
     const val PEER_SUMMARY = "id name ip publicKey status port deviceType createdAt updatedAt online managed"
     const val PEER = "id name ip key publicKey status port deviceType token createdAt updatedAt online managed"
     const val CHANNEL_FIELDS = "id ownerId name actions { isOwner canRename canManageMembers canLeave canDelete } members { peerId status } version status createdAt updatedAt"
-    private const val CHAT_DOWNLOAD_TASKS = "runtimeId revision tasks { id messageId status error downloaded total speed file { id: fileId uri size durationMs width height summary fileName } "
-    const val CHAT_DOWNLOAD_QUEUE = CHAT_DOWNLOAD_TASKS + "peer { " + PEER + " } }"
-    const val CHAT_DOWNLOAD_QUEUE_SUMMARY = CHAT_DOWNLOAD_TASKS + "peer { " + PEER_SUMMARY + " } }"
+    const val DOWNLOAD = "id title targetDir zipName status downloadedBytes totalBytes bytesPerSecond totalFiles doneFiles currentFile error failures { path error } source { __typename ... on ResourceDownloadSource { urls } ... on ChatDownloadSource { messageId peerId fileIds } }"
 
     fun mediaFields(type: DataType): String {
         val extra = when (type) {

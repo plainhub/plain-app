@@ -21,7 +21,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.ismartcoding.plain.features.downloads.DownloadStatus
 import com.ismartcoding.plain.features.downloads.isTerminalDownloadStatus
-import com.ismartcoding.plain.features.shares.SharedFolderBatchTask
+import com.ismartcoding.plain.models.Download
 import com.ismartcoding.plain.i18n.Res
 import com.ismartcoding.plain.ui.resources.check as ui_drawable_check
 import com.ismartcoding.plain.ui.resources.download as ui_drawable_download
@@ -42,7 +42,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
  */
 @Composable
 fun DownloadMiniBar(
-    tasks: List<SharedFolderBatchTask>,
+    tasks: List<Download>,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     leadingIcon: DrawableResource = UiRes.drawable.ui_drawable_download,
@@ -116,7 +116,7 @@ fun DownloadMiniBar(
 }
 
 /** Running first, then queued, then attention-worthy failures, then newest. */
-internal fun mostRelevant(tasks: List<SharedFolderBatchTask>): SharedFolderBatchTask? {
+internal fun mostRelevant(tasks: List<Download>): Download? {
     if (tasks.isEmpty()) return null
     return tasks.lastOrNull { it.status == DownloadStatus.DOWNLOADING }
         ?: tasks.lastOrNull { it.status == DownloadStatus.PENDING }
@@ -126,21 +126,21 @@ internal fun mostRelevant(tasks: List<SharedFolderBatchTask>): SharedFolderBatch
         ?: tasks.last()
 }
 
-internal fun miniBarTitle(task: SharedFolderBatchTask): String =
+internal fun miniBarTitle(task: Download): String =
     if (task.status == DownloadStatus.DOWNLOADING && task.totalFiles > 1 && task.currentFile.isNotEmpty()) {
         task.currentFile
     } else {
         task.title
     }
 
-internal fun miniBarPct(task: SharedFolderBatchTask): String = when (task.status) {
+internal fun miniBarPct(task: Download): String = when (task.status) {
     DownloadStatus.COMPLETED -> ""
     DownloadStatus.CANCELED -> ""
     DownloadStatus.PARTIAL, DownloadStatus.FAILED -> ""
     else -> "${(task.fraction() * 100).toInt()}%"
 }
 
-internal fun miniBarDetail(task: SharedFolderBatchTask): String {
-    val bytes = "${task.downloadedSize.formatBytes()} / ${task.totalSize.formatBytes()}"
+internal fun miniBarDetail(task: Download): String {
+    val bytes = "${task.downloadedBytes.formatBytes()} / ${task.totalBytes.formatBytes()}"
     return if (task.totalFiles > 1) "$bytes · ${task.doneFiles}/${task.totalFiles}" else bytes
 }

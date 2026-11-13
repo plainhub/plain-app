@@ -161,7 +161,7 @@ class Routing {
     object AudioPlayer
 
     @Serializable
-    data class TextFile(val path: String, val title: String = "", val mediaId: String = "", val type: String = "")
+    data class TextFile(val path: String, val title: String = "", val mediaId: String = "", val type: String = "", val localSource: Boolean = false)
 
     @Serializable
     data class AppDetails(val id: String)

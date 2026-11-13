@@ -40,6 +40,7 @@ class ApiContractTest {
         "albumFileId", // Audio.albumFileId — album-art display fileId token
         "AppFile", // AppFile.id — content-addressable app file store fileId
         "fileId", // chunk-flow args (uploadedChunks/mergeStatus/deleteChunks/mergeChunks/mergeAppFileChunks)
+        "fileIds", // ChatDownloadInput and ChatDownloadSource attachment file ids
         "runtimeId",
         "clientIds",
     )
@@ -65,10 +66,10 @@ class ApiContractTest {
         val queries = operationFieldNamesIn("Query")
         val mutations = operationFieldNamesIn("Mutation")
         val subscriptions = operationFieldNamesIn("Subscription")
-        if (queries.size != 125 || mutations.size != 188 || subscriptions.size != 35) {
+        if (queries.size != 122 || mutations.size != 180 || subscriptions.size != 35) {
             fail(
                 "Shared Rust schema fragments declare ${queries.size} Query / ${mutations.size} " +
-                    "Mutation and ${subscriptions.size} Subscription operations — the contract has 125 / 188 / 35. The snapshot looks truncated or " +
+                    "Mutation and ${subscriptions.size} Subscription operations — the contract has 122 / 180 / 35. The snapshot looks truncated or " +
                     "drifted; every check in this class reads it, so they would pass on an empty file.",
             )
         }

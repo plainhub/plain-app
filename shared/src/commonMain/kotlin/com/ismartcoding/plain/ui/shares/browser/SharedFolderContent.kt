@@ -23,9 +23,8 @@ import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 import com.ismartcoding.plain.features.downloads.DownloadStatus
-import com.ismartcoding.plain.features.shares.SharedFileDto
-import com.ismartcoding.plain.features.shares.SharedFolderBatchTask
-import com.ismartcoding.plain.features.shares.SharedLink
+import com.ismartcoding.plain.models.File as ShareFile
+import com.ismartcoding.plain.models.Download
 import com.ismartcoding.plain.i18n.*
 import com.ismartcoding.plain.ui.base.BottomActionButtons
 import com.ismartcoding.plain.ui.base.PFilledButton
@@ -43,10 +42,9 @@ import org.jetbrains.compose.resources.stringResource
 internal fun SharedFolderContent(
     state: SharedFolderState,
     contentPadding: PaddingValues,
-    tasks: List<SharedFolderBatchTask>,
+    tasks: List<Download>,
     onOpenDownloads: () -> Unit,
 ) {
-    val active = state.activeLink
 
     Column(
         modifier = Modifier
@@ -59,8 +57,8 @@ internal fun SharedFolderContent(
         // Breadcrumb only once the share's root info has loaded; a bare "/" placeholder while loading looks broken.
         if (state.rootInfo != null) {
             val breadcrumbs = buildList {
-                add(BreadcrumbItem(state.rootInfo?.name ?: "/", ""))
-                state.crumbs.forEach { add(BreadcrumbItem(it.name, it.relativePath)) }
+                add(BreadcrumbItem(state.shareMsg?.name ?: "/", ""))
+                state.crumbs.forEach { add(BreadcrumbItem(it.name, it.path)) }
             }
             BreadcrumbView(
                 breadcrumbs = breadcrumbs,
@@ -93,9 +91,8 @@ internal fun SharedFolderContent(
                 ) { CircularProgressIndicator() }
                 state.currentInfo == null && state.pathError -> CenteredHint(stringResource(Res.string.cannot_load_share))
                 state.entries.isEmpty() && state.currentInfo != null -> CenteredHint(stringResource(Res.string.shared_folder_empty))
-                state.entries.isNotEmpty() && active != null -> EntryList(
+                state.entries.isNotEmpty() -> EntryList(
                     state = state,
-                    link = active,
                     bottomPadding = if (showMini) miniClearance + 16 else 0,
                 )
             }
@@ -116,7 +113,6 @@ internal fun SharedFolderContent(
 @Composable
 private fun EntryList(
     state: SharedFolderState,
-    link: SharedLink,
     bottomPadding: Int,
     modifier: Modifier = Modifier,
 ) {
@@ -124,12 +120,9 @@ private fun EntryList(
         modifier = modifier.fillMaxSize(),
         contentPadding = PaddingValues(bottom = bottomPadding.dp),
     ) {
-        items(state.entries, key = { it.relativePath }) { entry ->
+        items(state.entries, key = { it.path }) { entry ->
             EntryRow(
                 entry = entry,
-                source = state.source,
-                link = link,
-                urlToken = state.rootInfo?.urlToken ?: "",
                 selectMode = state.selectMode,
                 selected = state.selected.contains(entry),
                 busy = state.isEntryBusy(entry),

@@ -9,6 +9,7 @@ data class File(
     var mediaId: String? = null,
     var name: String,
     var path: String,
+    val url: String = "",
     var createdAt: Instant?,
     var updatedAt: Instant,
     var size: Long,

@@ -14,6 +14,7 @@ object FilesClient : FilesApi(GraphqlApi, RustUploadChunks::replace)
 open class FilesApi internal constructor(
     protected val api: GraphqlClient,
     private val upload: suspend (String, Iterator<ByteArray>) -> Boolean,
+    private val resourceUrl: suspend (String) -> String = { it },
 ) {
     suspend fun size(path: String): Long =
         requireNotNull(api.execute(Query.fileInfo(path))) { "File not found" }.size
@@ -66,10 +67,10 @@ open class FilesApi internal constructor(
         read(root, query, sortBy, offset, limit)
 
     suspend fun indexed(query: String, limit: Int, offset: Int, sortBy: FileSortBy): List<FileEntry> =
-        api.execute(Query.indexedFiles(query, limit, offset, sortBy))
+        api.execute(Query.indexedFiles(query, limit, offset, sortBy)).resolveUrls()
 
     suspend fun recent(): List<FileEntry> =
-        api.execute(Query.recentFiles())
+        api.execute(Query.recentFiles()).resolveUrls()
 
     suspend fun indexedCount(query: String): Int =
         api.execute(Query.indexedFileCount(query))
@@ -98,7 +99,12 @@ open class FilesApi internal constructor(
         offset: Int = 0,
         limit: Int? = null,
     ): List<FileEntry> =
-        api.execute(Query.files(root, query, sortBy, offset, limit ?: Int.MAX_VALUE))
+        api.execute(Query.files(root, query, sortBy, offset, limit ?: Int.MAX_VALUE)).resolveUrls()
+
+    private suspend fun FileEntry.resolveUrl(): FileEntry =
+        copy(url = resourceUrl(url))
+
+    private suspend fun List<FileEntry>.resolveUrls(): List<FileEntry> = map { it.resolveUrl() }
 
     internal fun literalNameQuery(text: String): String = buildString {
         append("text:=")
@@ -116,6 +122,6 @@ open class FilesApi internal constructor(
     ): FileEntry {
         val target = if (path.startsWith("file://")) fileUriPath(path) else path
         val operation = Mutation.fileWrite(action, target, content, overwrite)
-        return api.execute(operation)
+        return api.execute(operation).resolveUrl()
     }
 }

@@ -32,7 +32,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.ismartcoding.plain.features.downloads.DownloadStatus
 import com.ismartcoding.plain.features.downloads.isTerminalDownloadStatus
-import com.ismartcoding.plain.features.shares.SharedFolderBatchTask
+import com.ismartcoding.plain.models.Download
 import com.ismartcoding.plain.i18n.*
 import com.ismartcoding.plain.i18n.Res
 import org.jetbrains.compose.resources.painterResource
@@ -51,7 +51,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
  */
 @Composable
 fun BoxScope.DownloadFloatingWidget(
-    tasks: List<SharedFolderBatchTask>,
+    tasks: List<Download>,
     onClick: () -> Unit,
 ) {
     if (tasks.isEmpty()) return

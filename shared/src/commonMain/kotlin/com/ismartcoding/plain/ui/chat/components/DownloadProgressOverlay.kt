@@ -14,7 +14,6 @@ import androidx.compose.ui.graphics.Color
 import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import com.ismartcoding.plain.features.chat.download.DownloadQueue
 import com.ismartcoding.plain.features.downloads.DownloadStatus
 import com.ismartcoding.plain.ui.components.PIconButton
 import com.ismartcoding.plain.ui.resources.Res as UiRes
@@ -56,7 +55,7 @@ private fun DownloadActionButton(
     when (status) {
         DownloadStatus.DOWNLOADING -> PIconButton(
             icon = UiRes.drawable.ui_drawable_pause,
-            click = { downloads.pauseDownload(taskId) },
+            click = { downloads.control(taskId, com.ismartcoding.plain.features.downloads.DownloadCommand.PAUSE) },
             tint = Color.White,
             contentDescription = stringResource(Res.string.pause),
             modifier = Modifier.size(24.dp)
@@ -64,7 +63,7 @@ private fun DownloadActionButton(
 
         DownloadStatus.PAUSED -> PIconButton(
             icon = UiRes.drawable.ui_drawable_download,
-            click = { downloads.resumeDownload(taskId) },
+            click = { downloads.control(taskId, com.ismartcoding.plain.features.downloads.DownloadCommand.RESUME) },
             tint = Color.White,
             contentDescription = stringResource(Res.string.resume),
             modifier = Modifier.size(24.dp)
@@ -72,15 +71,15 @@ private fun DownloadActionButton(
 
         DownloadStatus.PENDING -> PIconButton(
             icon = UiRes.drawable.ui_drawable_x,
-            click = { downloads.removeDownload(taskId) },
+            click = { downloads.control(taskId, com.ismartcoding.plain.features.downloads.DownloadCommand.REMOVE) },
             tint = Color.White,
             contentDescription = stringResource(Res.string.cancel),
             modifier = Modifier.size(24.dp)
         )
 
-        DownloadStatus.FAILED -> PIconButton(
+        DownloadStatus.FAILED, DownloadStatus.PARTIAL, DownloadStatus.CANCELED -> PIconButton(
             icon = UiRes.drawable.ui_drawable_circle_alert,
-            click = { downloads.retryDownload(taskId) },
+            click = { downloads.control(taskId, com.ismartcoding.plain.features.downloads.DownloadCommand.RETRY) },
             tint = Color.White,
             contentDescription = stringResource(Res.string.try_again),
             modifier = Modifier.size(24.dp)

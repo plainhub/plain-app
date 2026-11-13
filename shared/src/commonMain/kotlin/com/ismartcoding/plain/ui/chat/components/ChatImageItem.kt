@@ -20,8 +20,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import com.ismartcoding.plain.features.chat.download.DownloadQueue
-import com.ismartcoding.plain.features.chat.download.DownloadTask
+import com.ismartcoding.plain.models.Download
 import com.ismartcoding.plain.features.chat.models.MessageFile
 import com.ismartcoding.plain.models.Peer
 import com.ismartcoding.plain.features.chat.models.getPreviewPath
@@ -48,18 +47,16 @@ internal fun ChatImageItem(
     imageWidthDp: Dp,
     imageWidthPx: Int,
     previewerState: MediaPreviewerState,
-    downloadTask: DownloadTask?,
+    downloadTask: Download?,
 ) {
     val source = com.ismartcoding.plain.ui.navigation.LocalContentSource.current
     val downloads = com.ismartcoding.plain.ui.chat.LocalChatDownloads.current
     val itemState = rememberTransformItemState()
     val isRemoteFile = item.isRemoteFile()
-    val taskActive = downloadTask?.isActive() == true
-    val isFailed = downloadTask?.status == DownloadStatus.FAILED
-    val isDownloading = downloadTask?.isDownloading() == true
-    val downloadProgress = downloadTask?.let {
-        if (it.messageFile.size > 0) it.downloadedSize.toFloat() / it.messageFile.size.toFloat() else 0f
-    } ?: 0f
+    val taskActive = item.isRemoteFile() && downloadTask != null && downloadTask.status != DownloadStatus.COMPLETED
+    val isFailed = downloadTask?.status == DownloadStatus.FAILED || downloadTask?.status == DownloadStatus.PARTIAL || downloadTask?.status == DownloadStatus.CANCELED
+    val isDownloading = (downloadTask?.status == DownloadStatus.PENDING || downloadTask?.status == DownloadStatus.DOWNLOADING)
+    val downloadProgress = downloadTask?.fraction() ?: 0f
     val previewPath by produceState("", source, item.uri, peer?.id, peer?.ip, peer?.port, peer?.key, peer?.publicKey, peer?.status) {
         value = try {
             if (source is com.ismartcoding.plain.rust.graphql.ContentSource.Remote) { if (item.isRemoteFile()) "" else item.uri }
@@ -72,7 +69,7 @@ internal fun ChatImageItem(
 
     LaunchedEffect(item.uri) {
         if (isRemoteFile && downloadTask == null && peer != null) {
-            downloads.addDownloadTask(item, peer, messageId)
+            downloads.create(com.ismartcoding.plain.models.DownloadInput(chat = com.ismartcoding.plain.models.ChatDownloadInput(messageId, peer.id, listOf(item.id))))
         }
     }
 
@@ -82,7 +79,7 @@ internal fun ChatImageItem(
             // while a download is actively in flight (pending/downloading).
             if (isDownloading) return@clickable
             if (isFailed) {
-                downloads.retryDownload(item.id)
+                downloadTask?.let { downloads.control(it.id, com.ismartcoding.plain.features.downloads.DownloadCommand.RETRY) }
                 return@clickable
             }
             if (source is com.ismartcoding.plain.rust.graphql.ContentSource.Remote && item.isRemoteFile()) return@clickable
@@ -112,9 +109,9 @@ internal fun ChatImageItem(
             )
         }
 
-        if (taskActive) {
+        if (taskActive && downloadTask != null) {
             DownloadProgressOverlay(
-                taskId = item.id,
+                taskId = downloadTask.id,
                 status = downloadTask.status,
                 modifier = Modifier.size(imageWidthDp),
                 downloadProgress = downloadProgress,

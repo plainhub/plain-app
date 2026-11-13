@@ -34,22 +34,20 @@ import com.ismartcoding.plain.ui.components.DialogHelper
 import com.ismartcoding.plain.ui.components.rememberLifecycleEvent
 import androidx.lifecycle.Lifecycle
 import kotlinx.coroutines.CancellationException
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.isActive
 import kotlinx.coroutines.flow.filterNotNull
 
 @Composable
 fun SharedFolderPage(
     navController: NavHostController,
     messageId: String,
+    downloads: com.ismartcoding.plain.features.downloads.DownloadsClient = com.ismartcoding.plain.features.downloads.DownloadCenter,
 ) {
     val source = LocalContentSource.current
     val scope = rememberCoroutineScope()
     val previewerState = rememberPreviewerState(scope = scope, pageCount = { MediaPreviewData.items.size })
-    val state = remember(source, messageId) { SharedFolderState(messageId, navController, scope, previewerState, source) }
+    val state = remember(source, messageId, downloads) { SharedFolderState(messageId, navController, scope, previewerState, source, downloads) }
     val tasksMap = state.downloads.progress.collectAsState().value
-    val shareTasks = tasksMap.values
-        .filter { it.messageId == messageId }
+    val shareTasks = tasksMap.values.toList()
     var showDownloads by remember { mutableStateOf(false) }
 
     LaunchedEffect(state) { state.loadMessage() }
@@ -59,12 +57,7 @@ fun SharedFolderPage(
         if (lifecycle != Lifecycle.Event.ON_RESUME) return@LaunchedEffect
         try {
             state.downloads.refresh()
-            if (source is ContentSource.Remote) {
-                while (isActive) {
-                    delay(1_000)
-                    state.downloads.refresh()
-                }
-            }
+
         } catch (cancelled: CancellationException) { throw cancelled }
         catch (error: Exception) { DialogHelper.showMessage(error) }
     }

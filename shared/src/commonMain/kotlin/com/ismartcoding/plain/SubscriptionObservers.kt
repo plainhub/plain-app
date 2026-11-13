@@ -16,14 +16,14 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collect
 
 import com.ismartcoding.plain.features.chat.channel.ChannelSystemMessageReceiver
-import com.ismartcoding.plain.features.chat.download.DownloadQueue
+import com.ismartcoding.plain.features.downloads.DownloadCenter
 import com.ismartcoding.plain.features.images.search.RustImageModels
 import com.ismartcoding.plain.ui.nearby.PairingProjection
 import com.ismartcoding.plain.ui.pomodoro.PomodoroProjection
 
 internal object SubscriptionObservers {
     fun start(scope: CoroutineScope) {
-        scope.observe(AppSubscriptions.downloadsChanged) { DownloadQueue.refresh() }
+        scope.observe(AppSubscriptions.downloadsChanged) { DownloadCenter.refresh() }
         scope.observeData(AppSubscriptions.pairingStarted) { PairingProjection.started(it) }
         scope.observeData(AppSubscriptions.pairingFailed) { PairingProjection.failed(it) }
         scope.observeData(AppSubscriptions.pairingCanceled) { PairingProjection.cancelled(it) }

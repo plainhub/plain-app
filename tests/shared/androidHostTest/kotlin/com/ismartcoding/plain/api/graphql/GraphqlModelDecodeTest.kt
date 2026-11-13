@@ -117,7 +117,7 @@ class GraphqlModelDecodeTest {
 
     @Test
     fun peerQueriesIncludeManagementStatus() {
-        val requests = listOf(Query.peers(), Query.chatDownloadQueue(), Query.chatDownloadQueue(includePeerCredentials = false))
+        val requests = listOf(Query.peers())
         requests.forEach { request ->
             assertTrue(Regex("\\bmanaged\\b").containsMatchIn(request.operation.query), request.operation.query)
         }

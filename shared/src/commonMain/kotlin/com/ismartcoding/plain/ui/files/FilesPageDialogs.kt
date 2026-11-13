@@ -69,7 +69,7 @@ internal fun FilesPageDialogs(
 
     if (filesVM.showCreateShareDialog.value) {
         CreateShareDialog(
-            paths = filesVM.sharePaths.toList(),
+            items = filesVM.shareItems.toList(),
             onDismiss = { filesVM.showCreateShareDialog.value = false },
             onCreated = { filesVM.sharesVersion.value++ },
         )

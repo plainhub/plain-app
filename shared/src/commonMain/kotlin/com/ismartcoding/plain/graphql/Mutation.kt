@@ -5,7 +5,9 @@ import com.ismartcoding.plain.features.files.FileSortBy
 
 import com.ismartcoding.plain.models.MergeResult
 import com.ismartcoding.plain.features.audio.MediaPlayMode
-import com.ismartcoding.plain.features.chat.download.ChatDownloadCommand
+import com.ismartcoding.plain.features.downloads.DownloadCommand
+import com.ismartcoding.plain.models.Download
+import com.ismartcoding.plain.models.DownloadInput
 import com.ismartcoding.plain.features.chat.models.MessageShare
 import com.ismartcoding.plain.features.dlna.sender.CastCommand
 import com.ismartcoding.plain.features.dlna.sender.CastSnapshot
@@ -13,11 +15,6 @@ import com.ismartcoding.plain.features.files.FileTaskOp
 import com.ismartcoding.plain.features.files.FileTaskType
 import com.ismartcoding.plain.features.files.FileWriteAction
 import com.ismartcoding.plain.features.media.actions.MediaAction
-import com.ismartcoding.plain.features.shares.SharedBrowseResult
-import com.ismartcoding.plain.features.shares.SharedDownloadCommand
-import com.ismartcoding.plain.features.shares.SharedDownloadInput
-import com.ismartcoding.plain.features.shares.SharedFileDto
-import com.ismartcoding.plain.features.shares.SharedLink
 import com.ismartcoding.plain.models.ActionResult
 import com.ismartcoding.plain.models.AppFile
 import com.ismartcoding.plain.models.AudioItem
@@ -36,7 +33,7 @@ import com.ismartcoding.plain.models.Note
 import com.ismartcoding.plain.models.NoteInput
 import com.ismartcoding.plain.models.PairPeerInput
 import com.ismartcoding.plain.models.PomodoroToday
-import com.ismartcoding.plain.models.ShareRecord
+import com.ismartcoding.plain.models.Share
 import com.ismartcoding.plain.models.Tag
 import com.ismartcoding.plain.platform.system.DataType
 import com.ismartcoding.plain.rust.graphql.GraphqlRequest
@@ -382,38 +379,13 @@ object Mutation {
         field = "createFileTask",
     )
 
-    fun browseSharedLink(
-        messageId: String,
-        expected: MessageShare,
-        relativePath: String?,
-    ): GraphqlRequest<SharedBrowseResult?> = GraphqlRequest(
-        $$"mutation($messageId: ID!, $expected: SharedMessageCardInput!, $relativePath: String) { browseSharedLink(messageId: $messageId, expected: $expected, relativePath: $relativePath) { info { $${Fragments.SHARED_INFO} } link { $${Fragments.SHARE_LINK} } card { $${Fragments.SHARED_CARD} } } }",
-        mapOf(variable("messageId", messageId), variable("expected", expected), variable("relativePath", relativePath)),
-        field = "browseSharedLink",
-    )
-
-    fun cacheSharedFile(
-        link: SharedLink,
-        urlToken: String,
-        entry: SharedFileDto,
-        thumbnail: Boolean,
-    ): GraphqlRequest<String> = GraphqlRequest(
-        $$"mutation($link: SharedLinkInput!, $urlToken: String!, $entry: SharedEntryInput!, $thumbnail: Boolean!) { cacheSharedFile(link: $link, urlToken: $urlToken, entry: $entry, thumbnail: $thumbnail) }",
-        mapOf(variable("link", link), variable("urlToken", urlToken), variable("entry", entry), variable("thumbnail", thumbnail)),
-        field = "cacheSharedFile",
-    )
-
     fun deleteShare(id: String): GraphqlRequest<Unit> = GraphqlRequest(
         $$"mutation($id: ID!) { deleteShare(id: $id) }",
         mapOf(variable("id", id)),
         field = "deleteShare",
     )
 
-    internal fun enqueueSharedDownload(input: SharedDownloadInput): GraphqlRequest<Unit> = GraphqlRequest(
-        $$"mutation($input: SharedDownloadInput!) { enqueueSharedDownload(input: $input) }",
-        mapOf(variable("input", input)),
-        field = "enqueueSharedDownload",
-    )
+
 
     fun cacheAudioCover(path: String): GraphqlRequest<String?> = GraphqlRequest(
         $$"mutation CacheAudioCover($path: String!) { cacheAudioCover(path: $path) }",
@@ -637,60 +609,24 @@ object Mutation {
         )
     }
 
-    fun createShare(
-        name: String,
-        realPaths: Collection<String>,
-        readOnly: Boolean,
-        expiresAt: Instant?,
-    ): GraphqlRequest<ShareRecord> = GraphqlRequest(
-        $$"mutation($name: String!, $realPaths: [String!]!, $readOnly: Boolean!, $expiresAt: Instant) { createShare(name: $name, realPaths: $realPaths, readOnly: $readOnly, expiresAt: $expiresAt) { $${Fragments.SHARE} } }",
-        mapOf(variable("name", name), variable("realPaths", realPaths), variable("readOnly", readOnly), variable("expiresAt", expiresAt)),
-        field = "createShare",
+    fun createShare(input: com.ismartcoding.plain.models.ShareInput): GraphqlRequest<Share> = GraphqlRequest(
+        $$"mutation($input: ShareInput!) { createShare(input: $input) { $${Fragments.SHARE} } }",
+        mapOf(variable("input", input)), field = "createShare",
+    )
+    fun updateShare(id: String, input: com.ismartcoding.plain.models.ShareInput): GraphqlRequest<Share> = GraphqlRequest(
+        $$"mutation($id: ID!, $input: ShareInput!) { updateShare(id: $id, input: $input) { $${Fragments.SHARE} } }",
+        mapOf(variable("id", id), variable("input", input)), field = "updateShare",
     )
 
-    fun updateShare(
-        id: String,
-        name: String,
-        expiresAt: Instant?,
-        realPaths: Collection<String>?,
-    ): GraphqlRequest<ShareRecord> = GraphqlRequest(
-        $$"mutation($id: ID!, $name: String!, $expiresAt: Instant, $realPaths: [String!]) { updateShare(id: $id, name: $name, expiresAt: $expiresAt, realPaths: $realPaths) { $${Fragments.SHARE} } }",
-        mapOf(variable("id", id), variable("name", name), variable("expiresAt", expiresAt), variable("realPaths", realPaths)),
-        field = "updateShare",
+    fun createDownload(input: DownloadInput): GraphqlRequest<Download> = GraphqlRequest(
+        "mutation(${'$'}input: DownloadInput!) { createDownload(input: ${'$'}input) { ${Fragments.DOWNLOAD} } }",
+        mapOf(variable("input", input)), field = "createDownload",
     )
 
-    fun sharedDownloadControl(command: SharedDownloadCommand, id: String): GraphqlRequest<Unit> {
-        val field = when (command) {
-            SharedDownloadCommand.RETRY -> "retrySharedDownload"
-            SharedDownloadCommand.CANCEL -> "cancelSharedDownload"
-            SharedDownloadCommand.REMOVE -> "removeSharedDownload"
-        }
-        return GraphqlRequest(
-            $$"mutation($id: ID!) { $${field}(id: $id) }",
-            mapOf(variable("id", id)),
-            field = field,
-        )
-    }
-
-    fun enqueueChatDownload(messageId: String, fileId: String, peerId: String): GraphqlRequest<Unit> = GraphqlRequest(
-        $$"mutation($messageId: ID!, $fileId: String!, $peerId: ID!) { enqueueChatDownload(messageId: $messageId, fileId: $fileId, peerId: $peerId) }",
-        mapOf(variable("messageId", messageId), variable("fileId", fileId), variable("peerId", peerId)),
-        field = "enqueueChatDownload",
+    fun downloadControl(id: String, command: DownloadCommand): GraphqlRequest<Unit> = GraphqlRequest(
+        "mutation(${'$'}id: ID!) { ${command.field}(id: ${'$'}id) }",
+        mapOf(variable("id", id)), field = command.field,
     )
-
-    fun chatDownloadControl(command: ChatDownloadCommand, id: String): GraphqlRequest<Unit> {
-        val field = when (command) {
-            ChatDownloadCommand.PAUSE -> "pauseChatDownload"
-            ChatDownloadCommand.RESUME -> "resumeChatDownload"
-            ChatDownloadCommand.RETRY -> "retryChatDownload"
-            ChatDownloadCommand.REMOVE -> "removeChatDownload"
-        }
-        return GraphqlRequest(
-            $$"mutation($id: ID!) { $${field}(id: $id) }",
-            mapOf(variable("id", id)),
-            field = field,
-        )
-    }
 
     fun setPref(key: String, value: kotlinx.serialization.json.JsonElement): GraphqlRequest<Boolean> = GraphqlRequest(
         $$"mutation($key: String!, $value: JSON!) { setPref(key: $key, value: $value) }",

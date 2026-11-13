@@ -48,7 +48,7 @@ class GraphqlArgumentsTest {
             Query.notes("", 10, 0) to "notes",
             Query.clipboardItems(10, 0, "") to "clipboardItems",
             Query.favoriteFolders() to "favoriteFolders",
-            Query.shareRecords() to "shareRecords",
+            Query.shares() to "shares",
             Query.mediaRows(DataType.IMAGE, "", 10, 0, FileSortBy.NAME_ASC) to "images",
             Query.mediaCount(DataType.IMAGE, "") to "imageCount",
             Query.selectedMediaPaths("videos", "ids:=video", 1) to "videos",
@@ -173,7 +173,6 @@ class GraphqlArgumentsTest {
     fun variableRequestsOwnNamesAndPreserveDefaultInputFields() {
         val path = "a\"b\\c\n"
         assertEquals(mapOf("path" to JsonPrimitive(path)), Query.audioDuration(path).operation.variables)
-        assertEquals(mapOf("path" to JsonPrimitive(path)), Mutation.cacheAudioCover(path).operation.variables)
         val request = Mutation.createFileTask(FileTaskType.COPY, listOf(FileTaskOp("a", "b")))
         assertEquals(JsonPrimitive(false), request.operation.variables.getValue("ops").jsonArray.single().jsonObject["overwrite"])
         assertEquals(setOf("type", "title", "ops"), request.operation.variables.keys)
@@ -192,8 +191,9 @@ class GraphqlArgumentsTest {
         assertEquals(setOf("stateB64", "thumbnail", "canvasWidth", "canvasHeight", "layerCount"), project.keys)
         assertEquals(JsonNull, project["thumbnail"])
         val expiresAt = Instant.parse("2026-01-01T00:00:00.123456789Z")
-        assertEquals(JsonPrimitive(expiresAt.toString()), Mutation.createShare("share", listOf("path"), true, expiresAt).operation.variables["expiresAt"])
-        assertEquals(JsonNull, Mutation.updateShare("id", "name", null, null).operation.variables["realPaths"])
-        assertEquals(JsonNull, Query.shareLink("id", null).operation.variables["host"])
+        val shareInput = com.ismartcoding.plain.models.ShareInput("name", "", expiresAt, true, listOf(com.ismartcoding.plain.models.SharePath("/file", "/file", false)))
+        assertEquals(JsonHelper.jsonEncodeToElement(shareInput), Mutation.createShare(shareInput).operation.variables["input"])
+        assertEquals(JsonPrimitive(expiresAt.toString()), Mutation.createShare(shareInput).operation.variables.getValue("input").jsonObject["expiresAt"])
+        assertEquals(JsonNull, Mutation.updateShare("share", shareInput.copy(expiresAt = null)).operation.variables.getValue("input").jsonObject["expiresAt"])
     }
 }

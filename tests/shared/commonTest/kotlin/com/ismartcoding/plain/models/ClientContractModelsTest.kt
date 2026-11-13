@@ -7,7 +7,6 @@ import com.ismartcoding.plain.features.nearby.DiscoveryMethod
 import com.ismartcoding.plain.features.nearby.MdnsPacketDirection
 import com.ismartcoding.plain.features.nearby.MdnsSnapshot
 import com.ismartcoding.plain.features.nearby.MdnsPacketLog
-import com.ismartcoding.plain.features.shares.SharedInfoDto
 import com.ismartcoding.plain.features.nearby.PeerStatus
 import com.ismartcoding.plain.features.notifications.NotificationFilterData
 import com.ismartcoding.plain.features.notifications.NotificationFilterMode
@@ -130,10 +129,12 @@ class ClientContractModelsTest {
     }
 
     @Test
-    fun shared_info_expiry_decodes_nullable_instants() {
-        val info = JsonHelper.jsonDecode<SharedInfoDto>("""{"expiresAt":"2026-11-12T08:09:10.123Z"}""")
+    fun share_expiry_and_typed_paths_decode_without_public_credentials() {
+        val payload = """{"id":"share","name":"Example","password":"","readOnly":true,"expiresAt":"2026-11-12T08:09:10.123Z","data":[{"virtualPath":"/alias","realPath":"/owned/folder","isDir":true}],"url":"https://device.test/s/share#key"}"""
+        val info = JsonHelper.jsonDecode<Share>(payload)
         assertEquals(Instant.parse("2026-11-12T08:09:10.123Z"), info.expiresAt)
-        assertEquals(null, JsonHelper.jsonDecode<SharedInfoDto>("""{"expiresAt":null}""").expiresAt)
+        assertEquals(SharePath("/alias", "/owned/folder", true), info.data.single())
+        assertEquals(null, JsonHelper.jsonDecode<Share>(payload.replace("\"2026-11-12T08:09:10.123Z\"", "null")).expiresAt)
     }
 
 }

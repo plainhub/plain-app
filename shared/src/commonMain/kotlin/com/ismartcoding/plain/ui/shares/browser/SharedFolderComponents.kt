@@ -24,9 +24,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.ismartcoding.plain.ui.components.ButtonType
-import com.ismartcoding.plain.features.shares.SharedFileDto
-import com.ismartcoding.plain.features.shares.SharedInfoDto
-import com.ismartcoding.plain.features.shares.SharedLink
+import com.ismartcoding.plain.models.File as ShareFile
 import com.ismartcoding.plain.i18n.*
 import com.ismartcoding.plain.lib.TimeHelper
 import com.ismartcoding.plain.lib.extensions.formatBytes
@@ -78,10 +76,7 @@ internal fun ErrorBanner(onRetry: () -> Unit) {
 /** FilesPage-style file row: rounded card, shared thumbnail, name + size, select checkbox. */
 @Composable
 internal fun EntryRow(
-    entry: SharedFileDto,
-    source: com.ismartcoding.plain.rust.graphql.ContentSource,
-    link: SharedLink,
-    urlToken: String,
+    entry: ShareFile,
     selectMode: Boolean,
     selected: Boolean,
     busy: Boolean,
@@ -90,8 +85,8 @@ internal fun EntryRow(
     onLongClick: () -> Unit,
     onDownload: () -> Unit,
 ) {
-    val thumbnail: suspend () -> Any? = remember(source, link, urlToken, entry) {
-        { SharedThumbCache.thumbModel(source, link, urlToken, entry) }
+    val thumbnail: suspend () -> Any? = remember(entry) {
+        { SharedThumbCache.thumbModel(entry) }
     }
     Column(
         modifier = Modifier

@@ -47,8 +47,8 @@ internal fun NavGraphBuilder.addMainFilePages(
     }
     composable<Routing.TextFile> { backStackEntry ->
         val r = backStackEntry.toRoute<Routing.TextFile>()
-        val fileSource = when (r.type) {
-            TextFileType.APP_LOG.name, TextFileType.CRASH_REPORT.name -> ContentSource.Local
+        val fileSource = when {
+            r.localSource || r.type == TextFileType.APP_LOG.name || r.type == TextFileType.CRASH_REPORT.name -> ContentSource.Local
             else -> source()
         }
         fileSource?.let {

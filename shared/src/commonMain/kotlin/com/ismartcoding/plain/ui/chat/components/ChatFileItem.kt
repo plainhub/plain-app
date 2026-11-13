@@ -1,5 +1,7 @@
 package com.ismartcoding.plain.ui.chat.components
 
+import com.ismartcoding.plain.features.downloads.DownloadStatus
+import com.ismartcoding.plain.features.chat.download.attachmentDownload
 import com.ismartcoding.plain.features.media.MediaClient
 
 import androidx.compose.foundation.layout.Column
@@ -13,8 +15,7 @@ import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.navigation.NavHostController
-import com.ismartcoding.plain.features.chat.download.DownloadQueue
-import com.ismartcoding.plain.features.chat.download.DownloadTask
+import com.ismartcoding.plain.models.Download
 import com.ismartcoding.plain.features.chat.models.MessageFile
 import com.ismartcoding.plain.models.Peer
 import com.ismartcoding.plain.features.chat.models.getPreviewPath
@@ -45,7 +46,7 @@ fun ChatFileItem(
     previewerState: MediaPreviewerState,
     item: MessageFile,
     index: Int,
-    downloadProgressMap: Map<String, DownloadTask>,
+    downloadTasks: Map<String, Download>,
     onShowAudioPlayer: () -> Unit,
 ) {
     val source = com.ismartcoding.plain.ui.navigation.LocalContentSource.current
@@ -69,15 +70,13 @@ fun ChatFileItem(
 
     val showContextMenu = remember { mutableStateOf(false) }
 
-    val downloadTask = downloadProgressMap[item.id]
-    val taskActive = downloadTask?.isActive() == true
-    val downloadProgress = downloadTask?.let {
-        if (it.messageFile.size > 0) it.downloadedSize.toFloat() / it.messageFile.size.toFloat() else 0f
-    } ?: 0f
+    val downloadTask = downloadTasks.attachmentDownload(m.id, item.id)
+    val taskActive = item.isRemoteFile() && downloadTask != null && downloadTask.status != DownloadStatus.COMPLETED
+    val downloadProgress = downloadTask?.fraction() ?: 0f
 
     LaunchedEffect(item.uri) {
         if (item.isRemoteFile() && downloadTask == null && peer != null) {
-            downloads.addDownloadTask(item, peer, m.id)
+            downloads.create(com.ismartcoding.plain.models.DownloadInput(chat = com.ismartcoding.plain.models.ChatDownloadInput(m.id, peer.id, listOf(item.id))))
         }
     }
 

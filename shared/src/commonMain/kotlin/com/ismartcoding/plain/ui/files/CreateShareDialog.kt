@@ -21,7 +21,7 @@ import com.ismartcoding.plain.features.chat.ShareSendClient
 import com.ismartcoding.plain.ui.components.ButtonSize
 import com.ismartcoding.plain.features.shares.ShareExpiry
 import com.ismartcoding.plain.ui.navigation.LocalContentSource
-import com.ismartcoding.plain.models.ShareRecord
+import com.ismartcoding.plain.models.Share
 import com.ismartcoding.plain.i18n.Res
 import com.ismartcoding.plain.i18n.cancel
 import com.ismartcoding.plain.i18n.close
@@ -72,17 +72,17 @@ import org.jetbrains.compose.resources.stringResource
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun CreateShareDialog(
-    paths: List<String>,
+    items: List<com.ismartcoding.plain.models.File>,
     onDismiss: () -> Unit,
-    onCreated: (ShareRecord) -> Unit = {},
+    onCreated: (Share) -> Unit = {},
 ) {
     val source = LocalContentSource.current
     val scope = rememberCoroutineScope()
-    val defaultName = remember(paths) { if (paths.size == 1) paths[0].getFilenameFromPath() else "" }
+    val defaultName = remember(items) { if (items.size == 1) items[0].name else "" }
     var name by remember { mutableStateOf(defaultName) }
     var expiry by remember { mutableStateOf(ShareExpiry.NEVER) }
     var isLoading by remember { mutableStateOf(false) }
-    var share by remember { mutableStateOf<ShareRecord?>(null) }
+    var share by remember { mutableStateOf<Share?>(null) }
     var link by remember { mutableStateOf("") }
     var showQr by remember { mutableStateOf(false) }
     var showForwardDialog by remember { mutableStateOf(false) }
@@ -178,13 +178,12 @@ fun CreateShareDialog(
                     scope.launch {
                         isLoading = true
                         val created = withIO {
-                            val s = source.shares.createShare(
-                                name = name.ifBlank { defaultName },
-                                realPaths = paths,
-                                readOnly = true,
+                            val s = source.shares.createShare(com.ismartcoding.plain.models.ShareInput(
+                                name = name.ifBlank { defaultName }, password = "", readOnly = true,
                                 expiresAt = expiry.expiresAt(TimeHelper.now()),
-                            )
-                            link = source.shares.buildLink(s)
+                                data = items.map { com.ismartcoding.plain.models.SharePath("/" + it.name, it.path, it.isDir) },
+                            ))
+                            link = s.url
                             s
                         }
                         isLoading = false

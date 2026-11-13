@@ -44,8 +44,8 @@ fun NavHostController.navigateZipFile(path: String, title: String = "") {
     }
 }
 
-fun NavHostController.navigateTextFile(path: String, title: String = "", mediaId: String = "", type: TextFileType = TextFileType.DEFAULT) {
-    navigate(Routing.TextFile(path, title, mediaId, type.name)) {
+fun NavHostController.navigateTextFile(path: String, title: String = "", mediaId: String = "", type: TextFileType = TextFileType.DEFAULT, localSource: Boolean = false) {
+    navigate(Routing.TextFile(path, title, mediaId, type.name, localSource)) {
         launchSingleTop = true
     }
 }

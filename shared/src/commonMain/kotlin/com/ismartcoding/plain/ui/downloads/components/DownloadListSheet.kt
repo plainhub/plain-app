@@ -26,9 +26,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.ismartcoding.plain.features.shares.SharedFolderDownloadClient
-import com.ismartcoding.plain.features.shares.SharedFolderDownloadEngine
-import com.ismartcoding.plain.features.shares.SharedDownloadCommand
+import com.ismartcoding.plain.features.downloads.DownloadsClient
+import com.ismartcoding.plain.features.downloads.DownloadCenter
+import com.ismartcoding.plain.features.downloads.DownloadCommand
 import com.ismartcoding.plain.features.downloads.isTerminalDownloadStatus
 import com.ismartcoding.plain.i18n.*
 import com.ismartcoding.plain.ui.base.PBottomSheetTopAppBar
@@ -46,7 +46,7 @@ import androidx.compose.material3.Surface
 @Composable
 fun DownloadListSheet(
     onDismiss: () -> Unit,
-    downloads: SharedFolderDownloadClient = SharedFolderDownloadEngine,
+    downloads: DownloadsClient = DownloadCenter,
 ) {
     val scope = rememberCoroutineScope()
     val tasksMap = downloads.progress.collectAsState().value
@@ -67,7 +67,7 @@ fun DownloadListSheet(
                                 confirmActionAsync(
                                     title = Res.string.clear,
                                     message = Res.string.clear_completed_confirm,
-                                    callback = { finished.forEach { downloads.control(it.id, SharedDownloadCommand.REMOVE) } },
+                                    callback = { finished.forEach { downloads.control(it.id, DownloadCommand.REMOVE) } },
                                     danger = true,
                                 )
                             }

@@ -5,7 +5,10 @@ import com.ismartcoding.plain.rust.RustRuntime
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
-import com.ismartcoding.plain.features.shares.SharedLinkClient
+import com.ismartcoding.plain.models.ShareInput
+import com.ismartcoding.plain.models.SharePath
+import com.google.crypto.tink.subtle.XChaCha20Poly1305
+import java.security.MessageDigest
 import com.ismartcoding.plain.features.shares.SharesClient
 import com.ismartcoding.plain.Prefs
 import com.ismartcoding.plain.network.*
@@ -20,7 +23,6 @@ import java.io.File
 import java.io.IOException
 import java.net.InetSocketAddress
 import java.net.ServerSocket
-import java.net.URLEncoder
 import java.util.UUID
 import java.util.zip.ZipInputStream
 import kotlin.io.encoding.Base64
@@ -44,43 +46,49 @@ class ShareRustHttpTest {
         try {
             Prefs.backgroundServiceEnabled.value = true
             withIO { RustRuntime.start() }
-            val share = SharesClient.createShare(marker, listOf(folder.absolutePath), true, null)
+            val input = ShareInput(marker, "", null, true, listOf(SharePath("/photos", folder.absolutePath, true)))
+            val share = SharesClient.createShare(input)
             id = share.id
-            val link = SharedLinkClient.ownLink(share.id, "127.0.0.1")
-            val key = Base64.decode(link.token)
+            val key = android.util.Base64.decode(android.net.Uri.parse(share.url).fragment, android.util.Base64.URL_SAFE)
             val base = "http://127.0.0.1:${Prefs.httpPort.value}"
-            assertTrue(SharesClient.buildLink(share, "127.0.0.1").contains("/s/${share.id}#"))
+            assertTrue(share.url.contains("/s/${share.id}#"))
             createTestHttpClient(TestHttpClientSpec.Local()).use { client ->
                 suspend fun guest(path: String = "photos"): Pair<Int, JsonObject?> {
                     val query = buildJsonObject {
-                        put("query", "query(\$path: String) { sharedInfo(relativePath: \$path) { entries { relativePath isDir } } }")
+                        put("requestId", UUID((System.currentTimeMillis() shl 16) or 0x7000L or (UUID.randomUUID().mostSignificantBits and 0xfffL), (UUID.randomUUID().leastSignificantBits and Long.MAX_VALUE) or Long.MIN_VALUE).toString())
+                        put("query", "query(\$path: String) { sharedInfo(relativePath: \$path) { urlToken entries { relativePath isDir } } }")
                         put("variables", buildJsonObject { put("path", path) })
                     }
-                    val body = CryptoFixtures.chaCha20Encrypt(key, "${System.currentTimeMillis()}|${UUID.randomUUID()}|$query")
+                    val body = XChaCha20Poly1305(key).encrypt(query.toString().toByteArray(), "HTTP_REQUEST\u0000POST\u0000/guest_graphql".toByteArray())
                     return client.post("$base/guest_graphql", body, "application/octet-stream", mapOf("c-id" to share.id)).use {
                         val status = it.status.value
                         val result = if (status == 200) {
-                            val decrypted = CryptoFixtures.chaCha20Decrypt(key, it.bodyAsBytes())
+                            val reply = CryptoFixtures.chaCha20Decrypt(key, it.bodyAsBytes())
                                 ?: throw AssertionError("Guest response decryption failed")
+                            assertArrayEquals(byteArrayOf(0) + MessageDigest.getInstance("SHA-256").digest(body), reply.copyOfRange(0,33))
+                            val decrypted = reply.copyOfRange(33,reply.size)
                             Json.parseToJsonElement(decrypted.decodeToString()).jsonObject
                         } else null
                         status to result
                     }
                 }
+                val (status, listing) = guest()
+                assertEquals(200, status)
+                val info = listing!!.getValue("data").jsonObject.getValue("sharedInfo").jsonObject
+                val fileKey = Base64.decode(info.getValue("urlToken").jsonPrimitive.content)
                 fun resource(path: String, route: String = "fs"): String {
-                    val payload = buildJsonObject { put("sharedId", share.id); put("relativePath", path) }
-                    val encrypted = ResourceCrypto.encrypt(payload.toString(), Base64.decode(share.urlToken))
-                    return "$base/$route?sid=${share.id}&id=${URLEncoder.encode(encrypted, "UTF-8")}"
+                    val payload = buildJsonObject { put("type", "SHARED_FILE"); put("id", path) }
+                    val encrypted = XChaCha20Poly1305(fileKey).encrypt(payload.toString().toByteArray(), "FS\u0000s\u0000${share.id}".toByteArray())
+                    val encoded = android.util.Base64.encodeToString(encrypted, android.util.Base64.URL_SAFE or android.util.Base64.NO_WRAP or android.util.Base64.NO_PADDING)
+                    return "$base/$route?id=s.${share.id}.$encoded" + if (route == "fs") "&action=download" else ""
                 }
                 val fileUrl = resource("photos/a.txt")
                 client.get(fileUrl).use {
                     assertEquals(200, it.status.value)
                     assertEquals("synthetic", it.bodyAsText())
                 }
-                val (status, listing) = guest()
-                assertEquals(200, status)
-                val entries = listing!!.getValue("data").jsonObject.getValue("sharedInfo").jsonObject.getValue("entries").jsonArray
-                assertEquals(listOf("photos/a.txt"), entries.filter { !it.jsonObject.getValue("isDir").jsonPrimitive.boolean }
+                val entries = info.getValue("entries").jsonArray
+                assertEquals(listOf("/photos/a.txt"), entries.filter { !it.jsonObject.getValue("isDir").jsonPrimitive.boolean }
                     .map { it.jsonObject.getValue("relativePath").jsonPrimitive.content })
                 client.get(resource("photos", "zip/dir")).use {
                     assertEquals(200, it.status.value)
@@ -109,11 +117,12 @@ class ShareRustHttpTest {
                 }
                 Prefs.backgroundServiceEnabled.value = true
                 withIO { RustRuntime.start() }
-                SharesClient.updateShare(share.id, marker, null, listOf(other.absolutePath))
+                val replacement = input.copy(data = listOf(SharePath("/other",other.absolutePath,true)))
+                SharesClient.updateShare(share.id, replacement)
                 client.get(fileUrl).use { assertEquals(403, it.status.value) }
-                SharesClient.updateShare(share.id, marker, Instant.parse("2000-01-01T00:00:00Z"))
+                SharesClient.updateShare(share.id, replacement.copy(expiresAt = Instant.parse("2000-01-01T00:00:00Z")))
                 assertEquals(403, guest("other").first)
-                SharesClient.updateShare(share.id, marker, null)
+                SharesClient.updateShare(share.id, replacement)
                 assertEquals(200, guest("other").first)
                 SharesClient.deleteShare(share.id)
                 assertEquals(403, guest("other").first)

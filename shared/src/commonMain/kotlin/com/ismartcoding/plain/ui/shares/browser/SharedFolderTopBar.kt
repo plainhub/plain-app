@@ -36,7 +36,7 @@ internal fun SharedFolderTopBar(
         title = if (state.selectMode) {
             stringResource(Res.string.x_selected, state.selected.size)
         } else {
-            state.crumbs.lastOrNull()?.name ?: state.rootInfo?.name ?: state.shareMsg?.name ?: ""
+            state.crumbs.lastOrNull()?.name ?: state.shareMsg?.name ?: ""
         },
         subtitle = if (state.selectMode) "" else browseSubtitle(state),
         navigationIcon = if (state.selectMode) {
@@ -81,7 +81,7 @@ private fun browseSubtitle(state: SharedFolderState): String {
     val fileCount = entries.count { !it.isDir }
     if (dirCount > 0) parts.add(pluralStringResource(Res.plurals.x_folders, dirCount, dirCount))
     if (fileCount > 0) parts.add(pluralStringResource(Res.plurals.x_files, fileCount, fileCount))
-    val expiresAt = state.rootInfo?.expiresAt
+    val expiresAt = state.shareMsg?.expiresAt
     if (expiresAt != null) {
         val dateText = expiresAt.formatDateTime()
         parts.add(

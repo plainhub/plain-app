@@ -20,7 +20,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
-import com.ismartcoding.plain.features.chat.download.DownloadTask
+import com.ismartcoding.plain.models.Download
 import com.ismartcoding.plain.features.chat.models.MessageFile
 import com.ismartcoding.plain.features.files.TextFileType
 import com.ismartcoding.plain.i18n.*
@@ -63,7 +63,7 @@ internal fun ChatFileItemContent(
     previewPath: String,
     isActive: Boolean,
     downloadProgress: Float,
-    downloadTask: DownloadTask?,
+    downloadTask: Download?,
     isCurrentlyPlaying: Boolean,
     showContextMenu: MutableState<Boolean>,
     index: Int,

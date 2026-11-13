@@ -1,10 +1,8 @@
 package com.ismartcoding.plain.ui.downloads.components
 
 import com.ismartcoding.plain.features.downloads.DownloadStatus
-import com.ismartcoding.plain.features.shares.ShareBatchType
-import com.ismartcoding.plain.features.shares.SharedFileDto
-import com.ismartcoding.plain.features.shares.SharedFolderBatchTask
-import com.ismartcoding.plain.features.shares.SharedLink
+import com.ismartcoding.plain.models.Download
+import com.ismartcoding.plain.models.ResourceDownloadSource
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
@@ -17,18 +15,10 @@ import kotlin.test.assertTrue
  */
 class DownloadMiniBarTest {
 
-    private fun task(id: String, status: DownloadStatus, type: ShareBatchType = ShareBatchType.FILE): SharedFolderBatchTask =
-        SharedFolderBatchTask(
-            id = id, messageId = "m1", type = type, title = id, targetDir = "",
-            link = SharedLink("", 0, "", ""), urlToken = "",
-            entries = listOf(SharedFileDto(name = "f", size = 100)),
-        ).apply {
-            this.status = status
-            downloadedSize = 100
-            totalSize = 100
-            totalFiles = 1
-            doneFiles = 1
-        }
+    private fun task(id: String, status: DownloadStatus): Download = Download(
+        id, id, ResourceDownloadSource(listOf("https://fixture.invalid/fs?id=s.share.AA&action=download")), "/downloads", null, status,
+        100, 100, 0, 1, 1, "", "", emptyList(),
+    )
 
     @Test
     fun completedBatchRendersAsFullBarWithoutPercent() {
@@ -39,9 +29,7 @@ class DownloadMiniBarTest {
 
     @Test
     fun runningBatchKeepsPercentText() {
-        val t = task("run", DownloadStatus.DOWNLOADING).apply {
-            downloadedSize = 25
-        }
+        val t = task("run", DownloadStatus.DOWNLOADING).copy(downloadedBytes = 25)
         assertEquals("25%", miniBarPct(t))
     }
 
@@ -61,4 +49,12 @@ class DownloadMiniBarTest {
         assertEquals(partial.id, mostRelevant(listOf(completed, partial))?.id)
         assertTrue(miniBarPct(partial).isEmpty())
     }
+    @Test
+    fun fractionIsZeroForUnknownTotalsAndClampedForDisplay() {
+        val sample = task("sample", DownloadStatus.DOWNLOADING)
+        assertEquals(0f, sample.copy(totalBytes = 0).fraction())
+        assertEquals(1f, sample.copy(downloadedBytes = 150).fraction())
+        assertEquals(0.4f, sample.copy(downloadedBytes = 40).fraction())
+    }
+
 }

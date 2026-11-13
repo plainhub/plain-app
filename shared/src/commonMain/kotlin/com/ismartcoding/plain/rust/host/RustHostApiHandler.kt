@@ -24,7 +24,6 @@ import com.ismartcoding.plain.Prefs
 import com.ismartcoding.plain.HttpServerManager
 import com.ismartcoding.plain.features.dlna.DlnaRendererState
 import com.ismartcoding.plain.features.dlna.sender.RustDlnaSender
-import com.ismartcoding.plain.features.shares.SharedFolderDownloadEngine
 import com.ismartcoding.plain.features.settings.AppUpdateDownload
 import com.ismartcoding.plain.features.settings.AppUpdateDownloads
 import com.ismartcoding.plain.ui.clipboard.ClipboardHistoryViewModel
@@ -184,8 +183,8 @@ internal suspend fun executeHostRequest(
             PeerTransportProjection.apply(JsonHelper.jsonDecodeFromElement<List<PeerTransportState>>(params.getValue("active")))
             hostResult()
         }
-        "sharedFolderDownloadsRefresh" -> {
-            SharedFolderDownloadEngine.refresh()
+        "downloadsRefresh" -> {
+            com.ismartcoding.plain.features.downloads.DownloadCenter.refresh()
             hostResult()
         }
         "dlnaRendererChanged" -> {

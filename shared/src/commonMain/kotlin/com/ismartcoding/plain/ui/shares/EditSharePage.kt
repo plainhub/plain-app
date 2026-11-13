@@ -25,7 +25,7 @@ import androidx.navigation.NavHostController
 import com.ismartcoding.plain.ui.components.ButtonType
 import com.ismartcoding.plain.features.shares.ShareExpiry
 import com.ismartcoding.plain.ui.navigation.LocalContentSource
-import com.ismartcoding.plain.models.ShareRecord
+import com.ismartcoding.plain.models.Share
 import com.ismartcoding.plain.i18n.Res
 import com.ismartcoding.plain.i18n.confirm_to_delete
 import com.ismartcoding.plain.i18n.delete
@@ -40,6 +40,7 @@ import com.ismartcoding.plain.i18n.share_expiry_never
 import com.ismartcoding.plain.i18n.share_link
 import com.ismartcoding.plain.i18n.share_link_desc
 import com.ismartcoding.plain.i18n.share_name_placeholder
+import com.ismartcoding.plain.lib.extensions.getFilenameFromPath
 import com.ismartcoding.plain.lib.TimeHelper
 import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.ui.i18n.LocaleHelper
@@ -84,7 +85,7 @@ fun EditSharePage(
 ) {
     val source = LocalContentSource.current
     val scope = rememberCoroutineScope()
-    var share by remember(source, shareId) { mutableStateOf<ShareRecord?>(null) }
+    var share by remember(source, shareId) { mutableStateOf<Share?>(null) }
     var link by remember(source, shareId) { mutableStateOf("") }
     var name by remember(source, shareId) { mutableStateOf("") }
     var expiry by remember(source, shareId) { mutableStateOf(ShareExpiry.NEVER) }
@@ -104,10 +105,10 @@ fun EditSharePage(
             share = s
             name = s.name
             expiry = s.toExpiryOption()
-            paths = s.roots.map { it.realPath }
+            paths = s.data.map { it.realPath }
             dirFlags.clear()
-            dirFlags.putAll(s.roots.associate { it.realPath to it.isDir })
-            link = source.shares.buildLink(s)
+            dirFlags.putAll(s.data.associate { it.realPath to it.isDir })
+            link = s.url
         }.join()
     }
 
@@ -124,7 +125,10 @@ fun EditSharePage(
     val save: () -> Unit = {
         scope.launchSafe(onDone = { isLoading = false }) {
             isLoading = true
-            withIO { source.shares.updateShare(current.id, name, expiry.expiresAt(TimeHelper.now()), realPaths = paths) }
+            withIO { source.shares.updateShare(current.id, com.ismartcoding.plain.models.ShareInput(
+                name, current.password, expiry.expiresAt(TimeHelper.now()), current.readOnly,
+                paths.map { path -> current.data.find { it.realPath == path } ?: com.ismartcoding.plain.models.SharePath("/" + path.getFilenameFromPath(), path, dirFlags.getValue(path)) },
+            )) }
             navController.popBackStack()
         }
     }
@@ -241,7 +245,7 @@ fun EditSharePage(
 
 /** Human-readable expiry status of a share, e.g. "Expired" / "Expires …" / "Never". */
 @Composable
-fun ShareRecord.expiryLabel(): String {
+fun Share.expiryLabel(): String {
     val expiresAt = this.expiresAt
     return when {
         isExpired -> stringResource(Res.string.share_expired)
@@ -251,7 +255,7 @@ fun ShareRecord.expiryLabel(): String {
 }
 
 /** Pick the expiry chip closest to the share's remaining lifetime (null = NEVER). */
-private fun ShareRecord.toExpiryOption(): ShareExpiry {
+private fun Share.toExpiryOption(): ShareExpiry {
     val expiresAt = expiresAt ?: return ShareExpiry.NEVER
     val remainingHours = (expiresAt - TimeHelper.now()).inWholeHours
     return ShareExpiry.entries.filter { it != ShareExpiry.NEVER }

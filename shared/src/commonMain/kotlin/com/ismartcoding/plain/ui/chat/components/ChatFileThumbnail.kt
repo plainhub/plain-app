@@ -10,7 +10,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
-import com.ismartcoding.plain.features.chat.download.DownloadTask
+import com.ismartcoding.plain.models.Download
 import com.ismartcoding.plain.features.chat.models.MessageFile
 import com.ismartcoding.plain.lib.extensions.getFilenameExtension
 import com.ismartcoding.plain.lib.extensions.isImageFast
@@ -29,7 +29,7 @@ fun ChatFileThumbnail(
     previewerState: MediaPreviewerState,
     isActive: Boolean,
     downloadProgress: Float,
-    downloadTask: DownloadTask?,
+    downloadTask: Download?,
 ) {
     val widthPx = with(LocalDensity.current) { 48.dp.toPx() }.toInt()
     Box {
@@ -57,7 +57,7 @@ fun ChatFileThumbnail(
 
         if (isActive && downloadTask != null) {
             DownloadProgressOverlay(
-                taskId = item.id,
+                taskId = downloadTask.id,
                 status = downloadTask.status,
                 modifier = Modifier.size(48.dp),
                 downloadProgress = downloadProgress,

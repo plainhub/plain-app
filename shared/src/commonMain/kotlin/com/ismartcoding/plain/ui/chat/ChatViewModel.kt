@@ -43,8 +43,8 @@ class ChatViewModel internal constructor(
     companion object { val local: ChatViewModel by lazy { ChatViewModel() } }
     val client = source.chats
     val downloads by lazy {
-        if (source is com.ismartcoding.plain.rust.graphql.ContentSource.Local) com.ismartcoding.plain.features.chat.download.DownloadQueue
-        else com.ismartcoding.plain.features.chat.download.ChatDownloadClient(source.api, scope)
+        if (source is com.ismartcoding.plain.rust.graphql.ContentSource.Local) com.ismartcoding.plain.features.downloads.DownloadCenter
+        else com.ismartcoding.plain.features.downloads.DownloadsClient(source.api, scope)
     }
     internal val sourceChanges = kotlinx.coroutines.flow.MutableSharedFlow<Unit>(extraBufferCapacity = 1)
     internal suspend fun observeSource() {

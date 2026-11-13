@@ -1,7 +1,7 @@
 package com.ismartcoding.plain.ui.shares.browser
 
 import androidx.compose.runtime.Composable
-import com.ismartcoding.plain.features.shares.SharedFileDto
+import com.ismartcoding.plain.models.File as ShareFile
 import com.ismartcoding.plain.i18n.*
 import com.ismartcoding.plain.ui.components.SaveToSheet
 import org.jetbrains.compose.resources.stringResource
@@ -13,9 +13,10 @@ import org.jetbrains.compose.resources.stringResource
 @Composable
 internal fun SharedFolderDownloadSheet(
     state: SharedFolderState,
-    target: SharedFileDto,
+    target: ShareFile,
 ) {
     SaveToSheet(
+        source = com.ismartcoding.plain.rust.graphql.ContentSource.Local,
         title = target.name,
         onDismiss = { state.downloadTarget = null },
         onDownloads = {
@@ -39,6 +40,7 @@ internal fun SharedFolderDownloadSheet(
 @Composable
 internal fun SharedFolderSaveSelectionSheet(state: SharedFolderState) {
     SaveToSheet(
+        source = com.ismartcoding.plain.rust.graphql.ContentSource.Local,
         title = stringResource(Res.string.save_selected, state.selected.size),
         onDismiss = { state.showSaveSelectedSheet = false },
         onDownloads = {

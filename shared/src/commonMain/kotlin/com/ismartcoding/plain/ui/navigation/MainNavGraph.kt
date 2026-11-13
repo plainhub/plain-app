@@ -32,8 +32,6 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.toRoute
 import com.ismartcoding.plain.features.downloads.DownloadCenter
 import com.ismartcoding.plain.features.downloads.isTerminalDownloadStatus
-import com.ismartcoding.plain.features.shares.SharedFolderBatchTask
-import com.ismartcoding.plain.features.shares.SharedFolderDownloadEngine
 import com.ismartcoding.plain.i18n.Res
 import com.ismartcoding.plain.i18n.pomodoro_notification_prompt
 import com.ismartcoding.plain.ui.app.MainViewModel
@@ -142,9 +140,9 @@ fun MainNavGraph(
     var showDownloads by remember { mutableStateOf(false) }
     val tasksMap = DownloadCenter.progress.collectAsState().value
     LaunchedEffect(Unit) {
-        launchSafe { SharedFolderDownloadEngine.refresh() }
+        launchSafe { DownloadCenter.refresh() }
     }
-    val shareTasks = tasksMap.values.filterIsInstance<SharedFolderBatchTask>()
+    val downloadTasks = tasksMap.values.toList()
     val onShareFolderPage = backStackEntry?.destination?.hasRoute<Routing.SharedFolder>() == true
     key(selectedDevice) {
         CompositionLocalProvider(
@@ -201,9 +199,9 @@ fun MainNavGraph(
                     addMainRequestPages(navController, channelVM)
                 }
 
-                if (!onShareFolderPage && shareTasks.any { !it.status.isTerminalDownloadStatus() }) {
+                if (!onShareFolderPage && downloadTasks.any { !it.status.isTerminalDownloadStatus() }) {
                     DownloadFloatingWidget(
-                        tasks = shareTasks,
+                        tasks = downloadTasks,
                         onClick = { showDownloads = true },
                     )
                 }

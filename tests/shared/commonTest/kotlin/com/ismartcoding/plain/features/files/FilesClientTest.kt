@@ -23,7 +23,7 @@ class FilesClientTest {
             assertEquals(JsonPrimitive(expected), operation.variables["path"])
             GraphqlResponse(data = JsonHelper.jsonEncodeToElement(mapOf("writeTextFile" to file)).jsonObject)
         }
-        val client = FilesApi(api) { _, _ -> error("Unexpected upload") }
+        val client = FilesApi(api, upload = { _, _ -> error("Unexpected upload") })
 
         assertEquals(expected, client.writeText("file:///tmp/%E7%A4%BA%E4%BE%8B%20+%25%23.txt", "test", false).path)
     }

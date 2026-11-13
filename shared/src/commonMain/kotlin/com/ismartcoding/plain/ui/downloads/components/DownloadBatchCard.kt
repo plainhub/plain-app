@@ -27,8 +27,8 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.ismartcoding.plain.features.downloads.DownloadStatus
 import com.ismartcoding.plain.features.downloads.isTerminalDownloadStatus
-import com.ismartcoding.plain.features.shares.SharedFolderBatchTask
-import com.ismartcoding.plain.features.downloads.DownloadFailure
+import com.ismartcoding.plain.models.Download
+import com.ismartcoding.plain.models.DownloadFailure
 import com.ismartcoding.plain.i18n.*
 import com.ismartcoding.plain.lib.extensions.formatBytes
 import com.ismartcoding.plain.ui.components.PIconButton
@@ -46,10 +46,9 @@ import com.ismartcoding.plain.i18n.download
 import com.ismartcoding.plain.i18n.folder
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.ui.graphics.Color
-import com.ismartcoding.plain.features.shares.ShareBatchType
-import com.ismartcoding.plain.features.shares.SharedFolderDownloadEngine
-import com.ismartcoding.plain.features.shares.SharedFolderDownloadClient
-import com.ismartcoding.plain.features.shares.SharedDownloadCommand
+import com.ismartcoding.plain.features.downloads.DownloadCenter
+import com.ismartcoding.plain.features.downloads.DownloadsClient
+import com.ismartcoding.plain.features.downloads.DownloadCommand
 
 /**
  * One aggregated batch card: title, destination, status chip, byte progress
@@ -57,9 +56,9 @@ import com.ismartcoding.plain.features.shares.SharedDownloadCommand
  */
 @Composable
 fun DownloadBatchCard(
-    task: SharedFolderBatchTask,
+    task: Download,
     modifier: Modifier = Modifier,
-    downloads: SharedFolderDownloadClient = SharedFolderDownloadEngine,
+    downloads: DownloadsClient = DownloadCenter,
 ) {
     var failuresExpanded by remember(task.id) { mutableStateOf(false) }
     val active = !task.status.isTerminalDownloadStatus()
@@ -95,7 +94,7 @@ fun DownloadBatchCard(
                     PIconButton(
                         icon = UiRes.drawable.ui_drawable_x,
                         contentDescription = stringResource(Res.string.cancel),
-                    ) { downloads.control(task.id, SharedDownloadCommand.CANCEL) }
+                    ) { downloads.control(task.id, DownloadCommand.CANCEL) }
                 } else {
                     if (task.status == DownloadStatus.PARTIAL || task.status == DownloadStatus.FAILED) {
                         PIconButton(
@@ -103,13 +102,13 @@ fun DownloadBatchCard(
                             contentDescription = stringResource(Res.string.try_again),
                         ) {
                             failuresExpanded = false
-                            downloads.retryFailed(task.id)
+                            downloads.control(task.id, DownloadCommand.RETRY)
                         }
                     }
                     PIconButton(
                         icon = UiRes.drawable.ui_drawable_x,
                         contentDescription = stringResource(Res.string.cancel),
-                    ) { downloads.control(task.id, SharedDownloadCommand.REMOVE) }
+                    ) { downloads.control(task.id, DownloadCommand.REMOVE) }
                 }
             }
 
@@ -121,7 +120,7 @@ fun DownloadBatchCard(
                 StatusLine(task.error, color = MaterialTheme.colorScheme.error)
             }
 
-            if (active && task.downloadedSize > 0) {
+            if (active && task.downloadedBytes > 0) {
                 LinearProgressIndicator(
                     progress = { task.fraction() },
                     modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
@@ -148,7 +147,7 @@ fun DownloadBatchCard(
                     StatusLine(stringResource(Res.string.reading_folder))
                 task.status == DownloadStatus.PENDING ->
                     StatusLine(stringResource(Res.string.queued))
-                task.packing ->
+                task.status == DownloadStatus.PACKING ->
                     StatusLine(stringResource(Res.string.packing))
                 task.status == DownloadStatus.DOWNLOADING && task.totalFiles > 1 && task.currentFile.isNotEmpty() ->
                     StatusLine(
@@ -178,7 +177,7 @@ fun DownloadBatchCard(
                     onToggle = { failuresExpanded = !failuresExpanded },
                     onRetryItem = {
                         failuresExpanded = false
-                        downloads.retryFailed(task.id)
+                        downloads.control(task.id, DownloadCommand.RETRY)
                     },
                     modifier = Modifier.padding(top = 8.dp),
                 )
@@ -202,7 +201,7 @@ private fun StatusLine(text: String, color: Color = MaterialTheme.colorScheme.on
 @Composable
 private fun StatusChip(status: DownloadStatus, modifier: Modifier = Modifier) {
     val (labelRes, container, content) = when (status) {
-        DownloadStatus.DOWNLOADING -> Triple(Res.string.in_progress, MaterialTheme.colorScheme.primaryContainer, MaterialTheme.colorScheme.onPrimaryContainer)
+        DownloadStatus.DOWNLOADING, DownloadStatus.PACKING -> Triple(Res.string.in_progress, MaterialTheme.colorScheme.primaryContainer, MaterialTheme.colorScheme.onPrimaryContainer)
         DownloadStatus.PENDING -> Triple(Res.string.queued, MaterialTheme.colorScheme.surfaceVariant, MaterialTheme.colorScheme.onSurfaceVariant)
         DownloadStatus.COMPLETED -> Triple(Res.string.completed, MaterialTheme.colorScheme.green.copy(alpha = 0.12f), MaterialTheme.colorScheme.green)
         DownloadStatus.PARTIAL -> Triple(Res.string.partial_failure, MaterialTheme.colorScheme.errorContainer, MaterialTheme.colorScheme.onErrorContainer)
@@ -299,28 +298,28 @@ private fun FailureSummary(
 }
 
 @Composable
-private fun batchIcon(task: SharedFolderBatchTask) = when {
-    task.zipName.isNotEmpty() || task.type == ShareBatchType.ZIP -> UiRes.drawable.ui_drawable_folder
+private fun batchIcon(task: Download) = when {
+    !task.zipName.isNullOrEmpty() -> UiRes.drawable.ui_drawable_folder
     else -> UiRes.drawable.ui_drawable_download
 }
 
 @Composable
-private fun batchSubtitle(task: SharedFolderBatchTask): String {
-    val target = task.targetDir.ifEmpty { "Downloads/PlainApp" }
+private fun batchSubtitle(task: Download): String {
+    val target = task.targetDir
     val files = if (task.totalFiles > 0) {
-        pluralStringResource(Res.plurals.items, task.totalFiles) + " · " + task.totalSize.formatBytes()
+        pluralStringResource(Res.plurals.items, task.totalFiles) + " · " + task.totalBytes.formatBytes()
     } else {
-        task.entries.size.toString() + " · …"
+        when (val source = task.source) { is com.ismartcoding.plain.models.ResourceDownloadSource -> source.urls.size; is com.ismartcoding.plain.models.ChatDownloadSource -> source.fileIds.size }.toString() + " · …"
     }
     return "$target · $files"
 }
 
 @Composable
-private fun progressLine(task: SharedFolderBatchTask): String {
-    val bytes = task.downloadedSize.formatBytes() + " / " + task.totalSize.formatBytes()
-    return if (task.downloadSpeed > 0) "$bytes · ${task.downloadSpeed.formatBytes()}/s" else bytes
+private fun progressLine(task: Download): String {
+    val bytes = task.downloadedBytes.formatBytes() + " / " + task.totalBytes.formatBytes()
+    return if (task.bytesPerSecond > 0) "$bytes · ${task.bytesPerSecond.formatBytes()}/s" else bytes
 }
 
 @Composable
-private fun doneLine(task: SharedFolderBatchTask): String =
-    stringResource(Res.string.saved_to_x, task.targetDir.ifEmpty { "Downloads/PlainApp" })
+private fun doneLine(task: Download): String =
+    stringResource(Res.string.saved_to_x, task.targetDir)

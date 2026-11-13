@@ -100,6 +100,9 @@ internal class ManagedDeviceClient private constructor(
         }
     }
 
+    suspend fun absoluteResourceUrl(url: String): String =
+        if (url.startsWith("/")) http.current().getBaseUrl().trimEnd('/') + url else url
+
     suspend fun resource(path: String, size: ResourceSize? = null, action: FileAction = FileAction.PREVIEW): com.ismartcoding.plain.models.ManagedResource {
         val info = currentInfo
         val current = http.current()

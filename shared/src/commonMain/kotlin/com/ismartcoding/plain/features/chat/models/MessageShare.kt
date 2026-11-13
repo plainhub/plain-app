@@ -13,4 +13,6 @@ class MessageShare(
     val totalSize: Long = 0,
     /** Null = never expires. */
     val expiresAt: Instant? = null,
-)
+) {
+    fun browserUrl(): String = com.ismartcoding.plain.lib.UrlHelper.buildUrl("https", peerInfo.ip, peerInfo.port, "/s/$shareId") + "#$urlToken"
+}

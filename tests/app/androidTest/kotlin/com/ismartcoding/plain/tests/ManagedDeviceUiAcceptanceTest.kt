@@ -224,7 +224,7 @@ class ManagedDeviceUiAcceptanceTest {
         ActivityScenario.launch(MainActivity::class.java).use { scenario ->
             val stage = InstrumentationRegistry.getArguments().getString("managedShareFailure") ?: "SAVE"
             require(stage == "LOAD" || stage == "SAVE")
-            val operationName = if (stage == "LOAD") "shareRecord(" else "updateShare("
+            val operationName = if (stage == "LOAD") "share(" else "updateShare("
             val requests = java.util.Collections.synchronizedList(mutableListOf<com.ismartcoding.plain.rust.graphql.GraphqlOperation>())
             val source = shareFixtureSource(requests, failRead = { it.query.contains(operationName) })
             instrumentation.runOnMainSync { com.ismartcoding.plain.ui.components.ToastManager.current.value = null }
@@ -288,7 +288,7 @@ class ManagedDeviceUiAcceptanceTest {
     }
 
     @Test
-    fun realRemoteSharedBrowserCachesAndDownloadsOnlyOnItsTarget() = runBlocking {
+    fun realRemoteSharedBrowserDownloadsOnTheCurrentApp() = runBlocking {
         check(instrumentation.targetContext.packageName == "com.ismartcoding.plain.managedtest")
         ActivityScenario.launch(MainActivity::class.java).use { scenario ->
             val targetId = checkNotNull(InstrumentationRegistry.getArguments().getString("managedPeerId"))
@@ -296,12 +296,13 @@ class ManagedDeviceUiAcceptanceTest {
             val client = com.ismartcoding.plain.features.chat.peer.ManagedDeviceClient.load(peer)
             val source = com.ismartcoding.plain.rust.graphql.ContentSource.Remote(client)
             val remote = client.api
-            val localDownloads = GraphqlApi.execute(Query.sharedDownloadQueue()).tasks
+            val localDownloads = GraphqlApi.execute(Query.downloads())
+            val remoteDownloadIds = remote.execute(Query.downloads()).map { it.id }.toSet()
             val marker = "managed-real-share-${UUID.randomUUID()}"
             val directory = source.info.appDir.trimEnd('/') + "/" + marker
             val fileName = "$marker.txt"
             val originalPath = "$directory/$fileName"
-            val downloadedPath = source.info.downloadsDir.trimEnd('/') + "/PlainApp/" + fileName
+            val downloadedPath = com.ismartcoding.plain.platform.media.getDownloadsDirPath().trimEnd('/') + "/PlainApp/" + fileName
             val contents = "Synthetic target-owned shared file $marker"
             var shareId: String? = null
             var messageId: String? = null
@@ -309,18 +310,17 @@ class ManagedDeviceUiAcceptanceTest {
             remote.execute(Mutation.fileWrite(FileWriteAction.CREATE_DIRECTORY, directory, "", false))
             try {
                 remote.execute(Mutation.fileWrite(FileWriteAction.WRITE_TEXT, originalPath, contents, false))
-                val share = remote.execute(Mutation.createShare(marker, listOf(originalPath), true, null))
+                val share = remote.execute(Mutation.createShare(com.ismartcoding.plain.models.ShareInput(marker,"",null,true,listOf(com.ismartcoding.plain.models.SharePath("/$fileName",originalPath,false)))))
                 shareId = share.id
                 val message = remote.execute(Mutation.sendShare(listOf("peer:local"), share.id)).single()
                 messageId = message.id
                 assertNull(GraphqlApi.execute(Query.chatItem(message.id)))
                 val card = checkNotNull(message.messageContent?.value as? com.ismartcoding.plain.features.chat.models.MessageShare)
-                val browsed = checkNotNull(source.sharedLinks.browse(message.id, card, null))
-                val entry = browsed.info.entries.single { it.name == fileName }
-                val path = source.sharedLinks.cacheFile(browsed.link, browsed.info.urlToken, entry)
+                val entry = source.files.list(card.browserUrl(), false, FileSortBy.NAME_ASC).single { it.name == fileName }
+                val path = com.ismartcoding.plain.features.files.FilesClient.copyToDirectory(entry.url, instrumentation.targetContext.cacheDir.absolutePath, fileName)
                 cachedPath = path
-                assertFalse("Remote shared cache must not be created on the controller", java.io.File(path).exists())
-                val cached = remote.execute(Query.files(path.substringBeforeLast('/'), "", FileSortBy.NAME_ASC, 0, 1000)).single { it.path == path }
+                assertTrue("Shared preview is cached on the current App", java.io.File(path).exists())
+                val cached = GraphqlApi.execute(Query.files(path.substringBeforeLast('/'), "", FileSortBy.NAME_ASC, 0, 1000)).single { it.path == path }
                 assertEquals(contents.encodeToByteArray().size.toLong(), cached.size)
                 scenario.onActivity { activity ->
                     activity.setContent {
@@ -334,9 +334,9 @@ class ManagedDeviceUiAcceptanceTest {
                 }
                 awaitNode("real target shared entry") { it.text == fileName }
                 click(text(Res.string.download), "download target shared entry")
-                click(text(Res.string.download_to_downloads), "save into target Downloads")
-                val completed = awaitValue("target shared transfer completes") {
-                    remote.execute(Query.sharedDownloadQueue()).tasks.find { it.messageId == message.id }?.let { task ->
+                click(text(Res.string.download_to_downloads), "save into current App Downloads")
+                val completed = awaitValue("current App shared transfer completes") {
+                    GraphqlApi.execute(Query.downloads()).find { it.title == fileName && localDownloads.none { old -> old.id == it.id } }?.let { task ->
                         assertFalse("Target shared download failed: ${task.error}; ${task.failures}", task.status in setOf(
                             com.ismartcoding.plain.features.downloads.DownloadStatus.FAILED,
                             com.ismartcoding.plain.features.downloads.DownloadStatus.PARTIAL,
@@ -345,24 +345,21 @@ class ManagedDeviceUiAcceptanceTest {
                         task.takeIf { it.status == com.ismartcoding.plain.features.downloads.DownloadStatus.COMPLETED }
                     }
                 }
-                assertEquals(contents.encodeToByteArray().size.toLong(), completed.downloadedSize)
-                assertEquals(1L, completed.doneFiles)
-                val downloaded = remote.execute(Query.files(downloadedPath.substringBeforeLast('/'), "", FileSortBy.NAME_ASC, 0, 1000)).single { it.path == downloadedPath }
-                assertEquals(contents.encodeToByteArray().size.toLong(), downloaded.size)
-                assertFalse("Target Downloads must not be written on the controller", java.io.File(downloadedPath).exists())
-                assertEquals(localDownloads, GraphqlApi.execute(Query.sharedDownloadQueue()).tasks)
-                report("remote_shared_browser", "real_http_browse_target_cache_download_progress_and_controller_isolation_verified")
+                assertEquals(contents.encodeToByteArray().size.toLong(), completed.downloadedBytes)
+                assertEquals(1, completed.doneFiles)
+                assertEquals(contents, java.io.File(downloadedPath).readText())
+                assertEquals(remoteDownloadIds, remote.execute(Query.downloads()).map { it.id }.toSet())
+                report("remote_shared_browser", "remote_browse_cache_and_current_app_download_bytes_verified")
             } finally {
-                messageId?.let { id ->
-                    remote.execute(Query.sharedDownloadQueue()).tasks.filter { it.messageId == id }.forEach { task ->
-                        remote.execute(Mutation.sharedDownloadControl(com.ismartcoding.plain.features.shares.SharedDownloadCommand.REMOVE, task.id))
-                    }
-                    remote.execute(Mutation.deleteChatItem(id))
+                GraphqlApi.execute(Query.downloads()).filter { it.title == fileName && localDownloads.none { old -> old.id == it.id } }.forEach { task ->
+                    GraphqlApi.execute(Mutation.downloadControl(task.id, com.ismartcoding.plain.features.downloads.DownloadCommand.REMOVE))
                 }
+                messageId?.let { remote.execute(Mutation.deleteChatItem(it)) }
                 shareId?.let { remote.execute(Mutation.deleteShare(it)) }
-                val cleanupPaths = listOfNotNull(directory, cachedPath, downloadedPath)
-                remote.execute(Mutation.deleteFiles(cleanupPaths))
-                assertEquals(localDownloads, GraphqlApi.execute(Query.sharedDownloadQueue()).tasks)
+                remote.execute(Mutation.deleteFiles(listOf(directory)))
+                cachedPath?.let { check(java.io.File(it).delete()) }
+                java.io.File(downloadedPath).delete()
+                assertEquals(localDownloads.map { it.id }.toSet(), GraphqlApi.execute(Query.downloads()).map { it.id }.toSet())
             }
         }
     }
@@ -371,7 +368,7 @@ class ManagedDeviceUiAcceptanceTest {
     fun targetConversationShareCardLoadsFromTheOwningDevice() = runBlocking {
         ActivityScenario.launch(MainActivity::class.java).use { scenario ->
             val id = "share-card-ui-fixture"
-            val nativeDownloads = GraphqlApi.execute(Query.sharedDownloadQueue()).tasks
+            val nativeDownloads = GraphqlApi.execute(Query.downloads())
             assertNull(GraphqlApi.execute(Query.chatItem(id)))
             val requests = java.util.Collections.synchronizedList(mutableListOf<com.ismartcoding.plain.rust.graphql.GraphqlOperation>())
             val source = shareFixtureSource(requests)
@@ -379,34 +376,35 @@ class ManagedDeviceUiAcceptanceTest {
                 activity.setContent {
                     com.ismartcoding.plain.ui.theme.AppTheme(useDarkTheme = false) {
                         val navigation = androidx.navigation.compose.rememberNavController()
+                        val downloadsScope = androidx.compose.runtime.rememberCoroutineScope()
                         androidx.compose.runtime.CompositionLocalProvider(com.ismartcoding.plain.ui.navigation.LocalContentSource provides source) {
-                            com.ismartcoding.plain.ui.shares.browser.SharedFolderPage(navigation, id)
+                            com.ismartcoding.plain.ui.shares.browser.SharedFolderPage(navigation, id, androidx.compose.runtime.remember { com.ismartcoding.plain.features.downloads.DownloadsClient(source.api, downloadsScope) })
                         }
                     }
                 }
             }
             awaitNode("target conversation shared entry") { it.text == "target-card-file.txt" }
             assertTrue(synchronized(requests) { requests.any { it.query.contains("chatItem(") && it.variables["id"] == kotlinx.serialization.json.JsonPrimitive(id) } })
-            assertTrue(synchronized(requests) { requests.any { it.query.contains("browseSharedLink(") } })
+            assertTrue(synchronized(requests) { requests.any { it.query.contains("files(") && it.variables["root"] == kotlinx.serialization.json.JsonPrimitive("https://device.test:8443/s/fixture-shared-link#fixture-link-key") } })
             click(text(Res.string.download), "save shared target entry")
             click(text(Res.string.download_to_downloads), "target Downloads destination")
             val enqueued = awaitValue("target shared download enqueue") {
-                synchronized(requests) { requests.firstOrNull { it.query.contains("enqueueSharedDownload(") } }
+                synchronized(requests) { requests.firstOrNull { it.query.contains("createDownload(") } }
             }
-            val input = JsonHelper.jsonDecodeFromElement<com.ismartcoding.plain.features.shares.SharedDownloadInput>(enqueued.variables.getValue("input"))
-            assertEquals(id, input.messageId)
-            assertEquals(listOf("/root/target-card-file.txt"), input.entries.map { it.relativePath })
+            val input = JsonHelper.jsonDecodeFromElement<com.ismartcoding.plain.models.DownloadInput>(enqueued.variables.getValue("input"))
+            assertNull(input.chat)
+            assertEquals(listOf("https://device.test:8443/fs?id=s.fixture.AA&action=download"), checkNotNull(input.resources).urls)
             click("Target shared download", "target download summary")
             click(text(Res.string.cancel), "cancel target download")
             awaitValue("target shared download cancel") {
-                synchronized(requests) { requests.firstOrNull { it.query.contains("cancelSharedDownload(") } }
+                synchronized(requests) { requests.firstOrNull { it.query.contains("cancelDownload(") } }
             }
             click(text(Res.string.completed), "finished target downloads")
             click(text(Res.string.cancel), "remove finished target download")
             awaitValue("target shared download remove") {
-                synchronized(requests) { requests.firstOrNull { it.query.contains("removeSharedDownload(") } }
+                synchronized(requests) { requests.firstOrNull { it.query.contains("removeDownload(") } }
             }
-            assertEquals(nativeDownloads, GraphqlApi.execute(Query.sharedDownloadQueue()).tasks)
+            assertEquals(nativeDownloads, GraphqlApi.execute(Query.downloads()))
             assertNull(GraphqlApi.execute(Query.chatItem(id)))
         }
     }
@@ -485,22 +483,17 @@ class ManagedDeviceUiAcceptanceTest {
             var cached: java.io.File? = null
             var thumbnail: java.io.File? = null
             try {
-                val share = com.ismartcoding.plain.features.shares.SharesClient.createShare("Owned preview", listOf(file.absolutePath, image.absolutePath), true, null)
+                val share = com.ismartcoding.plain.features.shares.SharesClient.createShare(com.ismartcoding.plain.models.ShareInput("Owned preview","",null,true,listOf(file,image).map { com.ismartcoding.plain.models.SharePath("/"+it.name,it.absolutePath,false) }))
                 shareId = share.id
-                val link = com.ismartcoding.plain.features.shares.SharedLinkClient.ownLink(share.id, "127.0.0.1")
-                val path = com.ismartcoding.plain.features.shares.SharedLinkClient.cacheFile(
-                    link, share.urlToken,
-                    com.ismartcoding.plain.features.shares.SharedFileDto(file.name, share.roots.first { it.realPath == file.canonicalPath }.relativePath, size = file.length(), mimeType = "text/plain"),
-                )
+                val entries = com.ismartcoding.plain.features.files.FilesClient.list(share.url, false, FileSortBy.NAME_ASC)
+                val entry = entries.single { it.name == file.name }
+                val path = com.ismartcoding.plain.features.files.FilesClient.copyToDirectory(entry.url, root.absolutePath, file.name)
                 val preview = java.io.File(path).canonicalFile
                 assertTrue(preview.path.startsWith(instrumentation.targetContext.cacheDir.canonicalPath + "/"))
                 cached = preview
                 assertEquals(file.readText(), preview.readText())
-                val thumbnailPath = com.ismartcoding.plain.features.shares.SharedLinkClient.cacheFile(
-                    link, share.urlToken,
-                    com.ismartcoding.plain.features.shares.SharedFileDto(image.name, share.roots.first { it.realPath == image.canonicalPath }.relativePath, size = image.length(), mimeType = "image/jpeg", hasThumb = true),
-                    thumbnail = true,
-                )
+                val thumbnailUrl = entries.single { it.name == image.name }.url.replace("&action=download", "&action=preview&size=sm")
+                val thumbnailPath = com.ismartcoding.plain.features.files.FilesClient.copyToDirectory(thumbnailUrl, root.absolutePath, "thumbnail")
                 val thumbnailFile = java.io.File(thumbnailPath).canonicalFile
                 assertTrue(thumbnailFile.path.startsWith(instrumentation.targetContext.cacheDir.canonicalPath + "/"))
                 thumbnail = thumbnailFile
@@ -541,11 +534,8 @@ class ManagedDeviceUiAcceptanceTest {
         val chat = com.ismartcoding.plain.models.ChatItem(
             id = "share-card-ui-fixture", content = JsonHelper.jsonEncode(com.ismartcoding.plain.features.chat.models.MessageContent(com.ismartcoding.plain.features.chat.models.MessageType.SHARE, card)),
         )
-        val browsed = com.ismartcoding.plain.features.shares.SharedBrowseResult(
-            com.ismartcoding.plain.features.shares.SharedInfoDto(name = "Target folder", urlToken = "fixture-link-key", entries = listOf(com.ismartcoding.plain.features.shares.SharedFileDto(name = "target-card-file.txt", relativePath = "/root/target-card-file.txt", size = 8, mimeType = "text/plain"))),
-            com.ismartcoding.plain.features.shares.SharedLink("device.test", 8443, "fixture-shared-link", "fixture-token", "https://device.test:8443/share/fixture"), card,
-        )
-        val downloads = java.util.concurrent.atomic.AtomicReference(com.ismartcoding.plain.models.SharedDownloadSnapshot("fixture-runtime", 0, emptyList()))
+        val browsed = listOf(com.ismartcoding.plain.models.File(name="target-card-file.txt",path="https://device.test:8443/s/fixture-shared-link/root/target-card-file.txt#fixture-link-key",url="https://device.test:8443/fs?id=s.fixture.AA&action=download",createdAt=null,updatedAt=kotlin.time.Instant.fromEpochMilliseconds(0),size=8,isDir=false,childCount=0))
+        val downloads = java.util.concurrent.atomic.AtomicReference<List<com.ismartcoding.plain.models.Download>>(emptyList())
         val http = com.ismartcoding.plain.rust.graphql.PeerHttpClient(
             peer, peers = { listOf(peer) }, clientId = { "fixture-client" },
             encrypt = { _, _, payload -> kotlin.io.encoding.Base64.encode(payload.encodeToByteArray()) },
@@ -565,34 +555,34 @@ class ManagedDeviceUiAcceptanceTest {
                             data = JsonHelper.jsonEncodeToElement(ManagedFixturePrefs(mapOf("app_home_features" to readFeatures()))).jsonObject,
                         ))
                         operation.query.contains("setKeyValue(") -> """{"data":{"setKeyValue":true}}"""
-                        operation.query.contains("shareRecord(") -> """{"data":{"shareRecord":{"id":"share-ui-fixture","name":"Target fixture share","password":"","urlToken":"fixture-resource-token","readOnly":true,"expiresAt":null,"createdAt":"2026-01-01T00:00:00Z","updatedAt":"2026-01-01T00:00:00Z","roots":[{"relativePath":"root","realPath":"/target-share-root/existing.txt","isDir":false}]}}}"""
-                        operation.query.contains("shareLink(") -> """{"data":{"shareLink":{"host":"device.test","port":8443,"sharedId":"share-ui-fixture","token":"fixture-share-token","pageUrl":"https://device.test:8443/share/fixture"}}}"""
+                        operation.query.contains("share(") -> """{"data":{"share":{"id":"share-ui-fixture","name":"Target fixture share","password":"","readOnly":true,"expiresAt":null,"data":[{"virtualPath":"/root","realPath":"/target-share-root/existing.txt","isDir":false}],"url":"https://device.test:8443/s/share-ui-fixture#fixture-share-token"}}}"""
                         operation.query.contains("sendShare(") -> """{"data":{"sendShare":[]}}"""
                         operation.query.contains("peers {") -> JsonHelper.jsonEncode(mapOf("data" to mapOf("peers" to JsonHelper.jsonEncodeToElement(readPeers()))))
                         operation.query.contains("chatChannels") || operation.query.contains("chatConversations") -> """{"data":{"chatChannels":[],"chatConversations":[],"peers":[]}}"""
                         operation.query.contains("chatItem(") -> JsonHelper.jsonEncode(mapOf("data" to mapOf("chatItem" to JsonHelper.jsonEncodeToElement(chat))))
-                        operation.query.contains("browseSharedLink(") -> JsonHelper.jsonEncode(mapOf("data" to mapOf("browseSharedLink" to JsonHelper.jsonEncodeToElement(browsed))))
-                        operation.query.contains("sharedDownloadQueue") -> JsonHelper.jsonEncode(mapOf("data" to mapOf("sharedDownloadQueue" to JsonHelper.jsonEncodeToElement(downloads.get()))))
+                        operation.query.contains("downloads {") -> JsonHelper.jsonEncode(mapOf("data" to mapOf("downloads" to JsonHelper.jsonEncodeToElement(downloads.get()))))
                         operation.query.contains("keyValue(") -> """{"data":{"keyValue":null}}"""
-                        operation.query.contains("enqueueSharedDownload(") -> {
-                            val input = JsonHelper.jsonDecodeFromElement<com.ismartcoding.plain.features.shares.SharedDownloadInput>(operation.variables.getValue("input"))
-                            downloads.updateAndGet { current -> current.copy(revision = current.revision + 1, tasks = listOf(com.ismartcoding.plain.models.SharedDownloadRow(
-                                "fixture-download", input.messageId, input.kind, "Target shared download", input.targetDir,
-                                input.link, input.urlToken, input.entries, input.zipName,
-                                com.ismartcoding.plain.features.downloads.DownloadStatus.DOWNLOADING, "", 4, 8, 4, 1, 0, 0, "", false, emptyList(),
-                            ))) }
-                            """{"data":{}}"""
+                        operation.query.contains("createDownload(") -> {
+                            val input = JsonHelper.jsonDecodeFromElement<com.ismartcoding.plain.models.DownloadInput>(operation.variables.getValue("input"))
+                            val resources = checkNotNull(input.resources)
+                            val task = com.ismartcoding.plain.models.Download(
+                                "fixture-download", "Target shared download", com.ismartcoding.plain.models.ResourceDownloadSource(resources.urls), resources.targetDir, resources.zipName,
+                                com.ismartcoding.plain.features.downloads.DownloadStatus.DOWNLOADING, 4, 8, 4, 1, 0, "target-card-file.txt", "", emptyList(),
+                            )
+                            downloads.set(listOf(task))
+                            JsonHelper.jsonEncode(mapOf("data" to mapOf("createDownload" to JsonHelper.jsonEncodeToElement(task))))
                         }
-                        operation.query.contains("cancelSharedDownload(") -> {
-                            downloads.updateAndGet { current -> current.copy(revision = current.revision + 1, tasks = current.tasks.map { it.copy(status = com.ismartcoding.plain.features.downloads.DownloadStatus.CANCELED) }) }
-                            """{"data":{}}"""
+                        operation.query.contains("cancelDownload(") -> {
+                            downloads.updateAndGet { current -> current.map { it.copy(status = com.ismartcoding.plain.features.downloads.DownloadStatus.CANCELED) } }
+                            """{"data":{"cancelDownload":true}}"""
                         }
-                        operation.query.contains("removeSharedDownload(") -> {
-                            downloads.updateAndGet { current -> current.copy(revision = current.revision + 1, tasks = emptyList()) }
-                            """{"data":{}}"""
+                        operation.query.contains("removeDownload(") -> {
+                            downloads.set(emptyList())
+                            """{"data":{"removeDownload":true}}"""
                         }
                         operation.query.contains("mounts {") -> """{"data":{"mounts":[{"name":"Target storage","path":"/target-public"},{"name":"Target secondary","path":"/target-secondary"}]}}"""
                         operation.query.contains("files(") -> when (operation.variables["root"]) {
+                            kotlinx.serialization.json.JsonPrimitive(card.browserUrl()) -> JsonHelper.jsonEncode(mapOf("data" to mapOf("files" to JsonHelper.jsonEncodeToElement(browsed))))
                             kotlinx.serialization.json.JsonPrimitive("/target-share-root") -> """{"data":{"files":[{"name":"target-only-share-item.txt","path":"/target-share-root/target-only-share-item.txt","createdAt":null,"updatedAt":"2026-01-01T00:00:00Z","size":8,"isDir":false,"childCount":0}]}}"""
                             kotlinx.serialization.json.JsonPrimitive("/target-public") -> """{"data":{"files":[{"name":"target-public-file.txt","path":"/target-public/target-public-file.txt","createdAt":null,"updatedAt":"2026-01-01T00:00:00Z","size":8,"isDir":false,"childCount":0},{"name":"target-folder","path":"/target-public/target-folder","createdAt":null,"updatedAt":"2026-01-01T00:00:00Z","size":0,"isDir":true,"childCount":0}]}}"""
                             kotlinx.serialization.json.JsonPrimitive("/target-secondary") -> """{"data":{"files":[{"name":"target-secondary-file.txt","path":"/target-secondary/target-secondary-file.txt","createdAt":null,"updatedAt":"2026-01-01T00:00:00Z","size":8,"isDir":false,"childCount":0}]}}"""
