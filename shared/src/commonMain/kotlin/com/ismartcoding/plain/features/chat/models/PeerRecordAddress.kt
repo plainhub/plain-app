@@ -6,4 +6,3 @@ import com.ismartcoding.plain.features.chat.peer.RustPeerStore
 
 fun Peer.getBestIp(): String = address?.bestIp.orEmpty()
 suspend fun Peer.getFileUrl(fileId: String): String = RustPeerStore.fileUrl(this, fileId)
-fun Peer.getName(): String = address?.name ?: name

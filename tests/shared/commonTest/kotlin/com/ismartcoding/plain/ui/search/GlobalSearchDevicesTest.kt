@@ -282,7 +282,7 @@ class GlobalSearchDevicesTest {
             id = name, name = name, ip = "", status = PeerStatus.PAIRED, port = 8443,
             deviceType = DeviceType.PHONE, createdAt = now, updatedAt = now,
             publicKey = "public-$name", token = "token-$name",
-            address = PeerAddress("device.test", name, "https://device.test:8443", "", ""),
+            address = PeerAddress("device.test", "https://device.test:8443", "", ""),
         )
 
         suspend fun source(): ContentSource.Remote {

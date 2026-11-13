@@ -17,7 +17,6 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.ismartcoding.plain.models.Peer
 import com.ismartcoding.plain.features.chat.models.getBestIp
-import com.ismartcoding.plain.features.chat.models.getName
 import com.ismartcoding.plain.ui.components.ButtonSize
 import com.ismartcoding.plain.ui.components.ButtonType
 import com.ismartcoding.plain.platform.system.DeviceType
@@ -84,7 +83,7 @@ fun ChannelInfoPage(
                 PeerMember(m, deviceName, remote?.client?.deviceType ?: DeviceType.valueOf(rustStartupConfig.deviceType), isOwner = m.peerId == ownerPeerId)
             } else {
                 val peer = peers[m.peerId] ?: return@mapNotNull null
-                PeerMember(m, peer.getName(), peer.deviceType, peer, isOwner = m.peerId == ownerPeerId)
+                PeerMember(m, peer.name, peer.deviceType, peer, isOwner = m.peerId == ownerPeerId)
             }
         } ?: emptyList()
     }
@@ -114,7 +113,7 @@ fun ChannelInfoPage(
             ownerPeerId?.let { add(it) }
         }
         peers.values.filter { it.isPaired() && it.id !in presentIds }
-            .sortedBy { it.getName().toSortName() }
+            .sortedBy { it.name.toSortName() }
     } else emptyList()
 
     PScaffold(topBar = {
@@ -148,7 +147,7 @@ fun ChannelInfoPage(
                         displayMembers.forEach { pm ->
                             val canManage = liveChannel.actions.canManageMembers && !pm.isSelf && !pm.isOwner
                             val selfPendingInvite = pm.isSelf && pm.isPending()
-                            val ownerName = if (liveChannel.actions.isOwner) deviceName else peers[liveChannel.ownerId]?.getName().orEmpty()
+                            val ownerName = if (liveChannel.actions.isOwner) deviceName else peers[liveChannel.ownerId]?.name.orEmpty()
                             ChannelMemberListItem(
                                 member = pm,
                                 onClick = when {
@@ -183,7 +182,7 @@ fun ChannelInfoPage(
                         PCard(modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN)) {
                             addablePeers.forEach { peer ->
                                 PListItem(
-                                    title = peer.getName(),
+                                    title = peer.name,
                                     subtitle = peer.getBestIp(),
                                     start = {
                                         PeerIconWithStatus(

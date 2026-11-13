@@ -532,7 +532,7 @@ class ManagedDeviceUiAcceptanceTest {
             deviceType = com.ismartcoding.plain.platform.system.DeviceType.PHONE,
             createdAt = kotlin.time.Instant.fromEpochMilliseconds(0), updatedAt = kotlin.time.Instant.fromEpochMilliseconds(0),
             publicKey = "fixture-key", token = "fixture-token",
-            address = com.ismartcoding.plain.models.PeerAddress("device.test", "Target fixture", "https://device.test:8443", "", ""),
+            address = com.ismartcoding.plain.models.PeerAddress("device.test", "https://device.test:8443", "", ""),
         )
         val card = com.ismartcoding.plain.features.chat.models.MessageShare(
             "fixture-shared-link", "fixture-link-key", com.ismartcoding.plain.features.chat.models.SharePeerInfo("link-peer", "device.test", 8443), "Target folder",

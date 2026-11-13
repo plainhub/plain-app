@@ -106,7 +106,7 @@ class ManagedDeviceViewModelTest {
             id = "fixture-peer", name = "Remote", ip = "", status = PeerStatus.PAIRED, port = 8443,
             deviceType = DeviceType.PHONE, createdAt = Instant.fromEpochMilliseconds(0), updatedAt = Instant.fromEpochMilliseconds(0),
             publicKey = "fixture-key", token = "fixture-token",
-            address = PeerAddress("device.test", "Remote", "https://device.test:8443", "", ""),
+            address = PeerAddress("device.test", "https://device.test:8443", "", ""),
         )
         var currentPeer = peer
         var fail = true

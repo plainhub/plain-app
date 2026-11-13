@@ -9,7 +9,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import com.ismartcoding.plain.models.ChatChannel
 import com.ismartcoding.plain.features.chat.models.getBestIp
-import com.ismartcoding.plain.features.chat.models.getName
 import com.ismartcoding.plain.ui.components.ButtonSize
 import com.ismartcoding.plain.ui.components.ButtonType
 import com.ismartcoding.plain.ui.platform.system.getText
@@ -76,7 +75,7 @@ internal fun MemberInfoDialog(
                 }
             }
         } else null,
-        title = { Text(text = peer.getName(), style = MaterialTheme.typography.titleLarge) },
+        title = { Text(text = peer.name, style = MaterialTheme.typography.titleLarge) },
         text = {
             Column {
                 PListItem(title = stringResource(Res.string.peer_id), value = peer.id)

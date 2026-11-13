@@ -104,7 +104,7 @@ class GraphqlModelDecodeTest {
     }
     @Test
     fun peerFieldsUseMainCamelCaseFieldsAndKeepDerivedAddress() {
-        val peer = JsonHelper.jsonDecode<Peer>("""{"id":"peer-1","name":"Peer","ip":"127.0.0.1","key":"key","publicKey":"public","status":"PAIRED","port":8080,"deviceType":"PHONE","token":"","managed":true,"createdAt":"2026-10-12T00:00:00Z","updatedAt":"2026-10-12T00:00:00Z","address":{"bestIp":"127.0.0.1","name":"Peer","baseUrl":"https://127.0.0.1:8080","apiUrl":"https://127.0.0.1:8080/peer_graphql","statusWsUrl":"wss://127.0.0.1:8080/peer_status"}}""")
+        val peer = JsonHelper.jsonDecode<Peer>("""{"id":"peer-1","name":"Peer","ip":"127.0.0.1","key":"key","publicKey":"public","status":"PAIRED","port":8080,"deviceType":"PHONE","token":"","managed":true,"createdAt":"2026-10-12T00:00:00Z","updatedAt":"2026-10-12T00:00:00Z","address":{"bestIp":"127.0.0.1","baseUrl":"https://127.0.0.1:8080","apiUrl":"https://127.0.0.1:8080/peer_graphql","statusWsUrl":"wss://127.0.0.1:8080/peer_status"}}""")
         assertEquals("public", peer.publicKey)
         assertEquals("127.0.0.1", peer.address?.bestIp)
         assertTrue(peer.managed)

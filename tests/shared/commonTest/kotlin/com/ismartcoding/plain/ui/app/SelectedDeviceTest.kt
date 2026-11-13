@@ -82,7 +82,7 @@ class SelectedDeviceTest {
             id = "fixture-peer", name = "Remote", ip = "", status = PeerStatus.PAIRED, port = 8443,
             deviceType = DeviceType.PHONE, createdAt = now, updatedAt = now,
             publicKey = "fixture-key", token = "fixture-token",
-            address = PeerAddress("device.test", "Remote", "https://device.test:8443", "", ""),
+            address = PeerAddress("device.test", "https://device.test:8443", "", ""),
         )
         val response = """{"data":{"app":{"deviceName":"Remote","capabilities":[],"access":[],"appDir":"app://","downloadsDir":"/downloads","urlToken":"resource-token","tlsCertificateSha256":null}}}"""
         val http = PeerHttpClient(peer, peers = { listOf(peer) }, clientId = { "fixture-client" },

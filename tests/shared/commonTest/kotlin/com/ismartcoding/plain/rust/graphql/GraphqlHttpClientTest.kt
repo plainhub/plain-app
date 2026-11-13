@@ -18,7 +18,7 @@ class GraphqlHttpClientTest {
         id = "fixture-peer", name = "Device", ip = "", status = PeerStatus.PAIRED, port = 8443,
         deviceType = DeviceType.PHONE, createdAt = Instant.fromEpochMilliseconds(0), updatedAt = Instant.fromEpochMilliseconds(0),
         publicKey = "fixture-public-key", token = Base64.encode(ByteArray(32) { 7 }),
-        address = PeerAddress("device.test", "Device", "https://device.test:8443", "", ""),
+        address = PeerAddress("device.test", "https://device.test:8443", "", ""),
     )
     private val request = GraphqlRequest<String>("query { deviceName }", field = "deviceName")
     private fun encodedResult() = Base64.encode(JsonHelper.jsonEncode(GraphqlResponse(
