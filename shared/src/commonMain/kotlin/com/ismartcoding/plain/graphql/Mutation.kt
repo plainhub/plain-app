@@ -297,13 +297,13 @@ object Mutation {
     )
 
     fun renameSession(clientId: String, name: String): GraphqlRequest<Boolean> = GraphqlRequest(
-        $$"mutation($clientId: String!, $name: String!) { renameSession(clientId: $clientId, name: $name) }",
+        $$"mutation($clientId: ID!, $name: String!) { renameSession(clientId: $clientId, name: $name) }",
         mapOf(variable("clientId", clientId), variable("name", name)),
         field = "renameSession",
     )
 
     fun revokeSession(clientId: String): GraphqlRequest<Unit> = GraphqlRequest(
-        $$"mutation($clientId: String!) { revokeSession(clientId: $clientId) }",
+        $$"mutation($clientId: ID!) { revokeSession(clientId: $clientId) }",
         mapOf(variable("clientId", clientId)),
         field = "revokeSession",
     )
@@ -352,12 +352,6 @@ object Mutation {
         $$"mutation($durationSec: Int!) { adjustPomodoro(durationSec: $durationSec) { $${Fragments.POMODORO} } }",
         mapOf(variable("durationSec", durationSec)),
         field = "adjustPomodoro",
-    )
-
-    fun copyFile(src: String, dst: String, overwrite: Boolean): GraphqlRequest<Boolean> = GraphqlRequest(
-        $$"mutation($src: String!, $dst: String!, $overwrite: Boolean!) { copyFile(src: $src, dst: $dst, overwrite: $overwrite) }",
-        mapOf(variable("src", src), variable("dst", dst), variable("overwrite", overwrite)),
-        field = "copyFile",
     )
 
     fun copyFileToDirectory(src: String, directory: String, name: String): GraphqlRequest<String?> = GraphqlRequest(
@@ -578,10 +572,10 @@ object Mutation {
         field = "clearAppCache",
     )
 
-    fun deliverChatItem(id: String, recipients: Collection<String>?): GraphqlRequest<ChatItem> = GraphqlRequest(
-        $$"mutation($id: ID!, $recipients: [ID!]) { deliverChatItem(id: $id, recipients: $recipients) { $${Fragments.CHAT_ITEM} } }",
-        mapOf(variable("id", id), variable("recipients", recipients)),
-        field = "deliverChatItem",
+    fun retryChatItem(id: String, recipientIds: Collection<String>?): GraphqlRequest<ChatItem> = GraphqlRequest(
+        $$"mutation($id: ID!, $recipientIds: [ID!]) { retryChatItem(id: $id, recipientIds: $recipientIds) { $${Fragments.CHAT_ITEM} } }",
+        mapOf(variable("id", id), variable("recipientIds", recipientIds)),
+        field = "retryChatItem",
     )
 
     fun sendChatItems(targets: Collection<String>, content: String): GraphqlRequest<List<ChatItem>> = GraphqlRequest(

@@ -1436,7 +1436,7 @@ class ManagedDeviceUiAcceptanceTest {
             assertTrue(peer.isPaired())
             val item = ChatClient.sendText(ChatTarget(target, ChatTargetType.PEER), marker)
             try {
-                assertEquals(ChatStatus.SENT, ChatClient.deliver(item.id).status)
+                assertEquals(ChatStatus.SENT, item.status)
                 report("chat_delivery", "SENT")
             } finally {
                 val stored = ChatQueries.getChatItem(item.id)

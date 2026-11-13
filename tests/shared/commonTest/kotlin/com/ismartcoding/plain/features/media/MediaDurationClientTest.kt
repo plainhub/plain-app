@@ -12,16 +12,16 @@ import kotlin.test.assertTrue
 
 class MediaDurationClientTest {
     @Test
-    fun duration_uses_one_existing_file_info_request_with_an_audio_hint_and_only_duration() = runTest {
-        val path = "app://unknown \"name\".blob"
+    fun duration_uses_one_path_only_file_info_request_and_only_duration() = runTest {
+        val path = "app://unknown \"name\".mp3"
         var calls = 0
         val duration = readMediaDurationMs(
             path,
             api = graphqlClient(
                 query = { request ->
                     calls += 1
-                    assertEquals("query(\$path:String!,\$name:String!){fileInfo(path:\$path,fileName:\$name){data{... on AudioFileInfo{durationMs}}}}", request.query)
-                    assertEquals(mapOf("path" to JsonPrimitive(path), "name" to JsonPrimitive("audio.mp3")), request.variables)
+                    assertEquals("query(\$path:String!){fileInfo(path:\$path){data{... on AudioFileInfo{durationMs} ... on VideoFileInfo{durationMs}}}}", request.query)
+                    assertEquals(mapOf("path" to JsonPrimitive(path)), request.variables)
                     JsonObject(mapOf("fileInfo" to JsonObject(mapOf("data" to JsonObject(mapOf("durationMs" to JsonPrimitive(6000L)))))))
                 },
             ),
@@ -43,6 +43,15 @@ class MediaDurationClientTest {
             )
             assertEquals(0L, duration)
         }
+    }
+
+    @Test
+    fun missing_file_info_is_nullable() = runTest {
+        val duration = readMediaDurationMs(
+            "app://missing.mp3",
+            api = graphqlClient(query = { JsonObject(mapOf("fileInfo" to JsonNull)) }),
+        )
+        assertEquals(0L, duration)
     }
 
     @Test

@@ -66,7 +66,7 @@ class MainGraphqlRustHttpTest {
             }
             assertTrue(runCatching { httpQuery("sessions { token }") }.isFailure)
             assertTrue(httpQuery("sessions { clientId }").getValue("sessions").jsonArray.any { it.jsonObject.getValue("clientId").jsonPrimitive.content == clientId })
-            assertTrue(httpGraphql("mutation(\$id:String!,\$name:String!){renameSession(clientId:\$id,name:\$name)}", mapOf("id" to JsonPrimitive(clientId), "name" to JsonPrimitive("$name renamed"))).getValue("renameSession").jsonPrimitive.boolean)
+            assertTrue(httpGraphql("mutation(\$id:ID!,\$name:String!){renameSession(clientId:\$id,name:\$name)}", mapOf("id" to JsonPrimitive(clientId), "name" to JsonPrimitive("$name renamed"))).getValue("renameSession").jsonPrimitive.boolean)
             assertEquals("$name renamed", RustSessionStore.list().single { it.clientId == clientId }.name)
         } finally {
             httpClient.close()

@@ -30,9 +30,8 @@ class ApiContractTest {
     // Each entry must be justified in the API contract ("deliberate exceptions").
     private val stringIdAllowlist = setOf(
         // Each entry must be justified in the API contract ("deliberate exceptions").
-        "photoId", // Android RawContact photo row id (Contact/Call, Android-only feature)
+        "photoId", // Android RawContact photo row id (Contact, Android-only feature)
         "thumbnailId",
-        "clientId", // App.clientId — public client identity string, not an addressable entity id
         "rawId", // FeedEntry.rawId — upstream RSS guid, foreign identifier
         "requestId", // sendSms request id — idempotency key, not an entity id
         "subscriptionId", // Android SIM subscription integer (slot index), not an entity id
@@ -66,10 +65,10 @@ class ApiContractTest {
         val queries = operationFieldNamesIn("Query")
         val mutations = operationFieldNamesIn("Mutation")
         val subscriptions = operationFieldNamesIn("Subscription")
-        if (queries.size != 127 || mutations.size != 196 || subscriptions.size != 37) {
+        if (queries.size != 127 || mutations.size != 195 || subscriptions.size != 37) {
             fail(
                 "Shared Rust schema fragments declare ${queries.size} Query / ${mutations.size} " +
-                    "Mutation and ${subscriptions.size} Subscription operations — the contract has 127 / 196 / 37. The snapshot looks truncated or " +
+                    "Mutation and ${subscriptions.size} Subscription operations — the contract has 127 / 195 / 37. The snapshot looks truncated or " +
                     "drifted; every check in this class reads it, so they would pass on an empty file.",
             )
         }
@@ -85,6 +84,25 @@ class ApiContractTest {
             "audioPlaybackChanged", "pairingSucceeded")) {
             if (name in subscriptions) fail("Host callback exposed as a subscription: $name")
         }
+    }
+
+    @Test
+    fun clientIdentityUsesIdAndRetainsNullability() {
+        val fields = mutableMapOf<String, String>()
+        forEachTypedField { (owner, name, type) ->
+            if (name == "clientId") fields[owner] = type
+        }
+        assertEquals("ID!", fields["App"])
+        assertEquals("ID!", fields["Session"])
+        assertEquals("ID!", fields["FileTask"])
+        assertEquals("ID", fields["Event"])
+
+        val arguments = mutableMapOf<String, String>()
+        forEachOperationArgument { (op, name, type) ->
+            if (name == "clientId") arguments[op] = type
+        }
+        assertEquals("ID!", arguments["renameSession"])
+        assertEquals("ID!", arguments["revokeSession"])
     }
 
     @Test

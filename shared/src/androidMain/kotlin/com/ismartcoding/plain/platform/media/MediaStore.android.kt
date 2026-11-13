@@ -106,19 +106,17 @@ fun readSentMmsCandidates(minimumId: Long, launchTimeSec: Long): List<MmsCandida
     val context = appContext
     return context.contentResolver.query(
         Telephony.Mms.CONTENT_URI,
-        arrayOf(Telephony.Mms._ID, Telephony.Mms.THREAD_ID),
+        arrayOf(Telephony.Mms._ID),
         "${Telephony.Mms.MESSAGE_BOX} = 2 AND m_type = ${SmsProviderContract.MMS_PDU_SEND_REQ} AND ${Telephony.Mms._ID} > ? AND ${Telephony.Mms.DATE} >= ?",
         arrayOf(minimumId.toString(), launchTimeSec.toString()),
         "${Telephony.Mms._ID} ASC",
     )?.use { cursor ->
         val idIndex = cursor.getColumnIndexOrThrow(Telephony.Mms._ID)
-        val threadIndex = cursor.getColumnIndexOrThrow(Telephony.Mms.THREAD_ID)
         buildList {
             while (cursor.moveToNext()) {
                 val id = cursor.getLong(idIndex)
                 add(MmsCandidateFacts(id,
-                    SmsHelper.readMmsAddresses(context, id.toString()), SmsHelper.readMmsParts(context, id.toString()),
-                    cursor.getString(threadIndex).orEmpty()))
+                    SmsHelper.readMmsAddresses(context, id.toString()), SmsHelper.readMmsParts(context, id.toString())))
             }
         }
     } ?: emptyList()

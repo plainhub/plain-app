@@ -10,12 +10,11 @@ data class Call(
     override var id: String,
     var number: String,
     var name: String,
-    var photoId: String = "",
+    var photo: String = "",
     var startedAt: Instant,
     var durationSec: Int,
     var type: CallType,
     var accountId: String,
     var geo: PhoneGeo? = null,
     var typeCode: Int = 0,
-    var photoUri: String = "",
 ) : IData

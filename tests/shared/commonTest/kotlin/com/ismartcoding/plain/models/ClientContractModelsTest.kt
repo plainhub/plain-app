@@ -26,10 +26,10 @@ import kotlin.test.assertEquals
 
 class ClientContractModelsTest {
     @Test
-    fun tag_types_preserve_the_numeric_graphql_field() {
-        val tag = JsonHelper.jsonDecode<Tag>("""{"id":"tag","name":"Label","count":1,"type":6}""")
+    fun tag_types_preserve_the_graphql_enum_name() {
+        val tag = JsonHelper.jsonDecode<Tag>("""{"id":"tag","name":"Label","count":1,"type":"NOTE"}""")
         assertEquals(DataType.NOTE, tag.type)
-        assertEquals(JsonPrimitive(6), JsonHelper.jsonEncodeToElement(tag).jsonObject.getValue("type"))
+        assertEquals(JsonPrimitive("NOTE"), JsonHelper.jsonEncodeToElement(tag).jsonObject.getValue("type"))
     }
 
     @Test

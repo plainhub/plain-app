@@ -158,14 +158,14 @@ class ChatViewModel internal constructor(
                 val item = itemsFlow.value.firstOrNull { it.id == messageId } ?: return@launchSafe
                 sendMessage(target.value, MessageContent(item.type, item.value), pendingId = messageId)
             } else {
-                update(client.deliver(messageId))
+                update(client.retry(messageId))
             }
         }
     }
 
     fun resendToMembers(messageId: String, peerIds: List<String>) {
         launchSafe {
-            update(client.deliver(messageId, peerIds))
+            update(client.retry(messageId, peerIds))
         }
     }
 

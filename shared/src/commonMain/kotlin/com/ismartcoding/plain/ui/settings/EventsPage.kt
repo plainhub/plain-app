@@ -64,7 +64,7 @@ private fun eventTitle(type: EventType): String = stringResource(when (type) {
     EventType.LOGIN -> Res.string.event_login
     EventType.LOGIN_FAILED -> Res.string.event_login_failed
     EventType.LOGOUT -> Res.string.event_logout
-    EventType.REVOKE -> Res.string.event_revoke
+    EventType.REVOKE_SESSION -> Res.string.event_revoke
     EventType.SET_HOSTNAME -> Res.string.event_set_hostname
     EventType.UPDATE_DEVICE_NAME -> Res.string.event_update_device_name
     EventType.MOUNT -> Res.string.event_mount

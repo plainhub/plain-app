@@ -38,8 +38,8 @@ open class ChatApi internal constructor(private val api: com.ismartcoding.plain.
     suspend fun deleteQuery(query: String): Int =
         api.execute(Mutation.deleteChatItems(query)).affectedCount
 
-    suspend fun deliver(id: String, recipients: List<String>? = null): ChatItem =
-        api.execute(Mutation.deliverChatItem(id, recipients))
+    suspend fun retry(id: String, recipientIds: List<String>? = null): ChatItem =
+        api.execute(Mutation.retryChatItem(id, recipientIds))
 
     suspend fun deleteOne(id: String) {
         api.execute(Mutation.deleteChatItem(id))

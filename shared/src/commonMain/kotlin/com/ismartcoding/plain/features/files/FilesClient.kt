@@ -16,13 +16,10 @@ open class FilesApi internal constructor(
     private val upload: suspend (String, Iterator<ByteArray>) -> Boolean,
 ) {
     suspend fun size(path: String): Long =
-        api.execute(Query.fileInfo(path)).size
+        requireNotNull(api.execute(Query.fileInfo(path))) { "File not found" }.size
 
     suspend fun writeChunks(path: String, chunks: Iterator<ByteArray>): Boolean =
         upload(path, chunks)
-
-    suspend fun copyToPath(srcPath: String, targetPath: String, overwrite: Boolean): Boolean =
-        api.execute(Mutation.copyFile(srcPath, targetPath, overwrite))
 
     suspend fun copyToDirectory(srcPath: String, dirPath: String, fileName: String): String =
         api.execute(Mutation.copyFileToDirectory(srcPath, dirPath, fileName)).orEmpty()

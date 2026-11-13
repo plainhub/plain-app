@@ -76,10 +76,10 @@ class FileTaskRustHttpTest {
             val spoofedCaller = runCatching { GraphqlApi.execute(GraphqlRequest<JsonObject>("query { " + "fileTasks(clientId: ${JsonPrimitive("foreign-${UUID.randomUUID()}")}, query: \"\", offset: 0, limit: 1) { id }" + " }")) }
             assertTrue(spoofedCaller.isFailure)
             Prefs.setApiAccessFeatures(originalPermissions + com.ismartcoding.plain.features.web.AccessFeature.FILES)
-            assertEquals(true, GraphqlApi.execute(GraphqlRequest<JsonObject>("mutation { " + """copyFile(src: "${source.path}", dst: "${File(root,"public-copy.txt").path}", overwrite: false)""" + " }")).getValue("copyFile").jsonPrimitive.boolean)
+            assertEquals("DONE", GraphqlApi.execute(GraphqlRequest<JsonObject>("mutation { " + """createFileTask(type: COPY, title: "COPY", ops: [{src: "${source.path}", dst: "${File(root,"public-copy.txt").path}", overwrite: false}], waitForCompletion: true) {status error}""" + " }")).getValue("createFileTask").jsonObject.getValue("status").jsonPrimitive.content)
             assertEquals("synthetic",File(root,"public-copy.txt").readText())
             var publicFailed = false
-            try { GraphqlApi.execute(GraphqlRequest<JsonObject>("mutation { " + """copyFile(src: "/system/test", dst: "${File(root,"public-never").path}", overwrite: false)""" + " }")) }
+            try { GraphqlApi.execute(GraphqlRequest<JsonObject>("mutation { " + """createFileTask(type: COPY, title: "COPY", ops: [{src: "/system/test", dst: "${File(root,"public-never").path}", overwrite: false}], waitForCompletion: true) {status error}""" + " }")) }
             catch (_: Exception) { publicFailed = true }
             assertTrue(publicFailed)
         } finally {

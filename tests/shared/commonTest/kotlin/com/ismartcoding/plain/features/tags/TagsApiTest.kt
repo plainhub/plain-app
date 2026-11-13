@@ -22,7 +22,7 @@ class TagsApiTest {
                 mutate = {
                     requests.add(it)
                     val field = if (it.query.contains("createTag(")) "createTag" else "updateTag"
-                    JsonHelper.jsonDecode<JsonObject>("""{"$field":{"id":"server-tag","name":"Label","count":0,"type":6}}""")
+                    JsonHelper.jsonDecode<JsonObject>("""{"$field":{"id":"server-tag","name":"Label","count":0,"type":"NOTE"}}""")
                 },
             ),
         )

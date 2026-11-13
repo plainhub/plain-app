@@ -107,9 +107,13 @@ class GraphqlArgumentsTest {
     }
 
     @Test
-    fun nullAndEmptyRecipientsRemainDistinct() {
-        assertEquals(JsonNull, Mutation.deliverChatItem("id", null).operation.variables["recipients"])
-        assertEquals(JsonArray(emptyList()), Mutation.deliverChatItem("id", emptyList()).operation.variables["recipients"])
+    fun retryChatItemPreservesRecipientSelection() {
+        val retry = Mutation.retryChatItem("id", listOf("peer"))
+        assertEquals("retryChatItem", retry.field)
+        assertTrue(retry.operation.query.contains("retryChatItem(id: \$id, recipientIds: \$recipientIds)"))
+        assertEquals(JsonArray(listOf(JsonPrimitive("peer"))), retry.operation.variables["recipientIds"])
+        assertEquals(JsonNull, Mutation.retryChatItem("id", null).operation.variables["recipientIds"])
+        assertEquals(JsonArray(emptyList()), Mutation.retryChatItem("id", emptyList()).operation.variables["recipientIds"])
     }
 
     @Test

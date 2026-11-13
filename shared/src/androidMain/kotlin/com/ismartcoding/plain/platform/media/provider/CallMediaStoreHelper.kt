@@ -56,7 +56,7 @@ object CallMediaStoreHelper : BaseContentHelper() {
             val durationSec = cursor.getIntValue(CallLog.Calls.DURATION, cache)
             val type = cursor.getIntValue(CallLog.Calls.TYPE, cache)
             val accountId = cursor.getStringValue(CallLog.Calls.PHONE_ACCOUNT_ID, cache)
-            PhoneCall(id = id, number = number, name = name, photoUri = photoUri, startedAt = startTS, durationSec = durationSec, type = CallType.fromInt(type), typeCode = type, accountId = accountId)
+            PhoneCall(id = id, number = number, name = name, photo = photoUri, startedAt = startTS, durationSec = durationSec, type = CallType.fromInt(type), typeCode = type, accountId = accountId)
         } ?: emptyList()
     }
 

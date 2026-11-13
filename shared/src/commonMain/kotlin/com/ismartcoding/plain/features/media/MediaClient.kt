@@ -21,10 +21,10 @@ open class MediaApi internal constructor(protected val api: GraphqlClient = Grap
         api.execute(Mutation.cacheAudioCover(path))
 
     suspend fun videoInfo(path: String): VideoFileInfo? =
-        api.execute(Query.videoFileInfo(path)).data
+        api.execute(Query.videoFileInfo(path))?.data
 
     suspend fun imageInfo(path: String): ImageFileInfo? =
-        api.execute(Query.imageFileInfo(path)).data
+        api.execute(Query.imageFileInfo(path))?.data
 
     suspend fun durationMs(path: String): Long = readMediaDurationMs(path, api)
 }
@@ -33,5 +33,5 @@ internal suspend fun readMediaDurationMs(
     api: GraphqlClient = GraphqlApi,
 ): Long {
     val info = api.execute(Query.audioDuration(path))
-    return info.data?.durationMs ?: 0L
+    return info?.data?.durationMs ?: 0L
 }

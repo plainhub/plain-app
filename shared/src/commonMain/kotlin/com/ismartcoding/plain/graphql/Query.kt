@@ -176,7 +176,7 @@ object Query {
     )
 
     fun calls(query: String, limit: Int, offset: Int): GraphqlRequest<List<Call>> = GraphqlRequest(
-        $$"query($query: String!, $limit: Int!, $offset: Int!) { calls(query: $query, limit: $limit, offset: $offset) { id number name photoId photoUri startedAt durationSec type typeCode accountId } }",
+        $$"query($query: String!, $limit: Int!, $offset: Int!) { calls(query: $query, limit: $limit, offset: $offset) { id number name photo startedAt durationSec type typeCode accountId } }",
         mapOf(variable("query", query), variable("limit", limit), variable("offset", offset)),
         field = "calls",
     )
@@ -292,7 +292,7 @@ object Query {
         field = "pomodoroToday",
     )
 
-    fun fileInfo(path: String): GraphqlRequest<FileSize> = GraphqlRequest(
+    fun fileInfo(path: String): GraphqlRequest<FileSize?> = GraphqlRequest(
         $$"query($path: String!) { fileInfo(path: $path) { size } }",
         mapOf(variable("path", path)),
         field = "fileInfo",
@@ -378,21 +378,21 @@ object Query {
         field = "audioLyricsByPath",
     )
 
-    fun videoFileInfo(path: String): GraphqlRequest<MediaFileInfoResult<VideoFileInfo>> = GraphqlRequest(
-        $$"query($path:String!,$name:String!){fileInfo(path:$path,fileName:$name){data{__typename ... on VideoFileInfo{width height rotation displayWidth displayHeight durationMs bitrate frameRate title artist album genre takenAt writer composer location{latitude longitude}}}}}",
-        mapOf(variable("path", path), variable("name", "video.mp4")),
+    fun videoFileInfo(path: String): GraphqlRequest<MediaFileInfoResult<VideoFileInfo>?> = GraphqlRequest(
+        $$"query($path:String!){fileInfo(path:$path){data{__typename ... on VideoFileInfo{width height rotation displayWidth displayHeight durationMs bitrate frameRate title artist album genre takenAt writer composer location{latitude longitude}}}}}",
+        mapOf(variable("path", path)),
         field = "fileInfo",
     )
 
-    fun imageFileInfo(path: String): GraphqlRequest<MediaFileInfoResult<ImageFileInfo>> = GraphqlRequest(
-        $$"query($path:String!,$name:String!){fileInfo(path:$path,fileName:$name){data{__typename ... on ImageFileInfo{width height rotation make model colorSpace apertureValue exposureTime focalLength isoSpeed takenAt flash fNumber exposureProgram meteringMode whiteBalance creator resolutionX resolutionY description location{latitude longitude}}}}}",
-        mapOf(variable("path", path), variable("name", "image.jpg")),
+    fun imageFileInfo(path: String): GraphqlRequest<MediaFileInfoResult<ImageFileInfo>?> = GraphqlRequest(
+        $$"query($path:String!){fileInfo(path:$path){data{__typename ... on ImageFileInfo{width height rotation make model colorSpace apertureValue exposureTime focalLength isoSpeed takenAt flash fNumber exposureProgram meteringMode whiteBalance creator resolutionX resolutionY description location{latitude longitude}}}}}",
+        mapOf(variable("path", path)),
         field = "fileInfo",
     )
 
-    fun audioDuration(path: String): GraphqlRequest<MediaFileInfoResult<AudioDuration>> = GraphqlRequest(
-        $$"query($path:String!,$name:String!){fileInfo(path:$path,fileName:$name){data{... on AudioFileInfo{durationMs}}}}",
-        mapOf(variable("path", path), variable("name", "audio.mp3")),
+    fun audioDuration(path: String): GraphqlRequest<MediaFileInfoResult<AudioDuration>?> = GraphqlRequest(
+        $$"query($path:String!){fileInfo(path:$path){data{... on AudioFileInfo{durationMs} ... on VideoFileInfo{durationMs}}}}",
+        mapOf(variable("path", path)),
         field = "fileInfo",
     )
 

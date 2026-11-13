@@ -46,7 +46,7 @@ internal object SystemCallsHost {
     }
 
     private fun callFacts(call: PhoneCall) = CallFacts(
-        id = call.id, number = call.number, name = call.name, photoUri = call.photoUri,
+        id = call.id, number = call.number, name = call.name, photoUri = call.photo,
         startedAt = call.startedAt.toString(), durationSec = call.durationSec, type = call.typeCode, accountId = call.accountId,
     )
 }

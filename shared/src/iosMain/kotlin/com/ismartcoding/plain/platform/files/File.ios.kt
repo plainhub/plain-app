@@ -2,6 +2,10 @@
 
 package com.ismartcoding.plain.platform.files
 
+import com.ismartcoding.plain.features.files.FileTaskClient
+import com.ismartcoding.plain.features.files.FileTaskOp
+import com.ismartcoding.plain.features.files.FileTaskStatus
+import com.ismartcoding.plain.features.files.FileTaskType
 import com.ismartcoding.plain.features.files.FilesClient
 
 import com.ismartcoding.plain.platform.getContentTypeForPath
@@ -82,7 +86,9 @@ actual suspend fun copyFileToUri(path: String, uriStr: String): Boolean = withIO
     val accessed = destination.startAccessingSecurityScopedResource()
     try {
         val destinationPath = destination.path ?: return@withIO false
-        FilesClient.copyToPath(path, destinationPath, overwrite = true)
+        val task = FileTaskClient.execute(FileTaskType.COPY, listOf(FileTaskOp(path, destinationPath, overwrite = true)))
+        check(task.status == FileTaskStatus.DONE) { task.error }
+        true
     } catch (cancelled: CancellationException) {
         throw cancelled
     } catch (_: Exception) {

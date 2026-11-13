@@ -67,7 +67,7 @@ emit device_info '{ deviceInfo { name manufacturer model osName osVersion appVer
 emit device_status '{ deviceStatus { uptimeSec batteryLevel charging storageAvailable } }'
 emit peers '{ peers { id name ip port online } }'
 emit mounts '{ mounts { id name path mountPoint totalBytes freeBytes } }'
-emit path_exists '{ pathExists(path: "/sdcard") }'
+emit file_info '{ fileInfo(path: "/sdcard") { path size } }'
 
 # --- notes, feeds, bookmarks, tags ------------------------------------------
 emit notes '{ notes(offset: 0, limit: 5, query: "") { id title deletedAt createdAt } }'
