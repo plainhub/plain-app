@@ -36,7 +36,7 @@ import com.ismartcoding.plain.models.ImageEditorProject
 import com.ismartcoding.plain.models.ImageEditorProjectInput
 import com.ismartcoding.plain.models.Note
 import com.ismartcoding.plain.models.NoteInput
-import com.ismartcoding.plain.models.PairingDeviceInput
+import com.ismartcoding.plain.models.PairPeerInput
 import com.ismartcoding.plain.models.PomodoroToday
 import com.ismartcoding.plain.models.ShareRecord
 import com.ismartcoding.plain.models.Tag
@@ -92,10 +92,10 @@ object Mutation {
         field = "deleteChatItem",
     )
 
-    fun pairDevice(input: PairingDeviceInput): GraphqlRequest<Boolean> = GraphqlRequest(
-        $$"mutation($input: PairingDeviceInput!) { pairDevice(input: $input) }",
+    fun pairPeer(input: PairPeerInput): GraphqlRequest<Boolean> = GraphqlRequest(
+        $$"mutation($input: PairPeerInput!) { pairPeer(input: $input) }",
         mapOf(variable("input", input)),
-        field = "pairDevice",
+        field = "pairPeer",
     )
 
     fun cancelPairing(peerId: String): GraphqlRequest<Boolean> = GraphqlRequest(
@@ -510,15 +510,15 @@ object Mutation {
         field = "deleteImageEditorProject",
     )
 
-    fun deletePeer(id: String): GraphqlRequest<Boolean> = GraphqlRequest(
-        $$"mutation($id: ID!) { deletePeer(id: $id) }",
-        mapOf(variable("id", id)),
+    fun deletePeer(peerId: String): GraphqlRequest<Boolean> = GraphqlRequest(
+        $$"mutation($peerId: ID!) { deletePeer(peerId: $peerId) }",
+        mapOf(variable("peerId", peerId)),
         field = "deletePeer",
     )
 
-    fun unpairPeer(id: String): GraphqlRequest<Boolean> = GraphqlRequest(
-        $$"mutation($id: ID!) { unpairPeer(id: $id) }",
-        mapOf(variable("id", id)),
+    fun unpairPeer(peerId: String): GraphqlRequest<Boolean> = GraphqlRequest(
+        $$"mutation($peerId: ID!) { unpairPeer(peerId: $peerId) }",
+        mapOf(variable("peerId", peerId)),
         field = "unpairPeer",
     )
 

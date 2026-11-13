@@ -88,7 +88,7 @@ fun NearbyPairedDeviceItem(peer: Peer, device: NearbyDevice?) {
                             DialogHelper.showConfirmDialog(
                                 title = unpairText,
                                 message = unpairMessage,
-                                confirmButton = Pair(unpairText) { NearbyViewModel.unpairDevice(peer.id, checkbox.checked) },
+                                confirmButton = Pair(unpairText) { NearbyViewModel.unpairPeer(peer.id, checkbox.checked) },
                                 dismissButton = Pair(cancelText) {},
                                 danger = true,
                                 checkbox = checkbox,

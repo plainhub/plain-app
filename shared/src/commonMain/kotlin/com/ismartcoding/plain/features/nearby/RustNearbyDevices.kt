@@ -5,21 +5,20 @@ import com.ismartcoding.plain.graphql.Query
 import com.ismartcoding.plain.models.NearbyDevice
 import com.ismartcoding.plain.rust.graphql.GraphqlApi
 import com.ismartcoding.plain.ui.nearby.NearbyViewModel
-import kotlin.uuid.ExperimentalUuidApi
-import kotlin.uuid.Uuid
+import com.ismartcoding.plain.rust.graphql.AppSubscriptions
+import com.ismartcoding.plain.rust.graphql.changes
+import kotlinx.coroutines.flow.map
 
 object RustNearbyDevices {
-    @OptIn(ExperimentalUuidApi::class)
-
     suspend fun observeDiscovery() {
-        val token = Uuid.random().toString()
-        discoverySession(token,
-            acquire = {
-                GraphqlApi.execute(Mutation.acquireDiscovery(it))
+        discoverySession(
+            start = {
+                GraphqlApi.execute(Mutation.startDiscovery())
                 apply(snapshot())
                 RustMdnsRuntime.refresh()
             },
-            release = { GraphqlApi.execute(Mutation.releaseDiscovery(it)) },
+            stop = { GraphqlApi.execute(Mutation.stopDiscovery()) },
+            scanning = AppSubscriptions.mdnsChanged.changes().map { RustMdnsRuntime.snapshot().scanning },
         )
     }
     /**

@@ -101,7 +101,7 @@ class ApiFixtureRustHttpTest {
             stop.delete()
             if (clientId.isNotEmpty()) GraphqlApi.execute(GraphqlRequest<JsonObject>("mutation { revokeSession(clientId: ${JsonPrimitive(clientId)}) }"))
             if (channelId.isNotEmpty()) GraphqlApi.execute(GraphqlRequest<JsonObject>("mutation { deleteChatChannel(id: ${JsonPrimitive(channelId)}) }"))
-            if (peerCreated) GraphqlApi.execute(GraphqlRequest<JsonObject>("mutation { deletePeer(id: ${JsonPrimitive(peerId)}) }"))
+            if (peerCreated) GraphqlApi.execute(GraphqlRequest<JsonObject>("mutation { deletePeer(peerId: ${JsonPrimitive(peerId)}) }"))
             if (rootCreated) root.deleteRecursively()
             Prefs.setApiAccessFeatures(oldPermissions)
             Prefs.remoteAccess.value = oldAccess

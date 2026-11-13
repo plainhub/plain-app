@@ -2,15 +2,17 @@ package com.ismartcoding.plain.features.nearby
 
 import com.ismartcoding.plain.lib.logcat.LogCat
 import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.collect
 
-internal suspend fun discoverySession(token: String, acquire: suspend (String) -> Unit, release: suspend (String) -> Unit) {
+internal suspend fun discoverySession(start: suspend () -> Unit, stop: suspend () -> Unit, scanning: Flow<Boolean>) {
     try {
-        acquire(token)
-        awaitCancellation()
+        start()
+        scanning.collect { if (!it) start() }
     } finally {
         withContext(NonCancellable) {
-            try { release(token) }
-            catch (error: Exception) { LogCat.e("Discovery session release failed", error) }
+            try { stop() }
+            catch (error: Exception) { LogCat.e("Discovery stop failed", error) }
         }
     }
 }

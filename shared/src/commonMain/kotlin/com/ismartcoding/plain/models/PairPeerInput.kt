@@ -4,7 +4,7 @@ import com.ismartcoding.plain.features.nearby.PairingMode
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class PairingDeviceInput(
+data class PairPeerInput(
     val peerId: String,
     val mode: PairingMode,
     val password: String? = null,

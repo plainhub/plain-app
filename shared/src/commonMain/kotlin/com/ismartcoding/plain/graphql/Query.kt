@@ -451,9 +451,9 @@ object Query {
         field = "peers",
     )
 
-    internal fun peerFileUrl(id: String, fileId: String): GraphqlRequest<String> = GraphqlRequest(
-        $$"query($id: ID!, $fileId: String!) { peerFileUrl(id: $id, fileId: $fileId) }",
-        mapOf(variable("id", id), variable("fileId", fileId)),
+    internal fun peerFileUrl(peerId: String, fileId: String): GraphqlRequest<String> = GraphqlRequest(
+        $$"query($peerId: ID!, $fileId: String!) { peerFileUrl(peerId: $peerId, fileId: $fileId) }",
+        mapOf(variable("peerId", peerId), variable("fileId", fileId)),
         field = "peerFileUrl",
     )
 
