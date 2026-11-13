@@ -17,7 +17,7 @@ open class AudioOverviewApi internal constructor(protected val api: GraphqlClien
         api.execute(Query.audioOverview())
     val updates get() = merge(
         AppSubscriptions.contentChanged.changes(),
-        AppSubscriptions.mediaLibraryUpdated.changes { DataType.AUDIO in it.types },
+        AppSubscriptions.mediaUpdated.changes { DataType.AUDIO in it.types },
         AppSubscriptions.mediaScanProgress.changes {
             when (it.state) {
                 MediaScanState.IDLE, MediaScanState.FAILED, MediaScanState.STOPPED, MediaScanState.PAUSED -> true

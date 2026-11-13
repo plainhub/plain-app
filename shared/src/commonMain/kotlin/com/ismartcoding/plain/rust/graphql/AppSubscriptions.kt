@@ -1,7 +1,7 @@
 package com.ismartcoding.plain.rust.graphql
 
 import com.ismartcoding.plain.models.ChatItemId
-import com.ismartcoding.plain.models.MediaLibraryChange
+import com.ismartcoding.plain.models.MediaChange
 import com.ismartcoding.plain.models.MediaScanProgress
 import com.ismartcoding.plain.lib.JsonHelper
 import com.ismartcoding.plain.lib.logcat.LogCat
@@ -83,8 +83,8 @@ object AppSubscriptions {
     private val storageGranted = accessUpdated.changes()
         .map { Permission.WRITE_EXTERNAL_STORAGE.isGranted() }
         .distinctUntilChanged()
-    val mediaLibraryUpdated = storageGranted.flatMapLatest { granted ->
-        if (granted) subscription<MediaLibraryChange>("mediaLibraryUpdated", "{ types }") else emptyFlow()
+    val mediaUpdated = storageGranted.flatMapLatest { granted ->
+        if (granted) subscription<MediaChange>("mediaUpdated", "{ types }") else emptyFlow()
     }.shareIn(scope, SharingStarted.WhileSubscribed())
     val mediaScanProgress = storageGranted.flatMapLatest { granted ->
         if (granted) subscription<MediaScanProgress>("mediaScanProgress", "{ indexed pending total state error }") else emptyFlow()

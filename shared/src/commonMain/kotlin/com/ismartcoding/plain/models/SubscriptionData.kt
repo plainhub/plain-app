@@ -1,13 +1,14 @@
 package com.ismartcoding.plain.models
 
 import com.ismartcoding.plain.platform.system.DataType
+import com.ismartcoding.plain.platform.system.GraphqlDataTypeSerializer
 import kotlinx.serialization.Serializable
 
 @Serializable
 data class ChatItemId(val id: String)
 
 @Serializable
-data class MediaLibraryChange(val types: List<DataType>)
+data class MediaChange(val types: List<@Serializable(with = GraphqlDataTypeSerializer::class) DataType>)
 
 @Serializable
 data class MediaScanProgress(

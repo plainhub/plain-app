@@ -9,9 +9,9 @@ import kotlin.test.assertFailsWith
 
 class SubscriptionDataTest {
     @Test
-    fun library_changes_preserve_numeric_type_ids() {
-        val payload = """{"types":[1,2,3,24]}"""
-        val change = JsonHelper.jsonDecode<MediaLibraryChange>(payload)
+    fun media_changes_decode_graphql_enum_names_without_changing_numeric_domain_serialization() {
+        val payload = """{"types":["AUDIO","VIDEO","IMAGE","DOC"]}"""
+        val change = JsonHelper.jsonDecode<MediaChange>(payload)
 
         assertEquals(listOf(DataType.AUDIO, DataType.VIDEO, DataType.IMAGE, DataType.DOC), change.types)
         assertEquals(payload, JsonHelper.jsonEncode(change))
@@ -38,7 +38,10 @@ class SubscriptionDataTest {
     @Test
     fun unknown_types_and_states_are_rejected() {
         assertFailsWith<SerializationException> {
-            JsonHelper.jsonDecode<MediaLibraryChange>("""{"types":[999]}""")
+            JsonHelper.jsonDecode<MediaChange>("""{"types":["UNKNOWN"]}""")
+        }
+        assertFailsWith<SerializationException> {
+            JsonHelper.jsonDecode<MediaChange>("""{"types":[3]}""")
         }
         assertFailsWith<SerializationException> {
             JsonHelper.jsonDecode<MediaScanProgress>("""{"indexed":0,"state":"UNKNOWN"}""")
