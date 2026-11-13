@@ -11,7 +11,6 @@ import com.ismartcoding.plain.lib.JsonHelper
 import com.ismartcoding.plain.models.ManagedDeviceInfo
 import com.ismartcoding.plain.models.Note
 import com.ismartcoding.plain.models.Peer
-import com.ismartcoding.plain.models.PeerAddress
 import com.ismartcoding.plain.platform.system.DeviceType
 import com.ismartcoding.plain.rust.graphql.ContentSource
 import com.ismartcoding.plain.rust.graphql.GraphqlHttpResponse
@@ -279,10 +278,10 @@ class GlobalSearchDevicesTest {
         fun pages() = requests.filter { "notes(" in it.query }
 
         fun peer() = Peer(
-            id = name, name = name, ip = "", status = PeerStatus.PAIRED, port = 8443,
+            id = name, name = name, ip = "device.test", status = PeerStatus.PAIRED, port = 8443,
             deviceType = DeviceType.PHONE, createdAt = now, updatedAt = now,
             publicKey = "public-$name", token = "token-$name",
-            address = PeerAddress("device.test", "https://device.test:8443", "", ""),
+
         )
 
         suspend fun source(): ContentSource.Remote {

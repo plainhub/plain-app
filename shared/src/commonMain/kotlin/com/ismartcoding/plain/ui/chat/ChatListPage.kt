@@ -16,7 +16,6 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
-import com.ismartcoding.plain.features.chat.models.getBestIp
 import com.ismartcoding.plain.features.chat.peer.PeerStatusClient
 import com.ismartcoding.plain.ui.components.ButtonSize
 import com.ismartcoding.plain.ui.platform.system.getIcon
@@ -172,7 +171,7 @@ fun ChatListPage(
                     items(items = allPeers, key = { it.id }) { peer ->
                         PeerListItem(
                             title = peer.name,
-                            desc = if (peer.isPaired()) peer.getBestIp() else peer.ip,
+                            desc = peer.ip,
                             icon = peer.deviceType.getIcon(),
                             online = peer.online,
                             latestChat = latestChats[peer.id],

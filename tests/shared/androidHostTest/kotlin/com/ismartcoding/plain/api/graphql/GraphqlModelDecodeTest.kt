@@ -103,14 +103,14 @@ class GraphqlModelDecodeTest {
         assertEquals(30000L, info.durationMs)
     }
     @Test
-    fun peerFieldsUseMainCamelCaseFieldsAndKeepDerivedAddress() {
-        val peer = JsonHelper.jsonDecode<Peer>("""{"id":"peer-1","name":"Peer","ip":"127.0.0.1","key":"key","publicKey":"public","status":"PAIRED","port":8080,"deviceType":"PHONE","token":"","managed":true,"createdAt":"2026-10-12T00:00:00Z","updatedAt":"2026-10-12T00:00:00Z","address":{"bestIp":"127.0.0.1","baseUrl":"https://127.0.0.1:8080","apiUrl":"https://127.0.0.1:8080/peer_graphql","statusWsUrl":"wss://127.0.0.1:8080/peer_status"}}""")
+    fun peerFieldsUseMainCamelCaseFieldsWithoutDerivedAddress() {
+        val peer = JsonHelper.jsonDecode<Peer>("""{"id":"peer-1","name":"Peer","ip":"127.0.0.1","key":"key","publicKey":"public","status":"PAIRED","port":8080,"deviceType":"PHONE","token":"","managed":true,"createdAt":"2026-10-12T00:00:00Z","updatedAt":"2026-10-12T00:00:00Z"}""")
         assertEquals("public", peer.publicKey)
-        assertEquals("127.0.0.1", peer.address?.bestIp)
+        assertEquals("127.0.0.1", peer.ip)
         assertTrue(peer.managed)
         val encoded = JsonHelper.jsonEncodeToElement(peer).jsonObject
         for (field in listOf("publicKey", "deviceType", "createdAt", "updatedAt", "managed")) assertTrue(field in encoded)
-        for (field in listOf("public_key", "device_type", "created_at", "updated_at")) assertFalse(field in encoded)
+        for (field in listOf("public_key", "device_type", "created_at", "updated_at", "address")) assertFalse(field in encoded)
         assertEquals(peer, JsonHelper.jsonDecodeFromElement<Peer>(JsonHelper.jsonEncodeToElement(peer)))
         assertFalse(JsonHelper.jsonDecodeFromElement<Peer>(JsonHelper.jsonEncodeToElement(peer.copy(managed = false))).managed)
     }

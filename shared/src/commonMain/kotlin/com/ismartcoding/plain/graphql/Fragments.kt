@@ -34,7 +34,7 @@ internal object Fragments {
     const val IMAGE_EDITOR_SUMMARY = "id thumbnail canvasWidth canvasHeight layerCount updatedAt"
     const val IMAGE_EDITOR_PROJECT = $$"$$IMAGE_EDITOR_SUMMARY stateB64 createdAt"
     const val PEER_SUMMARY = "id name ip publicKey status port deviceType createdAt updatedAt online managed"
-    const val PEER = "id name ip key publicKey status port deviceType token createdAt updatedAt online managed address { bestIp baseUrl apiUrl statusWsUrl }"
+    const val PEER = "id name ip key publicKey status port deviceType token createdAt updatedAt online managed"
     const val CHANNEL_FIELDS = "id ownerId name actions { isOwner canRename canManageMembers canLeave canDelete } members { peerId status } version status createdAt updatedAt"
     private const val CHAT_DOWNLOAD_TASKS = "runtimeId revision tasks { id messageId status error downloaded total speed file { id: fileId uri size durationMs width height summary fileName } "
     const val CHAT_DOWNLOAD_QUEUE = CHAT_DOWNLOAD_TASKS + "peer { " + PEER + " } }"
@@ -45,7 +45,7 @@ internal object Fragments {
             DataType.AUDIO -> "artist durationMs albumId albumFileId isFavorite"
             DataType.IMAGE -> "width height rotation takenAt isFavorite"
             DataType.VIDEO -> "durationMs width height rotation takenAt isFavorite"
-            DataType.DOC -> "durationMs extension"
+            DataType.DOC -> "extension"
             else -> error("Unsupported media type: $type")
         }
         return $$"$$MEDIA_COMMON $$extra"

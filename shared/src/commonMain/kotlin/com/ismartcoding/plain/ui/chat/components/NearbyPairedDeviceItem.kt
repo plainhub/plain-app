@@ -49,7 +49,7 @@ fun NearbyPairedDeviceItem(peer: Peer, device: NearbyDevice?) {
         modifier = PlainTheme.getCardModifier().testTag("nearby-device:${peer.id}"),
         title = peer.name,
         subtitle = listOfNotNull(
-            device?.bestIp?.takeIf { it.isNotEmpty() } ?: peer.address?.bestIp ?: peer.ip,
+            peer.ip,
             if (device?.remoteAccess == false) stringResource(Res.string.nearby_enable_remote_access) else null,
         ).filter { it.isNotEmpty() }.joinToString(" · "),
         titleTrailing = {

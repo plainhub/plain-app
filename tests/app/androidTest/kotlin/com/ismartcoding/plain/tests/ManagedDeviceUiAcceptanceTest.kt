@@ -440,7 +440,7 @@ class ManagedDeviceUiAcceptanceTest {
             awaitNode("local destination") { it.text == text(Res.string.local_chat) }
             awaitValue("initial target recipient read") { synchronized(requests) { requests.firstOrNull { it.query.contains("peers {") } } }
             targetPeers.set(listOf(Peer(
-                id = "fixture-recipient", name = "Target recipient", ip = "", port = 8443,
+                id = "fixture-recipient", name = "Target recipient", ip = "device.test", port = 8443,
                 status = com.ismartcoding.plain.features.nearby.PeerStatus.PAIRED,
                 deviceType = com.ismartcoding.plain.platform.system.DeviceType.PHONE,
                 createdAt = kotlin.time.Instant.fromEpochMilliseconds(0), updatedAt = kotlin.time.Instant.fromEpochMilliseconds(0),
@@ -527,12 +527,12 @@ class ManagedDeviceUiAcceptanceTest {
         readFeatures: () -> String = { "NOTES|FILES" },
     ): com.ismartcoding.plain.rust.graphql.ContentSource.Remote {
         val peer = com.ismartcoding.plain.models.Peer(
-            id = "share-ui-fixture-peer", name = "Target fixture", ip = "", port = 8443,
+            id = "share-ui-fixture-peer", name = "Target fixture", ip = "device.test", port = 8443,
             status = com.ismartcoding.plain.features.nearby.PeerStatus.PAIRED,
             deviceType = com.ismartcoding.plain.platform.system.DeviceType.PHONE,
             createdAt = kotlin.time.Instant.fromEpochMilliseconds(0), updatedAt = kotlin.time.Instant.fromEpochMilliseconds(0),
             publicKey = "fixture-key", token = "fixture-token",
-            address = com.ismartcoding.plain.models.PeerAddress("device.test", "https://device.test:8443", "", ""),
+
         )
         val card = com.ismartcoding.plain.features.chat.models.MessageShare(
             "fixture-shared-link", "fixture-link-key", com.ismartcoding.plain.features.chat.models.SharePeerInfo("link-peer", "device.test", 8443), "Target folder",
@@ -1622,7 +1622,7 @@ class ManagedDeviceUiAcceptanceTest {
                         Box(Modifier.fillMaxSize().padding(32.dp)) {
                             com.ismartcoding.plain.ui.chat.components.NearbyPairedDeviceItem(
                                 com.ismartcoding.plain.models.Peer(
-                                    id = device.id, name = device.name, ip = "", status = device.status,
+                                    id = device.id, name = device.name, ip = "device.test", status = device.status,
                                     port = device.port, deviceType = device.deviceType,
                                     createdAt = kotlin.time.Instant.fromEpochMilliseconds(0), updatedAt = kotlin.time.Instant.fromEpochMilliseconds(0),
                                 ), device,
@@ -2225,7 +2225,7 @@ class ManagedDeviceUiAcceptanceTest {
                         uri = "fid:" + copied.realPath.substringAfterLast('/'), size = copied.size, fileName = "$marker.png",
                     ))),
                 )
-                val sent = remote.execute(Mutation.sendChatItem("peer:local", JsonHelper.jsonEncode(content))).single()
+                val sent = remote.execute(Mutation.sendChatItems(listOf("peer:local"), JsonHelper.jsonEncode(content))).single()
                 messageId = sent.id
                 remote.execute(Mutation.deleteChatItem(sent.id))
                 messageId = null

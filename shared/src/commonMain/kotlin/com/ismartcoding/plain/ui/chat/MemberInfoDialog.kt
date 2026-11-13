@@ -8,7 +8,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import com.ismartcoding.plain.models.ChatChannel
-import com.ismartcoding.plain.features.chat.models.getBestIp
 import com.ismartcoding.plain.ui.components.ButtonSize
 import com.ismartcoding.plain.ui.components.ButtonType
 import com.ismartcoding.plain.ui.platform.system.getText
@@ -79,7 +78,7 @@ internal fun MemberInfoDialog(
         text = {
             Column {
                 PListItem(title = stringResource(Res.string.peer_id), value = peer.id)
-                PListItem(title = stringResource(Res.string.ip_address), value = peer.getBestIp())
+                PListItem(title = stringResource(Res.string.ip_address), value = peer.ip)
                 PListItem(title = stringResource(Res.string.port), value = peer.port?.toString().orEmpty())
                 PListItem(title = stringResource(Res.string.device_type), value = peer.deviceType.getText())
                 val status = peer.status.getText()

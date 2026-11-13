@@ -1,5 +1,7 @@
 package com.ismartcoding.plain.features.chat.peer
 
+import com.ismartcoding.plain.features.chat.models.getBaseUrl
+
 import com.ismartcoding.plain.features.files.FileAction
 import com.ismartcoding.plain.features.notes.NotesApi
 import com.ismartcoding.plain.graphql.Mutation
@@ -102,7 +104,7 @@ internal class ManagedDeviceClient private constructor(
         val info = currentInfo
         val current = http.current()
         val fileId = http.encryptResourceReference(info.urlToken, path)
-        val base = current.address?.baseUrl ?: error("peer_address_unavailable")
+        val base = current.getBaseUrl()
         val url = managedResourceUrl(base, fileId, size, action)
         return com.ismartcoding.plain.models.ManagedResource(url, checkNotNull(info.tlsCertificateSha256) { "peer_https_unavailable" })
     }

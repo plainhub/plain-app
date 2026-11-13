@@ -3,7 +3,6 @@ package com.ismartcoding.plain.ui.app
 import com.ismartcoding.plain.features.chat.peer.ManagedDeviceClient
 import com.ismartcoding.plain.features.nearby.PeerStatus
 import com.ismartcoding.plain.models.Peer
-import com.ismartcoding.plain.models.PeerAddress
 import com.ismartcoding.plain.platform.system.DeviceType
 import com.ismartcoding.plain.rust.graphql.ContentSource
 import com.ismartcoding.plain.rust.graphql.GraphqlHttpResponse
@@ -79,10 +78,10 @@ class SelectedDeviceTest {
     private suspend fun remoteSource(): ContentSource.Remote {
         val now = Instant.fromEpochMilliseconds(0)
         val peer = Peer(
-            id = "fixture-peer", name = "Remote", ip = "", status = PeerStatus.PAIRED, port = 8443,
+            id = "fixture-peer", name = "Remote", ip = "device.test", status = PeerStatus.PAIRED, port = 8443,
             deviceType = DeviceType.PHONE, createdAt = now, updatedAt = now,
             publicKey = "fixture-key", token = "fixture-token",
-            address = PeerAddress("device.test", "https://device.test:8443", "", ""),
+
         )
         val response = """{"data":{"app":{"deviceName":"Remote","capabilities":[],"access":[],"appDir":"app://","downloadsDir":"/downloads","urlToken":"resource-token","tlsCertificateSha256":null}}}"""
         val http = PeerHttpClient(peer, peers = { listOf(peer) }, clientId = { "fixture-client" },

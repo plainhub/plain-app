@@ -3,7 +3,6 @@ package com.ismartcoding.plain.rust.graphql
 import com.ismartcoding.plain.features.nearby.PeerStatus
 import com.ismartcoding.plain.lib.JsonHelper
 import com.ismartcoding.plain.models.Peer
-import com.ismartcoding.plain.models.PeerAddress
 import com.ismartcoding.plain.platform.system.DeviceType
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.test.runTest
@@ -15,10 +14,10 @@ import kotlin.time.Instant
 
 class GraphqlHttpClientTest {
     private fun peer() = Peer(
-        id = "fixture-peer", name = "Device", ip = "", status = PeerStatus.PAIRED, port = 8443,
+        id = "fixture-peer", name = "Device", ip = "device.test", status = PeerStatus.PAIRED, port = 8443,
         deviceType = DeviceType.PHONE, createdAt = Instant.fromEpochMilliseconds(0), updatedAt = Instant.fromEpochMilliseconds(0),
         publicKey = "fixture-public-key", token = Base64.encode(ByteArray(32) { 7 }),
-        address = PeerAddress("device.test", "https://device.test:8443", "", ""),
+
     )
     private val request = GraphqlRequest<String>("query { deviceName }", field = "deviceName")
     private fun encodedResult() = Base64.encode(JsonHelper.jsonEncode(GraphqlResponse(
@@ -59,10 +58,10 @@ class GraphqlHttpClientTest {
     }
 
     @Test
-    fun rejects_management_addresses_without_https_or_a_host() = runTest {
-        for (base in listOf("http://device.test:8443", "https://", "https:///path")) {
+    fun rejects_invalid_peer_hosts_before_transport() = runTest {
+        for (ip in listOf("http://device.test", "", "/path")) {
             val original = peer()
-            val peer = original.copy(address = checkNotNull(original.address).copy(baseUrl = base))
+            val peer = original.copy(ip = ip)
             val client = PeerHttpClient(peer, peers = { listOf(peer) },
                 encrypt = { _, _, _ -> Base64.encode(byteArrayOf(1)) },
                 transport = object : GraphqlHttpTransport {

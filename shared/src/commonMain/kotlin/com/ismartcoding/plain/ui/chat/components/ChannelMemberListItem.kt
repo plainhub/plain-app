@@ -3,7 +3,6 @@ package com.ismartcoding.plain.ui.chat.components
 import androidx.compose.foundation.clickable
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import com.ismartcoding.plain.features.chat.models.getBestIp
 import com.ismartcoding.plain.ui.components.BadgeType
 import com.ismartcoding.plain.ui.components.ButtonSize
 import com.ismartcoding.plain.ui.components.ButtonType
@@ -26,7 +25,7 @@ fun ChannelMemberListItem(
     onRemove: (() -> Unit)? = null,
     isLoading: Boolean = false,
 ) {
-    val subtitle = if (member.isSelf) stringResource(Res.string.this_device) else member.peer?.getBestIp().orEmpty()
+    val subtitle = if (member.isSelf) stringResource(Res.string.this_device) else member.peer?.ip.orEmpty()
     PListItem(
         modifier = if (onClick != null) modifier.clickable { onClick() } else modifier,
         title = member.displayName(),

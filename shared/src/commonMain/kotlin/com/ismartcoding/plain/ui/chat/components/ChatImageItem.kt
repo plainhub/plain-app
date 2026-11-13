@@ -60,7 +60,7 @@ internal fun ChatImageItem(
     val downloadProgress = downloadTask?.let {
         if (it.messageFile.size > 0) it.downloadedSize.toFloat() / it.messageFile.size.toFloat() else 0f
     } ?: 0f
-    val previewPath by produceState("", source, item.uri, peer?.id, peer?.address, peer?.ip, peer?.port, peer?.key, peer?.publicKey, peer?.status) {
+    val previewPath by produceState("", source, item.uri, peer?.id, peer?.ip, peer?.port, peer?.key, peer?.publicKey, peer?.status) {
         value = try {
             if (source is com.ismartcoding.plain.rust.graphql.ContentSource.Remote) { if (item.isRemoteFile()) "" else item.uri }
             else item.getPreviewPath(peer)

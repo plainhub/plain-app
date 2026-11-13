@@ -19,7 +19,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.ismartcoding.plain.features.chat.data.ChatTarget
-import com.ismartcoding.plain.features.chat.models.getBestIp
 import com.ismartcoding.plain.ui.components.ButtonType
 import com.ismartcoding.plain.platform.system.DeviceType
 import com.ismartcoding.plain.ui.platform.system.getText
@@ -68,7 +67,7 @@ fun PeerInfoPage(
                 item {
                     PCard(modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN)) {
                         PListItem(title = stringResource(Res.string.peer_id), value = peer.id)
-                        PListItem(title = stringResource(Res.string.ip_address), value = peer.getBestIp())
+                        PListItem(title = stringResource(Res.string.ip_address), value = peer.ip)
                         PListItem(title = stringResource(Res.string.port), value = peer.port?.toString().orEmpty())
                         PListItem(title = stringResource(Res.string.device_type), value = peer.deviceType.getText())
                         val status = peer.status.getText()

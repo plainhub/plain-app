@@ -7,7 +7,8 @@ object UrlHelper {
      */
     fun buildUrl(scheme: String, host: String, port: Int, path: String = ""): String {
         val portPart = if ((scheme == "http" && port == 80) || (scheme == "https" || scheme == "wss") && port == 443) "" else ":$port"
-        return "$scheme://$host$portPart$path"
+        val authority = if (host.contains(':')) "[$host]" else host
+        return "$scheme://$authority$portPart$path"
     }
 
     fun getPolicyUrl(): String {

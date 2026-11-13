@@ -16,7 +16,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.ismartcoding.plain.models.Peer
-import com.ismartcoding.plain.features.chat.models.getBestIp
 import com.ismartcoding.plain.ui.components.ButtonSize
 import com.ismartcoding.plain.ui.components.ButtonType
 import com.ismartcoding.plain.platform.system.DeviceType
@@ -183,7 +182,7 @@ fun ChannelInfoPage(
                             addablePeers.forEach { peer ->
                                 PListItem(
                                     title = peer.name,
-                                    subtitle = peer.getBestIp(),
+                                    subtitle = peer.ip,
                                     start = {
                                         PeerIconWithStatus(
                                             icon = peer.deviceType.getIcon(),

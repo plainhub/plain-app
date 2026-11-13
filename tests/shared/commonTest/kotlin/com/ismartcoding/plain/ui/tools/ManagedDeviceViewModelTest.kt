@@ -7,7 +7,6 @@ import androidx.lifecycle.ViewModelProvider
 import com.ismartcoding.plain.features.nearby.PeerStatus
 import com.ismartcoding.plain.lib.JsonHelper
 import com.ismartcoding.plain.models.Peer
-import com.ismartcoding.plain.models.PeerAddress
 import com.ismartcoding.plain.platform.system.DeviceType
 import com.ismartcoding.plain.rust.graphql.*
 import kotlinx.coroutines.Dispatchers
@@ -103,10 +102,10 @@ class ManagedDeviceViewModelTest {
 
     private class Fixture {
         val peer = Peer(
-            id = "fixture-peer", name = "Remote", ip = "", status = PeerStatus.PAIRED, port = 8443,
+            id = "fixture-peer", name = "Remote", ip = "device.test", status = PeerStatus.PAIRED, port = 8443,
             deviceType = DeviceType.PHONE, createdAt = Instant.fromEpochMilliseconds(0), updatedAt = Instant.fromEpochMilliseconds(0),
             publicKey = "fixture-key", token = "fixture-token",
-            address = PeerAddress("device.test", "https://device.test:8443", "", ""),
+
         )
         var currentPeer = peer
         var fail = true
