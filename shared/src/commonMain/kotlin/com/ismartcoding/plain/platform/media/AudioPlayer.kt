@@ -14,7 +14,6 @@ interface AudioPlayer {
     val isPlayingFlow: StateFlow<Boolean>
     val currentPath: String
     fun bindRevision(revision: Long)
-    fun restorePlayback(revision: Long, positionMs: Long)
     suspend fun load(audio: AudioItem, positionMs: Long, speed: Float, revision: Long)
     val progress: Long
     suspend fun seekTo(positionMs: Long)

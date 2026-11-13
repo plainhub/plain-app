@@ -6,7 +6,6 @@ import androidx.lifecycle.ViewModel
 import com.ismartcoding.plain.models.Audio
 import com.ismartcoding.plain.models.AudioArtist
 import com.ismartcoding.plain.models.AudioPlaylist
-import com.ismartcoding.plain.models.AudioAlbumCover
 import com.ismartcoding.plain.ui.tags.TagsViewModel
 
 class AudioHomeViewModel internal constructor(val source: ContentSource = ContentSource.Local) : ViewModel() {
@@ -20,14 +19,12 @@ class AudioHomeViewModel internal constructor(val source: ContentSource = Conten
     }
 
     val playlists = mutableStateOf<List<Pair<AudioPlaylist, Int>>>(emptyList())
-    val playlistCovers = mutableStateOf<Map<String, List<AudioAlbumCover>>>(emptyMap())
     val recentItems = mutableStateOf<List<Audio>>(emptyList())
     val artists = mutableStateOf<List<AudioArtist>>(emptyList())
 
     suspend fun loadAsync(tagsVM: TagsViewModel) {
-        playlists.value = source.playlists.playlists()
+        playlists.value = source.playlists.playlists(includeCovers = true)
         refreshOverview(tagsVM)
-        playlistCovers.value = source.playlists.covers(playlists.value.filter { it.second > 0 }.map { it.first.id })
     }
 
     suspend fun refreshOverview(tagsVM: TagsViewModel) {

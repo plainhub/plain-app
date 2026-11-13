@@ -86,8 +86,9 @@ class AudioPlaybackDeviceTest {
             val old = tracks.last().toPlaylistAudio()
             AudioQueueClient.enqueue(listOf(old))
             AudioCommands.play(old)
-            waitFor { AudioQueueClient.playback().isPlaying && AudioQueueClient.playback().positionMs > 100 }
+            waitFor { com.ismartcoding.plain.platform.media.audioIsPlayingFlow().value && com.ismartcoding.plain.platform.media.audioPlayerProgressAsync() > 100 }
             val original = AudioQueueClient.playback()
+            val originalPosition = com.ismartcoding.plain.platform.media.audioPlayerProgressAsync()
             android.util.Log.i("PlainMediaDeviceTest", "Old track is playing; rendering artist page")
             lateinit var queue: AudioQueueViewModel
             onMain {
@@ -111,7 +112,7 @@ class AudioPlaybackDeviceTest {
             screenshot("permission-explanation")
             instrumentation.uiAutomation.performGlobalAction(android.accessibilityservice.AccessibilityService.GLOBAL_ACTION_BACK)
             waitFor { onMainValue { DialogHelper.confirmation.value == null } }
-            assertPreserved(original.mediaId, original.positionMs)
+            assertPreserved(original.mediaId, originalPosition)
 
             android.util.Log.i("PlainMediaDeviceTest", "Cancellation preserved playback; denying system permission")
 
@@ -120,7 +121,7 @@ class AudioPlaybackDeviceTest {
             clickText(onMainValue { DialogHelper.confirmation.value!!.confirmButton.first })
             clickSystemPermission("permission_deny_button")
             delay(500)
-            assertPreserved(original.mediaId, original.positionMs)
+            assertPreserved(original.mediaId, originalPosition)
 
             android.util.Log.i("PlainMediaDeviceTest", "Denial preserved playback; allowing system permission")
 
@@ -129,7 +130,7 @@ class AudioPlaybackDeviceTest {
             clickText(onMainValue { DialogHelper.confirmation.value!!.confirmButton.first })
             allowNotifications()
             android.util.Log.i("PlainMediaDeviceTest", "Notification permission granted; waiting for the new track")
-            waitFor { AudioQueueClient.playback().mediaId == tracks.first().id && AudioQueueClient.playback().isPlaying && AudioQueueClient.playback().positionMs > 100 }
+            waitFor { AudioQueueClient.playback().mediaId == tracks.first().id && com.ismartcoding.plain.platform.media.audioIsPlayingFlow().value && com.ismartcoding.plain.platform.media.audioPlayerProgressAsync() > 100 }
             assertEquals(tracks.map { it.id }, AudioQueueClient.queuePage(0, 10).map { it.mediaId })
             assertEquals(tracks.first().id, onMainValue { queue.selectedMediaId.value })
             screenshot("playing-in-page-order")
@@ -154,10 +155,11 @@ class AudioPlaybackDeviceTest {
     private suspend fun assertPreserved(id: String?, position: Long) {
         val playback = AudioQueueClient.playback()
         assertEquals(id, playback.mediaId)
-        assertTrue("Old track must remain playing: $playback", playback.isPlaying)
-        assertTrue(playback.positionMs >= position)
+        assertTrue("Old track must remain playing: $playback", com.ismartcoding.plain.platform.media.audioIsPlayingFlow().value)
+        val currentPosition = com.ismartcoding.plain.platform.media.audioPlayerProgressAsync()
+        assertTrue(currentPosition >= position)
         assertEquals(listOf(id), AudioQueueClient.queuePage(0, 10).map { it.mediaId })
-        waitFor { AudioQueueClient.playback().positionMs > playback.positionMs }
+        waitFor { com.ismartcoding.plain.platform.media.audioPlayerProgressAsync() > currentPosition }
     }
 
     private fun createAudio(artist: String, title: String) {

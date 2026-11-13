@@ -22,10 +22,8 @@ import com.ismartcoding.plain.features.shares.SharedLink
 import com.ismartcoding.plain.models.AppFile
 import com.ismartcoding.plain.models.Audio
 import com.ismartcoding.plain.models.AudioItem
-import com.ismartcoding.plain.models.AudioOverview
 import com.ismartcoding.plain.models.AudioPlayback
 import com.ismartcoding.plain.models.AudioPlaylist
-import com.ismartcoding.plain.models.AudioPlaylistCovers
 import com.ismartcoding.plain.models.Call
 import com.ismartcoding.plain.models.ChatChannel
 import com.ismartcoding.plain.models.ChatConversation
@@ -193,15 +191,15 @@ object Query {
         field = "mediaPlayHistory",
     )
 
-    fun audioPlaylistCovers(ids: Collection<String>): GraphqlRequest<List<AudioPlaylistCovers>> = GraphqlRequest(
-        $$"query($ids: [ID!]!) { audioPlaylistCovers(ids: $ids) { id albums { albumId trackCount candidatePaths } } }",
-        mapOf(variable("ids", ids)),
-        field = "audioPlaylistCovers",
+    fun audioPlaylists(includeCovers: Boolean = false): GraphqlRequest<List<AudioPlaylist>> = GraphqlRequest(
+        "query { audioPlaylists { ${Fragments.AUDIO_PLAYLIST_FIELDS} ${if (includeCovers) "coverAlbums { albumId trackCount candidatePaths }" else ""} } }",
+        field = "audioPlaylists",
     )
 
-    fun audioPlaylists(): GraphqlRequest<List<AudioPlaylist>> = GraphqlRequest(
-        $$"query { audioPlaylists { $${Fragments.AUDIO_PLAYLIST_FIELDS} } }",
-        field = "audioPlaylists",
+    fun audioPlaylist(id: String): GraphqlRequest<AudioPlaylist?> = GraphqlRequest(
+        "query(\$id: ID!) { audioPlaylist(id: \$id) { ${Fragments.AUDIO_PLAYLIST_FIELDS} coverAlbums { albumId trackCount candidatePaths } } }",
+        mapOf(variable("id", id)),
+        field = "audioPlaylist",
     )
 
     fun audioPlaylistItems(id: String, offset: Int, limit: Int, query: String): GraphqlRequest<List<AudioItem>> = GraphqlRequest(
@@ -211,16 +209,16 @@ object Query {
     )
 
     internal fun audioPlaybackSettings(): GraphqlRequest<com.ismartcoding.plain.models.AudioPlaybackSettings> = GraphqlRequest(
-        "query { audioPlayback { mediaId path mode isPlaying positionMs revision } prefs(keys: [\"audio_playback_speed\"]) }",
+        "query { audioPlayback { mediaId path } prefs(keys: [\"audio_playback_speed\"]) }",
     )
 
     internal fun audioQueueSnapshot(limit: Int): GraphqlRequest<com.ismartcoding.plain.models.AudioQueueSnapshot> = GraphqlRequest(
-        $$"query($limit: Int!) { audioPlayback { mediaId path mode isPlaying positionMs revision } prefs(keys: [\"audio_playback_speed\"]) count: audioQueueItemCount items: audioQueueItems(query: \"\", offset: 0, limit: $limit) { $${Fragments.AUDIO_TRACK_FIELDS} } queuedIds: audioQueueItems(query: \"\", offset: 0, limit: 2147483647) { mediaId } }",
+        $$"query($limit: Int!) { audioPlayback { mediaId path } prefs(keys: [\"audio_playback_speed\", \"audio_play_mode\"]) count: audioQueueItemCount items: audioQueueItems(query: \"\", offset: 0, limit: $limit) { $${Fragments.AUDIO_TRACK_FIELDS} } queuedIds: audioQueueItems(query: \"\", offset: 0, limit: 2147483647) { mediaId } }",
         mapOf(variable("limit", limit)),
     )
 
     fun audioPlayback(): GraphqlRequest<AudioPlayback> = GraphqlRequest(
-        $$"query { audioPlayback { mediaId path mode isPlaying positionMs revision } }",
+        $$"query { audioPlayback { mediaId path } }",
         field = "audioPlayback",
     )
 
@@ -491,11 +489,6 @@ object Query {
         return if (withCount) GraphqlRequest(document)
         else GraphqlRequest<List<Feed>>(document, field = "feeds").map { FeedsResponse(it, emptyList()) }
     }
-
-    fun audioOverview(): GraphqlRequest<AudioOverview> = GraphqlRequest(
-        $$"query { audioOverview { artists { name itemCount playCount samplePath } recentItems { $${Fragments.mediaFields(DataType.AUDIO)} } } }",
-        field = "audioOverview",
-    )
 
     fun shareLink(id: String, host: String?): GraphqlRequest<SharedLink> = GraphqlRequest(
         $$"query($id: ID!, $host: String) { shareLink(id: $id, host: $host) { $${Fragments.SHARE_LINK} } }",

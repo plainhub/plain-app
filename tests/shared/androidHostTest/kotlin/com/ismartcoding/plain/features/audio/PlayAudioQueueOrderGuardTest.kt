@@ -9,14 +9,14 @@ import kotlin.test.assertTrue
 import kotlin.test.fail
 
 /**
- * Locks the playAudio queue-order contract (2026-09-27, T58): playing a track
- * must NOT mutate or reorder the playback queue. playAudio used to append the
+ * Locks the selectAudio queue-order contract (2026-09-27, T58): playing a track
+ * must NOT mutate or reorder the playback queue. selectAudio used to append the
  * track to the manual queue unconditionally (enqueue moves an existing entry
  * to the tail), so every desktop play jumped the clicked track to the end of
- * the refetched audioQueue list. Now playAudio only marks the current track;
+ * the refetched audioQueue list. Now selectAudio only marks the current track;
  * callers that need the track queued combine addAudiosToQueue/enqueue with the
  * play themselves (enqueueAndPlayAsync, or two mutations in one document from
- * the desktop). The `playAudio` half of this now lives in Rust, where the
+ * the desktop). The `selectAudio` half of this now lives in Rust, where the
  * resolver is, and is guarded there; the client-side wiring below has no
  * host-testable seam (Rust HTTP runtime) so it stays a source scan.
  */

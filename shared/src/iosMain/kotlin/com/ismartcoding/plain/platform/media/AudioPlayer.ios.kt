@@ -52,11 +52,6 @@ private object AVPlayerAudioPlayer : AudioPlayer {
         observeCompletion()
     }
 
-    override fun restorePlayback(revision: Long, positionMs: Long) {
-        lastPositionMs = positionMs
-        bindRevision(revision)
-    }
-
     private fun observeCompletion() {
         completionObserver?.let { NSNotificationCenter.defaultCenter.removeObserver(it) }
         completionObserver = null
@@ -174,7 +169,7 @@ private object AVPlayerAudioPlayer : AudioPlayer {
                 newPlayer
             }
             currentAudio = audio
-            observeCompletion()
+            bindRevision(revision)
             playWhenReady = true
             observePlayback()
             source.play()

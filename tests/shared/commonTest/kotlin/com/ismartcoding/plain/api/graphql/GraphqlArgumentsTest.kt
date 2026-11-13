@@ -1,7 +1,6 @@
 package com.ismartcoding.plain.api.graphql
 
 import com.ismartcoding.plain.features.files.FileSortBy
-import com.ismartcoding.plain.features.audio.AudioSelectionAction
 import com.ismartcoding.plain.features.dlna.sender.CastCommand
 import com.ismartcoding.plain.features.dlna.sender.CastItem
 import com.ismartcoding.plain.features.files.FileTaskOp
@@ -31,16 +30,14 @@ class GraphqlArgumentsTest {
     @Test
     fun typedRequestsOwnTheirResponseFieldsWithoutChangingTheEnvelope() {
         val requests = listOf(
-            Query.audioPlaylistCovers(listOf("playlist")) to "audioPlaylistCovers",
             Query.audioPlaylists() to "audioPlaylists",
+            Query.audioPlaylist("playlist") to "audioPlaylist",
             Query.audioPlaylistItems("playlist", 0, 10, "") to "audioPlaylistItems",
             Query.audioPlayback() to "audioPlayback",
             Query.audioQueueIds(10) to "audioQueueItems",
             Query.audioQueueItemCount() to "audioQueueItemCount",
             Query.audioQueueItems(0, 10, "") to "audioQueueItems",
-            Query.audioOverview() to "audioOverview",
             Mutation.createAudioPlaylist("Playlist") to "createAudioPlaylist",
-            Mutation.advanceAudioSelection(AudioSelectionAction.NEXT, "", 0L, false) to "advanceAudioSelection",
             Query.contacts("", 10, 0) to "contacts",
             Query.calls("", 10, 0) to "calls",
             Query.sms("", 0, 10) to "sms",

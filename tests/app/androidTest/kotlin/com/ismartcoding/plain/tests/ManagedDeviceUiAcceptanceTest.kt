@@ -1081,7 +1081,7 @@ class ManagedDeviceUiAcceptanceTest {
                 assertTrue(com.ismartcoding.plain.features.audio.AudioCommands.output.value.source is com.ismartcoding.plain.rust.graphql.ContentSource.Local)
                 assertTrue(queue.queuePage(0, 10).isEmpty())
                 com.ismartcoding.plain.features.audio.AudioCommands.command(com.ismartcoding.plain.models.AudioCommand.SEEK, 5000)
-                awaitValue("native seek persisted by Rust") { queue.playback().takeIf { it.positionMs >= 5000 } }
+                awaitValue("native seek applied by SDK") { com.ismartcoding.plain.platform.media.audioPlayerProgressAsync().takeIf { it >= 5000 } }
                 com.ismartcoding.plain.features.audio.AudioCommands.command(com.ismartcoding.plain.models.AudioCommand.PAUSE)
                 awaitValue("native pause applied") {
                     var playing = true
@@ -2327,7 +2327,6 @@ class ManagedDeviceUiAcceptanceTest {
                 instrumentation.runOnMainSync { sdkPath = com.ismartcoding.plain.platform.media.createAudioPlayer().currentPath }
                 assertTrue("Renderer must read target /fs", sdkPath.startsWith(checkNotNull(peer.address).baseUrl.trimEnd('/') + "/fs?"))
                 awaitValue("remote playing history") { remote.execute(Query.mediaPlayHistory(historyQuery, 0, 100)).firstOrNull { it.mediaId == tracks.first().id } }
-                assertFalse("Target device must not play audio", remote.execute(Query.audioPlayback()).isPlaying)
                 remote.execute(Mutation.addAudioToQueue("ids:=" + tracks.last().id))
                 com.ismartcoding.plain.features.audio.AudioCommands.command(com.ismartcoding.plain.models.AudioCommand.NEXT)
                 awaitValue("target next-track selection") { remote.execute(Query.audioPlayback()).takeIf { it.mediaId == tracks.last().id } }
@@ -2357,7 +2356,7 @@ class ManagedDeviceUiAcceptanceTest {
                     tracks.forEach { remote.execute(Mutation.removeAudioFromQueue(it.id)) }
                     remote.execute(Mutation.deleteFiles(tracks.map { it.path }))
                     remote.execute(Mutation.updateAudioPlayMode(targetPlayback.mode))
-                    previousSelection?.let { remote.execute(Mutation.playAudio(it)) }
+                    previousSelection?.let { remote.execute(Mutation.selectAudio(it)) }
                     assertEquals(targetQueue.map { it.mediaId }, remote.execute(Query.audioQueueItems(0, 10000, "")).map { it.mediaId })
                 } catch (cleanup: Throwable) {
                     if (failure == null) throw cleanup

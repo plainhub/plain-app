@@ -3,8 +3,7 @@ package com.ismartcoding.plain.rust.host
 import com.ismartcoding.plain.features.chat.peer.transport.PeerTransportType
 import com.ismartcoding.plain.features.chat.peer.PeerTransportProjection
 import com.ismartcoding.plain.features.chat.peer.PeerTransportState
-import com.ismartcoding.plain.rust.host.audio.AudioPlaybackState
-import com.ismartcoding.plain.features.audio.AudioQueueClient
+import com.ismartcoding.plain.rust.host.audio.AudioSelectionState
 import com.ismartcoding.plain.features.nearby.BleScanDriver
 import com.ismartcoding.plain.ui.nearby.PairingProjection
 import com.ismartcoding.plain.lib.JsonHelper
@@ -166,13 +165,7 @@ internal suspend fun executeHostRequest(
             hostResult()
         }
         "audioPlaybackRefresh" -> {
-            exchangeScope.launch {
-                try {
-                    val playback = AudioQueueClient.playback()
-                    AudioEngineHost.restore(AudioPlaybackState(playback.revision, playback.positionMs))
-                } catch (cancelled: CancellationException) { throw cancelled }
-                catch (error: Exception) { LogCat.e("Restore audio playback", error) }
-            }
+            AudioEngineHost.stageLocalSelection(JsonHelper.jsonDecodeFromElement<AudioSelectionState>(params))
             hostResult()
         }
         "feedSyncChanged" -> {
@@ -237,7 +230,6 @@ internal suspend fun executeHostRequest(
         "systemFileResource" -> hostResult(FileResourceHost.handle(params))
         "systemMountFacts" -> hostResult(storageVolumeFacts())
         "imageDecodeBounds" -> hostResult(readImageBounds(JsonHelper.jsonDecodeFromElement<PathRequest>(params).path))
-        "systemAudioPlaybackState" -> hostResult(AudioEngineHost.localPlaybackFacts())
         "systemSetClipboard", "systemAccessFacts", "systemRequestAccess",
         "systemNetworkType",
         "systemProperties", "systemBatterySample",

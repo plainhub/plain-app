@@ -53,11 +53,6 @@ internal object AndroidAudioPlayer {
         player?.addListener(playerListener)
     }
 
-    fun restorePlayback(revision: Long, positionMs: Long) {
-        lastPositionMs = positionMs
-        bindRevision(revision)
-    }
-
     private fun listener(revision: Long) = object : Player.Listener {
         override fun onPlayerError(error: PlaybackException) {
             if (revision != activeRevision) return
@@ -200,8 +195,9 @@ internal object AndroidAudioPlayer {
         speed: Float,
         revision: Long,
     ) {
-        pendingStart = audio to revision
         player?.setMediaItem(audio.toMediaItem())
+        pendingStart = audio to revision
+        bindRevision(revision)
         player?.prepare()
         player?.seekTo(positionMs)
         player?.setPlaybackSpeed(speed)

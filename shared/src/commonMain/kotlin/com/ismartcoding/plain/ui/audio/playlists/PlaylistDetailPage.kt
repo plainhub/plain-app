@@ -97,11 +97,13 @@ fun PlaylistDetailPage(
     var showRename by remember { mutableStateOf(false) }
 
     val reload: suspend () -> Unit = {
-        val (name, list) = withIO {
-            audioVM.source.playlists.playlist(playlistId)?.name to audioVM.source.playlists.playlistItemsPage(playlistId, 0, 1000)
+        val list = withIO {
+            audioVM.source.playlists.playlistItemsPage(playlistId, 0, 1000)
         }
-        playlistName = name ?: ""
         items = list.pruneTrashedRows(playlistId, audioVM.source)
+        val playlist = withIO { audioVM.source.playlists.playlist(playlistId) }
+        playlistName = playlist?.name.orEmpty()
+        albumCovers = if (items.isEmpty()) emptyList() else playlist?.coverAlbums.orEmpty()
     }
 
     LaunchedEffect(playlistId, version) {
@@ -115,9 +117,6 @@ fun PlaylistDetailPage(
         }
     }
 
-    LaunchedEffect(items) {
-        albumCovers = if (items.isEmpty()) emptyList() else audioVM.source.playlists.covers(listOf(playlistId))[playlistId].orEmpty()
-    }
     PlaylistResumeEffect { version++ }
 
     val sortBy = audioVM.sortBy.value

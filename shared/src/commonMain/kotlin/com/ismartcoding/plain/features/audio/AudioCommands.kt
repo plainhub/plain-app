@@ -4,7 +4,9 @@ import com.ismartcoding.plain.graphql.Mutation
 import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.models.AudioCommand
 import com.ismartcoding.plain.models.AudioItem
-import com.ismartcoding.plain.rust.graphql.GraphqlApi
+import com.ismartcoding.plain.preferences.PrefKeys
+import com.ismartcoding.plain.rust.host.audio.AudioEngineHost
+import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.sync.Mutex
@@ -48,10 +50,28 @@ object AudioCommands {
 
     suspend fun command(action: AudioCommand, positionMs: Long = 0, speed: Float = 1f) = mutex.withLock {
         val remote = _output.value.source.audioPlayback
-        if (remote == null) GraphqlApi.execute(Mutation.audioCommand(action, positionMs, speed))
+        if (remote == null) commandLocal(action, positionMs, speed)
         else remote.command(action, positionMs, speed)
         changed.tryEmit(Unit)
         Unit
+    }
+
+    private suspend fun commandLocal(action: AudioCommand, positionMs: Long, speed: Float) {
+        val source = ContentSource.Local
+        when (action) {
+            AudioCommand.NEXT, AudioCommand.PREVIOUS -> {
+                val next = source.queue.nextMediaId(source.queue.snapshot(1), action)
+                if (next == null) AudioEngineHost.controlLocal(AudioCommand.PAUSE, 0, 1f)
+                else renderLocal(source, source.queue.select(next, enqueue = false))
+            }
+            AudioCommand.SET_SPEED -> {
+                require(speed.isFinite() && speed > 0) { "Invalid playback speed" }
+                source.api.execute(Mutation.setPref(PrefKeys.AUDIO_PLAYBACK_SPEED, JsonPrimitive(speed)))
+                AudioEngineHost.controlLocal(action, positionMs, speed)
+            }
+            AudioCommand.CLEAR, AudioCommand.COMPLETED -> error("Not a local player control: $action")
+            else -> AudioEngineHost.controlLocal(action, positionMs, speed)
+        }
     }
 
     internal fun submitRemoteCompletion(source: ContentSource.Remote, path: String, revision: Long) = submit {
@@ -69,11 +89,21 @@ object AudioCommands {
         if (remote != null) remote.play(audio, enqueue)
         else {
             if (enqueue) source.queue.enqueue(listOf(audio))
-            if (!audio.mediaId.isNullOrEmpty()) GraphqlApi.execute(Mutation.audioPlayTrack(audio.mediaId!!))
-            else GraphqlApi.execute(Mutation.audioPlayPath(audio.path))
+            val mediaId = audio.mediaId
+            val selected = if (mediaId.isNullOrEmpty()) source.api.execute(Mutation.selectAudioByPath(audio.path))
+            else source.queue.select(mediaId, enqueue = false)
+            renderLocal(source, selected)
         }
         changed.tryEmit(Unit)
         Unit
+    }
+
+    private suspend fun renderLocal(source: ContentSource, selected: AudioItem) {
+        val settings = source.queue.playbackSettings()
+        check(settings.audioPlayback.mediaId == selected.mediaId && settings.audioPlayback.path == selected.path) {
+            "Audio selection changed before playback"
+        }
+        AudioEngineHost.renderLocal(selected, settings.speed)
     }
 
     suspend fun clearQueue(source: ContentSource) = mutex.withLock {
@@ -100,7 +130,7 @@ object AudioCommands {
         mutex.withLock {
             val source = _output.value.source
             val modes = MediaPlayMode.entries
-            val current = source.queue.playback().mode
+            val current = source.queue.playMode()
             source.api.execute(Mutation.updateAudioPlayMode(modes[(modes.indexOf(current) + 1) % modes.size]))
             changed.tryEmit(Unit)
         }

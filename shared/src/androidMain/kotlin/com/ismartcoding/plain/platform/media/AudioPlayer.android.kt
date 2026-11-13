@@ -20,7 +20,6 @@ private object ExoPlayerAudioPlayer : AudioPlayer {
 
     override fun bindRevision(revision: Long) = AndroidAudioPlayer.bindRevision(revision)
 
-    override fun restorePlayback(revision: Long, positionMs: Long) = AndroidAudioPlayer.restorePlayback(revision, positionMs)
 
     override suspend fun load(audio: AudioItem, positionMs: Long, speed: Float, revision: Long) = AndroidAudioPlayer.load(appContext, audio, positionMs, speed, revision)
 

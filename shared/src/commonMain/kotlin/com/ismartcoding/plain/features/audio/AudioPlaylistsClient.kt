@@ -2,7 +2,6 @@ package com.ismartcoding.plain.features.audio
 
 import com.ismartcoding.plain.graphql.Mutation
 import com.ismartcoding.plain.graphql.Query
-import com.ismartcoding.plain.models.AudioAlbumCover
 import com.ismartcoding.plain.models.AudioItem
 import com.ismartcoding.plain.models.AudioPlaylist
 import com.ismartcoding.plain.rust.graphql.GraphqlClient
@@ -12,17 +11,11 @@ import com.ismartcoding.plain.rust.graphql.selectionQuery
 object AudioPlaylistsClient : AudioPlaylistsApi()
 
 open class AudioPlaylistsApi internal constructor(protected val api: GraphqlClient = GraphqlApi) {
-    suspend fun covers(ids: List<String>): Map<String, List<AudioAlbumCover>> {
-        if (ids.isEmpty()) return emptyMap()
-        return api.execute(Query.audioPlaylistCovers(ids))
-            .associate { it.id to it.albums }
-    }
-
     suspend fun playlist(id: String): AudioPlaylist? =
-        playlists().firstOrNull { it.first.id == id }?.first
+        api.execute(Query.audioPlaylist(id))
 
-    suspend fun playlists(): List<Pair<AudioPlaylist, Int>> =
-        api.execute(Query.audioPlaylists())
+    suspend fun playlists(includeCovers: Boolean = false): List<Pair<AudioPlaylist, Int>> =
+        api.execute(Query.audioPlaylists(includeCovers))
             .map { it to it.itemCount }
 
     suspend fun createPlaylist(name: String): AudioPlaylist =

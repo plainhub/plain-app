@@ -1,8 +1,9 @@
 package com.ismartcoding.plain.tests
 
+import com.ismartcoding.plain.graphql.Mutation
 import com.ismartcoding.plain.graphql.Query
+import com.ismartcoding.plain.models.AudioItem
 import java.util.UUID
-import com.ismartcoding.plain.rust.graphql.GraphqlRequest
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.ismartcoding.plain.appContext
 import com.ismartcoding.plain.features.audio.*
@@ -33,27 +34,29 @@ class AudioNativeRustHttpTest {
             .put("data".toByteArray()).putInt(samples).array()
         file.outputStream().use { it.write(header); it.write(ByteArray(samples)) }
         val oldEngine = AudioEngineHost.install(null)
-        suspend fun playback() = GraphqlApi.execute(GraphqlRequest<JsonObject>("query { audioPlayback { path positionMs revision } }")).getValue("audioPlayback").jsonObject
         try {
-            GraphqlApi.execute(GraphqlRequest<JsonObject>("mutation { audioPlayPath(path: ${JsonPrimitive(file.absolutePath)}) {path positionMs revision} }"))
+            val selected = GraphqlApi.execute(Mutation.selectAudioByPath(file.absolutePath))
+            assertEquals(file.absolutePath, selected.path)
+            assertNull(selected.mediaId)
+            assertFalse(com.ismartcoding.plain.platform.media.audioIsPlayingFlow().value)
+            AudioCommands.play(AudioItem(title = "", artist = "", path = file.absolutePath, durationMs = 0))
             assertTrue(GraphqlApi.execute(Query.mediaPlayHistory("type:AUDIO text:${JsonPrimitive(file.name)}", 0, 20)).isEmpty())
             assertTrue(AudioQueueClient.queuedMediaIds().isEmpty())
             assertNull(AudioQueueClient.playback().mediaId)
             withTimeout(5_000) {
-                while (playback().getValue("positionMs").jsonPrimitive.long < 100) delay(100)
+                while (com.ismartcoding.plain.platform.media.audioPlayerProgressAsync() < 100) delay(100)
             }
             AudioCommands.command(AudioCommand.SEEK,5_000)
             delay(100)
             AudioCommands.command(AudioCommand.PAUSE)
-            val paused = playback().getValue("positionMs").jsonPrimitive.long
-            assertTrue("Native seek must be persisted", paused in 4_900..6_000)
+            val paused = com.ismartcoding.plain.platform.media.audioPlayerProgressAsync()
+            assertTrue("Native seek must reach the SDK", paused in 4_900..6_000)
             AudioCommands.command(AudioCommand.PLAY)
             delay(300)
-            assertTrue(playback().getValue("positionMs").jsonPrimitive.long >= paused)
+            assertTrue(com.ismartcoding.plain.platform.media.audioPlayerProgressAsync() >= paused)
             assertTrue(GraphqlApi.execute(Query.mediaPlayHistory("type:AUDIO text:${JsonPrimitive(file.name)}", 0, 20)).isEmpty())
         } finally {
             try {
-                AudioCommands.command(AudioCommand.CLEAR)
                 AudioQueueClient.clearQueue()
             } finally {
                 AudioEngineHost.install(oldEngine)

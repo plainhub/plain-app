@@ -20,12 +20,7 @@ class AudioEngineHostTest {
         override val isPlayingFlow = MutableStateFlow(false)
         override var currentPath = "song"
         override var progress = 0L
-        var lastPositionMs = 0L
         override fun bindRevision(revision: Long) { calls += "bind:$revision" }
-        override fun restorePlayback(revision: Long, positionMs: Long) {
-            lastPositionMs = positionMs
-            bindRevision(revision)
-        }
         override suspend fun load(audio: AudioItem, positionMs: Long, speed: Float, revision: Long) {
             calls += "load"
             gate.await()
@@ -47,33 +42,6 @@ class AudioEngineHostTest {
     private fun command(newTrack: Boolean): JsonObject = JsonHelper.jsonDecode(
         """{"action":"PLAY","newTrack":$newTrack,"speed":1.5,"playback":{"path":"song","positionMs":1200,"revision":5},"track":{"path":"song","title":"Song","artist":"Artist","durationMs":2000}}""",
     )
-
-    @Test
-    fun remoteRenderingPreservesLocalSdkFactsAcrossTracksAndLocalRestores() = runTest {
-        Dispatchers.setMain(StandardTestDispatcher(testScheduler))
-        val player = Player().apply { gate.complete(Unit); progress = 3210 }
-        val previous = AudioEngineHost.install(player)
-        try {
-            AudioEngineHost.command(command(false))
-            player.progress = 3210
-            AudioEngineHost.renderRemote(AudioItem(path = "https://peer/fs?one", title = "One", artist = "", durationMs = 60000), 10, 0, 1f) {}
-            player.progress = 10004
-            player.isPlayingFlow.value = true
-            assertEquals(com.ismartcoding.plain.rust.host.provider.AudioPlaybackFacts(false, 3210), AudioEngineHost.localPlaybackFacts())
-            AudioEngineHost.renderRemote(AudioItem(path = "https://peer/fs?two", title = "Two", artist = "", durationMs = 60000), 11, 0, 1f) {}
-            assertEquals(3210, AudioEngineHost.localPlaybackFacts().positionMs)
-            val bound = player.calls.last { it.startsWith("bind:") }
-            AudioEngineHost.restore(AudioPlaybackState(6, 4321))
-            assertEquals(bound, player.calls.last { it.startsWith("bind:") })
-            assertEquals(4321, AudioEngineHost.localPlaybackFacts().positionMs)
-            AudioEngineHost.command(command(false))
-            assertEquals(player.progress, AudioEngineHost.localPlaybackFacts().positionMs)
-        } finally {
-            AudioEngineHost.command(command(false))
-            AudioEngineHost.install(previous)
-            Dispatchers.resetMain()
-        }
-    }
 
     @Test
     fun resume_acknowledges_only_after_seek_speed_and_play_complete() = runTest {
@@ -106,7 +74,7 @@ class AudioEngineHostTest {
             val result = async { AudioEngineHost.command(command(true)) }
             runCurrent()
             assertFalse(result.isCompleted)
-            assertEquals(listOf("bind:5", "load"), player.calls)
+            assertEquals(listOf("load"), player.calls)
             player.gate.complete(Unit)
             val report = JsonHelper.jsonDecode<JsonObject>(result.await().encodeReply(1)).getValue("result").jsonObject
             assertEquals("song", report.getValue("path").jsonPrimitive.content)
@@ -117,21 +85,22 @@ class AudioEngineHostTest {
         }
     }
     @Test
-    fun restored_state_never_overwrites_a_newer_command_or_live_position() = runTest {
+    fun staging_does_not_rebind_the_player_and_only_matching_selection_can_render() = runTest {
         Dispatchers.setMain(StandardTestDispatcher(testScheduler))
-        val player = Player()
-        player.gate.complete(Unit)
+        val player = Player().apply { gate.complete(Unit) }
         val previous = AudioEngineHost.install(player)
         try {
-            AudioEngineHost.command(command(true))
-            player.lastPositionMs = 777
-            AudioEngineHost.restore(AudioPlaybackState(4, 0))
-            assertEquals(777L, player.lastPositionMs)
-            AudioEngineHost.restore(AudioPlaybackState(6, 1234))
-            assertEquals(1234L, player.lastPositionMs)
-            AudioEngineHost.restore(AudioPlaybackState(6, 0))
-            assertEquals(1234L, player.lastPositionMs)
-            assertEquals(listOf("bind:5", "load", "bind:6"), player.calls)
+            val track = AudioItem(path = "song", title = "Song", artist = "", durationMs = 2000)
+            AudioEngineHost.stageLocalSelection(AudioSelectionState(track.path, 20, 700))
+            assertFailsWith<IllegalStateException> {
+                AudioEngineHost.stageLocalSelection(AudioSelectionState(track.path, 19, 0))
+            }
+            assertTrue(player.calls.isEmpty())
+            assertFailsWith<IllegalStateException> { AudioEngineHost.renderLocal(track.copy(path = "wrong"), 1f) }
+            AudioEngineHost.renderLocal(track, 1f)
+            assertEquals(listOf("load"), player.calls)
+            assertEquals(700L, player.progress)
+            assertFailsWith<IllegalStateException> { AudioEngineHost.renderLocal(track, 1f) }
         } finally {
             AudioEngineHost.install(previous)
             Dispatchers.resetMain()
@@ -153,7 +122,7 @@ class AudioEngineHostTest {
             queued?.join()
             AudioEngineHost.reportProgress(audio.path, 7, 200)?.join()
             AudioEngineHost.reportProgress(player.currentPath, 8, 300)?.join()
-            assertEquals(listOf<AudioHostReport>(AudioHostReport.Progress(audio.path, 100, 7)), first)
+            assertTrue(first.isEmpty())
             assertEquals(listOf<AudioHostReport>(AudioHostReport.Progress(player.currentPath, 300, 8)), second)
             assertEquals("https://fixture.invalid/fs?id=second", player.currentPath)
         } finally {

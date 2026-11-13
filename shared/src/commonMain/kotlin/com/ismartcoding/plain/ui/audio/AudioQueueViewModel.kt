@@ -89,7 +89,7 @@ class AudioQueueViewModel internal constructor(
             val rendered = if (source is com.ismartcoding.plain.rust.graphql.ContentSource.Remote && com.ismartcoding.plain.features.audio.AudioCommands.output.value.source.key == source.key) com.ismartcoding.plain.features.audio.AudioCommands.output.value.track else null
             selectedPath.value = rendered?.path ?: playback.path.orEmpty()
             selectedMediaId.value = rendered?.mediaId ?: playback.mediaId
-            playMode.value = playback.mode
+            playMode.value = com.ismartcoding.plain.models.audioPlayMode(snapshot.prefs)
             if (source is com.ismartcoding.plain.rust.graphql.ContentSource.Remote) {
                 playbackSpeed.floatValue = com.ismartcoding.plain.models.audioPlaybackSpeed(snapshot.prefs)
             }

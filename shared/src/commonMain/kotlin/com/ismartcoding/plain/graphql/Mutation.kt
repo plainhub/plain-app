@@ -3,9 +3,7 @@ package com.ismartcoding.plain.graphql
 import com.ismartcoding.plain.models.PlaybackType
 import com.ismartcoding.plain.features.files.FileSortBy
 
-import com.ismartcoding.plain.models.AdvancedAudioSelection
 import com.ismartcoding.plain.models.MergeResult
-import com.ismartcoding.plain.features.audio.AudioSelectionAction
 import com.ismartcoding.plain.features.audio.MediaPlayMode
 import com.ismartcoding.plain.features.chat.download.ChatDownloadCommand
 import com.ismartcoding.plain.features.chat.models.MessageShare
@@ -23,7 +21,6 @@ import com.ismartcoding.plain.features.shares.SharedLink
 import com.ismartcoding.plain.models.ActionResult
 import com.ismartcoding.plain.models.AppFile
 import com.ismartcoding.plain.models.AudioItem
-import com.ismartcoding.plain.models.AudioCommand
 import com.ismartcoding.plain.models.AudioPlaylist
 import com.ismartcoding.plain.models.ChatChannel
 import com.ismartcoding.plain.models.ChatItem
@@ -222,25 +219,14 @@ object Mutation {
     )
 
     internal fun enqueueAndSelectAudio(mediaId: String): GraphqlRequest<AudioItem> = GraphqlRequest(
-        $$"mutation($query: String!, $mediaId: ID!) { addAudioToQueue(query: $query) playAudio(mediaId: $mediaId) { $${Fragments.AUDIO_TRACK_FIELDS} } }",
+        $$"mutation($query: String!, $mediaId: ID!) { addAudioToQueue(query: $query) selectAudio(mediaId: $mediaId) { $${Fragments.AUDIO_TRACK_FIELDS} } }",
         mapOf(variable("query", com.ismartcoding.plain.rust.graphql.selectionQuery(setOf(mediaId))), variable("mediaId", mediaId)),
-        field = "playAudio",
+        field = "selectAudio",
     )
 
-    fun playAudio(mediaId: String): GraphqlRequest<AudioItem> = GraphqlRequest(
-        $$"mutation($mediaId: ID!) { playAudio(mediaId: $mediaId) { $${Fragments.AUDIO_TRACK_FIELDS} } }",
-        mapOf(variable("mediaId", mediaId)), field = "playAudio",
-    )
-
-    fun advanceAudioSelection(
-        action: AudioSelectionAction,
-        expectedPath: String,
-        expectedRevision: Long,
-        shuffle: Boolean,
-    ): GraphqlRequest<AdvancedAudioSelection?> = GraphqlRequest(
-        $$"mutation($action: AudioSelectionAction!, $expectedPath: String!, $expectedRevision: Long!, $shuffle: Boolean!) { advanceAudioSelection(action: $action, expectedPath: $expectedPath, expectedRevision: $expectedRevision, shuffle: $shuffle) { path positionMs revision track { $${Fragments.AUDIO_TRACK_FIELDS} } } }",
-        mapOf(variable("action", action.name), variable("expectedPath", expectedPath), variable("expectedRevision", expectedRevision), variable("shuffle", shuffle)),
-        field = "advanceAudioSelection",
+    fun selectAudio(mediaId: String): GraphqlRequest<AudioItem> = GraphqlRequest(
+        $$"mutation($mediaId: ID!) { selectAudio(mediaId: $mediaId) { $${Fragments.AUDIO_TRACK_FIELDS} } }",
+        mapOf(variable("mediaId", mediaId)), field = "selectAudio",
     )
 
     fun replaceAudioQueue(query: String, sortBy: FileSortBy, shuffle: Boolean): GraphqlRequest<AudioItem?> = GraphqlRequest(
@@ -272,28 +258,16 @@ object Mutation {
         field = "reorderAudioQueue",
     )
 
-    fun audioCommand(action: AudioCommand, positionMs: Long, speed: Float): GraphqlRequest<Unit> = GraphqlRequest(
-        $$"mutation($action: AudioCommandAction!, $positionMs: Long!, $speed: Float!) { audioCommand(action: $action, positionMs: $positionMs, speed: $speed) { path positionMs revision } }",
-        mapOf(variable("action", action.name), variable("positionMs", positionMs), variable("speed", speed)),
-        field = "audioCommand",
-    )
-
     fun updateAudioPlayMode(mode: MediaPlayMode): GraphqlRequest<Unit> = GraphqlRequest(
         $$"mutation($mode: MediaPlayMode!) { updateAudioPlayMode(mode: $mode) }",
         mapOf(variable("mode", mode.name)),
         field = "updateAudioPlayMode",
     )
 
-    fun audioPlayTrack(mediaId: String): GraphqlRequest<Unit> = GraphqlRequest(
-        $$"mutation($mediaId: ID!) { audioPlayTrack(mediaId: $mediaId) { path positionMs revision } }",
-        mapOf(variable("mediaId", mediaId)),
-        field = "audioPlayTrack",
-    )
-
-    fun audioPlayPath(path: String): GraphqlRequest<Unit> = GraphqlRequest(
-        $$"mutation($path: String!) { audioPlayPath(path: $path) { path positionMs revision } }",
+    fun selectAudioByPath(path: String): GraphqlRequest<AudioItem> = GraphqlRequest(
+        $$"mutation($path: String!) { selectAudioByPath(path: $path) { $${Fragments.AUDIO_TRACK_FIELDS} } }",
         mapOf(variable("path", path)),
-        field = "audioPlayPath",
+        field = "selectAudioByPath",
     )
 
     fun renameSession(clientId: String, name: String): GraphqlRequest<Boolean> = GraphqlRequest(

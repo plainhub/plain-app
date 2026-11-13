@@ -66,7 +66,7 @@ internal fun AudioHomeSections(
                 HomeSectionHeader(stringResource(Res.string.playlists), null)
             }
             item(key = "playlists") {
-                PlaylistsRow(playlists, homeVM.playlistCovers.value, onPlaylistClick)
+                PlaylistsRow(playlists, onPlaylistClick)
             }
         }
         item(key = "recent_header") {

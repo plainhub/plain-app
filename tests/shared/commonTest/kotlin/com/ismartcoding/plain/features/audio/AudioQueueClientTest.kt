@@ -2,6 +2,10 @@ package com.ismartcoding.plain.features.audio
 
 import com.ismartcoding.plain.features.files.FileSortBy
 import com.ismartcoding.plain.lib.JsonHelper
+import com.ismartcoding.plain.models.QueuedMediaId
+import com.ismartcoding.plain.models.AudioQueueSnapshot
+import com.ismartcoding.plain.models.AudioPlayback
+import com.ismartcoding.plain.models.AudioCommand
 import com.ismartcoding.plain.rust.graphql.GraphqlClient
 import com.ismartcoding.plain.rust.graphql.GraphqlResponse
 import kotlinx.coroutines.test.runTest
@@ -13,6 +17,26 @@ class AudioQueueClientTest {
     private fun client(response: String) = AudioQueueApi(GraphqlClient {
         GraphqlResponse(data = JsonHelper.jsonDecode(response))
     })
+
+    @Test
+    fun app_queue_navigation_wraps_and_only_repeats_one_on_completion() {
+        val api = client("{}")
+        fun next(current: String?, mode: MediaPlayMode, action: AudioCommand, ids: List<String> = listOf("a", "b")) =
+            api.nextMediaId(
+                AudioQueueSnapshot(
+                    AudioPlayback(current, null),
+                    mapOf("audio_play_mode" to kotlinx.serialization.json.JsonPrimitive(mode.name)), ids.size, emptyList(), ids.map { QueuedMediaId(it) },
+                ),
+                action,
+            )
+
+        assertEquals("a", next("b", MediaPlayMode.REPEAT, AudioCommand.NEXT))
+        assertEquals("b", next(null, MediaPlayMode.REPEAT, AudioCommand.PREVIOUS))
+        assertEquals("a", next("a", MediaPlayMode.REPEAT_ONE, AudioCommand.COMPLETED))
+        assertEquals("b", next("a", MediaPlayMode.REPEAT_ONE, AudioCommand.NEXT))
+        assertEquals("b", next("a", MediaPlayMode.SHUFFLE, AudioCommand.NEXT))
+        assertEquals(null, next(null, MediaPlayMode.REPEAT, AudioCommand.NEXT, emptyList()))
+    }
 
     @Test
     fun absent_target_speed_uses_its_default_and_saved_speeds_remain_device_scoped() = runTest {
@@ -30,18 +54,17 @@ class AudioQueueClientTest {
         var requests = 0
         val api = AudioQueueApi(GraphqlClient {
             requests++
-            GraphqlResponse(data = JsonHelper.jsonDecode("""{"audioPlayback":{"mediaId":"target-track","path":"/target.mp3","mode":"REPEAT","isPlaying":false,"positionMs":17,"revision":3},"prefs":{"audio_playback_speed":1.5}}"""))
+            GraphqlResponse(data = JsonHelper.jsonDecode("""{"audioPlayback":{"mediaId":"target-track","path":"/target.mp3"},"prefs":{"audio_playback_speed":1.5}}"""))
         })
         val settings = api.playbackSettings()
         assertEquals("target-track", settings.audioPlayback.mediaId)
-        assertEquals(3L, settings.audioPlayback.revision)
         assertEquals(1.5f, settings.speed)
         assertEquals(1, requests)
     }
 
     @Test
     fun combined_playback_settings_keep_defaults_local_to_the_reader_and_reject_invalid_values() = runTest {
-        val base = """"audioPlayback":{"mediaId":null,"path":null,"mode":"REPEAT","isPlaying":false,"positionMs":0,"revision":0}"""
+        val base = """"audioPlayback":{"mediaId":null,"path":null}"""
         val unset = client("{$base,\"prefs\":{}}")
         assertEquals(1f, unset.playbackSettings().speed)
         val invalid = client("{$base,\"prefs\":{\"audio_playback_speed\":\"invalid\"}}")
@@ -53,7 +76,7 @@ class AudioQueueClientTest {
         var requests = 0
         val api = AudioQueueApi(GraphqlClient {
             requests++
-            GraphqlResponse(data = JsonHelper.jsonDecode("""{"audioPlayback":{"mediaId":"target-track","path":"/target.mp3","mode":"REPEAT","isPlaying":false,"positionMs":0,"revision":3},"prefs":{},"audioQueueItemCount":2,"audioQueueItems":[{"mediaId":"target-track","path":"/target.mp3","title":"Track","artist":"","durationMs":1000}],"count":2,"items":[{"mediaId":"target-track","path":"/target.mp3","title":"Track","artist":"","durationMs":1000}],"queuedIds":[{"mediaId":"target-track"},{"mediaId":"other-track"}]}"""))
+            GraphqlResponse(data = JsonHelper.jsonDecode("""{"audioPlayback":{"mediaId":"target-track","path":"/target.mp3"},"prefs":{},"audioQueueItemCount":2,"audioQueueItems":[{"mediaId":"target-track","path":"/target.mp3","title":"Track","artist":"","durationMs":1000}],"count":2,"items":[{"mediaId":"target-track","path":"/target.mp3","title":"Track","artist":"","durationMs":1000}],"queuedIds":[{"mediaId":"target-track"},{"mediaId":"other-track"}]}"""))
         })
         val snapshot = api.snapshot(1)
         assertEquals(2, snapshot.count)
@@ -67,11 +90,11 @@ class AudioQueueClientTest {
         val operations = mutableListOf<com.ismartcoding.plain.rust.graphql.GraphqlOperation>()
         val api = AudioQueueApi(GraphqlClient { operation ->
             operations.add(operation)
-            GraphqlResponse(data = JsonHelper.jsonDecode("""{"addAudioToQueue":true,"playAudio":{"mediaId":"target-track","path":"/target.mp3","title":"Track","artist":"","durationMs":1000}}"""))
+            GraphqlResponse(data = JsonHelper.jsonDecode("""{"addAudioToQueue":true,"selectAudio":{"mediaId":"target-track","path":"/target.mp3","title":"Track","artist":"","durationMs":1000}}"""))
         })
         assertEquals("target-track", api.select("target-track", enqueue = true).mediaId)
         assertEquals(1, operations.size)
-        kotlin.test.assertTrue(operations.single().query.indexOf("addAudioToQueue(") < operations.single().query.indexOf("playAudio("))
+        kotlin.test.assertTrue(operations.single().query.indexOf("addAudioToQueue(") < operations.single().query.indexOf("selectAudio("))
         operations.clear()
         api.select("target-track", enqueue = false)
         assertEquals(1, operations.size)
