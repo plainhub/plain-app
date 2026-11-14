@@ -101,13 +101,21 @@ object Prefs {
     val onboardingCompleted = MutableStateFlow(false)
     val screenMirrorQuality = MutableStateFlow(ScreenMirrorQuality(ScreenMirrorMode.HD, 0))
 
-    internal fun load() {
-        val values = nativeValue<JsonObject>(RustNativeBindings.loadPreferencesResponse())
+    internal fun load(values: JsonObject = nativeValue<JsonObject>(RustNativeBindings.loadPreferencesResponse())) {
         for ((key, value) in values) update(key, value)
     }
 
-    internal suspend inline fun <reified T> set(key: String, value: T): Boolean =
-        RustNativeApi.setPref(key, JsonHelper.jsonEncodeToElement(value))
+    internal suspend inline fun <reified T> set(key: String, value: T): Boolean = set(
+        key, value, { name, encoded -> RustNativeApi.setPref(name, encoded) },
+        { load() },
+    )
+
+    internal suspend inline fun <reified T> set(
+        key: String,
+        value: T,
+        crossinline persist: suspend (String, JsonElement) -> Boolean,
+        crossinline reload: () -> Unit,
+    ): Boolean = persist(key, JsonHelper.jsonEncodeToElement(value)).also { reload() }
 
     internal fun update(key: String, value: JsonElement) {
         when (key) {
