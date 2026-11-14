@@ -18,7 +18,6 @@ import com.ismartcoding.plain.i18n.allow_any_host
 import com.ismartcoding.plain.i18n.allow_any_host_desc
 import com.ismartcoding.plain.i18n.ble_debug
 import com.ismartcoding.plain.i18n.client_id
-import com.ismartcoding.plain.i18n.developer_mode
 import com.ismartcoding.plain.i18n.mdns_debug
 import com.ismartcoding.plain.i18n.not_supported
 import com.ismartcoding.plain.i18n.service_debug
@@ -44,20 +43,13 @@ import org.jetbrains.compose.resources.stringResource
 @Composable
 internal fun DeveloperSettingsCard(
     navController: NavHostController,
+    developerMode: Boolean,
 ) {
     val scope = rememberCoroutineScope()
-    val developerMode = Prefs.developerMode.collectAsStateValue()
     val allowAnyHost = Prefs.allowAnyHost.collectAsStateValue()
 
     PCard(modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN)) {
         PListItem(title = stringResource(Res.string.client_id), value = Prefs.clientId.value)
-        PListItem(title = stringResource(Res.string.developer_mode)) {
-            Switch(checked = developerMode, onCheckedChange = {
-                scope.launch(Dispatchers.Default) {
-                    Prefs.set(PrefKeys.DEVELOPER_MODE, it)
-                }
-            })
-        }
         if (developerMode) {
             if (Capability.WIFI_AWARE in getDeviceCapabilities()) {
                 PListItem(
