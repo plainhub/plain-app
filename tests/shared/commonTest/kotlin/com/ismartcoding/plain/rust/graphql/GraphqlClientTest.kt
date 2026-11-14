@@ -79,7 +79,7 @@ class GraphqlClientTest {
 
     @Test
     fun unit_execution_checks_errors_without_decoding_an_unused_value() = runTest {
-        val request = Mutation.startPomodoro(60)
+        val request = Mutation.deleteTag("tag")
         var calls = 0
         val api = GraphqlClient {
             calls++
@@ -94,6 +94,28 @@ class GraphqlClientTest {
         assertEquals("no_permission", assertFailsWith<IllegalStateException> {
             failed.execute(request)
         }.message)
+    }
+
+    @Test
+    fun pomodoro_controls_decode_the_returned_snapshot_in_one_execution() = runTest {
+        val requests = listOf(
+            Mutation.startPomodoro(60), Mutation.pausePomodoro(), Mutation.stopPomodoro(),
+            Mutation.setPomodoroRemainingTime(20),
+        )
+        for (request in requests) {
+            var calls = 0
+            val api = GraphqlClient {
+                calls++
+                JsonHelper.jsonDecode<GraphqlResponse>(
+                    """{"data":{"${request.field}":{"date":"2026-01-01T00:00:00Z","completedCount":2,"currentRound":3,"timeLeftSec":20,"totalTimeSec":60,"isRunning":false,"isPaused":true,"state":"WORK"}}}""",
+                )
+            }
+            val today = api.execute(request)
+            assertEquals(20, today.timeLeftSec)
+            assertEquals(2, today.completedCount)
+            assertTrue(today.isPaused)
+            assertEquals(1, calls)
+        }
     }
 
     @Test

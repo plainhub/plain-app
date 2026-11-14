@@ -298,26 +298,26 @@ object Mutation {
         field = "deleteNotes",
     )
 
-    fun startPomodoro(durationSec: Int): GraphqlRequest<Unit> = GraphqlRequest(
-        $$"mutation($durationSec: Int!) { startPomodoro(durationSec: $durationSec) }",
+    fun startPomodoro(durationSec: Int): GraphqlRequest<PomodoroToday> = GraphqlRequest(
+        $$"mutation($durationSec: Int!) { startPomodoro(durationSec: $durationSec) { $${Fragments.POMODORO} } }",
         mapOf(variable("durationSec", durationSec)),
         field = "startPomodoro",
     )
 
-    fun pausePomodoro(): GraphqlRequest<Unit> = GraphqlRequest(
-        $$"mutation { pausePomodoro }",
+    fun pausePomodoro(): GraphqlRequest<PomodoroToday> = GraphqlRequest(
+        $$"mutation { pausePomodoro { $${Fragments.POMODORO} } }",
         field = "pausePomodoro",
     )
 
-    fun stopPomodoro(): GraphqlRequest<Unit> = GraphqlRequest(
-        $$"mutation { stopPomodoro }",
+    fun stopPomodoro(): GraphqlRequest<PomodoroToday> = GraphqlRequest(
+        $$"mutation { stopPomodoro { $${Fragments.POMODORO} } }",
         field = "stopPomodoro",
     )
 
-    fun adjustPomodoro(durationSec: Int): GraphqlRequest<PomodoroToday> = GraphqlRequest(
-        $$"mutation($durationSec: Int!) { adjustPomodoro(durationSec: $durationSec) { $${Fragments.POMODORO} } }",
-        mapOf(variable("durationSec", durationSec)),
-        field = "adjustPomodoro",
+    fun setPomodoroRemainingTime(remainingSec: Int): GraphqlRequest<PomodoroToday> = GraphqlRequest(
+        $$"mutation($remainingSec: Int!) { setPomodoroRemainingTime(remainingSec: $remainingSec) { $${Fragments.POMODORO} } }",
+        mapOf(variable("remainingSec", remainingSec)),
+        field = "setPomodoroRemainingTime",
     )
 
     fun copyFileToDirectory(src: String, directory: String, name: String): GraphqlRequest<String> = GraphqlRequest(

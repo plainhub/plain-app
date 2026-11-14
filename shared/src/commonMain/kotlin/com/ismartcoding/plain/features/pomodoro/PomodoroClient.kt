@@ -9,21 +9,15 @@ object PomodoroClient {
     suspend fun today(): PomodoroToday =
         GraphqlApi.execute(Query.pomodoroToday())
 
-    suspend fun start(durationSec: Int): PomodoroToday {
+    suspend fun start(durationSec: Int): PomodoroToday =
         GraphqlApi.execute(Mutation.startPomodoro(durationSec))
-        return today()
-    }
 
-    suspend fun pause(): PomodoroToday {
+    suspend fun pause(): PomodoroToday =
         GraphqlApi.execute(Mutation.pausePomodoro())
-        return today()
-    }
 
-    suspend fun stop(): PomodoroToday {
+    suspend fun stop(): PomodoroToday =
         GraphqlApi.execute(Mutation.stopPomodoro())
-        return today()
-    }
 
-    suspend fun adjust(durationSec: Int): PomodoroToday =
-        GraphqlApi.execute(Mutation.adjustPomodoro(durationSec))
+    suspend fun setRemainingTime(remainingSec: Int): PomodoroToday =
+        GraphqlApi.execute(Mutation.setPomodoroRemainingTime(remainingSec))
 }
