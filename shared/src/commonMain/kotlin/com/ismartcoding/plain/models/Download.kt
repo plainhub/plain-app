@@ -2,6 +2,8 @@ package com.ismartcoding.plain.models
 
 import com.ismartcoding.plain.features.downloads.DownloadStatus
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.EncodeDefault
+import kotlinx.serialization.ExperimentalSerializationApi
 
 @Serializable
 data class Download(
@@ -27,7 +29,13 @@ data class Download(
 data class DownloadFailure(val path: String, val error: String)
 
 @Serializable
-data class DownloadInput(val resources: ResourceDownloadInput? = null, val chat: ChatDownloadInput? = null)
+@OptIn(ExperimentalSerializationApi::class)
+data class DownloadInput(
+    @EncodeDefault(EncodeDefault.Mode.NEVER)
+    val resources: ResourceDownloadInput? = null,
+    @EncodeDefault(EncodeDefault.Mode.NEVER)
+    val chat: ChatDownloadInput? = null,
+)
 
 @Serializable
 data class ResourceDownloadInput(val urls: List<String>, val targetDir: String, val zipName: String? = null)

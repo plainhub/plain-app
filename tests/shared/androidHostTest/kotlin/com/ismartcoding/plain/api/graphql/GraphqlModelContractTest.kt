@@ -152,7 +152,7 @@ class GraphqlModelContractTest {
             "VideoFileInfo" to VideoFileInfo.serializer().descriptor,
         )
         val schemaWithoutDescriptions = Regex("\"\"\"[\\s\\S]*?\"\"\"").replace(sdl, "")
-        val blocks = Regex("""(?:type|input) (\w+)(?:\s+implements\s+\w+)?\s*\{([^}]+)}""").findAll(schemaWithoutDescriptions)
+        val blocks = Regex("""(?:type|input) (\w+)(?:\s+implements\s+\w+)?(?:\s+@oneOf)?\s*\{([^}]+)}""").findAll(schemaWithoutDescriptions)
             .associate { it.groupValues[1] to it.groupValues[2] }
         val lazyTags = setOf("Audio", "Call", "Contact", "Sms", "Doc", "Image", "Video", "Note", "FeedEntry")
         val mismatches = mutableListOf<String>()

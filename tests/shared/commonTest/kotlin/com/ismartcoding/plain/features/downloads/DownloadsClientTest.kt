@@ -24,6 +24,18 @@ import kotlin.test.assertTrue
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class DownloadsClientTest {
+    @Test
+    fun oneof_download_variables_omit_the_unused_branch() {
+        val resource = DownloadInput(resources = ResourceDownloadInput(listOf(url), "/owned/downloads"))
+        val chat = DownloadInput(chat = ChatDownloadInput("message", "peer", listOf("file")))
+        for ((input, branch) in listOf(resource to "resources", chat to "chat")) {
+            val request = com.ismartcoding.plain.graphql.Mutation.createDownload(input)
+            val fields = request.operation.variables.getValue("input").jsonObject
+            assertEquals(setOf(branch), fields.keys)
+            assertEquals(input, JsonHelper.jsonDecodeFromElement<DownloadInput>(fields))
+        }
+    }
+
     private val url = "https://fixture.invalid/fs?id=s.share.AA&action=download"
     private fun task(id: String) = Download(id, "Target download", ResourceDownloadSource(listOf(url)), "/target-downloads", null, DownloadStatus.DOWNLOADING, 4, 8, 4, 1, 0, "target.txt", "", emptyList())
 
