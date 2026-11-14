@@ -78,8 +78,8 @@ class FeedEntryPagerViewModel internal constructor(val source: ContentSource = C
                 try {
                     m.fetchContentAsync()
                     cacheContent(neighbor, m.content)
-                } catch (cancelled: CancellationException) {
-                    throw cancelled
+                } catch (canceled: CancellationException) {
+                    throw canceled
                 } catch (error: Exception) {
                     LogCat.e("Preload feed entry content", error)
                 } finally {

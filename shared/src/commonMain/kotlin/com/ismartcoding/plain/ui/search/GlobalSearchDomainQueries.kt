@@ -15,6 +15,7 @@ import com.ismartcoding.plain.features.chat.models.getMessagePreview
 import com.ismartcoding.plain.platform.system.DataType
 import com.ismartcoding.plain.ui.platform.system.getIcon
 import com.ismartcoding.plain.features.files.FileSortBy
+import com.ismartcoding.plain.models.mediaSortBy
 import com.ismartcoding.plain.models.Audio
 import com.ismartcoding.plain.models.ChatItem
 import com.ismartcoding.plain.models.ChatChannel
@@ -75,19 +76,19 @@ internal suspend fun GlobalSearchViewModel.queryDomain(
         GlobalSearchDomain.NOTES ->
             device.notes.search("${SearchHelper.buildTextFilter(q)} trash:false", limit, offset).map { it.toHit(q) }
         GlobalSearchDomain.AUDIO ->
-            device.catalog.rows(DataType.AUDIO, "${SearchHelper.buildTextFilter(q)} trash:false", limit, offset, FileSortBy.DATE_DESC)
+            device.catalog.rows(DataType.AUDIO, "${SearchHelper.buildTextFilter(q)} trash:false", limit, offset, mediaSortBy(DataType.AUDIO, "UPDATED_AT_DESC"))
                 .filterIsInstance<AudioTrack>().map { it.toHit() }
         GlobalSearchDomain.IMAGES ->
-            device.catalog.rows(DataType.IMAGE, "${SearchHelper.buildTextFilter(q)} trash:false", limit, offset, FileSortBy.DATE_DESC)
+            device.catalog.rows(DataType.IMAGE, "${SearchHelper.buildTextFilter(q)} trash:false", limit, offset, mediaSortBy(DataType.IMAGE, "UPDATED_AT_DESC"))
                 .filterIsInstance<MediaImage>().map { it.toHit() }
         GlobalSearchDomain.VIDEOS ->
-            device.catalog.rows(DataType.VIDEO, "${SearchHelper.buildTextFilter(q)} trash:false", limit, offset, FileSortBy.DATE_DESC)
+            device.catalog.rows(DataType.VIDEO, "${SearchHelper.buildTextFilter(q)} trash:false", limit, offset, mediaSortBy(DataType.VIDEO, "UPDATED_AT_DESC"))
                 .filterIsInstance<MediaVideo>().map { it.toHit() }
         GlobalSearchDomain.DOCS ->
-            device.catalog.rows(DataType.DOC, "${SearchHelper.buildTextFilter(q)} trash:false", limit, offset, FileSortBy.DATE_DESC)
+            device.catalog.rows(DataType.DOC, "${SearchHelper.buildTextFilter(q)} trash:false", limit, offset, mediaSortBy(DataType.DOC, "UPDATED_AT_DESC"))
                 .filterIsInstance<Document>().map { it.toHit() }
         GlobalSearchDomain.FILES ->
-            device.files.indexed(SearchHelper.buildTextFilter(q), limit, offset, FileSortBy.DATE_DESC).map { it.toHit() }
+            device.files.indexed(SearchHelper.buildTextFilter(q), limit, offset, FileSortBy.UPDATED_AT_DESC).map { it.toHit() }
         GlobalSearchDomain.FEEDS ->
             device.feedEntries.search(SearchHelper.buildTextFilter(q), limit, offset).map { it.toHit(q) }
         GlobalSearchDomain.CHAT -> {
@@ -99,7 +100,7 @@ internal suspend fun GlobalSearchViewModel.queryDomain(
             items.map { it.toHit(q, peers, channels) }
         }
         GlobalSearchDomain.APPS ->
-            device.packages.search(SearchHelper.buildTextFilter(q), limit, offset, FileSortBy.DATE_DESC).map { it.toHit() }
+            device.packages.search(SearchHelper.buildTextFilter(q), limit, offset, FileSortBy.UPDATED_AT_DESC).map { it.toHit() }
     }).map { it.copy(key = device.key + ":" + it.key, device = device) }
 
 /**
@@ -153,7 +154,7 @@ private suspend inline fun <reified T : Any> reloadMediaHits(
         }
     }
     if (ids.isEmpty()) return null
-    return device.catalog.rows(dataType, "ids:${ids.joinToString(",")} trash:false", ids.size, 0, FileSortBy.DATE_DESC)
+    return device.catalog.rows(dataType, "ids:${ids.joinToString(",")} trash:false", ids.size, 0, mediaSortBy(dataType, "UPDATED_AT_DESC"))
         .filterIsInstance<T>()
         .map { toHit(it) }
 }

@@ -82,7 +82,7 @@ class GlobalSearchViewModel internal constructor(
                         state.hits.value += hits
                         state.loaded.intValue += hits.size
                     }
-                } catch (cancelled: CancellationException) { throw cancelled }
+                } catch (canceled: CancellationException) { throw canceled }
                 catch (error: Exception) { handleDeviceError(state, error) }
                 finally { state.loading.value = false }
             }
@@ -124,13 +124,13 @@ class GlobalSearchViewModel internal constructor(
                                     device.hits.value = queryDomain(entry, query, size, 0, device.device)
                                     device.loaded.intValue = device.hits.value.size
                                 }
-                            } catch (cancelled: CancellationException) { throw cancelled }
+                            } catch (canceled: CancellationException) { throw canceled }
                             catch (error: Exception) { handleDeviceError(device, error) }
                             finally { device.loading.value = false }
                         }
                     } }
                 }
-            } catch (cancelled: CancellationException) { throw cancelled }
+            } catch (canceled: CancellationException) { throw canceled }
             catch (error: Exception) {
                 deviceErrors.value = listOf(GlobalSearchDeviceError(com.ismartcoding.plain.ui.i18n.LocaleHelper.getString(com.ismartcoding.plain.i18n.Res.string.devices), error.message ?: error.toString()))
             } finally { if (revision == request) searching.value = false }
@@ -155,7 +155,7 @@ class GlobalSearchViewModel internal constructor(
                             device.loaded.intValue = fresh.size
                         }
                         device.error.value = null
-                    } catch (cancelled: CancellationException) { throw cancelled }
+                    } catch (canceled: CancellationException) { throw canceled }
                     catch (error: Exception) { handleDeviceError(device, error) }
                 }
             }
@@ -188,7 +188,7 @@ internal suspend fun searchDevices(
         try {
             val client = loadDevice(peer)
             GlobalSearchDevices(listOf(ContentSource.Remote(client)))
-        } catch (cancelled: CancellationException) { throw cancelled }
+        } catch (canceled: CancellationException) { throw canceled }
         catch (error: Exception) {
             GlobalSearchDevices(emptyList(), if (error.isRemoteAccessDisabled()) emptyList() else listOf(GlobalSearchDeviceError(peer.name, error.message ?: error.toString())))
         }

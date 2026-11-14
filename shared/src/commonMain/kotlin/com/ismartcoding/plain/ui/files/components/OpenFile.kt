@@ -61,8 +61,8 @@ fun openFile(
                         onUnsupported = { navController.navigateOtherFile(path, file.name) },
                     )
                 }
-            } catch (cancelled: CancellationException) {
-                throw cancelled
+            } catch (canceled: CancellationException) {
+                throw canceled
             } catch (error: Exception) {
                 DialogHelper.showMessage(error)
             } finally {
@@ -172,8 +172,8 @@ fun openFileByType(
         name.isPdfFile() -> coMain {
             try {
                 navController.navigatePdf(fileToUriString(source.fileForOpen(path, name)))
-            } catch (cancelled: CancellationException) {
-                throw cancelled
+            } catch (canceled: CancellationException) {
+                throw canceled
             } catch (ex: Exception) {
                 DialogHelper.showMessage(Res.string.pdf_open_error)
             }

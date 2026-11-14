@@ -24,7 +24,7 @@ import com.ismartcoding.plain.MainActivity
 import com.ismartcoding.plain.Prefs
 import com.ismartcoding.plain.appContext
 import com.ismartcoding.plain.features.audio.*
-import com.ismartcoding.plain.features.files.FileSortBy
+import com.ismartcoding.plain.models.AudioSortBy
 import com.ismartcoding.plain.features.media.MediaCatalogClient
 import com.ismartcoding.plain.models.AudioCommand
 import com.ismartcoding.plain.preferences.PrefKeys
@@ -73,16 +73,16 @@ class AudioPlaybackDeviceTest {
             createAudio(artist, "Zulu")
             android.util.Log.i("PlainMediaDeviceTest", "Waiting for artist metadata")
             val tracks = withTimeout(15_000) {
-                var found = MediaCatalogClient.artistTracks(artist, FileSortBy.NAME_DESC)
+                var found = MediaCatalogClient.artistTracks(artist, AudioSortBy.TITLE_DESC)
                 while (found.size != 2) {
                     delay(200)
-                    found = MediaCatalogClient.artistTracks(artist, FileSortBy.NAME_DESC)
+                    found = MediaCatalogClient.artistTracks(artist, AudioSortBy.TITLE_DESC)
                 }
                 found
             }
             assertEquals(listOf("Zulu", "Alpha"), tracks.map { it.title })
             android.util.Log.i("PlainMediaDeviceTest", "Artist metadata ready; starting old track")
-            Prefs.set(PrefKeys.AUDIO_SORT_BY, FileSortBy.NAME_ASC.name)
+            Prefs.set(PrefKeys.AUDIO_SORT_BY, AudioSortBy.TITLE_ASC.name)
             val old = tracks.last().toPlaylistAudio()
             AudioQueueClient.enqueue(listOf(old))
             AudioCommands.play(old)
@@ -94,7 +94,7 @@ class AudioPlaybackDeviceTest {
             onMain {
                 queue = models[AudioQueueViewModel::class.java]
                 val audio = models[AudioViewModel::class.java]
-                audio.sortBy.value = FileSortBy.NAME_DESC
+                audio.sortBy.value = AudioSortBy.TITLE_DESC
                 activity.activity.setContent {
                     AppTheme(useDarkTheme = false) {
                         AudioArtistPage(rememberNavController(), artist, queue, audio,
@@ -105,7 +105,7 @@ class AudioPlaybackDeviceTest {
             }
             val playAll = getString(Res.string.play_all)
             waitFor { onMainValue { text(playAll) != null } }
-            android.util.Log.i("PlainMediaDeviceTest", "Artist page ready; cancelling permission explanation")
+            android.util.Log.i("PlainMediaDeviceTest", "Artist page ready; canceling permission explanation")
             screenshot("artist")
             clickText(playAll)
             waitFor { onMainValue { DialogHelper.confirmation.value != null } }
@@ -138,7 +138,7 @@ class AudioPlaybackDeviceTest {
             val playlist = AudioPlaylistsClient.createPlaylist("Plain order fixture")
             try {
                 AudioPlaylistsClient.addPlaylistItems(playlist.id, tracks.reversed().map { it.toPlaylistAudio() })
-                val selected = AudioQueueClient.replace("playlist_id:${playlist.id}", FileSortBy.NAME_DESC)
+                val selected = AudioQueueClient.replace("playlist_id:${playlist.id}", AudioSortBy.TITLE_DESC)
                 assertEquals(tracks.last().id, selected!!.mediaId)
                 assertEquals(tracks.reversed().map { it.id }, AudioQueueClient.queuePage(0, 10).map { it.mediaId })
             } finally {

@@ -21,7 +21,7 @@ open class GraphqlClient internal constructor(
             LogCat.d("$label result=success elapsedMs=${started.elapsedNow().inWholeMilliseconds} query=${request.operation.query}")
             return result
         } catch (error: CancellationException) {
-            LogCat.d("$label result=cancelled elapsedMs=${started.elapsedNow().inWholeMilliseconds} query=${request.operation.query}")
+            LogCat.d("$label result=canceled elapsedMs=${started.elapsedNow().inWholeMilliseconds} query=${request.operation.query}")
             throw error
         } catch (error: Exception) {
             LogCat.e("$label result=error error=${error::class.simpleName} elapsedMs=${started.elapsedNow().inWholeMilliseconds} query=${request.operation.query}")

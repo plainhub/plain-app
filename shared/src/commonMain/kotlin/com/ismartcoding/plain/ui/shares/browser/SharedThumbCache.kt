@@ -10,7 +10,7 @@ internal object SharedThumbCache {
     suspend fun thumbModel(entry: File): Any? {
         if (!isThumbable(entry)) return null
         return try { SharePreview.copy(entry, thumbnail = true) }
-        catch (cancelled: CancellationException) { throw cancelled }
+        catch (canceled: CancellationException) { throw canceled }
         catch (_: Exception) { null }
     }
 }

@@ -19,8 +19,8 @@ suspend fun checkAppUpdate(showToast: Boolean, automatic: Boolean = false): Bool
         }
         else -> error("Unknown update status: $status")
     }
-} catch (cancelled: CancellationException) {
-    throw cancelled
+} catch (canceled: CancellationException) {
+    throw canceled
 } catch (error: Exception) {
     if (showToast) DialogHelper.showMessage(Res.string.check_failure)
     null

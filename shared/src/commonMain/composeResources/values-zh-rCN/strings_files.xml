@@ -57,4 +57,6 @@
     <string name="no_app_files">暂无文件</string>
     <string name="add_folder">添加文件夹</string>
     <string name="manage_files">管理文件</string>
+    <string name="title_asc">标题（升序）</string>
+    <string name="title_desc">标题（降序）</string>
 </resources>

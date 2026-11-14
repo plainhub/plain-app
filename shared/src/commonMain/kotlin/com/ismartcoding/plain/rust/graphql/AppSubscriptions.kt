@@ -103,8 +103,8 @@ object AppSubscriptions {
                     }
                 }
                 return@flow
-            } catch (cancelled: CancellationException) {
-                throw cancelled
+            } catch (canceled: CancellationException) {
+                throw canceled
             } catch (error: GraphqlSubscriptionException) {
                 if (!error.requiresResynchronization) {
                     LogCat.e("GraphQL subscription $field", error)

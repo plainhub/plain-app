@@ -89,8 +89,8 @@ actual suspend fun copyFileToUri(path: String, uriStr: String): Boolean = withIO
         val task = FileTaskClient.execute(FileTaskType.COPY, listOf(FileTaskOp(path, destinationPath, overwrite = true)))
         check(task.status == FileTaskStatus.DONE) { task.error }
         true
-    } catch (cancelled: CancellationException) {
-        throw cancelled
+    } catch (canceled: CancellationException) {
+        throw canceled
     } catch (_: Exception) {
         false
     } finally {
@@ -235,8 +235,8 @@ actual suspend fun readTextFile(path: String): String = withIO {
         }
         val data = NSFileManager.defaultManager.contentsAtPath(localPath) ?: return@withIO ""
         NSString.create(data, NSUTF8StringEncoding)?.toString() ?: ""
-    } catch (cancelled: CancellationException) {
-        throw cancelled
+    } catch (canceled: CancellationException) {
+        throw canceled
     } catch (e: Exception) {
         ""
     } finally {

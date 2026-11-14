@@ -101,7 +101,7 @@ fun ViewTextFileBottomSheet(
                                         onDismiss()
                                         onDeleted()
                                     }
-                                } catch (cancelled: CancellationException) { throw cancelled }
+                                } catch (canceled: CancellationException) { throw canceled }
                                 catch (error: Exception) { DialogHelper.showMessage(error) }
                             }
                         },

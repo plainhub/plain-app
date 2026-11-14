@@ -32,8 +32,8 @@ fun MediaViewer(
     androidx.compose.runtime.LaunchedEffect(model.path) {
         try {
             model.prepareResource()
-        } catch (cancelled: kotlinx.coroutines.CancellationException) {
-            throw cancelled
+        } catch (canceled: kotlinx.coroutines.CancellationException) {
+            throw canceled
         } catch (error: Exception) {
             com.ismartcoding.plain.ui.components.DialogHelper.showMessage(error)
             state.mountedFlow.emit(true)

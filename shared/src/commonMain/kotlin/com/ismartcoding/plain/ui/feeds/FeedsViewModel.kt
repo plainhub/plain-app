@@ -88,8 +88,8 @@ class FeedsViewModel internal constructor(val source: ContentSource = ContentSou
                 if (!showAddDialog.value || editUrl.value != url) return@launchSafe
                 editName.value = title
                 feedTitleFetched.value = true
-            } catch (cancelled: CancellationException) {
-                throw cancelled
+            } catch (canceled: CancellationException) {
+                throw canceled
             } catch (e: Exception) {
                 if (showAddDialog.value && editUrl.value == url) editUrlError.value = feedErrorText(e)
             }
@@ -101,8 +101,8 @@ class FeedsViewModel internal constructor(val source: ContentSource = ContentSou
         viewModelScope.launchSafe {
             try {
                 source.feeds.update(editId.value, name = editName.value, url = editUrl.value, fetchContent = editFetchContent.value)
-            } catch (cancelled: CancellationException) {
-                throw cancelled
+            } catch (canceled: CancellationException) {
+                throw canceled
             } catch (e: Exception) {
                 editUrlError.value = feedErrorText(e)
                 return@launchSafe

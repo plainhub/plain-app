@@ -130,8 +130,8 @@ object AudioEngineHost {
                 try {
                     val progress = mutex.withLock { sampleProgress(engine()) }
                     reportProgress(progress.path, progress.revision, progress.positionMs)?.join()
-                } catch (cancelled: CancellationException) {
-                    throw cancelled
+                } catch (canceled: CancellationException) {
+                    throw canceled
                 } catch (error: Exception) {
                     LogCat.e("Audio progress: ${error.message}")
                 }
@@ -174,8 +174,8 @@ object AudioEngineHost {
                 } else if (remoteReport === target && target.path == report.path && target.revision == report.revision) {
                     target.send(report)
                 }
-            } catch (cancelled: CancellationException) {
-                throw cancelled
+            } catch (canceled: CancellationException) {
+                throw canceled
             } catch (error: Exception) {
                 LogCat.e("Audio report ${report::class.simpleName}: ${error.message}")
             }

@@ -51,7 +51,7 @@ fun PairPeerDialog(device: NearbyDevice, initialMode: PairingMode? = null, qrCod
                         if (disposed) RustPairingRuntime.cancel(device.id)
                     }
                 }
-            } catch (cancelled: CancellationException) { throw cancelled }
+            } catch (canceled: CancellationException) { throw canceled }
             catch (_: Exception) { error = failureText }
             finally { submitting = false }
         }
@@ -66,7 +66,7 @@ fun PairPeerDialog(device: NearbyDevice, initialMode: PairingMode? = null, qrCod
     LaunchedEffect(phase) {
         when (phase) {
             PairingStep.SUCCEEDED -> if (qrCode == null) onDismiss()
-            PairingStep.CANCELLED -> onDismiss()
+            PairingStep.CANCELED -> onDismiss()
             PairingStep.FAILED -> {
                 ToastManager.showErrorToast(failureText)
                 onDismiss()
@@ -85,7 +85,7 @@ fun PairPeerDialog(device: NearbyDevice, initialMode: PairingMode? = null, qrCod
                 submitting = true
                 scope.launch {
                     try { PairingProjection.starting(device.id); RustPairingRuntime.submit(device.id, mode, value) }
-                    catch (cancelled: CancellationException) { throw cancelled }
+                    catch (canceled: CancellationException) { throw canceled }
                     catch (_: Exception) { error = failureText }
                     finally { submitting = false }
                 }
@@ -134,7 +134,7 @@ fun PairPeerDialog(device: NearbyDevice, initialMode: PairingMode? = null, qrCod
                     submitting = true
                     scope.launch {
                         try { RustPairingRuntime.respond(device.id, true) }
-                        catch (cancelled: CancellationException) { throw cancelled }
+                        catch (canceled: CancellationException) { throw canceled }
                         catch (_: Exception) { error = failureText }
                         finally { submitting = false }
                     }

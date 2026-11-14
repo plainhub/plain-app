@@ -37,8 +37,8 @@ class NotificationSettingsViewModel : ViewModel() {
                     else getPackageInfoMap(filter.apps.toList()).values.filterNotNull()
                     selectedAppsFlow.value = apps.sortedBy { it.name }
                     appsLoaded.value = false
-                } catch (cancelled: CancellationException) {
-                    throw cancelled
+                } catch (canceled: CancellationException) {
+                    throw canceled
                 } catch (error: Exception) {
                     LogCat.e("Notification filter apps", error)
                 } finally {
@@ -57,8 +57,8 @@ class NotificationSettingsViewModel : ViewModel() {
                 .filter { it.id != ownPackage && it.id !in filterData.value.apps }
             allAppsFlow.value = apps
             appsLoaded.value = true
-        } catch (cancelled: CancellationException) {
-            throw cancelled
+        } catch (canceled: CancellationException) {
+            throw canceled
         } catch (error: Exception) {
             appsLoaded.value = false
             LogCat.e("Notification app selection", error)

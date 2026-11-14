@@ -24,7 +24,7 @@ class ChatRecoveryTest {
 
     private fun chat(id: String, text: String) = ChatItem(
         id = id, fromId = "peer", toId = "me", status = ChatStatus.SENT,
-        content = JsonHelper.jsonEncode(MessageContent(MessageType.TEXT, MessageText(text))),
+        content = com.ismartcoding.plain.models.ChatContent.Text(text, emptyList()),
         createdAt = Instant.parse("2026-01-01T00:00:00Z"), updatedAt = Instant.parse("2026-01-01T00:00:00Z"),
     )
     private fun text() = (ChatViewModel.local.itemsFlow.value.single().value as MessageText).text

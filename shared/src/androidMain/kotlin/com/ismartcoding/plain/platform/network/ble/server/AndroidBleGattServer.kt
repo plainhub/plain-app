@@ -97,7 +97,7 @@ class AndroidBleGattServer : BleGattServer {
         val device = connectedDevices[mac] ?: return false
         scope.launch {
             try { sendChunkedResponse(device, UUID.fromString(charUuid), BleMessage(requestId, RustBleWire.nearby(value))) }
-            catch (cancelled: CancellationException) { throw cancelled }
+            catch (canceled: CancellationException) { throw canceled }
             catch (error: Exception) { LogCat.e("GATT notification error: ${error.message}") }
         }
         return true
@@ -220,7 +220,7 @@ class AndroidBleGattServer : BleGattServer {
                 try {
                     val response = protocol.handleWrite(mac, charUuid, value)
                     if (response != null) sendChunkedResponse(device, characteristic.uuid, response)
-                } catch (cancelled: CancellationException) { throw cancelled }
+                } catch (canceled: CancellationException) { throw canceled }
                 catch (error: Exception) { protocol.clearClient(mac); LogCat.e("BLE exchange failed: ${error.message}") }
             }
         }

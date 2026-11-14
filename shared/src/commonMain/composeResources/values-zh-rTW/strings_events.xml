@@ -19,5 +19,5 @@
     <string name="event_reason_login_expired">登入請求已過期</string>
     <string name="event_reason_too_many_login_attempts">登入嘗試過多</string>
     <string name="event_reason_rejected">登入請求已拒绝</string>
-    <string name="event_reason_cancelled">登入請求已取消</string>
+    <string name="event_reason_canceled">登入請求已取消</string>
 </resources>

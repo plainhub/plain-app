@@ -35,10 +35,10 @@ class LinkPreviewRustHttpTest {
             hash = image.id
             val content = MessageContent(MessageType.TEXT, MessageText(url,
                 listOf(LinkPreview(url = url, title = id, imageLocalPath = AppFileStore.toFidUri(image))))).toJSONString()
-            val value = GraphqlApi.execute(GraphqlRequest<JsonObject>("mutation(\$content:String!){sendChatItems(targets: [\"peer:local\"], content: \$content) { id fromId toId channelId content status statusData createdAt updatedAt }}", mapOf("content" to JsonPrimitive(content)))).getValue("sendChatItems").jsonArray.single()
+            val value = GraphqlApi.execute(GraphqlRequest<JsonObject>("mutation(\$content:ChatContentInput!){sendChatItems(targets: [\"peer:local\"], content: \$content) { id fromId toId channelId content { ... on ChatTextContent { __typename text linkPreviews { url title description imageUrl imageLocalPath imageWidth imageHeight siteName domain createdAt } } ... on ChatImagesContent { __typename items { id uri size durationMs width height summary fileName } } ... on ChatFilesContent { __typename items { id uri size durationMs width height summary fileName } } ... on ChatShareContent { __typename shareId urlToken peerInfo { id ip port } name itemCount totalSize expiresAt } } createdAt updatedAt status deliveryResults { peerId peerName error } }}", mapOf("content" to JsonHelper.jsonEncodeToElement(com.ismartcoding.plain.models.ChatContentInput.from(JsonHelper.jsonDecode<MessageContent>(content)))))).getValue("sendChatItems").jsonArray.single()
             val chat = JsonHelper.jsonDecodeFromElement<ChatItem>(value)
             id = chat.id
-            val stale = ChatItem(id = id, toId = "stale", content = MessageContent(MessageType.TEXT, MessageText("stale")).toJSONString())
+            val stale = ChatItem(id = id, toId = "stale", content = com.ismartcoding.plain.models.ChatContent.Text("stale", emptyList()))
             assertTrue(ChatMessageEditor.updateTextAsync(stale, "edited $id"))
             assertEquals("local", stale.toId)
             assertEquals(chat.status, stale.status)

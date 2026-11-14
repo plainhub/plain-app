@@ -174,8 +174,8 @@ class ShareActivity : ComponentActivity() {
                 infos.count { info ->
                     try {
                         saveFileToDownloads(info.uri, info.name).isNotEmpty()
-                    } catch (cancelled: CancellationException) {
-                        throw cancelled
+                    } catch (canceled: CancellationException) {
+                        throw canceled
                     } catch (error: Exception) {
                         LogCat.e("Save shared content failed", error)
                         false
@@ -213,8 +213,8 @@ class ShareActivity : ComponentActivity() {
                     Mutation.saveSharedText(checkNotNull(f.parent), f.path, text),
                 )
                 withContext(Dispatchers.Main) { openInMain(Uri.fromFile(f), "text/plain") }
-            } catch (cancelled: CancellationException) {
-                throw cancelled
+            } catch (canceled: CancellationException) {
+                throw canceled
             } catch (error: Exception) {
                 LogCat.e("Prepare shared text failed", error)
                 withContext(Dispatchers.Main) { toast(LocaleHelper.getString(Res.string.cannot_get_content)) }

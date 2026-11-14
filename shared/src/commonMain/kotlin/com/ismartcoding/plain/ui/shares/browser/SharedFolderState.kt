@@ -71,7 +71,7 @@ internal class SharedFolderState(
             try {
                 val chat = withIO { source.chats.getChatItem(messageId) }
                 shareMsg = chat?.messageContent?.value as? MessageShare
-            } catch (cancelled: CancellationException) { throw cancelled }
+            } catch (canceled: CancellationException) { throw canceled }
             catch (error: Exception) { DialogHelper.showMessage(error) }
         }
     }
@@ -90,7 +90,7 @@ internal class SharedFolderState(
             errorPath = null
             val result = try {
                 source.files.list(path.ifEmpty { msg.browserUrl() }, false, com.ismartcoding.plain.features.files.FileSortBy.NAME_ASC)
-            } catch (cancelled: CancellationException) { throw cancelled }
+            } catch (canceled: CancellationException) { throw canceled }
             catch (error: Exception) {
                 DialogHelper.showMessage(error)
                 null
@@ -104,7 +104,7 @@ internal class SharedFolderState(
             }
             dirCache[path] = result
             try { shareMsg = withIO { source.chats.getChatItem(messageId) }?.messageContent?.value as? MessageShare }
-            catch (cancelled: CancellationException) { throw cancelled }
+            catch (canceled: CancellationException) { throw canceled }
             catch (error: Exception) { DialogHelper.showMessage(error) }
         }
     }
@@ -156,7 +156,7 @@ internal class SharedFolderState(
         scope.launch {
             try {
                 action(msg.browserUrl())
-            } catch (cancelled: CancellationException) { throw cancelled }
+            } catch (canceled: CancellationException) { throw canceled }
             catch (_: Exception) { DialogHelper.showErrorDialog(LocaleHelper.getString(Res.string.cannot_load_share)) }
         }
     }
@@ -167,7 +167,7 @@ internal class SharedFolderState(
         scope.launch {
             val path = try {
                 SharePreview.copy(entry)
-            } catch (cancelled: CancellationException) { throw cancelled }
+            } catch (canceled: CancellationException) { throw canceled }
             catch (error: Exception) {
                 DialogHelper.showMessage(error)
                 return@launch

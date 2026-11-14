@@ -90,8 +90,8 @@ fun MdnsDebugPage(navController: NavHostController) {
                 }
                 delay(2000)
             }
-        } catch (cancelled: CancellationException) {
-            throw cancelled
+        } catch (canceled: CancellationException) {
+            throw canceled
         } catch (error: Exception) {
             LogCat.e("mDNS debug snapshot", error)
         }

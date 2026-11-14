@@ -17,7 +17,7 @@ fun rememberFilePath(reference: String, source: ContentSource = LocalContentSour
         value = try {
             if (source is ContentSource.Remote && !external) source.client.resource(reference).url else FilePaths.resolve(reference)
         }
-        catch (cancelled: CancellationException) { throw cancelled }
+        catch (canceled: CancellationException) { throw canceled }
         catch (error: Exception) { LogCat.e(error.toString()); "" }
     }
     return path
@@ -30,7 +30,7 @@ fun rememberImageResource(reference: String, source: ContentSource = LocalConten
     val value by produceState<Any?>(initial, reference, source) {
         value = try {
             if (source is ContentSource.Remote && !external) source.client.resource(reference) else FilePaths.resolve(reference)
-        } catch (cancelled: CancellationException) { throw cancelled }
+        } catch (canceled: CancellationException) { throw canceled }
         catch (error: Exception) { LogCat.e(error.toString()); null }
     }
     return value

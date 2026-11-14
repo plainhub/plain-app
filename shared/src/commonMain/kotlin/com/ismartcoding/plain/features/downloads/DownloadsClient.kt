@@ -34,7 +34,7 @@ open class DownloadsClient internal constructor(
                         is Request.Control -> api.execute(Mutation.downloadControl(request.id, request.command))
                     }
                     refresh()
-                } catch (cancelled: CancellationException) { throw cancelled }
+                } catch (canceled: CancellationException) { throw canceled }
                 catch (error: Exception) {
                     failures.value = error
                     LogCat.e("Download request", error)

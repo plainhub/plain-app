@@ -95,7 +95,7 @@ fun FilesDrawerContent(
             val items = buildFolderOptions(filesVM, recentsText, internalStorageText, sdcardText, usbStorageText, fileTransferAssistantText)
             options.clear()
             options.addAll(items)
-        } catch (cancelled: CancellationException) { throw cancelled }
+        } catch (canceled: CancellationException) { throw canceled }
         catch (error: Exception) { DialogHelper.showMessage(error) }
     }
 

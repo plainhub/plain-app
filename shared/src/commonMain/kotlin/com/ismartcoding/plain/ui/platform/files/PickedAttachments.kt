@@ -50,8 +50,8 @@ internal object PickedAttachments {
                     }
                     MessageFile(uri = AppFileStore.toFidUri(file), size = file.size, fileName = name,
                         width = size.width, height = size.height, durationMs = duration)
-                } catch (cancelled: CancellationException) {
-                    throw cancelled
+                } catch (canceled: CancellationException) {
+                    throw canceled
                 } catch (error: Exception) {
                     DialogHelper.showMessage(error.message ?: "Unable to read selected file")
                     null

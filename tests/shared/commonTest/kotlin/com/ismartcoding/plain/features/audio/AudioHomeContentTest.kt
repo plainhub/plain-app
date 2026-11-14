@@ -49,7 +49,7 @@ class AudioHomeContentTest {
         assertEquals("newest", api.read().recentItems.single().id)
         assertEquals(2, requests.size)
         assertEquals(
-            mapOf("query" to JsonPrimitive(""), "offset" to JsonPrimitive(0), "limit" to JsonPrimitive(8), "sortBy" to JsonPrimitive("DATE_DESC")),
+            mapOf("query" to JsonPrimitive(""), "offset" to JsonPrimitive(0), "limit" to JsonPrimitive(8), "sortBy" to JsonPrimitive("UPDATED_AT_DESC")),
             requests.last().variables,
         )
     }

@@ -23,7 +23,7 @@ open class FilesApi internal constructor(
         upload(path, chunks)
 
     suspend fun copyToDirectory(srcPath: String, dirPath: String, fileName: String): String =
-        api.execute(Mutation.copyFileToDirectory(srcPath, dirPath, fileName)).orEmpty()
+        api.execute(Mutation.copyFileToDirectory(srcPath, dirPath, fileName))
 
     suspend fun createZipArchive(paths: List<String>, target: String): Boolean = archiveOperation {
         api.execute(Mutation.createZipArchive(paths, target))
@@ -35,8 +35,8 @@ open class FilesApi internal constructor(
 
     suspend fun cacheZipEntry(path: String): String? = try {
         api.execute(Mutation.cacheZipEntry(path))
-    } catch (cancelled: CancellationException) {
-        throw cancelled
+    } catch (canceled: CancellationException) {
+        throw canceled
     } catch (_: Exception) {
         null
     }
@@ -78,8 +78,8 @@ open class FilesApi internal constructor(
     private suspend fun archiveOperation(operation: suspend () -> String): Boolean = try {
         operation()
         true
-    } catch (cancelled: CancellationException) {
-        throw cancelled
+    } catch (canceled: CancellationException) {
+        throw canceled
     } catch (_: Exception) {
         false
     }

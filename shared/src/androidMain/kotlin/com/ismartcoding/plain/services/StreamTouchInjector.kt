@@ -13,7 +13,7 @@ import com.ismartcoding.plain.lib.logcat.LogCat
  *
  *  - a fresh stroke with willContinue=true is accepted and keeps the touch
  *    down after its timeline ends (a "dangling" stroke);
- *  - a continuation with willContinue=true is CANCELLED by the system in
+ *  - a continuation with willContinue=true is CANCELED by the system in
  *    every timing combination — streaming chains are unusable here;
  *  - a terminal continuation (willContinue=false) is accepted early,
  *    exactly on completion, and hundreds of ms past the stroke's end.
@@ -80,7 +80,7 @@ internal object StreamTouchInjector {
 
     private val strokeCallback = object : AccessibilityService.GestureResultCallback() {
         override fun onCancelled(gestureDescription: GestureDescription?) {
-            LogCat.w("TS stroke cancelled at=${SystemClock.uptimeMillis()}")
+            LogCat.w("TS stroke canceled at=${SystemClock.uptimeMillis()}")
         }
     }
 
@@ -92,7 +92,7 @@ internal object StreamTouchInjector {
         override fun onCancelled(gestureDescription: GestureDescription?) {
             // The lineage expired system-side (hold far past the dangle
             // grace) — the touch was already force-ended there.
-            LogCat.w("TS release cancelled (touch already ended by system)")
+            LogCat.w("TS release canceled (touch already ended by system)")
         }
     }
 

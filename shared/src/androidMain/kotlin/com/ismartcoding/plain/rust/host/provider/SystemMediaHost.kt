@@ -3,7 +3,7 @@ package com.ismartcoding.plain.rust.host.provider
 import com.ismartcoding.plain.appContext
 import com.ismartcoding.plain.platform.media.provider.DocMediaStoreHelper
 import com.ismartcoding.plain.IData
-import com.ismartcoding.plain.features.files.FileSortBy
+import com.ismartcoding.plain.models.mediaSortBy
 import com.ismartcoding.plain.lib.JsonHelper
 import com.ismartcoding.plain.models.Audio
 import com.ismartcoding.plain.models.Doc
@@ -41,7 +41,7 @@ internal object SystemMediaHost {
                 val items = searchMedia(
                     DataType.valueOf(request.dataType),
                     request.plan, request.limit, request.offset,
-                    FileSortBy.valueOf(request.sortBy),
+                    mediaSortBy(DataType.valueOf(request.dataType), request.sortBy),
                 )
                 val rows = items.map { mediaFacts(it) }
                 if (includeRevision) hostResult(MediaRowsFacts(rows, before, mediaStoreRevision()))

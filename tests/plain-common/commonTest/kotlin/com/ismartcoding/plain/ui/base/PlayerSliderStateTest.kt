@@ -169,7 +169,7 @@ class PlayerSliderStateTest {
     }
 
     @Test
-    fun `cancelling uses the latest external ratio and clears hold`() {
+    fun `canceling uses the latest external ratio and clears hold`() {
         val state = PlayerSliderState(0.2f)
         state.startDrag(0.8f)
         state.cancelDrag(0.4f)

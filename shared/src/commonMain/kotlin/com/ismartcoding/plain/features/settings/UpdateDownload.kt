@@ -26,8 +26,8 @@ object AppUpdateDownloads {
     private fun runCommand(action: suspend () -> AppUpdateDownload) = coIO {
         try {
             apply(action())
-        } catch (cancelled: CancellationException) {
-            throw cancelled
+        } catch (canceled: CancellationException) {
+            throw canceled
         } catch (error: Exception) {
             DialogHelper.showErrorMessage(error.toString())
         }

@@ -532,7 +532,7 @@ class ManagedDeviceUiAcceptanceTest {
             "fixture-shared-link", "fixture-link-key", com.ismartcoding.plain.features.chat.models.SharePeerInfo("link-peer", "device.test", 8443), "Target folder",
         )
         val chat = com.ismartcoding.plain.models.ChatItem(
-            id = "share-card-ui-fixture", content = JsonHelper.jsonEncode(com.ismartcoding.plain.features.chat.models.MessageContent(com.ismartcoding.plain.features.chat.models.MessageType.SHARE, card)),
+            id = "share-card-ui-fixture", content = com.ismartcoding.plain.models.ChatContent.Share(card.shareId, card.urlToken, card.peerInfo, card.name, card.itemCount, card.totalSize, card.expiresAt),
         )
         val browsed = listOf(com.ismartcoding.plain.models.File(name="target-card-file.txt",path="https://device.test:8443/s/fixture-shared-link/root/target-card-file.txt#fixture-link-key",url="https://device.test:8443/fs?id=s.fixture.AA&action=download",createdAt=null,updatedAt=kotlin.time.Instant.fromEpochMilliseconds(0),size=8,isDir=false,childCount=0))
         val downloads = java.util.concurrent.atomic.AtomicReference<List<com.ismartcoding.plain.models.Download>>(emptyList())
@@ -987,7 +987,7 @@ class ManagedDeviceUiAcceptanceTest {
             require(prefix.startsWith("managed-acceptance-"))
             val peer = checkNotNull(GraphqlApi.execute(Query.peers()).find { it.id == peerId })
             val source = com.ismartcoding.plain.rust.graphql.ContentSource.Remote(com.ismartcoding.plain.features.chat.peer.ManagedDeviceClient.load(peer))
-            val tracks = source.catalog.rows(com.ismartcoding.plain.platform.system.DataType.AUDIO, "text:$prefix trash:false", 10, 0, FileSortBy.NAME_ASC).filterIsInstance<com.ismartcoding.plain.models.Audio>()
+            val tracks = source.catalog.rows(com.ismartcoding.plain.platform.system.DataType.AUDIO, "text:$prefix trash:false", 10, 0, com.ismartcoding.plain.models.AudioSortBy.TITLE_ASC).filterIsInstance<com.ismartcoding.plain.models.Audio>()
             assertEquals(2, tracks.size)
             val before = source.queue.queuePage(0, 10000)
             val localQueue = com.ismartcoding.plain.features.audio.AudioQueueClient.queuePage(0, 10000)
@@ -1485,7 +1485,7 @@ class ManagedDeviceUiAcceptanceTest {
             val targetBefore = remote.execute(state)
             val marker = "/managed-cast-${UUID.randomUUID()}.mp3"
             val add = GraphqlRequest<ManagedAcceptanceCastState>(
-                "mutation(\$path:String!){addDlnaItem(item:{path:\$path,title:\$path}){$selection}}",
+                "mutation(\$path:String!){addDlnaItem(item:{path:\$path,title:\$path,type:VIDEO}){$selection}}",
                 mapOf("path" to JsonHelper.jsonEncodeToElement(marker)), field = "addDlnaItem",
             )
             val remove = GraphqlRequest<ManagedAcceptanceCastState>(
@@ -1561,11 +1561,11 @@ class ManagedDeviceUiAcceptanceTest {
                 awaitNode("production target casting dialog") { it.text == text(Res.string.cast_select_screen) }
                 awaitValue("target discovery command") { client.api.execute(state).takeIf { it.version > targetBefore.version } }
                 client.api.execute(GraphqlRequest<ManagedAcceptanceCastState>(
-                    "mutation(\$path:String!){addDlnaItem(item:{path:\$path,title:\$path}){$selection}}",
+                    "mutation(\$path:String!){addDlnaItem(item:{path:\$path,title:\$path,type:VIDEO}){$selection}}",
                     mapOf("path" to JsonHelper.jsonEncodeToElement(marker)), field = "addDlnaItem",
                 ))
                 awaitValue("production ViewModel receives target subscription") { model?.items?.value?.find { it.path == marker } }
-                scenario.onActivity { checkNotNull(model).removeCastItem(com.ismartcoding.plain.features.dlna.sender.CastItem(marker, marker)) }
+                scenario.onActivity { checkNotNull(model).removeCastItem(com.ismartcoding.plain.features.dlna.sender.CastItem(marker, marker, type = com.ismartcoding.plain.models.DlnaCastType.VIDEO)) }
                 val removed = awaitValue("ViewModel command removes only target item") { client.api.execute(state).takeIf { value -> value.items.none { it.path == marker } } }
                 scenario.onActivity { checkNotNull(model).showCastDialog.value = false }
                 awaitValue("target discovery stops when dialog closes") { client.api.execute(state).takeIf { it.version > removed.version } }
@@ -1711,7 +1711,7 @@ class ManagedDeviceUiAcceptanceTest {
                     report("pairing_phase", state?.step?.name.orEmpty())
                     state?.verificationCode?.let { report("pairing_code", it) }
                 }
-                state?.takeIf { it.step in setOf(PairingStep.SUCCEEDED, PairingStep.FAILED, PairingStep.CANCELLED, PairingStep.PASSWORD_REQUIRED) }
+                state?.takeIf { it.step in setOf(PairingStep.SUCCEEDED, PairingStep.FAILED, PairingStep.CANCELED, PairingStep.PASSWORD_REQUIRED) }
             }
             assertEquals("Pairing error: ${terminal.error}", PairingStep.SUCCEEDED, terminal.step)
             val peer = awaitValue("paired record") { GraphqlApi.execute(Query.peers()).find { it.id == targetId && it.isPaired() } }
@@ -1961,7 +1961,7 @@ class ManagedDeviceUiAcceptanceTest {
                     if (cancel) {
                         click(text(Res.string.cancel), "cancel resource download")
                         kotlinx.coroutines.withTimeout(10000) { operation.join() }
-                        assertTrue("Cancelled download must not return", operation.isCancelled)
+                        assertTrue("Canceled download must not return", operation.isCancelled)
                         assertFalse(directory.exists())
                     } else {
                         complete.complete(Unit)
@@ -2208,7 +2208,7 @@ class ManagedDeviceUiAcceptanceTest {
                 val fileQuery = "text:" + imageReference.substringAfterLast('/')
                 assertEquals(0, remote.execute(Query.appFileCount(fileQuery)))
                 assertEquals(0, GraphqlApi.execute(Query.appFileCount(fileQuery)))
-                val copied = remote.execute(Mutation.importAppFile(imageReference, "$marker.png", "image/png", false))
+                val copied = com.ismartcoding.plain.features.chat.peer.ManagedDeviceClient.load(peer).importAttachment(picked.absolutePath, "$marker.png", "image/png")
                 attachment = copied
                 val content = com.ismartcoding.plain.features.chat.models.MessageContent(
                     com.ismartcoding.plain.features.chat.models.MessageType.IMAGES,
@@ -2216,7 +2216,7 @@ class ManagedDeviceUiAcceptanceTest {
                         uri = "fid:" + copied.realPath.substringAfterLast('/'), size = copied.size, fileName = "$marker.png",
                     ))),
                 )
-                val sent = remote.execute(Mutation.sendChatItems(listOf("peer:local"), JsonHelper.jsonEncode(content))).single()
+                val sent = remote.execute(Mutation.sendChatItems(listOf("peer:local"), com.ismartcoding.plain.models.ChatContentInput.from(content))).single()
                 messageId = sent.id
                 remote.execute(Mutation.deleteChatItem(sent.id))
                 messageId = null
@@ -2279,7 +2279,7 @@ class ManagedDeviceUiAcceptanceTest {
             val peer = checkNotNull(GraphqlApi.execute(Query.peers()).find { it.id == peerId })
             val remote = GraphqlApi.forPeer(peer)
             val type = com.ismartcoding.plain.platform.system.DataType.AUDIO
-            val tracks = remote.execute(Query.mediaRows(type, "text:$prefix trash:false", 10, 0, FileSortBy.NAME_ASC))
+            val tracks = remote.execute(Query.mediaRows(type, "text:$prefix trash:false", 10, 0, com.ismartcoding.plain.models.mediaSortBy(type, "UPDATED_AT_DESC")))
                 .filterIsInstance<com.ismartcoding.plain.models.Audio>().sortedBy { it.title }
             assertEquals("Two owned MP3 fixtures must be scanned on the target", 2, tracks.size)
             require(tracks.all { it.path.substringAfterLast('/').startsWith(prefix) && it.path.endsWith(".mp3") })
@@ -2294,7 +2294,7 @@ class ManagedDeviceUiAcceptanceTest {
             val historyQuery = "type:AUDIO ids:" + tracks.joinToString(",") { it.id }
             val nativeHistory = GraphqlApi.execute(Query.mediaPlayHistory(historyQuery, 0, 100))
             val previousSelection = targetPlayback.mediaId?.takeIf { id ->
-                remote.execute(Query.mediaRows(type, "ids:=$id", 1, 0, FileSortBy.NAME_ASC)).any { it.id == id }
+                remote.execute(Query.mediaRows(type, "ids:=$id", 1, 0, com.ismartcoding.plain.models.mediaSortBy(type, "UPDATED_AT_DESC"))).any { it.id == id }
             }
             var failure: Throwable? = null
             val nativeMode = com.ismartcoding.plain.Prefs.audioPlayMode.value
@@ -2467,7 +2467,7 @@ class ManagedDeviceUiAcceptanceTest {
             val query = "text:$prefix trash:false"
             report("remote_media_stage", feature + "_catalog")
             val rows = awaitValue("owned target media scan") {
-                source.catalog.rows(type, query, 10, 0, FileSortBy.NAME_ASC).takeIf { it.size == 1 }
+                source.catalog.rows(type, query, 10, 0, com.ismartcoding.plain.models.mediaSortBy(type, "UPDATED_AT_DESC")).takeIf { it.size == 1 }
             }
             val selectedId = rows.single().id
             val (path, itemTitle) = when (val row = rows.single()) {
@@ -2477,7 +2477,7 @@ class ManagedDeviceUiAcceptanceTest {
                 else -> error("Unexpected media type")
             }
             assertTrue(path.substringAfterLast('/').startsWith(prefix))
-            assertTrue(com.ismartcoding.plain.features.media.MediaCatalogClient.rows(type, query, 10, 0, FileSortBy.NAME_ASC).isEmpty())
+            assertTrue(com.ismartcoding.plain.features.media.MediaCatalogClient.rows(type, query, 10, 0, com.ismartcoding.plain.models.mediaSortBy(type, "UPDATED_AT_DESC")).isEmpty())
             assertFalse(java.io.File(path).exists())
             openRemoteTools(peer.name)
             click(text(title), "selected remote media page")
@@ -2513,7 +2513,7 @@ class ManagedDeviceUiAcceptanceTest {
                     assertTrue(GraphqlApi.execute(Query.mediaPlayHistory(historyQuery, 0, 10)).isEmpty())
                 }
             }
-            assertTrue(com.ismartcoding.plain.features.media.MediaCatalogClient.rows(type, query, 10, 0, FileSortBy.NAME_ASC).isEmpty())
+            assertTrue(com.ismartcoding.plain.features.media.MediaCatalogClient.rows(type, query, 10, 0, com.ismartcoding.plain.models.mediaSortBy(type, "UPDATED_AT_DESC")).isEmpty())
             report("remote_media_page", feature + "_target_catalog_existing_page_and_preview_verified")
         }
     }

@@ -17,8 +17,8 @@ internal suspend fun observeClipboardReports() = observeClipboardWhenEnabled(
     observeClipboardChanges { report ->
         try {
             RustHostReports.clipboard(JsonHelper.jsonEncode(report))
-        } catch (cancelled: CancellationException) {
-            throw cancelled
+        } catch (canceled: CancellationException) {
+            throw canceled
         } catch (error: Exception) {
             LogCat.e("Clipboard report", error)
         }

@@ -44,15 +44,15 @@ class PasswordSettingsStateTest {
     }
 
     @Test
-    fun repeated_entry_preserves_configured_status_and_clears_cancelled_draft() = runTest {
+    fun repeated_entry_preserves_configured_status_and_clears_canceled_draft() = runTest {
         val fixture = Fixture(configured = true)
         fixture.state.refresh()
         repeat(2) {
             fixture.state.edit()
             assertTrue(fixture.state.settings!!.passwordConfigured)
             assertFalse(fixture.state.hasDraft)
-            fixture.state.updatePassword("cancelled-secret")
-            fixture.state.updateConfirmation("cancelled-secret")
+            fixture.state.updatePassword("canceled-secret")
+            fixture.state.updateConfirmation("canceled-secret")
             fixture.state.discard()
             fixture.state.save()
             assertFalse(fixture.state.editing)
@@ -289,26 +289,26 @@ class PasswordSettingsStateTest {
         for (operation in PasswordSettingsOperation.entries) {
             val fixture = Fixture(configured = true).editing()
             fixture.state.generate()
-            val cancelled = CancellationException("cancelled")
+            val canceled = CancellationException("canceled")
             val action: suspend () -> Unit = when (operation) {
                 PasswordSettingsOperation.READ -> {
-                    fixture.read = { throw cancelled }
+                    fixture.read = { throw canceled }
                     suspend { fixture.state.refresh() }
                 }
                 PasswordSettingsOperation.SAVE -> {
-                    fixture.write = { throw cancelled }
+                    fixture.write = { throw canceled }
                     suspend { fixture.state.save() }
                 }
                 PasswordSettingsOperation.GENERATE -> {
-                    fixture.generate = { throw cancelled }
+                    fixture.generate = { throw canceled }
                     suspend { fixture.state.generate() }
                 }
                 PasswordSettingsOperation.TOGGLE -> {
-                    fixture.toggle = { throw cancelled }
+                    fixture.toggle = { throw canceled }
                     suspend { fixture.state.setEnabled(true) }
                 }
             }
-            assertSame(cancelled, assertFailsWith<CancellationException> { action() })
+            assertSame(canceled, assertFailsWith<CancellationException> { action() })
             assertFalse(fixture.state.busy)
             assertNull(fixture.state.error)
             assertFalse(fixture.state.saved)
@@ -317,7 +317,7 @@ class PasswordSettingsStateTest {
     }
 
     @Test
-    fun cancelling_suspended_save_preserves_unsaved_draft_and_releases_busy() = runTest {
+    fun canceling_suspended_save_preserves_unsaved_draft_and_releases_busy() = runTest {
         val fixture = Fixture().editing()
         fixture.state.generate()
         val release = CompletableDeferred<Unit>()
@@ -341,10 +341,10 @@ class PasswordSettingsStateTest {
         for (cancelEnable in listOf(false, true)) {
             val fixture = Fixture().editing()
             fixture.state.generate()
-            val cancelled = CancellationException("cancelled after write")
-            if (cancelEnable) fixture.toggle = { throw cancelled }
-            else fixture.read = { throw cancelled }
-            assertSame(cancelled, assertFailsWith<CancellationException> { fixture.state.save() })
+            val canceled = CancellationException("canceled after write")
+            if (cancelEnable) fixture.toggle = { throw canceled }
+            else fixture.read = { throw canceled }
+            assertSame(canceled, assertFailsWith<CancellationException> { fixture.state.save() })
             assertTrue(fixture.state.saved)
             assertFalse(fixture.state.hasDraft)
             assertFalse(fixture.state.editing)

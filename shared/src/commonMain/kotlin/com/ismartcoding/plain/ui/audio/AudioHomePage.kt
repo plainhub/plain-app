@@ -142,11 +142,11 @@ fun AudioHomePage(
     LaunchedEffect(audioVM.hasPermission.value) {
         if (audioVM.hasPermission.value) {
             try { homeVM.loadAsync(tagsVM) }
-            catch (cancelled: CancellationException) { throw cancelled }
+            catch (canceled: CancellationException) { throw canceled }
             catch (error: Exception) { LogCat.e("Audio home load", error) }
             AudioOverviewClient.updates.conflate().collect {
                 try { homeVM.refreshOverview(tagsVM) }
-                catch (cancelled: CancellationException) { throw cancelled }
+                catch (canceled: CancellationException) { throw canceled }
                 catch (error: Exception) { LogCat.e("Audio overview refresh", error) }
             }
         }

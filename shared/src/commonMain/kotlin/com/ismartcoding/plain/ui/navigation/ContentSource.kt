@@ -32,8 +32,8 @@ internal fun rememberContentResource(
     return androidx.compose.runtime.produceState<Result<Any>?>(null, source, path, size) {
         value = try {
             Result.success((source as ContentSource.Remote).client.resource(path, size))
-        } catch (cancelled: kotlinx.coroutines.CancellationException) {
-            throw cancelled
+        } catch (canceled: kotlinx.coroutines.CancellationException) {
+            throw canceled
         } catch (error: Exception) {
             Result.failure(error)
         }

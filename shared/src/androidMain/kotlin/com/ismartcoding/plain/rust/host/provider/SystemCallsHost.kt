@@ -1,12 +1,14 @@
 package com.ismartcoding.plain.rust.host.provider
 
-import com.ismartcoding.plain.features.files.FileSortBy
+import com.ismartcoding.plain.appContext
+import com.ismartcoding.plain.platform.media.provider.CallMediaStoreHelper
+import com.ismartcoding.plain.platform.permissions.Permission
+import com.ismartcoding.plain.platform.permissions.isGranted
 import com.ismartcoding.plain.lib.JsonHelper
 import com.ismartcoding.plain.models.Call as PhoneCall
 import com.ismartcoding.plain.platform.media.call
 import com.ismartcoding.plain.platform.media.countMedia
 import com.ismartcoding.plain.platform.media.getMediaIds
-import com.ismartcoding.plain.platform.media.searchMedia
 import com.ismartcoding.plain.platform.system.DataType
 import com.ismartcoding.plain.rust.host.*
 import kotlinx.serialization.Serializable
@@ -17,10 +19,8 @@ internal object SystemCallsHost {
         "systemCallFacts" -> {
             val request = JsonHelper.jsonDecodeFromElement<ProviderPageRequest>(params)
             hostResult(
-                searchMedia(
-                    DataType.CALL, request.plan, request.limit, request.offset,
-                    FileSortBy.DATE_DESC,
-                ).filterIsInstance<PhoneCall>().map(::callFacts)
+                if (!Permission.READ_CALL_LOG.isGranted()) emptyList()
+                else CallMediaStoreHelper.searchAsync(appContext, request.plan.where(), request.limit, request.offset).map(::callFacts)
             )
         }
         "systemCallCount" -> hostResult(

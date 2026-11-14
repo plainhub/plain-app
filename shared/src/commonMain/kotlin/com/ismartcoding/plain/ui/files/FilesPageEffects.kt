@@ -73,13 +73,13 @@ internal fun FilesPageEffects(
                 Prefs.showHiddenFiles.collect {
                     if (filesVM.hasPermission.value || filesVM.type == FilesType.APP) {
                         try { filesVM.loadAsync() }
-                        catch (cancelled: kotlinx.coroutines.CancellationException) { throw cancelled }
+                        catch (canceled: kotlinx.coroutines.CancellationException) { throw canceled }
                         catch (error: Exception) { com.ismartcoding.plain.ui.components.DialogHelper.showMessage(error) }
                     }
                 }
             }
-        } catch (cancelled: kotlinx.coroutines.CancellationException) {
-            throw cancelled
+        } catch (canceled: kotlinx.coroutines.CancellationException) {
+            throw canceled
         } catch (error: Exception) {
             filesVM.isLoading.value = false
             com.ismartcoding.plain.ui.components.DialogHelper.showMessage(error)

@@ -2,7 +2,7 @@ package com.ismartcoding.plain.ui.audio
 
 import androidx.lifecycle.ViewModelStore
 import com.ismartcoding.plain.features.audio.AudioQueueApi
-import com.ismartcoding.plain.features.files.FileSortBy
+import com.ismartcoding.plain.models.AudioSortBy
 import com.ismartcoding.plain.lib.JsonHelper
 import com.ismartcoding.plain.models.AudioItem
 import com.ismartcoding.plain.rust.graphql.GraphqlClient
@@ -20,7 +20,7 @@ import kotlin.test.assertNotNull
 class AudioQueuePlaybackTest {
     @Test
     fun dismissing_or_denying_permission_keeps_the_current_queue_and_track() = withPlayer { player ->
-        player.vm.playQuery("artist:Artist", FileSortBy.NAME_DESC)
+        player.vm.playQuery("artist:Artist", AudioSortBy.TITLE_DESC)
         runCurrent()
         assertNotNull(player.onGranted)
         assertEquals(listOf("permission"), player.calls)
@@ -31,7 +31,7 @@ class AudioQueuePlaybackTest {
 
     @Test
     fun permission_must_finish_before_replacing_and_starting_playback() = withPlayer { player ->
-        player.vm.playQuery("artist:Artist", FileSortBy.NAME_DESC)
+        player.vm.playQuery("artist:Artist", AudioSortBy.TITLE_DESC)
         runCurrent()
         assertEquals(listOf("permission"), player.calls)
         player.onGranted!!.invoke()
@@ -44,7 +44,7 @@ class AudioQueuePlaybackTest {
 
     @Test
     fun granting_permission_after_the_view_model_is_cleared_does_not_change_playback() = withPlayer { player ->
-        player.vm.playQuery("artist:Artist", FileSortBy.NAME_DESC)
+        player.vm.playQuery("artist:Artist", AudioSortBy.TITLE_DESC)
         player.store.clear()
         player.onGranted!!.invoke()
         runCurrent()
@@ -71,7 +71,7 @@ class AudioQueuePlaybackTest {
         private val queue = AudioQueueApi(GraphqlClient { request ->
             if (request.query.contains("replaceAudioQueue")) {
                 calls.add("replace")
-                assertEquals("\"NAME_DESC\"", request.variables.getValue("sortBy").toString())
+                assertEquals("\"TITLE_DESC\"", request.variables.getValue("sortBy").toString())
                 GraphqlResponse(data = JsonHelper.jsonDecode("""{"replaceAudioQueue":{"mediaId":"new","title":"New","artist":"Artist","path":"/new.mp3","durationMs":1000}}"""))
             } else {
                 calls.add("refresh")

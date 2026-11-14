@@ -98,14 +98,14 @@ fun NearbyPage(
     }
     LaunchedEffect(Unit) {
         try { NetworkEvents.refresh() }
-        catch (cancelled: CancellationException) { throw cancelled }
+        catch (canceled: CancellationException) { throw canceled }
         catch (error: Exception) { LogCat.e("Load local addresses", error) }
     }
     LaunchedEffect(peerVM) { peerVM.observe() }
 
     LaunchedEffect(Unit) {
         try { RustNearbyDevices.observeDiscovery() }
-        catch (cancelled: CancellationException) { throw cancelled }
+        catch (canceled: CancellationException) { throw canceled }
         catch (error: Exception) { LogCat.e("Nearby discovery failed", error) }
     }
     LaunchedEffect(bleAvailability) {
@@ -181,7 +181,7 @@ fun NearbyPage(
                                 onClick = {
                                     scope.launch {
                                         try { pairingCode = RustNativeApi.pairingCode() }
-                                        catch (cancelled: CancellationException) { throw cancelled }
+                                        catch (canceled: CancellationException) { throw canceled }
                                         catch (error: Exception) { DialogHelper.showErrorDialog(error.message.orEmpty()) }
                                     }
                                 },

@@ -3,6 +3,7 @@ package com.ismartcoding.plain.api.graphql
 import com.ismartcoding.plain.features.files.FileSortBy
 import com.ismartcoding.plain.features.dlna.sender.CastCommand
 import com.ismartcoding.plain.features.dlna.sender.CastItem
+import com.ismartcoding.plain.models.DlnaCastType
 import com.ismartcoding.plain.features.files.FileTaskOp
 import com.ismartcoding.plain.features.files.FileTaskType
 import com.ismartcoding.plain.features.media.actions.MediaAction
@@ -16,6 +17,24 @@ import kotlinx.serialization.json.*
 import kotlin.test.*
 
 class GraphqlArgumentsTest {
+    @Test
+    fun catalog_sorts_use_their_own_graphql_enum() {
+        val sorts = listOf(
+            DataType.IMAGE to com.ismartcoding.plain.models.ImageSortBy.TAKEN_AT_DESC,
+            DataType.VIDEO to com.ismartcoding.plain.models.VideoSortBy.TAKEN_AT_DESC,
+            DataType.DOC to com.ismartcoding.plain.models.DocSortBy.NAME_ASC,
+            DataType.AUDIO to com.ismartcoding.plain.models.AudioSortBy.TITLE_ASC,
+        )
+        for ((type, sort) in sorts) {
+            val request = Query.mediaRows(type, "", 10, 0, sort).operation
+            assertTrue(request.query.contains("\$sortBy: ${sort.graphqlType}!"))
+            assertEquals(sort.name, request.variables.getValue("sortBy").jsonPrimitive.content)
+        }
+        assertFailsWith<IllegalArgumentException> {
+            Query.mediaRows(DataType.AUDIO, "", 10, 0, com.ismartcoding.plain.models.ImageSortBy.NAME_ASC)
+        }
+    }
+
     @Test
     fun audio_queue_count_passes_the_filter_as_a_required_argument() {
         val request = Query.audioQueueItemCount("text:alpha")
@@ -58,7 +77,7 @@ class GraphqlArgumentsTest {
             Query.clipboardItems(10, 0, "") to "clipboardItems",
             Query.favoriteFolders() to "favoriteFolders",
             Query.shares() to "shares",
-            Query.mediaRows(DataType.IMAGE, "", 10, 0, FileSortBy.NAME_ASC) to "images",
+            Query.mediaRows(DataType.IMAGE, "", 10, 0, com.ismartcoding.plain.models.ImageSortBy.NAME_ASC) to "images",
             Query.mediaCount(DataType.IMAGE, "") to "imageCount",
             Query.selectedMediaPaths("videos", "ids:=video", 1) to "videos",
             Query.mdnsState() to "mdnsState",
@@ -84,7 +103,7 @@ class GraphqlArgumentsTest {
         )
         assertEquals(
             JsonPrimitive("NAME_ASC"),
-            Query.mediaRows(DataType.IMAGE, "", 10, 0, FileSortBy.NAME_ASC).operation.variables["sortBy"],
+            Query.mediaRows(DataType.IMAGE, "", 10, 0, com.ismartcoding.plain.models.ImageSortBy.NAME_ASC).operation.variables["sortBy"],
         )
     }
 
@@ -141,7 +160,7 @@ class GraphqlArgumentsTest {
 
     @Test
     fun dlnaCommandsBindTypedInputsAndKeepResponseMetadataOffTheWire() {
-        val item = CastItem("a\"b", "title", durationMs = 4_000, audio = true)
+        val item = CastItem("a\"b", "title", durationMs = 4_000, type = DlnaCastType.AUDIO)
         val commands = listOf(
             CastCommand.StartScan to "startDlnaScan",
             CastCommand.StopScan to "stopDlnaScan",
@@ -167,14 +186,15 @@ class GraphqlArgumentsTest {
         val input = Mutation.dlna(CastCommand.Cast(item)).operation.variables.getValue("item").jsonObject
         assertEquals(JsonPrimitive(item.path), input["path"])
         assertEquals(JsonPrimitive(4_000L), input["durationMs"])
-        assertEquals(JsonPrimitive(true), input["audio"])
+        assertEquals(JsonPrimitive("AUDIO"), input["type"])
+        assertFalse("audio" in input)
     }
 
     @Test
     fun mediaSelectionsKeepTypeSpecificFields() {
-        assertTrue(Query.mediaRows(DataType.AUDIO, "", 10, 0, FileSortBy.NAME_ASC).operation.query.contains("albumFileId"))
-        assertTrue(Query.mediaRows(DataType.IMAGE, "", 10, 0, FileSortBy.NAME_ASC).operation.query.contains("takenAt"))
-        assertFalse(Query.mediaRows(DataType.DOC, "", 10, 0, FileSortBy.NAME_ASC).operation.query.contains("isFavorite"))
+        assertTrue(Query.mediaRows(DataType.AUDIO, "", 10, 0, com.ismartcoding.plain.models.AudioSortBy.TITLE_ASC).operation.query.contains("albumFileId"))
+        assertTrue(Query.mediaRows(DataType.IMAGE, "", 10, 0, com.ismartcoding.plain.models.ImageSortBy.NAME_ASC).operation.query.contains("takenAt"))
+        assertFalse(Query.mediaRows(DataType.DOC, "", 10, 0, com.ismartcoding.plain.models.DocSortBy.NAME_ASC).operation.query.contains("isFavorite"))
         assertTrue(Query.mediaCount(DataType.VIDEO, "").operation.query.contains("videoCount(query: \$query)"))
     }
 

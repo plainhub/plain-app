@@ -21,8 +21,8 @@ object PairingProjection {
         NearbyViewModel.pairingViews[notice.deviceId] = PairingView(notice.deviceId, step, notice.error)
         NearbyViewModel.itemStatus.remove(notice.deviceId)
     }
-    fun cancelled(notice: PairingProgressNotice) {
-        NearbyViewModel.pairingViews[notice.deviceId] = PairingView(notice.deviceId, PairingStep.CANCELLED)
+    fun canceled(notice: PairingProgressNotice) {
+        NearbyViewModel.pairingViews[notice.deviceId] = PairingView(notice.deviceId, PairingStep.CANCELED)
         NearbyViewModel.itemStatus.remove(notice.deviceId)
     }
     fun completed(notice: PairingProgressNotice) {

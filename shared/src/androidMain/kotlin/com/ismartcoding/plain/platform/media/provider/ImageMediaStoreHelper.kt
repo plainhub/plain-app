@@ -15,7 +15,7 @@ import com.ismartcoding.plain.lib.extensions.map
 import com.ismartcoding.plain.lib.withIO
 import com.ismartcoding.plain.platform.isQPlus
 import com.ismartcoding.plain.features.media.MediaType
-import com.ismartcoding.plain.features.files.FileSortBy
+import com.ismartcoding.plain.models.MediaSortBy
 import com.ismartcoding.plain.features.files.toSortBy
 import kotlin.time.Instant
 
@@ -48,7 +48,7 @@ object ImageMediaStoreHelper : BaseMediaContentHelper() {
         where: ContentWhere,
         limit: Int,
         offset: Int,
-        sortBy: FileSortBy,
+        sortBy: MediaSortBy,
     ): List<MediaImage> = withIO {
         getPagingCursorAsync(context, where, limit, offset, sortBy.toSortBy())?.map { cursor, cache ->
             val id = cursor.getStringValue(MediaStore.Images.Media._ID, cache)

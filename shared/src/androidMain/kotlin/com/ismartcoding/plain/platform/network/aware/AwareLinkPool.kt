@@ -58,8 +58,8 @@ internal class AwareLinkPool(
             }
             try {
                 buildLink(peerId)
-            } catch (cancelled: CancellationException) {
-                throw cancelled
+            } catch (canceled: CancellationException) {
+                throw canceled
             } catch (error: Exception) {
                 LogCat.w("[AWARE] onPublishHelloReceived build fail peer=$peerId type=${error::class.simpleName} msg=${error.message}")
             }
@@ -78,8 +78,8 @@ internal class AwareLinkPool(
             }
             try {
                 buildLink(peerId)
-            } catch (cancelled: CancellationException) {
-                throw cancelled
+            } catch (canceled: CancellationException) {
+                throw canceled
             } catch (error: Exception) {
                 LogCat.w("[AWARE] onSubscribeReadyReceived build fail peer=$peerId type=${error::class.simpleName} msg=${error.message}")
             }

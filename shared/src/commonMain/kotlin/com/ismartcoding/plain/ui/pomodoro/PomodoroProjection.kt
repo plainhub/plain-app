@@ -25,15 +25,15 @@ internal object PomodoroProjection {
         val state = PomodoroState.valueOf(completed)
         try {
             showPomodoroNotification(state, event.today.state)
-        } catch (cancelled: CancellationException) {
-            throw cancelled
+        } catch (canceled: CancellationException) {
+            throw canceled
         } catch (error: Exception) {
             LogCat.e("Pomodoro notification", error)
         }
         try {
             playPomodoroCompletionSound(Prefs.pomodoroSettings.value)
-        } catch (cancelled: CancellationException) {
-            throw cancelled
+        } catch (canceled: CancellationException) {
+            throw canceled
         } catch (error: Exception) {
             LogCat.e("Pomodoro completion sound", error)
         }

@@ -8,6 +8,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ismartcoding.plain.IMedia
+import com.ismartcoding.plain.models.DlnaCastType
 import com.ismartcoding.plain.features.dlna.sender.*
 import com.ismartcoding.plain.lib.extensions.getFilenameWithoutExtensionFromPath
 import com.ismartcoding.plain.ui.components.DialogHelper
@@ -52,9 +53,9 @@ class CastViewModel internal constructor(internal val source: com.ismartcoding.p
     fun playCast() = command(CastCommand.Play)
     fun pauseCast() = command(CastCommand.Pause)
     fun seekCast(positionMs: Float) = command(CastCommand.Seek(positionMs.toLong()))
-    fun cast(path: String) = castPath(path)
+    fun cast(path: String, type: DlnaCastType) = castPath(path, type)
     fun cast(item: IMedia) = castItem(item)
-    fun castPath(path: String) = castItemCommand(CastItem(path, path.getFilenameWithoutExtensionFromPath()))
+    fun castPath(path: String, type: DlnaCastType) = castItemCommand(CastItem(path, path.getFilenameWithoutExtensionFromPath(), type = type))
     fun castItem(item: IMedia) { castItemCommand(CastItem.from(item)) }
     fun reorderCastItems(from: Int, to: Int) = command(CastCommand.Reorder(from, to))
     fun addCastItem(item: IMedia) = command(CastCommand.Add(CastItem.from(item)))
@@ -70,7 +71,7 @@ class CastViewModel internal constructor(internal val source: com.ismartcoding.p
             try {
                 commands.withLock { sender.call(CastCommand.Cast(item)) }
             }
-            catch (cancelled: kotlinx.coroutines.CancellationException) { throw cancelled }
+            catch (canceled: kotlinx.coroutines.CancellationException) { throw canceled }
             catch (error: Exception) { DialogHelper.showErrorMessage(error.message ?: "Cast failed") }
             finally { isLoading.value = false }
         }

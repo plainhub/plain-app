@@ -57,7 +57,7 @@ fun ChatFileItem(
             if (source is com.ismartcoding.plain.rust.graphql.ContentSource.Remote) { if (item.isRemoteFile()) "" else item.uri }
             else item.getPreviewPath(peer)
         }
-        catch (cancelled: CancellationException) { throw cancelled }
+        catch (canceled: CancellationException) { throw canceled }
         catch (_: Exception) { "" }
     }
     val path = if (source is com.ismartcoding.plain.rust.graphql.ContentSource.Remote) item.uri else rememberFilePath(item.uri)

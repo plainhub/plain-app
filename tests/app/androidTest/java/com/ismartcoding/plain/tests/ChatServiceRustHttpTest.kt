@@ -43,7 +43,7 @@ class ChatServiceRustHttpTest {
         val files = mutableSetOf<String>()
         val shares = mutableSetOf<String>()
         val oldService = Prefs.backgroundServiceEnabled.value
-        suspend fun created(): List<ChatItem> = RustChatStore.getByPeerId("local").filter { it.content.contains(marker) }.also { rows -> ids += rows.map { it.id } }
+        suspend fun created(): List<ChatItem> = RustChatStore.getByPeerId("local").filter { com.ismartcoding.plain.lib.JsonHelper.jsonEncode(it.content).contains(marker) }.also { rows -> ids += rows.map { it.id } }
         try {
             Prefs.backgroundServiceEnabled.value = true
             val longText = marker + "😀".repeat(1100)

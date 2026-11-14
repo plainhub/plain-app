@@ -51,8 +51,8 @@ actual suspend fun saveFileToDownloads(path: String, fileName: String): String =
             PathHelper.getPlainPublicDir(Environment.DIRECTORY_DOWNLOADS).absolutePath,
             fileName.ifEmpty { path.getFilenameFromPath() },
         )
-    } catch (cancelled: CancellationException) {
-        throw cancelled
+    } catch (canceled: CancellationException) {
+        throw canceled
     } catch (error: Exception) {
         LogCat.e("Save to downloads failed", error)
         ""
@@ -142,8 +142,8 @@ actual suspend fun readTextFile(path: String): String = withIO {
             val filePath = if (path.startsWith("file://")) Uri.parse(path).path else path
             File(filePath ?: path).readText()
         }
-    } catch (cancelled: CancellationException) {
-        throw cancelled
+    } catch (canceled: CancellationException) {
+        throw canceled
     } catch (e: Exception) {
         ""
     }

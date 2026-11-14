@@ -122,7 +122,7 @@ dependencies = [
 [[package]]
 name = "block2"
 version = "0.6.2"
-source = "git+https://github.com/plainhub/plain-core.git?branch=main#01e61ee737a5f4bd8086c46aaa29e883fdf68b83"
+source = "git+https://github.com/plainhub/plain-core.git?branch=main#875f231cc39a23656e00cd2cbeae0f2fa3ebe817"
 dependencies = [
  "objc2",
 ]
@@ -441,7 +441,7 @@ dependencies = [
 [[package]]
 name = "dispatch2"
 version = "0.3.1"
-source = "git+https://github.com/plainhub/plain-core.git?branch=main#01e61ee737a5f4bd8086c46aaa29e883fdf68b83"
+source = "git+https://github.com/plainhub/plain-core.git?branch=main#875f231cc39a23656e00cd2cbeae0f2fa3ebe817"
 dependencies = [
  "objc2",
 ]
@@ -652,7 +652,7 @@ dependencies = [
 [[package]]
 name = "heic-rs"
 version = "0.1.4"
-source = "git+https://github.com/plainhub/plain-core.git?branch=main#01e61ee737a5f4bd8086c46aaa29e883fdf68b83"
+source = "git+https://github.com/plainhub/plain-core.git?branch=main#875f231cc39a23656e00cd2cbeae0f2fa3ebe817"
 
 [[package]]
 name = "hkdf"
@@ -952,7 +952,7 @@ dependencies = [
 [[package]]
 name = "objc2"
 version = "0.6.5"
-source = "git+https://github.com/plainhub/plain-core.git?branch=main#01e61ee737a5f4bd8086c46aaa29e883fdf68b83"
+source = "git+https://github.com/plainhub/plain-core.git?branch=main#875f231cc39a23656e00cd2cbeae0f2fa3ebe817"
 dependencies = [
  "objc2-encode",
 ]
@@ -960,7 +960,7 @@ dependencies = [
 [[package]]
 name = "objc2-av-foundation"
 version = "0.3.2"
-source = "git+https://github.com/plainhub/plain-core.git?branch=main#01e61ee737a5f4bd8086c46aaa29e883fdf68b83"
+source = "git+https://github.com/plainhub/plain-core.git?branch=main#875f231cc39a23656e00cd2cbeae0f2fa3ebe817"
 dependencies = [
  "bitflags",
  "block2",
@@ -975,7 +975,7 @@ dependencies = [
 [[package]]
 name = "objc2-core-foundation"
 version = "0.3.2"
-source = "git+https://github.com/plainhub/plain-core.git?branch=main#01e61ee737a5f4bd8086c46aaa29e883fdf68b83"
+source = "git+https://github.com/plainhub/plain-core.git?branch=main#875f231cc39a23656e00cd2cbeae0f2fa3ebe817"
 dependencies = [
  "bitflags",
  "objc2",
@@ -984,7 +984,7 @@ dependencies = [
 [[package]]
 name = "objc2-core-media"
 version = "0.3.2"
-source = "git+https://github.com/plainhub/plain-core.git?branch=main#01e61ee737a5f4bd8086c46aaa29e883fdf68b83"
+source = "git+https://github.com/plainhub/plain-core.git?branch=main#875f231cc39a23656e00cd2cbeae0f2fa3ebe817"
 dependencies = [
  "bitflags",
  "objc2",
@@ -994,7 +994,7 @@ dependencies = [
 [[package]]
 name = "objc2-core-video"
 version = "0.3.2"
-source = "git+https://github.com/plainhub/plain-core.git?branch=main#01e61ee737a5f4bd8086c46aaa29e883fdf68b83"
+source = "git+https://github.com/plainhub/plain-core.git?branch=main#875f231cc39a23656e00cd2cbeae0f2fa3ebe817"
 dependencies = [
  "bitflags",
  "objc2",
@@ -1004,12 +1004,12 @@ dependencies = [
 [[package]]
 name = "objc2-encode"
 version = "4.1.0"
-source = "git+https://github.com/plainhub/plain-core.git?branch=main#01e61ee737a5f4bd8086c46aaa29e883fdf68b83"
+source = "git+https://github.com/plainhub/plain-core.git?branch=main#875f231cc39a23656e00cd2cbeae0f2fa3ebe817"
 
 [[package]]
 name = "objc2-foundation"
 version = "0.3.2"
-source = "git+https://github.com/plainhub/plain-core.git?branch=main#01e61ee737a5f4bd8086c46aaa29e883fdf68b83"
+source = "git+https://github.com/plainhub/plain-core.git?branch=main#875f231cc39a23656e00cd2cbeae0f2fa3ebe817"
 dependencies = [
  "bitflags",
  "objc2",
@@ -1156,7 +1156,7 @@ checksum = "f6b464fbc74e149a392436b17d523f769e057cb6877f6a5c4618bc6f11800548"
 [[package]]
 name = "plain-graphql"
 version = "0.1.0"
-source = "git+https://github.com/plainhub/plain-core.git?branch=main#01e61ee737a5f4bd8086c46aaa29e883fdf68b83"
+source = "git+https://github.com/plainhub/plain-core.git?branch=main#875f231cc39a23656e00cd2cbeae0f2fa3ebe817"
 dependencies = [
  "bytes",
  "futures-util",
@@ -1168,7 +1168,7 @@ dependencies = [
 [[package]]
 name = "plain-graphql-macros"
 version = "0.1.0"
-source = "git+https://github.com/plainhub/plain-core.git?branch=main#01e61ee737a5f4bd8086c46aaa29e883fdf68b83"
+source = "git+https://github.com/plainhub/plain-core.git?branch=main#875f231cc39a23656e00cd2cbeae0f2fa3ebe817"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -1178,7 +1178,7 @@ dependencies = [
 [[package]]
 name = "plain-libs"
 version = "0.1.0"
-source = "git+https://github.com/plainhub/plain-core.git?branch=main#01e61ee737a5f4bd8086c46aaa29e883fdf68b83"
+source = "git+https://github.com/plainhub/plain-core.git?branch=main#875f231cc39a23656e00cd2cbeae0f2fa3ebe817"
 dependencies = [
  "argon2",
  "bitflags",
@@ -1243,7 +1243,7 @@ dependencies = [
 [[package]]
 name = "plain-rs"
 version = "0.1.0"
-source = "git+https://github.com/plainhub/plain-core.git?branch=main#01e61ee737a5f4bd8086c46aaa29e883fdf68b83"
+source = "git+https://github.com/plainhub/plain-core.git?branch=main#875f231cc39a23656e00cd2cbeae0f2fa3ebe817"
 dependencies = [
  "block2",
  "bytes",
@@ -1287,7 +1287,7 @@ dependencies = [
 [[package]]
 name = "plain-server"
 version = "0.1.0"
-source = "git+https://github.com/plainhub/plain-core.git?branch=main#01e61ee737a5f4bd8086c46aaa29e883fdf68b83"
+source = "git+https://github.com/plainhub/plain-core.git?branch=main#875f231cc39a23656e00cd2cbeae0f2fa3ebe817"
 dependencies = [
  "futures-util",
  "log",
@@ -1411,7 +1411,7 @@ checksum = "63b8176103e19a2643978565ca18b50549f6101881c443590420e4dc998a3c69"
 [[package]]
 name = "rav1d"
 version = "1.1.0"
-source = "git+https://github.com/plainhub/plain-core.git?branch=main#01e61ee737a5f4bd8086c46aaa29e883fdf68b83"
+source = "git+https://github.com/plainhub/plain-core.git?branch=main#875f231cc39a23656e00cd2cbeae0f2fa3ebe817"
 dependencies = [
  "bitflags",
  "cfg-if",
@@ -1864,7 +1864,7 @@ checksum = "b6f5e870be6c3b371b77fe0ee0bafb859fa4964b4404c27de1d380043c4dda20"
 [[package]]
 name = "undoc"
 version = "0.27.3"
-source = "git+https://github.com/plainhub/plain-core.git?branch=main#01e61ee737a5f4bd8086c46aaa29e883fdf68b83"
+source = "git+https://github.com/plainhub/plain-core.git?branch=main#875f231cc39a23656e00cd2cbeae0f2fa3ebe817"
 dependencies = [
  "plain-libs",
  "serde",
@@ -2154,7 +2154,7 @@ dependencies = [
 [[package]]
 name = "zerocopy"
 version = "0.7.35"
-source = "git+https://github.com/plainhub/plain-core.git?branch=main#01e61ee737a5f4bd8086c46aaa29e883fdf68b83"
+source = "git+https://github.com/plainhub/plain-core.git?branch=main#875f231cc39a23656e00cd2cbeae0f2fa3ebe817"
 dependencies = [
  "zerocopy-derive",
 ]
@@ -2162,7 +2162,7 @@ dependencies = [
 [[package]]
 name = "zerocopy-derive"
 version = "0.7.35"
-source = "git+https://github.com/plainhub/plain-core.git?branch=main#01e61ee737a5f4bd8086c46aaa29e883fdf68b83"
+source = "git+https://github.com/plainhub/plain-core.git?branch=main#875f231cc39a23656e00cd2cbeae0f2fa3ebe817"
 dependencies = [
  "proc-macro2",
  "quote",

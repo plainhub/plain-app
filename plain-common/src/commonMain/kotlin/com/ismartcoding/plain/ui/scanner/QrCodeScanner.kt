@@ -109,9 +109,9 @@ fun QrCodeScanner(
                     pairingInFlight = false
                     openResult(text)
                 }
-            } catch (cancelled: CancellationException) {
+            } catch (canceled: CancellationException) {
                 pairingInFlight = false
-                throw cancelled
+                throw canceled
             } catch (_: Exception) {
                 pairingInFlight = false
                 openResult(text)

@@ -26,8 +26,8 @@ fun exportLogsAsync() {
             } else {
                 shareLogArchive(path)
             }
-        } catch (cancelled: CancellationException) {
-            throw cancelled
+        } catch (canceled: CancellationException) {
+            throw canceled
         } catch (error: Exception) {
             DialogHelper.showErrorMessage(error.toString())
         } finally {

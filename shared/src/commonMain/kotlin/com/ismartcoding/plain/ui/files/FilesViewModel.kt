@@ -253,7 +253,7 @@ class FilesViewModel internal constructor(val source: ContentSource = ContentSou
                 withIO {
                     source.files.deleteMany(paths.toList())
                 }
-            } catch (cancelled: CancellationException) { throw cancelled }
+            } catch (canceled: CancellationException) { throw canceled }
             catch (error: Exception) { DialogHelper.showMessage(error) }
             finally {
                 DialogHelper.hideLoading()

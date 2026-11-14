@@ -26,7 +26,7 @@ internal object SubscriptionObservers {
         scope.observe(AppSubscriptions.downloadsChanged) { DownloadCenter.refresh() }
         scope.observeData(AppSubscriptions.pairingStarted) { PairingProjection.started(it) }
         scope.observeData(AppSubscriptions.pairingFailed) { PairingProjection.failed(it) }
-        scope.observeData(AppSubscriptions.pairingCanceled) { PairingProjection.cancelled(it) }
+        scope.observeData(AppSubscriptions.pairingCanceled) { PairingProjection.canceled(it) }
         scope.observeData(AppSubscriptions.pairingCompleted) { PairingProjection.completed(it) }
         scope.observeData(AppSubscriptions.imageModelsUpdated) { value -> RustImageModels.apply(value) }
         scope.observeData(AppSubscriptions.channelsChanged) { value -> ChannelSystemMessageReceiver.applyCommitted(value) }
@@ -40,7 +40,7 @@ internal object SubscriptionObservers {
         }
         scope.observe(AppSubscriptions.contentChanged) {
             try { FavoriteFoldersClient.refresh() }
-            catch (cancelled: CancellationException) { throw cancelled }
+            catch (canceled: CancellationException) { throw canceled }
             catch (error: Exception) { LogCat.e("Favorite folders refresh", error) }
             NotesViewModel.local.reloadAsync()
         }
@@ -71,7 +71,7 @@ internal object SubscriptionObservers {
             try {
                 if (update is SubscriptionUpdate.Failed) throw update.error
                 consume(update)
-            } catch (cancelled: CancellationException) { throw cancelled }
+            } catch (canceled: CancellationException) { throw canceled }
             catch (error: Exception) { LogCat.e("Apply GraphQL subscription", error) }
         }
     }

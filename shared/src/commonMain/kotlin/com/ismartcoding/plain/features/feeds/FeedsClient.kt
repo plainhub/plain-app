@@ -14,7 +14,7 @@ internal open class FeedsApi(
 
     suspend fun getAll(withCount: Boolean = false): List<Feed> {
         val data = api.execute(Query.feeds(withCount))
-        val counts = data.feedEntryCounts.associate { it.id to it.count }
+        val counts = data.feedEntryCounts.associate { it.feedId to it.count }
         return data.feeds.map { it.apply { entryCount = counts[id] ?: 0 } }
     }
 
@@ -39,7 +39,7 @@ internal open class FeedsApi(
         api.execute(Mutation.importFeeds(content))
     }
 
-    suspend fun exportAsync(): String = api.execute(Mutation.exportFeeds())
+    suspend fun exportAsync(): String = api.execute(Query.exportFeeds())
 
     suspend fun sync(feedId: String) {
         api.execute(Mutation.syncFeeds(feedId))

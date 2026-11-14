@@ -22,8 +22,8 @@ class DesktopAccessCommandReceiver : BroadcastReceiver() {
             try {
                 if (!Prefs.verifyAdbToken(intent.getStringExtra("token").orEmpty())) return@coIO
                 setRemoteAccessEnabled(enabled)
-            } catch (cancelled: CancellationException) {
-                throw cancelled
+            } catch (canceled: CancellationException) {
+                throw canceled
             } catch (error: Exception) {
                 LogCat.e("Desktop access command failed: ${error.message}")
             } finally {

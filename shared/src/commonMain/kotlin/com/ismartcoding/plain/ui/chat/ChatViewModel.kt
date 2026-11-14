@@ -210,8 +210,8 @@ class ChatViewModel internal constructor(
                 }
             }
             item.status == ChatStatus.SENT
-        } catch (cancelled: CancellationException) {
-            throw cancelled
+        } catch (canceled: CancellationException) {
+            throw canceled
         } catch (error: Exception) {
             _itemsFlow.update { current ->
                 current.map { if (it.id == pendingId) it.copy(status = ChatStatus.FAILED) else it }

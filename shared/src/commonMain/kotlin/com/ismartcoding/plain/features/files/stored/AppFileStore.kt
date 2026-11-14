@@ -35,9 +35,9 @@ object AppFileStore : AppFilesApi() {
         try {
             currentCoroutineContext().ensureActive()
             return file
-        } catch (cancelled: CancellationException) {
+        } catch (canceled: CancellationException) {
             withContext(NonCancellable) { release(file.id) }
-            throw cancelled
+            throw canceled
         }
     }
 }

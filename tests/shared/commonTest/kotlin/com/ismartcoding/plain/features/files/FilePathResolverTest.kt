@@ -41,7 +41,7 @@ class FilePathResolverTest {
     }
 
     @Test
-    fun cancellingOneWaiterDoesNotCancelTheSharedLookup() = runTest {
+    fun cancelingOneWaiterDoesNotCancelTheSharedLookup() = runTest {
         val entered = CompletableDeferred<Unit>()
         val release = CompletableDeferred<Unit>()
         var requests = 0
@@ -58,12 +58,12 @@ class FilePathResolverTest {
     }
 
     @Test
-    fun missingResultsAndCancelledRequestsDoNotPoisonLaterBatches() = runTest {
+    fun missingResultsAndCanceledRequestsDoNotPoisonLaterBatches() = runTest {
         var requests = 0
         val resolver = FilePathResolver(backgroundScope, { paths ->
             requests++
             when (requests) {
-                1 -> throw CancellationException("request cancelled")
+                1 -> throw CancellationException("request canceled")
                 2 -> paths.map { null }
                 else -> paths.map { "/found" }
             }

@@ -58,7 +58,7 @@ fun SharedFolderPage(
         try {
             state.downloads.refresh()
 
-        } catch (cancelled: CancellationException) { throw cancelled }
+        } catch (canceled: CancellationException) { throw canceled }
         catch (error: Exception) { DialogHelper.showMessage(error) }
     }
     LaunchedEffect(state) {

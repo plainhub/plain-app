@@ -22,6 +22,7 @@ import com.ismartcoding.plain.models.Certificate
 import com.ismartcoding.plain.models.ChatChannel
 import com.ismartcoding.plain.models.ChatChannelMember
 import com.ismartcoding.plain.models.ChatItem
+import com.ismartcoding.plain.features.chat.models.MessageDeliveryResult
 import com.ismartcoding.plain.models.ClipboardItem
 import com.ismartcoding.plain.models.Contact
 import com.ismartcoding.plain.models.ContactAddress
@@ -94,6 +95,7 @@ class GraphqlModelContractTest {
             "ChatChannel" to ChatChannel.serializer().descriptor,
             "ChatChannelMember" to ChatChannelMember.serializer().descriptor,
             "ChatItem" to ChatItem.serializer().descriptor,
+            "ChatDeliveryResult" to MessageDeliveryResult.serializer().descriptor,
             "ClipboardItem" to ClipboardItem.serializer().descriptor,
             "Contact" to Contact.serializer().descriptor,
             "ContactAddress" to ContactAddress.serializer().descriptor,

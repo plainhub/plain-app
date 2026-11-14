@@ -1,6 +1,5 @@
 package com.ismartcoding.plain.rust.graphql
 
-import com.ismartcoding.plain.features.files.FileSortBy
 import com.ismartcoding.plain.platform.system.DataType
 import com.ismartcoding.plain.models.Audio
 import com.ismartcoding.plain.models.Image
@@ -41,8 +40,8 @@ class GraphqlClientTest {
             }
             assertEquals("private-response", client.execute(request))
             val cancellation = CancellationException("private-cancellation")
-            val cancelled = GraphqlClient { throw cancellation }
-            assertSame(cancellation, assertFailsWith<CancellationException> { cancelled.execute(request) })
+            val canceled = GraphqlClient { throw cancellation }
+            assertSame(cancellation, assertFailsWith<CancellationException> { canceled.execute(request) })
             val failure = IllegalStateException("private-error")
             val failed = GraphqlClient { throw failure }
             assertSame(failure, assertFailsWith<IllegalStateException> { failed.execute(request) })
@@ -51,7 +50,7 @@ class GraphqlClientTest {
             assertSame(httpFailure, assertFailsWith<GraphqlHttpException> { httpFailed.execute(request) })
             assertEquals(listOf(LogCat.DEBUG, LogCat.DEBUG, LogCat.ERROR, LogCat.ERROR), logs.map { it.first })
             assertTrue(logs[0].second.startsWith("GraphQL transport=http operation=DeviceName result=success elapsedMs="))
-            assertTrue(logs[1].second.startsWith("GraphQL transport=native operation=DeviceName result=cancelled elapsedMs="))
+            assertTrue(logs[1].second.startsWith("GraphQL transport=native operation=DeviceName result=canceled elapsedMs="))
             assertTrue(logs[2].second.startsWith("GraphQL transport=native operation=DeviceName result=error error=IllegalStateException elapsedMs="))
             assertTrue(logs[3].second.startsWith("GraphQL transport=http operation=DeviceName result=error error=GraphqlHttpException elapsedMs="))
             assertTrue(logs.all { it.second.contains("query DeviceName { deviceName }") })
@@ -134,7 +133,7 @@ class GraphqlClientTest {
             JsonHelper.jsonDecode<GraphqlResponse>("""{"data":{"audios":[$row],"images":[$row],"videos":[$row],"docs":[$row]}}""")
         }
         for (type in listOf(DataType.AUDIO, DataType.IMAGE, DataType.VIDEO, DataType.DOC)) {
-            val item = api.execute(Query.mediaRows(type, "", 10, 0, FileSortBy.NAME_ASC)).single()
+            val item = api.execute(Query.mediaRows(type, "", 10, 0, com.ismartcoding.plain.models.mediaSortBy(type, "UPDATED_AT_DESC"))).single()
             assertTrue(when (type) {
                 DataType.AUDIO -> item is Audio
                 DataType.IMAGE -> item is Image
@@ -189,9 +188,9 @@ class GraphqlClientTest {
         assertSame(failure, assertFailsWith<IllegalStateException> { failed.execute(request) })
         assertEquals(1, calls)
 
-        val cancellation = CancellationException("Request cancelled")
-        val cancelled = GraphqlClient { calls++; throw cancellation }
-        assertSame(cancellation, assertFailsWith<CancellationException> { cancelled.execute(request) })
+        val cancellation = CancellationException("Request canceled")
+        val canceled = GraphqlClient { calls++; throw cancellation }
+        assertSame(cancellation, assertFailsWith<CancellationException> { canceled.execute(request) })
         assertEquals(2, calls)
     }
 }

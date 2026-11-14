@@ -15,62 +15,28 @@ import kotlin.test.assertTrue
 import kotlinx.serialization.json.Json
 
 class DChatTest {
-
     @Test
-    fun `parses TEXT content`() {
-        val message = ChatItem.parseContent("""{"type":"TEXT","value":{"text":"hello","linkPreviews":[]}}""")
-        assertEquals(MessageType.TEXT, message.type)
-        assertEquals("hello", (message.value as MessageText).text)
+    fun `decodes each concrete GraphQL content type`() {
+        val text = com.ismartcoding.plain.lib.JsonHelper.jsonDecode<com.ismartcoding.plain.models.ChatContent>("""{"__typename":"ChatTextContent","text":"hello","linkPreviews":[]}""")
+        assertEquals("hello", (text as com.ismartcoding.plain.models.ChatContent.Text).text)
+        for (kind in listOf("ChatImagesContent", "ChatFilesContent")) {
+            val content = com.ismartcoding.plain.lib.JsonHelper.jsonDecode<com.ismartcoding.plain.models.ChatContent>("""{"__typename":"$kind","items":[]}""")
+            assertTrue(content is com.ismartcoding.plain.models.ChatContent.Images || content is com.ismartcoding.plain.models.ChatContent.Files)
+        }
     }
-
     @Test
-    fun `parses IMAGES content`() {
-        val message = ChatItem.parseContent("""{"type":"IMAGES","value":{"items":[{"id":"1","uri":"fid:abc","size":0}]}}""")
-        assertEquals(MessageType.IMAGES, message.type)
-        assertEquals(1, (message.value as MessageImages).items.size)
+    fun `rejects unknown and serialized string content`() {
+        for (content in listOf("""{"__typename":"UnknownContent"}""", """"raw text"""")) {
+            kotlin.test.assertFails { com.ismartcoding.plain.lib.JsonHelper.jsonDecode<com.ismartcoding.plain.models.ChatContent>(content) }
+        }
     }
-
     @Test
-    fun `parses FILES content`() {
-        val message = ChatItem.parseContent("""{"type":"FILES","value":{"items":[{"id":"1","uri":"fsid:def","size":0}]}}""")
-        assertEquals(MessageType.FILES, message.type)
-        assertEquals(1, (message.value as MessageFiles).items.size)
-    }
-
-    // Regression: unknown type previously crashed with IllegalArgumentException
-    @Test
-    fun `falls back to TEXT for unknown type`() {
-        val message = ChatItem.parseContent("""{"type":"VIDEO","value":{"text":"hi"}}""")
-        assertEquals(MessageType.TEXT, message.type)
-        assertEquals("hi", (message.value as MessageText).text)
-    }
-
-    @Test
-    fun `falls back to TEXT for missing type`() {
-        val message = ChatItem.parseContent("""{"value":{"text":"hi"}}""")
-        assertEquals(MessageType.TEXT, message.type)
-        assertEquals("hi", (message.value as MessageText).text)
-    }
-
-    @Test
-    fun `shows raw content with type when value cannot be decoded`() {
-        val message = ChatItem.parseContent("""{"type":"TEXT","value":{"items":[]}}""")
-        assertEquals(MessageType.TEXT, message.type)
-        assertEquals("""{"type":"TEXT","value":{"items":[]}}""", (message.value as MessageText).text)
-    }
-
-    @Test
-    fun `shows raw content with unknown type when value cannot be decoded`() {
-        val message = ChatItem.parseContent("""{"type":"VIDEO","value":{"url":"a.mp4"}}""")
-        assertEquals(MessageType.TEXT, message.type)
-        assertEquals("""{"type":"VIDEO","value":{"url":"a.mp4"}}""", (message.value as MessageText).text)
-    }
-
-    @Test
-    fun `shows raw content when value is missing`() {
-        val message = ChatItem.parseContent("""{"type":"TEXT"}""")
-        assertEquals(MessageType.TEXT, message.type)
-        assertEquals("""{"type":"TEXT"}""", (message.value as MessageText).text)
+    fun `oneOf inputs encode only the selected field`() {
+        val input = com.ismartcoding.plain.models.ChatContentInput(text = MessageText("hello"))
+        val encoded = com.ismartcoding.plain.lib.JsonHelper.jsonEncodeToElement(input) as kotlinx.serialization.json.JsonObject
+        assertEquals(setOf("text"), encoded.keys)
+        kotlin.test.assertFailsWith<IllegalArgumentException> { com.ismartcoding.plain.models.ChatContentInput() }
+        kotlin.test.assertFailsWith<IllegalArgumentException> { com.ismartcoding.plain.models.ChatContentInput(text = MessageText("hello"), files = MessageFiles(emptyList())) }
     }
 }
 

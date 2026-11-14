@@ -45,8 +45,8 @@ internal class PasswordSettingsState(
         try {
             settings = readSettings()
             error = null
-        } catch (cancelled: CancellationException) {
-            throw cancelled
+        } catch (canceled: CancellationException) {
+            throw canceled
         } catch (_: Exception) {
             settings = null
             error = PasswordSettingsError.LOAD
@@ -94,8 +94,8 @@ internal class PasswordSettingsState(
             password = value
             confirmation = value
             generated = true
-        } catch (cancelled: CancellationException) {
-            throw cancelled
+        } catch (canceled: CancellationException) {
+            throw canceled
         } catch (_: Exception) {
             error = PasswordSettingsError.GENERATE
         } finally {
@@ -123,22 +123,22 @@ internal class PasswordSettingsState(
             if (enableAfterSave && settings?.passwordType != PasswordType.FIXED) {
                 try {
                     writeEnabled(true)
-                } catch (cancelled: CancellationException) {
-                    throw cancelled
+                } catch (canceled: CancellationException) {
+                    throw canceled
                 } catch (_: Exception) {
                     error = PasswordSettingsError.ENABLE
                 }
             }
             try {
                 settings = readSettings()
-            } catch (cancelled: CancellationException) {
-                throw cancelled
+            } catch (canceled: CancellationException) {
+                throw canceled
             } catch (_: Exception) {
                 settings = null
                 error = PasswordSettingsError.LOAD
             }
-        } catch (cancelled: CancellationException) {
-            throw cancelled
+        } catch (canceled: CancellationException) {
+            throw canceled
         } catch (_: Exception) {
             error = PasswordSettingsError.SAVE
         } finally {
@@ -159,8 +159,8 @@ internal class PasswordSettingsState(
         try {
             writeEnabled(enabled)
             settings = readSettings()
-        } catch (cancelled: CancellationException) {
-            throw cancelled
+        } catch (canceled: CancellationException) {
+            throw canceled
         } catch (_: Exception) {
             settings = null
             error = PasswordSettingsError.LOAD

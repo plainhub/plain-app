@@ -1,6 +1,7 @@
 package com.ismartcoding.plain.ui.casting
 
 
+import com.ismartcoding.plain.models.DlnaCastType
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -59,7 +60,7 @@ fun CastSessionPlaylistItem(
     var subtitle by remember { mutableStateOf("") }
 
     LaunchedEffect(source, item.path) {
-        if (item is CastItem && item.audio) {
+        if (item is CastItem && item.type == DlnaCastType.AUDIO) {
             val (t, a) = withIO { source.media.audioInfo(item.path).let { it.title to it.artist } }
             title = t; subtitle = a
         } else {

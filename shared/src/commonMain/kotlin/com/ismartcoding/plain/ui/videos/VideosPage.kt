@@ -32,7 +32,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.ismartcoding.plain.platform.system.AppFeatureType
-import com.ismartcoding.plain.features.files.FileSortBy
+import com.ismartcoding.plain.models.VideoSortBy
 import com.ismartcoding.plain.lib.withIO
 import com.ismartcoding.plain.ui.platform.media.MediaPreviewer
 import com.ismartcoding.plain.ui.navigation.PBackHandler
@@ -154,7 +154,7 @@ fun VideosPage(
     // Date grouping is computed outside the grid DSL: the DSL block re-executes
     // on every recomposition (tags/buckets landing right after items), which
     // would re-run the O(n) grouping each time.
-    val isGroupMode = videosVM.sortBy.value == FileSortBy.TAKEN_AT_DESC
+    val isGroupMode = videosVM.sortBy.value == VideoSortBy.TAKEN_AT_DESC
             && videosVM.queryText.value.isEmpty()
     val groupedItems = remember(itemsState, isGroupMode) {
         if (isGroupMode) groupMediaByDate(itemsState, { it.takenAt ?: it.createdAt }) else emptyList()

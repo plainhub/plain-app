@@ -24,8 +24,8 @@ class DesktopAccessSettingsViewModel : ViewModel() {
     suspend fun observeNetworkAddresses() {
         try {
             NetworkEvents.refresh()
-        } catch (cancelled: CancellationException) {
-            throw cancelled
+        } catch (canceled: CancellationException) {
+            throw canceled
         } catch (error: Exception) {
             LogCat.e("Load network addresses", error)
         }

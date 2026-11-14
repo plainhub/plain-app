@@ -19,5 +19,5 @@
     <string name="event_reason_login_expired">Sign-in request expired</string>
     <string name="event_reason_too_many_login_attempts">Too many sign-in attempts</string>
     <string name="event_reason_rejected">Sign-in request rejected</string>
-    <string name="event_reason_cancelled">Sign-in request cancelled</string>
+    <string name="event_reason_canceled">Sign-in request canceled</string>
 </resources>

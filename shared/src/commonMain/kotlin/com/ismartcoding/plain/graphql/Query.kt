@@ -14,6 +14,7 @@ import com.ismartcoding.plain.models.QueuedMediaId
 import com.ismartcoding.plain.models.SelectedMediaPath
 import com.ismartcoding.plain.features.chat.models.MessageShare
 import com.ismartcoding.plain.features.files.FileSortBy
+import com.ismartcoding.plain.models.MediaSortBy
 import com.ismartcoding.plain.features.nearby.NearbyDiscoverySnapshot
 import com.ismartcoding.plain.features.nearby.MdnsSnapshot
 import com.ismartcoding.plain.features.sessions.SessionFacts
@@ -55,6 +56,11 @@ import com.ismartcoding.plain.rust.graphql.GraphqlRequest
 import com.ismartcoding.plain.rust.graphql.variable
 
 object Query {
+    fun exportFeeds(): GraphqlRequest<String> = GraphqlRequest(
+        $$"query { exportFeeds }",
+        field = "exportFeeds",
+    )
+
     fun events(query: String, offset: Int, limit: Int): GraphqlRequest<List<com.ismartcoding.plain.models.EventRecord>> = GraphqlRequest(
         "query events(\$query:String!,\$offset:Int!,\$limit:Int!){events(query:\$query,offset:\$offset,limit:\$limit){id type message clientId createdAt}}",
         mapOf(variable("query", query), variable("offset", offset), variable("limit", limit)),
@@ -478,7 +484,7 @@ object Query {
     )
 
     fun feeds(withCount: Boolean): GraphqlRequest<FeedsResponse> {
-        val document = $$"query { feeds { $${Fragments.FEED_FIELDS} }" + (if (withCount) " feedEntryCounts { id count }" else "") + " }"
+        val document = $$"query { feeds { $${Fragments.FEED_FIELDS} }" + (if (withCount) " feedEntryCounts { feedId count }" else "") + " }"
         return if (withCount) GraphqlRequest(document)
         else GraphqlRequest<List<Feed>>(document, field = "feeds").map { FeedsResponse(it, emptyList()) }
     }
@@ -498,9 +504,10 @@ object Query {
         query: String,
         limit: Int,
         offset: Int,
-        sortBy: FileSortBy,
+        sortBy: MediaSortBy,
     ): GraphqlRequest<List<IData>> {
-        val document = $$"query($query: String!, $limit: Int!, $offset: Int!, $sortBy: FileSortBy!) { $${mediaRoot(type)}(query: $query, limit: $limit, offset: $offset, sortBy: $sortBy) { $${Fragments.mediaFields(type)} } }"
+        require(sortBy.dataType == type) { "Sort type does not match media type" }
+        val document = $$"query($query: String!, $limit: Int!, $offset: Int!, $sortBy: $${sortBy.graphqlType}!) { $${mediaRoot(type)}(query: $query, limit: $limit, offset: $offset, sortBy: $sortBy) { $${Fragments.mediaFields(type)} } }"
         val variables = mapOf(variable("query", query), variable("limit", limit), variable("offset", offset), variable("sortBy", sortBy.name))
         val field = mediaRoot(type)
         return when (type) {

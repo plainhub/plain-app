@@ -19,7 +19,7 @@ import androidx.compose.ui.Modifier
 import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.unit.dp
 import com.ismartcoding.plain.IData
-import com.ismartcoding.plain.features.files.FileSortBy
+import com.ismartcoding.plain.models.MediaSortBy
 import com.ismartcoding.plain.ui.base.PDialogRadioRow
 import com.ismartcoding.plain.ui.base.PTextButton
 import com.ismartcoding.plain.ui.media.BaseMediaViewModel
@@ -29,8 +29,8 @@ import com.ismartcoding.plain.ui.theme.dialogSheetBackground
 @Composable
 fun <T : IData> SortAndBrowseDialog(
     mediaVM: BaseMediaViewModel<T>,
-    sortByEntries: List<FileSortBy>,
-    onSortSelected: (FileSortBy) -> Unit = {},
+    sortByEntries: List<MediaSortBy>,
+    onSortSelected: (MediaSortBy) -> Unit = {},
     onDismiss: () -> Unit = {},
 ) {
     AlertDialog(

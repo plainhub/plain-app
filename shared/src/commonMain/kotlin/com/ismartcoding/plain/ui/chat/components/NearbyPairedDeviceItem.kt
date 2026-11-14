@@ -36,9 +36,9 @@ fun NearbyPairedDeviceItem(peer: Peer, device: NearbyDevice?) {
     var showMenu by remember(peer.id) { mutableStateOf(false) }
     val status = NearbyViewModel.getStatus(peer.id, true)
     val active = NearbyViewModel.pairingViews.values.any {
-        it.peerId == peer.id && it.step !in setOf(PairingStep.SUCCEEDED, PairingStep.FAILED, PairingStep.CANCELLED)
+        it.peerId == peer.id && it.step !in setOf(PairingStep.SUCCEEDED, PairingStep.FAILED, PairingStep.CANCELED)
     }
-    val cancelling = active || status == NearbyItemStatus.PAIRING
+    val canceling = active || status == NearbyItemStatus.PAIRING
     val selected = MainViewModel.selectedDevice.value?.peerId == peer.id
     val unpairText = stringResource(Res.string.unpair)
     val unpairMessage = stringResource(Res.string.confirm_unpair_device, peer.name)
@@ -74,12 +74,12 @@ fun NearbyPairedDeviceItem(peer: Peer, device: NearbyDevice?) {
                     )
                     PDropdownMenu(expanded = showMenu, onDismissRequest = { showMenu = false }) {
                         if (peer.token.isEmpty()) PDropdownMenuItem(
-                            text = { Text(stringResource(if (cancelling) Res.string.cancel else Res.string.pair_full_control)) },
+                            text = { Text(stringResource(if (canceling) Res.string.cancel else Res.string.pair_full_control)) },
                             enabled = status != NearbyItemStatus.STARTING && status != NearbyItemStatus.UNPAIRING &&
-                                (cancelling || (peer.online && device?.remoteAccess == true)),
+                                (canceling || (peer.online && device?.remoteAccess == true)),
                             onClick = {
                                 showMenu = false
-                                if (cancelling) NearbyViewModel.cancelPairing(peer.id) else showPair = true
+                                if (canceling) NearbyViewModel.cancelPairing(peer.id) else showPair = true
                             },
                         )
                         PDropdownMenuItem(text = { Text(unpairText) }, onClick = {

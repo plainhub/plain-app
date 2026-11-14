@@ -83,7 +83,7 @@ private fun eventMessage(type: EventType, message: String): String {
         "login_expired" -> Res.string.event_reason_login_expired
         "too_many_login_attempts" -> Res.string.event_reason_too_many_login_attempts
         "rejected" -> Res.string.event_reason_rejected
-        "cancelled" -> Res.string.event_reason_cancelled
+        "canceled" -> Res.string.event_reason_canceled
         else -> return message
     }
     return stringResource(resource)

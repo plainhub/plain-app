@@ -39,7 +39,7 @@ open class MediaPlayHistoryApi internal constructor(protected val api: GraphqlCl
         coIO {
             previousWrite?.join()
             try { api.execute(request) }
-            catch (cancelled: CancellationException) { throw cancelled }
+            catch (canceled: CancellationException) { throw canceled }
             catch (error: Exception) { LogCat.e("Write media playback history", error) }
         }.also { pendingWrite = it }
     }

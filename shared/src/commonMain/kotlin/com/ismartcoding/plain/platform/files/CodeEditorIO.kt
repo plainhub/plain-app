@@ -9,8 +9,8 @@ expect fun openByteSource(path: String): ByteSource
 
 suspend fun writeByteChunksStreaming(path: String, chunks: Iterator<ByteArray>): Boolean = try {
     FilesClient.writeChunks(path, chunks)
-} catch (cancelled: CancellationException) {
-    throw cancelled
+} catch (canceled: CancellationException) {
+    throw canceled
 } catch (error: Exception) {
     LogCat.e("File save failed", error)
     false

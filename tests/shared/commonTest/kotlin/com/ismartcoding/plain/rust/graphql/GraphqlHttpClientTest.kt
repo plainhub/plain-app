@@ -154,7 +154,7 @@ class GraphqlHttpClientTest {
             transport = object : GraphqlHttpTransport {
                 override suspend fun post(url: String, clientId: String, body: ByteArray, contentType: String, tlsCertificateSha256: String?): GraphqlHttpResponse {
                     delay(60_000)
-                    error("The timed out request must be cancelled")
+                    error("The timed out request must be canceled")
                 }
             },
         ).graphql

@@ -24,7 +24,7 @@ import kotlin.uuid.Uuid
 object BleScanDriver {
     suspend fun scan() {
         try { feedScan() }
-        catch (cancelled: CancellationException) { throw cancelled }
+        catch (canceled: CancellationException) { throw canceled }
         catch (error: Throwable) { LogCat.e("BLE scan driver", error) }
     }
 
@@ -34,7 +34,7 @@ object BleScanDriver {
             BleScanReports.scanState(scan, true)
             forEachAdvertisement { clientId ->
                 try { BleScanReports.scanSeen(scan, clientId) }
-                catch (cancelled: CancellationException) { throw cancelled }
+                catch (canceled: CancellationException) { throw canceled }
                 catch (error: Exception) { LogCat.d("[BLE] scanSeen $clientId: ${error.message}") }
             }
         } finally {
@@ -68,8 +68,8 @@ object BleScanDriver {
             val result = api.requestAsync(BleServices.nearby, request)
             api.disconnect()
             RustBleWire.nearbyBody(result).decodeToString(throwOnInvalidSequence = true).takeIf { it.isNotEmpty() }
-        } catch (cancelled: CancellationException) {
-            throw cancelled
+        } catch (canceled: CancellationException) {
+            throw canceled
         } catch (e: Exception) {
             LogCat.e("[BLE] bleScanRead error: ${e.message}")
             null

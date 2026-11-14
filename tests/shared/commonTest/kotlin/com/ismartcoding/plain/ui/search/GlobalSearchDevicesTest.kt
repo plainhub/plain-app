@@ -214,7 +214,7 @@ class GlobalSearchDevicesTest {
     }
 
     @Test
-    fun a_cancelled_query_does_not_finish_or_populate_its_replacement() = runTest {
+    fun a_canceled_query_does_not_finish_or_populate_its_replacement() = runTest {
         val device = Device("first", 1)
         val source = device.source()
         val old = CompletableDeferred<Unit>()
@@ -251,10 +251,7 @@ class GlobalSearchDevicesTest {
         val text = "Earlier message text. ".repeat(10) + query + " surrounding context"
         device.chats = listOf(com.ismartcoding.plain.models.ChatItem(
             id = "owned-chat", fromId = "first", toId = "me", status = com.ismartcoding.plain.features.chat.ChatStatus.SENT,
-            content = JsonHelper.jsonEncode(com.ismartcoding.plain.features.chat.models.MessageContent(
-                com.ismartcoding.plain.features.chat.models.MessageType.TEXT,
-                com.ismartcoding.plain.features.chat.models.MessageText(text),
-            )), createdAt = Instant.parse("2026-01-01T00:00:00Z"), updatedAt = Instant.parse("2026-01-01T00:00:00Z"),
+            content = com.ismartcoding.plain.models.ChatContent.Text(text, emptyList()), createdAt = Instant.parse("2026-01-01T00:00:00Z"), updatedAt = Instant.parse("2026-01-01T00:00:00Z"),
         ))
         val vm = model { GlobalSearchDevices(listOf(source)) }
         vm.domain.value = GlobalSearchDomain.CHAT

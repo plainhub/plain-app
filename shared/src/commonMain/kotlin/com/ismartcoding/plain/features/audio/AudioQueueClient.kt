@@ -1,6 +1,7 @@
 package com.ismartcoding.plain.features.audio
 
-import com.ismartcoding.plain.features.files.FileSortBy
+import com.ismartcoding.plain.models.MediaSortBy
+import com.ismartcoding.plain.models.AudioSortBy
 import com.ismartcoding.plain.graphql.Mutation
 import com.ismartcoding.plain.graphql.Query
 import com.ismartcoding.plain.models.AudioCommand
@@ -61,8 +62,10 @@ open class AudioQueueApi internal constructor(private val api: GraphqlClient = G
         }
     }
 
-    suspend fun replace(query: String, sortBy: FileSortBy, shuffle: Boolean = false): AudioItem? =
-        api.execute(Mutation.replaceAudioQueue(query, sortBy, shuffle))
+    suspend fun replace(query: String, sortBy: MediaSortBy, shuffle: Boolean = false): AudioItem? {
+        require(sortBy is AudioSortBy) { "Audio queue requires audio sorting" }
+        return api.execute(Mutation.replaceAudioQueue(query, sortBy, shuffle))
+    }
 
     suspend fun clearQueue() {
         api.execute(Mutation.clearAudioQueue())

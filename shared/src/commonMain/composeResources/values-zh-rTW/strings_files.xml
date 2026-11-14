@@ -57,4 +57,6 @@
     <string name="no_app_files">尚無檔案</string>
     <string name="add_folder">新增資料夾</string>
     <string name="manage_files">管理檔案</string>
+    <string name="title_asc">標題（升冪）</string>
+    <string name="title_desc">標題（降冪）</string>
 </resources>

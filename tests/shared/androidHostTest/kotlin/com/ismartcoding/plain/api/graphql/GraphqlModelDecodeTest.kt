@@ -16,7 +16,7 @@ import kotlin.test.assertNull
 import kotlin.time.Instant
 
 class GraphqlModelDecodeTest {
-    private val chat = """{"id":"chat-1","fromId":"me","toId":"peer-1","channelId":null,"content":"{\"type\":\"TEXT\",\"value\":{\"text\":\"hello 中文\"}}","status":"SENT","statusData":"","createdAt":"2026-10-12T00:00:00Z","updatedAt":"2026-10-12T01:00:00Z"}"""
+    private val chat = """{"id":"chat-1","fromId":"me","toId":"peer-1","channelId":null,"content":{"__typename":"ChatTextContent","text":"hello 中文","linkPreviews":[]},"status":"SENT","deliveryResults":[],"createdAt":"2026-10-12T00:00:00Z","updatedAt":"2026-10-12T01:00:00Z"}"""
 
     @Test
     fun chatDecodesTheWireEnvelopeWithoutChangingItsContent() {

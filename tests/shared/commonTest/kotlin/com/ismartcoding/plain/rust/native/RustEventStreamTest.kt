@@ -26,7 +26,7 @@ class RustEventStreamTest {
     }
 
     @Test
-    fun cancelling_a_pending_native_read_runs_cleanup_once() = runTest {
+    fun canceling_a_pending_native_read_runs_cleanup_once() = runTest {
         val entered = CompletableDeferred<Unit>()
         var closures = 0
         val reader = launch {

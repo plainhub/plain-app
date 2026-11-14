@@ -23,7 +23,7 @@ import java.util.UUID
 @RunWith(AndroidJUnit4::class)
 class AwareLinkLogTest {
     @Test
-    fun cancellingPendingBuildRestoresIdleWithoutFailureWarnings() = runBlocking {
+    fun cancelingPendingBuildRestoresIdleWithoutFailureWarnings() = runBlocking {
         assumeTrue(Build.VERSION.SDK_INT >= Build.VERSION_CODES.S)
         val peer = AwarePeer("aware-log-${UUID.randomUUID()}", 1025)
         val link = AwarePeerLink(peer.id, AwareSession(), connectivityManager, true, null, 1024) { _, _ -> }

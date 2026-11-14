@@ -28,7 +28,7 @@ object NetworkEvents {
                 try {
                     RustHostReports.networkInterfacesChanged("null")
                     refreshSnapshot()
-                } catch (cancelled: CancellationException) { throw cancelled }
+                } catch (canceled: CancellationException) { throw canceled }
                 catch (error: Exception) { LogCat.e("Network change report failed", error) }
             }
         }

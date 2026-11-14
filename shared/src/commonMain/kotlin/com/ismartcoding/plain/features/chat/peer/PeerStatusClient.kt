@@ -11,8 +11,8 @@ object PeerStatusClient {
         coIO {
             try {
                 RustNativeApi.reconnectPeers()
-            } catch (cancelled: CancellationException) {
-                throw cancelled
+            } catch (canceled: CancellationException) {
+                throw canceled
             } catch (error: Exception) {
                 LogCat.e("Rust peer status reconnect", error)
             }

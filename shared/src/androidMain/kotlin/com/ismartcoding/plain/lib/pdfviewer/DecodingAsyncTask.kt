@@ -14,7 +14,7 @@ internal class DecodingAsyncTask(
     val pdfViewReference: WeakReference<PDFView>,
     val pdfiumCore: PdfiumCore,
 ) : AsyncTask<Void?, Void?, Throwable?>() {
-    private var cancelled: Boolean = false
+    private var canceled: Boolean = false
     private var pdfFile: PdfFile? = null
 
     override fun doInBackground(vararg params: Void?): Throwable? {
@@ -48,13 +48,13 @@ internal class DecodingAsyncTask(
                 pdfView.loadError(result)
                 return
             }
-            if (!cancelled) {
+            if (!canceled) {
                 pdfView.loadComplete(pdfFile!!)
             }
         }
     }
 
     protected override fun onCancelled() {
-        cancelled = true
+        canceled = true
     }
 }

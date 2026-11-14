@@ -3,7 +3,7 @@ package com.ismartcoding.plain.graphql
 import com.ismartcoding.plain.platform.system.DataType
 
 internal object Fragments {
-    const val CHAT_ITEM = "id fromId toId channelId content status statusData createdAt updatedAt"
+    const val CHAT_ITEM = "id fromId toId channelId content { ... on ChatTextContent { __typename text linkPreviews { url title description imageUrl imageLocalPath imageWidth imageHeight siteName domain createdAt } } ... on ChatImagesContent { __typename items { id uri size durationMs width height summary fileName } } ... on ChatFilesContent { __typename items { id uri size durationMs width height summary fileName } } ... on ChatShareContent { __typename shareId urlToken peerInfo { id ip port } name itemCount totalSize expiresAt } } createdAt updatedAt status deliveryResults { peerId peerName error }"
     const val CONTACT = "id prefix firstName middleName lastName suffix nickname photoId phoneNumbers { value type typeCode label normalizedNumber } emails { value type typeCode label } addresses { value type typeCode label } events { value type typeCode label } websites { value type typeCode label } ims { value protocol customProtocol typeCode } source starred contactId thumbnailId notes groups { id name } organization { company title } ringtone updatedAt"
     const val NEARBY_DEVICE_FIELDS = "id name signaturePublicKey ips port deviceType version platform lastSeen discoveryMethods bestIp status remoteAccess"
     const val MDNS_STATUS = "runtimeId revision running scanning"
@@ -25,7 +25,7 @@ internal object Fragments {
     const val CLIPBOARD_ITEM = "id text source label sensitive createdAt"
     const val APP_FILE = "id size mimeType realPath createdAt updatedAt fileName"
     const val SMS = "id body address sentAt serviceCenter read threadId type typeCode subscriptionId isMms attachments { path contentType name }"
-    const val DLNA_STATE = "version devices { id hostAddress name } currentDevice { id hostAddress name } items { path title albumArt artist durationMs audio } currentUri playing progressMs durationMs supportsCallback"
+    const val DLNA_STATE = "version devices { id hostAddress name } currentDevice { id hostAddress name } items { path title albumArt artist durationMs type } currentUri playing progressMs durationMs supportsCallback"
     const val IMAGE_EDITOR_SUMMARY = "id thumbnail canvasWidth canvasHeight layerCount updatedAt"
     const val IMAGE_EDITOR_PROJECT = $$"$$IMAGE_EDITOR_SUMMARY stateB64 createdAt"
     const val PEER_SUMMARY = "id name ip publicKey status port deviceType createdAt updatedAt online managed"

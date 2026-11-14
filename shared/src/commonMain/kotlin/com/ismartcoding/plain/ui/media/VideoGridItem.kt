@@ -1,5 +1,6 @@
 package com.ismartcoding.plain.ui.media
 
+import com.ismartcoding.plain.models.DlnaCastType
 import androidx.compose.runtime.getValue
 
 import com.ismartcoding.plain.models.Video as MediaVideo
@@ -22,7 +23,7 @@ import com.ismartcoding.plain.lib.extensions.formatDurationMs
 import com.ismartcoding.plain.lib.extensions.getFilenameFromPath
 import com.ismartcoding.plain.lib.coMain
 import com.ismartcoding.plain.lib.withIO
-import com.ismartcoding.plain.features.files.FileSortBy
+import com.ismartcoding.plain.models.MediaSortBy
 import com.ismartcoding.plain.platform.media.getMediaItemUriString
 import com.ismartcoding.plain.ui.base.dragselect.DragSelectState
 import com.ismartcoding.plain.ui.media.viewer.previewer.MediaPreviewerState
@@ -43,7 +44,7 @@ fun VideoGridItem(
     previewerState: MediaPreviewerState,
     dragSelectState: DragSelectState,
     widthPx: Int,
-    sort: FileSortBy
+    sort: MediaSortBy
 ) {
     val isSelected by remember { derivedStateOf { dragSelectState.isSelected(m.id) } }
     val inSelectionMode = dragSelectState.selectMode
@@ -54,7 +55,7 @@ fun VideoGridItem(
             .combinedClickable(
                 onClick = {
                     if (castVM.castMode.value) {
-                        castVM.cast(m.path)
+                        castVM.cast(m.path, DlnaCastType.VIDEO)
                     } else if (inSelectionMode) {
                         dragSelectState.addSelected(m.id)
                     } else {
@@ -118,7 +119,7 @@ fun VideoGridItem(
         if (showSize) {
             Box(modifier = Modifier.align(Alignment.BottomEnd)) {
                 SizeLabel(
-                    text = if (setOf(FileSortBy.SIZE_ASC, FileSortBy.SIZE_DESC).contains(sort))
+                    text = if (sort.name in setOf("SIZE_ASC", "SIZE_DESC"))
                         m.size.formatBytes() else m.durationMs.formatDurationMs()
                 )
             }

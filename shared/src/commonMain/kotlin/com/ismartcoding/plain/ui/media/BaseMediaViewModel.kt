@@ -11,7 +11,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ismartcoding.plain.IData
 import com.ismartcoding.plain.platform.system.DataType
-import com.ismartcoding.plain.features.files.FileSortBy
+import com.ismartcoding.plain.models.mediaSortBy
 import com.ismartcoding.plain.models.Tag
 import com.ismartcoding.plain.helpers.SearchHelper
 import com.ismartcoding.plain.lib.withIO
@@ -46,7 +46,7 @@ abstract class BaseMediaViewModel<T : IData> internal constructor(val source: Co
     val noMore = mutableStateOf(false)
     val offset = mutableIntStateOf(0)
     val limit = mutableIntStateOf(1000)
-    val sortBy = mutableStateOf(FileSortBy.DATE_DESC)
+    val sortBy = mutableStateOf(mediaSortBy(dataType, "UPDATED_AT_DESC"))
     var selectedItem = mutableStateOf<T?>(null)
     val showRenameDialog = mutableStateOf(false)
     val showTagsDialog = mutableStateOf(false)

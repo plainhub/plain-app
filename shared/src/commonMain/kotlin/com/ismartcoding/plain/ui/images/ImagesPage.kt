@@ -34,7 +34,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.ismartcoding.plain.platform.system.AppFeatureType
-import com.ismartcoding.plain.features.files.FileSortBy
+import com.ismartcoding.plain.models.ImageSortBy
 import com.ismartcoding.plain.ui.navigation.PBackHandler
 import com.ismartcoding.plain.ui.platform.system.isGestureInteractionMode
 import com.ismartcoding.plain.Prefs
@@ -160,7 +160,7 @@ fun ImagesPage(
     // Date grouping is computed outside the grid DSL: the DSL block re-executes
     // on every recomposition (tags/buckets landing right after items), which
     // would re-run the O(n) grouping each time.
-    val isGroupMode = imagesVM.sortBy.value == FileSortBy.TAKEN_AT_DESC
+    val isGroupMode = imagesVM.sortBy.value == ImageSortBy.TAKEN_AT_DESC
             && imagesVM.queryText.value.isEmpty()
     val groupedItems = remember(itemsState, isGroupMode) {
         if (isGroupMode) groupMediaByDate(itemsState, { it.takenAt ?: it.createdAt }) else emptyList()

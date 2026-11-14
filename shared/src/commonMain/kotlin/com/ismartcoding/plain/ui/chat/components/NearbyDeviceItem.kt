@@ -45,14 +45,14 @@ internal fun NearbyPairButton(
     onPair: () -> Unit,
 ) {
     val active = NearbyViewModel.pairingViews.values.any {
-        it.peerId == deviceId && it.step !in setOf(PairingStep.SUCCEEDED, PairingStep.FAILED, PairingStep.CANCELLED)
+        it.peerId == deviceId && it.step !in setOf(PairingStep.SUCCEEDED, PairingStep.FAILED, PairingStep.CANCELED)
     }
-    val cancelling = active || status == NearbyItemStatus.PAIRING
+    val canceling = active || status == NearbyItemStatus.PAIRING
     POutlinedButton(
-        text = stringResource(if (cancelling) Res.string.cancel else label),
+        text = stringResource(if (canceling) Res.string.cancel else label),
         buttonSize = ButtonSize.SMALL,
         isLoading = status == NearbyItemStatus.STARTING || status == NearbyItemStatus.UNPAIRING,
-        enabled = cancelling || enabled,
-        onClick = { if (cancelling) NearbyViewModel.cancelPairing(deviceId) else onPair() },
+        enabled = canceling || enabled,
+        onClick = { if (canceling) NearbyViewModel.cancelPairing(deviceId) else onPair() },
     )
 }

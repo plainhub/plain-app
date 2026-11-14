@@ -8,5 +8,5 @@ enum class AppUpdateDownloadStatus {
     DOWNLOADING,
     COMPLETED,
     FAILED,
-    CANCELLED,
+    CANCELED,
 }

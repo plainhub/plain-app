@@ -1,7 +1,6 @@
 package com.ismartcoding.plain.features.chat.models
 
 import com.ismartcoding.plain.lib.JsonHelper
-import com.ismartcoding.plain.models.ChatItem
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.encoding.Decoder
@@ -24,6 +23,14 @@ object MessageContentSerializer : KSerializer<MessageContent> {
         encoder.encodeSerializableValue(MessageEnvelope.serializer(), MessageEnvelope(value.type, payload))
     }
 
-    override fun deserialize(decoder: Decoder): MessageContent =
-        ChatItem.parseContent(decoder.decodeSerializableValue(JsonElement.serializer()).toString())
+    override fun deserialize(decoder: Decoder): MessageContent {
+        val envelope = decoder.decodeSerializableValue(MessageEnvelope.serializer())
+        val value = when (envelope.type) {
+            MessageType.TEXT -> JsonHelper.jsonDecodeFromElement<MessageText>(envelope.value)
+            MessageType.IMAGES -> JsonHelper.jsonDecodeFromElement<MessageImages>(envelope.value)
+            MessageType.FILES -> JsonHelper.jsonDecodeFromElement<MessageFiles>(envelope.value)
+            MessageType.SHARE -> JsonHelper.jsonDecodeFromElement<MessageShare>(envelope.value)
+        }
+        return MessageContent(envelope.type, value)
+    }
 }

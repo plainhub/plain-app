@@ -55,8 +55,8 @@ class TextFileViewModel internal constructor(
         documentError.value = ""
         try {
             documentPreview.value = com.ismartcoding.plain.features.files.DocumentPreviewClient.read(source, path)
-        } catch (cancelled: kotlinx.coroutines.CancellationException) {
-            throw cancelled
+        } catch (canceled: kotlinx.coroutines.CancellationException) {
+            throw canceled
         } catch (error: Exception) {
             documentError.value = error.message ?: error.toString()
         }
@@ -70,8 +70,8 @@ class TextFileViewModel internal constructor(
             isExternalFile.value = isContentUri(path)
             if (source is ContentSource.Remote) cachedPath = source.fileForOpen(path)
             controller.open(path, gotoEnd)
-        } catch (cancelled: kotlinx.coroutines.CancellationException) {
-            throw cancelled
+        } catch (canceled: kotlinx.coroutines.CancellationException) {
+            throw canceled
         } catch (e: Exception) {
             DialogHelper.showErrorDialog(e.toString())
             LogCat.e(e.toString())

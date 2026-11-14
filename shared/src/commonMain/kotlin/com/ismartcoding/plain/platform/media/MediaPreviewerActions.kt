@@ -39,8 +39,8 @@ suspend fun savePreviewMedia(m: PreviewItem, dir: String?) {
         val path = RemoteFiles.download(m.path, name)
         temporary = path
         savePreviewFile(path, name, dir)
-    } catch (cancelled: CancellationException) {
-        throw cancelled
+    } catch (canceled: CancellationException) {
+        throw canceled
     } catch (error: Exception) {
         DialogHelper.showMessage(error.toString())
     } finally {

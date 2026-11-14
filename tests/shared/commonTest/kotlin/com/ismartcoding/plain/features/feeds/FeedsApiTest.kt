@@ -68,14 +68,14 @@ class FeedsApiTest {
             api = graphqlClient(
                 query = {
                     requests.add(it)
-                    JsonHelper.jsonDecode<JsonObject>("""{"feeds":[$feed],"feedEntryCounts":[{"id":"fixture","count":7}]}""")
+                    JsonHelper.jsonDecode<JsonObject>("""{"feeds":[$feed],"feedEntryCounts":[{"feedId":"fixture","count":7}]}""")
                 },
                 mutate = { error("List must not mutate") },
             ),
         )
         assertEquals(7, api.getAll(withCount = true).single().entryCount)
         assertEquals(1, requests.size)
-        assertTrue(requests.single().query.contains("feedEntryCounts"))
+        assertTrue(requests.single().query.contains("feedEntryCounts { feedId count }"))
     }
 
     @Test

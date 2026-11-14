@@ -28,8 +28,8 @@ fun FeedsPageEffects(feedsVM: FeedsViewModel) {
                         val content = readTextFile(event.uris.first())
                         feedsVM.source.feeds.importAsync(content)
                         feedsVM.loadAsync(withCount = true)
-                    } catch (cancelled: CancellationException) {
-                        throw cancelled
+                    } catch (canceled: CancellationException) {
+                        throw canceled
                     } catch (error: Exception) {
                         DialogHelper.showMessage(error)
                     } finally {
@@ -49,8 +49,8 @@ fun FeedsPageEffects(feedsVM: FeedsViewModel) {
                             "",
                             LocaleHelper.getStringFAsync(Res.string.exported_to, fileName),
                         )
-                    } catch (cancelled: CancellationException) {
-                        throw cancelled
+                    } catch (canceled: CancellationException) {
+                        throw canceled
                     } catch (error: Exception) {
                         DialogHelper.showMessage(error)
                     }

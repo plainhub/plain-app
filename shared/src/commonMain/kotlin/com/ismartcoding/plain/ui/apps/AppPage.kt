@@ -66,8 +66,8 @@ fun AppPage(
                 isShareable = remoteItem?.path?.isNotEmpty() == true
                 if (remoteItem == null) navController.navigateUp()
             }
-        } catch (cancelled: kotlinx.coroutines.CancellationException) {
-            throw cancelled
+        } catch (canceled: kotlinx.coroutines.CancellationException) {
+            throw canceled
         } catch (error: Exception) {
             DialogHelper.showMessage(error)
         } finally {

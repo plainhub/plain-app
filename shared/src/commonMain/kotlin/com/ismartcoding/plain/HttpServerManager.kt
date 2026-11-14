@@ -46,8 +46,8 @@ object HttpServerManager {
         coIO {
             try {
                 RustNativeApi.restartHttpServer()
-            } catch (cancelled: CancellationException) {
-                throw cancelled
+            } catch (canceled: CancellationException) {
+                throw canceled
             } catch (error: Exception) {
                 setHttpServerError(error.message.orEmpty())
             }

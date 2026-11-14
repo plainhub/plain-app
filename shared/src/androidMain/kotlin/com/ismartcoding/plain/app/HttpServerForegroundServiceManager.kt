@@ -43,8 +43,8 @@ internal object HttpServerForegroundServiceManager {
                     if (!Prefs.backgroundServiceEnabled.value) stop()
                     else if (Permission.POST_NOTIFICATIONS.isGranted()) start()
                 }
-            } catch (cancelled: CancellationException) {
-                throw cancelled
+            } catch (canceled: CancellationException) {
+                throw canceled
             } catch (error: Exception) {
                 LogCat.e("Apply background service setting", error)
                 HttpServerManager.foregroundServiceError.value = "${LocaleHelper.getString(Res.string.background_online_failed)} (${error.message})"

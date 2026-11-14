@@ -68,8 +68,8 @@ fun SettingsPage(navController: NavHostController, updateViewModel: UpdateViewMo
             try {
                 cacheSize = getCacheSize()
                 fileSize = getLogFileSize()
-            } catch (cancelled: CancellationException) {
-                throw cancelled
+            } catch (canceled: CancellationException) {
+                throw canceled
             } catch (error: Exception) {
                 DialogHelper.showErrorMessage(error.toString())
             }

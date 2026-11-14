@@ -10,7 +10,7 @@ object AppFileFixtures {
         val source = File.createTempFile("attachment-fixture-", ".tmp", InstrumentationRegistry.getInstrumentation().targetContext.cacheDir)
         try {
             source.writeBytes(bytes)
-            return AppFileStore.importFile(source.absolutePath, mimeType = mimeType, deleteSrc = true)
+            return AppFileStore.uploadFile(source.absolutePath, mimeType = mimeType)
         } finally {
             source.delete()
         }

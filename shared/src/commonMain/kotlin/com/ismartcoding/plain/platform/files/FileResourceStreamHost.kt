@@ -29,7 +29,7 @@ internal object FileResourceStreamHost {
                     check(error.isEmpty()) { error }
                     completed = true
                 } finally { sink.close() }
-            } catch (cancelled: CancellationException) { throw cancelled }
+            } catch (canceled: CancellationException) { throw canceled }
             catch (error: Exception) { LogCat.e("Native resource stream ended", error) }
             finally { if (!completed) RustNativeBindings.resourceClose(id, true) }
         }

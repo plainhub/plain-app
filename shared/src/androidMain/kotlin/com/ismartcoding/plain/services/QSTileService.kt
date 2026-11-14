@@ -66,8 +66,8 @@ class QSTileService : TileService() {
                     withContext(Dispatchers.IO) {
                         setRemoteAccessEnabled(!Prefs.remoteAccess.value)
                     }
-                } catch (cancelled: CancellationException) {
-                    throw cancelled
+                } catch (canceled: CancellationException) {
+                    throw canceled
                 } catch (error: Exception) {
                     LogCat.e("Desktop access tile failed: ${error.message}")
                 } finally {

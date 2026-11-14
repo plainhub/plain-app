@@ -5,7 +5,6 @@ import com.ismartcoding.plain.features.chat.data.ChatTargetType
 import com.ismartcoding.plain.features.chat.models.MessageContent
 import com.ismartcoding.plain.features.chat.models.MessageText
 import com.ismartcoding.plain.features.chat.models.MessageType
-import com.ismartcoding.plain.features.chat.models.toJSONString
 import com.ismartcoding.plain.graphql.Mutation
 import com.ismartcoding.plain.lib.withIO
 import com.ismartcoding.plain.models.ChatItem
@@ -27,7 +26,7 @@ open class ChatApi internal constructor(private val api: com.ismartcoding.plain.
     suspend fun getChatItem(id: String): ChatItem? = records.getById(id)
 
     suspend fun sendContent(target: ChatTarget, content: MessageContent): ChatItem =
-        api.execute(Mutation.sendChatItems(listOf(target.encodedToId), content.toJSONString())).single()
+        api.execute(Mutation.sendChatItems(listOf(target.encodedToId), com.ismartcoding.plain.models.ChatContentInput.from(content))).single()
 
     suspend fun sendText(target: ChatTarget, text: String): ChatItem =
         sendContent(target, MessageContent(MessageType.TEXT, MessageText(text)))

@@ -8,8 +8,8 @@ internal suspend fun discoverySession(start: suspend () -> Unit, stop: suspend (
         while (currentCoroutineContext().isActive) {
             try {
                 if (!poll()) start()
-            } catch (cancelled: CancellationException) {
-                throw cancelled
+            } catch (canceled: CancellationException) {
+                throw canceled
             } catch (error: Exception) {
                 LogCat.e("Discovery status poll failed", error)
             }

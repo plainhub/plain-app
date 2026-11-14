@@ -15,7 +15,7 @@ import com.ismartcoding.plain.lib.extensions.map
 import com.ismartcoding.plain.lib.withIO
 import com.ismartcoding.plain.platform.isQPlus
 import com.ismartcoding.plain.features.media.MediaType
-import com.ismartcoding.plain.features.files.FileSortBy
+import com.ismartcoding.plain.models.MediaSortBy
 import com.ismartcoding.plain.features.files.toSortBy
 import com.ismartcoding.plain.platform.media.provider.BaseMediaContentHelper
 
@@ -51,7 +51,7 @@ object AudioMediaStoreHelper : BaseMediaContentHelper() {
         where: ContentWhere,
         limit: Int,
         offset: Int,
-        sortBy: FileSortBy,
+        sortBy: MediaSortBy,
     ): List<AudioTrack> = withIO {
         val audios = mutableListOf<AudioTrack>()
         

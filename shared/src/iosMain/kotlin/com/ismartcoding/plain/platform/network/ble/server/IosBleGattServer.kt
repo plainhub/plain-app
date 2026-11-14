@@ -247,7 +247,7 @@ class IosBleGattServer : BleGattServer {
                 try {
                     val response = protocol.handleWrite(centralId, charUuid, value)
                     if (response != null) sendChunkedResponse(centralId, charUuid, response)
-                } catch (cancelled: CancellationException) { throw cancelled }
+                } catch (canceled: CancellationException) { throw canceled }
                 catch (error: Exception) { protocol.clearClient(centralId); LogCat.e("BLE exchange failed: ${error.message}") }
             }
         }

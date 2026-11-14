@@ -230,7 +230,7 @@ private suspend fun downloadDlnaMedia(url: String, mediaType: DlnaMediaType, tit
             DialogHelper.showMessage(getString(Res.string.dlna_download_success, saved))
             true
         }
-    } catch (cancelled: CancellationException) { throw cancelled }
+    } catch (canceled: CancellationException) { throw canceled }
     catch (_: Exception) {
         DialogHelper.showMessage(getString(Res.string.dlna_download_failed))
         false

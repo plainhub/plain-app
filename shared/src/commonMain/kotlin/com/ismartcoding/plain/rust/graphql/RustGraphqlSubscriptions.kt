@@ -52,7 +52,7 @@ object RustGraphqlSubscriptions {
                         }
                     }
                 }
-            } catch (cancelled: CancellationException) { throw cancelled }
+            } catch (canceled: CancellationException) { throw canceled }
             catch (error: Exception) {
                 LogCat.e("GraphQL subscription reader", error)
                 registry.withLock { consumers.values.forEach { it.close(error) }; consumers.clear() }

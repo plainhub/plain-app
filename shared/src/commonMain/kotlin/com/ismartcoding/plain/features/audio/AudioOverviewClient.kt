@@ -1,7 +1,7 @@
 package com.ismartcoding.plain.features.audio
 
 import com.ismartcoding.plain.graphql.Query
-import com.ismartcoding.plain.features.files.FileSortBy
+import com.ismartcoding.plain.models.AudioSortBy
 import com.ismartcoding.plain.lib.JsonHelper
 import com.ismartcoding.plain.models.Audio
 import com.ismartcoding.plain.models.AudioArtist
@@ -27,7 +27,7 @@ open class AudioOverviewApi internal constructor(protected val api: GraphqlClien
             item.media.takeIf { it["__typename"]?.jsonPrimitive?.contentOrNull == "Audio" }
                 ?.let { JsonHelper.jsonDecodeFromElement<Audio>(it) }
         }.ifEmpty {
-            api.execute(Query.mediaRows(DataType.AUDIO, "", 8, 0, FileSortBy.DATE_DESC)).filterIsInstance<Audio>()
+            api.execute(Query.mediaRows(DataType.AUDIO, "", 8, 0, AudioSortBy.UPDATED_AT_DESC)).filterIsInstance<Audio>()
         }
         return AudioHomeContent(data.audioArtists, recent)
     }

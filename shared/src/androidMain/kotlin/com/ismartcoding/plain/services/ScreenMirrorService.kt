@@ -47,8 +47,8 @@ class ScreenMirrorService : LifecycleService() {
         lifecycleScope.launch {
             try {
                 Prefs.screenMirrorQuality.collect { pipeline?.setQuality(it) }
-            } catch (cancelled: CancellationException) {
-                throw cancelled
+            } catch (canceled: CancellationException) {
+                throw canceled
             } catch (error: Exception) {
                 LogCat.e("screen mirror: pipeline quality change failed: ${error.message}", error)
                 stop()

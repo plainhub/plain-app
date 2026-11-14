@@ -22,7 +22,7 @@ private suspend fun executePaste(filesVM: FilesViewModel, type: FileTaskType, on
         val completed = task.completedOps.map { it.src }.toSet()
         pending.removeAll { it.path in completed }
         if (task.status == FileTaskStatus.ERROR) DialogHelper.showErrorMessage(task.error)
-    } catch (cancelled: CancellationException) { throw cancelled }
+    } catch (canceled: CancellationException) { throw canceled }
     catch (error: Exception) { DialogHelper.showErrorMessage(error.message ?: error.toString()) }
     finally {
         DialogHelper.hideLoading()

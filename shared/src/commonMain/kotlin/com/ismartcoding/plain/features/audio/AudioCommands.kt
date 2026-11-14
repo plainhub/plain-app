@@ -38,7 +38,7 @@ object AudioCommands {
         scope.launch {
             for (request in requests) {
                 try { request() }
-                catch (cancelled: CancellationException) { throw cancelled }
+                catch (canceled: CancellationException) { throw canceled }
                 catch (e: Exception) { LogCat.e("Audio command: ${e.message}") }
             }
         }

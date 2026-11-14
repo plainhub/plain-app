@@ -68,7 +68,7 @@ object PairingTransport {
                 val facts = AdvertisingFacts(available == BleAvailability.READY, lease)
                 if (!lock.withLock { !closed && current === this }) return@collect
                 try { RustHostReports.bleAdvertisingFacts(JsonHelper.jsonEncode(facts)) }
-                catch (cancelled: CancellationException) { throw cancelled }
+                catch (canceled: CancellationException) { throw canceled }
                 catch (error: Exception) { LogCat.e("BLE advertising facts", error) }
             }
         }

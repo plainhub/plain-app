@@ -31,8 +31,8 @@ private fun exportBackup(save: suspend (String) -> String) {
             archive = path
             val destination = save(path)
             DialogHelper.showConfirmDialog("", LocaleHelper.getStringFAsync(Res.string.exported_to, destination))
-        } catch (cancelled: CancellationException) {
-            throw cancelled
+        } catch (canceled: CancellationException) {
+            throw canceled
         } catch (error: Exception) {
             DialogHelper.showMessage(error.message ?: LocaleHelper.getStringAsync(Res.string.error))
         } finally {
@@ -55,8 +55,8 @@ fun restore(uriStr: String) {
             } else {
                 DialogHelper.showConfirmDialog("", message)
             }
-        } catch (cancelled: CancellationException) {
-            throw cancelled
+        } catch (canceled: CancellationException) {
+            throw canceled
         } catch (error: Exception) {
             DialogHelper.showMessage(error.message ?: LocaleHelper.getStringAsync(Res.string.error))
         } finally {

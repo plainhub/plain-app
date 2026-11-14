@@ -53,8 +53,8 @@ class EventsViewModel(
                 entries = if (reset) page else (entries + page).distinctBy { it.id }
                 nextOffset = offset + page.size
                 hasMore = page.size == 50
-            } catch (cancelled: CancellationException) {
-                throw cancelled
+            } catch (canceled: CancellationException) {
+                throw canceled
             } catch (cause: Exception) {
                 if (ticket == generation) error = cause.message ?: cause.toString()
             } finally {

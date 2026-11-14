@@ -16,7 +16,7 @@ import com.ismartcoding.plain.lib.extensions.map
 import com.ismartcoding.plain.lib.withIO
 import com.ismartcoding.plain.platform.isQPlus
 import com.ismartcoding.plain.features.media.MediaType
-import com.ismartcoding.plain.features.files.FileSortBy
+import com.ismartcoding.plain.models.MediaSortBy
 import com.ismartcoding.plain.features.files.toSortBy
 import kotlin.time.Instant
 
@@ -54,7 +54,7 @@ object VideoMediaStoreHelper : BaseMediaContentHelper() {
         where: ContentWhere,
         limit: Int,
         offset: Int,
-        sortBy: FileSortBy,
+        sortBy: MediaSortBy,
     ): List<MediaVideo> = withIO {
         val videos = mutableListOf<MediaVideo>()
         

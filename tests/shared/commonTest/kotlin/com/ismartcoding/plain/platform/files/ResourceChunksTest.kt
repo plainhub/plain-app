@@ -86,7 +86,7 @@ class ResourceChunksTest {
         read.cancelAndJoin()
         data!!(byteArrayOf(2))
         complete!!(null)
-        complete!!(IllegalStateException("cancelled"))
+        complete!!(IllegalStateException("canceled"))
         assertEquals(listOf(7), cancellations)
         assertEquals(1, writes)
     }
@@ -118,7 +118,7 @@ class ResourceChunksTest {
         val failure = assertFailsWith<IllegalStateException> {
             readResourceChunks<ByteArray>(
                 start = { data, complete -> data(byteArrayOf(1)); complete(IllegalStateException("unavailable locally")); 7 },
-                cancel = { error("completed source must not be cancelled") },
+                cancel = { error("completed source must not be canceled") },
                 size = { it.size.toLong() },
                 write = {},
             )

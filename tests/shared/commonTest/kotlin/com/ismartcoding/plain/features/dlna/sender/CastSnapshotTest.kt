@@ -1,6 +1,7 @@
 package com.ismartcoding.plain.features.dlna.sender
 
 import com.ismartcoding.plain.graphql.Query
+import com.ismartcoding.plain.models.DlnaCastType
 import com.ismartcoding.plain.lib.JsonHelper
 import com.ismartcoding.plain.rust.graphql.GraphqlClient
 import com.ismartcoding.plain.rust.graphql.GraphqlResponse
@@ -8,19 +9,36 @@ import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
+import kotlin.test.assertFailsWith
+import kotlinx.serialization.SerializationException
 
 class CastSnapshotTest {
+    @Test
+    fun mediaTypeIsRequiredAndRejectsUnknownValues() {
+        for (type in DlnaCastType.entries) {
+            val item = JsonHelper.jsonDecode<CastItem>("""{"path":"synthetic","title":"Synthetic","type":"${type.name}"}""")
+            assertEquals(type, item.type)
+        }
+        for (json in listOf(
+            """{"path":"synthetic","title":"Synthetic","type":"DOC"}""",
+            """{"path":"synthetic","title":"Synthetic","audio":true}""",
+        )) {
+            assertFailsWith<SerializationException> { JsonHelper.jsonDecode<CastItem>(json) }
+        }
+    }
+
     @Test
     fun stateQueryDecodesTheSameSnapshotAsSenderCommands() = runTest {
         var requests = 0
         val client = GraphqlClient { request ->
             requests++
             assertEquals("query", request.query.trim().substringBefore(' '))
-            JsonHelper.jsonDecode<GraphqlResponse>("""{"data":{"dlnaSenderState":{"version":7,"devices":[],"currentDevice":null,"items":[{"path":"/target/track.mp3","title":"Track","albumArt":"","artist":"","durationMs":1000,"audio":true}],"currentUri":"","playing":false,"progressMs":0,"durationMs":1000,"supportsCallback":false}}}""")
+            JsonHelper.jsonDecode<GraphqlResponse>("""{"data":{"dlnaSenderState":{"version":7,"devices":[],"currentDevice":null,"items":[{"path":"/target/track.mp3","title":"Track","albumArt":"","artist":"","durationMs":1000,"type":"AUDIO"}],"currentUri":"","playing":false,"progressMs":0,"durationMs":1000,"supportsCallback":false}}}""")
         }
         val snapshot = client.execute(Query.dlnaSenderState())
         assertEquals(7L, snapshot.version)
         assertEquals("/target/track.mp3", snapshot.items.single().path)
+        assertEquals(DlnaCastType.AUDIO, snapshot.items.single().type)
         assertFalse(snapshot.playing)
         assertEquals(1, requests)
     }
@@ -31,9 +49,9 @@ class CastSnapshotTest {
         val path = "/target/private/track.mp3"
         val client = DlnaSenderClient(GraphqlClient { request ->
             assertEquals(path, (request.variables["item"] as kotlinx.serialization.json.JsonObject)["path"]?.let { (it as kotlinx.serialization.json.JsonPrimitive).content })
-            JsonHelper.jsonDecode<GraphqlResponse>("""{"data":{"castDlnaMedia":{"version":10,"items":[{"path":"$path","title":"Track"}],"currentUri":"$path","playing":true}}}""")
+            JsonHelper.jsonDecode<GraphqlResponse>("""{"data":{"castDlnaMedia":{"version":10,"items":[{"path":"$path","title":"Track","type":"AUDIO"}],"currentUri":"$path","playing":true}}}""")
         })
-        client.call(CastCommand.Cast(CastItem(path, "Track")))
+        client.call(CastCommand.Cast(CastItem(path, "Track", type = DlnaCastType.AUDIO)))
         client.apply(CastSnapshot(version = 9, items = emptyList()))
         assertEquals(path, client.items.value.single().path)
         assertEquals(path, client.currentUri.value)

@@ -4,6 +4,6 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class FeedEntryCount(
-    var id: String,
+    var feedId: String,
     var count: Int,
 )

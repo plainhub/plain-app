@@ -1,7 +1,7 @@
 package com.ismartcoding.plain.graphql
 
 import com.ismartcoding.plain.models.PlaybackType
-import com.ismartcoding.plain.features.files.FileSortBy
+import com.ismartcoding.plain.models.AudioSortBy
 
 import com.ismartcoding.plain.models.MergeResult
 import com.ismartcoding.plain.features.audio.MediaPlayMode
@@ -167,10 +167,6 @@ object Mutation {
         field = "importFeeds",
     )
 
-    fun exportFeeds(): GraphqlRequest<String> = GraphqlRequest(
-        $$"mutation { exportFeeds }",
-        field = "exportFeeds",
-    )
 
     fun saveMediaPlayProgress(mediaId: String, type: PlaybackType, positionMs: Long): GraphqlRequest<Unit> = GraphqlRequest(
         $$"mutation($mediaId: ID!, $type: PlaybackType!, $positionMs: Long!) { saveMediaPlayProgress(mediaId: $mediaId, type: $type, positionMs: $positionMs) }",
@@ -225,8 +221,8 @@ object Mutation {
         mapOf(variable("mediaId", mediaId)), field = "selectAudio",
     )
 
-    fun replaceAudioQueue(query: String, sortBy: FileSortBy, shuffle: Boolean): GraphqlRequest<AudioItem?> = GraphqlRequest(
-        $$"mutation($query: String!, $sortBy: FileSortBy!, $shuffle: Boolean!) { replaceAudioQueue(query: $query, sortBy: $sortBy, shuffle: $shuffle) { $${Fragments.AUDIO_TRACK_FIELDS} } }",
+    fun replaceAudioQueue(query: String, sortBy: AudioSortBy, shuffle: Boolean): GraphqlRequest<AudioItem?> = GraphqlRequest(
+        $$"mutation($query: String!, $sortBy: AudioSortBy!, $shuffle: Boolean!) { replaceAudioQueue(query: $query, sortBy: $sortBy, shuffle: $shuffle) { $${Fragments.AUDIO_TRACK_FIELDS} } }",
         mapOf(variable("query", query), variable("sortBy", sortBy.name), variable("shuffle", shuffle)),
         field = "replaceAudioQueue",
     )
@@ -324,7 +320,7 @@ object Mutation {
         field = "adjustPomodoro",
     )
 
-    fun copyFileToDirectory(src: String, directory: String, name: String): GraphqlRequest<String?> = GraphqlRequest(
+    fun copyFileToDirectory(src: String, directory: String, name: String): GraphqlRequest<String> = GraphqlRequest(
         $$"mutation($src:String!,$directory:String!,$name:String!){copyFileToDirectory(src:$src,directory:$directory,name:$name)}",
         mapOf(variable("src", src), variable("directory", directory), variable("name", name)),
         field = "copyFileToDirectory",
@@ -383,7 +379,6 @@ object Mutation {
         mapOf(variable("id", id)),
         field = "deleteShare",
     )
-
 
 
     fun deleteClipboardItems(query: String): GraphqlRequest<ActionResult> = GraphqlRequest(
@@ -512,8 +507,8 @@ object Mutation {
         field = "retryChatItem",
     )
 
-    fun sendChatItems(targets: Collection<String>, content: String): GraphqlRequest<List<ChatItem>> = GraphqlRequest(
-        $$"mutation($targets: [String!]!, $content: String!) { sendChatItems(targets: $targets, content: $content) { $${Fragments.CHAT_ITEM} } }",
+    fun sendChatItems(targets: Collection<String>, content: com.ismartcoding.plain.models.ChatContentInput): GraphqlRequest<List<ChatItem>> = GraphqlRequest(
+        $$"mutation($targets: [String!]!, $content: ChatContentInput!) { sendChatItems(targets: $targets, content: $content) { $${Fragments.CHAT_ITEM} } }",
         mapOf(variable("targets", targets), variable("content", content)),
         field = "sendChatItems",
     )

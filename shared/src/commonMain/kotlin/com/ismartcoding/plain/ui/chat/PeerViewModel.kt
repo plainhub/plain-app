@@ -71,7 +71,7 @@ class PeerViewModel internal constructor(
 
     private suspend fun refreshSafely() {
         try { refresh() }
-        catch (cancelled: CancellationException) { throw cancelled }
+        catch (canceled: CancellationException) { throw canceled }
         catch (error: Exception) { LogCat.e("Load peers", error) }
     }
 

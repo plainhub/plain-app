@@ -1,5 +1,6 @@
 package com.ismartcoding.plain.ui.media.viewer
 
+import com.ismartcoding.plain.models.DlnaCastType
 import com.ismartcoding.plain.features.files.FilesClient
 import com.ismartcoding.plain.features.media.MediaClient
 
@@ -80,7 +81,7 @@ fun ViewMediaBottomSheet(
     if (castViewModel != null) {
         CastDialog(castViewModel, onDeviceSelected = {
             castViewModel.enterCastMode()
-            castViewModel.cast(m.path)
+            castViewModel.cast(m.path, if (m.isVideo()) DlnaCastType.VIDEO else DlnaCastType.IMAGE)
             onDismiss()
         })
     }

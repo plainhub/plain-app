@@ -1,5 +1,6 @@
 package com.ismartcoding.plain.ui.media
 
+import com.ismartcoding.plain.models.DlnaCastType
 import androidx.compose.runtime.getValue
 
 import com.ismartcoding.plain.models.Image as MediaImage
@@ -54,7 +55,7 @@ fun ImageGridItem(
             .combinedClickable(
                 onClick = {
                     if (castVM.castMode.value) {
-                        castVM.cast(m.path)
+                        castVM.cast(m.path, DlnaCastType.IMAGE)
                     } else if (inSelectionMode) {
                         dragSelectState.addSelected(m.id)
                     } else {

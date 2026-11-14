@@ -29,7 +29,7 @@ class ChatSendTest {
 
     private fun sent(target: ChatTarget) = ChatItem(
         id = "committed", fromId = "me", toId = target.toId,
-        content = content.toJSONString(), status = ChatStatus.SENT,
+        content = com.ismartcoding.plain.models.ChatContent.Text("hello", emptyList()), status = ChatStatus.SENT,
     )
 
     @Test

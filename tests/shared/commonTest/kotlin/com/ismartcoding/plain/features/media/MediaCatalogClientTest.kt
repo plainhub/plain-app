@@ -46,7 +46,7 @@ class MediaCatalogClientTest {
             }
             GraphqlResponse(data = JsonObject(mapOf("audios" to JsonHelper.jsonEncodeToElement(tracks))))
         })
-        val tracks = client.artistTracks(artist, com.ismartcoding.plain.features.files.FileSortBy.NAME_ASC)
+        val tracks = client.artistTracks(artist, com.ismartcoding.plain.models.AudioSortBy.TITLE_ASC)
         assertEquals(501, tracks.size)
         assertEquals("500", tracks.last().id)
         assertEquals(listOf("0", "500"), requests.map { it.variables.getValue("offset").toString() })

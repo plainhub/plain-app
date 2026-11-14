@@ -2,6 +2,10 @@ package com.ismartcoding.plain
 
 import com.ismartcoding.plain.features.audio.MediaPlayMode
 import com.ismartcoding.plain.features.files.FileSortBy
+import com.ismartcoding.plain.models.AudioSortBy
+import com.ismartcoding.plain.models.VideoSortBy
+import com.ismartcoding.plain.models.ImageSortBy
+import com.ismartcoding.plain.models.DocSortBy
 import com.ismartcoding.plain.features.notifications.NotificationFilterData
 import com.ismartcoding.plain.features.notifications.NotificationFilterMode
 import com.ismartcoding.plain.features.screenmirror.ScreenMirrorMode
@@ -85,12 +89,12 @@ object Prefs {
     )
     val appHomeFeatures = MutableStateFlow("")
     val launcherShortcuts = MutableStateFlow("")
-    val audioSortBy = MutableStateFlow(FileSortBy.DATE_ASC)
-    val videoSortBy = MutableStateFlow(FileSortBy.DATE_ASC)
-    val imageSortBy = MutableStateFlow(FileSortBy.DATE_ASC)
-    val docSortBy = MutableStateFlow(FileSortBy.DATE_ASC)
-    val fileSortBy = MutableStateFlow(FileSortBy.DATE_ASC)
-    val packageSortBy = MutableStateFlow(FileSortBy.DATE_ASC)
+    val audioSortBy = MutableStateFlow(AudioSortBy.UPDATED_AT_ASC)
+    val videoSortBy = MutableStateFlow(VideoSortBy.UPDATED_AT_ASC)
+    val imageSortBy = MutableStateFlow(ImageSortBy.UPDATED_AT_ASC)
+    val docSortBy = MutableStateFlow(DocSortBy.UPDATED_AT_ASC)
+    val fileSortBy = MutableStateFlow(FileSortBy.UPDATED_AT_ASC)
+    val packageSortBy = MutableStateFlow(FileSortBy.UPDATED_AT_ASC)
     val clientId = MutableStateFlow("")
     val deviceName = MutableStateFlow("")
     val mdnsHostname = MutableStateFlow("")
@@ -145,10 +149,10 @@ object Prefs {
             PrefKeys.POMODORO_SETTINGS -> pomodoroSettings.value = JsonHelper.jsonDecodeFromElement(value)
             PrefKeys.APP_HOME_FEATURES -> appHomeFeatures.value = value.jsonPrimitive.content
             PrefKeys.LAUNCHER_SHORTCUTS -> launcherShortcuts.value = value.jsonPrimitive.content
-            PrefKeys.AUDIO_SORT_BY -> audioSortBy.value = FileSortBy.valueOf(value.jsonPrimitive.content)
-            PrefKeys.VIDEO_SORT_BY -> videoSortBy.value = FileSortBy.valueOf(value.jsonPrimitive.content)
-            PrefKeys.IMAGE_SORT_BY -> imageSortBy.value = FileSortBy.valueOf(value.jsonPrimitive.content)
-            PrefKeys.DOC_SORT_BY -> docSortBy.value = FileSortBy.valueOf(value.jsonPrimitive.content)
+            PrefKeys.AUDIO_SORT_BY -> audioSortBy.value = AudioSortBy.valueOf(value.jsonPrimitive.content)
+            PrefKeys.VIDEO_SORT_BY -> videoSortBy.value = VideoSortBy.valueOf(value.jsonPrimitive.content)
+            PrefKeys.IMAGE_SORT_BY -> imageSortBy.value = ImageSortBy.valueOf(value.jsonPrimitive.content)
+            PrefKeys.DOC_SORT_BY -> docSortBy.value = DocSortBy.valueOf(value.jsonPrimitive.content)
             PrefKeys.FILE_SORT_BY -> fileSortBy.value = FileSortBy.valueOf(value.jsonPrimitive.content)
             PrefKeys.PACKAGE_SORT_BY -> packageSortBy.value = FileSortBy.valueOf(value.jsonPrimitive.content)
             PrefKeys.CLIENT_ID -> clientId.value = value.jsonPrimitive.content

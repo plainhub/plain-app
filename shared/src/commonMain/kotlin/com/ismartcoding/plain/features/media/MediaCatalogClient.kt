@@ -2,7 +2,7 @@ package com.ismartcoding.plain.features.media
 
 import com.ismartcoding.plain.IData
 import com.ismartcoding.plain.features.contacts.ContactsClient
-import com.ismartcoding.plain.features.files.FileSortBy
+import com.ismartcoding.plain.models.MediaSortBy
 import com.ismartcoding.plain.features.telephony.CallsClient
 import com.ismartcoding.plain.features.telephony.sms.RustSmsQuery
 import com.ismartcoding.plain.graphql.Query
@@ -21,7 +21,7 @@ open class MediaCatalogApi internal constructor(
     protected val api: GraphqlClient = GraphqlApi,
     private val shareUri: suspend (DataType, String, String) -> String = { type, id, path -> getMediaItemUriString(type, id, path) },
 ) {
-    suspend fun rows(type: DataType, query: String, limit: Int, offset: Int, sortBy: FileSortBy): List<IData> {
+    suspend fun rows(type: DataType, query: String, limit: Int, offset: Int, sortBy: MediaSortBy): List<IData> {
         when (type) {
             DataType.CALL -> return CallsClient.search(query, limit, offset)
             DataType.CONTACT -> return ContactsClient.search(query, limit, offset)
@@ -31,7 +31,7 @@ open class MediaCatalogApi internal constructor(
         return api.execute(Query.mediaRows(type, query, limit, offset, sortBy))
     }
 
-    suspend fun artistTracks(artist: String, sortBy: FileSortBy): List<Audio> {
+    suspend fun artistTracks(artist: String, sortBy: MediaSortBy): List<Audio> {
         val query = artistQuery(artist)
         val items = mutableListOf<Audio>()
         val pageSize = 500

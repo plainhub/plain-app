@@ -69,11 +69,11 @@ internal class IosPhotoFetcher(
             ) resultHandler@{ image, info ->
                 if (!continuation.isActive) return@resultHandler
                 val error = info?.get(PHImageErrorKey) as? NSError
-                val cancelled = (info?.get(PHImageCancelledKey) as? NSNumber)?.boolValue == true
+                val canceled = (info?.get(PHImageCancelledKey) as? NSNumber)?.boolValue == true
                 val degraded = (info?.get(PHImageResultIsDegradedKey) as? NSNumber)?.boolValue == true
-                if (error == null && !cancelled && degraded) return@resultHandler
+                if (error == null && !canceled && degraded) return@resultHandler
                 continuation.resumeWith(runCatching {
-                    if (cancelled) throw CancellationException("Photo thumbnail request cancelled")
+                    if (canceled) throw CancellationException("Photo thumbnail request canceled")
                     check(error == null) { "${error?.domain} (${error?.code}): ${error?.localizedDescription}" }
                     val thumbnail = checkNotNull(image) { "Photo thumbnail unavailable" }
                     checkNotNull(UIImagePNGRepresentation(thumbnail)) { "Could not encode photo thumbnail" }.toByteArray()

@@ -30,9 +30,9 @@ object RustMdnsRuntime {
                     val row = call(command.request)
                     apply(row)
                     command.reply.complete(row)
-                } catch (cancelled: CancellationException) {
-                    command.reply.cancel(cancelled)
-                    throw cancelled
+                } catch (canceled: CancellationException) {
+                    command.reply.cancel(canceled)
+                    throw canceled
                 } catch (error: Throwable) {
                     command.reply.completeExceptionally(error)
                     LogCat.e("Rust mDNS control", error)

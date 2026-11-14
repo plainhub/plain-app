@@ -88,8 +88,8 @@ object ClipboardWatcher {
         scope?.launch(Dispatchers.IO) {
             try {
                 handleClipboardChange()
-            } catch (cancelled: CancellationException) {
-                throw cancelled
+            } catch (canceled: CancellationException) {
+                throw canceled
             } catch (e: Exception) {
                 LogCat.e("ClipboardWatcher focus read failed: ${e.message}")
             }
@@ -137,8 +137,8 @@ object ClipboardWatcher {
         scope?.launch(Dispatchers.IO) {
             try {
                 handleClipboardChange()
-            } catch (cancelled: CancellationException) {
-                throw cancelled
+            } catch (canceled: CancellationException) {
+                throw canceled
             } catch (e: Exception) {
                 LogCat.e("ClipboardWatcher handle failed: ${e.message}")
             }

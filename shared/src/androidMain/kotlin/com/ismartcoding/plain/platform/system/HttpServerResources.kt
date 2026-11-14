@@ -62,8 +62,8 @@ internal object HttpServerResources {
             httpStarted = started
             if (started) start() else stop()
             httpResourcesError = ""
-        } catch (cancelled: CancellationException) {
-            throw cancelled
+        } catch (canceled: CancellationException) {
+            throw canceled
         } catch (error: Exception) {
             LogCat.e("Update HTTP server resources", error)
             httpResourcesError = errorMessage(error)
@@ -76,8 +76,8 @@ internal object HttpServerResources {
         try {
             PNotificationListenerService.toggle(appContext, shouldEnableNotificationListener)
             notificationListenerError = ""
-        } catch (cancelled: CancellationException) {
-            throw cancelled
+        } catch (canceled: CancellationException) {
+            throw canceled
         } catch (error: Exception) {
             LogCat.e("Update notification listener", error)
             notificationListenerError = errorMessage(error)

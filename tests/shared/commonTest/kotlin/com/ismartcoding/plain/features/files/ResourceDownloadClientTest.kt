@@ -37,14 +37,14 @@ class ResourceDownloadClientTest {
     @Test
     fun cancellationStopsOnlyTheSelectedTransfer() = runTest {
         val gates = mapOf("one" to CompletableDeferred<Unit>(), "two" to CompletableDeferred<Unit>())
-        val cancelled = mutableListOf<String>()
+        val canceled = mutableListOf<String>()
         val client = ResourceDownloadClient { url, _, _, progress ->
             try {
                 progress(4, null)
                 gates.getValue(url).await()
                 "/fixture/$url"
             } catch (error: CancellationException) {
-                cancelled += url
+                canceled += url
                 throw error
             }
         }
@@ -53,7 +53,7 @@ class ResourceDownloadClientTest {
         runCurrent()
         client.progress.value.single { it.name == "one.pdf" }.cancel()
         assertFailsWith<CancellationException> { first.await() }
-        assertEquals(listOf("one"), cancelled)
+        assertEquals(listOf("one"), canceled)
         assertEquals("two.pdf", client.progress.value.single().name)
         gates.getValue("two").complete(Unit)
         assertEquals("/fixture/two", second.await())

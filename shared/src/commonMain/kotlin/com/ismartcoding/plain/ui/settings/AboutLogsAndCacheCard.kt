@@ -74,7 +74,7 @@ fun AboutLogsAndCacheCard(
                                                 try {
                                                     clearLogsAsync()
                                                     onFileSizeCleared()
-                                                } catch (cancelled: CancellationException) { throw cancelled }
+                                                } catch (canceled: CancellationException) { throw canceled }
                                                 catch (error: Exception) { DialogHelper.showErrorMessage(error.toString()) }
                                             }
                                         },
@@ -101,8 +101,8 @@ fun AboutLogsAndCacheCard(
                                 val newSize = getCacheSize()
                                 onCacheCleared(newSize)
                                 DialogHelper.showMessage(Res.string.local_cache_cleared)
-                            } catch (cancelled: CancellationException) {
-                                throw cancelled
+                            } catch (canceled: CancellationException) {
+                                throw canceled
                             } catch (error: Exception) {
                                 DialogHelper.showErrorMessage(error.toString())
                             } finally {

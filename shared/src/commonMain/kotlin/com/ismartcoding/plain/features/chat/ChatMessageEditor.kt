@@ -13,7 +13,7 @@ object ChatMessageEditor {
         item.channelId = current.channelId
         item.createdAt = current.createdAt
         item.status = current.status
-        item.statusData = current.statusData
+        item.deliveryResults = current.deliveryResults
         item.content = current.content
         item.updatedAt = current.updatedAt
         return result.changed

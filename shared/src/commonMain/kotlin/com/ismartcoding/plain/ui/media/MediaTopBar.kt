@@ -40,7 +40,8 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.ismartcoding.plain.IData
 import com.ismartcoding.plain.platform.system.DataType
-import com.ismartcoding.plain.features.files.FileSortBy
+import com.ismartcoding.plain.models.MediaSortBy
+import com.ismartcoding.plain.models.mediaSortEntries
 import com.ismartcoding.plain.ui.base.dragselect.DragSelectState
 import com.ismartcoding.plain.ui.casting.CastViewModel
 import com.ismartcoding.plain.ui.files.MediaFoldersViewModel
@@ -73,7 +74,7 @@ fun <T : IData> MediaTopBar(
     bucketsMap: Map<String, MediaBucket>,
     itemsState: List<T>,
     scrollToTop: () -> Unit,
-    onSortSelected: (sortBy: FileSortBy) -> Unit = {},
+    onSortSelected: (sortBy: MediaSortBy) -> Unit = {},
     onSearchAction: (tagsViewModel: TagsViewModel) -> Unit,
     bottomBar: (@Composable () -> Unit)? = null,
     /** Replaces the default leading icon (folder drawer) — e.g. a back arrow on sub-pages. */
@@ -235,7 +236,7 @@ fun <T : IData> MediaTopBar(
     if (canBrowse && mediaVM.showSortAndBrowseDialog.value) {
         SortAndBrowseDialog(
             mediaVM = mediaVM,
-            sortByEntries = if (setOf(DataType.IMAGE, DataType.VIDEO).contains(mediaVM.dataType)) FileSortBy.entries else FileSortBy.entries.filter { it != FileSortBy.TAKEN_AT_DESC },
+            sortByEntries = mediaSortEntries(mediaVM.dataType),
             onSortSelected = { sortBy -> onSortSelected(sortBy) },
         ) { mediaVM.showSortAndBrowseDialog.value = false }
     }

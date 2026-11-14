@@ -59,7 +59,7 @@ class AwaitPlatformFutureTest {
     }
 
     @Test
-    fun cancelled_waiter_releases_connected_resource_before_delivery() = runTest {
+    fun canceled_waiter_releases_connected_resource_before_delivery() = runTest {
         val future = SettableFuture.create<Any>()
         val executor = PendingExecutor()
         var releases = 0

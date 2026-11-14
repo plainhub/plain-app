@@ -91,8 +91,8 @@ object MediaShortcutHelper {
         if (bitmap == null && path.isAudioFast()) {
             bitmap = try {
                 decodeAudioArtwork(path, ICON_SIZE)
-            } catch (cancelled: CancellationException) {
-                throw cancelled
+            } catch (canceled: CancellationException) {
+                throw canceled
             } catch (_: Exception) {
                 null
             }

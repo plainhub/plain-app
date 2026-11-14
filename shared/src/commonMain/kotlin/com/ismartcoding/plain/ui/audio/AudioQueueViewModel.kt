@@ -2,7 +2,7 @@ package com.ismartcoding.plain.ui.audio
 
 import com.ismartcoding.plain.rust.graphql.AppSubscriptions
 import com.ismartcoding.plain.rust.graphql.changes
-import com.ismartcoding.plain.features.files.FileSortBy
+import com.ismartcoding.plain.models.MediaSortBy
 import com.ismartcoding.plain.features.audio.toPlaylistAudio
 import com.ismartcoding.plain.models.Audio as AudioTrack
 import androidx.compose.runtime.mutableStateOf
@@ -66,10 +66,10 @@ class AudioQueueViewModel internal constructor(
                     )
                 changes.collect {
                     try { loadAsync() }
-                    catch (cancelled: CancellationException) { throw cancelled }
+                    catch (canceled: CancellationException) { throw canceled }
                     catch (error: Exception) { LogCat.e("Refresh audio queue", error) }
                 }
-            } catch (cancelled: CancellationException) { throw cancelled }
+            } catch (canceled: CancellationException) { throw canceled }
             catch (failure: Exception) {
                 error.value = failure.message ?: failure.toString()
                 LogCat.e("Observe audio queue", failure)
@@ -94,7 +94,7 @@ class AudioQueueViewModel internal constructor(
                 playbackSpeed.floatValue = com.ismartcoding.plain.models.audioPlaybackSpeed(snapshot.prefs)
             }
             error.value = null
-        } catch (cancelled: CancellationException) { throw cancelled }
+        } catch (canceled: CancellationException) { throw canceled }
         catch (failure: Exception) {
             error.value = failure.message ?: failure.toString()
             throw failure
@@ -117,7 +117,7 @@ class AudioQueueViewModel internal constructor(
         loadAsync()
     }
 
-    fun playQuery(query: String, sortBy: FileSortBy, shuffle: Boolean = false) {
+    fun playQuery(query: String, sortBy: MediaSortBy, shuffle: Boolean = false) {
         checkPlaybackPermission {
             viewModelScope.launchSafe {
                 val start = withIO { queue.replace(query, sortBy, shuffle) }

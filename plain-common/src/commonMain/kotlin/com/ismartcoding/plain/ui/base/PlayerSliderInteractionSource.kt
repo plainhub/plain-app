@@ -5,7 +5,7 @@ import androidx.compose.foundation.interaction.Interaction
 import androidx.compose.foundation.interaction.MutableInteractionSource
 
 // Draggable calls its finish callback after both Stop and Cancel. Reset before
-// forwarding Cancel so that the slider cannot commit a cancelled seek.
+// forwarding Cancel so that the slider cannot commit a canceled seek.
 internal class PlayerSliderInteractionSource(private val onCancel: () -> Unit) : MutableInteractionSource {
     private val delegate = MutableInteractionSource()
     override val interactions get() = delegate.interactions

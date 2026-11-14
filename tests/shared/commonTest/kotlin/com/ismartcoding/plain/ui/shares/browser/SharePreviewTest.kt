@@ -3,6 +3,7 @@ package com.ismartcoding.plain.ui.shares.browser
 import com.ismartcoding.plain.features.files.FilesApi
 import com.ismartcoding.plain.lib.JsonHelper
 import com.ismartcoding.plain.models.File
+import com.ismartcoding.plain.rust.graphql.GraphqlError
 import com.ismartcoding.plain.rust.graphql.GraphqlClient
 import com.ismartcoding.plain.rust.graphql.GraphqlResponse
 import kotlinx.coroutines.test.runTest
@@ -29,7 +30,8 @@ class SharePreviewTest {
 
     @Test
     fun unsuccessful_copy_does_not_open_a_remote_path() = runTest {
-        val files = FilesApi(GraphqlClient { GraphqlResponse(data = JsonHelper.jsonDecode("""{"copyFileToDirectory":""}""")) }, upload = { _, _ -> error("unexpected upload") })
-        assertFailsWith<IllegalStateException> { SharePreview.copy(entry, directory = "/owned/cache", files = files) }
+        val files = FilesApi(GraphqlClient { GraphqlResponse(errors = listOf(GraphqlError("cannot copy or move into source"))) }, upload = { _, _ -> error("unexpected upload") })
+        val error = assertFailsWith<IllegalStateException> { SharePreview.copy(entry, directory = "/owned/cache", files = files) }
+        assertEquals("cannot copy or move into source", error.message)
     }
 }

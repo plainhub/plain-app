@@ -142,7 +142,7 @@ fun ScanPage(navController: NavHostController) {
             },
             handleSpecialCode = specialCode@ { text, onFinished ->
                 val payload = try { RustPairingCode.parse(text) }
-                catch (cancelled: CancellationException) { throw cancelled }
+                catch (canceled: CancellationException) { throw canceled }
                 catch (error: Exception) {
                     DialogHelper.showErrorDialog(error.message ?: LocaleHelper.getStringAsync(Res.string.error), onFinished)
                     return@specialCode true

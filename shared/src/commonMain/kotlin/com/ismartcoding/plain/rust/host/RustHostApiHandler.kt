@@ -70,12 +70,12 @@ internal object RustHostApiHandler {
             val bleAdvertising = PairingTransport.connect()
             val advertisingObservation = launch {
                 try { bleAdvertising.observeFacts() }
-                catch (cancelled: CancellationException) { throw cancelled }
+                catch (canceled: CancellationException) { throw canceled }
                 catch (error: Exception) { LogCat.e("BLE advertising observation", error) }
             }
             val clipboardObservation = launch {
                 try { observeClipboardReports() }
-                catch (cancelled: CancellationException) { throw cancelled }
+                catch (canceled: CancellationException) { throw canceled }
                 catch (error: Exception) { LogCat.e("Clipboard observation", error) }
             }
             try {
@@ -89,7 +89,7 @@ internal object RustHostApiHandler {
                             try {
                                 val reply = try {
                                     executeHostRequest(request, exchangeScope, bleAdvertising).encodeReply(request.id)
-                                } catch (cancelled: CancellationException) { throw cancelled }
+                                } catch (canceled: CancellationException) { throw canceled }
                                 catch (error: Exception) { encodeHostError(request.id, error) }
                                 val error = RustNativeBindings.hostReply(reply)
                                 check(error.isEmpty()) { error }
@@ -155,10 +155,10 @@ internal suspend fun executeHostRequest(
         "audioLibraryRefresh" -> {
             exchangeScope.launch(Dispatchers.Main.immediate) {
                 try { AudioHomeViewModel.refreshActive() }
-                catch (cancelled: CancellationException) { throw cancelled }
+                catch (canceled: CancellationException) { throw canceled }
                 catch (error: Exception) { LogCat.e("Refresh audio overview", error) }
                 try { AudioQueueViewModel.refreshActive() }
-                catch (cancelled: CancellationException) { throw cancelled }
+                catch (canceled: CancellationException) { throw canceled }
                 catch (error: Exception) { LogCat.e("Refresh audio queue", error) }
             }
             hostResult()

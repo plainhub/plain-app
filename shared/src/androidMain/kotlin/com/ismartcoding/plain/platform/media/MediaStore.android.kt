@@ -17,7 +17,7 @@ import com.ismartcoding.plain.platform.media.provider.ImageMediaStoreHelper
 import com.ismartcoding.plain.platform.media.provider.VideoMediaStoreHelper
 import com.ismartcoding.plain.features.telephony.sms.SmsHelper
 import com.ismartcoding.plain.features.telephony.sms.SmsProviderContract
-import com.ismartcoding.plain.features.files.FileSortBy
+import com.ismartcoding.plain.models.MediaSortBy
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.CancellationException
 import android.content.ContentUris
@@ -47,8 +47,8 @@ suspend fun deleteSmsRows(ids: List<String>): SmsDeletionReceipt = withIO {
         val removed = try {
             ShizukuHelper.exec("content delete --uri $uri")
             appContext.contentResolver.query(uri, arrayOf("_id"), null, null, null)?.use { !it.moveToFirst() } == true
-        } catch (cancelled: CancellationException) {
-            throw cancelled
+        } catch (canceled: CancellationException) {
+            throw canceled
         } catch (error: Exception) {
             LogCat.e("SMS provider deletion failed", error)
             false
@@ -122,15 +122,13 @@ fun readSentMmsCandidates(minimumId: Long, launchTimeSec: Long): List<MmsCandida
     } ?: emptyList()
 }
 
-suspend fun searchMedia(dataType: DataType, plan: ProviderPlan, limit: Int, offset: Int, sortBy: FileSortBy): List<IData> {
-    if (dataType == DataType.CALL && !Permission.READ_CALL_LOG.isGranted()) return emptyList()
+suspend fun searchMedia(dataType: DataType, plan: ProviderPlan, limit: Int, offset: Int, sortBy: MediaSortBy): List<IData> {
     val where = plan.where()
     return when (dataType) {
         DataType.AUDIO -> AudioMediaStoreHelper.searchAsync(appContext, where, limit, offset, sortBy)
         DataType.DOC -> DocMediaStoreHelper.searchAsync(appContext, where, limit, offset, sortBy)
         DataType.IMAGE -> ImageMediaStoreHelper.searchAsync(appContext, where, limit, offset, sortBy)
         DataType.VIDEO -> VideoMediaStoreHelper.searchAsync(appContext, where, limit, offset, sortBy)
-        DataType.CALL -> CallMediaStoreHelper.searchAsync(appContext, where, limit, offset)
         else -> error("Unsupported provider: $dataType")
     }
 }

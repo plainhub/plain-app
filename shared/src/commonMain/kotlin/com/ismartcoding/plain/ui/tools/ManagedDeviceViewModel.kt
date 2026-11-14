@@ -60,8 +60,8 @@ internal class ManagedDeviceViewModel(
             }
             _state.value = ManagedDeviceState(client = source, loading = false)
             return true
-        } catch (cancelled: CancellationException) {
-            throw cancelled
+        } catch (canceled: CancellationException) {
+            throw canceled
         } catch (error: Exception) {
             LogCat.e(error)
             _state.value = _state.value.copy(loading = false, error = error.message ?: error.toString())

@@ -613,7 +613,7 @@ class EditorController(private val scope: CoroutineScope, private val fileIO: Ed
                 line = end
             }
             val byLine = found.groupBy { it.line }
-            // The job may be cancelled by a newer requestSearch between scan end and commit
+            // The job may be canceled by a newer requestSearch between scan end and commit
             // (IME composing fires extra callbacks); the finished scan must still land.
             withContext(Dispatchers.Main + NonCancellable) {
                 matchesInternal = found
