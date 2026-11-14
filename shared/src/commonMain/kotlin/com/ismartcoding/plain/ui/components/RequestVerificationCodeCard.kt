@@ -26,7 +26,7 @@ fun RequestVerificationCodeCard(code: String, hint: String, modifier: Modifier =
             verticalArrangement = Arrangement.spacedBy(8.dp),
         ) {
             Text(
-                text = code.chunked(8).joinToString(" "),
+                text = code,
                 modifier = Modifier.fillMaxWidth(),
                 style = MaterialTheme.typography.headlineLarge.copy(
                     fontFamily = FontFamily.Monospace,
