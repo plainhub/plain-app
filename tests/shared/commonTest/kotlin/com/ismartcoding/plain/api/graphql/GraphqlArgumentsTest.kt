@@ -17,6 +17,15 @@ import kotlin.test.*
 
 class GraphqlArgumentsTest {
     @Test
+    fun audio_queue_count_passes_the_filter_as_a_required_argument() {
+        val request = Query.audioQueueItemCount("text:alpha")
+        assertTrue(request.operation.query.contains("\$query: String!"))
+        assertTrue(request.operation.query.contains("audioQueueItemCount(query: \$query)"))
+        val operation = JsonHelper.jsonDecode<JsonObject>(JsonHelper.jsonEncode(request.operation))
+        assertEquals("text:alpha", operation.getValue("variables").jsonObject.getValue("query").jsonPrimitive.content)
+    }
+
+    @Test
     fun mdns_status_only_requests_debug_data_when_selected() {
         val status = Query.mdnsState().operation.query
         val debug = Query.mdnsState(debug = true).operation.query
@@ -35,7 +44,7 @@ class GraphqlArgumentsTest {
             Query.audioPlaylistItems("playlist", 0, 10, "") to "audioPlaylistItems",
             Query.audioPlayback() to "audioPlayback",
             Query.audioQueueIds(10) to "audioQueueItems",
-            Query.audioQueueItemCount() to "audioQueueItemCount",
+            Query.audioQueueItemCount("") to "audioQueueItemCount",
             Query.audioQueueItems(0, 10, "") to "audioQueueItems",
             Mutation.createAudioPlaylist("Playlist") to "createAudioPlaylist",
             Query.contacts("", 10, 0) to "contacts",

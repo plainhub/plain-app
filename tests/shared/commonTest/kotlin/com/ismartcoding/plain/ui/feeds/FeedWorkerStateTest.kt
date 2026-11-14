@@ -39,6 +39,9 @@ class FeedWorkerStateTest {
             assertNull(FeedWorkerState.status("retired"))
             assertEquals(FeedWorkerStatus.COMPLETED, FeedWorkerState.status("current"))
             assertEquals(2L, FeedWorkerState.completed().getValue("current").revision)
+            FeedWorkerState.apply(FeedSyncUpdate(listOf(FeedSyncState("current", "new", 3, FeedWorkerStatus.CANCELED, "")), emptyList(), replace = false))
+            assertEquals(FeedWorkerStatus.CANCELED, FeedWorkerState.status("current"))
+            assertEquals(3L, FeedWorkerState.completed().getValue("current").revision)
             FeedWorkerState.apply(FeedSyncUpdate(emptyList(), emptyList(), replace = true))
         } finally {
             Dispatchers.resetMain()

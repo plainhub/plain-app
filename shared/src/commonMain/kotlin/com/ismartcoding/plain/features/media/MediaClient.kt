@@ -12,13 +12,10 @@ object MediaClient : MediaApi()
 
 open class MediaApi internal constructor(protected val api: GraphqlClient = GraphqlApi) {
     suspend fun audioInfo(path: String): AudioItem =
-        api.execute(Query.audioMetadata(path))
+        api.execute(Query.audioByPath(path))
 
     suspend fun lyricsByPath(path: String): String =
         api.execute(Query.audioLyricsByPath(path)).orEmpty()
-
-    suspend fun cacheAudioCover(path: String): String? =
-        api.execute(Mutation.cacheAudioCover(path))
 
     suspend fun videoInfo(path: String): VideoFileInfo? =
         api.execute(Query.videoFileInfo(path))?.data

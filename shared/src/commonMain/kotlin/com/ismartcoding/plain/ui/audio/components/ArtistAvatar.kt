@@ -33,13 +33,15 @@ import com.ismartcoding.plain.ui.resources.person as ui_drawable_person
  */
 @Composable
 fun ArtistAvatar(name: String, artworkPath: String?, size: Dp, modifier: Modifier = Modifier) {
-    var cover by remember(artworkPath) { mutableStateOf<ImageBitmap?>(artworkPath?.let { audioCoverCache[it] }) }
-    LaunchedEffect(artworkPath) {
-        val key = artworkPath ?: return@LaunchedEffect
-        if (!audioCoverCache.containsKey(key)) {
-            audioCoverCache[key] = withIO { loadAudioCoverBitmap(key) }
+    val source = com.ismartcoding.plain.ui.navigation.LocalContentSource.current
+    val cacheKey = source.key + ":" + artworkPath
+    var cover by remember(cacheKey) { mutableStateOf<ImageBitmap?>(audioCoverCache[cacheKey]) }
+    LaunchedEffect(cacheKey) {
+        val path = artworkPath ?: return@LaunchedEffect
+        if (!audioCoverCache.containsKey(cacheKey)) {
+            audioCoverCache[cacheKey] = withIO { loadAudioCoverBitmap(path, source) }
         }
-        cover = audioCoverCache[key]
+        cover = audioCoverCache[cacheKey]
     }
     val bitmap = cover
     if (bitmap != null) {

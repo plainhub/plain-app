@@ -6,7 +6,7 @@ import kotlinx.serialization.Serializable
 enum class FeedWorkerStatus {
     QUEUED,
     RUNNING,
-    CANCELLED,
+    CANCELED,
     COMPLETED,
     ERROR,
 }

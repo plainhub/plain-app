@@ -40,7 +40,7 @@ open class AudioPlaylistsApi internal constructor(protected val api: GraphqlClie
 
     suspend fun removePlaylistItems(playlistId: String, mediaIds: Collection<String>) {
         if (mediaIds.isNotEmpty()) {
-            api.execute(Mutation.removeAudioPlaylistItem(playlistId, selectionQuery(mediaIds)))
+            api.execute(Mutation.removeAudioPlaylistItems(playlistId, selectionQuery(mediaIds)))
         }
     }
 

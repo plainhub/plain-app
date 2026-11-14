@@ -17,6 +17,11 @@ internal object RustUploadChunks {
     )
 
     suspend fun replace(path: String, chunks: Iterator<ByteArray>): Boolean = client.replace(path, chunks)
+
+    suspend fun attachment(uri: String, fileName: String, mimeType: String): com.ismartcoding.plain.models.AppFile =
+        client.attachment(fileName, mimeType) { sink ->
+            checkNotNull(com.ismartcoding.plain.platform.files.streamContentUri(uri, sink)) { "Unable to read selected file" }
+        }
 }
 @OptIn(ExperimentalUuidApi::class)
 internal class UploadChunksClient(
@@ -31,6 +36,20 @@ internal class UploadChunksClient(
 
     suspend fun create(path: String, produce: suspend (com.ismartcoding.plain.platform.files.StreamSink) -> Unit): String =
         requireNotNull(upload(produce) { id, count, size -> Mutation.mergeChunks(id, count, path, size, replace = false) }.value) { "Uploaded file name missing" }
+
+    suspend fun attachment(
+        fileName: String,
+        mimeType: String,
+        produce: suspend (com.ismartcoding.plain.platform.files.StreamSink) -> Unit,
+    ): com.ismartcoding.plain.models.AppFile {
+        val storedName = if (fileName.substringAfterLast('/').contains('.')) fileName else {
+            val extension = com.ismartcoding.plain.platform.media.getExtensionFromMimeType(mimeType)
+            if (extension.isEmpty()) fileName else "$fileName.$extension"
+        }
+        val suffix = requireNotNull(upload(produce) { id, count, size -> Mutation.mergeAppFileChunks(id, count, storedName, size) }.value) { "Uploaded attachment missing" }
+        val id = suffix.substringBefore('.')
+        return api.execute(Query.appFiles(0, 1, "text:$id")).single { it.id == id }.copy(fileName = fileName)
+    }
 
     private suspend fun upload(
         produce: suspend (com.ismartcoding.plain.platform.files.StreamSink) -> Unit,

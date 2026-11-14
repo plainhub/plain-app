@@ -7,7 +7,6 @@
     <string name="event_login_failed">登录失败</string>
     <string name="event_logout">已退出登录</string>
     <string name="event_revoke">会话已撤销</string>
-    <string name="event_set_hostname">主机名已更改</string>
     <string name="event_update_device_name">设备名称已更改</string>
     <string name="event_mount">磁盘已挂载</string>
     <string name="event_mount_failed">磁盘挂载失败</string>

@@ -5,7 +5,8 @@ import com.ismartcoding.plain.features.files.FileSortBy
 import com.ismartcoding.plain.lib.JsonHelper
 import com.ismartcoding.plain.models.Audio
 import com.ismartcoding.plain.models.AudioArtist
-import com.ismartcoding.plain.models.MediaScanState
+import com.ismartcoding.plain.models.MediaDataType
+import com.ismartcoding.plain.models.FileIndexScanState
 import com.ismartcoding.plain.platform.system.DataType
 import com.ismartcoding.plain.rust.graphql.AppSubscriptions
 import com.ismartcoding.plain.rust.graphql.GraphqlClient
@@ -33,11 +34,11 @@ open class AudioOverviewApi internal constructor(protected val api: GraphqlClien
 
     val updates get() = merge(
         AppSubscriptions.contentChanged.changes(),
-        AppSubscriptions.mediaUpdated.changes { DataType.AUDIO in it.types },
-        AppSubscriptions.mediaScanProgress.changes {
+        AppSubscriptions.mediaUpdated.changes { MediaDataType.AUDIO in it.types },
+        AppSubscriptions.fileIndexScanProgressUpdated.changes {
             when (it.state) {
-                MediaScanState.IDLE, MediaScanState.FAILED, MediaScanState.STOPPED, MediaScanState.PAUSED -> true
-                MediaScanState.RUNNING -> false
+                FileIndexScanState.IDLE, FileIndexScanState.FAILED, FileIndexScanState.STOPPED, FileIndexScanState.PAUSED -> true
+                FileIndexScanState.RUNNING -> false
             }
         },
     )

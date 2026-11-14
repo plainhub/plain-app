@@ -182,7 +182,7 @@ class GraphqlClientTest {
 
     @Test
     fun request_failures_and_cancellation_propagate_without_retries() = runTest {
-        val request = Query.audioQueueItemCount()
+        val request = Query.audioQueueItemCount("")
         var calls = 0
         val failure = IllegalStateException("Request failed")
         val failed = GraphqlClient { calls++; throw failure }

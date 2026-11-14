@@ -34,16 +34,18 @@ fun PlaylistMosaicCover(
     modifier: Modifier = Modifier,
     iconSize: Int = 28,
 ) {
-    var covers by remember(albums) { mutableStateOf<List<ImageBitmap>>(emptyList()) }
-    LaunchedEffect(albums) {
+    val source = com.ismartcoding.plain.ui.navigation.LocalContentSource.current
+    var covers by remember(albums, source.key) { mutableStateOf<List<ImageBitmap>>(emptyList()) }
+    LaunchedEffect(albums, source.key) {
         val found = mutableListOf<ImageBitmap>()
         for (album in albums) {
             if (found.size >= TILES) break
             for (path in album.candidatePaths) {
-                if (!audioCoverCache.containsKey(path)) {
-                    audioCoverCache[path] = withIO { loadAudioCoverBitmap(path) }
+                val cacheKey = source.key + ":" + path
+                if (!audioCoverCache.containsKey(cacheKey)) {
+                    audioCoverCache[cacheKey] = withIO { loadAudioCoverBitmap(path, source) }
                 }
-                val bitmap = audioCoverCache[path] ?: continue
+                val bitmap = audioCoverCache[cacheKey] ?: continue
                 found.add(bitmap)
                 break
             }

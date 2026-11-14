@@ -46,7 +46,7 @@ class GraphqlModelDecodeTest {
 
     @Test
     fun selectedFeedFieldsDecodeWithoutResolverBackedRelationships() {
-        val feed = JsonHelper.jsonDecode<Feed>("""{"id":"feed-1","name":"Feed","url":"https://example.org/feed","logo":"/feeds/icon.png","fetchContent":true,"lastSyncAt":null,"lastError":{"code":"","detail":""},"createdAt":"2026-10-12T00:00:00Z","updatedAt":"2026-10-12T00:00:00Z"}""")
+        val feed = JsonHelper.jsonDecode<Feed>("""{"id":"feed-1","name":"Feed","url":"https://example.org/feed","logo":"/feeds/icon.png","fetchContent":true,"lastSyncAt":null,"lastError":{"code":"NONE","detail":""},"createdAt":"2026-10-12T00:00:00Z","updatedAt":"2026-10-12T00:00:00Z"}""")
         assertEquals("/feeds/icon.png", feed.logo)
         assertNull(feed.lastSyncAt)
         assertEquals(false, feed.hasSyncError)
@@ -138,6 +138,30 @@ class GraphqlModelDecodeTest {
     fun nativeRecordDecodersKeepRejectingIncompleteSnapshots() {
         assertFailsWith<SerializationException> { JsonHelper.jsonDecode<Peer>("""{"id":"peer-1"}""") }
         assertFailsWith<SerializationException> { JsonHelper.jsonDecode<ChatChannel>("""{"id":"channel-1"}""") }
+    }
+
+    @Test
+    fun closedPhoneAndFeedValuesRoundTripAndRejectUnknownCodes() {
+        for (kind in PhoneNumberType.entries) {
+            val wire = "\"${kind.name}\""
+            assertEquals(kind, JsonHelper.jsonDecode<PhoneNumberType>(wire))
+            assertEquals(wire, JsonHelper.jsonEncode(kind))
+        }
+        for (code in FeedErrorCode.entries) {
+            val wire = """{"code":"${code.name}","detail":"fixture"}"""
+            val error = JsonHelper.jsonDecode<FeedError>(wire)
+            assertEquals(code, error.code)
+            assertEquals(wire, JsonHelper.jsonEncode(error))
+            assertEquals(code != FeedErrorCode.NONE, Feed(lastError = error).hasSyncError)
+        }
+        for (invalid in listOf("", "INVALID", "mobile")) {
+            assertFailsWith<SerializationException> {
+                JsonHelper.jsonDecode<PhoneNumberType>("\"$invalid\"")
+            }
+            assertFailsWith<SerializationException> {
+                JsonHelper.jsonDecode<FeedError>("""{"code":"$invalid","detail":"fixture"}""")
+            }
+        }
     }
 
 }

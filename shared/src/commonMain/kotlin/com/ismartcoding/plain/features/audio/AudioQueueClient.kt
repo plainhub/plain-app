@@ -91,7 +91,7 @@ open class AudioQueueApi internal constructor(private val api: GraphqlClient = G
             .toSet()
 
     suspend fun queueTotal(): Int =
-        api.execute(Query.audioQueueItemCount())
+        api.execute(Query.audioQueueItemCount(""))
 
     suspend fun queuePage(offset: Int, limit: Int): List<AudioItem> =
         queuePageFiltered("", offset, limit)

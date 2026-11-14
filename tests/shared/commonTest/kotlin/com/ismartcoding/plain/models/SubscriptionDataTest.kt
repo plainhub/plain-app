@@ -13,7 +13,7 @@ class SubscriptionDataTest {
         val payload = """{"types":["AUDIO","VIDEO","IMAGE","DOC"]}"""
         val change = JsonHelper.jsonDecode<MediaChange>(payload)
 
-        assertEquals(listOf(DataType.AUDIO, DataType.VIDEO, DataType.IMAGE, DataType.DOC), change.types)
+        assertEquals(MediaDataType.entries.toList(), change.types)
         assertEquals(payload, JsonHelper.jsonEncode(change))
         for (type in DataType.entries) {
             val encoded = JsonHelper.jsonEncode(type)
@@ -24,15 +24,15 @@ class SubscriptionDataTest {
 
     @Test
     fun scan_progress_decodes_every_state_and_preserves_optional_fields() {
-        for (state in MediaScanState.entries) {
-            val progress = JsonHelper.jsonDecode<MediaScanProgress>(
+        for (state in FileIndexScanState.entries) {
+            val progress = JsonHelper.jsonDecode<FileIndexScanProgress>(
                 """{"indexed":8,"state":"${state.name}"}""",
             )
-            assertEquals(MediaScanProgress(indexed = 8, state = state), progress)
+            assertEquals(FileIndexScanProgress(indexed = 8, state = state), progress)
             assertEquals("\"${state.name}\"", JsonHelper.jsonEncode(progress.state))
         }
-        val progress = MediaScanProgress(8, 2, 10, MediaScanState.FAILED, "Scan failed")
-        assertEquals(progress, JsonHelper.jsonDecode<MediaScanProgress>(JsonHelper.jsonEncode(progress)))
+        val progress = FileIndexScanProgress(8, 2, 10, FileIndexScanState.FAILED, "Scan failed")
+        assertEquals(progress, JsonHelper.jsonDecode<FileIndexScanProgress>(JsonHelper.jsonEncode(progress)))
     }
 
     @Test
@@ -41,10 +41,13 @@ class SubscriptionDataTest {
             JsonHelper.jsonDecode<MediaChange>("""{"types":["UNKNOWN"]}""")
         }
         assertFailsWith<SerializationException> {
+            JsonHelper.jsonDecode<MediaChange>("""{"types":["NOTE"]}""")
+        }
+        assertFailsWith<SerializationException> {
             JsonHelper.jsonDecode<MediaChange>("""{"types":[3]}""")
         }
         assertFailsWith<SerializationException> {
-            JsonHelper.jsonDecode<MediaScanProgress>("""{"indexed":0,"state":"UNKNOWN"}""")
+            JsonHelper.jsonDecode<FileIndexScanProgress>("""{"indexed":0,"state":"UNKNOWN"}""")
         }
     }
 }

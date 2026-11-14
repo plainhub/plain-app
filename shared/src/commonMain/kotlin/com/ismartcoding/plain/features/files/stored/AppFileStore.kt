@@ -18,20 +18,19 @@ object AppFileStore : AppFilesApi() {
 
     fun toFidUri(file: AppFile): String = "fid:${file.realPath.substringAfterLast('/')}"
 
-    suspend fun importFile(
+    suspend fun uploadFile(
         srcPath: String,
         fileName: String = "",
         mimeType: String = "",
-        deleteSrc: Boolean = false,
     ): AppFile = withIO {
         val platformResource = srcPath.startsWith("content://") || srcPath.startsWith("ph://")
         val name = if (platformResource && fileName.isEmpty()) queryPickedFileInfo(srcPath)?.displayName.orEmpty() else fileName
-        importPath(srcPath, name, mimeType, deleteSrc)
+        uploadPath(srcPath, name, mimeType)
     }
 
-    private suspend fun importPath(path: String, name: String, mime: String, deleteSource: Boolean): AppFile {
+    private suspend fun uploadPath(path: String, name: String, mime: String): AppFile {
         val file = withContext(NonCancellable) {
-            GraphqlApi.execute(Mutation.importAppFile(path, name, mime, deleteSource))
+            com.ismartcoding.plain.features.files.upload.RustUploadChunks.attachment(path, name, mime)
         }
         try {
             currentCoroutineContext().ensureActive()

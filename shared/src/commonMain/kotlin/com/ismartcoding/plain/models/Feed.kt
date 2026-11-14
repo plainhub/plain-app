@@ -22,5 +22,5 @@ data class Feed(
 ) : IData {
     /** True when the last sync attempt failed. */
     val hasSyncError: Boolean
-        get() = lastError.code.isNotEmpty()
+        get() = lastError.code != FeedErrorCode.NONE
 }

@@ -1,5 +1,7 @@
 package com.ismartcoding.plain.ui.feeds
 
+import com.ismartcoding.plain.models.FeedErrorCode
+
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
@@ -54,18 +56,15 @@ import androidx.compose.foundation.layout.Arrangement
 
 /** Maps the persisted Feed.lastError.code to a localized user-facing reason. */
 @Composable
-internal fun feedSyncErrorReason(code: String): String? {
-    val errorCode = FeedSyncErrorCode.fromString(code) ?: return null
-    if (errorCode == FeedSyncErrorCode.NONE) return null
+internal fun feedSyncErrorReason(code: FeedErrorCode): String? {
+    if (code == FeedErrorCode.NONE) return null
     return stringResource(
-        when (errorCode) {
-            FeedSyncErrorCode.NO_NETWORK -> Res.string.feed_err_no_network
-            FeedSyncErrorCode.DNS -> Res.string.feed_err_dns
-            FeedSyncErrorCode.TIMEOUT -> Res.string.feed_err_timeout
-            FeedSyncErrorCode.SERVER -> Res.string.feed_err_server
-            FeedSyncErrorCode.SSL -> Res.string.feed_err_ssl
-            FeedSyncErrorCode.PARSE -> Res.string.feed_err_parse
-            FeedSyncErrorCode.UNKNOWN, FeedSyncErrorCode.NONE -> Res.string.sync_failed
+        when (code) {
+            FeedErrorCode.DNS -> Res.string.feed_err_dns
+            FeedErrorCode.TIMEOUT -> Res.string.feed_err_timeout
+            FeedErrorCode.SERVER -> Res.string.feed_err_server
+            FeedErrorCode.PARSE -> Res.string.feed_err_parse
+            FeedErrorCode.UNKNOWN, FeedErrorCode.NONE -> Res.string.sync_failed
         },
     )
 }

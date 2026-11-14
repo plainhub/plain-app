@@ -17,7 +17,8 @@ class EventRecordTest {
         assertEquals(null, record.clientId)
         assertEquals("\"LOGIN_FAILED\"", JsonHelper.jsonEncode(record.type))
         assertFails { JsonHelper.jsonDecode<EventType>("\"UNKNOWN\"") }
-        assertEquals(listOf("LOGIN", "LOGIN_FAILED", "LOGOUT", "REVOKE_SESSION", "SET_HOSTNAME", "UPDATE_DEVICE_NAME", "MOUNT", "MOUNT_FAILED", "UNMOUNT", "FORMAT_DISK", "FORMAT_DISK_FAILED"), EventType.entries.map { it.name })
+        assertFails { JsonHelper.jsonDecode<EventType>("\"SET_HOSTNAME\"") }
+        assertEquals(listOf("LOGIN", "LOGIN_FAILED", "LOGOUT", "REVOKE_SESSION", "UPDATE_DEVICE_NAME", "MOUNT", "MOUNT_FAILED", "UNMOUNT", "FORMAT_DISK", "FORMAT_DISK_FAILED"), EventType.entries.map { it.name })
     }
     @Test
     fun queryUsesTheSameMainSchemaOperation() {

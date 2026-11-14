@@ -29,7 +29,7 @@ internal object PickedAttachments {
                     val info = queryPickedFileInfo(uri) ?: error("Unable to read selected file information")
                     val file = withContext(NonCancellable) {
                         (if (source is com.ismartcoding.plain.rust.graphql.ContentSource.Remote) source.client.importAttachment(uri, info.displayName, info.mimeType)
-                        else AppFileStore.importFile(uri, info.displayName, info.mimeType)).also { imports.add(it.id) }
+                        else AppFileStore.uploadFile(uri, info.displayName, info.mimeType)).also { imports.add(it.id) }
                     }
                     currentCoroutineContext().ensureActive()
                     val path = file.realPath

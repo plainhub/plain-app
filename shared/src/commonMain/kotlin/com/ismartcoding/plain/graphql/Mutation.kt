@@ -16,7 +16,6 @@ import com.ismartcoding.plain.features.files.FileTaskType
 import com.ismartcoding.plain.features.files.FileWriteAction
 import com.ismartcoding.plain.features.media.actions.MediaAction
 import com.ismartcoding.plain.models.ActionResult
-import com.ismartcoding.plain.models.AppFile
 import com.ismartcoding.plain.models.AudioItem
 import com.ismartcoding.plain.models.AudioPlaylist
 import com.ismartcoding.plain.models.ChatChannel
@@ -209,10 +208,10 @@ object Mutation {
         field = "addAudioPlaylistItems",
     )
 
-    fun removeAudioPlaylistItem(id: String, query: String): GraphqlRequest<Unit> = GraphqlRequest(
-        $$"mutation($id: ID!, $query: String!) { removeAudioPlaylistItem(id: $id, query: $query) { affectedCount } }",
+    fun removeAudioPlaylistItems(id: String, query: String): GraphqlRequest<Unit> = GraphqlRequest(
+        $$"mutation($id: ID!, $query: String!) { removeAudioPlaylistItems(id: $id, query: $query) { affectedCount } }",
         mapOf(variable("id", id), variable("query", query)),
-        field = "removeAudioPlaylistItem",
+        field = "removeAudioPlaylistItems",
     )
 
     internal fun enqueueAndSelectAudio(mediaId: String): GraphqlRequest<AudioItem> = GraphqlRequest(
@@ -387,12 +386,6 @@ object Mutation {
 
 
 
-    fun cacheAudioCover(path: String): GraphqlRequest<String?> = GraphqlRequest(
-        $$"mutation CacheAudioCover($path: String!) { cacheAudioCover(path: $path) }",
-        mapOf(variable("path", path)),
-        field = "cacheAudioCover",
-    )
-
     fun deleteClipboardItems(query: String): GraphqlRequest<ActionResult> = GraphqlRequest(
         $$"mutation($query: String!) { deleteClipboardItems(query: $query) { affectedCount } }",
         mapOf(variable("query", query)),
@@ -411,15 +404,10 @@ object Mutation {
         field = "deleteChunks",
     )
 
-    fun importAppFile(
-        source: String,
-        fileName: String,
-        mimeType: String,
-        deleteSource: Boolean,
-    ): GraphqlRequest<AppFile> = GraphqlRequest(
-        $$"mutation($source: String!, $fileName: String!, $mimeType: String!, $deleteSource: Boolean!) { importAppFile(source: $source, fileName: $fileName, mimeType: $mimeType, deleteSource: $deleteSource) { $${Fragments.APP_FILE} } }",
-        mapOf(variable("source", source), variable("fileName", fileName), variable("mimeType", mimeType), variable("deleteSource", deleteSource)),
-        field = "importAppFile",
+    fun mergeAppFileChunks(fileId: String, totalChunks: Long, fileName: String, totalSize: Long): GraphqlRequest<MergeResult> = GraphqlRequest(
+        $$"mutation($fileId: String!, $totalChunks: Int!, $fileName: String!, $totalSize: Long!) { mergeAppFileChunks(fileId: $fileId, totalChunks: $totalChunks, fileName: $fileName, totalSize: $totalSize) { status value error } }",
+        mapOf(variable("fileId", fileId), variable("totalChunks", totalChunks), variable("fileName", fileName), variable("totalSize", totalSize)),
+        field = "mergeAppFileChunks",
     )
 
     fun releaseAppFile(fileId: String): GraphqlRequest<Unit> = GraphqlRequest(

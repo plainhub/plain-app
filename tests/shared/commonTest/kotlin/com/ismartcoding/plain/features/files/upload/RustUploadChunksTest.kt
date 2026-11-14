@@ -130,4 +130,32 @@ class RustUploadChunksTest {
         assertTrue("deleteChunks(" in operations.last().query)
     }
 
+    @Test fun attachment_upload_merges_directly_into_the_store_without_an_import_command() = runTest {
+        val id = "a".repeat(64)
+        val operations = mutableListOf<GraphqlOperation>()
+        val received = mutableListOf<ByteArray>()
+        val api = com.ismartcoding.plain.rust.graphql.GraphqlClient { operation ->
+            operations += operation
+            val response = when {
+                "mergeAppFileChunks(" in operation.query -> """{"mergeAppFileChunks":{"status":"DONE","value":"$id.txt"}}"""
+                "appFiles(" in operation.query -> """{"appFiles":[{"id":"$id","size":4,"mimeType":"text/plain","realPath":"/fixture/files/$id.txt","fileName":"$id.txt","createdAt":"2026-01-01T00:00:00Z","updatedAt":"2026-01-01T00:00:00Z"}]}"""
+                else -> """{"deleteChunks":true}"""
+            }
+            com.ismartcoding.plain.rust.graphql.GraphqlResponse(data = com.ismartcoding.plain.lib.JsonHelper.jsonDecode(response))
+        }
+        val client = UploadChunksClient({ _, _, bytes -> received += bytes.copyOf(); "" }, api)
+        val bytes = byteArrayOf(0, 1, -1, 42)
+        val file = client.attachment("picked.txt", "text/plain") { it.write(bytes) }
+        assertContentEquals(bytes, received.single())
+        assertEquals(id, file.id)
+        assertEquals("picked.txt", file.fileName)
+        assertEquals(4L, file.size)
+        assertEquals(JsonPrimitive("picked.txt"), operations.first().variables["fileName"])
+        assertEquals(JsonPrimitive(4), operations.first().variables["totalSize"])
+        assertEquals(JsonPrimitive("text:$id"), operations.last().variables["query"])
+        assertEquals(1, operations.count { "mergeAppFileChunks(" in it.query })
+        assertEquals(1, operations.count { "deleteChunks(" in it.query })
+        assertFalse(operations.any { "importAppFile(" in it.query || "mergeChunks(" in it.query })
+    }
+
 }

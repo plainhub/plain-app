@@ -7,7 +7,6 @@
     <string name="event_login_failed">登入失敗</string>
     <string name="event_logout">已退出登入</string>
     <string name="event_revoke">工作階段已撤銷</string>
-    <string name="event_set_hostname">主機名已更改</string>
     <string name="event_update_device_name">设备名稱已更改</string>
     <string name="event_mount">磁碟已掛載</string>
     <string name="event_mount_failed">磁碟掛載失敗</string>

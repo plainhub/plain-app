@@ -6,14 +6,13 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import android.media.ThumbnailUtils
 import androidx.core.content.pm.ShortcutInfoCompat
 import androidx.core.content.pm.ShortcutManagerCompat
 import androidx.core.graphics.drawable.IconCompat
 import com.ismartcoding.plain.Constants
 import com.ismartcoding.plain.app.AppIntents
-import com.ismartcoding.plain.features.media.MediaClient
+import com.ismartcoding.plain.ui.platform.media.decodeAudioArtwork
 import com.ismartcoding.plain.lib.extensions.isAudioFast
 import com.ismartcoding.plain.ui.media.thumbnail.ThumbnailGenerator
 import com.ismartcoding.plain.ui.components.DialogHelper
@@ -91,7 +90,7 @@ object MediaShortcutHelper {
         }.getOrNull()
         if (bitmap == null && path.isAudioFast()) {
             bitmap = try {
-                loadAudioArtwork(path)
+                decodeAudioArtwork(path, ICON_SIZE)
             } catch (cancelled: CancellationException) {
                 throw cancelled
             } catch (_: Exception) {
@@ -107,19 +106,5 @@ object MediaShortcutHelper {
         } else {
             square
         }
-    }
-
-    private suspend fun loadAudioArtwork(path: String): Bitmap? {
-        val cover = MediaClient.cacheAudioCover(path) ?: return null
-        val bounds = BitmapFactory.Options().apply { inJustDecodeBounds = true }
-        BitmapFactory.decodeFile(cover, bounds)
-        var sample = 1
-        while (bounds.outWidth / (sample * 2) >= ICON_SIZE && bounds.outHeight / (sample * 2) >= ICON_SIZE) {
-            sample *= 2
-        }
-        return BitmapFactory.decodeFile(
-            cover,
-            BitmapFactory.Options().apply { inSampleSize = sample },
-        )
     }
 }

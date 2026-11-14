@@ -81,6 +81,15 @@ class ClientContractModelsTest {
     }
 
     @Test
+    fun feed_cancellation_uses_the_canceled_wire_name() {
+        val state = JsonHelper.jsonDecode<FeedSyncState>(
+            """{"feedId":"feed","taskId":"task","revision":1,"status":"CANCELED","error":""}""",
+        )
+        assertEquals(FeedWorkerStatus.CANCELED, state.status)
+        assertEquals(JsonPrimitive("CANCELED"), JsonHelper.jsonEncodeToElement(state).jsonObject.getValue("status"))
+    }
+
+    @Test
     fun fixed_states_decode_the_existing_wire_names() {
         for (status in AppUpdateDownloadStatus.entries) {
             val download = JsonHelper.jsonDecode<AppUpdateDownload>("""{"status":"${status.name}"}""")

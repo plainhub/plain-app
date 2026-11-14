@@ -220,7 +220,7 @@ object Query {
     )
 
     internal fun audioQueueSnapshot(limit: Int): GraphqlRequest<com.ismartcoding.plain.models.AudioQueueSnapshot> = GraphqlRequest(
-        $$"query($limit: Int!) { audioPlayback { mediaId path } prefs(keys: [\"audio_playback_speed\", \"audio_play_mode\"]) count: audioQueueItemCount items: audioQueueItems(query: \"\", offset: 0, limit: $limit) { $${Fragments.AUDIO_TRACK_FIELDS} } queuedIds: audioQueueItems(query: \"\", offset: 0, limit: 2147483647) { mediaId } }",
+        $$"query($limit: Int!) { audioPlayback { mediaId path } prefs(keys: [\"audio_playback_speed\", \"audio_play_mode\"]) count: audioQueueItemCount(query: \"\") items: audioQueueItems(query: \"\", offset: 0, limit: $limit) { $${Fragments.AUDIO_TRACK_FIELDS} } queuedIds: audioQueueItems(query: \"\", offset: 0, limit: 2147483647) { mediaId } }",
         mapOf(variable("limit", limit)),
     )
 
@@ -235,8 +235,9 @@ object Query {
         field = "audioQueueItems",
     )
 
-    fun audioQueueItemCount(): GraphqlRequest<Int> = GraphqlRequest(
-        $$"query { audioQueueItemCount }",
+    fun audioQueueItemCount(query: String): GraphqlRequest<Int> = GraphqlRequest(
+        $$"query($query: String!) { audioQueueItemCount(query: $query) }",
+        mapOf(variable("query", query)),
         field = "audioQueueItemCount",
     )
 
@@ -357,10 +358,10 @@ object Query {
         field = "mediaBuckets",
     )
 
-    fun audioMetadata(path: String): GraphqlRequest<AudioItem> = GraphqlRequest(
-        $$"query AudioMetadata($path: String!) { audioMetadata(path: $path) { title artist path durationMs } }",
+    fun audioByPath(path: String): GraphqlRequest<AudioItem> = GraphqlRequest(
+        $$"query AudioByPath($path: String!) { audioByPath(path: $path) { title artist path durationMs } }",
         mapOf(variable("path", path)),
-        field = "audioMetadata",
+        field = "audioByPath",
     )
 
     fun audioLyricsByPath(path: String): GraphqlRequest<String?> = GraphqlRequest(

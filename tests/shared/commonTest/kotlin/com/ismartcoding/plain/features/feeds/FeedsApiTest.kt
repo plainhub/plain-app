@@ -14,7 +14,7 @@ import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
 class FeedsApiTest {
-    private val feed = JsonHelper.jsonDecode<JsonObject>("""{"id":"fixture","name":"Named","url":"https://example.org/feed","fetchContent":false,"logo":"","lastSyncAt":null,"lastError":{"code":"","detail":""},"createdAt":"2026-01-01T00:00:00Z","updatedAt":"2026-01-01T00:00:00Z"}""")
+    private val feed = JsonHelper.jsonDecode<JsonObject>("""{"id":"fixture","name":"Named","url":"https://example.org/feed","fetchContent":false,"logo":"","lastSyncAt":null,"lastError":{"code":"NONE","detail":""},"createdAt":"2026-01-01T00:00:00Z","updatedAt":"2026-01-01T00:00:00Z"}""")
 
     @Test
     fun create_and_edit_each_make_one_mutation_without_prereads_or_second_steps() = runTest {

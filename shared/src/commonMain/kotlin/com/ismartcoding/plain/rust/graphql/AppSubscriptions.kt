@@ -2,7 +2,7 @@ package com.ismartcoding.plain.rust.graphql
 
 import com.ismartcoding.plain.models.ChatItemId
 import com.ismartcoding.plain.models.MediaChange
-import com.ismartcoding.plain.models.MediaScanProgress
+import com.ismartcoding.plain.models.FileIndexScanProgress
 import com.ismartcoding.plain.lib.JsonHelper
 import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.platform.permissions.Permission
@@ -86,8 +86,8 @@ object AppSubscriptions {
     val mediaUpdated = storageGranted.flatMapLatest { granted ->
         if (granted) subscription<MediaChange>("mediaUpdated", "{ types }") else emptyFlow()
     }.shareIn(scope, SharingStarted.WhileSubscribed())
-    val mediaScanProgress = storageGranted.flatMapLatest { granted ->
-        if (granted) subscription<MediaScanProgress>("mediaScanProgress", "{ indexed pending total state error }") else emptyFlow()
+    val fileIndexScanProgressUpdated = storageGranted.flatMapLatest { granted ->
+        if (granted) subscription<FileIndexScanProgress>("fileIndexScanProgressUpdated", "{ indexed pending total state error }") else emptyFlow()
     }.shareIn(scope, SharingStarted.WhileSubscribed())
 
     private inline fun <reified T> subscription(field: String, selection: String = ""): Flow<SubscriptionUpdate<T>> = flow {

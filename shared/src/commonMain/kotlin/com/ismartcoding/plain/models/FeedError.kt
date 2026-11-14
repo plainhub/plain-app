@@ -5,6 +5,6 @@ import kotlinx.serialization.Required
 
 @Serializable
 data class FeedError(
-    @Required var code: String = "",
+    @Required var code: FeedErrorCode = FeedErrorCode.NONE,
     @Required var detail: String = "",
 )

@@ -7,7 +7,6 @@
     <string name="event_login_failed">Sign-in failed</string>
     <string name="event_logout">Signed out</string>
     <string name="event_revoke">Session revoked</string>
-    <string name="event_set_hostname">Hostname changed</string>
     <string name="event_update_device_name">Device name changed</string>
     <string name="event_mount">Disk mounted</string>
     <string name="event_mount_failed">Disk mount failed</string>

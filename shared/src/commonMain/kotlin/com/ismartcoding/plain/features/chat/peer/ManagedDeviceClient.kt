@@ -87,18 +87,10 @@ internal class ManagedDeviceClient private constructor(
         }
     }
 
-    @OptIn(kotlin.uuid.ExperimentalUuidApi::class)
-    suspend fun importAttachment(uri: String, fileName: String, mimeType: String): com.ismartcoding.plain.models.AppFile {
-        val name = uploads.create("app://upload-${kotlin.uuid.Uuid.random()}") { sink ->
+    suspend fun importAttachment(uri: String, fileName: String, mimeType: String): com.ismartcoding.plain.models.AppFile =
+        uploads.attachment(fileName, mimeType) { sink ->
             checkNotNull(com.ismartcoding.plain.platform.files.streamContentUri(uri, sink)) { "Unable to read selected file" }
         }
-        val uploaded = "app://$name"
-        try {
-            return api.execute(Mutation.importAppFile(uploaded, fileName, mimeType, true))
-        } finally {
-            kotlinx.coroutines.withContext(kotlinx.coroutines.NonCancellable) { api.execute(Mutation.deleteFiles(listOf(uploaded))) }
-        }
-    }
 
     suspend fun absoluteResourceUrl(url: String): String =
         if (url.startsWith("/")) http.current().getBaseUrl().trimEnd('/') + url else url

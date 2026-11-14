@@ -19,7 +19,7 @@ open class FeedSyncStateStore internal constructor(private val client: com.ismar
     fun status(id: String): FeedWorkerStatus? = states[id]?.status
 
     internal fun completed(): Map<String, FeedSyncState> = states.filterValues {
-        it.status in setOf(FeedWorkerStatus.COMPLETED, FeedWorkerStatus.ERROR, FeedWorkerStatus.CANCELLED)
+        it.status in setOf(FeedWorkerStatus.COMPLETED, FeedWorkerStatus.ERROR, FeedWorkerStatus.CANCELED)
     }
 
     suspend fun refresh() = lock.withLock { applyLocked(client.syncStates(), replace = true) }
