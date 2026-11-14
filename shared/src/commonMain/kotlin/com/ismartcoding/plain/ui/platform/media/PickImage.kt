@@ -1,6 +1,7 @@
 package com.ismartcoding.plain.ui.platform.media
 
 import com.ismartcoding.plain.rust.native.RustNativeApi
+import com.ismartcoding.plain.features.files.stored.AppFileStore
 
 import com.ismartcoding.plain.platform.files.queryPickedFileInfo
 
@@ -24,7 +25,10 @@ fun PickImageEffect(imageUrl: MutableState<String>) {
                     val info = checkNotNull(queryPickedFileInfo(source)) { "Unable to read selected image" }
                     imageUrl.value = when (contentSource) {
                         com.ismartcoding.plain.rust.graphql.ContentSource.Local -> RustNativeApi.importNoteImage(source, info.displayName)
-                        is com.ismartcoding.plain.rust.graphql.ContentSource.Remote -> contentSource.client.importNoteImage(source, info.mimeType)
+                        is com.ismartcoding.plain.rust.graphql.ContentSource.Remote -> {
+                            val file = contentSource.client.importAttachment(source, info.displayName, info.mimeType)
+                            AppFileStore.toFidUri(file)
+                        }
                     }
                 } catch (error: CancellationException) {
                     throw error

@@ -78,15 +78,6 @@ internal class ManagedDeviceClient private constructor(
         "query { mounts { name path } }", field = "mounts",
     ))
 
-    @OptIn(kotlin.uuid.ExperimentalUuidApi::class)
-    suspend fun importNoteImage(path: String, mimeType: String): String {
-        val extension = com.ismartcoding.plain.platform.media.getExtensionFromMimeType(mimeType)
-        val name = kotlin.uuid.Uuid.random().toString() + if (extension.isEmpty()) "" else ".$extension"
-        return "app://note-images/" + uploads.create("app://note-images/$name") { sink ->
-            checkNotNull(com.ismartcoding.plain.platform.files.streamContentUri(path, sink)) { "Unable to open selected image" }
-        }
-    }
-
     suspend fun importAttachment(uri: String, fileName: String, mimeType: String): com.ismartcoding.plain.models.AppFile =
         uploads.attachment(fileName, mimeType) { sink ->
             checkNotNull(com.ismartcoding.plain.platform.files.streamContentUri(uri, sink)) { "Unable to read selected file" }
