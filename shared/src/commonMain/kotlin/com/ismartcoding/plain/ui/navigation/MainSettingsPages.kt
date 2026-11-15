@@ -56,9 +56,12 @@ internal fun NavGraphBuilder.addMainSettingsPages(
         ApiTokenTipsPage(navController, r.clientId, r.token)
     }
     composable<Routing.WebDev> {
-        WebDevPage(navController, packageId = getOwnPackageName(), onResetToken = {
-            coIO { Prefs.resetAdbToken() }
-        })
+        WebDevPage(
+            navController,
+            packageId = getOwnPackageName(),
+            onEnabledChange = { enabled -> coIO { Prefs.setAdbAutomationEnabled(enabled) } },
+            onResetToken = { coIO { Prefs.resetAdbToken() } },
+        )
     }
     composable<Routing.WebSecurity> { WebSecurityPage(navController) }
     composable<Routing.ReplaceSslCertificate> { ReplaceSslCertificatePage(navController) }

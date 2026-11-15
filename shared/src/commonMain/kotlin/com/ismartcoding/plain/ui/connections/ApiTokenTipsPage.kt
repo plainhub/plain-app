@@ -52,6 +52,8 @@ fun ApiTokenTipsPage(
             LazyColumn(modifier = Modifier.padding(top = paddingValues.calculateTopPadding())) {
                 item { TopSpace() }
                 item {
+                    Tips(text = stringResource(Res.string.api_token_save_once))
+                    VerticalSpace(dp = 16.dp)
                     CornerCopyCard(
                         label = "CURL",
                         modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN),

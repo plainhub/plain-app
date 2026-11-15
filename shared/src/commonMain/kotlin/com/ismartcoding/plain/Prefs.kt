@@ -206,7 +206,10 @@ object Prefs {
     suspend fun generatePassword() = RustNativeApi.generatePassword()
 
 
-    suspend fun resetAdbToken() = RustNativeApi.resetAdbToken()
+    suspend fun resetAdbToken() = RustNativeApi.resetAdbToken().also { load() }
+
+    suspend fun setAdbAutomationEnabled(enabled: Boolean): Boolean =
+        if (enabled) resetAdbToken() else set(PrefKeys.ADB_TOKEN, "")
 
     suspend fun setApiAccess(
         features: Set<com.ismartcoding.plain.features.web.AccessFeature>,

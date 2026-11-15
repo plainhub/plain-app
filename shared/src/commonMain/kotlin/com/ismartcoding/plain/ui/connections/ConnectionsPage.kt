@@ -75,7 +75,9 @@ fun ConnectionsPage(
             onDismiss = { showCreateDialog = false },
             onCreate = { name ->
                 showCreateDialog = false
-                sessionsVM.createCustomToken(name)
+                sessionsVM.createCustomToken(name) { created ->
+                    navController.navigate(Routing.ApiTokenTips(created.clientId, created.token))
+                }
             },
         )
     }
@@ -125,7 +127,6 @@ fun ConnectionsPage(
                                     m = m,
                                     onDelete = { sessionsVM.delete(it) },
                                     onRename = { clientId, name -> sessionsVM.rename(clientId, name) },
-                                    onHowToUse = { navController.navigate(Routing.ApiTokenTips(m.clientId, m.token)) },
                                 )
                             }
                             item { BottomSpace(paddingValues) }

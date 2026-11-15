@@ -86,7 +86,7 @@ fun DesktopAccessSettingsPage(
                             if (destination != null) navController.navigate(destination) else toggle()
                         },
                         title = item.getText(), subtitle = item.getDescription(),
-                        separatedActions = destination != null, showMore = destination != null,
+                        separatedActions = destination != null, showMore = false,
                     ) {
                         Switch(checked = enabled, enabled = !state.busy, onCheckedChange = { toggle() })
                     }

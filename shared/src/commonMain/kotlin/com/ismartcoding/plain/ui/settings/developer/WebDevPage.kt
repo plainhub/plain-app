@@ -9,6 +9,7 @@ import com.ismartcoding.plain.i18n.*
 
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.material3.Switch
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -20,6 +21,8 @@ import com.ismartcoding.plain.ui.components.ButtonType
 import com.ismartcoding.plain.ui.base.BottomSpace
 import com.ismartcoding.plain.ui.components.CornerCopyCard
 import com.ismartcoding.plain.ui.base.PFilledButton
+import com.ismartcoding.plain.ui.base.PCard
+import com.ismartcoding.plain.ui.base.PListItem
 import com.ismartcoding.plain.ui.base.PScaffold
 import com.ismartcoding.plain.ui.base.PTopAppBar
 import com.ismartcoding.plain.ui.base.PSectionTitle
@@ -32,9 +35,11 @@ import com.ismartcoding.plain.ui.base.VerticalSpace
 fun WebDevPage(
     navController: NavHostController,
     packageId: String,
+    onEnabledChange: (Boolean) -> Unit,
     onResetToken: () -> Unit,
 ) {
     val adbToken = Prefs.adbToken.collectAsStateValue()
+    val enabled = adbToken.isNotEmpty()
 
     PScaffold(
         topBar = {
@@ -47,34 +52,42 @@ fun WebDevPage(
             LazyColumn(modifier = Modifier.padding(top = paddingValues.calculateTopPadding())) {
                 item {
                     TopSpace()
-                    PSectionTitle(title = stringResource(Res.string.token))
-                    CornerCopyCard(
-                        label = stringResource(Res.string.token),
-                        modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN),
-                        text = adbToken
-                    )
-                    VerticalSpace(dp = 16.dp)
-                    PSectionTitle(title = stringResource(Res.string.enable_desktop_access))
-                    CornerCopyCard(
-                        label = stringResource(Res.string.adb_cmd_start),
-                        modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN),
-                        text = "adb shell am broadcast -a $packageId.action.ENABLE_DESKTOP_ACCESS -p $packageId --es token $adbToken",
-                    )
-                    VerticalSpace(dp = 16.dp)
-                    PSectionTitle(title = stringResource(Res.string.disable_desktop_access))
-                    CornerCopyCard(
-                        label = stringResource(Res.string.adb_cmd_stop),
-                        modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN),
-                        text = "adb shell am broadcast -a $packageId.action.DISABLE_DESKTOP_ACCESS -p $packageId --es token $adbToken",
-                    )
-                    Tips(text = stringResource(Res.string.adb_token_desc))
-                    VerticalSpace(dp = 16.dp)
-                    PFilledButton(
-                        modifier = Modifier.padding(horizontal = 16.dp).fillMaxWidth(),
-                        text = stringResource(Res.string.reset_token),
-                        type = ButtonType.DANGER,
-                        onClick = onResetToken,
-                    )
+                    PCard(modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN)) {
+                        PListItem(title = stringResource(Res.string.adb_automation)) {
+                            Switch(checked = enabled, onCheckedChange = onEnabledChange)
+                        }
+                    }
+                    if (enabled) {
+                        VerticalSpace(dp = 16.dp)
+                        PSectionTitle(title = stringResource(Res.string.token))
+                        CornerCopyCard(
+                            label = stringResource(Res.string.token),
+                            modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN),
+                            text = adbToken
+                        )
+                        VerticalSpace(dp = 16.dp)
+                        PSectionTitle(title = stringResource(Res.string.enable_desktop_access))
+                        CornerCopyCard(
+                            label = stringResource(Res.string.adb_cmd_start),
+                            modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN),
+                            text = "adb shell am broadcast -a $packageId.action.ENABLE_DESKTOP_ACCESS -p $packageId --es token $adbToken",
+                        )
+                        VerticalSpace(dp = 16.dp)
+                        PSectionTitle(title = stringResource(Res.string.disable_desktop_access))
+                        CornerCopyCard(
+                            label = stringResource(Res.string.adb_cmd_stop),
+                            modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN),
+                            text = "adb shell am broadcast -a $packageId.action.DISABLE_DESKTOP_ACCESS -p $packageId --es token $adbToken",
+                        )
+                        Tips(text = stringResource(Res.string.adb_token_desc))
+                        VerticalSpace(dp = 16.dp)
+                        PFilledButton(
+                            modifier = Modifier.padding(horizontal = 16.dp).fillMaxWidth(),
+                            text = stringResource(Res.string.reset_token),
+                            type = ButtonType.DANGER,
+                            onClick = onResetToken,
+                        )
+                    }
                     BottomSpace(paddingValues)
                 }
             }

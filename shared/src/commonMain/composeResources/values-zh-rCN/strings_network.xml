@@ -165,4 +165,5 @@
     <string name="password_saved_disabled_description">密码登录未启用，已保存的密码仍保留。</string>
     <string name="disable_password_login">关闭密码登录</string>
     <string name="disable_password_login_description">新的登录将不再要求密码。已保存的密码和登录确认设置将保留。</string>
+    <string name="api_token_save_once">请立即复制并妥善保存 Token，离开此页面后将不再显示。</string>
 </resources>

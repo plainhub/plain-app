@@ -26,7 +26,6 @@ import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import com.ismartcoding.plain.Prefs
 import com.ismartcoding.plain.lib.extensions.capitalize
 import com.ismartcoding.plain.ui.components.ButtonSize
 import com.ismartcoding.plain.platform.system.formatDateTime
@@ -34,7 +33,6 @@ import com.ismartcoding.plain.ui.extensions.timeAgo
 import com.ismartcoding.plain.ui.base.CopyIconButton
 import com.ismartcoding.plain.ui.base.PCard
 import com.ismartcoding.plain.ui.base.PListItem
-import com.ismartcoding.plain.ui.base.POutlinedButton
 import com.ismartcoding.plain.ui.components.TextFieldDialog
 import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.components.confirmActionAsync
@@ -49,7 +47,6 @@ internal fun SessionListItem(
     m: VSession,
     onDelete: (String) -> Unit,
     onRename: (String, String) -> Unit,
-    onHowToUse: () -> Unit,
 ) {
     val scope = rememberCoroutineScope()
     val onlineIds by onlineClientIds.collectAsState()
@@ -59,7 +56,6 @@ internal fun SessionListItem(
     var showFullTime by remember { mutableStateOf(false) }
     var showRenameDialog by remember { mutableStateOf(false) }
     val lastActiveText = if (showFullTime) m.lastActiveAt?.formatDateTime() else m.lastActiveAt?.timeAgo()
-    val displayName = m.name.ifEmpty { stringResource(Res.string.unknown) }
 
     if (showRenameDialog) {
         TextFieldDialog(
@@ -86,35 +82,18 @@ internal fun SessionListItem(
                     showRenameDialog = true
                 },
                 action = {
-                    if (m.isApiToken) {
-                        POutlinedButton(
-                            text = stringResource(Res.string.how_to_use),
-                            buttonSize = ButtonSize.SMALL, onClick = onHowToUse
-                        )
-                    } else {
-                        SessionBadge(m = m, isOnline = isOnline)
-                    }
+                    SessionBadge(isOnline = isOnline)
                 },
             )
 
-            if (m.isApiToken || Prefs.developerMode.value) {
-                PListItem(
-                    title = stringResource(Res.string.client_id),
-                    subtitle = m.clientId, action = {
-                        Column(horizontalAlignment = Alignment.End) {
-                            CopyIconButton(text = m.clientId, clipLabel = stringResource(Res.string.client_id))
-                        }
+            PListItem(
+                title = stringResource(Res.string.client_id),
+                subtitle = m.clientId, action = {
+                    Column(horizontalAlignment = Alignment.End) {
+                        CopyIconButton(text = m.clientId, clipLabel = stringResource(Res.string.client_id))
                     }
-                )
-                PListItem(
-                    title = stringResource(Res.string.token),
-                    subtitle = m.token, action = {
-                        Column(horizontalAlignment = Alignment.End) {
-                            CopyIconButton(text = m.token, clipLabel = stringResource(Res.string.token))
-                        }
-                    }
-                )
-            }
+                }
+            )
             if (m.clientIp.isNotEmpty()) {
                 PListItem(title = stringResource(Res.string.ip_address), value = m.clientIp)
             }

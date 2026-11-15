@@ -13,7 +13,6 @@ object RustSessionStore {
             it.clientId,
             it.name,
             it.type,
-            it.token,
             it.clientIp,
             it.osName,
             it.osVersion,

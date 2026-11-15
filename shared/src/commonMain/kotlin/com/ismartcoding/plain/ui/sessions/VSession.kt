@@ -7,7 +7,6 @@ data class VSession(
     val clientId: String,
     val name: String,
     val type: SessionType,
-    val token: String,
     val clientIp: String,
     val osName: String,
     val osVersion: String,

@@ -6,10 +6,9 @@ import androidx.compose.runtime.Composable
 import org.jetbrains.compose.resources.stringResource
 import com.ismartcoding.plain.ui.components.BadgeType
 import com.ismartcoding.plain.ui.base.PStatusBadge
-import com.ismartcoding.plain.ui.sessions.VSession
 
 @Composable
-fun SessionBadge(m: VSession, isOnline: Boolean) {
+fun SessionBadge(isOnline: Boolean) {
     val label = if (isOnline) stringResource(Res.string.online) else stringResource(Res.string.offline)
     PStatusBadge(
         text = label,
