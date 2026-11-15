@@ -283,7 +283,7 @@ class GlobalSearchDevicesTest {
 
         suspend fun source(): ContentSource.Remote {
             val peer = peer()
-            val http = PeerHttpClient(peer, peers = { listOf(peer) }, clientId = { "fixture-client" },
+            val http = PeerHttpClient(peer, peers = { listOf(peer) }, clientId = { "706c6169-b9ef-8b64-b37d-1162ef232835" },
                 encrypt = { _, _, payload -> Base64.encode(payload.encodeToByteArray()) },
                 decrypt = { _, encoded, _ ->
                     val operation = JsonHelper.jsonDecode<GraphqlOperation>(Base64.decode(encoded).decodeToString())

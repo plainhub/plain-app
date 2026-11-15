@@ -14,7 +14,7 @@ import kotlin.time.Instant
 
 class GraphqlHttpClientTest {
     private fun peer() = Peer(
-        id = "fixture-peer", name = "Device", ip = "device.test", status = PeerStatus.PAIRED, port = 8443,
+        id = "706c6169-1c1b-84a0-8bc0-cc3821775aba", name = "Device", ip = "device.test", status = PeerStatus.PAIRED, port = 8443,
         deviceType = DeviceType.PHONE, createdAt = Instant.fromEpochMilliseconds(0), updatedAt = Instant.fromEpochMilliseconds(0),
         publicKey = "fixture-public-key", token = Base64.encode(ByteArray(32) { 7 }),
 
@@ -30,7 +30,7 @@ class GraphqlHttpClientTest {
         var posts = 0
         val ciphertext = Base64.encode("request ciphertext".encodeToByteArray())
         val client = PeerHttpClient(peer,
-            peers = { listOf(peer.copy()) }, clientId = { "local-client" },
+            peers = { listOf(peer.copy()) }, clientId = { "706c6169-a5ec-8cb0-b41d-c3030368d632" },
             encrypt = { token, endpoint, payload ->
                 assertEquals(peer.token, token)
                 assertEquals("/graphql", endpoint)
@@ -47,7 +47,7 @@ class GraphqlHttpClientTest {
                 override suspend fun post(url: String, clientId: String, body: ByteArray, contentType: String, tlsCertificateSha256: String?): GraphqlHttpResponse {
                     posts++
                     assertEquals("https://device.test:8443/graphql", url)
-                    assertEquals("local-client", clientId)
+                    assertEquals("706c6169-a5ec-8cb0-b41d-c3030368d632", clientId)
                     assertContentEquals(Base64.decode(ciphertext), body)
                     return GraphqlHttpResponse(200, "response ciphertext".encodeToByteArray())
                 }
@@ -93,7 +93,7 @@ class GraphqlHttpClientTest {
         val expected = peer().copy(key = "previous-chat-key")
         var current = expected.copy()
         var posts = 0
-        val client = PeerHttpClient(expected, peers = { listOf(current) }, clientId = { "local-client" },
+        val client = PeerHttpClient(expected, peers = { listOf(current) }, clientId = { "706c6169-a5ec-8cb0-b41d-c3030368d632" },
             encrypt = { _, _, _ -> Base64.encode(byteArrayOf(1)) }, decrypt = { _, _, _ -> encodedResult() },
             transport = object : GraphqlHttpTransport {
                 override suspend fun post(url: String, clientId: String, body: ByteArray, contentType: String, tlsCertificateSha256: String?): GraphqlHttpResponse {
@@ -167,7 +167,7 @@ class GraphqlHttpClientTest {
         val bytes = byteArrayOf(0, 13, 10, -1, 42)
         val encrypted = byteArrayOf(8, 0, -2)
         var posts = 0
-        val client = PeerHttpClient(peer, peers = { listOf(peer) }, clientId = { "local-client" },
+        val client = PeerHttpClient(peer, peers = { listOf(peer) }, clientId = { "706c6169-a5ec-8cb0-b41d-c3030368d632" },
             encrypt = { token, endpoint, payload ->
                 assertEquals(peer.token, token)
                 assertEquals("/upload_chunk", endpoint)
@@ -179,7 +179,7 @@ class GraphqlHttpClientTest {
                     posts++
                     assertEquals("https://device.test:8443/upload_chunk", url)
                     assertEquals("f".repeat(64), tlsCertificateSha256)
-                    assertEquals("local-client", clientId)
+                    assertEquals("706c6169-a5ec-8cb0-b41d-c3030368d632", clientId)
                     val boundary = contentType.substringAfter("boundary=")
                     val expected = "--$boundary\r\nContent-Disposition: form-data; name=\"info\"; filename=\"info\"\r\nContent-Type: application/octet-stream\r\n\r\n".encodeToByteArray() + encrypted +
                         "\r\n--$boundary\r\nContent-Disposition: form-data; name=\"file\"; filename=\"chunk\"\r\nContent-Type: application/octet-stream\r\n\r\n".encodeToByteArray() + bytes + "\r\n--$boundary--\r\n".encodeToByteArray()

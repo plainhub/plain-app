@@ -10,12 +10,12 @@ import kotlin.test.assertTrue
 
 class EventRecordTest {
     private fun event(type: String, payload: String): EventRecord = JsonHelper.jsonDecode(
-        """{"id":"fixture","type":"$type","data":$payload,"clientId":"actor","clientName":"Operator","clientIp":null,"osName":null,"osVersion":null,"appName":null,"appVersion":null,"createdAt":"2026-01-01T00:00:00Z"}"""
+        """{"id":"fixture","type":"$type","data":$payload,"clientId":"706c6169-5847-8f52-9073-afe9de5f9211","clientName":"Operator","clientIp":null,"osName":null,"osVersion":null,"appName":null,"appVersion":null,"createdAt":"2026-01-01T00:00:00Z"}"""
     )
 
     @Test
     fun decodesEveryTypedPayloadAndKeepsTheActorSeparateFromTheTarget() {
-        val session = """{"__typename":"SessionEventData","session":{"clientId":"target","clientName":"Target","type":"API_TOKEN"}}"""
+        val session = """{"__typename":"SessionEventData","session":{"clientId":"706c6169-15b2-8ac4-83ea-4e6b0c3a4b3c","clientName":"Target","type":"API_TOKEN"}}"""
         val volume = """{"id":"volume","name":"Volume","devicePath":"/dev/generated1","mountPath":"/mnt/generated","fileSystem":"ext4"}"""
         val disk = """{"id":"disk","name":"Disk","path":"/dev/generated","sizeBytes":64000000000}"""
         val fixtures = listOf(
@@ -33,10 +33,10 @@ class EventRecordTest {
         for ((type, payload) in fixtures) {
             val record = event(type, payload)
             assertEquals(type, record.type.name)
-            assertEquals("actor", record.clientId)
+            assertEquals("706c6169-5847-8f52-9073-afe9de5f9211", record.clientId)
             assertEquals(record, JsonHelper.jsonDecode<EventRecord>(JsonHelper.jsonEncode(record)))
             when (val data = record.data) {
-                is SessionEventData -> assertEquals("target", data.session.clientId)
+                is SessionEventData -> assertEquals("706c6169-15b2-8ac4-83ea-4e6b0c3a4b3c", data.session.clientId)
                 is DiskFormatEventData -> assertEquals(64000000000, data.disk.sizeBytes)
                 is LoginFailedEventData -> assertEquals(EventReason.INVALID_PASSWORD, data.reason)
                 else -> Unit

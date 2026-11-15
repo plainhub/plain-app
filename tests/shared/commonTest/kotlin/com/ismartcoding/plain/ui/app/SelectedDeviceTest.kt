@@ -84,7 +84,7 @@ class SelectedDeviceTest {
 
         )
         val response = """{"data":{"app":{"deviceName":"Remote","capabilities":[],"access":[],"appDir":"app://","downloadsDir":"/downloads","urlToken":"resource-token","tlsCertificateSha256":null}}}"""
-        val http = PeerHttpClient(peer, peers = { listOf(peer) }, clientId = { "fixture-client" },
+        val http = PeerHttpClient(peer, peers = { listOf(peer) }, clientId = { "706c6169-b9ef-8b64-b37d-1162ef232835" },
             encrypt = { _, _, _ -> Base64.encode(byteArrayOf(1)) },
             decrypt = { _, _, _ -> Base64.encode(response.encodeToByteArray()) },
             transport = object : GraphqlHttpTransport {

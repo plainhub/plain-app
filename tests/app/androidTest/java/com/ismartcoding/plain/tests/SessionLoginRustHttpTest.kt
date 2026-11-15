@@ -30,7 +30,7 @@ class SessionLoginRustHttpTest {
         val oldService = Prefs.backgroundServiceEnabled.value
         val oldDesktop = Prefs.remoteAccess.value
         val oldTwoFactor = Prefs.loginRequireApproval.value
-        val id = UUID.randomUUID().toString()
+        val id = UUID.randomUUID().toString().let { "706c6169${it.substring(8, 14)}8${it.substring(15)}" }
         var pendingId = ""
         val http = createTestHttpClient(TestHttpClientSpec.HttpHost)
         var browser: PasswordLoginFixture? = null

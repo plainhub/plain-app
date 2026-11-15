@@ -232,7 +232,7 @@ const host = opts.host
 // No default: the ports are a stored preference, so guessing one is how a
 // request ends up on the other build that shares the phone.
 const port = opts.port
-const clientId = opts['client-id'] || `plain-api-test-${crypto.randomBytes(4).toString('hex')}`
+const clientId = opts['client-id'] || crypto.randomUUID().replace(/^[0-9a-f]{8}-([0-9a-f]{4})-./, '706c6169-$1-8')
 
 if ((!opts['base-url'] && (!host || !port)) || (!opts.queries && !opts.raw)) {
   console.error('usage: gql-client.mjs --base-url <http[s]://host:port> (--queries <tsv> | --raw <query-file>) [--client-id <id>] [--password-file <path>] [--on-pending <cmd>]')

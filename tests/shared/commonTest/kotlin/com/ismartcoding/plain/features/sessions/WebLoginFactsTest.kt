@@ -10,7 +10,7 @@ class WebLoginFactsTest {
 
     @Test
     fun passwordlessApprovalKeepsTheServerVerificationCodeWithoutRequiringAPassword() {
-        val facts = JsonHelper.jsonDecode<WebLoginRequestFacts>("""{"clientId":"browser","requestId":"request","clientIp":"127.0.0.1","request":{$metadata,"verificationCode":"0123 4567","loginContext":"context"}}""")
+        val facts = JsonHelper.jsonDecode<WebLoginRequestFacts>("""{"clientId":"706c6169-fe7e-818e-a0f0-a71b7c0f3f75","requestId":"request","clientIp":"127.0.0.1","request":{$metadata,"verificationCode":"0123 4567","loginContext":"context"}}""")
         assertEquals("", facts.request.password)
         assertEquals("0123 4567", facts.request.verificationCode)
         assertEquals("request", facts.requestId)

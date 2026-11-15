@@ -537,7 +537,7 @@ class ManagedDeviceUiAcceptanceTest {
         val browsed = listOf(com.ismartcoding.plain.models.File(name="target-card-file.txt",path="https://device.test:8443/s/fixture-shared-link/root/target-card-file.txt#fixture-link-key",url="https://device.test:8443/fs?id=s.fixture.AA&action=download",createdAt=null,updatedAt=kotlin.time.Instant.fromEpochMilliseconds(0),size=8,isDir=false,childCount=0))
         val downloads = java.util.concurrent.atomic.AtomicReference<List<com.ismartcoding.plain.models.Download>>(emptyList())
         val http = com.ismartcoding.plain.rust.graphql.PeerHttpClient(
-            peer, peers = { listOf(peer) }, clientId = { "fixture-client" },
+            peer, peers = { listOf(peer) }, clientId = { "706c6169-b9ef-8b64-b37d-1162ef232835" },
             encrypt = { _, _, payload -> kotlin.io.encoding.Base64.encode(payload.encodeToByteArray()) },
             decrypt = { _, _, response -> response },
             transport = object : com.ismartcoding.plain.rust.graphql.GraphqlHttpTransport {

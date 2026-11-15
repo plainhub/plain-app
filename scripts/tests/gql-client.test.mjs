@@ -45,7 +45,7 @@ test(`actual GraphQL script ${wrongPassword ? 'rejects a wrong password' : 'inte
         return
       }
       assert.equal(req.url, '/graphql')
-      assert.equal(req.headers['c-id'], 'wasm-test-client')
+      assert.equal(req.headers['c-id'], '706c6169-0001-8000-8000-000000000001')
       const chunks = []
       for await (const chunk of req) chunks.push(chunk)
       const request = Buffer.concat(chunks)
@@ -86,7 +86,7 @@ test(`actual GraphQL script ${wrongPassword ? 'rejects a wrong password' : 'inte
             key = await next(); requestAad = await next(); responseAad = await next()
             const metadata = JSON.parse(Buffer.from(open(key, frame.subarray(64), requestAad)).toString())
             assert.equal(metadata.appName, 'plain-api-test')
-            stream.write(encodeFrame(seal(key, Buffer.from(JSON.stringify({ status: 'COMPLETED', clientId: 'wasm-test-server' })), responseAad)))
+            stream.write(encodeFrame(seal(key, Buffer.from(JSON.stringify({ status: 'COMPLETED', clientId: '706c6169-b0c6-8ca5-9ecf-8fe6e7176564' })), responseAad)))
           }
         }).catch(error => { serverError = error; stream.destroy() })
       }
@@ -97,7 +97,7 @@ test(`actual GraphQL script ${wrongPassword ? 'rejects a wrong password' : 'inte
     await new Promise(resolve => server.listen(0, '127.0.0.1', resolve))
     const query = join(dir, 'query.graphql')
     await writeFile(query, '{ __typename }')
-    const child = spawn(process.execPath, [fileURLToPath(new URL('../gql-client.mjs', import.meta.url)), '--base-url', `http://127.0.0.1:${server.address().port}`, '--client-id', 'wasm-test-client', '--raw', query], {
+    const child = spawn(process.execPath, [fileURLToPath(new URL('../gql-client.mjs', import.meta.url)), '--base-url', `http://127.0.0.1:${server.address().port}`, '--client-id', '706c6169-0001-8000-8000-000000000001', '--raw', query], {
       env: { ...process.env, PLAIN_TEST_PASSWORD: wrongPassword ? 'wrong password' : 'test password for OPAQUE', PLAIN_TEST_PASSWORD_FILE: '' },
     })
     let stdout = ''; let stderr = ''

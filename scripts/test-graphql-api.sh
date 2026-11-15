@@ -23,7 +23,7 @@ source "$(dirname "${BASH_SOURCE[0]}")/test-lib.sh" "$@"
 
 # No default port: the caller must name the build under test explicitly.
 BASE_URL="${1:?usage: %s <base-url> [client-id]  (port is the one the build under test bound)}"
-CLIENT_ID="${2:-plain-api-test}"
+CLIENT_ID="${2:-706c6169-0001-8000-8000-000000000001}"
 CLIENT="$(dirname "${BASH_SOURCE[0]}")/gql-client.mjs"
 GQL_PORT="$(printf '%s' "$BASE_URL" | sed -n 's#.*:\([0-9][0-9]*\)\(/\{0,1\}\).*#\1#p')"
 

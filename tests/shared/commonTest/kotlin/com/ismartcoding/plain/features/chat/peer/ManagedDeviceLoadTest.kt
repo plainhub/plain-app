@@ -40,7 +40,7 @@ class ManagedDeviceLoadTest {
         var currentPeer = peer
         val requests = mutableListOf<GraphqlOperation>()
         var response = """{"data":{"app":{"deviceName":"Device","capabilities":[],"access":["IMAGES","AUDIO","VIDEOS","APPS"],"appDir":"app://","downloadsDir":"/downloads","urlToken":"resource-token","tlsCertificateSha256":"fixture-certificate"}}}"""
-        val http = PeerHttpClient(peer, peers = { listOf(currentPeer) }, clientId = { "fixture-client" },
+        val http = PeerHttpClient(peer, peers = { listOf(currentPeer) }, clientId = { "706c6169-b9ef-8b64-b37d-1162ef232835" },
             encryptResourceReference = { token, path ->
                 assertEquals("resource-token", token)
                 assertEquals("/target.mp3", path)
