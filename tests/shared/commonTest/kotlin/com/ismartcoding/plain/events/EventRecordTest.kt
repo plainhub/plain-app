@@ -1,8 +1,7 @@
 package com.ismartcoding.plain.events
 
 import com.ismartcoding.plain.lib.JsonHelper
-import com.ismartcoding.plain.models.EventRecord
-import com.ismartcoding.plain.models.EventType
+import com.ismartcoding.plain.models.*
 import com.ismartcoding.plain.graphql.Query
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -10,20 +9,55 @@ import kotlin.test.assertFails
 import kotlin.test.assertTrue
 
 class EventRecordTest {
+    private fun event(type: String, payload: String): EventRecord = JsonHelper.jsonDecode(
+        """{"id":"fixture","type":"$type","data":$payload,"clientId":"actor","clientName":"Operator","clientIp":null,"osName":null,"osVersion":null,"appName":null,"appVersion":null,"createdAt":"2026-01-01T00:00:00Z"}"""
+    )
+
     @Test
-    fun decodesCanonicalEventsAndRejectsUnknownStatuses() {
-        val record = JsonHelper.jsonDecode<EventRecord>("""{"id":"fixture","type":"LOGIN_FAILED","message":"invalid_password","clientId":null,"createdAt":"2026-01-01T00:00:00Z"}""")
-        assertEquals(EventType.LOGIN_FAILED, record.type)
-        assertEquals(null, record.clientId)
-        assertEquals("\"LOGIN_FAILED\"", JsonHelper.jsonEncode(record.type))
+    fun decodesEveryTypedPayloadAndKeepsTheActorSeparateFromTheTarget() {
+        val session = """{"__typename":"SessionEventData","session":{"clientId":"target","clientName":"Target","type":"API_TOKEN"}}"""
+        val volume = """{"id":"volume","name":"Volume","devicePath":"/dev/generated1","mountPath":"/mnt/generated","fileSystem":"ext4"}"""
+        val disk = """{"id":"disk","name":"Disk","path":"/dev/generated","sizeBytes":64000000000}"""
+        val fixtures = listOf(
+            "LOGIN" to """{"__typename":"LoginEventData","sessionType":"LOGIN"}""",
+            "LOGIN_FAILED" to """{"__typename":"LoginFailedEventData","reason":"INVALID_PASSWORD"}""",
+            "LOGOUT" to session,
+            "REVOKE_SESSION" to session,
+            "UPDATE_DEVICE_NAME" to """{"__typename":"DeviceNameEventData","oldName":"Old","newName":"New"}""",
+            "MOUNT" to """{"__typename":"VolumeEventData","volume":$volume}""",
+            "MOUNT_FAILED" to """{"__typename":"VolumeFailedEventData","volume":$volume,"failure":{"reason":"MOUNT_FAILED","detail":null}}""",
+            "UNMOUNT" to """{"__typename":"VolumeEventData","volume":$volume}""",
+            "FORMAT_DISK" to """{"__typename":"DiskFormatEventData","disk":$disk,"fileSystem":"ext4"}""",
+            "FORMAT_DISK_FAILED" to """{"__typename":"DiskFormatFailedEventData","disk":$disk,"fileSystem":"ext4","failure":{"reason":"FORMAT_DISK_FAILED","detail":null}}""",
+        )
+        for ((type, payload) in fixtures) {
+            val record = event(type, payload)
+            assertEquals(type, record.type.name)
+            assertEquals("actor", record.clientId)
+            assertEquals(record, JsonHelper.jsonDecode<EventRecord>(JsonHelper.jsonEncode(record)))
+            when (val data = record.data) {
+                is SessionEventData -> assertEquals("target", data.session.clientId)
+                is DiskFormatEventData -> assertEquals(64000000000, data.disk.sizeBytes)
+                is LoginFailedEventData -> assertEquals(EventReason.INVALID_PASSWORD, data.reason)
+                else -> Unit
+            }
+        }
+        assertEquals(EventType.entries.map { it.name }, fixtures.map { it.first })
+        assertFails { event("LOGIN_FAILED", """{"__typename":"LoginFailedEventData","reason":"UNKNOWN"}""") }
+        assertFails { event("LOGIN", """{"__typename":"LoginEventData","sessionType":"UNKNOWN"}""") }
+        assertFails { event("LOGIN", """{"__typename":"UnknownEventData"}""") }
         assertFails { JsonHelper.jsonDecode<EventType>("\"UNKNOWN\"") }
         assertFails { JsonHelper.jsonDecode<EventType>("\"SET_HOSTNAME\"") }
-        assertEquals(listOf("LOGIN", "LOGIN_FAILED", "LOGOUT", "REVOKE_SESSION", "UPDATE_DEVICE_NAME", "MOUNT", "MOUNT_FAILED", "UNMOUNT", "FORMAT_DISK", "FORMAT_DISK_FAILED"), EventType.entries.map { it.name })
     }
+
     @Test
-    fun queryUsesTheSameMainSchemaOperation() {
+    fun queryUsesTheSameMainSchemaOperationAndSelectsAllUnionMembers() {
         val request = Query.events("text:fixture", 50, 50)
         assertTrue(request.operation.query.contains("events(query:"))
+        for (name in listOf("LoginEventData", "LoginFailedEventData", "SessionEventData", "DeviceNameEventData", "VolumeEventData", "VolumeFailedEventData", "DiskFormatEventData", "DiskFormatFailedEventData")) {
+            assertTrue(request.operation.query.contains("... on $name{"))
+        }
+        assertTrue(!request.operation.query.contains(" message "))
         assertEquals("events", request.field)
     }
 }

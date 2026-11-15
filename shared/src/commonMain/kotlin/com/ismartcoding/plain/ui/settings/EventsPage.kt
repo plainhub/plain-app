@@ -14,7 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.ismartcoding.plain.i18n.*
-import com.ismartcoding.plain.models.EventType
+import com.ismartcoding.plain.models.*
 import com.ismartcoding.plain.platform.system.formatDateTime
 import com.ismartcoding.plain.ui.base.PListItem
 import com.ismartcoding.plain.ui.base.PScaffold
@@ -47,7 +47,10 @@ fun EventsPage(navController: NavHostController, model: EventsViewModel) {
             }
             items(model.entries, key = { it.id }) { entry ->
                 PListItem(title = eventTitle(entry.type), subtitle = listOfNotNull(
-                    entry.createdAt.formatDateTime(), eventMessage(entry.type, entry.message),
+                    entry.createdAt.formatDateTime(), eventMessage(entry.data),
+                    entry.clientName,
+                    listOfNotNull(entry.appName, entry.appVersion).joinToString(" "),
+                    listOfNotNull(entry.osName, entry.osVersion).joinToString(" "), entry.clientIp,
                     entry.clientId?.let { "${stringResource(Res.string.event_client)}: $it" },
                 ).filter { it.isNotEmpty() }.joinToString("\n"))
             }
@@ -74,17 +77,29 @@ private fun eventTitle(type: EventType): String = stringResource(when (type) {
 })
 
 @Composable
-private fun eventMessage(type: EventType, message: String): String {
-    if (type != EventType.LOGIN_FAILED) return message
-    val resource = when (message) {
-        "invalid_password" -> Res.string.event_reason_invalid_password
-        "invalid_login_request" -> Res.string.event_reason_invalid_login_request
-        "remote_access_disabled" -> Res.string.event_reason_remote_access_disabled
-        "login_expired" -> Res.string.event_reason_login_expired
-        "too_many_login_attempts" -> Res.string.event_reason_too_many_login_attempts
-        "rejected" -> Res.string.event_reason_rejected
-        "canceled" -> Res.string.event_reason_canceled
-        else -> return message
-    }
-    return stringResource(resource)
+private fun eventMessage(data: EventData): String = when (data) {
+    is LoginEventData -> ""
+    is LoginFailedEventData -> eventReason(data.reason)
+    is SessionEventData -> data.session.clientName.ifEmpty { data.session.clientId }
+    is DeviceNameEventData -> "${data.oldName} → ${data.newName}"
+    is VolumeEventData -> listOfNotNull(data.volume.name, data.volume.mountPath).joinToString(" · ")
+    is VolumeFailedEventData -> listOfNotNull(data.volume.name, data.volume.mountPath, eventReason(data.failure.reason), data.failure.detail).joinToString(" · ")
+    is DiskFormatEventData -> listOfNotNull(data.disk.name, data.disk.path, data.fileSystem).joinToString(" · ")
+    is DiskFormatFailedEventData -> listOfNotNull(data.disk.name, data.disk.path, data.fileSystem, eventReason(data.failure.reason), data.failure.detail).joinToString(" · ")
 }
+
+@Composable
+private fun eventReason(reason: EventReason): String = stringResource(when (reason) {
+    EventReason.INVALID_PASSWORD -> Res.string.event_reason_invalid_password
+    EventReason.INVALID_LOGIN_REQUEST -> Res.string.event_reason_invalid_login_request
+    EventReason.REMOTE_ACCESS_DISABLED -> Res.string.event_reason_remote_access_disabled
+    EventReason.LOGIN_EXPIRED -> Res.string.event_reason_login_expired
+    EventReason.TOO_MANY_LOGIN_ATTEMPTS -> Res.string.event_reason_too_many_login_attempts
+    EventReason.REJECTED -> Res.string.event_reason_rejected
+    EventReason.CANCELED -> Res.string.event_reason_canceled
+    EventReason.PEER_IDENTITY_CHANGED -> Res.string.event_reason_peer_identity_changed
+    EventReason.PASSWORD_SETUP_REQUIRED -> Res.string.event_reason_password_setup_required
+    EventReason.INTERNAL_ERROR -> Res.string.event_reason_internal_error
+    EventReason.MOUNT_FAILED -> Res.string.event_mount_failed
+    EventReason.FORMAT_DISK_FAILED -> Res.string.event_format_disk_failed
+})

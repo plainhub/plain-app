@@ -13,7 +13,13 @@ enum class EventType {
 data class EventRecord(
     val id: String,
     val type: EventType,
-    val message: String,
+    val data: EventData,
     val clientId: String?,
+    val clientName: String?,
+    val clientIp: String?,
+    val osName: String?,
+    val osVersion: String?,
+    val appName: String?,
+    val appVersion: String?,
     val createdAt: Instant,
 )

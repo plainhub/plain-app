@@ -2,6 +2,8 @@ package com.ismartcoding.plain.events
 
 import com.ismartcoding.plain.models.EventRecord
 import com.ismartcoding.plain.models.EventType
+import com.ismartcoding.plain.models.LoginEventData
+import com.ismartcoding.plain.features.sessions.SessionType
 import com.ismartcoding.plain.ui.settings.EventsViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.test.*
@@ -23,7 +25,7 @@ class EventsViewModelTest {
             val model = EventsViewModel { query, offset, _ ->
                 calls.add(query to offset)
                 if (fail) error("unavailable")
-                if (offset == 0) List(50) { index -> EventRecord("$index", EventType.LOGIN, "Fixture", null, Instant.parse("2026-01-01T00:00:00Z")) } else emptyList()
+                if (offset == 0) List(50) { index -> EventRecord("$index", EventType.LOGIN, LoginEventData(SessionType.LOGIN), null, null, null, null, null, null, null, Instant.parse("2026-01-01T00:00:00Z")) } else emptyList()
             }
             model.refresh(); advanceUntilIdle()
             assertTrue(model.hasMore)
@@ -46,7 +48,7 @@ class EventsViewModelTest {
                 offsets.add(offset)
                 val start = if (offset == 0) 0 else 49
                 if (offset >= 100) emptyList() else List(50) { index ->
-                    EventRecord("${index + start}", EventType.LOGIN, "Fixture", null, Instant.parse("2026-01-01T00:00:00Z"))
+                    EventRecord("${index + start}", EventType.LOGIN, LoginEventData(SessionType.LOGIN), null, null, null, null, null, null, null, Instant.parse("2026-01-01T00:00:00Z"))
                 }
             }
             model.refresh(); advanceUntilIdle()

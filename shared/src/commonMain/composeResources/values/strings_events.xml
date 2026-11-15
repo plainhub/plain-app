@@ -20,4 +20,7 @@
     <string name="event_reason_too_many_login_attempts">Too many sign-in attempts</string>
     <string name="event_reason_rejected">Sign-in request rejected</string>
     <string name="event_reason_canceled">Sign-in request canceled</string>
+    <string name="event_reason_peer_identity_changed">Client identity changed</string>
+    <string name="event_reason_password_setup_required">Sign-in password is not configured</string>
+    <string name="event_reason_internal_error">Internal server error</string>
 </resources>

@@ -20,4 +20,7 @@
     <string name="event_reason_too_many_login_attempts">登录尝试过多</string>
     <string name="event_reason_rejected">登录请求已拒绝</string>
     <string name="event_reason_canceled">登录请求已取消</string>
+    <string name="event_reason_peer_identity_changed">客户端身份已变化</string>
+    <string name="event_reason_password_setup_required">尚未配置登录密码</string>
+    <string name="event_reason_internal_error">服务器内部错误</string>
 </resources>
