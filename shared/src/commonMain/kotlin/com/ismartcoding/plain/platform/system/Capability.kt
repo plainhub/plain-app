@@ -1,10 +1,10 @@
+// Enum values generated from plain-core Capability; do not edit.
 package com.ismartcoding.plain.platform.system
 
 enum class Capability {
     ADB,
     BLE,
     WIFI_AWARE,
-
     APP_RELAUNCH,
     MEDIA_TRASH,
     MEDIA_DELETE,
@@ -13,7 +13,6 @@ enum class Capability {
     VIDEO_REMUX,
     VIDEO_TRANSCODE,
     APP_UPDATES,
-
     MIRROR_AUDIO,
     MEDIA_SCAN,
     TELEPHONY,
@@ -22,6 +21,7 @@ enum class Capability {
     NOTIFICATIONS,
     CLIPBOARD,
     DISK_MANAGER,
+    HTTP_SERVER,
 }
 
 /**
