@@ -1,3 +1,4 @@
+// Enum values generated from plain-core AppFeatureType; do not edit.
 package com.ismartcoding.plain.platform.system
 
 import com.ismartcoding.plain.platform.permissions.FeaturePermission
@@ -16,7 +17,13 @@ enum class AppFeatureType {
     POMODORO_TIMER,
     NOTIFICATIONS,
     CHECK_UPDATES,
-    IMAGE_EDITOR;
+    IMAGE_EDITOR,
+    CHAT,
+    SMS,
+    CALLS,
+    CONTACTS,
+    SCREEN_MIRROR,
+    CALL_PHONE;
 
     fun getPermission(): FeaturePermission? = when (this) {
         FILES -> FeaturePermission(setOf(Permission.WRITE_EXTERNAL_STORAGE), Permission.WRITE_EXTERNAL_STORAGE)
