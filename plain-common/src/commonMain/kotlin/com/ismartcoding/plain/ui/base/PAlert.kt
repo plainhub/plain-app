@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -23,9 +24,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.layout.Layout
+import androidx.compose.ui.unit.constrainHeight
+import androidx.compose.ui.unit.constrainWidth
 import androidx.compose.ui.unit.offset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.ismartcoding.plain.ui.theme.Spacing
 import com.ismartcoding.plain.ui.theme.warning
 import com.ismartcoding.plain.ui.theme.warningContainer
 import org.jetbrains.compose.resources.painterResource
@@ -69,6 +73,8 @@ fun PAlert(
     }
     val shape = MaterialTheme.shapes.medium
     val lineHeight = 24.sp
+    val leadingSize = 20.dp
+    val firstLineHeight = maxOf(leadingSize, with(LocalDensity.current) { lineHeight.toDp() })
 
     Surface(
         modifier = modifier.fillMaxWidth(),
@@ -76,52 +82,76 @@ fun PAlert(
         color = containerColor,
         contentColor = contentColor,
     ) {
-        Column(
+        AlertLayout(
             modifier = Modifier
                 .then(if (onClick != null) Modifier.clip(shape).clickable(onClick = onClick) else Modifier)
-                .padding(16.dp),
-        ) {
-            Row(verticalAlignment = Alignment.Top, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                Box(
-                    modifier = Modifier.width(16.dp).height(with(LocalDensity.current) { lineHeight.toDp() }),
-                    contentAlignment = Alignment.Center,
-                ) {
-                    Icon(painterResource(iconRes), contentDescription = null, tint = iconColor, modifier = Modifier.size(16.dp))
-                }
-                Text(
-                    text = description,
-                    style = MaterialTheme.typography.bodyMedium.copy(lineHeight = lineHeight),
-                    modifier = Modifier.weight(1f),
-                    color = contentColor,
-                )
-                if (trailing != null) {
-                    Row(verticalAlignment = Alignment.CenterVertically, content = trailing)
-                }
-            }
-            if (actions != null) {
-                AlertSection {
-                    FlowRow(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.End),
-                        verticalArrangement = Arrangement.spacedBy(8.dp),
+                .padding(horizontal = Spacing.lg),
+            header = {
+                Row(verticalAlignment = Alignment.Top, horizontalArrangement = Arrangement.spacedBy(Spacing.sm)) {
+                    Box(
+                        modifier = Modifier.width(leadingSize).height(firstLineHeight),
+                        contentAlignment = Alignment.Center,
                     ) {
-                        actions()
+                        Icon(painterResource(iconRes), contentDescription = null, tint = iconColor, modifier = Modifier.size(leadingSize))
+                    }
+                    Text(
+                        text = description,
+                        style = MaterialTheme.typography.bodyMedium.copy(lineHeight = lineHeight),
+                        modifier = Modifier.weight(1f),
+                        color = contentColor,
+                    )
+                    if (trailing != null) {
+                        Row(Modifier.heightIn(min = firstLineHeight), verticalAlignment = Alignment.CenterVertically, content = trailing)
                     }
                 }
-            }
-            if (content != null) {
-                AlertSection { Column(Modifier.fillMaxWidth(), content = content) }
-            }
-        }
+            },
+            actions = {
+                if (actions != null) {
+                    FlowRow(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(Spacing.sm, Alignment.End),
+                        verticalArrangement = Arrangement.spacedBy(Spacing.sm),
+                        content = actions,
+                    )
+                }
+            },
+            details = {
+                if (content != null) Column(Modifier.fillMaxWidth(), content = content)
+            },
+        )
     }
 }
 
 @Composable
-private fun AlertSection(content: @Composable () -> Unit) {
-    Layout(content = content) { measurables, constraints ->
-        val gap = 8.dp.roundToPx()
-        val child = measurables.single().measure(constraints.offset(vertical = -gap))
-        val top = if (child.height == 0) 0 else gap
-        layout(child.width, child.height + top) { child.placeRelative(0, top) }
+private fun AlertLayout(
+    modifier: Modifier,
+    header: @Composable () -> Unit,
+    actions: @Composable () -> Unit,
+    details: @Composable () -> Unit,
+) {
+    Layout(contents = listOf(header, actions, details), modifier = modifier) { (heading, buttons, body), constraints ->
+        val inset = (Spacing.sm + Spacing.xs).roundToPx()
+        val compact = Spacing.xs.roundToPx()
+        val detailGap = Spacing.sm.roundToPx()
+        val loose = constraints.copy(minHeight = 0)
+        val headingPlaceable = heading.single().measure(loose.offset(vertical = -inset - compact))
+        val afterHeading = inset + headingPlaceable.height
+        val buttonPlaceable = buttons.singleOrNull()?.measure(loose.offset(vertical = -afterHeading - compact * 2))
+        val hasButtons = (buttonPlaceable?.height ?: 0) > 0
+        val buttonStart = afterHeading + if (hasButtons) compact else 0
+        val afterButtons = buttonStart + (buttonPlaceable?.height ?: 0)
+        val detailPlaceable = body.singleOrNull()?.measure(loose.offset(vertical = -afterButtons - detailGap - inset))
+        val hasDetails = (detailPlaceable?.height ?: 0) > 0
+        val detailStart = afterButtons + if (hasDetails) detailGap else 0
+        val bottom = if (hasButtons && !hasDetails) compact else inset
+        val width = constraints.constrainWidth(
+            maxOf(headingPlaceable.width, buttonPlaceable?.width ?: 0, detailPlaceable?.width ?: 0),
+        )
+        val height = constraints.constrainHeight(detailStart + (detailPlaceable?.height ?: 0) + bottom)
+        layout(width, height) {
+            headingPlaceable.placeRelative(0, inset)
+            buttonPlaceable?.placeRelative(0, buttonStart)
+            detailPlaceable?.placeRelative(0, detailStart)
+        }
     }
 }

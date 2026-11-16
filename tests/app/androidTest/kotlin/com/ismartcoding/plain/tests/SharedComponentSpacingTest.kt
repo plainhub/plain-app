@@ -23,23 +23,29 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.platform.ViewRootForTest
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.SemanticsNode
 import androidx.compose.ui.semantics.SemanticsProperties
 import androidx.compose.ui.semantics.getOrNull
 import androidx.compose.ui.unit.Density
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.test.core.app.ActivityScenario
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.ismartcoding.plain.MainActivity
+import com.ismartcoding.plain.ui.base.AlertType
+import com.ismartcoding.plain.ui.base.PAlert
+import com.ismartcoding.plain.ui.base.PTextButton
 import com.ismartcoding.plain.ui.base.PBottomSheetTopAppBar
 import com.ismartcoding.plain.ui.base.PSheetPrimaryActionsCard
 import com.ismartcoding.plain.ui.base.PTopAppBar
 import com.ismartcoding.plain.ui.base.fastscroll.LazyColumnScrollbar
 import com.ismartcoding.plain.ui.base.fastscroll.LazyVerticalGridScrollbar
 import com.ismartcoding.plain.ui.base.fastscroll.ScrollbarSettings
+import com.ismartcoding.plain.ui.components.ButtonSize
 import com.ismartcoding.plain.ui.theme.AppTheme
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
@@ -49,6 +55,42 @@ import org.junit.runner.RunWith
 @RunWith(AndroidJUnit4::class)
 class SharedComponentSpacingTest {
     private val instrumentation = InstrumentationRegistry.getInstrumentation()
+
+    @Test
+    fun alertKeepsButtonTouchSizeWithoutAnExtraBottomGutter() = render({
+        PAlert("Network permission is needed to find nearby devices.", AlertType.WARNING, Modifier.testTag("with-button")) {
+            PTextButton("Fix now", {}, Modifier.testTag("fix-action"), buttonSize = ButtonSize.SMALL)
+        }
+        PAlert("No alert action", AlertType.INFO, Modifier.testTag("without-button"))
+        PAlert("No alert action", AlertType.INFO, Modifier.testTag("empty-button"), actions = {}, content = {})
+        PAlert("More details", AlertType.ERROR, Modifier.testTag("with-detail"), content = {
+            Text("Description", Modifier.testTag("detail-content"))
+        })
+    }) {
+        await { nodes().any { it.config.getOrNull(SemanticsProperties.TestTag) == "fix-action" } }
+        val action = tagged("fix-action").touchBoundsInRoot
+        val alert = tagged("with-button").boundsInRoot
+        assertTrue("action touch height: ${action.height}", action.height >= 48f)
+        assertEquals(4f, alert.bottom - action.bottom, 0.5f)
+        val plain = tagged("without-button").boundsInRoot
+        assertEquals(plain.height, tagged("empty-button").boundsInRoot.height, 0.5f)
+        assertEquals(12f, tagged("with-detail").boundsInRoot.bottom - tagged("detail-content").boundsInRoot.bottom, 0.5f)
+    }
+
+    @Test
+    fun alertKeepsActionsAtTheLogicalEndInRtl() = render({
+        CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
+            PAlert("Network permission is needed to find nearby devices.", AlertType.ERROR, Modifier.testTag("rtl-alert")) {
+                PTextButton("Configure now", {}, Modifier.testTag("rtl-action"), buttonSize = ButtonSize.SMALL)
+            }
+        }
+    }) {
+        await { nodes().any { it.config.getOrNull(SemanticsProperties.TestTag) == "rtl-action" } }
+        val alert = tagged("rtl-alert").boundsInRoot
+        val action = tagged("rtl-action").touchBoundsInRoot
+        assertEquals(16f, action.left - alert.left, 0.5f)
+        assertEquals(4f, alert.bottom - action.bottom, 0.5f)
+    }
 
     @Test
     fun sheetCardAppliesCallerPaddingAndSemanticsOnce() = render({
