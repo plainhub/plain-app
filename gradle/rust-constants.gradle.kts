@@ -21,6 +21,17 @@ fun rustPackage(metadata: String, name: String): File {
     return File(packages.single()["manifest_path"] as String).parentFile
 }
 
+tasks.register<Exec>("checkAppFeatureParity") {
+    group = "verification"
+    description = "Check Android AppFeatureType against the Cargo-resolved plain-core"
+    val consumer = rootProject.projectDir
+    doFirst {
+        val core = rustPackage(cargoMetadata.get(), "plain-rs").parentFile
+        commandLine("node", core.resolve("scripts/gen-app-features.mjs"), "--target=android",
+            "--consumer-root=${consumer.absolutePath}")
+    }
+}
+
 tasks.withType<org.gradle.api.tasks.testing.Test>().configureEach {
     val coreDirectory = providers.environmentVariable("PLAIN_CORE_DIR").map(::File)
         .orElse(cargoMetadata.map { rustPackage(it, "plain-rs").parentFile })

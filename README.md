@@ -182,6 +182,8 @@ bash scripts/check-ui.sh
 ./gradlew :app:assembleDebug
 ```
 
+CI also runs `./gradlew :shared:checkAppFeatureParity` to compare Kotlin's `AppFeatureType` with the Cargo-locked Core enum. The check requires Node.js; normal Android builds do not run it.
+
 ## Build
 
 1. Generate `release.jks` file under `$rootProject/app` folder.

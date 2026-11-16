@@ -21,5 +21,6 @@ jobs:
           distribution: jetbrains
           java-version: '21'
       - uses: android-actions/setup-android@v4
+      - run: ./gradlew :shared:checkAppFeatureParity
       - run: bash scripts/check-ui.sh
       - run: ./gradlew :plain-common:testAndroidHostTest :shared:testAndroidHostTest
