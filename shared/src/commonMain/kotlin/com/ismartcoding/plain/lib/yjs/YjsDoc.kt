@@ -40,7 +40,7 @@ class YjsDoc(data: ByteArray) {
         val parentId: Pair<Long, Long>?, // parent item ID (if parent is nested type)
         var parentSub: String?,         // Y.Map key (if parent is Y.Map)
         val content: YjsContent,
-        val deleted: Boolean,
+        var deleted: Boolean,
     )
 
     private sealed class YjsContent {
@@ -61,6 +61,14 @@ class YjsDoc(data: ByteArray) {
     init {
         val decoder = YjsDecoder(data)
         parseStructs(decoder)
+        repeat(decoder.readVarUint().toInt()) {
+            val client = decoder.readVarUint()
+            repeat(decoder.readVarUint().toInt()) {
+                val clock = decoder.readVarUint()
+                val length = decoder.readVarUint()
+                for (deletedClock in clock until clock + length) itemsById[Pair(client, deletedClock)]?.deleted = true
+            }
+        }
         buildDocument()
     }
 
@@ -174,7 +182,7 @@ class YjsDoc(data: ByteArray) {
                             deleted = contentType == 1,
                         )
                         items.add(item)
-                        itemsById[item.id] = item
+                        for (itemClock in itemId.second until clock) itemsById[Pair(client, itemClock)] = item
                     }
                     else -> {
                         val len = decoder.readVarUint().toInt()
@@ -192,7 +200,6 @@ class YjsDoc(data: ByteArray) {
         //   - no item has parentSub  → Y.Array (typeRef=0)
         val rootTypeKinds = mutableMapOf<String, Int>()
         for (item in items) {
-            if (item.deleted) continue
             val key = item.parentYKey ?: continue
             if (item.parentSub != null) {
                 rootTypeKinds[key] = 1 // Y.Map
@@ -209,15 +216,6 @@ class YjsDoc(data: ByteArray) {
         // - If parentId != null → parent is a nested item (e.g., a layer Y.Map)
         // - If only origin/right → resolve parent through neighbor chain
         for (item in items) {
-            if (item.deleted) continue
-            if (item.content is YjsContent.TypeContent && item.parentYKey != null) {
-                val rootType = rootTypes[item.parentYKey]
-                if (rootType != null && rootType.typeRef == item.content.typeRef) {
-                    // Root type definition from Android encoder — skip
-                    continue
-                }
-            }
-
             if (item.parentSub == null) {
                 item.parentSub = resolveParentSub(item)
             }
@@ -229,26 +227,53 @@ class YjsDoc(data: ByteArray) {
             if (parentYKey != null) {
                 val rootType = rootTypes[parentYKey] ?: continue
                 if (sub != null) {
-                    rootType.mapEntries[sub] = item
+                    if (!item.deleted) rootType.mapEntries[sub] = item
                 } else {
                     rootType.arrayItems.add(item)
                 }
             } else if (parentId != null) {
                 if (sub != null) {
-                    itemMapEntries.getOrPut(parentId) { mutableMapOf() }[sub] = item
+                    if (!item.deleted) itemMapEntries.getOrPut(parentId) { mutableMapOf() }[sub] = item
                 } else {
                     itemArrayItems.getOrPut(parentId) { mutableListOf() }.add(item)
                 }
             }
         }
 
-        // Sort array items by clock so the order matches the web side.
-        for ((_, rootType) in rootTypes) {
-            if (rootType.typeRef == 0) rootType.arrayItems.sortBy { it.id.second }
+        for (rootType in rootTypes.values) orderArray(rootType.arrayItems)
+        for (array in itemArrayItems.values) orderArray(array)
+    }
+
+    private fun orderArray(array: MutableList<YjsItem>) {
+        val entries = array.associateBy { it.id }
+        val successors = entries.keys.associateWith { mutableSetOf<Pair<Long, Long>>() }
+        val incoming = entries.keys.associateWith { 0 }.toMutableMap()
+        fun link(left: YjsItem?, right: YjsItem?) {
+            if (left == null || right == null || left.id !in entries || right.id !in entries) return
+            if (successors.getValue(left.id).add(right.id)) incoming[right.id] = incoming.getValue(right.id) + 1
         }
-        for ((_, arr) in itemArrayItems) {
-            arr.sortBy { it.id.second }
+        for (item in array) {
+            link(itemsById[item.origin], item)
+            link(item, itemsById[item.right])
         }
+        for (siblings in array.groupBy { Pair(it.origin, it.right) }.values) {
+            val ordered = siblings.sortedWith(compareBy({ it.id.first }, { it.id.second }))
+            for (index in 1 until ordered.size) link(ordered[index - 1], ordered[index])
+        }
+        val ready = array.filter { incoming.getValue(it.id) == 0 }.toMutableList()
+        val ordered = mutableListOf<YjsItem>()
+        while (ready.isNotEmpty()) {
+            ready.sortWith(compareBy({ it.id.first }, { it.id.second }))
+            val item = ready.removeAt(0)
+            ordered.add(item)
+            for (next in successors.getValue(item.id)) {
+                incoming[next] = incoming.getValue(next) - 1
+                if (incoming.getValue(next) == 0) ready.add(entries.getValue(next))
+            }
+        }
+        check(ordered.size == array.size) { "Invalid Yjs array ordering" }
+        array.clear()
+        array.addAll(ordered.filterNot { it.deleted })
     }
 
     private fun resolveParentYKey(item: YjsItem): String? {
@@ -305,6 +330,7 @@ class YjsDoc(data: ByteArray) {
 
     fun getBgColor(): String = (getMetaValue("bgColor") as? String) ?: "transparent"
     fun getSourceImage(): String? = getMetaValue("sourceImage") as? String
+    fun getImages(): Map<String, String> = rootTypes["images"]?.mapEntries?.mapValues { (_, item) -> extractValue(item) as String } ?: emptyMap()
     fun getImgAlpha(): Double = (getMetaValue("imgAlpha") as? Number)?.toDouble() ?: 100.0
 
     fun getImgOffset(): Point {
@@ -315,15 +341,14 @@ class YjsDoc(data: ByteArray) {
 
     fun getLayers(): List<EditorLayer> {
         val layersType = rootTypes["layers"] ?: return emptyList()
-        return layersType.arrayItems.mapNotNull { item ->
-            if (item.content !is YjsContent.TypeContent) return@mapNotNull null
-            if (item.content.typeRef != 1) return@mapNotNull null // not a Y.Map
+        return layersType.arrayItems.map { item ->
+            check(item.content is YjsContent.TypeContent && item.content.typeRef == 1) { "Invalid image editor layer" }
             readLayer(item.id)
         }
     }
 
-    private fun readLayer(layerItemId: Pair<Long, Long>): EditorLayer? {
-        val entries = itemMapEntries[layerItemId] ?: return null
+    private fun readLayer(layerItemId: Pair<Long, Long>): EditorLayer {
+        val entries = checkNotNull(itemMapEntries[layerItemId]) { "Invalid image editor layer" }
         val layerMap = mutableMapOf<String, Any?>()
         for ((sub, item) in entries) {
             layerMap[sub] = when {
@@ -333,10 +358,10 @@ class YjsDoc(data: ByteArray) {
             }
         }
 
-        val type = layerMap["type"] as? String ?: return null
-        val id = layerMap["id"] as? String ?: return null
-        val visible = layerMap["visible"] as? Boolean ?: true
-        val name = layerMap["name"] as? String ?: type
+        val type = layerMap["type"] as String
+        val id = layerMap["id"] as String
+        val visible = layerMap["visible"] as Boolean
+        val name = layerMap["name"] as String
 
         return when (type) {
             "arrow" -> ArrowLayer(
@@ -415,7 +440,7 @@ class YjsDoc(data: ByteArray) {
                 fontStyle = str(layerMap["fontStyle"]),
                 rotation = num(layerMap["rotation"]),
             )
-            else -> null
+            else -> error("Unsupported image editor layer type")
         }
     }
 
@@ -450,7 +475,7 @@ class YjsDoc(data: ByteArray) {
     }
 
     private fun readTextStroke(value: Any?): TextStroke {
-        val map = value as? Map<*, *> ?: return TextStroke()
+        val map = value as Map<*, *>
         return TextStroke(
             width = num(map["width"]),
             color = str(map["color"]),
@@ -458,7 +483,7 @@ class YjsDoc(data: ByteArray) {
     }
 
     private fun readTextShadow(value: Any?): TextShadow {
-        val map = value as? Map<*, *> ?: return TextShadow()
+        val map = value as Map<*, *>
         return TextShadow(
             offsetX = num(map["offsetX"]),
             offsetY = num(map["offsetY"]),
@@ -501,15 +526,7 @@ class YjsDoc(data: ByteArray) {
         }
     }
 
-    private fun num(value: Any?): Double {
-        return when (value) {
-            is Number -> value.toDouble()
-            is String -> value.toDoubleOrNull() ?: 0.0
-            else -> 0.0
-        }
-    }
+    private fun num(value: Any?): Double = (value as Number).toDouble()
 
-    private fun str(value: Any?): String {
-        return value?.toString() ?: ""
-    }
+    private fun str(value: Any?): String = value as String
 }

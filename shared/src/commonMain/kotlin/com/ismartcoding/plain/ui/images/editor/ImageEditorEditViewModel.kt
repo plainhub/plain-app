@@ -82,20 +82,25 @@ class ImageEditorEditViewModel : ViewModel() {
             showLoading.value = false
             return@withIO
         }
-        if (project.stateB64.isNotEmpty()) {
-            runCatching {
+        try {
+            if (project.stateB64.isNotEmpty()) {
                 val bytes = Base64Lenient.decode(project.stateB64)
                 val doc = YjsDoc(bytes)
+                require((doc.getMetaValue("formatVersion") as? Number)?.toDouble() == YjsDocEncoder.FORMAT_VERSION.toDouble()) { "Unsupported image editor document format" }
+                val decodedLayers = doc.getLayers()
+                val decodedImages = doc.getImages()
                 canvasSize.value = doc.getCanvasSize()
                 bgColor.value = doc.getBgColor()
                 sourceImage.value = doc.getSourceImage()
                 imgOffset.value = doc.getImgOffset()
                 imgAlpha.value = doc.getImgAlpha()
-                _layersFlow.value = doc.getLayers()
+                images.value = decodedImages
+                _layersFlow.value = decodedLayers
             }
+            dirty.value = false
+        } finally {
+            showLoading.value = false
         }
-        dirty.value = false
-        showLoading.value = false
     }
 
     fun toggleLevel() {

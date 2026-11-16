@@ -106,25 +106,24 @@ class YjsEncoder {
  *   writeVarUint(numClients)  // deleteSet (0 = empty)
  */
 object YjsDocEncoder {
+    const val FORMAT_VERSION = 1
     private const val CLIENT_ID = 1L
 
     // Info bit flags (Yjs/lib0: BIT8=origin, BIT7=right, BIT6=parentSub)
     private const val BIT_ORIGIN = 128
-    private const val BIT_RIGHT = 64
     private const val BIT_PARENT_SUB = 32
 
     // Content type refs (Yjs internals.js contentRefs array)
-    private const val CONTENT_STRING = 4
     private const val CONTENT_ANY = 8
     private const val CONTENT_TYPE = 7
 
     private data class ItemSpec(
         val contentRef: Int,
         val contentWriter: (YjsEncoder) -> Unit,
-        val contentLength: Long,
         val parentYKey: String? = null,
         val parentId: Pair<Long, Long>? = null,
         val parentSub: String? = null,
+        val origin: Pair<Long, Long>? = null,
     )
 
     fun encode(
@@ -139,21 +138,9 @@ object YjsDocEncoder {
         val items = mutableListOf<ItemSpec>()
         var clock = 0L
 
-        // Root types: meta (Y.Map=1), layers (Y.Array=0), images (Y.Map=1)
-        val metaRootId = Pair(CLIENT_ID, clock)
-        items.add(ItemSpec(CONTENT_TYPE, { it.writeVarUint(1) }, 1, parentYKey = "meta"))
-        clock += 1
-
-        val layersRootId = Pair(CLIENT_ID, clock)
-        items.add(ItemSpec(CONTENT_TYPE, { it.writeVarUint(0) }, 1, parentYKey = "layers"))
-        clock += 1
-
-        val imagesRootId = Pair(CLIENT_ID, clock)
-        items.add(ItemSpec(CONTENT_TYPE, { it.writeVarUint(1) }, 1, parentYKey = "images"))
-        clock += 1
-
         // Meta entries (Y.Map keys on root "meta" type)
         val metaEntries = linkedMapOf<String, Any?>(
+            "formatVersion" to FORMAT_VERSION,
             "canvasWidth" to canvasSize.width,
             "canvasHeight" to canvasSize.height,
             "bgColor" to bgColor,
@@ -169,9 +156,11 @@ object YjsDocEncoder {
         }
 
         // Layer entries (each is a ContentType Y.Map inside the layers Y.Array)
+        var previousLayer: Pair<Long, Long>? = null
         for (layer in layers) {
             val layerId = Pair(CLIENT_ID, clock)
-            items.add(ItemSpec(CONTENT_TYPE, { it.writeVarUint(1) }, 1, parentYKey = "layers"))
+            items.add(ItemSpec(CONTENT_TYPE, { it.writeVarUint(1) }, parentYKey = "layers", origin = previousLayer))
+            previousLayer = layerId
             clock += 1
 
             val props = layerToMap(layer)
@@ -179,26 +168,29 @@ object YjsDocEncoder {
                 if (key == "points" && layer is FreehandLayer) {
                     // Freehand points: create a Y.Array (ContentType=0) as a nested type
                     val pointsArrId = Pair(CLIENT_ID, clock)
-                    items.add(ItemSpec(CONTENT_TYPE, { it.writeVarUint(0) }, 1, parentId = layerId, parentSub = "points"))
+                    items.add(ItemSpec(CONTENT_TYPE, { it.writeVarUint(0) }, parentId = layerId, parentSub = "points"))
                     clock += 1
 
                     // Each point is a ContentAny with a single [x, y] array value
+                    var previousPoint: Pair<Long, Long>? = null
                     for (p in layer.points) {
+                        val pointId = Pair(CLIENT_ID, clock)
                         items.add(ItemSpec(
                             CONTENT_ANY,
                             { enc ->
                                 enc.writeVarUint(1)
                                 enc.writeAny(listOf(p.x, p.y))
                             },
-                            1,
                             parentId = pointsArrId,
+                            origin = previousPoint,
                         ))
+                        previousPoint = pointId
                         clock += 1
                     }
                 } else if (value is Map<*, *>) {
                     // Nested Y.Map (e.g., textStroke, textShadow)
                     val nestedId = Pair(CLIENT_ID, clock)
-                    items.add(ItemSpec(CONTENT_TYPE, { it.writeVarUint(1) }, 1, parentId = layerId, parentSub = key))
+                    items.add(ItemSpec(CONTENT_TYPE, { it.writeVarUint(1) }, parentId = layerId, parentSub = key))
                     clock += 1
 
                     for ((nk, nv) in value) {
@@ -213,15 +205,8 @@ object YjsDocEncoder {
             }
         }
 
-        // Image entries (Y.Map keys on root "images" type)
         for ((layerId, dataUrl) in images) {
-            items.add(ItemSpec(
-                CONTENT_STRING,
-                { it.writeVarString(dataUrl) },
-                dataUrl.length.toLong(),
-                parentYKey = "images",
-                parentSub = layerId,
-            ))
+            items.add(makeValueItem(dataUrl, parentYKey = "images", parentSub = layerId, assignClock = { clock += it }))
         }
 
         // Write V1 update
@@ -248,53 +233,34 @@ object YjsDocEncoder {
         parentSub: String,
         assignClock: (Long) -> Unit,
     ): ItemSpec {
-        return when (value) {
-            is String -> {
-                assignClock(value.length.toLong())
-                ItemSpec(CONTENT_STRING, { it.writeVarString(value) }, value.length.toLong(), parentYKey, parentId, parentSub)
-            }
-            else -> {
-                assignClock(1)
-                ItemSpec(CONTENT_ANY, { enc ->
-                    enc.writeVarUint(1)
-                    enc.writeAny(value)
-                }, 1, parentYKey, parentId, parentSub)
-            }
-        }
+        assignClock(1)
+        return ItemSpec(CONTENT_ANY, { encoder ->
+            encoder.writeVarUint(1)
+            encoder.writeAny(value)
+        }, parentYKey, parentId, parentSub)
     }
 
     private fun writeItem(encoder: YjsEncoder, item: ItemSpec) {
         val hasParentSub = item.parentSub != null
-        val hasOrigin = false
-        val hasRight = false
-
         var info = item.contentRef
-        if (hasOrigin) info = info or BIT_ORIGIN
-        if (hasRight) info = info or BIT_RIGHT
+        if (item.origin != null) info = info or BIT_ORIGIN
         if (hasParentSub) info = info or BIT_PARENT_SUB
-
         encoder.writeUint8(info)
-
-        // No origin, no right to write
-
-        // Parent info is written when !hasOrigin && !hasRight
-        if (!hasOrigin && !hasRight) {
+        val origin = item.origin
+        if (origin != null) {
+            encoder.writeVarUint(origin.first)
+            encoder.writeVarUint(origin.second)
+        } else {
             if (item.parentYKey != null) {
-                encoder.writeVarUint(1) // parentInfo = 1 (string, root type)
+                encoder.writeVarUint(1)
                 encoder.writeVarString(item.parentYKey)
             } else if (item.parentId != null) {
-                encoder.writeVarUint(0) // parentInfo = 0 (ID, nested type)
+                encoder.writeVarUint(0)
                 encoder.writeVarUint(item.parentId.first)
                 encoder.writeVarUint(item.parentId.second)
             }
+            if (hasParentSub) encoder.writeVarString(item.parentSub!!)
         }
-
-        // parentSub string
-        if (hasParentSub) {
-            encoder.writeVarString(item.parentSub)
-        }
-
-        // Content
         item.contentWriter(encoder)
     }
 
