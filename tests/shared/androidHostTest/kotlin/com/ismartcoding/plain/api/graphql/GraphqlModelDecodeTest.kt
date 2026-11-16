@@ -1,5 +1,6 @@
 package com.ismartcoding.plain.api.graphql
 
+import com.ismartcoding.plain.graphql.Fragments
 import com.ismartcoding.plain.features.chat.models.*
 import com.ismartcoding.plain.features.chat.ChatStatus
 import com.ismartcoding.plain.graphql.Query
@@ -57,10 +58,13 @@ class GraphqlModelDecodeTest {
 
     @Test
     fun plainMixedMessageKeepsDerivedLinkPreviewMetadataWithoutSendingItBack() {
+        assertTrue(Fragments.CHAT_ITEM.contains("description image imageWidth"))
+        assertFalse(Fragments.CHAT_ITEM.contains("imageLocalPath"))
+        assertFalse(Fragments.CHAT_ITEM.contains("imageUrl"))
         val url = "https://example.org/article"
         val fixture = chat.replace(
             """{"__typename":"ChatMessageContent","text":"hello 中文","format":"PLAIN","items":[],"linkPreviews":[]}""",
-            """{"__typename":"ChatMessageContent","text":"$url","format":"PLAIN","items":[{"type":"IMAGE","attachment":{"id":"a","uri":"fid:image","size":3}},{"type":"FILE","attachment":{"id":"b","uri":"fid:file","size":5}}],"linkPreviews":[{"url":"$url","title":"Article","description":"Preview summary","imageUrl":"https://example.org/cover.png","imageLocalPath":"fid:cover","imageWidth":32,"imageHeight":24,"siteName":"Example Site","domain":"example.org","createdAt":"2026-10-12T00:00:00Z"}]}""",
+            """{"__typename":"ChatMessageContent","text":"$url","format":"PLAIN","items":[{"type":"IMAGE","attachment":{"id":"a","uri":"fid:image","size":3}},{"type":"FILE","attachment":{"id":"b","uri":"fid:file","size":5}}],"linkPreviews":[{"url":"$url","title":"Article","description":"Preview summary","image":"fid:cover","imageWidth":32,"imageHeight":24,"siteName":"Example Site","domain":"example.org","createdAt":"2026-10-12T00:00:00Z"}]}""",
         )
         val content = JsonHelper.jsonDecode<ChatItem>(fixture).messageContent
         val message = content.value as ChatMessage
@@ -70,7 +74,10 @@ class GraphqlModelDecodeTest {
         val preview = message.linkPreviews.single()
         assertEquals("Article", preview.title)
         assertEquals("Preview summary", preview.description)
-        assertEquals("fid:cover", preview.imageLocalPath)
+        assertEquals("fid:cover", preview.imageReference)
+        for (invalid in listOf(null, "fid:", "https://example.org/cover.png", "/cache/cover.png")) {
+            assertNull(preview.copy(image = invalid).imageReference)
+        }
         assertEquals("Example Site", preview.siteName)
         assertEquals(32, preview.imageWidth)
         assertEquals(24, preview.imageHeight)

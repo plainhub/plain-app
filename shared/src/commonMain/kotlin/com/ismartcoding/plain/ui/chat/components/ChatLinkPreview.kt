@@ -31,14 +31,15 @@ fun ChatLinkPreview(linkPreview: LinkPreview, modifier: Modifier = Modifier) {
             .clickable { launchUrl(linkPreview.url) },
     ) {
         Column {
-            val imageLocalPath = linkPreview.imageLocalPath
+            val image = linkPreview.imageReference
             val domain = linkPreview.domain
             val title = linkPreview.title
             val description = linkPreview.description
-            if (!imageLocalPath.isNullOrEmpty() && linkPreview.imageWidth >= 200 && linkPreview.imageHeight >= 200) {
+            val showLargeImage = linkPreview.imageWidth >= 200 && linkPreview.imageHeight >= 200
+            if (image != null && showLargeImage) {
                 Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
                     AsyncImage(
-                        model = rememberImageResource(imageLocalPath),
+                        model = rememberImageResource(image),
                         contentDescription = stringResource(Res.string.link_preview_image),
                         modifier = Modifier.fillMaxWidth().heightIn(min = 120.dp, max = 200.dp),
                         contentScale = ContentScale.Fit
@@ -65,12 +66,9 @@ fun ChatLinkPreview(linkPreview: LinkPreview, modifier: Modifier = Modifier) {
                     Spacer(modifier = Modifier.height(8.dp))
                 }
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    val showSmallIcon = (!imageLocalPath.isNullOrEmpty() &&
-                            (linkPreview.imageWidth < 200 || linkPreview.imageHeight < 200)) ||
-                            (imageLocalPath.isNullOrEmpty() && !linkPreview.imageUrl.isNullOrEmpty())
-                    if (showSmallIcon) {
+                    if (image != null && !showLargeImage) {
                         AsyncImage(
-                            model = if (!imageLocalPath.isNullOrEmpty()) rememberImageResource(imageLocalPath) else linkPreview.imageUrl,
+                            model = rememberImageResource(image),
                             contentDescription = null,
                             modifier = Modifier.size(18.dp).clip(RoundedCornerShape(3.dp)),
                             contentScale = ContentScale.Fit
