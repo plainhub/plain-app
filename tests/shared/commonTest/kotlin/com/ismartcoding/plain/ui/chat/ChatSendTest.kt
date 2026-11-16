@@ -3,7 +3,8 @@ package com.ismartcoding.plain.ui.chat
 import com.ismartcoding.plain.features.chat.ChatStatus
 import com.ismartcoding.plain.features.chat.data.ChatTarget
 import com.ismartcoding.plain.features.chat.models.MessageContent
-import com.ismartcoding.plain.features.chat.models.MessageText
+import com.ismartcoding.plain.features.chat.models.ChatMessage
+import com.ismartcoding.plain.features.chat.models.ChatTextFormat
 import com.ismartcoding.plain.features.chat.models.MessageType
 import com.ismartcoding.plain.features.chat.models.toJSONString
 import com.ismartcoding.plain.models.ChatItem
@@ -19,7 +20,7 @@ import kotlin.test.*
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class ChatSendTest {
-    private val content = MessageContent(MessageType.TEXT, MessageText("hello"))
+    private val content = MessageContent(MessageType.MESSAGE, ChatMessage(text = "hello"))
 
     @BeforeTest
     fun setup() { Dispatchers.setMain(StandardTestDispatcher()) }
@@ -29,7 +30,7 @@ class ChatSendTest {
 
     private fun sent(target: ChatTarget) = ChatItem(
         id = "committed", fromId = "me", toId = target.toId,
-        content = com.ismartcoding.plain.models.ChatContent.Text("hello", emptyList()), status = ChatStatus.SENT,
+        content = com.ismartcoding.plain.models.ChatContent.Message("hello", ChatTextFormat.PLAIN, emptyList(), emptyList()), status = ChatStatus.SENT,
     )
 
     @Test
@@ -47,7 +48,7 @@ class ChatSendTest {
         }
         started.await()
         assertEquals(ChatStatus.PENDING, ChatViewModel.local.itemsFlow.value.single().status)
-        assertEquals("hello", (ChatViewModel.local.itemsFlow.value.single().value as MessageText).text)
+        assertEquals("hello", (ChatViewModel.local.itemsFlow.value.single().value as ChatMessage).text)
         ChatViewModel.local.onMessagesCreated(target, listOf(sent(target)))
         release.complete(Unit)
         assertTrue(sending.await())

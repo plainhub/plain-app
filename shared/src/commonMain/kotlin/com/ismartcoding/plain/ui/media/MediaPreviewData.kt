@@ -6,8 +6,7 @@ import com.ismartcoding.plain.models.Video as MediaVideo
 import com.ismartcoding.plain.models.Image as MediaImage
 import androidx.compose.ui.unit.toSize
 import com.ismartcoding.plain.features.chat.models.MessageFile
-import com.ismartcoding.plain.features.chat.models.MessageFiles
-import com.ismartcoding.plain.features.chat.models.MessageImages
+import com.ismartcoding.plain.features.chat.models.ChatMessage
 import com.ismartcoding.plain.models.Image
 import com.ismartcoding.plain.models.Video
 import com.ismartcoding.plain.lib.extensions.isImageFast
@@ -27,11 +26,9 @@ object MediaPreviewData {
     ) {
         val newItems = mutableListOf<MessageFile>()
         chatItems.forEach { item ->
-            if (item.value is MessageImages) {
-                newItems.addAll((item.value as MessageImages).items)
-            } else if (item.value is MessageFiles) {
-                newItems.addAll((item.value as MessageFiles).items.filter { it.fileName.isVideoFast() || it.fileName.isImageFast() })
-            }
+            val message = item.value as? ChatMessage ?: return@forEach
+            newItems.addAll(message.images)
+            newItems.addAll(message.files.filter { it.fileName.isVideoFast() || it.fileName.isImageFast() })
         }
         if (source is com.ismartcoding.plain.rust.graphql.ContentSource.Remote) newItems.removeAll { it.isRemoteFile() }
         val paths = if (source is com.ismartcoding.plain.rust.graphql.ContentSource.Local) FilePaths.resolveAll(newItems.map { it.uri }) else newItems.map { it.uri }

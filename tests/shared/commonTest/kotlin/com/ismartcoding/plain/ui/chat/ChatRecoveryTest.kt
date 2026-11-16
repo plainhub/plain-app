@@ -3,7 +3,8 @@ package com.ismartcoding.plain.ui.chat
 import com.ismartcoding.plain.models.ChatItem
 import com.ismartcoding.plain.features.chat.ChatStatus
 import com.ismartcoding.plain.features.chat.models.MessageContent
-import com.ismartcoding.plain.features.chat.models.MessageText
+import com.ismartcoding.plain.features.chat.models.ChatMessage
+import com.ismartcoding.plain.features.chat.models.ChatTextFormat
 import com.ismartcoding.plain.features.chat.models.MessageType
 import com.ismartcoding.plain.lib.JsonHelper
 import kotlinx.coroutines.CompletableDeferred
@@ -24,10 +25,10 @@ class ChatRecoveryTest {
 
     private fun chat(id: String, text: String) = ChatItem(
         id = id, fromId = "peer", toId = "me", status = ChatStatus.SENT,
-        content = com.ismartcoding.plain.models.ChatContent.Text(text, emptyList()),
+        content = com.ismartcoding.plain.models.ChatContent.Message(text, ChatTextFormat.PLAIN, emptyList(), emptyList()),
         createdAt = Instant.parse("2026-01-01T00:00:00Z"), updatedAt = Instant.parse("2026-01-01T00:00:00Z"),
     )
-    private fun text() = (ChatViewModel.local.itemsFlow.value.single().value as MessageText).text
+    private fun text() = (ChatViewModel.local.itemsFlow.value.single().value as ChatMessage).text
 
     @AfterTest
     fun cleanup() { ChatViewModel.local._itemsFlow.value = emptyList(); Dispatchers.resetMain() }

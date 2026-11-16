@@ -14,8 +14,9 @@ import androidx.compose.ui.unit.dp
 import com.ismartcoding.plain.features.chat.ShareSendClient
 import com.ismartcoding.plain.features.chat.models.MessageContent
 import com.ismartcoding.plain.features.chat.models.MessageFile
-import com.ismartcoding.plain.features.chat.models.MessageFiles
-import com.ismartcoding.plain.features.chat.models.MessageImages
+import com.ismartcoding.plain.features.chat.models.ChatAttachmentType
+import com.ismartcoding.plain.features.chat.models.ChatMessage
+import com.ismartcoding.plain.features.chat.models.ChatMessageAttachment
 import com.ismartcoding.plain.features.chat.models.MessageType
 import com.ismartcoding.plain.features.files.stored.AppFileStore
 import com.ismartcoding.plain.i18n.*
@@ -54,8 +55,8 @@ fun AppFileInfoBottomSheet(
                 scope.launchSafe {
                     val dFile = MessageFile(uri = AppFileStore.toFidUri(file.appFile), size = file.appFile.size, fileName = file.fileName)
                     val isMedia = file.fileName.isImageFast() || file.fileName.isVideoFast() || file.appFile.mimeType.startsWith("image/") || file.appFile.mimeType.startsWith("video/")
-                    val content = if (isMedia) MessageContent(MessageType.IMAGES, MessageImages(listOf(dFile)))
-                        else MessageContent(MessageType.FILES, MessageFiles(listOf(dFile)))
+                    val type = if (isMedia) ChatAttachmentType.IMAGE else ChatAttachmentType.FILE
+                    val content = MessageContent(MessageType.MESSAGE, ChatMessage(items = listOf(ChatMessageAttachment(type, dFile))))
                     source.chatSender.sendContent(targets, content)
                     DialogHelper.showSuccess(Res.string.sent)
                     onDismiss()

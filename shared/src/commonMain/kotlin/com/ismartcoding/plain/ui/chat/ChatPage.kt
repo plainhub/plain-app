@@ -74,6 +74,13 @@ import com.ismartcoding.plain.ui.navigation.Routing
 import com.ismartcoding.plain.ui.chat.components.ChatInput
 import com.ismartcoding.plain.ui.chat.components.ChatListItem
 import com.ismartcoding.plain.ui.chat.components.TransportIcon
+import com.ismartcoding.plain.features.chat.sendChatDraft
+import com.ismartcoding.plain.features.chat.ChatDraftAttachment
+import com.ismartcoding.plain.features.chat.models.ChatAttachmentType
+import com.ismartcoding.plain.features.chat.models.ChatTextFormat
+import com.ismartcoding.plain.features.files.PickFileType
+import com.ismartcoding.plain.lib.withIO
+import com.ismartcoding.plain.platform.files.queryPickedFileInfo
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
@@ -99,7 +106,10 @@ fun ChatPage(
         scope.launchSafe { com.ismartcoding.plain.ui.permissions.requestAccess(chatVM.source.api, com.ismartcoding.plain.features.web.AccessFeature.FILES) }
         Unit
     }
-    var inputValue by remember { mutableStateOf("") }
+    var inputValue by remember(id) { mutableStateOf("") }
+    var chatFormat by remember(id) { mutableStateOf(ChatTextFormat.PLAIN) }
+    var attachments by remember(id) { mutableStateOf<Map<String, ChatDraftAttachment>>(emptyMap()) }
+    var sending by remember(id) { mutableStateOf(false) }
     var showForwardDialog by remember { mutableStateOf(false) }
     var messageToForward by remember { mutableStateOf<VChat?>(null) }
     var showFolderShareSheet by remember { mutableStateOf(false) }
@@ -124,7 +134,19 @@ fun ChatPage(
         inputValue = chatVM.client.readDraft(id)
     }
 
-    ChatPageEffects(chatVM, peerVM, channelVM, id, chatTarget.value.type, focusManager, scrollState)
+    ChatPageEffects(chatVM, peerVM, channelVM, id, chatTarget.value.type, scrollState) { event ->
+        if (!sending && filesAllowed) {
+            val picked = withIO {
+                event.uris.associateWith { uri ->
+                    ChatDraftAttachment(
+                        if (event.type == PickFileType.IMAGE_VIDEO) ChatAttachmentType.IMAGE else ChatAttachmentType.FILE,
+                        queryPickedFileInfo(uri)?.displayName ?: uri.substringAfterLast('/'),
+                    )
+                }
+            }
+            if (!sending) attachments = attachments + picked
+        }
+    }
 
     PBackHandler(enabled = chatVM.selectMode.value || previewerState.visible) {
         if (previewerState.visible) scope.launch { previewerState.closeTransform() }
@@ -264,12 +286,34 @@ fun ChatPage(
                             chatVM.client.writeDraft(id, it)
                         }
                     },
+                    attachments = attachments.mapValues { it.value.name },
+                    markdown = chatFormat == ChatTextFormat.MARKDOWN,
+                    sending = sending,
+                    onRemoveAttachment = { attachments = attachments - it },
+                    onChangeFormat = {
+                        chatFormat = if (chatFormat == ChatTextFormat.PLAIN) ChatTextFormat.MARKDOWN else ChatTextFormat.PLAIN
+                    },
                     onSend = {
-                        if (inputValue.isEmpty()) return@ChatInput
-                        scope.launch {
-                            chatVM.sendTextMessage(inputValue)
-                            inputValue = ""
-                            chatVM.client.writeDraft(id, "")
+                        if (sending || inputValue.isBlank() && attachments.isEmpty()) return@ChatInput
+                        if (!filesAllowed && attachments.isNotEmpty()) return@ChatInput
+                        val target = chatTarget.value
+                        val body = inputValue
+                        val format = chatFormat
+                        val picked = attachments
+                        sending = true
+                        scope.launchSafe {
+                            try {
+                                if (sendChatDraft(chatVM, target, body, format, picked) &&
+                                    inputValue == body && chatFormat == format && attachments == picked
+                                ) {
+                                    inputValue = ""
+                                    attachments = emptyMap()
+                                    chatFormat = ChatTextFormat.PLAIN
+                                    chatVM.client.writeDraft(id, "")
+                                }
+                            } finally {
+                                sending = false
+                            }
                         }
                     },
                     onShareFolder = { showFolderShareSheet = true })

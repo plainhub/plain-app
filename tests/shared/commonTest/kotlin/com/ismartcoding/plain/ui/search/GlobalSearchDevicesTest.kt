@@ -251,7 +251,7 @@ class GlobalSearchDevicesTest {
         val text = "Earlier message text. ".repeat(10) + query + " surrounding context"
         device.chats = listOf(com.ismartcoding.plain.models.ChatItem(
             id = "owned-chat", fromId = "first", toId = "me", status = com.ismartcoding.plain.features.chat.ChatStatus.SENT,
-            content = com.ismartcoding.plain.models.ChatContent.Text(text, emptyList()), createdAt = Instant.parse("2026-01-01T00:00:00Z"), updatedAt = Instant.parse("2026-01-01T00:00:00Z"),
+            content = com.ismartcoding.plain.models.ChatContent.Message(text, com.ismartcoding.plain.features.chat.models.ChatTextFormat.PLAIN, emptyList(), emptyList()), createdAt = Instant.parse("2026-01-01T00:00:00Z"), updatedAt = Instant.parse("2026-01-01T00:00:00Z"),
         ))
         val vm = model { GlobalSearchDevices(listOf(source)) }
         vm.domain.value = GlobalSearchDomain.CHAT

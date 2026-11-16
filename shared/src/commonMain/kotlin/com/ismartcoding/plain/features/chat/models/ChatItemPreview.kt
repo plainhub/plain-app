@@ -11,48 +11,32 @@ import com.ismartcoding.plain.i18n.shared_folder
 import com.ismartcoding.plain.i18n.video
 import com.ismartcoding.plain.i18n.videos
 import com.ismartcoding.plain.ui.i18n.LocaleHelper
-import com.ismartcoding.plain.ui.resources.file as ui_drawable_file
-import com.ismartcoding.plain.ui.resources.files as ui_drawable_files
-import com.ismartcoding.plain.ui.resources.image as ui_drawable_image
-import com.ismartcoding.plain.ui.resources.video as ui_drawable_video
 
 fun ChatItem.getMessagePreview(): String {
-    return when (messageContent.type) {
-        MessageType.TEXT -> {
-            val textMessage = messageContent.value as? MessageText
-            textMessage?.text?.take(50) ?: LocaleHelper.getString(Res.string.message)
+    val message = messageContent
+    if (message.type == MessageType.SHARE) return LocaleHelper.getString(Res.string.shared_folder)
+    val value = message.value as ChatMessage
+    value.text?.takeIf { it.isNotBlank() }?.let { return it.take(50) }
+    val items = value.images
+    if (items.isNotEmpty()) {
+        val videoCount = items.count { it.durationMs > 0 }
+        val imageCount = items.size - videoCount
+        val images = when {
+            imageCount > 1 -> "$imageCount ${LocaleHelper.getString(Res.string.images)}"
+            imageCount == 1 -> LocaleHelper.getString(Res.string.image)
+            else -> null
         }
-
-        MessageType.IMAGES -> {
-            val imagesMessage = messageContent.value as? MessageImages
-            val items = imagesMessage?.items ?: emptyList()
-            val videoCount = items.count { it.durationMs > 0 }
-            val imageCount = items.size - videoCount
-            when {
-                imageCount > 0 && videoCount > 0 -> {
-                    val imgPart = if (imageCount > 1) "$imageCount ${LocaleHelper.getString(Res.string.images)}" else LocaleHelper.getString(Res.string.image)
-                    val vidPart = if (videoCount > 1) "$videoCount ${LocaleHelper.getString(Res.string.videos)}" else LocaleHelper.getString(Res.string.video)
-                    "$imgPart, $vidPart"
-                }
-
-                videoCount > 0 -> {
-                    if (videoCount > 1) "$videoCount ${LocaleHelper.getString(Res.string.videos)}" else LocaleHelper.getString(Res.string.video)
-                }
-
-                else -> {
-                    if (imageCount > 1) "$imageCount ${LocaleHelper.getString(Res.string.images)}" else LocaleHelper.getString(Res.string.image)
-                }
-            }
+        val videos = when {
+            videoCount > 1 -> "$videoCount ${LocaleHelper.getString(Res.string.videos)}"
+            videoCount == 1 -> LocaleHelper.getString(Res.string.video)
+            else -> null
         }
-
-        MessageType.FILES -> {
-            val filesMessage = messageContent.value as? MessageFiles
-            val count = filesMessage?.items?.size ?: 0
-            if (count > 1) "$count ${LocaleHelper.getString(Res.string.files)}" else LocaleHelper.getString(Res.string.file)
-        }
-
-        MessageType.SHARE -> LocaleHelper.getString(Res.string.shared_folder)
-
+        return listOfNotNull(images, videos).joinToString(", ")
+    }
+    val count = value.files.size
+    return when {
+        count > 1 -> "$count ${LocaleHelper.getString(Res.string.files)}"
+        count == 1 -> LocaleHelper.getString(Res.string.file)
         else -> LocaleHelper.getString(Res.string.message)
     }
 }

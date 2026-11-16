@@ -5,22 +5,28 @@ import kotlinx.serialization.EncodeDefault
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.Serializable
 
+@Serializable
+data class ChatMessageInput(
+    val text: String?,
+    val format: ChatTextFormat,
+    val items: List<ChatMessageAttachment>,
+)
+
 @OptIn(ExperimentalSerializationApi::class)
 @Serializable
 data class ChatContentInput(
-    @EncodeDefault(EncodeDefault.Mode.NEVER) val text: MessageText? = null,
-    @EncodeDefault(EncodeDefault.Mode.NEVER) val images: MessageImages? = null,
-    @EncodeDefault(EncodeDefault.Mode.NEVER) val files: MessageFiles? = null,
+    @EncodeDefault(EncodeDefault.Mode.NEVER) val message: ChatMessageInput? = null,
     @EncodeDefault(EncodeDefault.Mode.NEVER) val share: MessageShare? = null,
 ) {
     init {
-        require(listOf(text, images, files, share).count { it != null } == 1)
+        require((message == null) != (share == null))
     }
     companion object {
         fun from(content: MessageContent): ChatContentInput = when (content.type) {
-            MessageType.TEXT -> ChatContentInput(text = content.value as MessageText)
-            MessageType.IMAGES -> ChatContentInput(images = content.value as MessageImages)
-            MessageType.FILES -> ChatContentInput(files = content.value as MessageFiles)
+            MessageType.MESSAGE -> {
+                val value = content.value as ChatMessage
+                ChatContentInput(message = ChatMessageInput(value.text, value.format, value.items))
+            }
             MessageType.SHARE -> ChatContentInput(share = content.value as MessageShare)
         }
     }

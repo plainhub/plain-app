@@ -3,7 +3,7 @@ package com.ismartcoding.plain.features.chat
 import com.ismartcoding.plain.features.chat.data.ChatTarget
 import com.ismartcoding.plain.features.chat.data.ChatTargetType
 import com.ismartcoding.plain.features.chat.models.MessageContent
-import com.ismartcoding.plain.features.chat.models.MessageText
+import com.ismartcoding.plain.features.chat.models.ChatMessage
 import com.ismartcoding.plain.features.chat.models.MessageType
 import com.ismartcoding.plain.graphql.Mutation
 import com.ismartcoding.plain.lib.withIO
@@ -29,7 +29,7 @@ open class ChatApi internal constructor(private val api: com.ismartcoding.plain.
         api.execute(Mutation.sendChatItems(listOf(target.encodedToId), com.ismartcoding.plain.models.ChatContentInput.from(content))).single()
 
     suspend fun sendText(target: ChatTarget, text: String): ChatItem =
-        sendContent(target, MessageContent(MessageType.TEXT, MessageText(text)))
+        sendContent(target, MessageContent(MessageType.MESSAGE, ChatMessage(text = text)))
 
     suspend fun forward(id: String, targets: List<ChatTarget>): List<ChatItem> =
         api.execute(Mutation.forwardChatItems(id, targets.map { it.encodedToId }))

@@ -4,8 +4,6 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 enum class MessageType {
-    TEXT,
-    IMAGES,
-    FILES,
+    MESSAGE,
     SHARE,
 }

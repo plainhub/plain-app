@@ -12,7 +12,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
-import com.ismartcoding.plain.features.chat.models.MessageFiles
+import com.ismartcoding.plain.features.chat.models.MessageFile
 import com.ismartcoding.plain.models.Peer
 import com.ismartcoding.plain.ui.media.viewer.previewer.MediaPreviewerState
 import com.ismartcoding.plain.ui.audio.AudioQueueViewModel
@@ -24,12 +24,12 @@ fun ChatFiles(
     items: List<VChat>,
     navController: NavHostController,
     m: VChat,
+    fileItems: List<MessageFile>,
     peer: Peer?,
     audioQueueVM: AudioQueueViewModel,
     previewerState: MediaPreviewerState,
 ) {
     val downloads = com.ismartcoding.plain.ui.chat.LocalChatDownloads.current
-    val fileItems = (m.value as MessageFiles).items
     val downloadTasks by downloads.progress.collectAsState(mapOf())
 
     Column(

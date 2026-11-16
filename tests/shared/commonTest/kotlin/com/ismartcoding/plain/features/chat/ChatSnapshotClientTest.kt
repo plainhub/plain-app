@@ -12,7 +12,7 @@ import kotlin.time.Instant
 
 class ChatSnapshotClientTest {
     private fun chat(id: String) = ChatItem(
-        id = id, fromId = "peer", toId = "me", content = com.ismartcoding.plain.models.ChatContent.Text("", emptyList()), status = ChatStatus.SENT,
+        id = id, fromId = "peer", toId = "me", content = com.ismartcoding.plain.models.ChatContent.Message("", com.ismartcoding.plain.features.chat.models.ChatTextFormat.PLAIN, emptyList(), emptyList()), status = ChatStatus.SENT,
         createdAt = Instant.parse("2026-01-01T00:00:00Z"), updatedAt = Instant.parse("2026-01-01T00:00:00Z"),
     )
 

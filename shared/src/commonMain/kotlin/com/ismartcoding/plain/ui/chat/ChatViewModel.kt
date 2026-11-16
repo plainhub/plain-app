@@ -7,7 +7,6 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import com.ismartcoding.plain.features.chat.data.ChatTarget
 import com.ismartcoding.plain.features.chat.data.ChatTargetType
-import com.ismartcoding.plain.features.chat.models.MessageText
 import com.ismartcoding.plain.features.chat.models.MessageType
 import com.ismartcoding.plain.lib.generateId
 import com.ismartcoding.plain.lib.TimeHelper
@@ -220,16 +219,6 @@ class ChatViewModel internal constructor(
             false
         }
     }
-
-    fun sendContent(content: MessageContent, onResult: (Boolean) -> Unit = {}) {
-        val target = target.value
-        launchSafe {
-            onResult(sendMessage(target, content))
-        }
-    }
-
-    fun sendTextMessage(text: String, onResult: (Boolean) -> Unit = {}) =
-        sendContent(MessageContent(MessageType.TEXT, MessageText(text)), onResult)
 
     /**
      * Entry point for non-UI writers delivering already-persisted messages

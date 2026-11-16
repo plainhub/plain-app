@@ -14,7 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.ismartcoding.plain.ui.chat.ChatViewModel
-import com.ismartcoding.plain.features.chat.models.MessageImages
+import com.ismartcoding.plain.features.chat.models.MessageFile
 import com.ismartcoding.plain.models.Peer
 import com.ismartcoding.plain.ui.media.viewer.previewer.MediaPreviewerState
 import com.ismartcoding.plain.ui.chat.VChat
@@ -24,6 +24,7 @@ import com.ismartcoding.plain.ui.chat.VChat
 fun ChatImages(
     items: List<VChat>,
     m: VChat,
+    imageItems: List<MessageFile>,
     peer: Peer?,
     imageWidthDp: Dp,
     imageWidthPx: Int,
@@ -31,7 +32,6 @@ fun ChatImages(
     chatViewModel: ChatViewModel,
 ) {
     val downloads = com.ismartcoding.plain.ui.chat.LocalChatDownloads.current
-    val imageItems = (m.value as MessageImages).items
     val downloadTasks by downloads.progress.collectAsState(mapOf())
 
     FlowRow(

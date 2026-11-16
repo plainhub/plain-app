@@ -9,8 +9,7 @@ import com.ismartcoding.plain.features.chat.ChatClient
 import com.ismartcoding.plain.features.chat.RustChatStore
 import com.ismartcoding.plain.features.chat.ShareSendClient
 import com.ismartcoding.plain.features.chat.data.ChatTarget
-import com.ismartcoding.plain.features.chat.models.MessageFiles
-import com.ismartcoding.plain.features.chat.models.MessageImages
+import com.ismartcoding.plain.features.chat.models.ChatMessage
 import com.ismartcoding.plain.features.chat.models.MessageShare
 import com.ismartcoding.plain.features.chat.ChatStatus
 import com.ismartcoding.plain.features.shares.SharesClient
@@ -49,15 +48,14 @@ class ChatServiceRustHttpTest {
             val longText = marker + "😀".repeat(1100)
             val text = ChatClient.sendText(local, longText).also { ids += it.id }
             assertEquals(ChatStatus.SENT, text.status)
-            val textFile = (text.messageContent.value as MessageFiles).items.single()
-            files += textFile.uri.removePrefix("fid:").substringBefore('.')
-            assertEquals(longText.toByteArray().size.toLong(), textFile.size)
-            val record = AppFileStore.page(0, 1, "text:${files.single()}").single().appFile
-            assertArrayEquals(longText.toByteArray(), File(RustRuntime.dataDir, record.realPath).readBytes())
+            val longMessage = text.messageContent.value as ChatMessage
+            assertEquals(longText, longMessage.text)
+            assertTrue(longMessage.items.isEmpty())
             assertTrue(sendPickedAttachments(listOf(local, local), listOf(FileProvider.getUriForFile(appContext, AppIntents.AUTHORITY, source).toString()), null, "$marker caption"))
-            val picked = created().filter { (it.messageContent.value as? MessageFiles)?.items?.any { item -> item.fileName == source.name } == true }
-            assertEquals(2, picked.size)
-            val attachment = (picked.first().messageContent.value as MessageFiles).items.single()
+            val picked = created().filter { (it.messageContent.value as? ChatMessage)?.files?.any { item -> item.fileName == source.name } == true }
+            assertEquals(1, picked.size)
+            assertEquals("$marker caption", (picked.single().messageContent.value as ChatMessage).text)
+            val attachment = (picked.first().messageContent.value as ChatMessage).files.single()
             val hash = attachment.uri.removePrefix("fid:").substringBefore('.')
             files += hash
             assertEquals(source.length(), attachment.size)
@@ -78,7 +76,7 @@ class ChatServiceRustHttpTest {
             bitmap.recycle()
             val imageUri = FileProvider.getUriForFile(appContext, AppIntents.AUTHORITY, image).toString()
             assertTrue(sendPickedAttachments(listOf(local), listOf(imageUri), null, null))
-            val picture = created().mapNotNull { it.messageContent.value as? MessageImages }.single().items.single()
+            val picture = created().flatMap { (it.messageContent.value as? ChatMessage)?.images.orEmpty() }.single()
             files += picture.uri.removePrefix("fid:").substringBefore('.')
             assertEquals(7, picture.width)
             assertEquals(5, picture.height)

@@ -2,6 +2,8 @@ package com.ismartcoding.plain.ui.chat.components
 
 import com.ismartcoding.plain.i18n.*
 import androidx.compose.foundation.border
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -24,6 +26,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.onFocusChanged
 import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.text.style.TextOverflow
+import com.ismartcoding.plain.ui.base.PFilterChip
+import com.ismartcoding.plain.ui.base.PTextButton
 import com.ismartcoding.plain.features.files.PickFileTag
 import com.ismartcoding.plain.features.files.PickFileType
 import com.ismartcoding.plain.events.PickFileEvent
@@ -45,11 +50,27 @@ fun ChatInput(
     onShareFolder: () -> Unit = {},
     filesAllowed: Boolean = true,
     onRequestFilePermission: () -> Unit = {},
+    attachments: Map<String, String> = emptyMap(),
+    markdown: Boolean = false,
+    sending: Boolean = false,
+    onRemoveAttachment: (String) -> Unit = {},
+    onChangeFormat: () -> Unit = {},
 ) {
     var hasFocus by remember { mutableStateOf(false) }
     Column(modifier = Modifier.fillMaxWidth()) {
+        if (attachments.isNotEmpty()) {
+            Column(Modifier.heightIn(max = 128.dp).verticalScroll(rememberScrollState())) {
+                attachments.forEach { (uri, name) ->
+                    Row(Modifier.fillMaxWidth().padding(horizontal = 16.dp), horizontalArrangement = Arrangement.SpaceBetween) {
+                        Text(name, modifier = Modifier.weight(1f), maxLines = 1, overflow = TextOverflow.Ellipsis)
+                        PTextButton(text = stringResource(Res.string.remove), onClick = { if (!sending) onRemoveAttachment(uri) })
+                    }
+                }
+            }
+        }
         OutlinedTextField(
             value = value,
+            enabled = !sending,
             onValueChange = { onValueChange(it) },
             modifier =
             Modifier
@@ -72,7 +93,14 @@ fun ChatInput(
                 )
             },
         )
-        if (hasFocus) {
+        if (hasFocus || attachments.isNotEmpty() || markdown) {
+            PFilterChip(
+                selected = markdown,
+                onClick = onChangeFormat,
+                label = { Text("Markdown") },
+                enabled = !sending,
+                modifier = Modifier.padding(horizontal = 16.dp),
+            )
             Row(
                 modifier =
                 Modifier
@@ -88,21 +116,21 @@ fun ChatInput(
                     contentDescription = stringResource(Res.string.images),
                     tint = MaterialTheme.colorScheme.primary,
                 ) {
-                    sendEvent(PickFileEvent(PickFileTag.SEND_MESSAGE, PickFileType.IMAGE_VIDEO, multiple = true))
+                    if (!sending) sendEvent(PickFileEvent(PickFileTag.SEND_MESSAGE, PickFileType.IMAGE_VIDEO, multiple = true))
                 }
                 PIconButton(
                     icon = UiRes.drawable.ui_drawable_folder,
                     contentDescription = stringResource(Res.string.files),
                     tint = MaterialTheme.colorScheme.primary,
                 ) {
-                    sendEvent(PickFileEvent(PickFileTag.SEND_MESSAGE, PickFileType.FILE, multiple = true))
+                    if (!sending) sendEvent(PickFileEvent(PickFileTag.SEND_MESSAGE, PickFileType.FILE, multiple = true))
                 }
                 PIconButton(
                     icon = UiRes.drawable.ui_drawable_folders,
                     contentDescription = stringResource(Res.string.share_folder),
                     tint = MaterialTheme.colorScheme.primary,
                 ) {
-                    onShareFolder()
+                    if (!sending) onShareFolder()
                 }
                 }
                 Spacer(modifier = Modifier.weight(1f))
@@ -111,7 +139,7 @@ fun ChatInput(
                     contentDescription = stringResource(Res.string.send_message),
                     tint = MaterialTheme.colorScheme.primary,
                 ) {
-                    onSend()
+                    if (!sending) onSend()
                 }
             }
         } else {

@@ -21,7 +21,7 @@ import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.withContext
 
 internal object PickedAttachments {
-    suspend fun <T> withFiles(uris: List<String>, normalize: Boolean, source: com.ismartcoding.plain.rust.graphql.ContentSource = com.ismartcoding.plain.rust.graphql.ContentSource.Local, send: suspend (List<MessageFile>) -> T): T = withIO {
+    suspend fun <T> withFiles(uris: List<String>, normalize: (String) -> Boolean, source: com.ismartcoding.plain.rust.graphql.ContentSource = com.ismartcoding.plain.rust.graphql.ContentSource.Local, send: suspend (List<Pair<String, MessageFile>>) -> T): T = withIO {
         val imports = mutableListOf<String>()
         try {
             val attachments = uris.distinct().mapNotNull { uri ->
@@ -42,13 +42,13 @@ internal object PickedAttachments {
                         else -> IntSize.Zero
                     }
                     val extension = getExtensionFromMimeType(info.mimeType)
-                    val name = if (normalize && extension.isNotEmpty()) "${info.displayName.substringBeforeLast('.', info.displayName)}.$extension" else info.displayName
+                    val name = if (normalize(uri) && extension.isNotEmpty()) "${info.displayName.substringBeforeLast('.', info.displayName)}.$extension" else info.displayName
                     val duration = when {
                         video != null -> video.durationMs
                         isVideo || info.mimeType.startsWith("audio/") || info.displayName.isAudioFast() -> source.media.durationMs(path)
                         else -> 0L
                     }
-                    MessageFile(uri = AppFileStore.toFidUri(file), size = file.size, fileName = name,
+                    uri to MessageFile(uri = AppFileStore.toFidUri(file), size = file.size, fileName = name,
                         width = size.width, height = size.height, durationMs = duration)
                 } catch (canceled: CancellationException) {
                     throw canceled

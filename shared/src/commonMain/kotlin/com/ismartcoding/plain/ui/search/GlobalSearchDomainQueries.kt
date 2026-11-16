@@ -243,7 +243,7 @@ private fun ChatItem.toHit(q: String, peers: Map<String, Peer>, channels: Map<St
     return GlobalSearchHit(
         key = "chat_$id",
         title = senderName,
-        snippet = ((messageContent.value as? com.ismartcoding.plain.features.chat.models.MessageText)?.text ?: getMessagePreview()).snippetAround(q),
+        snippet = ((messageContent.value as? com.ismartcoding.plain.features.chat.models.ChatMessage)?.text ?: getMessagePreview()).snippetAround(q),
         subtitle = conversation,
         iconRes = thumbRes,
         roundThumb = true,

@@ -4,7 +4,7 @@ import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.ui.focus.FocusManager
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
@@ -19,8 +19,10 @@ internal val LocalChatDownloads = androidx.compose.runtime.staticCompositionLoca
 @Composable
 internal fun ChatPageEffects(
     chatVM: ChatViewModel, peerVM: PeerViewModel, channelVM: ChannelViewModel,
-    id: String, targetType: ChatTargetType, focusManager: FocusManager, scrollState: LazyListState,
+    id: String, targetType: ChatTargetType, scrollState: LazyListState,
+    onPicked: suspend (PickFileResultEvent) -> Unit,
 ) {
+    val currentOnPicked = rememberUpdatedState(onPicked)
     val lifecycleOwner = LocalLifecycleOwner.current
     DisposableEffect(chatVM, lifecycleOwner, id) {
         val observer = LifecycleEventObserver { _, event ->
@@ -48,10 +50,10 @@ internal fun ChatPageEffects(
     LaunchedEffect(chatVM.source) {
         if (chatVM.source is com.ismartcoding.plain.rust.graphql.ContentSource.Local) launchSafe { chatVM.downloads.refresh() }
     }
-    LaunchedEffect(chatVM, peerVM, focusManager) {
+    LaunchedEffect(chatVM, id) {
         Channel.sharedFlow.collect { event ->
             if (event is PickFileResultEvent && event.tag == PickFileTag.SEND_MESSAGE) {
-                handleChatFileSelection(event, chatVM, peerVM, focusManager)
+                currentOnPicked.value(event)
             }
         }
     }

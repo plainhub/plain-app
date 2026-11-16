@@ -1,8 +1,7 @@
 package com.ismartcoding.plain.ui.files.stored
 
 import com.ismartcoding.plain.features.chat.models.MessageFile
-import com.ismartcoding.plain.features.chat.models.MessageFiles
-import com.ismartcoding.plain.features.chat.models.MessageImages
+import com.ismartcoding.plain.features.chat.models.ChatMessage
 import com.ismartcoding.plain.models.AppFile
 import com.ismartcoding.plain.models.ChatItem
 import com.ismartcoding.plain.features.files.stored.AppFileStore
@@ -16,8 +15,7 @@ object AppFileDisplayNameHelper {
             .sortedByDescending { it.createdAt }
             .forEach { chat ->
                 when (val value = chat.messageContent.value) {
-                    is MessageFiles -> bindItems(value.items, map)
-                    is MessageImages -> bindItems(value.items, map)
+                    is ChatMessage -> bindItems(value.items.map { it.attachment }, map)
                 }
             }
         return map

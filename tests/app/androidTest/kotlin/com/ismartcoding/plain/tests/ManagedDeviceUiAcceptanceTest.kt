@@ -57,7 +57,7 @@ import com.ismartcoding.plain.features.chat.ChatQueries
 import com.ismartcoding.plain.features.chat.ChatStatus
 import com.ismartcoding.plain.features.chat.data.ChatTarget
 import com.ismartcoding.plain.features.chat.data.ChatTargetType
-import com.ismartcoding.plain.features.chat.models.MessageText
+import com.ismartcoding.plain.features.chat.models.ChatMessage
 import android.view.inspector.WindowInspector
 import androidx.compose.ui.platform.ViewRootForTest
 import androidx.compose.ui.semantics.SemanticsNode
@@ -960,7 +960,7 @@ class ManagedDeviceUiAcceptanceTest {
                 assertTrue(input.performAction(AccessibilityNodeInfo.ACTION_SET_TEXT, Bundle().apply { putCharSequence(AccessibilityNodeInfo.ACTION_ARGUMENT_SET_TEXT_CHARSEQUENCE, reply) }))
                 awaitValue("target draft persisted") { if (source.chats.readDraft("peer:local") == reply) true else null }
                 click(text(Res.string.send_message), "send target conversation text")
-                val saved = awaitValue("target text persisted") { source.chats.records.search(reply, 10, 0).firstOrNull { (it.messageContent.value as? MessageText)?.text == reply } }
+                val saved = awaitValue("target text persisted") { source.chats.records.search(reply, 10, 0).firstOrNull { (it.messageContent.value as? ChatMessage)?.text == reply } }
                 owned.add(saved.id)
                 awaitValue("target draft cleared") { if (source.chats.readDraft("peer:local").isEmpty()) true else null }
                 assertTrue(ChatClient.records.search(marker, 20, 0).isEmpty())
@@ -968,7 +968,7 @@ class ManagedDeviceUiAcceptanceTest {
             }
         } finally {
             remote?.let { source ->
-                source.chats.records.search(reply, 10, 0).filter { (it.messageContent.value as? MessageText)?.text == reply }.forEach { owned.add(it.id) }
+                source.chats.records.search(reply, 10, 0).filter { (it.messageContent.value as? ChatMessage)?.text == reply }.forEach { owned.add(it.id) }
                 source.chats.deleteByIds(owned)
                 originalDraft?.let { source.chats.writeDraft("peer:local", it) }
                 assertTrue(source.chats.records.search(marker, 20, 0).isEmpty())
@@ -1431,7 +1431,7 @@ class ManagedDeviceUiAcceptanceTest {
                 report("chat_delivery", "SENT")
             } finally {
                 val stored = ChatQueries.getChatItem(item.id)
-                if ((stored?.messageContent?.value as? MessageText)?.text == marker) ChatClient.deleteOne(item.id)
+                if ((stored?.messageContent?.value as? ChatMessage)?.text == marker) ChatClient.deleteOne(item.id)
                 assertNull(ChatQueries.getChatItem(item.id))
             }
         }
@@ -1446,7 +1446,7 @@ class ManagedDeviceUiAcceptanceTest {
             check(marker.startsWith("managed-chat-"))
             val item = awaitValue("delivered chat fixture") {
                 ChatQueries.searchAsync(marker, 100, 0).find {
-                    it.fromId == sender && (it.messageContent.value as? MessageText)?.text == marker
+                    it.fromId == sender && (it.messageContent.value as? ChatMessage)?.text == marker
                 }
             }
             ChatClient.deleteOne(item.id)
@@ -2211,10 +2211,11 @@ class ManagedDeviceUiAcceptanceTest {
                 val copied = com.ismartcoding.plain.features.chat.peer.ManagedDeviceClient.load(peer).importAttachment(picked.absolutePath, "$marker.png", "image/png")
                 attachment = copied
                 val content = com.ismartcoding.plain.features.chat.models.MessageContent(
-                    com.ismartcoding.plain.features.chat.models.MessageType.IMAGES,
-                    com.ismartcoding.plain.features.chat.models.MessageImages(listOf(com.ismartcoding.plain.features.chat.models.MessageFile(
+                    com.ismartcoding.plain.features.chat.models.MessageType.MESSAGE,
+                    ChatMessage(items = listOf(com.ismartcoding.plain.features.chat.models.ChatMessageAttachment(
+                        com.ismartcoding.plain.features.chat.models.ChatAttachmentType.IMAGE, com.ismartcoding.plain.features.chat.models.MessageFile(
                         uri = "fid:" + copied.realPath.substringAfterLast('/'), size = copied.size, fileName = "$marker.png",
-                    ))),
+                    )))),
                 )
                 val sent = remote.execute(Mutation.sendChatItems(listOf("peer:local"), com.ismartcoding.plain.models.ChatContentInput.from(content))).single()
                 messageId = sent.id

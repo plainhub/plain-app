@@ -128,6 +128,7 @@ fun rememberMarkdownTextConfig(
         fontSize = 16.sp,
         lineHeight = 24.sp,
     ),
+    openLink: (String) -> Unit = { WebHelper.open(it) },
 ): MarkdownTextConfig {
     val defaultColor = MaterialTheme.colorScheme.onSurface
     val textStyle = remember(style, defaultColor) {
@@ -155,7 +156,7 @@ fun rememberMarkdownTextConfig(
             ),
         )
     }
-    return remember(colors, typography, padding, dimens, extendedSpans) {
+    return remember(colors, typography, padding, dimens, extendedSpans, openLink) {
         MarkdownTextConfig(
             colors = colors,
             typography = typography,
@@ -167,7 +168,7 @@ fun rememberMarkdownTextConfig(
                     val settings = annotatorSettings(
                         linkInteractionListener = LinkInteractionListener { link ->
                             val url = (link as? LinkAnnotation.Url)?.url ?: return@LinkInteractionListener
-                            WebHelper.open(url)
+                            openLink(url)
                         },
                     )
                     CoreMarkdownTextElement(
@@ -262,8 +263,10 @@ fun MarkdownText(
         lineHeight = 24.sp,
     ),
     previewerState: MediaPreviewerState? = null,
+    loadImages: Boolean = true,
+    openLink: (String) -> Unit = { WebHelper.open(it) },
 ) {
-    val config = rememberMarkdownTextConfig(style)
+    val config = rememberMarkdownTextConfig(style, openLink)
     val markdownState = rememberMarkdownState(text)
     val parsed by markdownState.state.collectAsState()
 
@@ -275,7 +278,8 @@ fun MarkdownText(
         padding = config.padding,
         dimens = config.dimens,
         extendedSpans = config.extendedSpans,
-        imageTransformer = rememberMarkdownImageTransformer(parsed, previewerState),
+        imageTransformer = if (loadImages) rememberMarkdownImageTransformer(parsed, previewerState)
+            else remember { com.ismartcoding.plain.ui.markdown.model.NoOpImageTransformerImpl() },
         components = config.components,
     )
 

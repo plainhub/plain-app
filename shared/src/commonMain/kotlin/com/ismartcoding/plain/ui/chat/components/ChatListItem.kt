@@ -31,7 +31,7 @@ import com.ismartcoding.plain.i18n.request_permission
 import com.ismartcoding.plain.ui.chat.ChatViewModel
 import com.ismartcoding.plain.features.chat.data.ChatTarget
 import com.ismartcoding.plain.features.chat.models.MessageStatusData
-import com.ismartcoding.plain.features.chat.models.MessageText
+import com.ismartcoding.plain.features.chat.models.ChatMessage
 import com.ismartcoding.plain.features.chat.models.MessageType
 import com.ismartcoding.plain.models.Peer
 import com.ismartcoding.plain.ui.base.HorizontalSpace
@@ -64,6 +64,7 @@ fun ChatListItem(
     filesAllowed: Boolean = true,
     onRequestFilePermission: () -> Unit = {},
 ) {
+    val message = m.value as? ChatMessage
     val showContextMenu = remember { mutableStateOf(false) }
     val showDeliveryDialog = remember { mutableStateOf<MessageStatusData?>(null) }
     val selected = chatVM.selectedItem.value?.id == m.id || chatVM.selectedIds.contains(m.id)
@@ -102,9 +103,7 @@ fun ChatListItem(
                                 showContextMenu.value = true
                             },
                             onDoubleClick = {
-                                if (m.value is MessageText) {
-                                    navController.navigateChatText((m.value as MessageText).text)
-                                }
+                                message?.text?.takeIf { it.isNotBlank() }?.let(navController::navigateChatText)
                             },
                         ),
                 ) {
@@ -119,18 +118,31 @@ fun ChatListItem(
                         onShowDeliveryDetails = if (!chatTarget.isLocal()) {
                             { statusData -> showDeliveryDialog.value = statusData }
                         } else null)
-                    if (!filesAllowed && m.type in setOf(MessageType.IMAGES, MessageType.FILES)) {
-                        com.ismartcoding.plain.ui.base.PTextButton(text = org.jetbrains.compose.resources.stringResource(com.ismartcoding.plain.i18n.Res.string.request_permission), onClick = onRequestFilePermission)
-                    } else when (m.type) {
-                        MessageType.IMAGES -> ChatImages(items, m, peer, imageWidthDp, imageWidthPx, previewerState, chatVM)
-                        MessageType.FILES -> ChatFiles(items, navController, m, peer, audioQueueVM, previewerState)
-                        MessageType.TEXT -> ChatText(focusManager, m, isSelectMode = chatVM.selectMode.value, onSelect = { chatVM.select(it) }, onDoubleClick = {
-                            navController.navigateChatText((m.value as MessageText).text)
-                        }, onLongClick = {
-                            if (chatVM.selectMode.value) return@ChatText
-                            chatVM.selectedItem.value = m
-                            showContextMenu.value = true
-                        })
+                    when (m.type) {
+                        MessageType.MESSAGE -> {
+                            if (message != null) {
+                                val text = message.text
+                                if (!text.isNullOrBlank()) {
+                                    ChatText(focusManager, m, message, text, isSelectMode = chatVM.selectMode.value, onSelect = { chatVM.select(it) }, onDoubleClick = {
+                                        navController.navigateChatText(text)
+                                    }, onLongClick = {
+                                        if (chatVM.selectMode.value) return@ChatText
+                                        chatVM.selectedItem.value = m
+                                        showContextMenu.value = true
+                                    })
+                                }
+                                if (message.items.isNotEmpty()) {
+                                    if (!filesAllowed) {
+                                        com.ismartcoding.plain.ui.base.PTextButton(text = org.jetbrains.compose.resources.stringResource(com.ismartcoding.plain.i18n.Res.string.request_permission), onClick = onRequestFilePermission)
+                                    } else {
+                                        val images = message.images
+                                        val files = message.files
+                                        if (images.isNotEmpty()) ChatImages(items, m, images, peer, imageWidthDp, imageWidthPx, previewerState, chatVM)
+                                        if (files.isNotEmpty()) ChatFiles(items, navController, m, files, peer, audioQueueVM, previewerState)
+                                    }
+                                }
+                            }
+                        }
                         MessageType.SHARE -> ChatShareItem(navController, m, isSelectMode = chatVM.selectMode.value, onSelect = { chatVM.select(it) }, onLongClick = {
                             chatVM.selectedItem.value = m
                             showContextMenu.value = true

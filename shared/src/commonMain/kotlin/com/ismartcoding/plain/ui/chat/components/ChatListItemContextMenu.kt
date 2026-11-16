@@ -12,9 +12,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.navigation.NavHostController
 import com.ismartcoding.plain.features.chat.models.MessageFile
-import com.ismartcoding.plain.features.chat.models.MessageImages
+import com.ismartcoding.plain.features.chat.models.ChatMessage
 import com.ismartcoding.plain.features.chat.models.MessageShare
-import com.ismartcoding.plain.features.chat.models.MessageText
 import com.ismartcoding.plain.features.chat.models.MessageType
 import com.ismartcoding.plain.ui.extensions.getFinalPath
 import com.ismartcoding.plain.i18n.*
@@ -72,7 +71,7 @@ fun ChatListItemContextMenu(
                 },
             )
         }
-        if (m.type == MessageType.IMAGES) {
+        if ((m.value as? ChatMessage)?.images?.isNotEmpty() == true) {
             PDropdownMenuItem(
                 text = { Text(stringResource(Res.string.save_as)) },
                 onClick = {
@@ -82,14 +81,14 @@ fun ChatListItemContextMenu(
                 },
             )
         }
-        if (m.value is MessageText) {
+        val messageText = (m.value as? ChatMessage)?.text
+        if (!messageText.isNullOrEmpty()) {
             PDropdownMenuItem(
                 text = { Text(stringResource(Res.string.copy_text)) },
                 onClick = {
                     selectedItem.value = null
                     showContextMenu.value = false
-                    val text = (m.value as MessageText).text
-                    setClipboardText(LocaleHelper.getString(Res.string.message), text)
+                    setClipboardText(LocaleHelper.getString(Res.string.message), messageText)
                 },
             )
             if (m.fromId == "me" && !m.id.startsWith("pending_")) {
@@ -98,8 +97,7 @@ fun ChatListItemContextMenu(
                     onClick = {
                         selectedItem.value = null
                         showContextMenu.value = false
-                        val content = (m.value as MessageText).text
-                        navController.navigateChatEditText(m.id, content)
+                        navController.navigateChatEditText(m.id, messageText)
                     },
                 )
             }
@@ -125,7 +123,7 @@ fun ChatListItemContextMenu(
     }
 
     if (showSaveSheet) {
-        val images = (m.value as? MessageImages)?.items.orEmpty()
+        val images = (m.value as? ChatMessage)?.images.orEmpty()
         SaveToSheet(
             source = source,
             title = images.firstOrNull()?.fileName?.takeIf { it.isNotEmpty() }

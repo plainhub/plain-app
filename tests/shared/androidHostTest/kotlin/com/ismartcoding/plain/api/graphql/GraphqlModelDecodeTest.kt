@@ -6,6 +6,8 @@ import com.ismartcoding.plain.graphql.Query
 import com.ismartcoding.plain.models.*
 import com.ismartcoding.plain.lib.JsonHelper
 import kotlinx.serialization.json.jsonObject
+import kotlinx.serialization.json.jsonArray
+import kotlinx.serialization.json.jsonPrimitive
 import kotlinx.serialization.SerializationException
 import kotlin.test.Test
 import kotlin.test.assertTrue
@@ -16,7 +18,7 @@ import kotlin.test.assertNull
 import kotlin.time.Instant
 
 class GraphqlModelDecodeTest {
-    private val chat = """{"id":"chat-1","fromId":"me","toId":"peer-1","channelId":null,"content":{"__typename":"ChatTextContent","text":"hello 中文","linkPreviews":[]},"status":"SENT","deliveryResults":[],"createdAt":"2026-10-12T00:00:00Z","updatedAt":"2026-10-12T01:00:00Z"}"""
+    private val chat = """{"id":"chat-1","fromId":"me","toId":"peer-1","channelId":null,"content":{"__typename":"ChatMessageContent","text":"hello 中文","format":"PLAIN","items":[],"linkPreviews":[]},"status":"SENT","deliveryResults":[],"createdAt":"2026-10-12T00:00:00Z","updatedAt":"2026-10-12T01:00:00Z"}"""
 
     @Test
     fun chatDecodesTheWireEnvelopeWithoutChangingItsContent() {
@@ -25,8 +27,55 @@ class GraphqlModelDecodeTest {
         assertNull(item.channelId)
         assertEquals(ChatStatus.SENT, item.status)
         assertEquals(Instant.parse("2026-10-12T01:00:00Z"), item.updatedAt)
-        assertEquals("hello 中文", (item.messageContent.value as MessageText).text)
+        assertEquals("hello 中文", (item.messageContent.value as ChatMessage).text)
         assertEquals(value, JsonHelper.jsonEncodeToElement(item))
+    }
+
+    @Test
+    fun unifiedMessageProjectsFromTheMainGraphqlResult() {
+        val fixture = chat.replace(
+            """{"__typename":"ChatMessageContent","text":"hello 中文","format":"PLAIN","items":[],"linkPreviews":[]}""",
+            """{"__typename":"ChatMessageContent","text":"hello 中文","format":"MARKDOWN","items":[{"type":"IMAGE","attachment":{"id":"a","uri":"fid:image","size":3}},{"type":"FILE","attachment":{"id":"b","uri":"fsid:file","size":5}}],"linkPreviews":[]}""",
+        )
+        val content = JsonHelper.jsonDecode<ChatItem>(fixture).messageContent
+        assertEquals("MESSAGE", content.type.name)
+        val message = content.value as ChatMessage
+        assertEquals(ChatTextFormat.MARKDOWN, message.format)
+        assertEquals("hello 中文", message.text)
+        assertEquals(listOf("fid:image"), message.images.map { it.uri })
+        assertEquals(listOf("fsid:file"), message.files.map { it.uri })
+        val request = com.ismartcoding.plain.graphql.Mutation.sendChatItems(listOf("peer:local"), ChatContentInput.from(content))
+        val sent = request.operation.variables.getValue("content").jsonObject
+        assertEquals(setOf("message"), sent.keys)
+        val payload = sent.getValue("message").jsonObject
+        assertEquals(setOf("text", "format", "items"), payload.keys)
+        assertEquals("MARKDOWN", payload.getValue("format").jsonPrimitive.content)
+        assertEquals(listOf("IMAGE", "FILE"), payload.getValue("items").jsonArray.map { it.jsonObject.getValue("type").jsonPrimitive.content })
+        assertTrue(request.operation.query.contains("... on ChatMessageContent"))
+        assertFalse(request.operation.query.contains("... on ChatTextContent"))
+    }
+
+    @Test
+    fun plainMixedMessageKeepsDerivedLinkPreviewMetadataWithoutSendingItBack() {
+        val url = "https://example.org/article"
+        val fixture = chat.replace(
+            """{"__typename":"ChatMessageContent","text":"hello 中文","format":"PLAIN","items":[],"linkPreviews":[]}""",
+            """{"__typename":"ChatMessageContent","text":"$url","format":"PLAIN","items":[{"type":"IMAGE","attachment":{"id":"a","uri":"fid:image","size":3}},{"type":"FILE","attachment":{"id":"b","uri":"fid:file","size":5}}],"linkPreviews":[{"url":"$url","title":"Article","description":"Preview summary","imageUrl":"https://example.org/cover.png","imageLocalPath":"fid:cover","imageWidth":32,"imageHeight":24,"siteName":"Example Site","domain":"example.org","createdAt":"2026-10-12T00:00:00Z"}]}""",
+        )
+        val content = JsonHelper.jsonDecode<ChatItem>(fixture).messageContent
+        val message = content.value as ChatMessage
+        assertEquals(ChatTextFormat.PLAIN, message.format)
+        assertEquals(url, message.text)
+        assertEquals(2, message.items.size)
+        val preview = message.linkPreviews.single()
+        assertEquals("Article", preview.title)
+        assertEquals("Preview summary", preview.description)
+        assertEquals("fid:cover", preview.imageLocalPath)
+        assertEquals("Example Site", preview.siteName)
+        assertEquals(32, preview.imageWidth)
+        assertEquals(24, preview.imageHeight)
+        val input = JsonHelper.jsonEncodeToElement(ChatContentInput.from(content)).jsonObject
+        assertFalse("linkPreviews" in input.getValue("message").jsonObject)
     }
 
     @Test
@@ -84,9 +133,11 @@ class GraphqlModelDecodeTest {
     @Test
     fun messageContentUsesTheSharedJsonHelperForEveryEnvelopeType() {
         val messages = listOf(
-            MessageContent(MessageType.TEXT, MessageText("hello")),
-            MessageContent(MessageType.IMAGES, MessageImages(listOf(MessageFile(uri = "fid:image", size = 3)))),
-            MessageContent(MessageType.FILES, MessageFiles(listOf(MessageFile(uri = "fsid:file", size = 5, durationMs = 30000)))),
+            MessageContent(MessageType.MESSAGE, ChatMessage(text = "hello")),
+            MessageContent(MessageType.MESSAGE, ChatMessage(items = listOf(
+                ChatMessageAttachment(ChatAttachmentType.IMAGE, MessageFile(uri = "fid:image", size = 3)),
+                ChatMessageAttachment(ChatAttachmentType.FILE, MessageFile(uri = "fsid:file", size = 5, durationMs = 30000)),
+            ))),
             MessageContent(MessageType.SHARE, MessageShare("share-1", "secret", SharePeerInfo("peer", "127.0.0.1", 8080), "Folder")),
         )
         messages.forEach { message ->

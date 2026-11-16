@@ -12,19 +12,14 @@ sealed class ChatContent {
     abstract fun message(): MessageContent
 
     @Serializable
-    data class Text(val text: String, val linkPreviews: List<LinkPreview>) : ChatContent() {
-        @SerialName("__typename") val typename = "ChatTextContent"
-        override fun message() = MessageContent(MessageType.TEXT, MessageText(text, linkPreviews))
-    }
-    @Serializable
-    data class Images(val items: List<MessageFile>) : ChatContent() {
-        @SerialName("__typename") val typename = "ChatImagesContent"
-        override fun message() = MessageContent(MessageType.IMAGES, MessageImages(items))
-    }
-    @Serializable
-    data class Files(val items: List<MessageFile>) : ChatContent() {
-        @SerialName("__typename") val typename = "ChatFilesContent"
-        override fun message() = MessageContent(MessageType.FILES, MessageFiles(items))
+    data class Message(
+        val text: String?,
+        val format: ChatTextFormat,
+        val items: List<ChatMessageAttachment>,
+        val linkPreviews: List<LinkPreview>,
+    ) : ChatContent() {
+        @SerialName("__typename") val typename = "ChatMessageContent"
+        override fun message() = MessageContent(MessageType.MESSAGE, ChatMessage(text, format, items, linkPreviews))
     }
     @Serializable
     data class Share(
@@ -44,9 +39,7 @@ sealed class ChatContent {
 object ChatContentSerializer : JsonContentPolymorphicSerializer<ChatContent>(ChatContent::class) {
     override fun selectDeserializer(element: JsonElement): DeserializationStrategy<ChatContent> =
         when (element.jsonObject.getValue("__typename").jsonPrimitive.content) {
-            "ChatTextContent" -> ChatContent.Text.serializer()
-            "ChatImagesContent" -> ChatContent.Images.serializer()
-            "ChatFilesContent" -> ChatContent.Files.serializer()
+            "ChatMessageContent" -> ChatContent.Message.serializer()
             "ChatShareContent" -> ChatContent.Share.serializer()
             else -> throw SerializationException("Unknown chat content type")
         }
