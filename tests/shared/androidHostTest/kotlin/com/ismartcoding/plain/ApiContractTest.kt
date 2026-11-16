@@ -1,12 +1,25 @@
 package com.ismartcoding.plain
 
 import com.ismartcoding.plain.api.graphql.readMainSchema
+import com.ismartcoding.plain.platform.system.Capability
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFalse
 import kotlin.test.fail
 
 class ApiContractTest {
     private val sdl: String = readMainSchema()
+
+    @Test
+    fun appCapabilitiesMatchThePublicContractWithoutPlaybackConversionFlags() {
+        val body = Regex("""enum Capability \{([\s\S]*?)\}""")
+            .find(sdl)?.groupValues?.get(1) ?: fail("Capability enum missing")
+        val names = Regex("""(?m)^\s*([A-Z_]+)\s*$""").findAll(body)
+            .map { it.groupValues[1] }.toSet()
+        assertFalse("VIDEO_REMUX" in names, "Remux is an internal playback operation")
+        assertFalse("VIDEO_TRANSCODE" in names, "Transcode is an internal playback operation")
+        assertEquals(names, Capability.entries.map { it.name }.toSet())
+    }
 
     @Test
     fun activeHttpsCertificateFingerprintIsNullableAppMetadata() {

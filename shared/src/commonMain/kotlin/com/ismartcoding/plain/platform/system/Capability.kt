@@ -10,8 +10,6 @@ enum class Capability {
     MEDIA_DELETE,
     MEDIA_MOVE,
     MEDIA_FAVORITE,
-    VIDEO_REMUX,
-    VIDEO_TRANSCODE,
     APP_UPDATES,
     MIRROR_AUDIO,
     MEDIA_SCAN,

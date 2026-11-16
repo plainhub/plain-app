@@ -11,7 +11,6 @@ actual fun getDeviceCapabilities(): List<Capability> = Capability.entries.filter
         Capability.ADB -> true
         Capability.BLE -> isBluetoothSupported()
         Capability.WIFI_AWARE -> isWifiAwareSupported
-        Capability.VIDEO_REMUX, Capability.VIDEO_TRANSCODE -> false
         Capability.MEDIA_SCAN, Capability.DISK_MANAGER, Capability.HTTP_SERVER -> false
         Capability.MEDIA_TRASH, Capability.MEDIA_FAVORITE -> Build.VERSION.SDK_INT >= Build.VERSION_CODES.R
         Capability.MEDIA_MOVE, Capability.MIRROR_AUDIO -> Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q
