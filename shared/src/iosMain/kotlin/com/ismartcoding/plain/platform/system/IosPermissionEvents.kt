@@ -8,24 +8,28 @@ import com.ismartcoding.plain.lib.receiveEventHandler
 import com.ismartcoding.plain.platform.permissions.isGranted
 import com.ismartcoding.plain.ui.permissions.showPermissionDeniedDialog
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.onSubscription
 
 object IosPermissionEvents {
-    private var eventJob: Job? = null
+    internal var eventJob: Job? = null
+        private set
 
     fun register() {
         if (eventJob?.isActive == true) return
         eventJob = receiveEventHandler<RequestPermissionsEvent> { event ->
-            val permission = event.permissions.first()
-            LogCat.d("IosPermissionEvents: requesting ${permission.name}")
-            Channel.sharedFlow
-                .onSubscription { IosPlatformRegistry.requestPermission(permission.name) }
-                .filterIsInstance<PermissionsResultEvent>()
-                .first { it.has(permission) }
-            if (!permission.isGranted() && event.showDeniedDialog) {
-                showPermissionDeniedDialog { IosPlatformRegistry.openAppSettings() }
+            launch {
+                val permission = event.permissions.first()
+                LogCat.d("IosPermissionEvents: requesting ${permission.name}")
+                Channel.sharedFlow
+                    .onSubscription { IosPlatformRegistry.requestPermission(permission.name) }
+                    .filterIsInstance<PermissionsResultEvent>()
+                    .first { it.has(permission) }
+                if (!permission.isGranted() && event.showDeniedDialog) {
+                    showPermissionDeniedDialog { IosPlatformRegistry.openAppSettings() }
+                }
             }
         }
     }
