@@ -196,4 +196,5 @@
     <string name="nearby_enable_remote_access">请在对方设备开启远程访问</string>
     <string name="pairing_identity_changed">对方公钥已改变，可能重装了应用。请核对完整指纹后再信任。</string>
     <string name="pairing_trust">信任</string>
+    <string name="pairing_scan_qrcode">使用另一台手机扫码，即可与这台手机配对。</string>
 </resources>

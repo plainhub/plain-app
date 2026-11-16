@@ -7,7 +7,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 
 import com.ismartcoding.plain.models.NearbyDevice
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -48,23 +47,16 @@ import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.chat.PeerViewModel
 import com.ismartcoding.plain.ui.chat.components.NearbyDeviceItem
 import com.ismartcoding.plain.ui.chat.components.NearbyPairedDeviceItem
-import com.ismartcoding.plain.ui.chat.components.PeerIconWithStatus
-import com.ismartcoding.plain.ui.base.PListItem
-import com.ismartcoding.plain.ui.base.POutlinedButton
 import com.ismartcoding.plain.ui.base.PSectionTitle
-import com.ismartcoding.plain.ui.app.MainViewModel
-import com.ismartcoding.plain.Prefs
-import com.ismartcoding.plain.platform.system.getDeviceName
-import com.ismartcoding.plain.platform.system.getDeviceType
-import com.ismartcoding.plain.platform.network.NetworkEvents
-import com.ismartcoding.plain.ui.platform.system.getIcon
-import com.ismartcoding.plain.ui.theme.PlainTheme
 import org.jetbrains.compose.resources.stringResource
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import com.ismartcoding.plain.rust.native.PairingQr
 import com.ismartcoding.plain.rust.native.RustNativeApi
+import com.ismartcoding.plain.ui.components.PIconButton
+import com.ismartcoding.plain.ui.resources.Res as UiRes
+import com.ismartcoding.plain.ui.resources.qr_code as ui_drawable_qr_code
 import com.ismartcoding.plain.ui.components.DialogHelper
 import com.ismartcoding.plain.ui.web.components.WebAddressBarQrDialog
 import kotlinx.coroutines.launch
@@ -88,18 +80,10 @@ fun NearbyPage(
     val peersMap by peerVM.peersMap.collectAsState()
     val peers = peersMap.values.filter { it.isPaired() }.sortedBy { it.name.toSortName() }
     val newDevices = nearbyDevices.filter { device -> peers.none { it.id == device.id } }
-    val localName by Prefs.deviceName.collectAsState()
-    val network by NetworkEvents.snapshot.collectAsState()
-    val selectedDevice by MainViewModel.selectedDevice
     val scope = rememberCoroutineScope()
     var pairingCode by remember { mutableStateOf<PairingQr?>(null) }
     pairingCode?.let { code ->
         WebAddressBarQrDialog(code.payload, verificationCode = code.verificationCode) { pairingCode = null }
-    }
-    LaunchedEffect(Unit) {
-        try { NetworkEvents.refresh() }
-        catch (canceled: CancellationException) { throw canceled }
-        catch (error: Exception) { LogCat.e("Load local addresses", error) }
     }
     LaunchedEffect(peerVM) { peerVM.observe() }
 
@@ -124,6 +108,19 @@ fun NearbyPage(
                     NavigationBackIcon { navController.navigateUp() }
                 },
                 title = stringResource(Res.string.nearby_devices),
+                actions = {
+                    PIconButton(
+                        icon = UiRes.drawable.ui_drawable_qr_code,
+                        contentDescription = stringResource(Res.string.show_qr_code),
+                        click = {
+                            scope.launch {
+                                try { pairingCode = RustNativeApi.pairingCode() }
+                                catch (canceled: CancellationException) { throw canceled }
+                                catch (error: Exception) { DialogHelper.showErrorDialog(error.message.orEmpty()) }
+                            }
+                        },
+                    )
+                },
             )
         }
     ) { paddingValues ->
@@ -166,35 +163,8 @@ fun NearbyPage(
                     }
                 }
             }
-            item { PSectionTitle(stringResource(Res.string.paired_devices)) }
-            item {
-                PListItem(
-                    modifier = PlainTheme.getCardModifier(),
-                    title = localName.ifEmpty { getDeviceName() },
-                    subtitle = network.lanIpv4Addresses.orEmpty().joinToString(", "),
-                    start = { PeerIconWithStatus(getDeviceType().getIcon(), null) },
-                    action = {
-                        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                            POutlinedButton(
-                                text = stringResource(Res.string.qrcode),
-                                buttonSize = ButtonSize.SMALL,
-                                onClick = {
-                                    scope.launch {
-                                        try { pairingCode = RustNativeApi.pairingCode() }
-                                        catch (canceled: CancellationException) { throw canceled }
-                                        catch (error: Exception) { DialogHelper.showErrorDialog(error.message.orEmpty()) }
-                                    }
-                                },
-                            )
-                            if (selectedDevice != null) POutlinedButton(
-                                text = stringResource(Res.string.nearby_switch_device),
-                                buttonSize = ButtonSize.SMALL,
-                                onClick = { MainViewModel.selectDevice(null) },
-                            )
-                        }
-                    },
-                )
-                VerticalSpace(8.dp)
+            if (peers.isNotEmpty()) {
+                item { PSectionTitle(stringResource(Res.string.paired_devices)) }
             }
             items(peers, key = { "paired:${it.id}" }) { peer ->
                 NearbyPairedDeviceItem(peer, nearbyDevices.find { it.id == peer.id })

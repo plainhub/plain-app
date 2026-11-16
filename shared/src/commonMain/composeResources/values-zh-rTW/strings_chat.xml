@@ -196,4 +196,5 @@
     <string name="nearby_enable_remote_access">請在對方裝置開啟遠端存取</string>
     <string name="pairing_identity_changed">對方公鑰已改變，可能重新安裝了應用程式。請核對完整指紋後再信任。</string>
     <string name="pairing_trust">信任</string>
+    <string name="pairing_scan_qrcode">使用另一台手機掃碼，即可與這台手機配對。</string>
 </resources>

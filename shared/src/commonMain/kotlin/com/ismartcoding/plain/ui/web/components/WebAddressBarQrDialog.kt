@@ -43,7 +43,7 @@ fun WebAddressBarQrDialog(
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
                 Text(
-                    text = stringResource(if (verificationCode == null) Res.string.scan_qrcode_to_access_web else Res.string.qrcode),
+                    text = stringResource(if (verificationCode == null) Res.string.scan_qrcode_to_access_web else Res.string.pairing_scan_qrcode),
                     style = MaterialTheme.typography.titleMedium,
                     color = MaterialTheme.colorScheme.onSurface,
                 )

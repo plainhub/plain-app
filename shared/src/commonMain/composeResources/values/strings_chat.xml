@@ -196,4 +196,5 @@
     <string name="nearby_enable_remote_access">Enable remote access on the other device</string>
     <string name="pairing_identity_changed">The device public key has changed. It may have been reinstalled. Compare the full fingerprint before trusting it.</string>
     <string name="pairing_trust">Trust</string>
+    <string name="pairing_scan_qrcode">Scan with another phone to pair with this phone.</string>
 </resources>
