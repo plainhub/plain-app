@@ -14,6 +14,8 @@ import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material3.IconButtonDefaults
+import androidx.compose.material3.IconToggleButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -24,10 +26,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.onFocusChanged
+import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.text.style.TextOverflow
-import com.ismartcoding.plain.ui.base.PFilterChip
+import com.ismartcoding.plain.ui.base.PIcon
 import com.ismartcoding.plain.ui.base.PTextButton
 import com.ismartcoding.plain.features.files.PickFileTag
 import com.ismartcoding.plain.features.files.PickFileType
@@ -38,6 +41,7 @@ import com.ismartcoding.plain.ui.resources.Res as UiRes
 import com.ismartcoding.plain.ui.resources.folder as ui_drawable_folder
 import com.ismartcoding.plain.ui.resources.folders as ui_drawable_folders
 import com.ismartcoding.plain.ui.resources.image as ui_drawable_image
+import com.ismartcoding.plain.ui.resources.markdown as ui_drawable_markdown
 import com.ismartcoding.plain.ui.resources.send as ui_drawable_send
 
 @Composable
@@ -94,13 +98,6 @@ fun ChatInput(
             },
         )
         if (hasFocus || attachments.isNotEmpty() || markdown) {
-            PFilterChip(
-                selected = markdown,
-                onClick = onChangeFormat,
-                label = { Text("Markdown") },
-                enabled = !sending,
-                modifier = Modifier.padding(horizontal = 16.dp),
-            )
             Row(
                 modifier =
                 Modifier
@@ -111,27 +108,41 @@ fun ChatInput(
                 if (!filesAllowed) {
                     com.ismartcoding.plain.ui.base.PTextButton(text = stringResource(Res.string.request_permission), onClick = onRequestFilePermission)
                 } else {
-                PIconButton(
-                    icon = UiRes.drawable.ui_drawable_image,
-                    contentDescription = stringResource(Res.string.images),
-                    tint = MaterialTheme.colorScheme.primary,
-                ) {
-                    if (!sending) sendEvent(PickFileEvent(PickFileTag.SEND_MESSAGE, PickFileType.IMAGE_VIDEO, multiple = true))
+                    PIconButton(
+                        icon = UiRes.drawable.ui_drawable_image,
+                        contentDescription = stringResource(Res.string.images),
+                        tint = MaterialTheme.colorScheme.primary,
+                    ) {
+                        if (!sending) sendEvent(PickFileEvent(PickFileTag.SEND_MESSAGE, PickFileType.IMAGE_VIDEO, multiple = true))
+                    }
+                    PIconButton(
+                        icon = UiRes.drawable.ui_drawable_folder,
+                        contentDescription = stringResource(Res.string.files),
+                        tint = MaterialTheme.colorScheme.primary,
+                    ) {
+                        if (!sending) sendEvent(PickFileEvent(PickFileTag.SEND_MESSAGE, PickFileType.FILE, multiple = true))
+                    }
+                    PIconButton(
+                        icon = UiRes.drawable.ui_drawable_folders,
+                        contentDescription = stringResource(Res.string.share_folder),
+                        tint = MaterialTheme.colorScheme.primary,
+                    ) {
+                        if (!sending) onShareFolder()
+                    }
                 }
-                PIconButton(
-                    icon = UiRes.drawable.ui_drawable_folder,
-                    contentDescription = stringResource(Res.string.files),
-                    tint = MaterialTheme.colorScheme.primary,
+                IconToggleButton(
+                    checked = markdown,
+                    enabled = !sending,
+                    onCheckedChange = { onChangeFormat() },
+                    colors = IconButtonDefaults.iconToggleButtonColors(
+                        checkedContainerColor = MaterialTheme.colorScheme.secondaryContainer,
+                        checkedContentColor = MaterialTheme.colorScheme.onSecondaryContainer,
+                    ),
                 ) {
-                    if (!sending) sendEvent(PickFileEvent(PickFileTag.SEND_MESSAGE, PickFileType.FILE, multiple = true))
-                }
-                PIconButton(
-                    icon = UiRes.drawable.ui_drawable_folders,
-                    contentDescription = stringResource(Res.string.share_folder),
-                    tint = MaterialTheme.colorScheme.primary,
-                ) {
-                    if (!sending) onShareFolder()
-                }
+                    PIcon(
+                        icon = painterResource(UiRes.drawable.ui_drawable_markdown),
+                        contentDescription = stringResource(Res.string.chat_markdown),
+                    )
                 }
                 Spacer(modifier = Modifier.weight(1f))
                 PIconButton(

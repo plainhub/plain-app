@@ -1,9 +1,5 @@
 package com.ismartcoding.plain.ui.chat.components
 
-import com.ismartcoding.plain.features.files.FilesClient
-
-import com.ismartcoding.plain.features.files.extension
-
 import com.ismartcoding.plain.models.File as FileEntry
 
 import androidx.compose.foundation.layout.Arrangement
@@ -34,7 +30,9 @@ import com.ismartcoding.plain.lib.extensions.getFilenameFromPath
 import com.ismartcoding.plain.platform.files.getInternalStorageName
 import com.ismartcoding.plain.platform.files.getInternalStoragePath
 import com.ismartcoding.plain.lib.withIO
+import com.ismartcoding.plain.ui.base.AlertType
 import com.ismartcoding.plain.ui.base.BottomActionButtons
+import com.ismartcoding.plain.ui.base.PAlert
 import com.ismartcoding.plain.ui.components.ClipboardTextField
 import com.ismartcoding.plain.ui.base.PBottomSheetTopAppBar
 import com.ismartcoding.plain.ui.base.PFilterChip
@@ -45,8 +43,8 @@ import com.ismartcoding.plain.ui.base.PModalBottomSheet
 import com.ismartcoding.plain.ui.components.DirBrowserRow
 import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.files.label
-import com.ismartcoding.plain.ui.theme.cardBackgroundNormal
 import org.jetbrains.compose.resources.stringResource
+import kotlinx.coroutines.CancellationException
 
 /**
  * Bottom sheet to share a whole folder into the current chat: browse the
@@ -61,25 +59,24 @@ fun FolderShareSheet(
 ) {
     val source = com.ismartcoding.plain.ui.navigation.LocalContentSource.current
     val rootPath = source.rootPath
-    var currentPath by remember { mutableStateOf(rootPath) }
-    var dirs by remember { mutableStateOf<List<FileEntry>>(emptyList()) }
-    var itemCount by remember { mutableStateOf(0) }
-    var totalSize by remember { mutableStateOf(0L) }
+    var currentPath by remember(source) { mutableStateOf(rootPath) }
+    var contents by remember(source, currentPath) { mutableStateOf<Result<List<FileEntry>>?>(null) }
     var expiry by remember { mutableStateOf(ShareExpiry.DAY_7) }
     var name by remember { mutableStateOf("") }
     var nameEdited by remember { mutableStateOf(false) }
+    val suggestedName = if (currentPath != rootPath) currentPath.getFilenameFromPath()
+    else if (source is com.ismartcoding.plain.rust.graphql.ContentSource.Remote) source.info.deviceName
+    else getInternalStorageName()
 
-    LaunchedEffect(currentPath) {
-        withIO {
-            val entries = source.files.list(currentPath, showHidden = false, sortBy = FileSortBy.NAME_ASC)
-            dirs = entries.filter { it.isDir }
-            itemCount = entries.size
-            totalSize = entries.sumOf { if (it.isDir) 0L else it.size }
+    LaunchedEffect(source, currentPath) {
+        val path = currentPath
+        val result = loadFolderShareEntries {
+            withIO { source.files.list(path, showHidden = false, sortBy = FileSortBy.NAME_ASC) }
         }
-        if (!nameEdited) {
-            name = if (currentPath == rootPath) (if (source is com.ismartcoding.plain.rust.graphql.ContentSource.Remote) source.info.deviceName else getInternalStorageName()) else currentPath.getFilenameFromPath()
-        }
+        contents = result
+        if (result.isSuccess && !nameEdited) name = suggestedName
     }
+    val entries = contents?.getOrNull()
 
     PModalBottomSheet(onDismissRequest = onDismiss, modifier = Modifier.fillMaxWidth()) {
         PBottomSheetTopAppBar(
@@ -109,7 +106,7 @@ fun FolderShareSheet(
                     )
                 }
             }
-            items(dirs, key = { it.path }) { dir ->
+            items(entries.orEmpty().filter { it.isDir }, key = { it.path }) { dir ->
                 DirBrowserRow(
                     name = dir.name,
                     onClick = { currentPath = dir.path },
@@ -117,15 +114,20 @@ fun FolderShareSheet(
             }
         }
         VerticalSpace(8.dp)
-        Row(
-            modifier = Modifier.padding(horizontal = 16.dp),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            Text(
-                text = stringResource(Res.string.folder_card_items, itemCount) + " · " + totalSize.formatBytes(),
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
+        if (contents?.isFailure == true) {
+            PAlert(stringResource(Res.string.load_failed), AlertType.ERROR, Modifier.padding(horizontal = 16.dp))
+        } else {
+            Row(
+                modifier = Modifier.padding(horizontal = 16.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Text(
+                    text = if (entries == null) stringResource(Res.string.loading)
+                    else stringResource(Res.string.folder_card_items, entries.size) + " · " + entries.sumOf { if (it.isDir) 0L else it.size }.formatBytes(),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
         }
         VerticalSpace(8.dp)
         ClipboardTextField(
@@ -162,12 +164,19 @@ fun FolderShareSheet(
         BottomActionButtons {
             PFilledButton(
                 text = stringResource(Res.string.share_this_folder),
-                onClick = {
-                    val fallbackName = if (currentPath == rootPath) (if (source is com.ismartcoding.plain.rust.graphql.ContentSource.Remote) source.info.deviceName else getInternalStorageName()) else currentPath.getFilenameFromPath()
-                    onConfirm(currentPath, name.ifBlank { fallbackName }, expiry)
-                },
+                enabled = contents?.isSuccess == true,
+                onClick = { onConfirm(currentPath, name.ifBlank { suggestedName }, expiry) },
                 modifier = Modifier.weight(1f),
             )
         }
     }
 }
+
+internal suspend fun loadFolderShareEntries(load: suspend () -> List<FileEntry>): Result<List<FileEntry>> =
+    try {
+        Result.success(load())
+    } catch (canceled: CancellationException) {
+        throw canceled
+    } catch (failure: Exception) {
+        Result.failure(failure)
+    }
