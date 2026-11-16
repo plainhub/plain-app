@@ -22,15 +22,21 @@ where
         .block_on(runtime.spawn(operation))
         .map_err(|error| error.to_string())
 }
+fn execute_graphql(
+    request: &str,
+    runtime: &Handle,
+    executor: NativeGraphqlExecutor,
+) -> Result<String, String> {
+    let parsed = plain_libs::serde_json::from_str(request).map_err(|e| e.to_string())?;
+    execute_on_runtime(runtime, async move {
+        plain_libs::serde_json::to_string(&executor.execute(parsed).await)
+            .map_err(|e| e.to_string())
+    })?
+}
 fn public(request: &str) -> String {
-    let result = (|| {
-        let (runtime, executor) = parts()?;
-        let parsed = plain_libs::serde_json::from_str(request).map_err(|e| e.to_string())?;
-        execute_on_runtime(&runtime, async move {
-            plain_libs::serde_json::to_string(&executor.execute(parsed).await).map_err(|e| e.to_string())
-        })?
-    })();
-    result.unwrap_or_else(errors)
+    parts()
+        .and_then(|(runtime, executor)| execute_graphql(request, &runtime, executor))
+        .unwrap_or_else(errors)
 }
 #[unsafe(no_mangle)]
 pub extern "C" fn plain_graphql(request: *const c_char) -> *mut c_char {

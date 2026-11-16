@@ -1,6 +1,7 @@
 package com.ismartcoding.plain
 
 import com.ismartcoding.plain.api.graphql.readMainSchema
+import com.ismartcoding.plain.graphql.Fragments
 import com.ismartcoding.plain.platform.system.Capability
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -19,6 +20,16 @@ class ApiContractTest {
         assertFalse("VIDEO_REMUX" in names, "Remux is an internal playback operation")
         assertFalse("VIDEO_TRANSCODE" in names, "Transcode is an internal playback operation")
         assertEquals(names, Capability.entries.map { it.name }.toSet())
+    }
+
+    @Test
+    fun nativeChatSelectionMatchesTheLockedCoreContentUnion() {
+        val union = Regex("""(?m)^union ChatContent\s*=\s*(.+)$""")
+            .find(sdl)?.groupValues?.get(1) ?: fail("ChatContent union missing")
+        val declared = union.split('|').map(String::trim).toSet()
+        val selected = Regex("""\.\.\. on (\w+)""").findAll(Fragments.CHAT_ITEM)
+            .map { it.groupValues[1] }.toSet()
+        assertEquals(declared, selected, "Native chat uses a fragment outside the locked Core ChatContent union")
     }
 
     @Test
