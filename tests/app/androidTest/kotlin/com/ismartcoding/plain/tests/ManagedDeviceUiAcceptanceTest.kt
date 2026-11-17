@@ -393,7 +393,7 @@ class ManagedDeviceUiAcceptanceTest {
             }
             val input = JsonHelper.jsonDecodeFromElement<com.ismartcoding.plain.models.DownloadInput>(enqueued.variables.getValue("input"))
             assertNull(input.chat)
-            assertEquals(listOf("https://device.test:8443/fs?id=s.fixture.AA&action=download"), checkNotNull(input.resources).urls)
+            assertEquals(listOf("https://device.test:8443/fs?id=s.fixture.AA&action=DOWNLOAD"), checkNotNull(input.resources).urls)
             click("Target shared download", "target download summary")
             click(text(Res.string.cancel), "cancel target download")
             awaitValue("target shared download cancel") {
@@ -492,7 +492,7 @@ class ManagedDeviceUiAcceptanceTest {
                 assertTrue(preview.path.startsWith(instrumentation.targetContext.cacheDir.canonicalPath + "/"))
                 cached = preview
                 assertEquals(file.readText(), preview.readText())
-                val thumbnailUrl = entries.single { it.name == image.name }.url.replace("&action=download", "&action=preview&size=sm")
+                val thumbnailUrl = entries.single { it.name == image.name }.url.replace("&action=DOWNLOAD", "&action=PREVIEW&size=SM")
                 val thumbnailPath = com.ismartcoding.plain.features.files.FilesClient.copyToDirectory(thumbnailUrl, root.absolutePath, "thumbnail")
                 val thumbnailFile = java.io.File(thumbnailPath).canonicalFile
                 assertTrue(thumbnailFile.path.startsWith(instrumentation.targetContext.cacheDir.canonicalPath + "/"))
@@ -534,7 +534,7 @@ class ManagedDeviceUiAcceptanceTest {
         val chat = com.ismartcoding.plain.models.ChatItem(
             id = "share-card-ui-fixture", content = com.ismartcoding.plain.models.ChatContent.Share(card.shareId, card.urlToken, card.peerInfo, card.name, card.itemCount, card.totalSize, card.expiresAt),
         )
-        val browsed = listOf(com.ismartcoding.plain.models.File(name="target-card-file.txt",path="https://device.test:8443/s/fixture-shared-link/root/target-card-file.txt#fixture-link-key",url="https://device.test:8443/fs?id=s.fixture.AA&action=download",createdAt=null,updatedAt=kotlin.time.Instant.fromEpochMilliseconds(0),size=8,isDir=false,childCount=0))
+        val browsed = listOf(com.ismartcoding.plain.models.File(name="target-card-file.txt",path="https://device.test:8443/s/fixture-shared-link/root/target-card-file.txt#fixture-link-key",url="https://device.test:8443/fs?id=s.fixture.AA&action=DOWNLOAD",createdAt=null,updatedAt=kotlin.time.Instant.fromEpochMilliseconds(0),size=8,isDir=false,childCount=0))
         val downloads = java.util.concurrent.atomic.AtomicReference<List<com.ismartcoding.plain.models.Download>>(emptyList())
         val http = com.ismartcoding.plain.rust.graphql.PeerHttpClient(
             peer, peers = { listOf(peer) }, clientId = { "706c6169-b9ef-8b64-b37d-1162ef232835" },

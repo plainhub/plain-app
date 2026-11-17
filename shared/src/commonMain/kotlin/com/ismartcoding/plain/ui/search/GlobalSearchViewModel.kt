@@ -1,7 +1,8 @@
 package com.ismartcoding.plain.ui.search
 
+import com.ismartcoding.plain.models.AuthErrorCode
+
 import com.ismartcoding.plain.models.BusinessException
-import com.ismartcoding.plain.models.ErrorCode
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
@@ -180,7 +181,7 @@ class GlobalSearchViewModel internal constructor(
 }
 
 private fun Exception.isRemoteAccessDisabled(): Boolean =
-    this is GraphqlHttpException && status == 404 || this is BusinessException && code == ErrorCode.REMOTE_ACCESS_DISABLED
+    this is GraphqlHttpException && status == 404 || this is BusinessException && code == AuthErrorCode.REMOTE_ACCESS_DISABLED.wire
 
 internal suspend fun searchDevices(
     readPeers: suspend () -> List<Peer> = { GraphqlApi.execute(Query.peers()) },

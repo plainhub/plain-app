@@ -1,5 +1,7 @@
 package com.ismartcoding.plain.ui.nearby
 
+import com.ismartcoding.plain.models.PairingErrorCode
+
 import com.ismartcoding.plain.models.PairingProgressNotice
 import com.ismartcoding.plain.models.PairingRequestNotice
 import com.ismartcoding.plain.platform.system.DeviceType
@@ -20,7 +22,7 @@ class PairingProjectionTest {
         PairingProjection.started(PairingProgressNotice("peer", "Fixture", verificationCode = "01234567"))
         assertEquals("01234567", NearbyViewModel.pairingViews["peer"]?.verificationCode)
         assertEquals(NearbyItemStatus.PAIRING, NearbyViewModel.itemStatus["peer"])
-        PairingProjection.failed(PairingProgressNotice("peer", "Fixture", com.ismartcoding.plain.models.ErrorCode.PASSWORD_REQUIRED))
+        PairingProjection.failed(PairingProgressNotice("peer", "Fixture", PairingErrorCode.PASSWORD_REQUIRED))
         assertEquals(PairingStep.PASSWORD_REQUIRED, NearbyViewModel.pairingViews["peer"]?.step)
         assertEquals(null, NearbyViewModel.itemStatus["peer"])
         PairingProjection.starting("peer")

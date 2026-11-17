@@ -1,5 +1,6 @@
 package com.ismartcoding.plain.models
 
+
 import com.ismartcoding.plain.features.sessions.SessionType
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.SerialName
@@ -17,7 +18,7 @@ data class LoginEventData(val sessionType: SessionType) : EventData
 
 @Serializable
 @SerialName("LoginFailedEventData")
-data class LoginFailedEventData(val reason: ErrorCode) : EventData
+data class LoginFailedEventData(val reason: AuthErrorCode) : EventData
 
 @Serializable
 data class EventSession(val clientId: String, val clientName: String, val type: SessionType)
@@ -34,7 +35,7 @@ data class DeviceNameEventData(val oldName: String, val newName: String) : Event
 data class EventVolume(val id: String?, val name: String?, val devicePath: String?, val mountPath: String, val fileSystem: String?)
 
 @Serializable
-data class EventFailure(val reason: ErrorCode, val detail: String?)
+data class MountFailure(val reason: MountErrorCode, val detail: String?)
 
 @Serializable
 @SerialName("VolumeEventData")
@@ -42,7 +43,10 @@ data class VolumeEventData(val volume: EventVolume) : EventData
 
 @Serializable
 @SerialName("VolumeFailedEventData")
-data class VolumeFailedEventData(val volume: EventVolume, val failure: EventFailure) : EventData
+data class VolumeFailedEventData(val volume: EventVolume, val failure: MountFailure) : EventData
+
+@Serializable
+data class DiskFormatFailure(val reason: DiskFormatErrorCode, val detail: String?)
 
 @Serializable
 data class EventDisk(val id: String?, val name: String?, val path: String, val sizeBytes: Long?)
@@ -53,4 +57,4 @@ data class DiskFormatEventData(val disk: EventDisk, val fileSystem: String) : Ev
 
 @Serializable
 @SerialName("DiskFormatFailedEventData")
-data class DiskFormatFailedEventData(val disk: EventDisk, val fileSystem: String, val failure: EventFailure) : EventData
+data class DiskFormatFailedEventData(val disk: EventDisk, val fileSystem: String, val failure: DiskFormatFailure) : EventData

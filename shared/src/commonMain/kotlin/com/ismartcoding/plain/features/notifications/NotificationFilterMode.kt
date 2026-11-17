@@ -5,8 +5,8 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 enum class NotificationFilterMode {
-    @SerialName("allowlist")
+    @SerialName("ALLOWLIST")
     ALLOWLIST,
-    @SerialName("blacklist")
+    @SerialName("BLACKLIST")
     BLACKLIST,
 }

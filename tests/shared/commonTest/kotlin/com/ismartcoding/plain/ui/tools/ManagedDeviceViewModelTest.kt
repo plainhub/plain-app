@@ -92,7 +92,7 @@ class ManagedDeviceViewModelTest {
             assertNull(model.state.value.error)
             fixture.currentPeer = fixture.peer.copy(publicKey = "changed-identity")
             val before = fixture.requests.size
-            assertEquals("peer_identity_changed", assertFailsWith<IllegalStateException> { model.rename("Forbidden rename") }.message)
+            assertEquals("PEER_IDENTITY_CHANGED", assertFailsWith<IllegalStateException> { model.rename("Forbidden rename") }.message)
             assertEquals(before, fixture.requests.size)
         } finally {
             store.clear()

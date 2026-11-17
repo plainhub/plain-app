@@ -16,7 +16,7 @@ class DlnaPlayerReportsTest {
         assertEquals(Long.MAX_VALUE, position.payload().getValue("positionMs").jsonPrimitive.long)
         assertEquals(Long.MAX_VALUE - 1, position.payload().getValue("durationMs").jsonPrimitive.long)
         val playback = Playback(uri, DlnaPlaybackState.PAUSED)
-        assertEquals("PausedPlayback", playback.payload().getValue("state").jsonPrimitive.content)
+        assertEquals("PAUSED_PLAYBACK", playback.payload().getValue("state").jsonPrimitive.content)
         val seek = Seek(uri, 5_000_000_001)
         assertEquals(5_000_000_001, seek.payload().getValue("positionMs").jsonPrimitive.long)
         val stopped = Stopped(uri)

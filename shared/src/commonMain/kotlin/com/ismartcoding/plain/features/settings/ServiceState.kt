@@ -5,15 +5,15 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 enum class ServiceState {
-    @SerialName("stopped")
+    @SerialName("STOPPED")
     OFF,
-    @SerialName("started")
+    @SerialName("STARTED")
     ON,
-    @SerialName("starting")
+    @SerialName("STARTING")
     STARTING,
-    @SerialName("stopping")
+    @SerialName("STOPPING")
     STOPPING,
-    @SerialName("error")
+    @SerialName("ERROR")
     ERROR;
 
     fun isProcessing(): Boolean {

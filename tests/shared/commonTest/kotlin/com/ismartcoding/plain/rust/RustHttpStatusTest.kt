@@ -13,9 +13,9 @@ class RustHttpStatusTest {
     @Test
     fun rust_http_states_decode_directly_to_service_state_and_keep_the_wire_names() {
         for ((wire, expected) in listOf(
-            "started" to ServiceState.ON,
-            "error" to ServiceState.ERROR,
-            "stopped" to ServiceState.OFF,
+            "STARTED" to ServiceState.ON,
+            "ERROR" to ServiceState.ERROR,
+            "STOPPED" to ServiceState.OFF,
         )) {
             val status = JsonHelper.jsonDecode<RustHttpStatus>(
                 """{"state":"$wire","message":"fixture","httpPort":8080,"httpsPort":8443}""",

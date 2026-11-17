@@ -16,7 +16,7 @@ import kotlin.test.assertTrue
 class DownloadMiniBarTest {
 
     private fun task(id: String, status: DownloadStatus): Download = Download(
-        id, id, ResourceDownloadSource(listOf("https://fixture.invalid/fs?id=s.share.AA&action=download")), "/downloads", null, status,
+        id, id, ResourceDownloadSource(listOf("https://fixture.invalid/fs?id=s.share.AA&action=DOWNLOAD")), "/downloads", null, status,
         100, 100, 0, 1, 1, "", "", emptyList(),
     )
 

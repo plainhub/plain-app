@@ -36,7 +36,7 @@ class DownloadsClientTest {
         }
     }
 
-    private val url = "https://fixture.invalid/fs?id=s.share.AA&action=download"
+    private val url = "https://fixture.invalid/fs?id=s.share.AA&action=DOWNLOAD"
     private fun task(id: String) = Download(id, "Target download", ResourceDownloadSource(listOf(url)), "/target-downloads", null, DownloadStatus.DOWNLOADING, 4, 8, 4, 1, 0, "target.txt", "", emptyList())
 
     @Test

@@ -1,5 +1,9 @@
 package com.ismartcoding.plain.ui.settings
 
+import com.ismartcoding.plain.models.AuthErrorCode
+import com.ismartcoding.plain.models.DiskFormatErrorCode
+import com.ismartcoding.plain.models.MountErrorCode
+
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -79,28 +83,28 @@ private fun eventTitle(type: EventType): String = stringResource(when (type) {
 @Composable
 private fun eventMessage(data: EventData): String = when (data) {
     is LoginEventData -> ""
-    is LoginFailedEventData -> eventReason(data.reason)
+    is LoginFailedEventData -> eventReason(data.reason.wire)
     is SessionEventData -> data.session.clientName.ifEmpty { data.session.clientId }
     is DeviceNameEventData -> "${data.oldName} → ${data.newName}"
     is VolumeEventData -> listOfNotNull(data.volume.name, data.volume.mountPath).joinToString(" · ")
-    is VolumeFailedEventData -> listOfNotNull(data.volume.name, data.volume.mountPath, eventReason(data.failure.reason), data.failure.detail).joinToString(" · ")
+    is VolumeFailedEventData -> listOfNotNull(data.volume.name, data.volume.mountPath, eventReason(data.failure.reason.wire), data.failure.detail).joinToString(" · ")
     is DiskFormatEventData -> listOfNotNull(data.disk.name, data.disk.path, data.fileSystem).joinToString(" · ")
-    is DiskFormatFailedEventData -> listOfNotNull(data.disk.name, data.disk.path, data.fileSystem, eventReason(data.failure.reason), data.failure.detail).joinToString(" · ")
+    is DiskFormatFailedEventData -> listOfNotNull(data.disk.name, data.disk.path, data.fileSystem, eventReason(data.failure.reason.wire), data.failure.detail).joinToString(" · ")
 }
 
 @Composable
-private fun eventReason(reason: ErrorCode): String = stringResource(when (reason) {
-    ErrorCode.INVALID_PASSWORD -> Res.string.event_reason_invalid_password
-    ErrorCode.INVALID_LOGIN_REQUEST -> Res.string.event_reason_invalid_login_request
-    ErrorCode.REMOTE_ACCESS_DISABLED -> Res.string.event_reason_remote_access_disabled
-    ErrorCode.LOGIN_EXPIRED -> Res.string.event_reason_login_expired
-    ErrorCode.TOO_MANY_LOGIN_ATTEMPTS -> Res.string.event_reason_too_many_login_attempts
-    ErrorCode.REJECTED -> Res.string.event_reason_rejected
-    ErrorCode.CANCELED -> Res.string.event_reason_canceled
-    ErrorCode.PEER_IDENTITY_CHANGED -> Res.string.event_reason_peer_identity_changed
-    ErrorCode.PASSWORD_SETUP_REQUIRED -> Res.string.event_reason_password_setup_required
-    ErrorCode.INTERNAL_ERROR -> Res.string.event_reason_internal_error
-    ErrorCode.MOUNT_FAILED -> Res.string.event_mount_failed
-    ErrorCode.FORMAT_DISK_FAILED -> Res.string.event_format_disk_failed
+private fun eventReason(reason: String): String = stringResource(when (reason) {
+    AuthErrorCode.INVALID_PASSWORD.wire -> Res.string.event_reason_invalid_password
+    AuthErrorCode.INVALID_LOGIN_REQUEST.wire -> Res.string.event_reason_invalid_login_request
+    AuthErrorCode.REMOTE_ACCESS_DISABLED.wire -> Res.string.event_reason_remote_access_disabled
+    AuthErrorCode.LOGIN_EXPIRED.wire -> Res.string.event_reason_login_expired
+    AuthErrorCode.TOO_MANY_LOGIN_ATTEMPTS.wire -> Res.string.event_reason_too_many_login_attempts
+    AuthErrorCode.REJECTED.wire -> Res.string.event_reason_rejected
+    AuthErrorCode.CANCELED.wire -> Res.string.event_reason_canceled
+    AuthErrorCode.PEER_IDENTITY_CHANGED.wire -> Res.string.event_reason_peer_identity_changed
+    AuthErrorCode.PASSWORD_SETUP_REQUIRED.wire -> Res.string.event_reason_password_setup_required
+    AuthErrorCode.INTERNAL_ERROR.wire -> Res.string.event_reason_internal_error
+    MountErrorCode.MOUNT_FAILED.wire -> Res.string.event_mount_failed
+    DiskFormatErrorCode.FORMAT_DISK_FAILED.wire -> Res.string.event_format_disk_failed
     else -> Res.string.event_reason_internal_error
 })

@@ -1,5 +1,7 @@
 package com.ismartcoding.plain.events
 
+import com.ismartcoding.plain.models.AuthErrorCode
+
 import com.ismartcoding.plain.lib.JsonHelper
 import com.ismartcoding.plain.models.*
 import com.ismartcoding.plain.graphql.Query
@@ -38,7 +40,7 @@ class EventRecordTest {
             when (val data = record.data) {
                 is SessionEventData -> assertEquals("706c6169-15b2-8ac4-83ea-4e6b0c3a4b3c", data.session.clientId)
                 is DiskFormatEventData -> assertEquals(64000000000, data.disk.sizeBytes)
-                is LoginFailedEventData -> assertEquals(ErrorCode.INVALID_PASSWORD, data.reason)
+                is LoginFailedEventData -> assertEquals(AuthErrorCode.INVALID_PASSWORD, data.reason)
                 else -> Unit
             }
         }

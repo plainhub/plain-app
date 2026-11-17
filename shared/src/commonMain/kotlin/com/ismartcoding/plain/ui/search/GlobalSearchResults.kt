@@ -1,5 +1,7 @@
 package com.ismartcoding.plain.ui.search
 
+import com.ismartcoding.plain.models.AccessErrorCode
+
 import com.ismartcoding.plain.i18n.*
 import com.ismartcoding.plain.ui.state.launchSafe
 import com.ismartcoding.plain.ui.web.accessFeatureOf
@@ -185,7 +187,7 @@ private fun SearchDeviceError(viewModel: GlobalSearchViewModel, domain: GlobalSe
         com.ismartcoding.plain.ui.permissions.RemotePermissionEffects(state.device, feature, granted) { viewModel.search() }
     }
     Column(Modifier.padding(horizontal = 16.dp, vertical = 8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-        if (error is com.ismartcoding.plain.models.BusinessException && error.code == com.ismartcoding.plain.models.ErrorCode.NO_PERMISSION && permission != null) {
+        if (error is com.ismartcoding.plain.models.BusinessException && error.code == AccessErrorCode.NO_PERMISSION.wire && permission != null) {
             Text(stringResource(Res.string.remote_permission_required), style = MaterialTheme.typography.bodyMedium)
             POutlinedButton(text = stringResource(Res.string.request_permission), onClick = {
                 requested.value = true

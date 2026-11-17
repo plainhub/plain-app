@@ -97,11 +97,11 @@ class ClientContractModelsTest {
         }
         for (mode in NotificationFilterMode.entries) {
             val filter = JsonHelper.jsonDecode<NotificationFilterData>(
-                """{"mode":"${mode.name.lowercase()}","apps":[]}""",
+                """{"mode":"${mode.name}","apps":[]}""",
             )
             assertEquals(mode, filter.mode)
             assertEquals(
-                JsonPrimitive(mode.name.lowercase()),
+                JsonPrimitive(mode.name),
                 JsonHelper.jsonEncodeToElement(filter).jsonObject.getValue("mode"),
             )
         }

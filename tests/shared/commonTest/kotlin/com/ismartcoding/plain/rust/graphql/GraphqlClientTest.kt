@@ -1,8 +1,10 @@
 package com.ismartcoding.plain.rust.graphql
 
+import com.ismartcoding.plain.models.AuthErrorCode
+import com.ismartcoding.plain.models.GraphqlErrorCode
+
 import com.ismartcoding.plain.platform.system.DataType
 import com.ismartcoding.plain.models.Audio
-import com.ismartcoding.plain.models.ErrorCode
 import com.ismartcoding.plain.models.Image
 import com.ismartcoding.plain.models.Video
 import com.ismartcoding.plain.models.Doc
@@ -219,13 +221,13 @@ class GraphqlClientTest {
     @Test
     fun business_failure_uses_the_enum_extension_and_preserves_diagnostics() = runTest {
         val client = GraphqlClient {
-            JsonHelper.jsonDecode<GraphqlResponse>("""{"errors":[{"message":"diagnostic context","extensions":{"code":"invalid_password"}}]}""")
+            JsonHelper.jsonDecode<GraphqlResponse>("""{"errors":[{"message":"diagnostic context","extensions":{"code":"INVALID_PASSWORD"}}]}""")
         }
         val failure = assertFailsWith<GraphqlException> { client.execute(Query.audioQueueItemCount("")) }
-        assertEquals(ErrorCode.INVALID_PASSWORD, failure.code)
+        assertEquals(AuthErrorCode.INVALID_PASSWORD.wire, failure.code)
         assertEquals("diagnostic context", failure.message)
         val unrelated = GraphqlClient { GraphqlResponse(errors = listOf(GraphqlError("invalid_password"))) }
-        assertEquals(ErrorCode.INTERNAL_ERROR, assertFailsWith<GraphqlException> { unrelated.execute(Query.audioQueueItemCount("")) }.code)
+        assertEquals(GraphqlErrorCode.INTERNAL_ERROR.wire, assertFailsWith<GraphqlException> { unrelated.execute(Query.audioQueueItemCount("")) }.code)
     }
 
 }

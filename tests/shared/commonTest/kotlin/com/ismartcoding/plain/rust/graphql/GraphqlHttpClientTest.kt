@@ -1,5 +1,8 @@
 package com.ismartcoding.plain.rust.graphql
 
+import com.ismartcoding.plain.models.HttpErrorCode
+import com.ismartcoding.plain.models.PeerConnectionErrorCode
+
 import com.ismartcoding.plain.features.nearby.PeerStatus
 import com.ismartcoding.plain.lib.JsonHelper
 import com.ismartcoding.plain.models.Peer
@@ -69,7 +72,7 @@ class GraphqlHttpClientTest {
                         error("Invalid management addresses must not reach the transport")
                 },
             )
-            assertEquals(com.ismartcoding.plain.models.ErrorCode.PEER_ADDRESS_UNAVAILABLE,
+            assertEquals(PeerConnectionErrorCode.PEER_ADDRESS_UNAVAILABLE.wire,
                 assertFailsWith<com.ismartcoding.plain.models.BusinessException> { client.graphql.execute(request) }.code)
         }
     }
@@ -121,7 +124,7 @@ class GraphqlHttpClientTest {
                 }
             },
         ).graphql
-        assertEquals("peer_identity_changed", assertFailsWith<IllegalStateException> { client.execute(request) }.message)
+        assertEquals("PEER_IDENTITY_CHANGED", assertFailsWith<IllegalStateException> { client.execute(request) }.message)
     }
 
     @Test
@@ -142,7 +145,7 @@ class GraphqlHttpClientTest {
             val error = assertFailsWith<IllegalStateException> { client.execute(request) }
             if (status != 401 && status != 403) {
                 assertEquals(status, assertIs<GraphqlHttpException>(error).status)
-                assertEquals(com.ismartcoding.plain.models.ErrorCode.NETWORK_ERROR, assertIs<com.ismartcoding.plain.models.BusinessException>(error).code)
+                assertEquals(HttpErrorCode.NETWORK_ERROR.wire, assertIs<com.ismartcoding.plain.models.BusinessException>(error).code)
                 assertEquals("HTTP $status", error.message)
             }
             assertEquals(1, posts)
@@ -160,7 +163,7 @@ class GraphqlHttpClientTest {
                 }
             },
         ).graphql
-        assertEquals("connection_timeout", assertFailsWith<IllegalStateException> { client.execute(request) }.message)
+        assertEquals("CONNECTION_TIMEOUT", assertFailsWith<IllegalStateException> { client.execute(request) }.message)
     }
 
     @Test

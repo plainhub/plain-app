@@ -1,7 +1,11 @@
 package com.ismartcoding.plain.rust.graphql
 
+import com.ismartcoding.plain.models.AccessErrorCode
+import com.ismartcoding.plain.models.AuthErrorCode
+import com.ismartcoding.plain.models.HttpErrorCode
+import com.ismartcoding.plain.models.PeerConnectionErrorCode
+
 import com.ismartcoding.plain.models.BusinessException
-import com.ismartcoding.plain.models.ErrorCode
 import com.ismartcoding.plain.features.chat.models.getBaseUrl
 
 import com.ismartcoding.plain.Prefs
@@ -15,7 +19,7 @@ import com.ismartcoding.plain.rust.native.nativeCall
 import kotlinx.coroutines.withTimeoutOrNull
 import kotlin.io.encoding.Base64
 
-internal class GraphqlHttpException(val status: Int) : BusinessException(ErrorCode.NETWORK_ERROR, message = "HTTP $status")
+internal class GraphqlHttpException(val status: Int) : BusinessException(HttpErrorCode.NETWORK_ERROR.wire, message = "HTTP $status")
 
 internal data class GraphqlHttpResponse(val status: Int, val body: ByteArray)
 
@@ -41,21 +45,21 @@ internal class PeerHttpClient(
     private val expected = peer.copy()
 
     internal suspend fun current(): Peer {
-        val current = peers().find { it.id == expected.id } ?: throw BusinessException(ErrorCode.PEER_REMOVED)
-        if (!(current.isPaired() && current.token.isNotEmpty())) throw BusinessException(ErrorCode.NO_PERMISSION)
-        if (!(current.publicKey == expected.publicKey && current.token == expected.token)) throw BusinessException(ErrorCode.PEER_IDENTITY_CHANGED)
+        val current = peers().find { it.id == expected.id } ?: throw BusinessException(PeerConnectionErrorCode.PEER_REMOVED.wire)
+        if (!(current.isPaired() && current.token.isNotEmpty())) throw BusinessException(AccessErrorCode.NO_PERMISSION.wire)
+        if (!(current.publicKey == expected.publicKey && current.token == expected.token)) throw BusinessException(AuthErrorCode.PEER_IDENTITY_CHANGED.wire)
         return current
     }
 
     private suspend fun post(peer: Peer, endpoint: String, body: ByteArray, contentType: String = "application/octet-stream", tlsCertificateSha256: String? = null): GraphqlHttpResponse {
         val base = peer.getBaseUrl()
-        if (!base.isUrl()) throw BusinessException(ErrorCode.PEER_ADDRESS_UNAVAILABLE)
+        if (!base.isUrl()) throw BusinessException(PeerConnectionErrorCode.PEER_ADDRESS_UNAVAILABLE.wire)
         val response = withTimeoutOrNull(30_000) {
             transport.post(base.trimEnd('/') + endpoint, clientId(), body, contentType, tlsCertificateSha256)
-        } ?: throw BusinessException(ErrorCode.CONNECTION_TIMEOUT)
+        } ?: throw BusinessException(PeerConnectionErrorCode.CONNECTION_TIMEOUT.wire)
         when (response.status) {
-            401 -> throw BusinessException(ErrorCode.UNAUTHORIZED)
-            403 -> throw BusinessException(ErrorCode.REMOTE_ACCESS_DISABLED)
+            401 -> throw BusinessException(AccessErrorCode.UNAUTHORIZED.wire)
+            403 -> throw BusinessException(AuthErrorCode.REMOTE_ACCESS_DISABLED.wire)
             in 200..299 -> Unit
             else -> throw GraphqlHttpException(response.status)
         }

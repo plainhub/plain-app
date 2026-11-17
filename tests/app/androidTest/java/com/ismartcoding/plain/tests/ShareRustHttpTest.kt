@@ -80,7 +80,7 @@ class ShareRustHttpTest {
                     val payload = buildJsonObject { put("type", "SHARED_FILE"); put("id", path) }
                     val encrypted = XChaCha20Poly1305(fileKey).encrypt(payload.toString().toByteArray(), "FS\u0000s\u0000${share.id}".toByteArray())
                     val encoded = android.util.Base64.encodeToString(encrypted, android.util.Base64.URL_SAFE or android.util.Base64.NO_WRAP or android.util.Base64.NO_PADDING)
-                    return "$base/$route?id=s.${share.id}.$encoded" + if (route == "fs") "&action=download" else ""
+                    return "$base/$route?id=s.${share.id}.$encoded" + if (route == "fs") "&action=DOWNLOAD" else ""
                 }
                 val fileUrl = resource("photos/a.txt")
                 client.get(fileUrl).use {

@@ -1,7 +1,10 @@
 package com.ismartcoding.plain.ui.tools
 
+import com.ismartcoding.plain.models.AccessErrorCode
+import com.ismartcoding.plain.models.AuthErrorCode
+import com.ismartcoding.plain.models.PeerConnectionErrorCode
+
 import com.ismartcoding.plain.models.BusinessException
-import com.ismartcoding.plain.models.ErrorCode
 import androidx.lifecycle.ViewModel
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.lifecycle.viewModelScope
@@ -39,9 +42,9 @@ internal class ManagedDeviceViewModel(
     }
 
     private suspend fun selectedPeer(): Peer {
-        val peer = readPeers().find { it.id == peerId } ?: throw BusinessException(ErrorCode.PEER_REMOVED)
-        if (!(peer.isPaired() && peer.token.isNotEmpty())) throw BusinessException(ErrorCode.NO_PERMISSION)
-        if (!(peer.publicKey == publicKey)) throw BusinessException(ErrorCode.PEER_IDENTITY_CHANGED)
+        val peer = readPeers().find { it.id == peerId } ?: throw BusinessException(PeerConnectionErrorCode.PEER_REMOVED.wire)
+        if (!(peer.isPaired() && peer.token.isNotEmpty())) throw BusinessException(AccessErrorCode.NO_PERMISSION.wire)
+        if (!(peer.publicKey == publicKey)) throw BusinessException(AuthErrorCode.PEER_IDENTITY_CHANGED.wire)
         return peer
     }
 

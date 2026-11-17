@@ -68,12 +68,12 @@ class ManagedDeviceLoadTest {
         assertTrue(requests.single().query.contains("access"))
         repeat(2) {
             val resource = client.resource("/target.mp3")
-            assertEquals("https://device.test:8443/fs?id=encrypted-resource&action=preview", resource.url)
+            assertEquals("https://device.test:8443/fs?id=encrypted-resource&action=PREVIEW", resource.url)
             assertEquals("fixture-certificate", resource.tlsCertificateSha256)
         }
         assertEquals(1, requests.size, "Resources reuse the authenticated entry metadata")
         currentPeer = peer.copy(token = "revoked-token")
-        assertEquals("peer_identity_changed", assertFailsWith<IllegalStateException> { client.resource("/target.mp3") }.message)
+        assertEquals("PEER_IDENTITY_CHANGED", assertFailsWith<IllegalStateException> { client.resource("/target.mp3") }.message)
         assertEquals(1, requests.size)
         currentPeer = peer
         response = """{"data":{"app":{"access":[]}}}"""

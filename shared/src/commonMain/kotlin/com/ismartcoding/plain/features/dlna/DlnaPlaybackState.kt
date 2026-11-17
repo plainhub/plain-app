@@ -5,9 +5,9 @@ import kotlinx.serialization.SerialName
 
 @Serializable
 enum class DlnaPlaybackState {
-    @SerialName("NoMediaPresent") NO_MEDIA_PRESENT,
-    @SerialName("Stopped") STOPPED,
-    @SerialName("Playing") PLAYING,
-    @SerialName("PausedPlayback") PAUSED,
-    @SerialName("Transitioning") TRANSITIONING,
+    @SerialName("NO_MEDIA_PRESENT") NO_MEDIA_PRESENT,
+    @SerialName("STOPPED") STOPPED,
+    @SerialName("PLAYING") PLAYING,
+    @SerialName("PAUSED_PLAYBACK") PAUSED,
+    @SerialName("TRANSITIONING") TRANSITIONING,
 }

@@ -1,5 +1,8 @@
 package com.ismartcoding.plain.ui.search
 
+import com.ismartcoding.plain.models.AccessErrorCode
+import com.ismartcoding.plain.models.PeerConnectionErrorCode
+
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelStore
 import androidx.lifecycle.ViewModelStoreOwner
@@ -11,7 +14,6 @@ import com.ismartcoding.plain.lib.JsonHelper
 import com.ismartcoding.plain.models.ManagedDeviceInfo
 import com.ismartcoding.plain.models.Note
 import com.ismartcoding.plain.models.BusinessException
-import com.ismartcoding.plain.models.ErrorCode
 import com.ismartcoding.plain.rust.graphql.GraphqlHttpException
 import com.ismartcoding.plain.models.Peer
 import com.ismartcoding.plain.platform.system.DeviceType
@@ -112,11 +114,11 @@ class GlobalSearchDevicesTest {
         val second = Device("second", 1)
         val sources = listOf(first.source(), second.source())
         val vm = model { GlobalSearchDevices(sources) }
-        first.failure = "no_permission"
+        first.failure = "NO_PERMISSION"
         vm.search()
         advanceUntilIdle()
         val state = checkNotNull(vm.domainStates[GlobalSearchDomain.NOTES])
-        assertEquals(ErrorCode.NO_PERMISSION, assertIs<BusinessException>(state.devices.first().error.value).code)
+        assertEquals(AccessErrorCode.NO_PERMISSION.wire, assertIs<BusinessException>(state.devices.first().error.value).code)
         assertEquals(1, state.hits.value.size)
         assertSame(sources.last(), state.hits.value.single().device)
         assertTrue(state.hasErrors.value)
@@ -136,12 +138,12 @@ class GlobalSearchDevicesTest {
         val vm = model { GlobalSearchDevices(sources) }
         vm.search()
         advanceUntilIdle()
-        first.failure = "connection_timeout"
+        first.failure = "CONNECTION_TIMEOUT"
         second.rows = second.rows.map { it.copy(title = "Live target update") }
         vm.refreshHits()
         advanceUntilIdle()
         val state = vm.domainStates.getValue(GlobalSearchDomain.NOTES)
-        assertEquals(ErrorCode.CONNECTION_TIMEOUT, assertIs<BusinessException>(state.devices.first().error.value).code)
+        assertEquals(PeerConnectionErrorCode.CONNECTION_TIMEOUT.wire, assertIs<BusinessException>(state.devices.first().error.value).code)
         assertEquals("Live target update", state.devices.last().hits.value.single().title)
         first.failure = null
         vm.refreshHits()
@@ -296,7 +298,7 @@ class GlobalSearchDevicesTest {
                     } else {
                         requests.add(operation)
                         beforeResponse(operation)
-                        failure?.let { throw BusinessException(checkNotNull(ErrorCode.fromWire(it))) }
+                        failure?.let { throw BusinessException(it) }
                         val offset = operation.variables["offset"]?.jsonPrimitive?.int ?: 0
                         val limit = operation.variables["limit"]?.jsonPrimitive?.int ?: rows.size
                         if ("chatRecords(" in operation.query || "chatCount(" in operation.query || "peers {" in operation.query) {

@@ -1,8 +1,9 @@
 package com.ismartcoding.plain.ui.nearby
 
+import com.ismartcoding.plain.models.PairingErrorCode
+
 import com.ismartcoding.plain.features.chat.peer.PeerStatusClient
 import com.ismartcoding.plain.features.chat.peer.RustPeerStore
-import com.ismartcoding.plain.models.ErrorCode
 import com.ismartcoding.plain.models.PairingRequestNotice
 import com.ismartcoding.plain.models.PairingProgressNotice
 import com.ismartcoding.plain.ui.app.MainViewModel
@@ -18,7 +19,7 @@ object PairingProjection {
         NearbyViewModel.itemStatus[notice.deviceId] = NearbyItemStatus.PAIRING
     }
     fun failed(notice: PairingProgressNotice) {
-        val step = if (notice.error in setOf(ErrorCode.PASSWORD_REQUIRED, ErrorCode.INVALID_PASSWORD)) PairingStep.PASSWORD_REQUIRED else PairingStep.FAILED
+        val step = if (notice.error in setOf(PairingErrorCode.PASSWORD_REQUIRED, PairingErrorCode.INVALID_PASSWORD)) PairingStep.PASSWORD_REQUIRED else PairingStep.FAILED
         NearbyViewModel.pairingViews[notice.deviceId] = PairingView(notice.deviceId, step, notice.error)
         NearbyViewModel.itemStatus.remove(notice.deviceId)
     }

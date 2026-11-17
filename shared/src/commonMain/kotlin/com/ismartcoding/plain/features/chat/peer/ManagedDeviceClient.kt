@@ -1,7 +1,9 @@
 package com.ismartcoding.plain.features.chat.peer
 
+import com.ismartcoding.plain.models.AuthErrorCode
+import com.ismartcoding.plain.models.PeerConnectionErrorCode
+
 import com.ismartcoding.plain.models.BusinessException
-import com.ismartcoding.plain.models.ErrorCode
 import com.ismartcoding.plain.features.chat.models.getBaseUrl
 
 import com.ismartcoding.plain.features.files.FileAction
@@ -24,7 +26,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.distinctUntilChanged
 
-internal enum class ResourceSize(val queryValue: String) { SM("sm"), LG("lg") }
+internal enum class ResourceSize(val queryValue: String) { SM("SM"), LG("LG") }
 
 internal class ManagedDeviceClient private constructor(
     private val peer: Peer,
@@ -68,7 +70,7 @@ internal class ManagedDeviceClient private constructor(
         api.execute(Query.appAccess()).also { access -> _info.value = _info.value.copy(access = access) }
 
     private val uploads = com.ismartcoding.plain.features.files.upload.UploadChunksClient({ id, index, bytes ->
-        http.uploadChunk(id, index, bytes, currentInfo.tlsCertificateSha256 ?: throw BusinessException(ErrorCode.PEER_HTTPS_UNAVAILABLE))
+        http.uploadChunk(id, index, bytes, currentInfo.tlsCertificateSha256 ?: throw BusinessException(PeerConnectionErrorCode.PEER_HTTPS_UNAVAILABLE.wire))
     }, api)
 
     suspend fun writeChunks(path: String, chunks: Iterator<ByteArray>): Boolean = uploads.replace(path, chunks)
@@ -94,14 +96,14 @@ internal class ManagedDeviceClient private constructor(
         val fileId = http.encryptResourceReference(info.urlToken, path)
         val base = current.getBaseUrl()
         val url = managedResourceUrl(base, fileId, size, action)
-        return com.ismartcoding.plain.models.ManagedResource(url, info.tlsCertificateSha256 ?: throw BusinessException(ErrorCode.PEER_HTTPS_UNAVAILABLE))
+        return com.ismartcoding.plain.models.ManagedResource(url, info.tlsCertificateSha256 ?: throw BusinessException(PeerConnectionErrorCode.PEER_HTTPS_UNAVAILABLE.wire))
     }
 
     suspend fun downloadFile(path: String, name: String): String {
         val request = resource(path, action = FileAction.DOWNLOAD)
         val downloaded = com.ismartcoding.plain.features.files.RemoteFiles.download(request.url, name, request.tlsCertificateSha256)
         val latest = GraphqlApi.execute(Query.peers()).find { it.id == peer.id }
-        if (!(latest?.isPaired() == true && latest.publicKey == peer.publicKey && latest.token == peer.token)) throw BusinessException(ErrorCode.PEER_IDENTITY_CHANGED)
+        if (!(latest?.isPaired() == true && latest.publicKey == peer.publicKey && latest.token == peer.token)) throw BusinessException(AuthErrorCode.PEER_IDENTITY_CHANGED.wire)
         return downloaded
     }
 }
