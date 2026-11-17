@@ -6,6 +6,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.drawscope.rotate
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.text.TextStyle
@@ -66,6 +67,19 @@ internal fun DrawScope.drawSceneLayer(
     layer: EditorLayer,
     textMeasurer: TextMeasurer,
 ) {
+    val angle = when (layer) {
+        is ArrowLayer -> layer.rotation.toFloat()
+        is TextLayer -> layer.rotation.toFloat()
+        is StickerLayer -> layer.rotation.toFloat()
+        else -> 0f
+    }
+    val center = when (layer) {
+        is ArrowLayer -> Offset(((layer.x1 + layer.x2) / 2).toFloat(), ((layer.y1 + layer.y2) / 2).toFloat())
+        is TextLayer -> Offset(layer.x.toFloat(), layer.y.toFloat())
+        is StickerLayer -> Offset(layer.x.toFloat(), layer.y.toFloat())
+        else -> Offset.Zero
+    }
+    rotate(angle, center) {
     when (layer) {
         is ArrowLayer -> drawSceneArrow(layer)
         is RectLayer -> drawRect(
@@ -81,92 +95,39 @@ internal fun DrawScope.drawSceneLayer(
             style = Stroke(width = layer.lineWidth.toFloat()),
         )
         is HighlightLayer -> drawRect(
-            color = parseScopeBgColor(layer.color),
+            color = parseScopeBgColor(layer.color).let { it.copy(alpha = it.alpha * .35f) },
             topLeft = Offset(layer.x.toFloat(), layer.y.toFloat()),
             size = Size(layer.w.toFloat(), layer.h.toFloat()),
         )
-        is MosaicLayer -> {
-            drawRect(
-                color = Color.Gray.copy(alpha = 0.5f),
-                topLeft = Offset(layer.x.toFloat(), layer.y.toFloat()),
-                size = Size(layer.w.toFloat(), layer.h.toFloat()),
-            )
-        }
+        is MosaicLayer, is ImageLayer -> Unit
         is TextLayer -> drawSceneTextLayer(layer, textMeasurer)
-        is ImageLayer -> drawRect(
-            color = Color.Gray.copy(alpha = 0.6f),
-            topLeft = Offset((layer.x - layer.w / 2).toFloat(), (layer.y - layer.h / 2).toFloat()),
-            size = Size(layer.w.toFloat(), layer.h.toFloat()),
-            style = Stroke(width = 1f),
-        )
         is FreehandLayer -> drawSceneFreehand(layer)
         is StickerLayer -> drawSceneStickerLayer(layer, textMeasurer)
     }
+    }
 }
 
-private fun DrawScope.drawSceneTextLayer(
-    layer: TextLayer,
-    textMeasurer: TextMeasurer,
-) {
-    val style = TextStyle(
-        color = parseScopeBgColor(layer.color),
-        fontSize = layer.fontSize.toFloat().sp,
-        fontStyle = if (layer.fontStyle == "italic") FontStyle.Italic else FontStyle.Normal,
-        fontWeight = parseScopeFontWeight(layer.fontWeight),
-        textAlign = parseScopeTextAlign(layer.textAlign),
-        letterSpacing = layer.letterSpacing.toFloat().sp,
-    )
-    val constraints = if (layer.maxWidth > 0) {
-        Constraints(maxWidth = layer.maxWidth.toInt().coerceAtLeast(1))
-    } else {
-        Constraints()
-    }
-    val measured = textMeasurer.measure(layer.text, style, constraints = constraints)
-    val textW = if (layer.maxWidth > 0) layer.maxWidth.toFloat() else measured.size.width.toFloat()
-    val textH = measured.size.height.toFloat()
-    if (layer.text.isEmpty()) {
-        drawRect(
-            color = parseScopeBgColor(layer.color).copy(alpha = 0.3f),
-            topLeft = Offset((layer.x - 40).toFloat(), (layer.y - textH / 2).toFloat()),
-            size = Size(80f, textH),
-            style = Stroke(width = 1f),
-        )
-        return
-    }
-    drawText(
-        textMeasurer = textMeasurer,
-        text = layer.text,
-        style = style,
-        topLeft = Offset((layer.x - textW / 2).toFloat(), (layer.y - textH / 2).toFloat()),
-        size = Size(textW, textH),
-    )
-}
-
-private fun DrawScope.drawSceneStickerLayer(
-    layer: StickerLayer,
-    textMeasurer: TextMeasurer,
-) {
+private fun DrawScope.drawSceneStickerLayer(layer: StickerLayer, textMeasurer: TextMeasurer) {
     val left = (layer.x - layer.w / 2).toFloat()
     val top = (layer.y - layer.h / 2).toFloat()
-    drawRect(
-        color = parseScopeBgColor(layer.color),
-        topLeft = Offset(left, top),
-        size = Size(layer.w.toFloat(), layer.h.toFloat()),
-    )
-    if (layer.text.isNotEmpty()) {
-        val style = TextStyle(
-            color = Color.Black,
-            fontSize = layer.fontSize.toFloat().sp,
-            fontWeight = parseScopeFontWeight(layer.fontWeight),
-            fontStyle = if (layer.fontStyle == "italic") FontStyle.Italic else FontStyle.Normal,
-        )
-        drawText(
-            textMeasurer = textMeasurer,
-            text = layer.text,
-            style = style,
-            topLeft = Offset(left, top),
-            size = Size(layer.w.toFloat(), layer.h.toFloat()),
-        )
+    drawRoundRect(parseScopeBgColor(layer.color), Offset(left, top), Size(layer.w.toFloat(), layer.h.toFloat()), cornerRadius = androidx.compose.ui.geometry.CornerRadius(8f))
+    if (layer.text.isEmpty()) return
+    val textColor = when (layer.color) {
+        "#fef08a" -> "#713f12"
+        "#bbf7d0" -> "#14532d"
+        "#bfdbfe" -> "#1e3a5f"
+        "#fbcfe8" -> "#831843"
+        "#fde68a" -> "#78350f"
+        else -> "#374151"
+    }
+    val style = TextStyle(fontSize = layer.fontSize.toFloat().sp, fontFamily = androidx.compose.ui.text.font.FontFamily.SansSerif, fontWeight = parseScopeFontWeight(layer.fontWeight), fontStyle = if (layer.fontStyle == "italic") FontStyle.Italic else FontStyle.Normal)
+    fun measure(text: String) = textMeasurer.measure(text, style, density = androidx.compose.ui.unit.Density(1f))
+    val lines = wrapSceneText(layer.text, layer.w - 28) { measure(it).size.width.toDouble() }
+    val lineHeight = layer.fontSize.toFloat() * 1.3f
+    for ((index, line) in lines.withIndex()) {
+        val y = top + (layer.h.toFloat() - lines.size * lineHeight) / 2 + index * lineHeight
+        if (y + lineHeight > top + layer.h + 2) break
+        drawText(measure(line), parseScopeBgColor(textColor), Offset(left + 14, y))
     }
 }
 
@@ -200,9 +161,12 @@ private fun DrawScope.drawSceneFreehand(layer: FreehandLayer) {
     if (layer.points.size < 2) return
     val path = Path().apply {
         moveTo(layer.points[0].x.toFloat(), layer.points[0].y.toFloat())
-        for (i in 1 until layer.points.size) {
-            lineTo(layer.points[i].x.toFloat(), layer.points[i].y.toFloat())
+        for (index in 1 until layer.points.lastIndex) {
+            val current = layer.points[index]
+            val next = layer.points[index + 1]
+            quadraticBezierTo(current.x.toFloat(), current.y.toFloat(), ((current.x + next.x) / 2).toFloat(), ((current.y + next.y) / 2).toFloat())
         }
+        lineTo(layer.points.last().x.toFloat(), layer.points.last().y.toFloat())
     }
     drawPath(
         path = path,
@@ -268,7 +232,7 @@ private fun parseScopeRgb(value: String): Color {
     return Color(nums[0].toInt(), nums[1].toInt(), nums[2].toInt())
 }
 
-private fun parseScopeFontWeight(value: String): FontWeight {
+internal fun parseScopeFontWeight(value: String): FontWeight {
     return when (value) {
         "bold" -> FontWeight.Bold
         "semibold", "600" -> FontWeight.SemiBold

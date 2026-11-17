@@ -61,13 +61,11 @@ fun FeatureItem.Companion.getList(navController: NavHostController, capabilities
         )
     )
 
-    if (AppFeatureType.IMAGE_EDITOR.has(capabilities)) {
-        list.add(
-            FeatureItem(AppFeatureType.IMAGE_EDITOR, Res.string.image_editor, UiRes.drawable.ui_drawable_square_pen) {
-                navController.navigate(Routing.ImageEditor)
-            },
-        )
-    }
+    list.add(
+        FeatureItem(AppFeatureType.IMAGE_EDITOR, Res.string.image_editor, UiRes.drawable.ui_drawable_square_pen) {
+            navController.navigate(Routing.ImageEditor)
+        },
+    )
 
     return list.filter {
         it.type.has(capabilities) && (localToolsAllowed || it.type !in localToolTypes)
@@ -75,4 +73,4 @@ fun FeatureItem.Companion.getList(navController: NavHostController, capabilities
 }
 
 
-private val localToolTypes = setOf(AppFeatureType.SOUND_METER, AppFeatureType.POMODORO_TIMER, AppFeatureType.IMAGE_EDITOR)
+private val localToolTypes = setOf(AppFeatureType.SOUND_METER, AppFeatureType.POMODORO_TIMER)

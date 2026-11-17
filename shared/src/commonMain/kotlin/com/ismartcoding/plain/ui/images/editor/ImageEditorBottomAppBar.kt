@@ -33,6 +33,8 @@ import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import com.ismartcoding.plain.ui.images.editor.ImageEditorTool
+import com.ismartcoding.plain.ui.resources.image
+import com.ismartcoding.plain.ui.resources.scissors
 import com.ismartcoding.plain.ui.resources.Res as UiRes
 import com.ismartcoding.plain.ui.resources.arrow_up_right as ui_drawable_arrow_up_right
 import com.ismartcoding.plain.ui.resources.circle as ui_drawable_circle
@@ -58,6 +60,7 @@ private data class ToolItem(
 
 private val TOOL_LIST_1 = listOf(
     ToolItem(ImageEditorTool.SELECT, UiRes.drawable.ui_drawable_mouse_pointer, Res.string.image_editor_tool_select),
+    ToolItem(ImageEditorTool.CROP, UiRes.drawable.scissors, Res.string.image_editor_crop),
     ToolItem(ImageEditorTool.FREEHAND, UiRes.drawable.ui_drawable_pen, Res.string.image_editor_tool_freehand),
     ToolItem(ImageEditorTool.ARROW, UiRes.drawable.ui_drawable_arrow_up_right, Res.string.image_editor_tool_arrow),
     ToolItem(ImageEditorTool.RECT, UiRes.drawable.ui_drawable_square, Res.string.image_editor_tool_rect),
@@ -73,10 +76,9 @@ private val TOOL_LIST_2 = listOf(
 
 @Composable
 fun ImageEditorBottomAppBar(
-    level: Int,
     currentTool: ImageEditorTool,
     onToolSelected: (ImageEditorTool) -> Unit,
-    onToggleLevel: () -> Unit,
+    onAddImage: () -> Unit,
     onClear: () -> Unit,
     onLayerPanel: () -> Unit,
 ) {
@@ -98,10 +100,10 @@ fun ImageEditorBottomAppBar(
                     .weight(1f)
                     .horizontalScroll(scrollState)
                     .padding(horizontal = 4.dp),
-                horizontalArrangement = Arrangement.spacedBy(2.dp),
+                horizontalArrangement = Arrangement.spacedBy(4.dp),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
-                val toolList = if (level == 0) TOOL_LIST_1 else TOOL_LIST_2
+                val toolList = TOOL_LIST_1 + TOOL_LIST_2
                 toolList.forEach { item ->
                     ToolButton(
                         item = item,
@@ -109,16 +111,11 @@ fun ImageEditorBottomAppBar(
                         onClick = { onToolSelected(item.tool) },
                     )
                 }
-                if (level == 1) {
-                    Box(
-                        modifier = Modifier
-                            .width(1.dp)
-                            .height(32.dp)
-                            .background(MaterialTheme.colorScheme.outlineVariant),
-                    )
+                ActionButton(UiRes.drawable.image, stringResource(Res.string.image_editor_add_image), true, onAddImage)
+                run {
                     ActionButton(
                         icon = UiRes.drawable.ui_drawable_trash_2,
-                        label = stringResource(Res.string.image_editor_delete_layer),
+                        label = stringResource(Res.string.image_editor_clear_all),
                         enabled = true,
                         onClick = onClear,
                     )
@@ -130,22 +127,7 @@ fun ImageEditorBottomAppBar(
                     )
                 }
             }
-            Box(
-                modifier = Modifier
-                    .fillMaxHeight()
-                    .background(MaterialTheme.colorScheme.primary),
-                contentAlignment = Alignment.Center,
-            ) {
-                IconButton(onClick = onToggleLevel) {
-                    Icon(
-                        painter = painterResource(
-                            if (level == 0) UiRes.drawable.ui_drawable_looks_one else UiRes.drawable.ui_drawable_looks_two
-                        ),
-                        contentDescription = null,
-                        tint = MaterialTheme.colorScheme.onPrimary,
-                    )
-                }
-            }
+
         }
     }
 }
@@ -168,19 +150,19 @@ private fun ToolButton(
     }
     Column(
         modifier = Modifier
-            .width(54.dp)
-            .clip(RoundedCornerShape(10.dp))
+            .width(64.dp)
+            .clip(RoundedCornerShape(8.dp))
             .background(containerColor)
             .clickable { onClick() }
             .padding(vertical = 4.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(2.dp),
+        verticalArrangement = Arrangement.spacedBy(4.dp),
     ) {
         Icon(
             painter = painterResource(item.icon),
             contentDescription = stringResource(item.labelRes),
             tint = tint,
-            modifier = Modifier.size(22.dp),
+            modifier = Modifier.size(24.dp),
         )
         Text(
             text = stringResource(item.labelRes),
@@ -205,18 +187,18 @@ private fun ActionButton(
     }
     Column(
         modifier = Modifier
-            .width(54.dp)
-            .clip(RoundedCornerShape(10.dp))
+            .width(64.dp)
+            .clip(RoundedCornerShape(8.dp))
             .clickable(enabled = enabled) { onClick() }
             .padding(vertical = 4.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(2.dp),
+        verticalArrangement = Arrangement.spacedBy(4.dp),
     ) {
         Icon(
             painter = painterResource(icon),
             contentDescription = label,
             tint = tint,
-            modifier = Modifier.size(22.dp),
+            modifier = Modifier.size(24.dp),
         )
         Text(
             text = label,

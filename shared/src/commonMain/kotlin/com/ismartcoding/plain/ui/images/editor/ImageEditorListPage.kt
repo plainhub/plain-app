@@ -47,7 +47,8 @@ import com.ismartcoding.plain.ui.resources.plus as ui_drawable_plus
 @Composable
 fun ImageEditorListPage(
     navController: NavHostController,
-    vm: ImageEditorViewModel = viewModel { ImageEditorViewModel() },
+    source: com.ismartcoding.plain.rust.graphql.ContentSource = com.ismartcoding.plain.ui.navigation.LocalContentSource.current,
+    vm: ImageEditorViewModel = viewModel { ImageEditorViewModel(com.ismartcoding.plain.features.images.editor.ImageEditorProjectsClient(source.api)) },
 ) {
     val itemsState by vm.itemsFlow.collectAsState()
     val scope = rememberCoroutineScope()
@@ -56,11 +57,12 @@ fun ImageEditorListPage(
         scope.launch { withIO { vm.loadAsync() }; setRefreshState(RefreshContentState.Finished) }
     }
 
-    LaunchedEffect(vm) {
-        launch { vm.loadAsync() }
-        AppSubscriptions.contentChanged.changes().collect {
-            vm.loadAsync()
+    LaunchedEffect(source, vm) {
+        val updates = when (source) {
+            com.ismartcoding.plain.rust.graphql.ContentSource.Local -> AppSubscriptions.subscription<Boolean>("contentChanged")
+            is com.ismartcoding.plain.rust.graphql.ContentSource.Remote -> source.client.subscriptionUpdates(listOf(com.ismartcoding.plain.rust.graphql.GraphqlOperation("subscription { contentChanged }")))
         }
+        vm.observe(updates)
     }
 
     PScaffold(
@@ -86,7 +88,10 @@ fun ImageEditorListPage(
             refreshLayoutState = topRefreshLayoutState,
         ) {
             AnimatedVisibility(visible = true, enter = fadeIn(), exit = fadeOut()) {
-                if (itemsState.isNotEmpty()) {
+                val failed = vm.loadState.value as? EditorLoadState.Failed
+                if (failed != null) {
+                    com.ismartcoding.plain.ui.components.NoDataView(message = failed.message, icon = null)
+                } else if (itemsState.isNotEmpty()) {
                     LazyColumn(
                         Modifier
                             .fillMaxSize()
@@ -103,7 +108,7 @@ fun ImageEditorListPage(
                         item { BottomSpace(paddingValues) }
                     }
                 } else {
-                    NoDataColumn(loading = vm.showLoading.value)
+                    NoDataColumn(loading = vm.loadState.value == EditorLoadState.Loading)
                 }
             }
         }

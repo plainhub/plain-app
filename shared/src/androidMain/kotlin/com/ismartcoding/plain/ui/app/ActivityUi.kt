@@ -5,8 +5,6 @@ import androidx.compose.runtime.setValue
 
 import androidx.activity.compose.setContent
 import androidx.compose.runtime.CompositionLocalProvider
-import com.ismartcoding.plain.ui.images.editor.scene.LocalEditorCanvas
-import com.ismartcoding.plain.ui.images.editor.scene.AndroidEditorCanvas
 import com.ismartcoding.plain.ui.platform.media.LocalImageRenderer
 import com.ismartcoding.plain.ui.platform.media.AndroidImageRenderer
 import androidx.compose.runtime.mutableStateOf
@@ -31,7 +29,6 @@ internal fun MainActivity.installComposeUi() {
     setContent {
         CompositionLocalProvider(
             LocalImageRenderer provides AndroidImageRenderer,
-            LocalEditorCanvas provides { state, modifier, onReady -> AndroidEditorCanvas(state, modifier, onReady) },
         ) {
             AppContent(
                 navControllerState, onLaunched = { handleIntent(intent) },

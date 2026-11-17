@@ -52,6 +52,8 @@ import org.jetbrains.compose.resources.stringResource
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.ismartcoding.plain.lib.generateId
+import com.ismartcoding.plain.ui.base.NoDataColumn
+import com.ismartcoding.plain.ui.components.NoDataView
 import com.ismartcoding.plain.ui.components.NavigationBackIcon
 import com.ismartcoding.plain.ui.components.PIconButton
 import com.ismartcoding.plain.ui.base.PScaffold
@@ -61,7 +63,6 @@ import com.ismartcoding.plain.ui.images.editor.ImageEditorEditViewModel
 import com.ismartcoding.plain.ui.images.editor.ImageEditorTool
 import com.ismartcoding.plain.ui.images.editor.ResizeHandle
 import com.ismartcoding.plain.ui.images.editor.scene.NativeEditorCanvas
-import com.ismartcoding.plain.ui.images.editor.scene.SceneState
 import com.ismartcoding.plain.ui.images.editor.scene.SceneViewport
 import com.ismartcoding.plain.ui.images.editor.scene.parseScopeBgColor
 import com.ismartcoding.plain.lib.yjs.ArrowLayer
@@ -100,10 +101,18 @@ private val PRESET_WIDTHS = listOf(2.0, 4.0, 8.0, 16.0)
 fun ImageEditorPage(
     navController: NavHostController,
     projectId: String,
-    vm: ImageEditorEditViewModel = viewModel { ImageEditorEditViewModel() },
+    source: com.ismartcoding.plain.rust.graphql.ContentSource = com.ismartcoding.plain.ui.navigation.LocalContentSource.current,
+    vm: ImageEditorEditViewModel = viewModel { ImageEditorEditViewModel(com.ismartcoding.plain.features.images.editor.ImageEditorProjectsClient(source.api)) },
 ) {
-    val layers by vm.layersFlow.collectAsState()
+    val document by vm.document.collectAsState()
+    val layers = document.layers
 
+    val textMeasurer = androidx.compose.ui.text.rememberTextMeasurer()
+    val imageActions = rememberEditorImageActions(vm, textMeasurer)
+    var showCanvasSettings by remember { mutableStateOf(false) }
+    var previewImage by remember { mutableStateOf<androidx.compose.ui.graphics.ImageBitmap?>(null) }
+    var showProperties by remember { mutableStateOf(false) }
+    var cropRect by remember { mutableStateOf<RectLayer?>(null) }
     var drawingLayer by remember { mutableStateOf<EditorLayer?>(null) }
     var showTextDialog by remember { mutableStateOf(false) }
     var textInsertPoint by remember { mutableStateOf<Point?>(null) }
@@ -153,6 +162,12 @@ fun ImageEditorPage(
         ImageEditorLayerPanel(vm = vm, onDismiss = { vm.showLayerPanel.value = false })
     }
 
+    val selectedLayer = layers.find { it.id == vm.selectedLayerId.value }
+    if (showProperties && selectedLayer != null) ImageEditorProperties(selectedLayer, vm::updateLayer, replaceImage = { imageActions.pick(EditorImageTarget.Replacement(selectedLayer.id)) }, dismiss = { showProperties = false })
+
+    if (showCanvasSettings) ImageEditorCanvasSettings(document, vm, { imageActions.pick(EditorImageTarget.Background) }, { showCanvasSettings = false })
+    previewImage?.let { ImageEditorPreview(it) { previewImage = null } }
+
     PScaffold(
         topBar = {
             PTopAppBar(
@@ -172,6 +187,8 @@ fun ImageEditorPage(
                         tint = MaterialTheme.colorScheme.onSurface,
                         enabled = vm.canRedo.value,
                     ) { vm.redo() }
+                    if (selectedLayer != null) com.ismartcoding.plain.ui.base.PTextButton(stringResource(Res.string.image_editor_properties), { showProperties = true })
+                    ImageEditorMenu(vm.loadState.value == EditorLoadState.Ready, { showCanvasSettings = true }, { previewImage = imageActions.render() }, imageActions::export)
                     val sel = vm.selectedLayerId.value
                     if (sel != null) {
                         PIconButton(
@@ -184,10 +201,19 @@ fun ImageEditorPage(
             )
         },
         bottomBar = {
-            Column {
+            if (vm.loadState.value == EditorLoadState.Ready) Column {
+                if (vm.currentTool.value == ImageEditorTool.CROP) Row {
+                    com.ismartcoding.plain.ui.base.PTextButton(stringResource(Res.string.image_editor_apply_crop), {
+                        cropRect?.let { crop ->
+                            val image = cropEditorBitmap(imageActions.render(), crop)
+                            vm.applyCrop(embeddedEditorPng(image), image.width, image.height)
+                            cropRect = null
+                        }
+                    }, enabled = cropRect?.let { it.w >= 2 && it.h >= 2 } == true)
+                    com.ismartcoding.plain.ui.base.PTextButton(stringResource(Res.string.cancel), { cropRect = null; vm.currentTool.value = ImageEditorTool.SELECT })
+                }
                 if (vm.currentTool.value != ImageEditorTool.SELECT &&
-                    vm.currentTool.value != ImageEditorTool.TEXT &&
-                    vm.level.value == 0
+                    vm.currentTool.value != ImageEditorTool.TEXT
                 ) {
                     StylePickerRow(
                         currentColor = vm.color.value,
@@ -197,19 +223,24 @@ fun ImageEditorPage(
                     )
                 }
                 ImageEditorBottomAppBar(
-                    level = vm.level.value,
                     currentTool = vm.currentTool.value,
                     onToolSelected = {
+                        cropRect = null
                         vm.currentTool.value = it
                         vm.selectLayer(null)
                     },
-                    onToggleLevel = { vm.toggleLevel() },
+                    onAddImage = { imageActions.pick(EditorImageTarget.Layer) },
                     onClear = { vm.clearLayers() },
                     onLayerPanel = { vm.showLayerPanel.value = true },
                 )
             }
         },
     ) { paddingValues ->
+        when (val loading = vm.loadState.value) {
+            EditorLoadState.Loading -> { NoDataColumn(loading = true, modifier = Modifier.padding(paddingValues)); return@PScaffold }
+            is EditorLoadState.Failed -> { NoDataView(modifier = Modifier.padding(paddingValues), message = loading.message, icon = null); return@PScaffold }
+            EditorLoadState.Ready -> Unit
+        }
         val density = LocalDensity.current
         BoxWithConstraints(
             modifier = Modifier
@@ -219,8 +250,8 @@ fun ImageEditorPage(
         ) {
             val availW = with(density) { maxWidth.toPx() }
             val availH = with(density) { maxHeight.toPx() }
-            val cw = vm.canvasSize.value.width.toFloat()
-            val ch = vm.canvasSize.value.height.toFloat()
+            val cw = document.canvasSize.width.toFloat()
+            val ch = document.canvasSize.height.toFloat()
             val fitScale = if (cw > 0f && ch > 0f) min(availW / cw, availH / ch) * 0.9f else 1f
             val renderScale = fitScale * zoom
             val displayW = cw * renderScale
@@ -245,11 +276,9 @@ fun ImageEditorPage(
                     .border(1.dp, Color(0xFF888888))
                     .pointerInput(vm.currentTool.value, layers) {
                         val tool = vm.currentTool.value
-                        println("ImageEditor: pointerInput launched tool=$tool")
                         awaitEachGesture {
                             val firstDown = awaitFirstDown(requireUnconsumed = false)
                             val firstPos = firstDown.position
-                            println("ImageEditor: gesture start tool=$tool pos=$firstPos")
                             firstDown.consume()
 
                             var isMultiTouch = false
@@ -338,7 +367,6 @@ fun ImageEditorPage(
                                         val zoomChange = dist / lastPinchDist
                                         val panChange = cent - lastCentroid
                                         val newZoom = (zoom * zoomChange).coerceIn(0.1f, 5f)
-                                        println("ImageEditor: pinch zoom=$zoom zoomChange=$zoomChange newZoom=$newZoom dist=$dist lastPinchDist=$lastPinchDist")
                                         zoom = newZoom
                                         pan += panChange
                                     }
@@ -399,19 +427,22 @@ fun ImageEditorPage(
 
                             if (!isMultiTouch) {
                                 when {
+                                    tool == ImageEditorTool.CROP -> {
+                                        cropRect = (drawingLayer as? RectLayer)?.let { constrainCrop(it, document.canvasSize) }
+                                        drawingLayer = null
+                                        previewId = null
+                                    }
                                     tool == ImageEditorTool.TEXT -> {
                                         textInsertPoint = toCanvas(firstPos)
                                         showTextDialog = true
                                         drawingLayer = null
                                         previewId = null
-                                        println("ImageEditor: TEXT dialog should show")
                                     }
                                     tool == ImageEditorTool.STICKER -> {
                                         val p = toCanvas(firstPos)
                                         vm.addStickerAt(p.x, p.y)
                                         drawingLayer = null
                                         previewId = null
-                                        println("ImageEditor: STICKER added at $p")
                                     }
                                     tool == ImageEditorTool.FREEHAND -> {
                                         if (strokePoints.size >= 2 && drawingLayer != null) {
@@ -436,23 +467,15 @@ fun ImageEditorPage(
                         }
                     },
             ) {
-                val renderList = if (drawingLayer != null) layers + drawingLayer!! else layers
+                val renderList = if (drawingLayer != null && vm.currentTool.value != ImageEditorTool.CROP) layers + drawingLayer!! else layers
                 NativeEditorCanvas(
-                    state = SceneState(
-                        canvasSize = vm.canvasSize.value,
-                        bgColor = vm.bgColor.value,
-                        layers = renderList,
-                        viewport = SceneViewport(renderScale, 0f, 0f),
-                        sourceImagePath = vm.sourceImage.value,
-                        imgOffsetX = vm.imgOffset.value.x,
-                        imgOffsetY = vm.imgOffset.value.y,
-                        imgAlpha = vm.imgAlpha.value,
-                        images = vm.images.value,
-                    ),
+                    state = document.copy(layers = renderList),
+                    viewport = SceneViewport(renderScale, 0f, 0f),
                     modifier = Modifier.fillMaxSize(),
                 )
                 Canvas(modifier = Modifier.fillMaxSize()) {
                     scale(renderScale, pivot = Offset.Zero) {
+                        if (vm.currentTool.value == ImageEditorTool.CROP) ((drawingLayer as? RectLayer) ?: cropRect)?.let { drawEditorCrop(constrainCrop(it, document.canvasSize), renderScale) }
                         val selId = vm.selectedLayerId.value
                         if (selId != null) {
                             val selLayer = layers.find { it.id == selId }
@@ -603,7 +626,7 @@ private fun createShape(
             id = id, x1 = start.x, y1 = start.y, x2 = end.x, y2 = end.y,
             color = color, lineWidth = lineWidth,
         )
-        ImageEditorTool.RECT -> RectLayer(
+        ImageEditorTool.RECT, ImageEditorTool.CROP -> RectLayer(
             id = id, x = x1, y = y1, w = w, h = h, color = color, lineWidth = lineWidth,
         )
         ImageEditorTool.ELLIPSE -> EllipseLayer(
@@ -671,100 +694,4 @@ private fun DrawScope.drawResizeHandles(layer: EditorLayer, renderScale: Float) 
             style = Stroke(width = 2f / renderScale),
         )
     }
-}
-
-private fun layerBounds(layer: EditorLayer): Pair<Point, Point>? {
-    return when (layer) {
-        is ArrowLayer -> {
-            val x1 = min(layer.x1, layer.x2)
-            val y1 = min(layer.y1, layer.y2)
-            val x2 = max(layer.x1, layer.x2)
-            val y2 = max(layer.y1, layer.y2)
-            Pair(Point(x1, y1), Point(x2 - x1, y2 - y1))
-        }
-        is RectLayer -> Pair(Point(layer.x, layer.y), Point(layer.w, layer.h))
-        is EllipseLayer -> Pair(Point(layer.cx - layer.rx, layer.cy - layer.ry), Point(layer.rx * 2, layer.ry * 2))
-        is HighlightLayer -> Pair(Point(layer.x, layer.y), Point(layer.w, layer.h))
-        is MosaicLayer -> Pair(Point(layer.x, layer.y), Point(layer.w, layer.h))
-        is TextLayer -> {
-            val mw = maxWidthForText(layer).toDouble()
-            Pair(Point(layer.x - mw / 2, layer.y - layer.fontSize / 2), Point(mw, layer.fontSize))
-        }
-        is ImageLayer -> Pair(Point(layer.x - layer.w / 2, layer.y - layer.h / 2), Point(layer.w, layer.h))
-        is FreehandLayer -> {
-            if (layer.points.isEmpty()) return null
-            var minX = layer.points[0].x; var minY = layer.points[0].y
-            var maxX = layer.points[0].x; var maxY = layer.points[0].y
-            for (p in layer.points) {
-                if (p.x < minX) minX = p.x; if (p.y < minY) minY = p.y
-                if (p.x > maxX) maxX = p.x; if (p.y > maxY) maxY = p.y
-            }
-            Pair(Point(minX, minY), Point(maxX - minX, maxY - minY))
-        }
-        is StickerLayer -> Pair(Point(layer.x - layer.w / 2, layer.y - layer.h / 2), Point(layer.w, layer.h))
-    }
-}
-
-private fun maxWidthForText(layer: TextLayer): Float {
-    return if (layer.maxWidth > 0) layer.maxWidth.toFloat() else 200f
-}
-
-private fun hitTest(layer: EditorLayer, p: Point, threshold: Double = 12.0): Boolean {
-    return when (layer) {
-        is ArrowLayer -> distanceToSegment(p, Point(layer.x1, layer.y1), Point(layer.x2, layer.y2)) < threshold
-        is RectLayer -> p.x >= layer.x && p.x <= layer.x + layer.w && p.y >= layer.y && p.y <= layer.y + layer.h
-        is EllipseLayer -> {
-            val dx = if (layer.rx > 0) (p.x - layer.cx) / layer.rx else 0.0
-            val dy = if (layer.ry > 0) (p.y - layer.cy) / layer.ry else 0.0
-            dx * dx + dy * dy <= 1.0
-        }
-        is HighlightLayer -> p.x >= layer.x && p.x <= layer.x + layer.w && p.y >= layer.y && p.y <= layer.y + layer.h
-        is MosaicLayer -> p.x >= layer.x && p.x <= layer.x + layer.w && p.y >= layer.y && p.y <= layer.y + layer.h
-        is TextLayer -> {
-            val mw = maxWidthForText(layer).toDouble()
-            p.x >= layer.x - mw / 2 && p.x <= layer.x + mw / 2 &&
-                p.y >= layer.y - layer.fontSize / 2 && p.y <= layer.y + layer.fontSize / 2
-        }
-        is ImageLayer -> p.x >= layer.x - layer.w / 2 && p.x <= layer.x + layer.w / 2 &&
-            p.y >= layer.y - layer.h / 2 && p.y <= layer.y + layer.h / 2
-        is FreehandLayer -> {
-            if (layer.points.size < 2) return false
-            for (i in 0 until layer.points.size - 1) {
-                if (distanceToSegment(p, layer.points[i], layer.points[i + 1]) < threshold) return true
-            }
-            false
-        }
-        is StickerLayer -> p.x >= layer.x - layer.w / 2 && p.x <= layer.x + layer.w / 2 &&
-            p.y >= layer.y - layer.h / 2 && p.y <= layer.y + layer.h / 2
-    }
-}
-
-private fun hitTestHandle(layer: EditorLayer, p: Point, threshold: Double): ResizeHandle? {
-    val bounds = layerBounds(layer) ?: return null
-    val (origin, size) = bounds
-    val corners = mapOf(
-        ResizeHandle.TOP_LEFT to Point(origin.x, origin.y),
-        ResizeHandle.TOP_RIGHT to Point(origin.x + size.x, origin.y),
-        ResizeHandle.BOTTOM_LEFT to Point(origin.x, origin.y + size.y),
-        ResizeHandle.BOTTOM_RIGHT to Point(origin.x + size.x, origin.y + size.y),
-    )
-    val tSq = threshold * threshold
-    for ((handle, corner) in corners) {
-        val dx = p.x - corner.x
-        val dy = p.y - corner.y
-        if (dx * dx + dy * dy < tSq) return handle
-    }
-    return null
-}
-
-private fun distanceToSegment(p: Point, a: Point, b: Point): Double {
-    val dx = b.x - a.x
-    val dy = b.y - a.y
-    val lenSq = dx * dx + dy * dy
-    if (lenSq == 0.0) return sqrt((p.x - a.x) * (p.x - a.x) + (p.y - a.y) * (p.y - a.y))
-    val t = ((p.x - a.x) * dx + (p.y - a.y) * dy) / lenSq
-    val tc = t.coerceIn(0.0, 1.0)
-    val projX = a.x + tc * dx
-    val projY = a.y + tc * dy
-    return sqrt((p.x - projX) * (p.x - projX) + (p.y - projY) * (p.y - projY))
 }

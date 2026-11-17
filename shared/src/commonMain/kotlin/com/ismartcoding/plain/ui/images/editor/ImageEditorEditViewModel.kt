@@ -1,7 +1,5 @@
 package com.ismartcoding.plain.ui.images.editor
 
-import com.ismartcoding.plain.ui.state.launchSafe
-
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -9,309 +7,163 @@ import com.ismartcoding.plain.features.images.editor.ImageEditorProjectsClient
 import com.ismartcoding.plain.helpers.Base64Lenient
 import com.ismartcoding.plain.lib.generateId
 import com.ismartcoding.plain.lib.withIO
-import com.ismartcoding.plain.lib.yjs.ArrowLayer
-import com.ismartcoding.plain.lib.yjs.CanvasSize
-import com.ismartcoding.plain.lib.yjs.EditorLayer
-import com.ismartcoding.plain.lib.yjs.EllipseLayer
-import com.ismartcoding.plain.lib.yjs.FreehandLayer
-import com.ismartcoding.plain.lib.yjs.HighlightLayer
-import com.ismartcoding.plain.lib.yjs.ImageLayer
-import com.ismartcoding.plain.lib.yjs.MosaicLayer
-import com.ismartcoding.plain.lib.yjs.Point
-import com.ismartcoding.plain.lib.yjs.RectLayer
-import com.ismartcoding.plain.lib.yjs.StickerLayer
-import com.ismartcoding.plain.lib.yjs.TextLayer
-import com.ismartcoding.plain.lib.yjs.YjsDoc
-import com.ismartcoding.plain.lib.yjs.YjsDocEncoder
+import com.ismartcoding.plain.lib.yjs.*
+import com.ismartcoding.plain.ui.state.launchSafe
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import kotlin.math.max
+import kotlin.math.min
 
-enum class ImageEditorTool {
-    SELECT, ARROW, RECT, ELLIPSE, HIGHLIGHT, MOSAIC, TEXT, FREEHAND, STICKER
-}
 
+enum class ImageEditorTool { SELECT, CROP, FREEHAND, ARROW, RECT, ELLIPSE, HIGHLIGHT, MOSAIC, TEXT, STICKER }
 enum class ResizeHandle { TOP_LEFT, TOP_RIGHT, BOTTOM_LEFT, BOTTOM_RIGHT }
 
-class ImageEditorEditViewModel : ViewModel() {
-    private val _layersFlow = MutableStateFlow<List<EditorLayer>>(emptyList())
-    val layersFlow: StateFlow<List<EditorLayer>> = _layersFlow
-
-    var id = mutableStateOf("")
-    var canvasSize = mutableStateOf(CanvasSize(1920, 1080))
-    var bgColor = mutableStateOf("transparent")
-    var sourceImage = mutableStateOf<String?>(null)
-    var imgOffset = mutableStateOf(Point(0.0, 0.0))
-    var imgAlpha = mutableStateOf(100.0)
-    var images = mutableStateOf<Map<String, String>>(emptyMap())
-
-    var currentTool = mutableStateOf(ImageEditorTool.SELECT)
-    var selectedLayerId = mutableStateOf<String?>(null)
-    var color = mutableStateOf("#ff0000")
-    var lineWidth = mutableStateOf(4.0)
-    var showLoading = mutableStateOf(true)
-    var dirty = mutableStateOf(false)
-    var level = mutableStateOf(0)
-    var showLayerPanel = mutableStateOf(false)
-    var showColorPicker = mutableStateOf(false)
-
-    private val history = mutableListOf<List<EditorLayer>>()
-    private val redoStack = mutableListOf<List<EditorLayer>>()
-    var canUndo = mutableStateOf(false)
-    var canRedo = mutableStateOf(false)
-
-    private var stickerColorIdx = 0
-
+class ImageEditorEditViewModel(private val projects: ImageEditorProjectsClient) : ViewModel() {
+    private val state = MutableStateFlow(EditorDocumentState())
+    val document = state.asStateFlow()
+    val layers: List<EditorLayer> get() = state.value.layers
+    val id = mutableStateOf("")
+    val loadState = mutableStateOf<EditorLoadState>(EditorLoadState.Loading)
+    val dirty = mutableStateOf(false)
+    val currentTool = mutableStateOf(ImageEditorTool.SELECT)
+    val selectedLayerId = mutableStateOf<String?>(null)
+    val color = mutableStateOf("#ef4444")
+    val lineWidth = mutableStateOf(4.0)
+    val showLayerPanel = mutableStateOf(false)
+    val canUndo = mutableStateOf(false)
+    val canRedo = mutableStateOf(false)
+    private val history = mutableListOf<EditorDocumentState>()
+    private val redoStack = mutableListOf<EditorDocumentState>()
     private var autoSaveJob: Job? = null
 
-    val layers: List<EditorLayer> get() = _layersFlow.value
-
-    suspend fun loadAsync(projectId: String) = withIO {
+    suspend fun loadAsync(projectId: String) {
+        if (loadState.value == EditorLoadState.Ready && id.value == projectId) return
+        loadState.value = EditorLoadState.Loading
         id.value = projectId
-        history.clear()
-        redoStack.clear()
-        refreshUndoFlags()
-        if (projectId.isEmpty()) {
-            showLoading.value = false
-            return@withIO
-        }
-        val project = ImageEditorProjectsClient.getByIdAsync(projectId)
-        if (project == null) {
-            showLoading.value = false
-            return@withIO
-        }
+        history.clear(); redoStack.clear(); refreshUndoFlags()
         try {
-            if (project.stateB64.isNotEmpty()) {
-                val bytes = Base64Lenient.decode(project.stateB64)
-                val doc = YjsDoc(bytes)
-                require((doc.getMetaValue("formatVersion") as? Number)?.toDouble() == YjsDocEncoder.FORMAT_VERSION.toDouble()) { "Unsupported image editor document format" }
-                val decodedLayers = doc.getLayers()
-                val decodedImages = doc.getImages()
-                canvasSize.value = doc.getCanvasSize()
-                bgColor.value = doc.getBgColor()
-                sourceImage.value = doc.getSourceImage()
-                imgOffset.value = doc.getImgOffset()
-                imgAlpha.value = doc.getImgAlpha()
-                images.value = decodedImages
-                _layersFlow.value = decodedLayers
+            val decoded = if (projectId.isEmpty()) EditorDocumentState(bgColor = "#ffffff") else withIO {
+                val project = checkNotNull(projects.getByIdAsync(projectId)) { "Image editor project not found" }
+                val doc = YjsDoc(Base64Lenient.decode(project.stateB64))
+                require((doc.getMetaValue("formatVersion") as Number).toDouble() == YjsDocEncoder.FORMAT_VERSION.toDouble()) { "Unsupported image editor document format" }
+                EditorDocumentState(doc.getCanvasSize(), doc.getBgColor(), doc.getSourceImage(), doc.getImgOffset(), doc.getImgAlpha(), doc.getLayers(), doc.getImages())
             }
+            com.ismartcoding.plain.ui.images.editor.scene.decodeSceneImages(decoded.sourceImage, decoded.images)
+            for (layer in decoded.layers.filterIsInstance<ImageLayer>()) require(layer.id in decoded.images) { "Missing editor image resource" }
+            state.value = decoded
             dirty.value = false
-        } finally {
-            showLoading.value = false
-        }
+            loadState.value = EditorLoadState.Ready
+        } catch (canceled: kotlinx.coroutines.CancellationException) { throw canceled }
+        catch (error: Exception) { loadState.value = EditorLoadState.Failed(error.message.orEmpty()) }
     }
 
-    fun toggleLevel() {
-        level.value = if (level.value == 0) 1 else 0
-    }
-
-    fun selectLayer(layerId: String?) {
-        selectedLayerId.value = layerId
-    }
-
-    private fun pushHistory() {
-        history.add(_layersFlow.value)
-        redoStack.clear()
-        refreshUndoFlags()
-    }
-
-    private fun refreshUndoFlags() {
-        canUndo.value = history.isNotEmpty()
-        canRedo.value = redoStack.isNotEmpty()
-    }
-
+    fun selectLayer(layerId: String?) { selectedLayerId.value = layerId }
+    private fun pushHistory() { history.add(state.value); redoStack.clear(); refreshUndoFlags() }
+    private fun refreshUndoFlags() { canUndo.value = history.isNotEmpty(); canRedo.value = redoStack.isNotEmpty() }
     private fun markDirty() {
         dirty.value = true
         autoSaveJob?.cancel()
-        autoSaveJob = viewModelScope.launchSafe {
-            delay(2000)
-            saveAsync()
-        }
+        autoSaveJob = viewModelScope.launchSafe { delay(2000); saveAsync() }
     }
-
     fun undo() {
         if (history.isEmpty()) return
-        redoStack.add(_layersFlow.value)
-        _layersFlow.value = history.removeAt(history.lastIndex)
-        markDirty()
-        refreshUndoFlags()
+        redoStack.add(state.value); state.value = history.removeAt(history.lastIndex)
+        selectedLayerId.value = null; markDirty(); refreshUndoFlags()
     }
-
     fun redo() {
         if (redoStack.isEmpty()) return
-        history.add(_layersFlow.value)
-        _layersFlow.value = redoStack.removeAt(redoStack.lastIndex)
-        markDirty()
-        refreshUndoFlags()
+        history.add(state.value); state.value = redoStack.removeAt(redoStack.lastIndex)
+        selectedLayerId.value = null; markDirty(); refreshUndoFlags()
     }
-
     fun clearLayers() {
-        if (_layersFlow.value.isEmpty()) return
-        pushHistory()
-        _layersFlow.value = emptyList()
-        selectedLayerId.value = null
-        markDirty()
+        if (layers.isEmpty()) return
+        pushHistory(); state.update { it.copy(layers = emptyList(), images = emptyMap()) }
+        selectedLayerId.value = null; markDirty()
     }
-
     fun addLayer(layer: EditorLayer) {
-        pushHistory()
-        _layersFlow.update { it + layer }
-        selectedLayerId.value = layer.id
-        markDirty()
+        pushHistory(); state.update { it.copy(layers = it.layers + layer) }
+        selectedLayerId.value = layer.id; markDirty()
     }
-
-    fun addStickerAt(x: Double, y: Double) {
-        val colors = listOf("#fef08a", "#bbf7d0", "#bfdbfe", "#fbcfe8", "#fde68a")
-        val color = colors[stickerColorIdx % colors.size]
-        stickerColorIdx++
-        val cw = canvasSize.value.width.toDouble()
-        val layer = StickerLayer(
-            id = generateId(),
-            x = x,
-            y = y,
-            w = cw * 0.18,
-            h = cw * 0.06,
-            color = color,
-            text = "Note",
-            fontSize = (cw * 0.02).toInt().toDouble(),
-            fontWeight = "600",
-        )
-        addLayer(layer)
-    }
-
+    fun addStickerAt(x: Double, y: Double) = addLayer(StickerLayer(id = generateId(), x = x, y = y, w = 240.0, h = 120.0, text = "", color = "#fef08a", fontSize = 24.0))
     fun updateLayer(layer: EditorLayer) {
-        pushHistory()
-        _layersFlow.update { list ->
-            list.map { if (it.id == layer.id) layer else it }
-        }
-        markDirty()
+        if (layers.find { it.id == layer.id } == layer) return
+        pushHistory(); state.update { it.copy(layers = it.layers.map { existing -> if (existing.id == layer.id) layer else existing }) }; markDirty()
     }
-
     fun deleteLayer(layerId: String) {
-        pushHistory()
-        _layersFlow.update { list -> list.filter { it.id != layerId } }
-        if (selectedLayerId.value == layerId) {
-            selectedLayerId.value = null
-        }
+        pushHistory(); state.update { it.copy(layers = it.layers.filter { layer -> layer.id != layerId }, images = it.images - layerId) }
+        if (selectedLayerId.value == layerId) selectedLayerId.value = null
         markDirty()
     }
-
     fun moveLayer(layerId: String, dx: Double, dy: Double) {
-        _layersFlow.update { list ->
-            list.map { layer ->
-                if (layer.id == layerId) moveLayerBy(layer, dx, dy) else layer
-            }
-        }
-        markDirty()
+        state.update { it.copy(layers = it.layers.map { layer -> if (layer.id == layerId) moveLayerBy(layer, dx, dy) else layer }) }; markDirty()
     }
-
-    fun beginMove() {
-        pushHistory()
-    }
-
-    fun beginResize() {
-        pushHistory()
-    }
-
+    fun beginMove() = pushHistory()
+    fun beginResize() = pushHistory()
     fun resizeLayer(layerId: String, handle: ResizeHandle, dx: Double, dy: Double) {
-        _layersFlow.update { list ->
-            list.map { layer ->
-                if (layer.id == layerId) resizeLayerBy(layer, handle, dx, dy) else layer
-            }
-        }
-        markDirty()
+        state.update { it.copy(layers = it.layers.map { layer -> if (layer.id == layerId) resizeLayerBy(layer, handle, dx, dy) else layer }) }; markDirty()
     }
-
     fun toggleVisibility(layerId: String) {
-        pushHistory()
-        _layersFlow.update { list ->
-            list.map { layer ->
-                if (layer.id == layerId) setLayerVisible(layer, !layer.visible) else layer
-            }
-        }
-        markDirty()
+        val layer = layers.first { it.id == layerId }; updateLayer(setLayerVisible(layer, !layer.visible))
     }
-
     fun duplicateLayer(layerId: String) {
-        val layer = _layersFlow.value.find { it.id == layerId } ?: return
-        pushHistory()
-        val copy = offsetLayer(layer, 20.0, 20.0, generateId())
-        _layersFlow.update { it + copy }
-        selectedLayerId.value = copy.id
-        markDirty()
+        val layer = layers.first { it.id == layerId }
+        val copy = offsetLayer(layer, 16.0, 16.0, generateId())
+        pushHistory(); state.update { doc -> doc.copy(layers = doc.layers + copy, images = doc.images[layerId]?.let { doc.images + (copy.id to it) } ?: doc.images) }
+        selectedLayerId.value = copy.id; markDirty()
     }
-
-    fun bringForward(layerId: String) {
-        val list = _layersFlow.value.toMutableList()
-        val idx = list.indexOfFirst { it.id == layerId }
-        if (idx < 0 || idx >= list.size - 1) return
-        pushHistory()
-        val tmp = list[idx]
-        list[idx] = list[idx + 1]
-        list[idx + 1] = tmp
-        _layersFlow.value = list
-        markDirty()
+    fun bringForward(layerId: String) = reorder(layerId, 1)
+    fun sendBackward(layerId: String) = reorder(layerId, -1)
+    private fun reorder(layerId: String, delta: Int) {
+        val index = layers.indexOfFirst { it.id == layerId }; val target = index + delta
+        if (index < 0 || target !in layers.indices) return
+        pushHistory(); val reordered = layers.toMutableList(); reordered.add(target, reordered.removeAt(index)); state.update { it.copy(layers = reordered) }; markDirty()
     }
-
-    fun sendBackward(layerId: String) {
-        val list = _layersFlow.value.toMutableList()
-        val idx = list.indexOfFirst { it.id == layerId }
-        if (idx <= 0) return
-        pushHistory()
-        val tmp = list[idx]
-        list[idx] = list[idx - 1]
-        list[idx - 1] = tmp
-        _layersFlow.value = list
-        markDirty()
-    }
-
-    fun setBgColor(color: String) {
-        bgColor.value = color
-        markDirty()
-    }
-
+    fun setBgColor(color: String) { pushHistory(); state.update { it.copy(bgColor = color) }; markDirty() }
     fun setCanvasSize(width: Int, height: Int) {
-        canvasSize.value = CanvasSize(width, height)
-        markDirty()
+        require(width in 1..8000 && height in 1..8000)
+        pushHistory(); state.update { it.copy(canvasSize = CanvasSize(width, height)) }; markDirty()
     }
-
+    fun setBackgroundImage(png: String?) {
+        pushHistory(); state.update { it.copy(sourceImage = png, imgOffset = Point(0.0, 0.0)) }; markDirty()
+    }
+    fun setBackgroundOffset(offset: Point) { pushHistory(); state.update { it.copy(imgOffset = offset) }; markDirty() }
+    fun setBackgroundAlpha(alpha: Double) { require(alpha in 0.0..100.0); pushHistory(); state.update { it.copy(imgAlpha = alpha) }; markDirty() }
+    fun addImage(png: String, width: Int, height: Int) {
+        val size = state.value.canvasSize
+        val fit = min(1.0, min(size.width.toDouble() / width, size.height.toDouble() / height))
+        val layer = ImageLayer(id = generateId(), x = size.width / 2.0, y = size.height / 2.0, w = width * fit, h = height * fit)
+        pushHistory(); state.update { it.copy(layers = it.layers + layer, images = it.images + (layer.id to png)) }
+        selectedLayerId.value = layer.id; markDirty()
+    }
+    fun replaceImage(id: String, png: String) { pushHistory(); state.update { it.copy(images = it.images + (id to png)) }; markDirty() }
+    fun applyCrop(png: String, width: Int, height: Int) {
+        pushHistory(); state.value = EditorDocumentState(CanvasSize(width, height), "transparent", png); selectedLayerId.value = null; currentTool.value = ImageEditorTool.SELECT; markDirty()
+    }
     fun saveAsync(onDone: () -> Unit = {}) {
+        check(loadState.value == EditorLoadState.Ready) { "Image editor document is not loaded" }
         autoSaveJob?.cancel()
+        val saved = state.value
+        if (id.value.isEmpty()) id.value = generateId()
+        val projectId = id.value
         viewModelScope.launchSafe {
             withIO {
-                val stateBytes = YjsDocEncoder.encode(
-                    canvasSize = canvasSize.value,
-                    bgColor = bgColor.value,
-                    sourceImage = sourceImage.value,
-                    imgOffset = imgOffset.value,
-                    imgAlpha = imgAlpha.value,
-                    layers = _layersFlow.value,
-                    images = images.value,
-                )
-                val stateB64 = Base64Lenient.encode(stateBytes)
-                val projectId = id.value
-                val updated = ImageEditorProjectsClient.addOrUpdateAsync(projectId) {
-                    this.stateB64 = stateB64
-                    this.canvasWidth = canvasSize.value.width
-                    this.canvasHeight = canvasSize.value.height
-                    this.layerCount = _layersFlow.value.size
-                }
-                if (updated != null) {
-                    id.value = updated.id
-                    dirty.value = false
+                val bytes = YjsDocEncoder.encode(saved.canvasSize, saved.bgColor, saved.sourceImage, saved.imgOffset, saved.imgAlpha, saved.layers, saved.images)
+                projects.addOrUpdateAsync(projectId) {
+                    stateB64 = Base64Lenient.encode(bytes); canvasWidth = saved.canvasSize.width; canvasHeight = saved.canvasSize.height; layerCount = saved.layers.size
                 }
             }
+            if (state.value == saved) dirty.value = false
             onDone()
         }
     }
-
-    override fun onCleared() {
+    fun deleteProject(onDone: () -> Unit) {
         autoSaveJob?.cancel()
-        super.onCleared()
+        viewModelScope.launchSafe { if (id.value.isNotEmpty()) projects.deleteAsync(id.value); dirty.value = false; onDone() }
     }
-
+    override fun onCleared() { autoSaveJob?.cancel(); super.onCleared() }
     private fun moveLayerBy(layer: EditorLayer, dx: Double, dy: Double): EditorLayer {
         return when (layer) {
             is ArrowLayer -> layer.copy(x1 = layer.x1 + dx, y1 = layer.y1 + dy, x2 = layer.x2 + dx, y2 = layer.y2 + dy)

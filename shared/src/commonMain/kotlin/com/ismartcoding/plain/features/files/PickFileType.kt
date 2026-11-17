@@ -12,6 +12,7 @@ enum class PickFileTag {
     SEND_MESSAGE,
     SCAN,
     EDITOR,
+    IMAGE_EDITOR,
     FEED,
     BOOK,
     RESTORE,

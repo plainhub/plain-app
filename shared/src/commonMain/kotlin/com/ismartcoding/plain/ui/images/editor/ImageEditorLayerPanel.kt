@@ -69,7 +69,8 @@ fun ImageEditorLayerPanel(
     vm: ImageEditorEditViewModel,
     onDismiss: () -> Unit,
 ) {
-    val layers by vm.layersFlow.collectAsState()
+    val document by vm.document.collectAsState()
+    val layers = document.layers
     PModalBottomSheet(onDismissRequest = onDismiss) {
         Column {
             PBottomSheetTopAppBar(

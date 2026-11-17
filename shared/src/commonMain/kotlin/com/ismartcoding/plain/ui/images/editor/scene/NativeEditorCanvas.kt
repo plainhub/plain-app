@@ -1,39 +1,72 @@
 package com.ismartcoding.plain.ui.images.editor.scene
 
+import androidx.compose.foundation.Canvas
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.staticCompositionLocalOf
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import com.ismartcoding.plain.lib.yjs.CanvasSize
-import com.ismartcoding.plain.lib.yjs.EditorLayer
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.drawscope.CanvasDrawScope
+import androidx.compose.ui.graphics.drawscope.rotate
+import androidx.compose.ui.graphics.drawscope.scale
+import androidx.compose.ui.graphics.drawscope.translate
+import androidx.compose.ui.text.TextMeasurer
+import androidx.compose.ui.text.rememberTextMeasurer
+import androidx.compose.ui.unit.Density
+import androidx.compose.ui.unit.IntSize
+import androidx.compose.ui.unit.LayoutDirection
+import com.ismartcoding.plain.ui.images.editor.EditorDocumentState
+import com.ismartcoding.plain.lib.yjs.ImageLayer
+import com.ismartcoding.plain.lib.yjs.MosaicLayer
+
+@Composable
+fun NativeEditorCanvas(state: EditorDocumentState, viewport: SceneViewport, modifier: Modifier, onReady: () -> Unit = {}) {
+    val textMeasurer = rememberTextMeasurer()
+    val images = remember(state.sourceImage, state.images) { decodeSceneImages(state.sourceImage, state.images) }
+    val bitmap = remember(state.canvasSize, state.bgColor, state.layers, state.sourceImage, state.imgOffset.x, state.imgOffset.y, state.imgAlpha, state.images) {
+        renderSceneBitmap(state, textMeasurer, images)
+    }
+    LaunchedEffect(bitmap) { onReady() }
+    Canvas(modifier) {
+        translate(viewport.panX, viewport.panY) {
+            scale(viewport.scale, pivot = Offset.Zero) {
+                drawSceneCheckerboard(bitmap.width.toFloat(), bitmap.height.toFloat())
+                drawImage(bitmap)
+            }
+        }
+    }
+}
+
+internal fun renderSceneBitmap(state: EditorDocumentState, textMeasurer: TextMeasurer, resources: SceneImages): ImageBitmap {
+    val width = state.canvasSize.width
+    val height = state.canvasSize.height
+    val bitmap = ImageBitmap(width, height)
+    val images = resources.layers
+    val source = resources.source
+    CanvasDrawScope().draw(Density(1f), LayoutDirection.Ltr, androidx.compose.ui.graphics.Canvas(bitmap), Size(width.toFloat(), height.toFloat())) {
+        if (state.bgColor != "transparent") drawSceneBackground(state.bgColor, width.toFloat(), height.toFloat())
+        if (source != null) drawImage(source, topLeft = Offset(state.imgOffset.x.toFloat(), state.imgOffset.y.toFloat()), alpha = (state.imgAlpha / 100).toFloat())
+        for (layer in state.layers) {
+            if (!layer.visible) continue
+            when (layer) {
+                is MosaicLayer -> drawSceneMosaic(bitmap, layer)
+                is ImageLayer -> {
+                    val image = checkNotNull(images[layer.id]) { "Missing editor image resource" }
+                    rotate(layer.rotation.toFloat(), Offset(layer.x.toFloat(), layer.y.toFloat())) {
+                        drawImage(image, dstOffset = androidx.compose.ui.unit.IntOffset((layer.x - layer.w / 2).toInt(), (layer.y - layer.h / 2).toInt()), dstSize = IntSize(layer.w.toInt(), layer.h.toInt()), alpha = layer.opacity.toFloat())
+                    }
+                }
+                else -> drawSceneLayer(layer, textMeasurer)
+            }
+        }
+    }
+    return bitmap
+}
 
 data class SceneViewport(
     val scale: Float,
     val panX: Float,
     val panY: Float,
 )
-
-data class SceneState(
-    val canvasSize: CanvasSize,
-    val bgColor: String,
-    val layers: List<EditorLayer>,
-    val viewport: SceneViewport,
-    val sourceImagePath: String? = null,
-    val imgOffsetX: Double = 0.0,
-    val imgOffsetY: Double = 0.0,
-    val imgAlpha: Double = 100.0,
-    val images: Map<String, String> = emptyMap(),
-    val hideLayerId: String? = null,
-)
-
-internal val LocalEditorCanvas = staticCompositionLocalOf<(@Composable (SceneState, Modifier, () -> Unit) -> Unit)?> { null }
-
-@Composable
-fun NativeEditorCanvas(
-    state: SceneState,
-    modifier: Modifier,
-    onReady: () -> Unit = {},
-) {
-    val renderer = LocalEditorCanvas.current
-    if (renderer == null) SceneCanvas(state, modifier, onReady)
-    else renderer(state, modifier, onReady)
-}

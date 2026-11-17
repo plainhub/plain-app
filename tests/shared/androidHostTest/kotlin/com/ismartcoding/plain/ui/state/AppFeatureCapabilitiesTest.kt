@@ -27,10 +27,9 @@ class AppFeatureCapabilitiesTest {
     }
 
     @Test
-    fun imageEditorVisibilityFollowsDebugInsteadOfDeviceCapabilities() {
+    fun imageEditorIsVisibleWithoutDebugOrDeviceCapabilities() {
         for (capabilities in listOf(emptyList(), Capability.entries)) {
-            assertTrue(AppFeatureType.IMAGE_EDITOR.has(capabilities, debug = true))
-            assertFalse(AppFeatureType.IMAGE_EDITOR.has(capabilities, debug = false))
+            assertTrue(AppFeatureType.IMAGE_EDITOR.has(capabilities))
         }
     }
 

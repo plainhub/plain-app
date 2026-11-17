@@ -90,7 +90,7 @@ object AppSubscriptions {
         if (granted) subscription<FileIndexScanProgress>("fileIndexScanProgressUpdated", "{ indexed pending total state error }") else emptyFlow()
     }.shareIn(scope, SharingStarted.WhileSubscribed())
 
-    private inline fun <reified T> subscription(field: String, selection: String = ""): Flow<SubscriptionUpdate<T>> = flow {
+    internal inline fun <reified T> subscription(field: String, selection: String = ""): Flow<SubscriptionUpdate<T>> = flow {
         while (currentCoroutineContext().isActive) {
             try {
                 RustGraphqlSubscriptions.subscribe(GraphqlOperation("subscription { $field $selection }")).collect { response ->

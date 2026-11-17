@@ -69,7 +69,10 @@ internal fun MainActivity.handleExportFileEvent(event: ExportFileEvent) {
             Intent(Intent.ACTION_CREATE_DOCUMENT).apply {
                 type = when (event.type) {
                     ExportFileType.BACKUP -> "application/zip"
-                    else -> "text/*"
+                    ExportFileType.OPML -> "text/*"
+                    ExportFileType.IMAGE_PNG -> "image/png"
+                    ExportFileType.IMAGE_JPEG -> "image/jpeg"
+                    ExportFileType.IMAGE_WEBP -> "image/webp"
                 }
                 addCategory(Intent.CATEGORY_OPENABLE)
                 putExtra(Intent.EXTRA_TITLE, event.fileName)
