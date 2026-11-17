@@ -37,7 +37,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.painterResource
@@ -136,7 +135,7 @@ private fun CategoryButton(
     } else {
         Modifier
     }
-    Column(
+    Box(
         modifier = modifier
             .clip(RoundedCornerShape(12.dp))
             .then(pill)
@@ -146,26 +145,14 @@ private fun CategoryButton(
                     color = bgColor
                 ), onClick = onClick
             )
-            .heightIn(min = 64.dp)
-            .padding(vertical = 4.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
+            .heightIn(min = 64.dp),
+        contentAlignment = Alignment.Center,
     ) {
-        Box(
+        Icon(
+            painter = painterResource(category.icon ?: UiRes.drawable.ui_drawable_circle_help),
+            contentDescription = stringResource(category.tip),
+            tint = contentColor,
             modifier = Modifier.size(24.dp),
-            contentAlignment = Alignment.Center,
-        ) {
-            Icon(
-                painter = painterResource(category.icon ?: UiRes.drawable.ui_drawable_circle_help),
-                contentDescription = stringResource(category.tip),
-                tint = contentColor,
-            )
-        }
-        VerticalSpace(4.dp)
-        Text(
-            stringResource(category.tip),
-            style = MaterialTheme.typography.labelLarge,
-            textAlign = TextAlign.Center,
-            color = contentColor,
         )
     }
 }
