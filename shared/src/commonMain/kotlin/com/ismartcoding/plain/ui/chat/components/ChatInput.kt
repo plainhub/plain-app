@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.IconButtonDefaults
@@ -24,12 +25,19 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.focus.onFocusChanged
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.text.style.TextOverflow
+import coil3.compose.AsyncImage
+import coil3.compose.rememberAsyncImagePainter
+import com.ismartcoding.plain.lib.extensions.getFilenameExtension
+import com.ismartcoding.plain.ui.media.fileIconData
 import com.ismartcoding.plain.ui.base.PIcon
 import com.ismartcoding.plain.ui.base.PTextButton
 import com.ismartcoding.plain.features.files.PickFileTag
@@ -59,15 +67,21 @@ fun ChatInput(
     sending: Boolean = false,
     onRemoveAttachment: (String) -> Unit = {},
     onChangeFormat: () -> Unit = {},
+    imageAttachments: Set<String> = emptySet(),
 ) {
     var hasFocus by remember { mutableStateOf(false) }
     Column(modifier = Modifier.fillMaxWidth()) {
         if (attachments.isNotEmpty()) {
             Column(Modifier.heightIn(max = 128.dp).verticalScroll(rememberScrollState())) {
                 attachments.forEach { (uri, name) ->
-                    Row(Modifier.fillMaxWidth().padding(horizontal = 16.dp), horizontalArrangement = Arrangement.SpaceBetween) {
+                    Row(
+                        Modifier.fillMaxWidth().padding(horizontal = 16.dp),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        DraftAttachmentPreview(uri, name, uri in imageAttachments)
                         Text(name, modifier = Modifier.weight(1f), maxLines = 1, overflow = TextOverflow.Ellipsis)
-                        PTextButton(text = stringResource(Res.string.remove), onClick = { if (!sending) onRemoveAttachment(uri) })
+                        PTextButton(text = stringResource(Res.string.remove), enabled = !sending, onClick = { onRemoveAttachment(uri) })
                     }
                 }
             }
@@ -157,4 +171,19 @@ fun ChatInput(
             Spacer(modifier = Modifier.navigationBarsPadding())
         }
     }
+}
+
+@Composable
+private fun DraftAttachmentPreview(uri: String, name: String, image: Boolean) {
+    val icon = remember(name) { fileIconData(name.getFilenameExtension()) }
+    val localImage = image && (uri.startsWith("content://") || uri.startsWith("file://"))
+    val iconPainter = if (localImage) rememberAsyncImagePainter(icon) else null
+    AsyncImage(
+        model = if (localImage) uri else icon,
+        contentDescription = null,
+        placeholder = iconPainter,
+        error = iconPainter,
+        contentScale = if (localImage) ContentScale.Crop else ContentScale.Fit,
+        modifier = Modifier.size(36.dp).clip(MaterialTheme.shapes.extraSmall),
+    )
 }

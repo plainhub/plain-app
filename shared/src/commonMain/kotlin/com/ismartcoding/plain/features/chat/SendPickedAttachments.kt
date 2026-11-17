@@ -43,7 +43,7 @@ suspend fun sendPickedAttachments(
     }
 }
 
-internal data class ChatDraftAttachment(val type: ChatAttachmentType, val name: String)
+internal data class ChatDraftAttachment(val type: ChatAttachmentType, val name: String, val previewImage: Boolean = false)
 
 internal suspend fun sendChatDraft(
     chatVM: ChatViewModel,
