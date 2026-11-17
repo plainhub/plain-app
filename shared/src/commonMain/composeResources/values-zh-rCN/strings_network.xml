@@ -147,7 +147,6 @@
     <string name="password_too_long">密码过长，最多支持 1,024 个 UTF-8 字节。</string>
     <string name="password_mismatch">两次输入不一致，请再检查一下。</string>
     <string name="generated_password_hint">仅本次草稿可查看或复制，请在保存前记下。</string>
-    <string name="password_write_only_hint">保存后无法查看原密码，可以设置新密码。</string>
     <string name="password_save_failed">未能保存密码。已保留输入，请重试。</string>
     <string name="password_generate_failed">未能生成密码，请重试。</string>
     <string name="password_save_succeeded">密码保存成功。下次使用密码登录时，请使用新密码。</string>
@@ -158,7 +157,6 @@
     <string name="discard_password_changes">放弃修改</string>
     <string name="keep_editing">继续编辑</string>
     <string name="use_password_login">使用密码登录</string>
-    <string name="password_login_purpose">浏览器和设备远程管理</string>
     <string name="password_saved">密码已保存</string>
     <string name="password_not_set">尚未设置密码</string>
     <string name="password_not_set_description">设置后，其他设备可使用密码登录。</string>

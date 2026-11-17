@@ -147,7 +147,6 @@
     <string name="password_too_long">This password is too long. Use at most 1,024 UTF-8 bytes.</string>
     <string name="password_mismatch">The passwords do not match. Please check them.</string>
     <string name="generated_password_hint">Only this draft can be viewed or copied. Remember it before saving.</string>
-    <string name="password_write_only_hint">Saved passwords cannot be viewed. You can set a new password.</string>
     <string name="password_save_failed">Could not save the password. Your input is kept; please try again.</string>
     <string name="password_generate_failed">Could not generate a password. Please try again.</string>
     <string name="password_save_succeeded">Password saved. Use your new password the next time you sign in with a password.</string>
@@ -158,7 +157,6 @@
     <string name="discard_password_changes">Discard changes</string>
     <string name="keep_editing">Keep editing</string>
     <string name="use_password_login">Use password login</string>
-    <string name="password_login_purpose">Browser and remote device management</string>
     <string name="password_saved">Password saved</string>
     <string name="password_not_set">Password not set</string>
     <string name="password_not_set_description">Set a password to let other devices sign in with it.</string>

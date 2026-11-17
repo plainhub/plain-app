@@ -130,11 +130,6 @@ internal fun PasswordEditorPage(
             if (state.generated) {
                 Text(stringResource(Res.string.generated_password_hint), style = MaterialTheme.typography.bodyMedium)
             }
-            Text(
-                text = stringResource(Res.string.password_write_only_hint),
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
             VerticalSpace(8.dp)
         }
     }

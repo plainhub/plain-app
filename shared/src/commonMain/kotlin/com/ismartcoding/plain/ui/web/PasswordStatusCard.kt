@@ -52,7 +52,6 @@ internal fun PasswordStatusCard(
     PCard {
         PListItem(
             title = loginLabel,
-            subtitle = stringResource(Res.string.password_login_purpose),
         ) {
             Switch(
                 modifier = Modifier.semantics { contentDescription = loginLabel },
@@ -74,15 +73,13 @@ internal fun PasswordStatusCard(
                     color = statusColor, style = MaterialTheme.typography.titleMedium,
                 )
             }
-            Text(
-                text = stringResource(when {
-                    !configured -> Res.string.password_not_set_description
-                    !enabled -> Res.string.password_saved_disabled_description
-                    else -> Res.string.password_write_only_hint
-                }),
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
+            if (!configured || !enabled) {
+                Text(
+                    text = stringResource(if (configured) Res.string.password_saved_disabled_description else Res.string.password_not_set_description),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
             if (configured) {
                 POutlinedButton(
                     text = stringResource(Res.string.change_login_password), onClick = onEdit,
