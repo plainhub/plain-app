@@ -73,4 +73,10 @@
     <string name="image_editor_blue">藍色</string>
     <string name="image_editor_green">綠色</string>
     <string name="image_editor_pink">粉色</string>
+    <string name="image_editor_copy_image">複製圖片</string>
+    <string name="image_editor_tools">圖片工具</string>
+    <string name="image_editor_style">繪圖樣式</string>
+    <string name="image_editor_canvas">圖片畫布</string>
+    <string name="image_editor_delete_project">刪除專案</string>
+    <string name="image_editor_delete_project_confirm">刪除此圖片專案及其全部圖層？</string>
 </resources>

@@ -73,4 +73,10 @@
     <string name="image_editor_blue">Blue</string>
     <string name="image_editor_green">Green</string>
     <string name="image_editor_pink">Pink</string>
+    <string name="image_editor_copy_image">Copy image</string>
+    <string name="image_editor_tools">Image tools</string>
+    <string name="image_editor_style">Drawing style</string>
+    <string name="image_editor_canvas">Image canvas</string>
+    <string name="image_editor_delete_project">Delete project</string>
+    <string name="image_editor_delete_project_confirm">Delete this image project and all its layers?</string>
 </resources>

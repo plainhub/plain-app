@@ -9,6 +9,12 @@ import com.ismartcoding.plain.lib.generateId
 import com.ismartcoding.plain.lib.withIO
 import com.ismartcoding.plain.lib.yjs.*
 import com.ismartcoding.plain.ui.state.launchSafe
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.IO
+import kotlinx.coroutines.withContext
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -21,7 +27,7 @@ import kotlin.math.min
 enum class ImageEditorTool { SELECT, CROP, FREEHAND, ARROW, RECT, ELLIPSE, HIGHLIGHT, MOSAIC, TEXT, STICKER }
 enum class ResizeHandle { TOP_LEFT, TOP_RIGHT, BOTTOM_LEFT, BOTTOM_RIGHT }
 
-class ImageEditorEditViewModel(private val projects: ImageEditorProjectsClient) : ViewModel() {
+class ImageEditorEditViewModel(private val projects: ImageEditorProjectsClient, private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO) : ViewModel() {
     private val state = MutableStateFlow(EditorDocumentState())
     val document = state.asStateFlow()
     val layers: List<EditorLayer> get() = state.value.layers
@@ -38,9 +44,11 @@ class ImageEditorEditViewModel(private val projects: ImageEditorProjectsClient) 
     private val history = mutableListOf<EditorDocumentState>()
     private val redoStack = mutableListOf<EditorDocumentState>()
     private var autoSaveJob: Job? = null
+    private val saveMutex = Mutex()
+    internal val imageActions = EditorImageActions(this)
 
     suspend fun loadAsync(projectId: String) {
-        if (loadState.value == EditorLoadState.Ready && id.value == projectId) return
+        if (loadState.value == EditorLoadState.Ready) return
         loadState.value = EditorLoadState.Loading
         id.value = projectId
         history.clear(); redoStack.clear(); refreshUndoFlags()
@@ -98,12 +106,47 @@ class ImageEditorEditViewModel(private val projects: ImageEditorProjectsClient) 
         markDirty()
     }
     fun moveLayer(layerId: String, dx: Double, dy: Double) {
+        if (dx == 0.0 && dy == 0.0) return
         state.update { it.copy(layers = it.layers.map { layer -> if (layer.id == layerId) moveLayerBy(layer, dx, dy) else layer }) }; markDirty()
     }
-    fun beginMove() = pushHistory()
-    fun beginResize() = pushHistory()
-    fun resizeLayer(layerId: String, handle: ResizeHandle, dx: Double, dy: Double) {
-        state.update { it.copy(layers = it.layers.map { layer -> if (layer.id == layerId) resizeLayerBy(layer, handle, dx, dy) else layer }) }; markDirty()
+    fun beginTransform() = pushHistory()
+    fun rotateLayer(id: String, degrees: Double) {
+        state.update { doc -> doc.copy(layers = doc.layers.map { layer ->
+            if (layer.id != id) layer else when (layer) {
+                is ArrowLayer -> layer.copy(rotation = degrees)
+                is ImageLayer -> layer.copy(rotation = degrees)
+                is TextLayer -> layer.copy(rotation = degrees)
+                is StickerLayer -> layer.copy(rotation = degrees)
+                else -> error("This layer cannot rotate")
+            }
+        }) }
+        markDirty()
+    }
+    internal fun scaleLayer(original: EditorLayer, ratio: Double, bounds: EditorBounds) {
+        val center = Point(bounds.x + bounds.width / 2, bounds.y + bounds.height / 2)
+        fun coordinate(value: Double, pivot: Double) = pivot + (value - pivot) * ratio
+        val scaled = when (original) {
+            is ArrowLayer -> original.copy(x1 = coordinate(original.x1, center.x), y1 = coordinate(original.y1, center.y), x2 = coordinate(original.x2, center.x), y2 = coordinate(original.y2, center.y))
+            is RectLayer -> original.copy(x = center.x - max(4.0, original.w * ratio) / 2, y = center.y - max(4.0, original.h * ratio) / 2, w = max(4.0, original.w * ratio), h = max(4.0, original.h * ratio))
+            is EllipseLayer -> original.copy(rx = max(2.0, original.rx * ratio), ry = max(2.0, original.ry * ratio))
+            is HighlightLayer -> original.copy(x = center.x - max(4.0, original.w * ratio) / 2, y = center.y - max(4.0, original.h * ratio) / 2, w = max(4.0, original.w * ratio), h = max(4.0, original.h * ratio))
+            is MosaicLayer -> original.copy(x = center.x - max(4.0, original.w * ratio) / 2, y = center.y - max(4.0, original.h * ratio) / 2, w = max(4.0, original.w * ratio), h = max(4.0, original.h * ratio))
+            is ImageLayer -> original.copy(w = max(20.0, original.w * ratio), h = max(20.0, original.h * ratio))
+            is StickerLayer -> original.copy(w = max(4.0, original.w * ratio), h = max(4.0, original.h * ratio))
+            is TextLayer -> original.copy(fontSize = (original.fontSize * ratio).coerceIn(10.0, 500.0), maxWidth = max(50.0, original.maxWidth * ratio))
+            is FreehandLayer -> original.copy(points = original.points.map { Point(coordinate(it.x, center.x), coordinate(it.y, center.y)) })
+        }
+        state.update { it.copy(layers = it.layers.map { layer -> if (layer.id == original.id) scaled else layer }) }
+        markDirty()
+    }
+    internal fun resizeLayerWidth(original: EditorLayer, delta: Double) {
+        val resized = when (original) {
+            is TextLayer -> original.copy(maxWidth = max(50.0, original.maxWidth + delta))
+            is ImageLayer -> max(20.0, original.w + delta).let { width -> original.copy(w = width, h = max(20.0, width * original.h / original.w)) }
+            else -> error("This layer has no width handle")
+        }
+        state.update { it.copy(layers = it.layers.map { layer -> if (layer.id == original.id) resized else layer }) }
+        markDirty()
     }
     fun toggleVisibility(layerId: String) {
         val layer = layers.first { it.id == layerId }; updateLayer(setLayerVisible(layer, !layer.visible))
@@ -149,19 +192,27 @@ class ImageEditorEditViewModel(private val projects: ImageEditorProjectsClient) 
         if (id.value.isEmpty()) id.value = generateId()
         val projectId = id.value
         viewModelScope.launchSafe {
-            withIO {
-                val bytes = YjsDocEncoder.encode(saved.canvasSize, saved.bgColor, saved.sourceImage, saved.imgOffset, saved.imgAlpha, saved.layers, saved.images)
-                projects.addOrUpdateAsync(projectId) {
-                    stateB64 = Base64Lenient.encode(bytes); canvasWidth = saved.canvasSize.width; canvasHeight = saved.canvasSize.height; layerCount = saved.layers.size
+            saveMutex.withLock {
+                withContext(ioDispatcher) {
+                    val bytes = YjsDocEncoder.encode(saved.canvasSize, saved.bgColor, saved.sourceImage, saved.imgOffset, saved.imgAlpha, saved.layers, saved.images)
+                    projects.addOrUpdateAsync(projectId) {
+                        stateB64 = Base64Lenient.encode(bytes); canvasWidth = saved.canvasSize.width; canvasHeight = saved.canvasSize.height; layerCount = saved.layers.size
+                    }
                 }
+                if (state.value == saved) dirty.value = false
             }
-            if (state.value == saved) dirty.value = false
             onDone()
         }
     }
     fun deleteProject(onDone: () -> Unit) {
         autoSaveJob?.cancel()
-        viewModelScope.launchSafe { if (id.value.isNotEmpty()) projects.deleteAsync(id.value); dirty.value = false; onDone() }
+        viewModelScope.launchSafe {
+            saveMutex.withLock {
+                if (id.value.isNotEmpty()) withContext(ioDispatcher) { projects.deleteAsync(id.value) }
+                dirty.value = false
+            }
+            onDone()
+        }
     }
     override fun onCleared() { autoSaveJob?.cancel(); super.onCleared() }
     private fun moveLayerBy(layer: EditorLayer, dx: Double, dy: Double): EditorLayer {
@@ -183,94 +234,6 @@ class ImageEditorEditViewModel(private val projects: ImageEditorProjectsClient) 
     private fun offsetLayer(layer: EditorLayer, dx: Double, dy: Double, newId: String): EditorLayer {
         val moved = moveLayerBy(layer, dx, dy)
         return setLayerId(moved, newId)
-    }
-
-    private fun resizeLayerBy(layer: EditorLayer, handle: ResizeHandle, dx: Double, dy: Double): EditorLayer {
-        val minSize = 4.0
-        return when (layer) {
-            is RectLayer -> {
-                var nx = layer.x; var ny = layer.y; var nw = layer.w; var nh = layer.h
-                when (handle) {
-                    ResizeHandle.TOP_LEFT -> { nx += dx; ny += dy; nw -= dx; nh -= dy }
-                    ResizeHandle.TOP_RIGHT -> { nw += dx; ny += dy; nh -= dy }
-                    ResizeHandle.BOTTOM_LEFT -> { nx += dx; nw -= dx; nh += dy }
-                    ResizeHandle.BOTTOM_RIGHT -> { nw += dx; nh += dy }
-                }
-                if (nw < minSize) { if (handle == ResizeHandle.TOP_LEFT || handle == ResizeHandle.BOTTOM_LEFT) nx -= (minSize - nw); nw = minSize }
-                if (nh < minSize) { if (handle == ResizeHandle.TOP_LEFT || handle == ResizeHandle.TOP_RIGHT) ny -= (minSize - nh); nh = minSize }
-                layer.copy(x = nx, y = ny, w = nw, h = nh)
-            }
-            is EllipseLayer -> {
-                var left = layer.cx - layer.rx
-                var top = layer.cy - layer.ry
-                var right = layer.cx + layer.rx
-                var bottom = layer.cy + layer.ry
-                when (handle) {
-                    ResizeHandle.TOP_LEFT -> { left += dx; top += dy }
-                    ResizeHandle.TOP_RIGHT -> { right += dx; top += dy }
-                    ResizeHandle.BOTTOM_LEFT -> { left += dx; bottom += dy }
-                    ResizeHandle.BOTTOM_RIGHT -> { right += dx; bottom += dy }
-                }
-                val w = (right - left).coerceAtLeast(minSize)
-                val h = (bottom - top).coerceAtLeast(minSize)
-                layer.copy(cx = (left + right) / 2.0, cy = (top + bottom) / 2.0, rx = w / 2.0, ry = h / 2.0)
-            }
-            is HighlightLayer -> {
-                var nx = layer.x; var ny = layer.y; var nw = layer.w; var nh = layer.h
-                when (handle) {
-                    ResizeHandle.TOP_LEFT -> { nx += dx; ny += dy; nw -= dx; nh -= dy }
-                    ResizeHandle.TOP_RIGHT -> { nw += dx; ny += dy; nh -= dy }
-                    ResizeHandle.BOTTOM_LEFT -> { nx += dx; nw -= dx; nh += dy }
-                    ResizeHandle.BOTTOM_RIGHT -> { nw += dx; nh += dy }
-                }
-                if (nw < minSize) { if (handle == ResizeHandle.TOP_LEFT || handle == ResizeHandle.BOTTOM_LEFT) nx -= (minSize - nw); nw = minSize }
-                if (nh < minSize) { if (handle == ResizeHandle.TOP_LEFT || handle == ResizeHandle.TOP_RIGHT) ny -= (minSize - nh); nh = minSize }
-                layer.copy(x = nx, y = ny, w = nw, h = nh)
-            }
-            is MosaicLayer -> {
-                var nx = layer.x; var ny = layer.y; var nw = layer.w; var nh = layer.h
-                when (handle) {
-                    ResizeHandle.TOP_LEFT -> { nx += dx; ny += dy; nw -= dx; nh -= dy }
-                    ResizeHandle.TOP_RIGHT -> { nw += dx; ny += dy; nh -= dy }
-                    ResizeHandle.BOTTOM_LEFT -> { nx += dx; nw -= dx; nh += dy }
-                    ResizeHandle.BOTTOM_RIGHT -> { nw += dx; nh += dy }
-                }
-                if (nw < minSize) nw = minSize
-                if (nh < minSize) nh = minSize
-                layer.copy(x = nx, y = ny, w = nw, h = nh)
-            }
-            is ImageLayer -> {
-                var left = layer.x - layer.w / 2
-                var top = layer.y - layer.h / 2
-                var right = layer.x + layer.w / 2
-                var bottom = layer.y + layer.h / 2
-                when (handle) {
-                    ResizeHandle.TOP_LEFT -> { left += dx; top += dy }
-                    ResizeHandle.TOP_RIGHT -> { right += dx; top += dy }
-                    ResizeHandle.BOTTOM_LEFT -> { left += dx; bottom += dy }
-                    ResizeHandle.BOTTOM_RIGHT -> { right += dx; bottom += dy }
-                }
-                val w = (right - left).coerceAtLeast(minSize)
-                val h = (bottom - top).coerceAtLeast(minSize)
-                layer.copy(x = (left + right) / 2.0, y = (top + bottom) / 2.0, w = w, h = h)
-            }
-            is StickerLayer -> {
-                var left = layer.x - layer.w / 2
-                var top = layer.y - layer.h / 2
-                var right = layer.x + layer.w / 2
-                var bottom = layer.y + layer.h / 2
-                when (handle) {
-                    ResizeHandle.TOP_LEFT -> { left += dx; top += dy }
-                    ResizeHandle.TOP_RIGHT -> { right += dx; top += dy }
-                    ResizeHandle.BOTTOM_LEFT -> { left += dx; bottom += dy }
-                    ResizeHandle.BOTTOM_RIGHT -> { right += dx; bottom += dy }
-                }
-                val w = (right - left).coerceAtLeast(minSize)
-                val h = (bottom - top).coerceAtLeast(minSize)
-                layer.copy(x = (left + right) / 2.0, y = (top + bottom) / 2.0, w = w, h = h)
-            }
-            else -> layer
-        }
     }
 
     private fun setLayerVisible(layer: EditorLayer, visible: Boolean): EditorLayer {

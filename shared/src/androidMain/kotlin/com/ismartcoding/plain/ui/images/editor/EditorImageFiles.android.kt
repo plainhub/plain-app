@@ -26,3 +26,8 @@ internal actual fun encodeEditorImage(image: ImageBitmap, format: EditorRasterFo
     check(image.asAndroidBitmap().compress(compression, 92, output)) { "Unable to encode editor image" }
     output.toByteArray()
 }
+
+internal actual fun publishEditorClipboardImage(path: String) {
+    val uri = androidx.core.content.FileProvider.getUriForFile(appContext, appContext.packageName + ".provider", java.io.File(path))
+    com.ismartcoding.plain.clipboardManager.setPrimaryClip(android.content.ClipData.newUri(appContext.contentResolver, "Image", uri))
+}

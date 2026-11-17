@@ -25,7 +25,7 @@ internal sealed interface EditorImageTarget {
     data class Replacement(val id: String) : EditorImageTarget
 }
 
-internal class EditorImageActions(private val vm: ImageEditorEditViewModel, private val textMeasurer: TextMeasurer) {
+internal class EditorImageActions(private val vm: ImageEditorEditViewModel) {
     private var importTarget: EditorImageTarget? = null
     private var exportImage: Pair<EditorRasterFormat, ByteArray>? = null
 
@@ -34,13 +34,20 @@ internal class EditorImageActions(private val vm: ImageEditorEditViewModel, priv
         sendEvent(PickFileEvent(PickFileTag.IMAGE_EDITOR, PickFileType.IMAGE, false))
     }
 
-    fun render(): ImageBitmap {
+    fun render(textMeasurer: TextMeasurer): ImageBitmap {
         val doc = vm.document.value
         return renderSceneBitmap(doc, textMeasurer, decodeSceneImages(doc.sourceImage, doc.images))
     }
 
-    fun export(format: EditorRasterFormat) {
-        val image = render()
+    suspend fun copy(textMeasurer: TextMeasurer) {
+        val path = com.ismartcoding.plain.platform.system.cacheDirPath() + "/image-editor-clipboard.png"
+        val bytes = encodeEditorImage(render(textMeasurer), EditorRasterFormat.PNG)
+        check(FilesClient.writeChunks(path, listOf(bytes).iterator())) { "Unable to prepare clipboard image" }
+        publishEditorClipboardImage(path)
+    }
+
+    fun export(format: EditorRasterFormat, textMeasurer: TextMeasurer) {
+        val image = render(textMeasurer)
         val raster = if (format == EditorRasterFormat.JPEG) ImageBitmap(image.width, image.height).also {
             CanvasDrawScope().draw(Density(1f), LayoutDirection.Ltr, Canvas(it), Size(it.width.toFloat(), it.height.toFloat())) { drawRect(Color.White); drawImage(image) }
         } else image
@@ -72,8 +79,7 @@ internal class EditorImageActions(private val vm: ImageEditorEditViewModel, priv
 }
 
 @Composable
-internal fun rememberEditorImageActions(vm: ImageEditorEditViewModel, measurer: TextMeasurer): EditorImageActions {
-    val actions = remember(vm, measurer) { EditorImageActions(vm, measurer) }
+internal fun ImageEditorFileEffects(actions: EditorImageActions) {
     LaunchedEffect(actions) {
         Channel.sharedFlow.collect { event ->
             try { actions.receive(event) }
@@ -81,5 +87,4 @@ internal fun rememberEditorImageActions(vm: ImageEditorEditViewModel, measurer: 
             catch (error: Exception) { DialogHelper.showMessage(error) }
         }
     }
-    return actions
 }

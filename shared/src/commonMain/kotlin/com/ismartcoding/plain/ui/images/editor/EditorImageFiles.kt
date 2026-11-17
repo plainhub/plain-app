@@ -13,3 +13,5 @@ enum class EditorRasterFormat(val extension: String, val exportType: ExportFileT
 internal expect suspend fun importEditorImage(bytes: ByteArray): ImageBitmap
 internal expect fun encodeEditorImage(image: ImageBitmap, format: EditorRasterFormat): ByteArray
 internal fun embeddedEditorPng(image: ImageBitmap): String = "data:image/png;base64," + Base64Lenient.encode(encodeEditorImage(image, EditorRasterFormat.PNG))
+
+internal expect fun publishEditorClipboardImage(path: String)

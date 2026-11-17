@@ -98,10 +98,10 @@ fun ImageEditorListPage(
                             .nestedScroll(scrollBehavior.nestedScrollConnection),
                     ) {
                         item { TopSpace() }
-                        items(itemsState, key = { it.id.value }) { project ->
+                        items(itemsState, key = { it.id }) { project ->
                             ImageEditorProjectListItem(
                                 project = project,
-                                onClick = { navController.navigate(Routing.ImageEditorDetail(project.id.value)) },
+                                onClick = { navController.navigate(Routing.ImageEditorDetail(project.id)) },
                             )
                             VerticalSpace(dp = 8.dp)
                         }

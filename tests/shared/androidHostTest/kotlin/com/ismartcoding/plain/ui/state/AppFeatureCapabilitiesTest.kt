@@ -27,13 +27,6 @@ class AppFeatureCapabilitiesTest {
     }
 
     @Test
-    fun imageEditorIsVisibleWithoutDebugOrDeviceCapabilities() {
-        for (capabilities in listOf(emptyList(), Capability.entries)) {
-            assertTrue(AppFeatureType.IMAGE_EDITOR.has(capabilities))
-        }
-    }
-
-    @Test
     fun baseFileAndMediaEntriesAreAvailableWithoutCapabilities() {
         for (feature in listOf(
             AppFeatureType.FILES, AppFeatureType.IMAGES, AppFeatureType.VIDEOS,

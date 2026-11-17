@@ -9,7 +9,7 @@ import com.ismartcoding.plain.models.FeedsResponse
 import com.ismartcoding.plain.models.FileSize
 import com.ismartcoding.plain.models.MediaFileInfoResult
 import com.ismartcoding.plain.models.MergeResult
-import com.ismartcoding.plain.models.ProjectSummary
+import com.ismartcoding.plain.models.ImageEditorProjectSummary
 import com.ismartcoding.plain.models.QueuedMediaId
 import com.ismartcoding.plain.models.SelectedMediaPath
 import com.ismartcoding.plain.features.chat.models.MessageShare
@@ -442,7 +442,7 @@ object Query {
         field = "smsCount",
     )
 
-    fun imageEditorProjects(): GraphqlRequest<List<ProjectSummary>> = GraphqlRequest(
+    fun imageEditorProjects(): GraphqlRequest<List<ImageEditorProjectSummary>> = GraphqlRequest(
         $$"query { imageEditorProjects { $${Fragments.IMAGE_EDITOR_SUMMARY} } }",
         field = "imageEditorProjects",
     )

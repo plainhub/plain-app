@@ -9,6 +9,7 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.Fill
 import androidx.compose.ui.text.TextMeasurer
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.drawText
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
@@ -16,8 +17,9 @@ import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.sp
 import com.ismartcoding.plain.lib.yjs.TextLayer
 
-internal fun DrawScope.drawSceneTextLayer(layer: TextLayer, measurer: TextMeasurer) {
-    if (layer.text.isEmpty()) return
+internal data class SceneTextLayout(val lines: List<TextLayoutResult>, val lineHeight: Float)
+
+internal fun measureSceneText(layer: TextLayer, measurer: TextMeasurer): SceneTextLayout {
     val style = TextStyle(
         fontSize = layer.fontSize.toFloat().sp,
         fontFamily = sceneFontFamily(layer.fontFamily),
@@ -26,15 +28,19 @@ internal fun DrawScope.drawSceneTextLayer(layer: TextLayer, measurer: TextMeasur
         letterSpacing = layer.letterSpacing.toFloat().sp,
     )
     fun measure(text: String) = measurer.measure(text, style, density = Density(1f))
-    val lines = wrapSceneText(layer.text, layer.maxWidth) { measure(it).size.width.toDouble() }
-    val lineHeight = layer.fontSize.toFloat() * 1.15f
+    val lines = wrapSceneText(layer.text, layer.maxWidth) { measure(it).size.width.toDouble() }.map(::measure)
+    return SceneTextLayout(lines, layer.fontSize.toFloat() * 1.15f)
+}
+
+internal fun DrawScope.drawSceneTextLayer(layer: TextLayer, measurer: TextMeasurer) {
+    if (layer.text.isEmpty()) return
+    val (lines, lineHeight) = measureSceneText(layer, measurer)
     val shadow = when {
         layer.glow -> Shadow(parseScopeBgColor(layer.color), blurRadius = if (layer.textShadow.blur > 0) layer.textShadow.blur.toFloat() else 20f)
         layer.textShadow.blur > 0 || layer.textShadow.offsetX != 0.0 || layer.textShadow.offsetY != 0.0 -> Shadow(parseScopeBgColor(layer.textShadow.color), Offset(layer.textShadow.offsetX.toFloat(), layer.textShadow.offsetY.toFloat()), layer.textShadow.blur.toFloat())
-        else -> null
+        else -> Shadow.None
     }
-    for ((index, line) in lines.withIndex()) {
-        val measured = measure(line)
+    for ((index, measured) in lines.withIndex()) {
         val width = measured.size.width.toFloat()
         val left = when (layer.textAlign) {
             "left" -> (layer.x - layer.maxWidth / 2).toFloat()

@@ -4,6 +4,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -21,16 +22,18 @@ import com.ismartcoding.plain.ui.resources.ellipsis_vertical
 import org.jetbrains.compose.resources.stringResource
 
 @Composable
-internal fun ImageEditorMenu(enabled: Boolean, canvasSettings: () -> Unit, preview: () -> Unit, export: (EditorRasterFormat) -> Unit) {
+internal fun ImageEditorMenu(enabled: Boolean, canvasSettings: () -> Unit, preview: () -> Unit, copy: () -> Unit, deleteProject: () -> Unit, export: (EditorRasterFormat) -> Unit) {
     var open by remember { mutableStateOf(false) }
     Box {
         PIconButton(icon = UiRes.drawable.ellipsis_vertical, contentDescription = stringResource(Res.string.more), enabled = enabled) { open = true }
         PDropdownMenu(open, { open = false }) {
             PDropdownMenuItem({ Text(stringResource(Res.string.image_editor_canvas_settings)) }, { open = false; canvasSettings() })
             PDropdownMenuItem({ Text(stringResource(Res.string.image_editor_preview)) }, { open = false; preview() })
+            PDropdownMenuItem({ Text(stringResource(Res.string.image_editor_copy_image)) }, { open = false; copy() })
             EditorRasterFormat.entries.forEach { format ->
                 PDropdownMenuItem({ Text(stringResource(Res.string.image_editor_export) + " " + format.name) }, { open = false; export(format) })
             }
+            PDropdownMenuItem({ Text(stringResource(Res.string.image_editor_delete_project), color = MaterialTheme.colorScheme.error) }, { open = false; deleteProject() })
         }
     }
 }

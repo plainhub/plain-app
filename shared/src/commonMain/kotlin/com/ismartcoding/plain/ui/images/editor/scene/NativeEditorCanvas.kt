@@ -2,7 +2,6 @@ package com.ismartcoding.plain.ui.images.editor.scene
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
@@ -11,9 +10,7 @@ import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.drawscope.CanvasDrawScope
 import androidx.compose.ui.graphics.drawscope.rotate
 import androidx.compose.ui.graphics.drawscope.scale
-import androidx.compose.ui.graphics.drawscope.translate
 import androidx.compose.ui.text.TextMeasurer
-import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.LayoutDirection
@@ -22,19 +19,15 @@ import com.ismartcoding.plain.lib.yjs.ImageLayer
 import com.ismartcoding.plain.lib.yjs.MosaicLayer
 
 @Composable
-fun NativeEditorCanvas(state: EditorDocumentState, viewport: SceneViewport, modifier: Modifier, onReady: () -> Unit = {}) {
-    val textMeasurer = rememberTextMeasurer()
+fun NativeEditorCanvas(state: EditorDocumentState, displayScale: Float, textMeasurer: TextMeasurer, modifier: Modifier) {
     val images = remember(state.sourceImage, state.images) { decodeSceneImages(state.sourceImage, state.images) }
-    val bitmap = remember(state.canvasSize, state.bgColor, state.layers, state.sourceImage, state.imgOffset.x, state.imgOffset.y, state.imgAlpha, state.images) {
+    val bitmap = remember(state, textMeasurer) {
         renderSceneBitmap(state, textMeasurer, images)
     }
-    LaunchedEffect(bitmap) { onReady() }
     Canvas(modifier) {
-        translate(viewport.panX, viewport.panY) {
-            scale(viewport.scale, pivot = Offset.Zero) {
+        scale(displayScale, pivot = Offset.Zero) {
                 drawSceneCheckerboard(bitmap.width.toFloat(), bitmap.height.toFloat())
                 drawImage(bitmap)
-            }
         }
     }
 }
@@ -64,9 +57,3 @@ internal fun renderSceneBitmap(state: EditorDocumentState, textMeasurer: TextMea
     }
     return bitmap
 }
-
-data class SceneViewport(
-    val scale: Float,
-    val panX: Float,
-    val panY: Float,
-)

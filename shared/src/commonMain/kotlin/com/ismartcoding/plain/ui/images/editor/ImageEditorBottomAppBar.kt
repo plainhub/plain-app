@@ -25,6 +25,8 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
@@ -95,10 +97,12 @@ fun ImageEditorBottomAppBar(
             verticalAlignment = Alignment.CenterVertically,
         ) {
             val scrollState = rememberScrollState()
+            val toolsLabel = stringResource(Res.string.image_editor_tools)
             Row(
                 modifier = Modifier
                     .weight(1f)
                     .horizontalScroll(scrollState)
+                    .semantics { contentDescription = toolsLabel }
                     .padding(horizontal = 4.dp),
                 horizontalArrangement = Arrangement.spacedBy(4.dp),
                 verticalAlignment = Alignment.CenterVertically,

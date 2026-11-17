@@ -2,6 +2,8 @@ package com.ismartcoding.plain.ui.images.editor
 
 import androidx.compose.foundation.selection.toggleable
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
@@ -40,7 +42,7 @@ internal fun EditorToggle(label: String, value: Boolean, onChange: (Boolean) -> 
 @Composable
 internal fun EditorChoices(label: String, value: String, choices: List<Pair<String, String>>, onChange: (String) -> Unit) {
     Text(label, style = MaterialTheme.typography.labelLarge)
-    Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+    Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()).semantics { contentDescription = label }, horizontalArrangement = Arrangement.spacedBy(4.dp)) {
         choices.forEach { (key, text) -> PTextButton(text, { onChange(key) }, contentColor = if (value == key) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant) }
     }
 }
@@ -49,5 +51,11 @@ internal fun EditorChoices(label: String, value: String, choices: List<Pair<Stri
 internal fun EditorColorField(label: String, value: String, onChange: (String) -> Unit) {
     var open by remember { mutableStateOf(false) }
     PTextButton("$label: $value", { open = true })
-    if (open) ColorPickerDialog(label, if (value.startsWith('#')) value else "#000000", { open = false }, { onChange(it); open = false })
+    if (open) {
+        val initial = editorColorToPicker(value)
+        ColorPickerDialog(label, initial, { open = false }, { selected ->
+            try { onChange(if (selected.equals(initial, ignoreCase = true)) value else pickerColorToEditor(selected)); open = false }
+            catch (error: IllegalArgumentException) { com.ismartcoding.plain.ui.components.DialogHelper.showMessage(error) }
+        })
+    }
 }
