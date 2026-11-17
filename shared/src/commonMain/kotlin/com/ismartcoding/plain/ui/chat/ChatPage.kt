@@ -81,6 +81,7 @@ import com.ismartcoding.plain.features.chat.models.ChatTextFormat
 import com.ismartcoding.plain.features.files.PickFileType
 import com.ismartcoding.plain.lib.withIO
 import com.ismartcoding.plain.platform.files.queryPickedFileInfo
+import com.ismartcoding.plain.lib.extensions.isImageFast
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
@@ -138,9 +139,12 @@ fun ChatPage(
         if (!sending && filesAllowed) {
             val picked = withIO {
                 event.uris.associateWith { uri ->
+                    val info = queryPickedFileInfo(uri)
+                    val name = info?.displayName ?: uri.substringAfterLast('/')
                     ChatDraftAttachment(
                         if (event.type == PickFileType.IMAGE_VIDEO) ChatAttachmentType.IMAGE else ChatAttachmentType.FILE,
-                        queryPickedFileInfo(uri)?.displayName ?: uri.substringAfterLast('/'),
+                        name,
+                        previewImage = info?.mimeType?.startsWith("image/", ignoreCase = true) == true || name.isImageFast(),
                     )
                 }
             }
@@ -287,6 +291,7 @@ fun ChatPage(
                         }
                     },
                     attachments = attachments.mapValues { it.value.name },
+                    imageAttachments = attachments.filterValues { it.previewImage }.keys,
                     markdown = chatFormat == ChatTextFormat.MARKDOWN,
                     sending = sending,
                     onRemoveAttachment = { attachments = attachments - it },
