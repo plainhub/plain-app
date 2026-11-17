@@ -187,6 +187,7 @@
     <string name="request_permission">请求权限</string>
     <string name="remote_permission_required">此设备尚未授予访问权限，请请求权限后继续。</string>
     <string name="pairing_failed">配对失败</string>
+    <string name="pairing_expired">已过期</string>
     <string name="confirm_unpair_device">要与 %1$s 解除配对吗？删除聊天记录也会将此设备从聊天列表中移除，此操作无法撤销。</string>
     <string name="delete_chat_history">删除聊天记录</string>
     <string name="nearby_my_devices">我的设备</string>
@@ -197,4 +198,5 @@
     <string name="pairing_identity_changed">对方公钥已改变，可能重装了应用。请核对完整指纹后再信任。</string>
     <string name="pairing_trust">信任</string>
     <string name="pairing_scan_qrcode">使用另一台手机扫码，即可与这台手机配对。</string>
+    <string name="pairing_manage_identity_changed">此设备的公钥已更改。仅在你认识此设备且确认此更改符合预期时信任它。</string>
 </resources>

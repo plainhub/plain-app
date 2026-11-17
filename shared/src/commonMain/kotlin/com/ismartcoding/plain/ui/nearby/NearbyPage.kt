@@ -61,6 +61,7 @@ import com.ismartcoding.plain.ui.components.DialogHelper
 import com.ismartcoding.plain.ui.web.components.WebAddressBarQrDialog
 import kotlinx.coroutines.launch
 import com.ismartcoding.plain.features.nearby.BleScanDriver
+import com.ismartcoding.plain.features.nearby.PairingMode
 import com.ismartcoding.plain.features.nearby.RustNearbyDevices
 import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.platform.network.canRequestBluetoothAccess
@@ -79,8 +80,26 @@ fun NearbyPage(
     val isSearching = isDiscovering || isBleScanning
     val peersMap by peerVM.peersMap.collectAsState()
     val peers = peersMap.values.filter { it.isPaired() }.sortedBy { it.name.toSortName() }
-    val newDevices = nearbyDevices.filter { device -> peers.none { it.id == device.id } }
+    val attempt = NearbyViewModel.nearbyAttempt
+    val attemptView = attempt?.first?.id?.let { NearbyViewModel.pairingViews[it] }
+    val activeDevice = attempt?.first?.takeIf { attemptView?.active == true }
+    val visibleDevices = if (activeDevice != null && nearbyDevices.none { it.id == activeDevice.id }) nearbyDevices + activeDevice else nearbyDevices
+    val newDevices = visibleDevices.filter { device -> peers.none { it.id == device.id } }
     val scope = rememberCoroutineScope()
+    var chooseMode by remember { mutableStateOf<NearbyDevice?>(null) }
+    chooseMode?.let { device ->
+        NearbyPairModeDialog(device.name, onDismiss = { chooseMode = null }) { mode ->
+            chooseMode = null
+            NearbyViewModel.startPairing(device, mode)
+        }
+    }
+    if (attempt != null && attemptView != null) {
+        NearbyPairChallenge(attempt.first, attempt.second, attemptView)
+    }
+    var upgradePeer by remember { mutableStateOf<NearbyDevice?>(null) }
+    upgradePeer?.let { device ->
+        PairPeerDialog(device, initialMode = PairingMode.MANAGE) { upgradePeer = null }
+    }
     var pairingCode by remember { mutableStateOf<PairingQr?>(null) }
     pairingCode?.let { code ->
         WebAddressBarQrDialog(code.payload, verificationCode = code.verificationCode) { pairingCode = null }
@@ -167,11 +186,16 @@ fun NearbyPage(
                 item { PSectionTitle(stringResource(Res.string.paired_devices)) }
             }
             items(peers, key = { "paired:${it.id}" }) { peer ->
-                NearbyPairedDeviceItem(peer, nearbyDevices.find { it.id == peer.id })
+                NearbyPairedDeviceItem(peer, nearbyDevices.find { it.id == peer.id }) {
+                    upgradePeer = it
+                }
                 VerticalSpace(8.dp)
             }
             nearbySearchingItem(isSearching)
-            nearbyDeviceListItems(newDevices)
+            nearbyDeviceListItems(newDevices, activeDevice?.id) { device ->
+                if (device.remoteAccess == true) chooseMode = device
+                else NearbyViewModel.startPairing(device, PairingMode.CHAT)
+            }
             if (newDevices.isEmpty() && !isSearching) {
                 item {
                     Box(
@@ -199,14 +223,15 @@ fun NearbyPage(
 
 internal fun LazyListScope.nearbyDeviceListItems(
     nearbyDevices: List<NearbyDevice>,
+    activePeerId: String?,
+    onPair: (NearbyDevice) -> Unit,
 ) {
     val sortedDevices = nearbyDevices.sortedBy { it.name.toSortName() }
     items(sortedDevices, key = { it.id }) { item ->
-        val status = NearbyViewModel.getStatus(item.id, false)
         NearbyDeviceItem(
             item = item,
-            status = status,
-            bestIp = item.bestIp,
+            enabled = activePeerId == null || activePeerId == item.id,
+            onPair = { onPair(item) },
         )
         VerticalSpace(8.dp)
     }

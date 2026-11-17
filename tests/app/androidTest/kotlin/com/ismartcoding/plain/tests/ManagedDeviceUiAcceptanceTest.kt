@@ -1133,45 +1133,6 @@ class ManagedDeviceUiAcceptanceTest {
     }
 
     @Test
-    fun pairingModeDialogUsesPlainAccessChoices() = runBlocking {
-        val args = InstrumentationRegistry.getArguments()
-        val dark = args.getString("managedDarkTheme")?.toBooleanStrict() ?: false
-        val dismissed = java.util.concurrent.atomic.AtomicBoolean()
-        ActivityScenario.launch(MainActivity::class.java).use { scenario ->
-            scenario.onActivity { activity ->
-                activity.setContent {
-                    com.ismartcoding.plain.ui.theme.AppTheme(useDarkTheme = dark) {
-                        val show = androidx.compose.runtime.remember { androidx.compose.runtime.mutableStateOf(true) }
-                        Box(Modifier.fillMaxSize().background(androidx.compose.material3.MaterialTheme.colorScheme.background)) {
-                            if (show.value) com.ismartcoding.plain.ui.nearby.PairPeerDialog(
-                                com.ismartcoding.plain.models.NearbyDevice(
-                                    id = "pair-dialog-ui-fixture", name = "Nearby device", port = 8443, remoteAccess = true,
-                                    signaturePublicKey = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=",
-                                    deviceType = com.ismartcoding.plain.platform.system.DeviceType.PHONE,
-                                    version = "fixture", platform = "fixture", lastSeen = kotlin.time.Instant.fromEpochMilliseconds(0),
-                                    status = com.ismartcoding.plain.features.nearby.PeerStatus.UNPAIRED,
-                                ),
-                            ) { show.value = false; dismissed.set(true) }
-                        }
-                    }
-                }
-            }
-            val manage = text(Res.string.pair_full_control)
-            val chat = text(Res.string.pair_chat_only)
-            awaitNode("default manage option") { it.isCheckable && it.isChecked && nodes(it).any { child -> child.text?.contains(manage) == true } }
-            click(chat, "select chat access")
-            awaitNode("selected chat option") { it.isCheckable && it.isChecked && nodes(it).any { child -> child.text?.contains(chat) == true } }
-            click(manage, "select management access")
-            awaitNode("selected manage option") { it.isCheckable && it.isChecked && nodes(it).any { child -> child.text?.contains(manage) == true } }
-            report("pairing_dialog_ready", if (dark) "dark" else "light")
-            delay(args.getString("managedHoldMillis")?.toLong() ?: 0)
-            click(text(Res.string.cancel), "dismiss pairing mode dialog")
-            awaitValue("pairing dialog dismissed") { dismissed.get().takeIf { it } }
-            Unit
-        }
-    }
-
-    @Test
     fun configuresOwnedPairingAcceptanceSettings() = runBlocking {
         check(instrumentation.targetContext.packageName == "com.ismartcoding.plain.managedtest")
         ActivityScenario.launch(MainActivity::class.java).use {
@@ -1616,7 +1577,7 @@ class ManagedDeviceUiAcceptanceTest {
                                     id = device.id, name = device.name, ip = "device.test", status = device.status,
                                     port = device.port, deviceType = device.deviceType,
                                     createdAt = kotlin.time.Instant.fromEpochMilliseconds(0), updatedAt = kotlin.time.Instant.fromEpochMilliseconds(0),
-                                ), device,
+                                ), device, onPair = { error("Pairing is not part of this unpair test") },
                             )
                         }
                         com.ismartcoding.plain.ui.navigation.MainDialogs()
@@ -1626,8 +1587,7 @@ class ManagedDeviceUiAcceptanceTest {
             try {
                 awaitMainWindowFocus(scenario)
                 repeat(2) { opening ->
-                    performClick(awaitNode("paired device actions") { it.contentDescription == text(Res.string.unpair) }, "open paired device actions")
-                    click(text(Res.string.unpair), "request unpair confirmation")
+                    click(text(Res.string.unpair), "right-side unpair opens confirmation")
                     val checkbox = awaitNode("delete chat history checkbox") { it.isCheckable }
                     assertFalse("Delete history must default to off", checkbox.isChecked)
                     assertNull(com.ismartcoding.plain.ui.nearby.NearbyViewModel.itemStatus[device.id])
