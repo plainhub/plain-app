@@ -1,5 +1,6 @@
 package com.ismartcoding.plain.ui.editor.markdown
 
+import com.ismartcoding.plain.features.web.WebHelper
 import com.ismartcoding.plain.ui.state.select
 import com.ismartcoding.plain.i18n.*
 
@@ -12,6 +13,7 @@ import com.ismartcoding.plain.ui.resources.calculate as ui_drawable_calculate
 import com.ismartcoding.plain.ui.resources.checklist as ui_drawable_checklist
 import com.ismartcoding.plain.ui.resources.code as ui_drawable_code
 import com.ismartcoding.plain.ui.resources.code_blocks as ui_drawable_code_blocks
+import com.ismartcoding.plain.ui.resources.circle_help as ui_drawable_circle_help
 import com.ismartcoding.plain.ui.resources.comment as ui_drawable_comment
 import com.ismartcoding.plain.ui.resources.expand_more as ui_drawable_expand_more
 import com.ismartcoding.plain.ui.resources.format_bold as ui_drawable_format_bold
@@ -148,6 +150,7 @@ val mdToolbarCategories = listOf(
                 click = { it.insertAtFocused("<details>\n<summary>Title</summary>\n", "\n</details>") },
             ),
             MdToolbarItem(Res.string.md_select_blocks, caption = Res.string.select, icon = UiRes.drawable.ui_drawable_select_all, click = { it.enterSelectionMode() }),
+            MdToolbarItem(Res.string.help, caption = Res.string.help, icon = UiRes.drawable.ui_drawable_circle_help, click = { WebHelper.open("https://plainapp.app/docs/markdown") }),
         ),
     ),
 )

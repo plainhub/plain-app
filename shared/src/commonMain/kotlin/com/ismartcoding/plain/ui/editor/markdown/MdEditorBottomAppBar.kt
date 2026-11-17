@@ -37,7 +37,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.painterResource
@@ -45,7 +44,6 @@ import org.jetbrains.compose.resources.stringResource
 import com.ismartcoding.plain.ui.i18n.LocaleHelper
 import com.ismartcoding.plain.ui.components.ColorPickerDialog
 import com.ismartcoding.plain.ui.components.DialogHelper
-import com.ismartcoding.plain.features.web.WebHelper
 import com.ismartcoding.plain.ui.editor.markdown.MdEditorViewModel
 import com.ismartcoding.plain.ui.editor.markdown.MdToolbarCategory
 import com.ismartcoding.plain.ui.editor.markdown.MdToolbarItem
@@ -102,7 +100,7 @@ fun MdEditorBottomAppBar(
                 }
             }
         }
-        // main toolbar: fixed category buttons + settings
+        // main toolbar: fixed category buttons
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -118,14 +116,6 @@ fun MdEditorBottomAppBar(
                 ) {
                     activeKey = if (activeKey == category.key) null else category.key
                 }
-            }
-            CategoryButton(
-                category = MdToolbarCategory("help", Res.string.help, icon = UiRes.drawable.ui_drawable_circle_help, items = emptyList()),
-                active = false,
-                modifier = Modifier
-                    .weight(1f),
-            ) {
-                WebHelper.open("https://plainapp.app/docs/markdown")
             }
         }
     }
@@ -145,7 +135,7 @@ private fun CategoryButton(
     } else {
         Modifier
     }
-    Column(
+    Box(
         modifier = modifier
             .clip(RoundedCornerShape(12.dp))
             .then(pill)
@@ -155,26 +145,14 @@ private fun CategoryButton(
                     color = bgColor
                 ), onClick = onClick
             )
-            .heightIn(min = 64.dp)
-            .padding(vertical = 4.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
+            .heightIn(min = 64.dp),
+        contentAlignment = Alignment.Center,
     ) {
-        Box(
+        Icon(
+            painter = painterResource(category.icon ?: UiRes.drawable.ui_drawable_circle_help),
+            contentDescription = stringResource(category.tip),
+            tint = contentColor,
             modifier = Modifier.size(24.dp),
-            contentAlignment = Alignment.Center,
-        ) {
-            Icon(
-                painter = painterResource(category.icon ?: UiRes.drawable.ui_drawable_circle_help),
-                contentDescription = stringResource(category.tip),
-                tint = contentColor,
-            )
-        }
-        VerticalSpace(4.dp)
-        Text(
-            stringResource(category.tip),
-            style = MaterialTheme.typography.labelLarge,
-            textAlign = TextAlign.Center,
-            color = contentColor,
         )
     }
 }
