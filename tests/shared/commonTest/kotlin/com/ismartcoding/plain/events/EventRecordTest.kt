@@ -53,6 +53,14 @@ class EventRecordTest {
     }
 
     @Test
+    fun readsOnlyTheCurrentTimeoutReason() {
+        fun payload(reason: String) = """{"__typename":"LoginFailedEventData","reason":"$reason"}"""
+        val current = event("LOGIN_FAILED", payload("TIMEOUT")).data as LoginFailedEventData
+        assertEquals(AuthErrorCode.TIMEOUT, current.reason)
+        assertFails { event("LOGIN_FAILED", payload("LOGIN_EXPIRED")) }
+    }
+
+    @Test
     fun queryUsesTheSameMainSchemaOperationAndSelectsAllUnionMembers() {
         val request = Query.events("text:fixture", 50, 50)
         assertTrue(request.operation.query.contains("events(query:"))

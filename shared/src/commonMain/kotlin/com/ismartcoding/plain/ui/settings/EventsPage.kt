@@ -97,7 +97,7 @@ private fun eventReason(reason: String): String = stringResource(when (reason) {
     AuthErrorCode.INVALID_PASSWORD.wire -> Res.string.event_reason_invalid_password
     AuthErrorCode.INVALID_LOGIN_REQUEST.wire -> Res.string.event_reason_invalid_login_request
     AuthErrorCode.REMOTE_ACCESS_DISABLED.wire -> Res.string.event_reason_remote_access_disabled
-    AuthErrorCode.LOGIN_EXPIRED.wire -> Res.string.event_reason_login_expired
+    AuthErrorCode.TIMEOUT.wire -> Res.string.event_reason_login_expired
     AuthErrorCode.TOO_MANY_LOGIN_ATTEMPTS.wire -> Res.string.event_reason_too_many_login_attempts
     AuthErrorCode.REJECTED.wire -> Res.string.event_reason_rejected
     AuthErrorCode.CANCELED.wire -> Res.string.event_reason_canceled
