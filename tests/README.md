@@ -23,10 +23,12 @@ Run from the repository root.
 
 ## Unit tests
 
-Run on your computer without a device.
+Run on your computer without a device. The default runs Kotlin JVM host tests and the pinned Core Rust tests. Desktop Web tests are owned by and run from `plain-desktop`.
 
 ```bash
+bash scripts/test-unit.sh
 bash scripts/test-unit.sh kotlin
+bash scripts/test-unit.sh rust
 ```
 
 ## Android device tests
