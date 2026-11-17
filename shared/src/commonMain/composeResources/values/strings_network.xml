@@ -26,7 +26,7 @@
     <string name="device_name">Device name</string>
     <string name="open_in_web">Open in web browser</string>
     <string name="require_password">Require password</string>
-    <string name="two_factor_auth_tips">When logging in on the webpage, we'll display a confirmation popup in the app for added security.</string>
+    <string name="two_factor_auth_tips">When this is on, you’ll need to approve new logins in PlainApp.</string>
     <string name="how_to_use">How to use</string>
     <string name="service_not_running">Service not running</string>
     <string name="quick_start">Quick start</string>

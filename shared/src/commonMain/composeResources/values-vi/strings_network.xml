@@ -6,7 +6,7 @@
     <string name="device_name">Tên thiết bị</string>
     <string name="open_in_web">Mở trong trình duyệt web</string>
     <string name="require_password">Yêu cầu mật khẩu</string>
-    <string name="two_factor_auth_tips">Khi đăng nhập trên trang web, chúng tôi sẽ hiển thị một cửa sổ thoả thuận trong ứng dụng để tăng cường bảo mật.</string>
+    <string name="two_factor_auth_tips">Khi bật tùy chọn này, bạn cần xác nhận các lượt đăng nhập mới trong PlainApp.</string>
     <string name="http_server_state_on">Dịch vụ đang chạy</string>
     <string name="http_server_state_starting">Đang khởi động dịch vụ…</string>
     <string name="http_server_state_stopping">Đang dừng dịch vụ…</string>

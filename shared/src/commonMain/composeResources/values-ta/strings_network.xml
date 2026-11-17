@@ -6,7 +6,7 @@
     <string name="device_name">சாதன பெயர்</string>
     <string name="open_in_web">வலையில் திறக்க</string>
     <string name="require_password">கடவுச்சொல் தேவை</string>
-    <string name="two_factor_auth_tips">வலைத்தளத்தில் உள்நுழையும் போது, சேர்க்கையை கூக்கும் நிறுவலின் ஒரு உறுதியான சாளரம் நாங்கள் பயன்படுத்துகிறோம்.</string>
+    <string name="two_factor_auth_tips">இந்த அமைப்பை இயக்கினால், புதிய உள்நுழைவுகளை PlainApp இல் அங்கீகரிக்க வேண்டும்.</string>
     <string name="http_server_state_on">சேவை இயங்குகின்றது</string>
     <string name="http_server_state_starting">சேவை தொடங்குகிறது…</string>
     <string name="http_server_state_stopping">சேவை நிறுத்தப்படுகிறது…</string>

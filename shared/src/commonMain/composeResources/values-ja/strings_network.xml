@@ -6,7 +6,7 @@
     <string name="device_name">デバイス名</string>
     <string name="open_in_web">ウェブブラウザで開く</string>
     <string name="require_password">パスワードが必要です</string>
-    <string name="two_factor_auth_tips">ウェブページにログインする際に、アプリ内で確認ポップアップが表示されます。</string>
+    <string name="two_factor_auth_tips">この設定をオンにすると、新しいログインを PlainApp で承認する必要があります。</string>
     <string name="http_server_state_on">サービスが実行されています</string>
     <string name="http_server_state_starting">サービスを開始しています...</string>
     <string name="http_server_state_stopping">サービスを停止しています...</string>

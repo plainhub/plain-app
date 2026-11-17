@@ -6,7 +6,7 @@
     <string name="device_name">Cihaz adı</string>
     <string name="open_in_web">Web tarayıcısında aç</string>
     <string name="require_password">Şifre gerekli</string>
-    <string name="two_factor_auth_tips">Web sayfasında oturum açarken, ek güvenlik için uygulamada bir onay açılır penceresi görüntüleyeceğiz.</string>
+    <string name="two_factor_auth_tips">Bu seçenek açıkken yeni girişleri PlainApp’te onaylamanız gerekir.</string>
     <string name="http_server_state_on">Hizmet çalışıyor</string>
     <string name="http_server_state_starting">Hizmet başlatılıyor…</string>
     <string name="http_server_state_stopping">Hizmet durduruluyor…</string>

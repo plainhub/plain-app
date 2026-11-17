@@ -6,7 +6,7 @@
     <string name="device_name">Имя устройства</string>
     <string name="open_in_web">Открыть в веб-браузере</string>
     <string name="require_password">Требуется пароль</string>
-    <string name="two_factor_auth_tips">При входе на веб-странице мы отобразим всплывающее окно подтверждения в приложении для дополнительной безопасности.</string>
+    <string name="two_factor_auth_tips">Если эта настройка включена, вам нужно будет подтверждать новые входы в PlainApp.</string>
     <string name="http_server_state_on">Служба запущена</string>
     <string name="http_server_state_starting">Запуск службы…</string>
     <string name="http_server_state_stopping">Остановка службы…</string>

@@ -6,7 +6,7 @@
     <string name="device_name">기기 이름</string>
     <string name="open_in_web">웹 브라우저에서 열기</string>
     <string name="require_password">비밀번호 필요</string>
-    <string name="two_factor_auth_tips">웹 페이지에 로그인 할 때, 추가 보안을 위해 앱에서 확인 팝업을 표시합니다.</string>
+    <string name="two_factor_auth_tips">이 설정을 켜면 새 로그인 요청을 PlainApp에서 승인해야 합니다.</string>
     <string name="http_server_state_on">서비스가 실행 중입니다</string>
     <string name="http_server_state_starting">서비스 시작 중…</string>
     <string name="http_server_state_stopping">서비스 중지 중…</string>

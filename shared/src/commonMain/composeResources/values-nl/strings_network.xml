@@ -6,7 +6,7 @@
     <string name="device_name">Apparaatnaam</string>
     <string name="open_in_web">Openen in webbrowser</string>
     <string name="require_password">Wachtwoord vereist</string>
-    <string name="two_factor_auth_tips">Bij het inloggen op de webpagina tonen we een bevestigingspop-up in de app voor extra beveiliging.</string>
+    <string name="two_factor_auth_tips">Als deze optie aanstaat, moet je nieuwe aanmeldingen in PlainApp bevestigen.</string>
     <string name="http_server_state_on">Service draait</string>
     <string name="http_server_state_starting">Service wordt gestart…</string>
     <string name="http_server_state_stopping">Service wordt gestopt…</string>

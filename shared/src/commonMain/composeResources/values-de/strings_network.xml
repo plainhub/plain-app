@@ -6,7 +6,7 @@
     <string name="device_name">Gerätename</string>
     <string name="open_in_web">Im Webbrowser öffnen</string>
     <string name="require_password">Passwort erforderlich</string>
-    <string name="two_factor_auth_tips">Beim Einloggen auf der Webseite wird in der App ein Bestätigungsfenster für zusätzliche Sicherheit angezeigt.</string>
+    <string name="two_factor_auth_tips">Wenn diese Option aktiviert ist, musst du neue Anmeldungen in PlainApp bestätigen.</string>
     <string name="http_server_state_on">Dienst läuft</string>
     <string name="http_server_state_starting">Dienst wird gestartet...</string>
     <string name="http_server_state_stopping">Dienst wird gestoppt...</string>

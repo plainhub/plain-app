@@ -6,7 +6,7 @@
     <string name="device_name">Nom de l'appareil</string>
     <string name="open_in_web">Ouvrir dans le navigateur web</string>
     <string name="require_password">Mot de passe requis</string>
-    <string name="two_factor_auth_tips">Lors de la connexion sur la page web, nous afficherons une fenêtre de confirmation dans l'application pour plus de sécurité.</string>
+    <string name="two_factor_auth_tips">Si cette option est activée, vous devrez approuver les nouvelles connexions dans PlainApp.</string>
     <string name="http_server_state_on">Le service est en cours d'exécution</string>
     <string name="http_server_state_starting">Démarrage du service...</string>
     <string name="http_server_state_stopping">Arrêt du service...</string>

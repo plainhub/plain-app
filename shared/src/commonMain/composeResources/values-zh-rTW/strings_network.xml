@@ -6,7 +6,7 @@
     <string name="device_name">設備名稱</string>
     <string name="open_in_web">在瀏覽器中開啟</string>
     <string name="require_password">需要密碼</string>
-    <string name="two_factor_auth_tips">在網頁登入時，我們將於應用程式中顯示確認彈出視窗，以增加安全性。</string>
+    <string name="two_factor_auth_tips">開啟後，有人嘗試登入時，需要你在 PlainApp 裡確認。</string>
     <string name="http_server_state_on">服務正在運行中</string>
     <string name="http_server_state_starting">正在啟動服務…</string>
     <string name="http_server_state_stopping">正在停止服務…</string>

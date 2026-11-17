@@ -6,7 +6,7 @@
     <string name="device_name">ডিভাইসের নাম</string>
     <string name="open_in_web">ওয়েব ব্রাউজারে খোলুন</string>
     <string name="require_password">পাসওয়ার্ড প্রয়োজন</string>
-    <string name="two_factor_auth_tips">ওয়েবপৃষ্ঠে লগইন করার সময়, আমরা অতিরিক্ত নিরাপত্তার জন্য অ্যাপে একটি অনুমোদন পপআপ প্রদর্শন করব।</string>
+    <string name="two_factor_auth_tips">এই বিকল্পটি চালু থাকলে, আপনাকে PlainApp-এ নতুন লগইন অনুমোদন করতে হবে।</string>
     <string name="http_server_state_on">সেবা চলছে</string>
     <string name="http_server_state_starting">সেবা চালু করা হচ্ছে…</string>
     <string name="http_server_state_stopping">সেবা বন্ধ করা হচ্ছে...</string>

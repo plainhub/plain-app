@@ -6,7 +6,7 @@
     <string name="device_name">उपकरण का नाम</string>
     <string name="open_in_web">वेब ब्राउज़र में खोलें</string>
     <string name="require_password">पासवर्ड आवश्यक</string>
-    <string name="two_factor_auth_tips">वेबपृष्ठ पर लॉगिन करते समय, हम अतिरिक्त सुरक्षा के लिए ऐप में पुष्टि पॉपअप प्रदर्शित करेंगे।</string>
+    <string name="two_factor_auth_tips">यह विकल्प चालू होने पर आपको नए लॉगिन की पुष्टि PlainApp में करनी होगी।</string>
     <string name="http_server_state_on">सेवा चल रही है</string>
     <string name="http_server_state_starting">सेवा शुरू हो रही है...</string>
     <string name="http_server_state_stopping">सेवा बंद हो रही है...</string>

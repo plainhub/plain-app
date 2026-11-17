@@ -6,7 +6,7 @@
     <string name="device_name">Nombre del dispositivo</string>
     <string name="open_in_web">Abrir en navegador web</string>
     <string name="require_password">Requiere contraseña</string>
-    <string name="two_factor_auth_tips">Al iniciar sesión en la página web, mostraremos una ventana emergente de confirmación en la aplicación para añadir seguridad adicional.</string>
+    <string name="two_factor_auth_tips">Si activas esta opción, tendrás que aprobar los nuevos inicios de sesión en PlainApp.</string>
     <string name="http_server_state_on">El servicio está en ejecución</string>
     <string name="http_server_state_starting">Iniciando servicio...</string>
     <string name="http_server_state_stopping">Deteniendo servicio...</string>
