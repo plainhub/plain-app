@@ -45,7 +45,6 @@ import org.jetbrains.compose.resources.stringResource
 import com.ismartcoding.plain.ui.i18n.LocaleHelper
 import com.ismartcoding.plain.ui.components.ColorPickerDialog
 import com.ismartcoding.plain.ui.components.DialogHelper
-import com.ismartcoding.plain.features.web.WebHelper
 import com.ismartcoding.plain.ui.editor.markdown.MdEditorViewModel
 import com.ismartcoding.plain.ui.editor.markdown.MdToolbarCategory
 import com.ismartcoding.plain.ui.editor.markdown.MdToolbarItem
@@ -102,7 +101,7 @@ fun MdEditorBottomAppBar(
                 }
             }
         }
-        // main toolbar: fixed category buttons + settings
+        // main toolbar: fixed category buttons
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -118,14 +117,6 @@ fun MdEditorBottomAppBar(
                 ) {
                     activeKey = if (activeKey == category.key) null else category.key
                 }
-            }
-            CategoryButton(
-                category = MdToolbarCategory("help", Res.string.help, icon = UiRes.drawable.ui_drawable_circle_help, items = emptyList()),
-                active = false,
-                modifier = Modifier
-                    .weight(1f),
-            ) {
-                WebHelper.open("https://plainapp.app/docs/markdown")
             }
         }
     }
