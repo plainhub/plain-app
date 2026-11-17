@@ -52,9 +52,46 @@ import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.junit.runner.RunWith
 
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.navigation.compose.rememberNavController
+import com.ismartcoding.plain.features.chat.ChatStatus
+import com.ismartcoding.plain.features.chat.data.ChatTarget
+import com.ismartcoding.plain.features.chat.models.ChatAttachmentType
+import com.ismartcoding.plain.features.chat.models.ChatMessage
+import com.ismartcoding.plain.features.chat.models.ChatMessageAttachment
+import com.ismartcoding.plain.features.chat.models.MessageFile
+import com.ismartcoding.plain.features.chat.models.MessageType
+import com.ismartcoding.plain.ui.audio.AudioQueueViewModel
+import com.ismartcoding.plain.ui.chat.ChatViewModel
+import com.ismartcoding.plain.ui.chat.VChat
+import com.ismartcoding.plain.ui.chat.components.ChatListItem
+import com.ismartcoding.plain.ui.media.viewer.previewer.rememberPreviewerState
+import kotlin.time.Instant
+
 @RunWith(AndroidJUnit4::class)
 class SharedComponentSpacingTest {
     private val instrumentation = InstrumentationRegistry.getInstrumentation()
+
+    @Test
+    fun mixedChatMessageAddsOnlyTheGapBetweenAttachmentGroups() = render({
+        val image = ChatMessageAttachment(ChatAttachmentType.IMAGE, MessageFile(uri = "fixture.png", fileName = "fixture.png", size = 10))
+        val file = ChatMessageAttachment(ChatAttachmentType.FILE, MessageFile(uri = "fixture.pdf", fileName = "fixture.pdf", size = 10))
+        val nav = rememberNavController()
+        val focus = LocalFocusManager.current
+        val previewer = rememberPreviewerState()
+        val audio = androidx.compose.runtime.remember { AudioQueueViewModel() }
+        for ((id, attachments) in mapOf("text" to emptyList(), "image" to listOf(image), "file" to listOf(file), "mixed" to listOf(image, file))) {
+            val chat = VChat(id, "me", Instant.parse("2026-01-01T10:00:00Z"), MessageType.MESSAGE, ChatStatus.SENT,
+                value = ChatMessage(text = "Attachment fixture", items = attachments))
+            Box(Modifier.testTag("chat-$id")) {
+                ChatListItem(nav, ChatViewModel.local, ChatTarget.parseId("peer:local"), audio, listOf(chat), chat, null, 0, 48.dp, 48, focus, previewer)
+            }
+        }
+    }) {
+        await { nodes().any { it.config.getOrNull(SemanticsProperties.TestTag) == "chat-mixed" } }
+        fun height(id: String): Float = tagged("chat-$id").boundsInRoot.height
+        assertEquals(8f, height("mixed") - height("image") - height("file") + height("text"), 0.5f)
+    }
 
     @Test
     fun alertKeepsButtonTouchSizeWithoutAnExtraBottomGutter() = render({

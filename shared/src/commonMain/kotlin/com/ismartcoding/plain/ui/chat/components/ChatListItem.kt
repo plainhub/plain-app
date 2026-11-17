@@ -138,6 +138,7 @@ fun ChatListItem(
                                         val images = message.images
                                         val files = message.files
                                         if (images.isNotEmpty()) ChatImages(items, m, images, peer, imageWidthDp, imageWidthPx, previewerState, chatVM)
+                                        if (images.isNotEmpty() && files.isNotEmpty()) VerticalSpace(8.dp)
                                         if (files.isNotEmpty()) ChatFiles(items, navController, m, files, peer, audioQueueVM, previewerState)
                                     }
                                 }
