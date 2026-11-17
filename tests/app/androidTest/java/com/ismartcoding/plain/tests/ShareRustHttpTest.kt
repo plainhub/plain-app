@@ -59,7 +59,7 @@ class ShareRustHttpTest {
                         put("query", "query(\$path: String) { sharedInfo(relativePath: \$path) { urlToken entries { relativePath isDir } } }")
                         put("variables", buildJsonObject { put("path", path) })
                     }
-                    val body = XChaCha20Poly1305(key).encrypt(query.toString().toByteArray(), "HTTP_REQUEST\u0000POST\u0000/guest_graphql".toByteArray())
+                    val body = XChaCha20Poly1305(key).encrypt(query.toString().toByteArray(), "HTTP_REQUEST.POST./guest_graphql".toByteArray())
                     return client.post("$base/guest_graphql", body, "application/octet-stream", mapOf("c-id" to share.id)).use {
                         val status = it.status.value
                         val result = if (status == 200) {
