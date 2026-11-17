@@ -1,5 +1,7 @@
 package com.ismartcoding.plain.ui.files.components
 
+import com.ismartcoding.plain.models.BusinessException
+import com.ismartcoding.plain.models.ErrorCode
 import com.ismartcoding.plain.features.media.MediaClient
 
 import com.ismartcoding.plain.features.files.FilesClient
@@ -47,7 +49,7 @@ fun openFile(
         coMain {
             DialogHelper.showLoading()
             try {
-                val path = if (ZipBrowserHelper.isZipPath(file.path)) source.files.cacheZipEntry(file.path) ?: error("archive_entry_unavailable") else file.path
+                val path = if (ZipBrowserHelper.isZipPath(file.path)) source.files.cacheZipEntry(file.path) ?: throw BusinessException(ErrorCode.ARCHIVE_ENTRY_UNAVAILABLE) else file.path
                 when {
                     file.name.isImageFast() || file.name.isVideoFast() -> {
                         val previewFiles = if (ZipBrowserHelper.isZipPath(file.path)) listOf(file.copy(path = path)) else files.filter { it.path.isImageFast() || it.path.isVideoFast() }

@@ -69,7 +69,8 @@ class GraphqlHttpClientTest {
                         error("Invalid management addresses must not reach the transport")
                 },
             )
-            assertFailsWith<IllegalArgumentException> { client.graphql.execute(request) }
+            assertEquals(com.ismartcoding.plain.models.ErrorCode.PEER_ADDRESS_UNAVAILABLE,
+                assertFailsWith<com.ismartcoding.plain.models.BusinessException> { client.graphql.execute(request) }.code)
         }
     }
 
@@ -141,6 +142,7 @@ class GraphqlHttpClientTest {
             val error = assertFailsWith<IllegalStateException> { client.execute(request) }
             if (status != 401 && status != 403) {
                 assertEquals(status, assertIs<GraphqlHttpException>(error).status)
+                assertEquals(com.ismartcoding.plain.models.ErrorCode.NETWORK_ERROR, assertIs<com.ismartcoding.plain.models.BusinessException>(error).code)
                 assertEquals("HTTP $status", error.message)
             }
             assertEquals(1, posts)

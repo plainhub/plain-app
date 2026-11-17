@@ -14,7 +14,7 @@ open class GraphqlClient internal constructor(
         try {
             val response = send(request.operation)
             if (response.errors.isNotEmpty()) {
-                error(response.errors.joinToString { it.message })
+                throw GraphqlException(response.errors)
             }
             val data = checkNotNull(response.data) { "GraphQL response has no data" }
             val result = request.decode(data)

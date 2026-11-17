@@ -15,7 +15,7 @@ import com.ismartcoding.plain.ui.base.pullrefresh.setRefreshState
 import kotlinx.coroutines.launch
 
 @Composable
-internal fun ManagedDeviceStatus(loading: Boolean, error: String?, tools: Boolean = false, onRefresh: suspend () -> Boolean) {
+internal fun ManagedDeviceStatus(loading: Boolean, error: Throwable?, tools: Boolean = false, onRefresh: suspend () -> Boolean) {
     val scope = rememberCoroutineScope()
     val refresh = rememberRefreshLayoutState {
         val state = this

@@ -45,7 +45,7 @@ class AudioQueueViewModel internal constructor(
     val queueCount = mutableStateOf(0)
     val noMore = mutableStateOf(false)
 
-    val error = mutableStateOf<String?>(null)
+    val error = mutableStateOf<Throwable?>(null)
     val canReorder = mutableStateOf(false)
 
     val queuedMediaIds = mutableStateOf<Set<String>>(emptySet())
@@ -71,7 +71,7 @@ class AudioQueueViewModel internal constructor(
                 }
             } catch (canceled: CancellationException) { throw canceled }
             catch (failure: Exception) {
-                error.value = failure.message ?: failure.toString()
+                error.value = failure
                 LogCat.e("Observe audio queue", failure)
             }
         }
@@ -96,7 +96,7 @@ class AudioQueueViewModel internal constructor(
             error.value = null
         } catch (canceled: CancellationException) { throw canceled }
         catch (failure: Exception) {
-            error.value = failure.message ?: failure.toString()
+            error.value = failure
             throw failure
         }
     }

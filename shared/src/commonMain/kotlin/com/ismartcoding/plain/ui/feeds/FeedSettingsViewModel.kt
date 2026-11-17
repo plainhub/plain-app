@@ -1,5 +1,7 @@
 package com.ismartcoding.plain.ui.feeds
 
+import com.ismartcoding.plain.models.BusinessException
+import com.ismartcoding.plain.models.ErrorCode
 import com.ismartcoding.plain.rust.graphql.ContentSource
 import com.ismartcoding.plain.ui.state.launchSafe
 
@@ -70,7 +72,7 @@ class FeedSettingsViewModel internal constructor(val source: ContentSource = Con
     }
 
     private suspend inline fun <reified T> saveRemoteSetting(key: String, value: T) {
-        check(source.api.execute(com.ismartcoding.plain.graphql.Mutation.setPref(key, com.ismartcoding.plain.lib.JsonHelper.jsonEncodeToElement(value)))) { "preference_update_failed" }
+        if (!(source.api.execute(com.ismartcoding.plain.graphql.Mutation.setPref(key, com.ismartcoding.plain.lib.JsonHelper.jsonEncodeToElement(value))))) throw BusinessException(ErrorCode.PREFERENCE_UPDATE_FAILED)
     }
 
     suspend fun clearByFeedIdAsync(feedId: String) = withIO {

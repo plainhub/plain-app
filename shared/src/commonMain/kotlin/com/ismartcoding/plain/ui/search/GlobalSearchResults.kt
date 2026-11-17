@@ -99,7 +99,7 @@ internal fun SearchResults(
             item(key = "device_error_$index") {
                 Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     Text(error.name, style = MaterialTheme.typography.titleMedium)
-                    com.ismartcoding.plain.ui.tools.ManagedError(error.message)
+                    com.ismartcoding.plain.ui.tools.ManagedError(error.error)
                     POutlinedButton(text = stringResource(Res.string.retry), onClick = viewModel::search)
                 }
             }
@@ -164,7 +164,7 @@ internal fun SearchResults(
 }
 
 @Composable
-private fun SearchDeviceError(viewModel: GlobalSearchViewModel, domain: GlobalSearchDomain, state: GlobalSearchDeviceState, error: String) {
+private fun SearchDeviceError(viewModel: GlobalSearchViewModel, domain: GlobalSearchDomain, state: GlobalSearchDeviceState, error: Throwable) {
     val permission = when (domain) {
         GlobalSearchDomain.NOTES, GlobalSearchDomain.FEEDS, GlobalSearchDomain.CHAT -> null
         GlobalSearchDomain.APPS -> com.ismartcoding.plain.platform.permissions.Permission.QUERY_ALL_PACKAGES
@@ -185,7 +185,7 @@ private fun SearchDeviceError(viewModel: GlobalSearchViewModel, domain: GlobalSe
         com.ismartcoding.plain.ui.permissions.RemotePermissionEffects(state.device, feature, granted) { viewModel.search() }
     }
     Column(Modifier.padding(horizontal = 16.dp, vertical = 8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-        if (error == "no_permission" && permission != null) {
+        if (error is com.ismartcoding.plain.models.BusinessException && error.code == com.ismartcoding.plain.models.ErrorCode.NO_PERMISSION && permission != null) {
             Text(stringResource(Res.string.remote_permission_required), style = MaterialTheme.typography.bodyMedium)
             POutlinedButton(text = stringResource(Res.string.request_permission), onClick = {
                 requested.value = true

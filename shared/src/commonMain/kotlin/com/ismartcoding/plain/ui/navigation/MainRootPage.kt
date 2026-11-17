@@ -23,7 +23,7 @@ internal fun MainRootPage(
     owner: ViewModelStoreOwner,
     source: ContentSource?,
     loading: Boolean,
-    error: String?,
+    error: Throwable?,
     refreshDevice: suspend () -> Boolean,
     channelVM: com.ismartcoding.plain.ui.chat.ChannelViewModel,
     updateVM: com.ismartcoding.plain.ui.settings.UpdateViewModel,

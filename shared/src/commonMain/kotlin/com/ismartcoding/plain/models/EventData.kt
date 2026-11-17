@@ -6,13 +6,6 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonClassDiscriminator
 
-@Serializable
-enum class EventReason {
-    INVALID_LOGIN_REQUEST, INVALID_PASSWORD, PEER_IDENTITY_CHANGED, REMOTE_ACCESS_DISABLED,
-    LOGIN_EXPIRED, TOO_MANY_LOGIN_ATTEMPTS, PASSWORD_SETUP_REQUIRED, INTERNAL_ERROR,
-    REJECTED, CANCELED, MOUNT_FAILED, FORMAT_DISK_FAILED,
-}
-
 @OptIn(ExperimentalSerializationApi::class)
 @Serializable
 @JsonClassDiscriminator("__typename")
@@ -24,7 +17,7 @@ data class LoginEventData(val sessionType: SessionType) : EventData
 
 @Serializable
 @SerialName("LoginFailedEventData")
-data class LoginFailedEventData(val reason: EventReason) : EventData
+data class LoginFailedEventData(val reason: ErrorCode) : EventData
 
 @Serializable
 data class EventSession(val clientId: String, val clientName: String, val type: SessionType)
@@ -41,7 +34,7 @@ data class DeviceNameEventData(val oldName: String, val newName: String) : Event
 data class EventVolume(val id: String?, val name: String?, val devicePath: String?, val mountPath: String, val fileSystem: String?)
 
 @Serializable
-data class EventFailure(val reason: EventReason, val detail: String?)
+data class EventFailure(val reason: ErrorCode, val detail: String?)
 
 @Serializable
 @SerialName("VolumeEventData")

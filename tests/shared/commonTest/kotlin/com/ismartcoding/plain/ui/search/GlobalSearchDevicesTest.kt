@@ -10,6 +10,9 @@ import com.ismartcoding.plain.features.nearby.PeerStatus
 import com.ismartcoding.plain.lib.JsonHelper
 import com.ismartcoding.plain.models.ManagedDeviceInfo
 import com.ismartcoding.plain.models.Note
+import com.ismartcoding.plain.models.BusinessException
+import com.ismartcoding.plain.models.ErrorCode
+import com.ismartcoding.plain.rust.graphql.GraphqlHttpException
 import com.ismartcoding.plain.models.Peer
 import com.ismartcoding.plain.platform.system.DeviceType
 import com.ismartcoding.plain.rust.graphql.ContentSource
@@ -113,7 +116,7 @@ class GlobalSearchDevicesTest {
         vm.search()
         advanceUntilIdle()
         val state = checkNotNull(vm.domainStates[GlobalSearchDomain.NOTES])
-        assertEquals("no_permission", state.devices.first().error.value)
+        assertEquals(ErrorCode.NO_PERMISSION, assertIs<BusinessException>(state.devices.first().error.value).code)
         assertEquals(1, state.hits.value.size)
         assertSame(sources.last(), state.hits.value.single().device)
         assertTrue(state.hasErrors.value)
@@ -138,7 +141,7 @@ class GlobalSearchDevicesTest {
         vm.refreshHits()
         advanceUntilIdle()
         val state = vm.domainStates.getValue(GlobalSearchDomain.NOTES)
-        assertEquals("connection_timeout", state.devices.first().error.value)
+        assertEquals(ErrorCode.CONNECTION_TIMEOUT, assertIs<BusinessException>(state.devices.first().error.value).code)
         assertEquals("Live target update", state.devices.last().hits.value.single().title)
         first.failure = null
         vm.refreshHits()
@@ -158,7 +161,8 @@ class GlobalSearchDevicesTest {
             loadDevice = { devices.getValue(it.id).source().client },
         )
         assertEquals(listOf(ContentSource.Local.key, available.source().key), result.devices.map { it.key })
-        assertEquals(listOf(GlobalSearchDeviceError("broken", "HTTP 503")), result.errors)
+        assertEquals(listOf("broken"), result.errors.map { it.name })
+        assertEquals(503, assertIs<GraphqlHttpException>(result.errors.single().error).status)
     }
 
     @Test
@@ -292,7 +296,7 @@ class GlobalSearchDevicesTest {
                     } else {
                         requests.add(operation)
                         beforeResponse(operation)
-                        failure?.let { error(it) }
+                        failure?.let { throw BusinessException(checkNotNull(ErrorCode.fromWire(it))) }
                         val offset = operation.variables["offset"]?.jsonPrimitive?.int ?: 0
                         val limit = operation.variables["limit"]?.jsonPrimitive?.int ?: rows.size
                         if ("chatRecords(" in operation.query || "chatCount(" in operation.query || "peers {" in operation.query) {

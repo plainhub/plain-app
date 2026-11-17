@@ -1,5 +1,7 @@
 package com.ismartcoding.plain.rust.graphql
 
+import com.ismartcoding.plain.models.BusinessException
+import com.ismartcoding.plain.models.ErrorCode
 import com.ismartcoding.plain.features.chat.models.getBaseUrl
 
 import com.ismartcoding.plain.Prefs
@@ -13,7 +15,7 @@ import com.ismartcoding.plain.rust.native.nativeCall
 import kotlinx.coroutines.withTimeoutOrNull
 import kotlin.io.encoding.Base64
 
-internal class GraphqlHttpException(val status: Int) : IllegalStateException("HTTP $status")
+internal class GraphqlHttpException(val status: Int) : BusinessException(ErrorCode.NETWORK_ERROR, message = "HTTP $status")
 
 internal data class GraphqlHttpResponse(val status: Int, val body: ByteArray)
 
@@ -39,21 +41,21 @@ internal class PeerHttpClient(
     private val expected = peer.copy()
 
     internal suspend fun current(): Peer {
-        val current = peers().find { it.id == expected.id } ?: error("peer_removed")
-        check(current.isPaired() && current.token.isNotEmpty()) { "no_permission" }
-        check(current.publicKey == expected.publicKey && current.token == expected.token) { "peer_identity_changed" }
+        val current = peers().find { it.id == expected.id } ?: throw BusinessException(ErrorCode.PEER_REMOVED)
+        if (!(current.isPaired() && current.token.isNotEmpty())) throw BusinessException(ErrorCode.NO_PERMISSION)
+        if (!(current.publicKey == expected.publicKey && current.token == expected.token)) throw BusinessException(ErrorCode.PEER_IDENTITY_CHANGED)
         return current
     }
 
     private suspend fun post(peer: Peer, endpoint: String, body: ByteArray, contentType: String = "application/octet-stream", tlsCertificateSha256: String? = null): GraphqlHttpResponse {
         val base = peer.getBaseUrl()
-        require(base.isUrl()) { "Invalid management address" }
+        if (!base.isUrl()) throw BusinessException(ErrorCode.PEER_ADDRESS_UNAVAILABLE)
         val response = withTimeoutOrNull(30_000) {
             transport.post(base.trimEnd('/') + endpoint, clientId(), body, contentType, tlsCertificateSha256)
-        } ?: error("connection_timeout")
+        } ?: throw BusinessException(ErrorCode.CONNECTION_TIMEOUT)
         when (response.status) {
-            401 -> error("unauthorized")
-            403 -> error("remote_access_disabled")
+            401 -> throw BusinessException(ErrorCode.UNAUTHORIZED)
+            403 -> throw BusinessException(ErrorCode.REMOTE_ACCESS_DISABLED)
             in 200..299 -> Unit
             else -> throw GraphqlHttpException(response.status)
         }

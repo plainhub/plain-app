@@ -6,6 +6,6 @@ import kotlinx.serialization.Serializable
 data class PairingProgressNotice(
     val deviceId: String,
     val deviceName: String,
-    val error: String? = null,
+    val error: ErrorCode? = null,
     val verificationCode: String? = null,
 )

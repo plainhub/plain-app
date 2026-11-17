@@ -1,5 +1,7 @@
 package com.ismartcoding.plain.ui.tools
 
+import com.ismartcoding.plain.models.BusinessException
+import com.ismartcoding.plain.models.ErrorCode
 import androidx.lifecycle.ViewModel
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.lifecycle.viewModelScope
@@ -20,7 +22,7 @@ internal val LocalManagedDeviceViewModel = staticCompositionLocalOf<ManagedDevic
 internal data class ManagedDeviceState(
     val client: ManagedDeviceClient? = null,
     val loading: Boolean = true,
-    val error: String? = null,
+    val error: Throwable? = null,
 )
 
 internal class ManagedDeviceViewModel(
@@ -37,9 +39,9 @@ internal class ManagedDeviceViewModel(
     }
 
     private suspend fun selectedPeer(): Peer {
-        val peer = readPeers().find { it.id == peerId } ?: error("peer_removed")
-        check(peer.isPaired() && peer.token.isNotEmpty()) { "no_permission" }
-        check(peer.publicKey == publicKey) { "peer_identity_changed" }
+        val peer = readPeers().find { it.id == peerId } ?: throw BusinessException(ErrorCode.PEER_REMOVED)
+        if (!(peer.isPaired() && peer.token.isNotEmpty())) throw BusinessException(ErrorCode.NO_PERMISSION)
+        if (!(peer.publicKey == publicKey)) throw BusinessException(ErrorCode.PEER_IDENTITY_CHANGED)
         return peer
     }
 
@@ -64,7 +66,7 @@ internal class ManagedDeviceViewModel(
             throw canceled
         } catch (error: Exception) {
             LogCat.e(error)
-            _state.value = _state.value.copy(loading = false, error = error.message ?: error.toString())
+            _state.value = _state.value.copy(loading = false, error = error)
             return false
         }
     }

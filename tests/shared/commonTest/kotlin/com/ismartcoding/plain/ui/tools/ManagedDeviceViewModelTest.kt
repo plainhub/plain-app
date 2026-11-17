@@ -39,7 +39,7 @@ class ManagedDeviceViewModelTest {
                     fixture.responseGate!!.complete(Unit)
                     runCurrent()
                     assertFalse(model.state.value.loading)
-                    assertEquals(if (entryFails) "HTTP 500" else null, model.state.value.error)
+                    if (entryFails) assertEquals(500, assertIs<com.ismartcoding.plain.rust.graphql.GraphqlHttpException>(model.state.value.error).status) else assertNull(model.state.value.error)
                     val previous = model.state.value
 
                     fixture.fail = false
@@ -74,7 +74,7 @@ class ManagedDeviceViewModelTest {
                 initializer { ManagedDeviceViewModel(fixture.peer.id, fixture.peer.publicKey, { listOf(fixture.currentPeer) }, { fixture.http }) }
             })[ManagedDeviceViewModel::class]
             runCurrent()
-            assertEquals("HTTP 500", model.state.value.error)
+            assertEquals(500, assertIs<com.ismartcoding.plain.rust.graphql.GraphqlHttpException>(model.state.value.error).status)
             assertNull(model.state.value.client)
             fixture.fail = false
             model.rename("Renamed remote")
@@ -86,7 +86,7 @@ class ManagedDeviceViewModelTest {
             fixture.fail = true
             assertFalse(model.refresh())
             assertEquals("Renamed remote", model.state.value.client?.currentInfo?.deviceName)
-            assertEquals("HTTP 500", model.state.value.error)
+            assertEquals(500, assertIs<com.ismartcoding.plain.rust.graphql.GraphqlHttpException>(model.state.value.error).status)
             fixture.fail = false
             assertTrue(model.refresh())
             assertNull(model.state.value.error)

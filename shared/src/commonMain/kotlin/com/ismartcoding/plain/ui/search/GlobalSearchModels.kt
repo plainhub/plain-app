@@ -91,7 +91,7 @@ internal class GlobalSearchDeviceState(val device: com.ismartcoding.plain.rust.g
     val loaded = mutableIntStateOf(0)
     val hits = mutableStateOf<List<GlobalSearchHit>>(emptyList())
     val loading = mutableStateOf(true)
-    val error = mutableStateOf<String?>(null)
+    val error = mutableStateOf<Throwable?>(null)
 }
 
 class GlobalSearchDomainState internal constructor(internal val devices: List<GlobalSearchDeviceState>) {
@@ -102,7 +102,7 @@ class GlobalSearchDomainState internal constructor(internal val devices: List<Gl
     internal val hasErrors = androidx.compose.runtime.derivedStateOf { devices.any { it.error.value != null } }
 }
 
-internal data class GlobalSearchDeviceError(val name: String, val message: String)
+internal data class GlobalSearchDeviceError(val name: String, val error: Throwable)
 internal data class GlobalSearchDevices(
     val devices: List<com.ismartcoding.plain.rust.graphql.ContentSource>,
     val errors: List<GlobalSearchDeviceError> = emptyList(),

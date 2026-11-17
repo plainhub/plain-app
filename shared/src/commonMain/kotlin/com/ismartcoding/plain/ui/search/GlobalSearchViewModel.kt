@@ -1,5 +1,7 @@
 package com.ismartcoding.plain.ui.search
 
+import com.ismartcoding.plain.models.BusinessException
+import com.ismartcoding.plain.models.ErrorCode
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
@@ -132,7 +134,7 @@ class GlobalSearchViewModel internal constructor(
                 }
             } catch (canceled: CancellationException) { throw canceled }
             catch (error: Exception) {
-                deviceErrors.value = listOf(GlobalSearchDeviceError(com.ismartcoding.plain.ui.i18n.LocaleHelper.getString(com.ismartcoding.plain.i18n.Res.string.devices), error.message ?: error.toString()))
+                deviceErrors.value = listOf(GlobalSearchDeviceError(com.ismartcoding.plain.ui.i18n.LocaleHelper.getString(com.ismartcoding.plain.i18n.Res.string.devices), error))
             } finally { if (revision == request) searching.value = false }
         }
     }
@@ -168,7 +170,7 @@ class GlobalSearchViewModel internal constructor(
             state.loaded.intValue = 0
             state.error.value = null
         } else {
-            state.error.value = error.message ?: error.toString()
+            state.error.value = error
         }
     }
     companion object {
@@ -178,7 +180,7 @@ class GlobalSearchViewModel internal constructor(
 }
 
 private fun Exception.isRemoteAccessDisabled(): Boolean =
-    this is GraphqlHttpException && status == 404 || message == "remote_access_disabled"
+    this is GraphqlHttpException && status == 404 || this is BusinessException && code == ErrorCode.REMOTE_ACCESS_DISABLED
 
 internal suspend fun searchDevices(
     readPeers: suspend () -> List<Peer> = { GraphqlApi.execute(Query.peers()) },
@@ -190,7 +192,7 @@ internal suspend fun searchDevices(
             GlobalSearchDevices(listOf(ContentSource.Remote(client)))
         } catch (canceled: CancellationException) { throw canceled }
         catch (error: Exception) {
-            GlobalSearchDevices(emptyList(), if (error.isRemoteAccessDisabled()) emptyList() else listOf(GlobalSearchDeviceError(peer.name, error.message ?: error.toString())))
+            GlobalSearchDevices(emptyList(), if (error.isRemoteAccessDisabled()) emptyList() else listOf(GlobalSearchDeviceError(peer.name, error)))
         }
     } }.awaitAll()
     GlobalSearchDevices(listOf(ContentSource.Local) + remote.flatMap { it.devices }, remote.flatMap { it.errors })

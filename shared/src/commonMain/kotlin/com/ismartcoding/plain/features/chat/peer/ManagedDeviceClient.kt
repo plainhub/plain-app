@@ -1,5 +1,7 @@
 package com.ismartcoding.plain.features.chat.peer
 
+import com.ismartcoding.plain.models.BusinessException
+import com.ismartcoding.plain.models.ErrorCode
 import com.ismartcoding.plain.features.chat.models.getBaseUrl
 
 import com.ismartcoding.plain.features.files.FileAction
@@ -66,7 +68,7 @@ internal class ManagedDeviceClient private constructor(
         api.execute(Query.appAccess()).also { access -> _info.value = _info.value.copy(access = access) }
 
     private val uploads = com.ismartcoding.plain.features.files.upload.UploadChunksClient({ id, index, bytes ->
-        http.uploadChunk(id, index, bytes, checkNotNull(currentInfo.tlsCertificateSha256) { "peer_https_unavailable" })
+        http.uploadChunk(id, index, bytes, currentInfo.tlsCertificateSha256 ?: throw BusinessException(ErrorCode.PEER_HTTPS_UNAVAILABLE))
     }, api)
 
     suspend fun writeChunks(path: String, chunks: Iterator<ByteArray>): Boolean = uploads.replace(path, chunks)
@@ -92,14 +94,14 @@ internal class ManagedDeviceClient private constructor(
         val fileId = http.encryptResourceReference(info.urlToken, path)
         val base = current.getBaseUrl()
         val url = managedResourceUrl(base, fileId, size, action)
-        return com.ismartcoding.plain.models.ManagedResource(url, checkNotNull(info.tlsCertificateSha256) { "peer_https_unavailable" })
+        return com.ismartcoding.plain.models.ManagedResource(url, info.tlsCertificateSha256 ?: throw BusinessException(ErrorCode.PEER_HTTPS_UNAVAILABLE))
     }
 
     suspend fun downloadFile(path: String, name: String): String {
         val request = resource(path, action = FileAction.DOWNLOAD)
         val downloaded = com.ismartcoding.plain.features.files.RemoteFiles.download(request.url, name, request.tlsCertificateSha256)
         val latest = GraphqlApi.execute(Query.peers()).find { it.id == peer.id }
-        check(latest?.isPaired() == true && latest.publicKey == peer.publicKey && latest.token == peer.token) { "peer_identity_changed" }
+        if (!(latest?.isPaired() == true && latest.publicKey == peer.publicKey && latest.token == peer.token)) throw BusinessException(ErrorCode.PEER_IDENTITY_CHANGED)
         return downloaded
     }
 }

@@ -20,7 +20,7 @@ class PairingProjectionTest {
         PairingProjection.started(PairingProgressNotice("peer", "Fixture", verificationCode = "01234567"))
         assertEquals("01234567", NearbyViewModel.pairingViews["peer"]?.verificationCode)
         assertEquals(NearbyItemStatus.PAIRING, NearbyViewModel.itemStatus["peer"])
-        PairingProjection.failed(PairingProgressNotice("peer", "Fixture", "password_required"))
+        PairingProjection.failed(PairingProgressNotice("peer", "Fixture", com.ismartcoding.plain.models.ErrorCode.PASSWORD_REQUIRED))
         assertEquals(PairingStep.PASSWORD_REQUIRED, NearbyViewModel.pairingViews["peer"]?.step)
         assertEquals(null, NearbyViewModel.itemStatus["peer"])
         PairingProjection.starting("peer")
