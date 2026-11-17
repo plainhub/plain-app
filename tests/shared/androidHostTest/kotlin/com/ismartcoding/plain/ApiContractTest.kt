@@ -6,6 +6,7 @@ import com.ismartcoding.plain.platform.system.Capability
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
+import kotlin.test.assertTrue
 import kotlin.test.fail
 
 class ApiContractTest {
@@ -45,8 +46,16 @@ class ApiContractTest {
             "setNotificationFilterMode", "clearNotificationFilterApps", "pairingCode", "isPairingRequestCurrent",
             "logoutPeer", "controlPeerStatus", "filePaths", "importNoteImage", "importPomodoroSound",
             "dlnaReceiver", "controlDlnaReceiver", "scanHistory", "addScanHistory", "removeScanHistory",
-            "acquireMdnsDebugSession", "releaseMdnsDebugSession", "vpnActive")) {
+            "vpnActive")) {
             if (Regex("(?m)^\\s*$name(?:\\(|:)").containsMatchIn(sdl)) fail("Internal operation exposed: $name")
+        }
+
+        // Core exposes authenticated, HTTP_SERVER-gated leases for Web diagnostics.
+        val mutations = operationFieldDeclarationsIn("Mutation")
+        for (name in listOf("acquireMdnsDebugSession", "releaseMdnsDebugSession")) {
+            assertTrue("$name(token: String!): Boolean!" in mutations, "Web diagnostics lease contract drifted: $name")
+            assertFalse(name in operationFieldNamesIn("Query"), "Lease changes must remain mutations: $name")
+            assertFalse(name in operationFieldNamesIn("Subscription"), "Lease changes must remain mutations: $name")
         }
     }
 
@@ -90,10 +99,10 @@ class ApiContractTest {
         val queries = operationFieldNamesIn("Query")
         val mutations = operationFieldNamesIn("Mutation")
         val subscriptions = operationFieldNamesIn("Subscription")
-        if (queries.size != 124 || mutations.size != 175 || subscriptions.size != 35) {
+        if (queries.size != 125 || mutations.size != 179 || subscriptions.size != 36) {
             fail(
                 "Shared Rust schema fragments declare ${queries.size} Query / ${mutations.size} " +
-                    "Mutation and ${subscriptions.size} Subscription operations — the contract has 124 / 175 / 35. The snapshot looks truncated or " +
+                    "Mutation and ${subscriptions.size} Subscription operations — the contract has 125 / 179 / 36. The snapshot looks truncated or " +
                     "drifted; every check in this class reads it, so they would pass on an empty file.",
             )
         }
@@ -102,8 +111,10 @@ class ApiContractTest {
     @Test
     fun hostCallbacksAreNotExposedAsSubscriptions() {
         val subscriptions = operationFieldNamesIn("Subscription")
+        // The Web snapshot is an intentional public subscription, unlike the native callbacks below.
+        assertTrue("httpServerChanged: HttpServer!" in operationFieldDeclarationsIn("Subscription"))
         for (name in listOf("networkChanged", "audioLibraryChanged", "clipboardHistoryChanged",
-            "httpServerChanged", "onlineClientsUpdated", "peerClipboardChanged",
+            "onlineClientsUpdated", "peerClipboardChanged",
             "sharedFolderDownloadsChanged", "dlnaRendererChanged", "dlnaSenderUpdated",
             "peerTransportsUpdated", "appUpdateDownloadUpdated", "feedSyncUpdated",
             "audioPlaybackChanged", "pairingSucceeded")) {
@@ -132,14 +143,26 @@ class ApiContractTest {
 
     @Test
     fun idSuffixedFieldsUseTheIdScalar() {
+        val auditSnapshotIds = mutableMapOf(
+            "EventDisk.id" to "String", // Captured platform disk identifier.
+            "EventVolume.id" to "String", // Captured platform volume identifier.
+            "EventSession.clientId" to "String!", // Captured identity, not the current Session entity field.
+        )
         forEachTypedField { (owner, name, type) ->
+            val field = "$owner.$name"
+            val auditType = auditSnapshotIds.remove(field)
+            if (auditType != null) {
+                assertEquals(auditType, type, "Audit snapshot wire type changed: $field")
+                return@forEachTypedField
+            }
             val isIdName = isIdName(name)
             if (!isIdName) return@forEachTypedField
             val usesIdScalar = type.startsWith("ID") || type.startsWith("[ID")
             if (!usesIdScalar && owner !in stringIdAllowlist && name !in stringIdAllowlist) {
-                fail("Field $owner.$name is typed '$type' — id-suffixed fields must use the ID scalar (spec §IDs).")
+                fail("Field $field is typed '$type' — id-suffixed fields must use the ID scalar (spec §IDs).")
             }
         }
+        assertTrue(auditSnapshotIds.isEmpty(), "Missing audit snapshot fields: ${auditSnapshotIds.keys}")
     }
 
     @Test
@@ -343,11 +366,9 @@ class ApiContractTest {
     }
 
     /**
-     * Every operation declared by one root block, by name. Unlike
-     * [operationSignaturesIn] this counts argument-less fields too, which is
-     * what a coverage check needs.
+     * Every operation declaration in one root, including argument-less fields.
      */
-    private fun operationFieldNamesIn(block: String): List<String> {
+    private fun operationFieldDeclarationsIn(block: String): List<String> {
         var inside = false
         val out = mutableListOf<String>()
         var inDescription = false
@@ -363,10 +384,13 @@ class ApiContractTest {
                 return@forEach
             }
             if (line.isEmpty() || line.startsWith("#")) return@forEach
-            Regex("^(\\w+)[(:]").find(line)?.let { out.add(it.groupValues[1]) }
+            if (Regex("^\\w+[(:]").containsMatchIn(line)) out.add(line)
         }
         return out
     }
+
+    private fun operationFieldNamesIn(block: String): List<String> =
+        operationFieldDeclarationsIn(block).map { it.substringBefore('(').substringBefore(':') }
 
     private fun forbiddenPattern(pattern: String, message: (String) -> String) {
         val regex = Regex(pattern)
