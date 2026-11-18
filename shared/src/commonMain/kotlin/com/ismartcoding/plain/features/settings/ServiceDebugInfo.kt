@@ -41,7 +41,7 @@ fun getServiceDebugInfo(): ServiceDebugInfo {
     val awareRunning = wifiAwareAttached.value
 
     return ServiceDebugInfo(
-        httpServerRunning = httpState == ServiceState.ON,
+        httpServerRunning = httpState == ServiceState.STARTED,
         httpServerState = httpState.name,
         httpPort = Prefs.httpPort.value,
         httpsPort = Prefs.httpsPort.value,

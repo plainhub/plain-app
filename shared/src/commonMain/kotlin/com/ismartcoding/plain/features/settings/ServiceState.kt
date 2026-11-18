@@ -1,19 +1,13 @@
 package com.ismartcoding.plain.features.settings
 
-import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
 enum class ServiceState {
-    @SerialName("STOPPED")
-    OFF,
-    @SerialName("STARTED")
-    ON,
-    @SerialName("STARTING")
+    STOPPED,
+    STARTED,
     STARTING,
-    @SerialName("STOPPING")
     STOPPING,
-    @SerialName("ERROR")
     ERROR;
 
     fun isProcessing(): Boolean {

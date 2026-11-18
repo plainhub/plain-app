@@ -26,7 +26,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.distinctUntilChanged
 
-internal enum class ResourceSize(val queryValue: String) { SM("SM"), LG("LG") }
+internal enum class ResourceSize { SM, LG }
 
 internal class ManagedDeviceClient private constructor(
     private val peer: Peer,
@@ -114,6 +114,6 @@ internal fun managedResourceUrl(base: String, fileId: String, size: ResourceSize
         append("/fs?id=")
         append(fileId.urlEncode())
         append("&action=")
-        append(action.queryValue)
-        size?.let { append("&size=").append(it.queryValue) }
+        append(action.name)
+        size?.let { append("&size=").append(it.name) }
     }

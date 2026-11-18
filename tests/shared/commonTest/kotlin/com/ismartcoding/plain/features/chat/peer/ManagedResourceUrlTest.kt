@@ -30,6 +30,18 @@ class ManagedResourceUrlTest {
     }
 
     @Test
+    fun probeAndTranscodeUseExistingWireValues() {
+        assertEquals(
+            "https://device.invalid/fs?id=opaque&action=PROBE",
+            managedResourceUrl("https://device.invalid", "opaque", null, FileAction.PROBE),
+        )
+        assertEquals(
+            "https://device.invalid/fs?id=opaque&action=TRANSCODE",
+            managedResourceUrl("https://device.invalid", "opaque", null, FileAction.TRANSCODE),
+        )
+    }
+
+    @Test
     fun fullResourceDoesNotRequestAThumbnail() {
         assertEquals(
             "https://device.invalid:8443/fs?id=opaque&action=PREVIEW",

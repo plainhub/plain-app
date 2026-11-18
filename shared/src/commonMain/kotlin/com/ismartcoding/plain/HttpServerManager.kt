@@ -18,10 +18,10 @@ import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.MutableStateFlow
 
 object HttpServerManager {
-    val httpServerState = MutableStateFlow(ServiceState.OFF)
+    val httpServerState = MutableStateFlow(ServiceState.STOPPED)
     val httpServerError = MutableStateFlow("")
     val httpServerResourcesError = MutableStateFlow("")
-    val foregroundServiceState = MutableStateFlow(ServiceState.OFF)
+    val foregroundServiceState = MutableStateFlow(ServiceState.STOPPED)
     val foregroundServiceError = MutableStateFlow("")
 
     fun setBackgroundServiceEnabled(enable: Boolean) = coIO {

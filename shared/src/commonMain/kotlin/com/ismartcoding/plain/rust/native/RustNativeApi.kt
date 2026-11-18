@@ -71,7 +71,7 @@ internal object RustNativeApi {
 
     suspend fun resetAdbToken(): Boolean = nativeCall { RustNativeBindings.resetAdbToken() }
 
-    suspend fun setNotificationFilterMode(mode: NotificationFilterMode): Boolean = nativeCall { RustNativeBindings.setNotificationFilterMode(mode.name.lowercase()) }
+    suspend fun setNotificationFilterMode(mode: NotificationFilterMode): Boolean = nativeCall { RustNativeBindings.setNotificationFilterMode(mode.name) }
 
     suspend fun clearNotificationFilterApps(): Boolean = nativeCall { RustNativeBindings.clearNotificationFilterApps() }
 

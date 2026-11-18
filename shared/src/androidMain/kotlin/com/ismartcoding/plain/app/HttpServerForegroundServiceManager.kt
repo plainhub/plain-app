@@ -53,7 +53,7 @@ internal object HttpServerForegroundServiceManager {
     }
 
     private fun start() {
-        if (HttpServerManager.foregroundServiceState.value == ServiceState.ON ||
+        if (HttpServerManager.foregroundServiceState.value == ServiceState.STARTED ||
             HttpServerManager.foregroundServiceState.value == ServiceState.STARTING) return
         HttpServerManager.foregroundServiceState.value = ServiceState.STARTING
         HttpServerManager.foregroundServiceError.value = ""
@@ -74,7 +74,7 @@ internal object HttpServerForegroundServiceManager {
         HttpServerManager.foregroundServiceState.value = if (HttpServerForegroundService.isRunning()) {
             ServiceState.STOPPING
         } else {
-            ServiceState.OFF
+            ServiceState.STOPPED
         }
         HttpServerManager.foregroundServiceError.value = ""
     }

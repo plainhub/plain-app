@@ -40,7 +40,7 @@ internal object HttpServerResources {
         get() = httpStarted == true && Prefs.remoteAccess.value && com.ismartcoding.plain.features.web.AccessFeature.NOTIFICATIONS in Prefs.apiAccessFeatures.value
 
     fun observe() = scope.launch(start = CoroutineStart.UNDISPATCHED) {
-        val httpUpdates = HttpServerManager.httpServerState.map { HttpStatusUpdate(it == ServiceState.ON) }
+        val httpUpdates = HttpServerManager.httpServerState.map { HttpStatusUpdate(it == ServiceState.STARTED) }
         merge(
             httpUpdates,
             combine(

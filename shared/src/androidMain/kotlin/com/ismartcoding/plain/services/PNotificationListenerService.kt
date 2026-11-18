@@ -71,7 +71,8 @@ class PNotificationListenerService : NotificationListenerService() {
             } else {
                 notificationActions.remove(n.id)
             }
-            coIO { RustNotificationEvents.publish(if (old == null) NotificationChange.CREATED else NotificationChange.UPDATED, n) }
+            val change = if (old == null) NotificationChange.NOTIFICATION_CREATED else NotificationChange.NOTIFICATION_UPDATED
+            coIO { RustNotificationEvents.publish(change, n) }
 
         }
     }
@@ -83,7 +84,7 @@ class PNotificationListenerService : NotificationListenerService() {
             if (old != null) {
                 notifications.remove(old)
                 notificationActions.remove(old.id)
-                coIO { RustNotificationEvents.publish(NotificationChange.DELETED, old) }
+                coIO { RustNotificationEvents.publish(NotificationChange.NOTIFICATION_DELETED, old) }
             }
         }
     }

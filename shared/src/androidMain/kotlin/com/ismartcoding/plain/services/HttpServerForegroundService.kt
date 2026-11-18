@@ -51,7 +51,7 @@ class HttpServerForegroundService : LifecycleService() {
             return START_NOT_STICKY
         }
 
-        HttpServerManager.foregroundServiceState.value = ServiceState.ON
+        HttpServerManager.foregroundServiceState.value = ServiceState.STARTED
 
         return START_STICKY
     }
@@ -61,7 +61,7 @@ class HttpServerForegroundService : LifecycleService() {
         super.onDestroy()
         stopForeground(STOP_FOREGROUND_REMOVE)
         if (HttpServerManager.foregroundServiceState.value != ServiceState.ERROR) {
-            HttpServerManager.foregroundServiceState.value = ServiceState.OFF
+            HttpServerManager.foregroundServiceState.value = ServiceState.STOPPED
         }
     }
 
