@@ -8,6 +8,8 @@ import com.ismartcoding.plain.rust.graphql.GraphqlApi
 import com.ismartcoding.plain.rust.graphql.selectionQuery
 
 object ClipboardClient {
+    internal val directions = ClipboardDirectionsClient()
+
     suspend fun getPage(limit: Int, offset: Int, query: String = ""): List<ClipboardItem> =
         GraphqlApi.execute(Query.clipboardItems(limit, offset, query))
 

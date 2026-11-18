@@ -150,6 +150,10 @@
     <string name="ws_session_count">WebSocket oturumları</string>
     <string name="clipboard_sync">Pano senkronizasyonu</string>
     <string name="clipboard_sync_tips">Açıldığında, bu telefonda kopyaladığınız metin masaüstlerinize otomatik senkronize edilir; masaüstlerinde kopyalanan metin de bu telefona gönderilir.</string>
+    <string name="clipboard_send_only">Yalnızca gönder</string>
+    <string name="clipboard_receive_only">Yalnızca al</string>
+    <string name="clipboard_both_directions">Her iki yönde</string>
+    <string name="clipboard_no_managed_devices">Uzaktan erişilebilen cihaz yok</string>
     <string name="clipboard_history">Pano geçmişi</string>
     <string name="clipboard_source_local">Bu cihaz</string>
     <string name="clipboard_sync_tips_dir">Her masaüstünün neyi senkronize edeceğini masaüstü ayarlarından seçin.</string>

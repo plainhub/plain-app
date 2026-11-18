@@ -150,6 +150,10 @@
     <string name="ws_session_count">WebSocket-Sitzungen</string>
     <string name="clipboard_sync">Zwischenablage-Sync</string>
     <string name="clipboard_sync_tips">Nach dem Aktivieren: Kopierter Text wird automatisch an deine Desktops übertragen, und kopierter Desktop-Text wird an dieses Handy gesendet.</string>
+    <string name="clipboard_send_only">Nur senden</string>
+    <string name="clipboard_receive_only">Nur empfangen</string>
+    <string name="clipboard_both_directions">Beide Richtungen</string>
+    <string name="clipboard_no_managed_devices">Keine Geräte mit Fernzugriff</string>
     <string name="clipboard_history">Zwischenablage-Verlauf</string>
     <string name="clipboard_source_local">Dieses Gerät</string>
     <string name="clipboard_sync_tips_dir">Was jeder Desktop synchronisiert, wählst du in den Desktop-Einstellungen.</string>

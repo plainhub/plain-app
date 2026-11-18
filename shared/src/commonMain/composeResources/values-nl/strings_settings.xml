@@ -150,6 +150,10 @@
     <string name="ws_session_count">WebSocket-sessies</string>
     <string name="clipboard_sync">Klembord synchronisatie</string>
     <string name="clipboard_sync_tips">Eenmaal aan: tekst die je op dit telefoontoestel kopieert, wordt gesynchroniseerd met je desktops, en tekst die op desktops wordt gekopieerd, wordt naar dit toestel gestuurd.</string>
+    <string name="clipboard_send_only">Alleen verzenden</string>
+    <string name="clipboard_receive_only">Alleen ontvangen</string>
+    <string name="clipboard_both_directions">Beide richtingen</string>
+    <string name="clipboard_no_managed_devices">Geen apparaten met externe toegang</string>
     <string name="clipboard_history">Klembordgeschiedenis</string>
     <string name="clipboard_source_local">Dit apparaat</string>
     <string name="clipboard_sync_tips_dir">Kies wat elke desktop synchroniseert in de desktopinstellingen.</string>

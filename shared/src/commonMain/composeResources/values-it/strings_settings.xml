@@ -150,6 +150,10 @@
     <string name="ws_session_count">Sessioni WebSocket</string>
     <string name="clipboard_sync">Sincronizzazione appunti</string>
     <string name="clipboard_sync_tips">Una volta attivo, il testo copiato su questo telefono si sincronizza con i tuoi desktop, e il testo copiato sui desktop viene inviato a questo telefono.</string>
+    <string name="clipboard_send_only">Solo invio</string>
+    <string name="clipboard_receive_only">Solo ricezione</string>
+    <string name="clipboard_both_directions">Entrambe le direzioni</string>
+    <string name="clipboard_no_managed_devices">Nessun dispositivo con accesso remoto</string>
     <string name="clipboard_history">Cronologia appunti</string>
     <string name="clipboard_source_local">Questo dispositivo</string>
     <string name="clipboard_sync_tips_dir">Scegli cosa sincronizza ogni desktop nelle impostazioni del desktop.</string>

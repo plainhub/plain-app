@@ -16,6 +16,9 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import org.jetbrains.compose.resources.painterResource
@@ -53,6 +56,8 @@ fun ClipboardHistoryPage(
 ) {
     val scope = rememberCoroutineScope()
     val items by vm.itemsFlow.collectAsState()
+    var showSettings by remember { mutableStateOf(false) }
+    if (showSettings) ClipboardDirectionSettingsDialog(onDismiss = { showSettings = false })
 
     DisposableEffect(vm) {
         ClipboardHistoryViewModel.attach(vm)
@@ -76,8 +81,12 @@ fun ClipboardHistoryPage(
                 onNavigateBack = { navController.navigateUp() },
                 title = stringResource(Res.string.clipboard_history),
                 actions = {
-                    if (items.isNotEmpty()) {
-                        ActionButtonMoreWithMenu { dismiss ->
+                    ActionButtonMoreWithMenu { dismiss ->
+                        PDropdownMenuItem(
+                            text = { Text(stringResource(Res.string.settings)) },
+                            onClick = { dismiss(); showSettings = true },
+                        )
+                        if (items.isNotEmpty()) {
                             PDropdownMenuItem(
                                 leadingIcon = {
                                     Icon(
