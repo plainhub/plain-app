@@ -88,6 +88,8 @@
     <string name="tv">TV và máy chiếu</string>
     <string name="delete_peer_warning">Xóa thiết bị này cũng sẽ xóa tất cả tin nhắn trò chuyện. Hành động này không thể hoàn tác.</string>
     <string name="forward">Tiếp tục</string>
+    <string name="forward_note_optional">Ghi chú (không bắt buộc)</string>
+    <string name="forward_unconfirmed">Không thể xác nhận đã chuyển tiếp. Hãy kiểm tra các cuộc trò chuyện nhận trước khi gửi lại.</string>
     <string name="sent">Đã gửi</string>
     <string name="device_type">Loại thiết bị</string>
     <string name="port">Cổng</string>

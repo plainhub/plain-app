@@ -334,7 +334,7 @@ fun ChatPage(
         onDismissFolder = { showFolderShareSheet = false },
         forwardMessage = messageToForward.takeIf { showForwardDialog },
         onDismissForward = { showForwardDialog = false; messageToForward = null },
-        onForward = { message, targets -> chatVM.forwardMessage(message.id, targets) },
+        onForward = { message, targets, note -> chatVM.forwardMessage(message.id, targets, note) },
     )
     }
 }

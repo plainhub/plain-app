@@ -31,7 +31,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.ismartcoding.plain.features.chat.data.ChatTargetType
-import com.ismartcoding.plain.i18n.Res
 import com.ismartcoding.plain.ui.resources.send as ui_drawable_send
 import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.components.CheckCircle
@@ -40,7 +39,7 @@ import com.ismartcoding.plain.ui.resources.Res as UiRes
 
 /**
  * Multi-select chat target list used by the share sheet and the forward
- * dialog: local chat pinned first, then Channels / Devices sections, with a
+ * dialog: local chat pinned first, followed by channels and peers, with a
  * circular confirm button that shows the selection count (and a spinner
  * while [sending]). Selection state is owned by the caller ([selectedIds]
  * holds [com.ismartcoding.plain.features.chat.data.ChatTarget.encodedToId] values).
@@ -54,31 +53,31 @@ fun ChatTargetPicker(
     onConfirm: () -> Unit,
     enabled: Boolean = true,
     sending: Boolean = false,
+    beforeConfirm: @Composable () -> Unit = {},
 ) {
     val localOption = options.first { it.target.isLocal() }
     val channelOptions = options.filter { it.target.type == ChatTargetType.CHANNEL }
     val peerOptions = options.filter { !it.target.isLocal() && it.target.type == ChatTargetType.PEER }
 
-    LazyColumn(
-        modifier = Modifier.fillMaxWidth().heightIn(max = 360.dp),
-        verticalArrangement = Arrangement.spacedBy(8.dp),
-    ) {
-        item { TargetRow(localOption, selectedIds.contains(localOption.target.encodedToId), enabled, onToggle) }
-        items(channelOptions, key = { it.target.encodedToId }) {
-            TargetRow(it, selectedIds.contains(it.target.encodedToId), enabled, onToggle)
+    Column {
+        LazyColumn(
+            modifier = Modifier.weight(1f, fill = false).fillMaxWidth().heightIn(max = 360.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+        ) {
+            items(listOf(localOption) + channelOptions + peerOptions, key = { it.target.encodedToId }) {
+                TargetRow(it, selectedIds.contains(it.target.encodedToId), enabled, onToggle)
+            }
         }
-        items(peerOptions, key = { it.target.encodedToId }) {
-            TargetRow(it, selectedIds.contains(it.target.encodedToId), enabled, onToggle)
-        }
-    }
 
-    VerticalSpace(16.dp)
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier.fillMaxWidth().padding(16.dp),
-    ) {
-        Spacer(modifier = Modifier.weight(1f))
-        SendButton(count = selectedIds.size, enabled = selectedIds.isNotEmpty() && enabled && !sending, sending = sending, onClick = onConfirm)
+        beforeConfirm()
+        VerticalSpace(16.dp)
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.fillMaxWidth().padding(16.dp),
+        ) {
+            Spacer(modifier = Modifier.weight(1f))
+            SendButton(count = selectedIds.size, enabled = selectedIds.isNotEmpty() && enabled && !sending, sending = sending, onClick = onConfirm)
+        }
     }
 }
 

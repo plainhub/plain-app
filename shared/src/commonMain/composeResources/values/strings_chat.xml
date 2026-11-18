@@ -125,6 +125,8 @@
     <string name="tv">TV &amp; projector</string>
     <string name="delete_peer_warning">Deleting this device will also delete all related chat messages. This action cannot be undone.</string>
     <string name="forward">Forward</string>
+    <string name="forward_note_optional">Note (optional)</string>
+    <string name="forward_unconfirmed">Could not confirm forwarding. Check the destination chats before sending again.</string>
     <string name="sent">Sent</string>
     <string name="device_type">Device type</string>
     <string name="port">Port</string>

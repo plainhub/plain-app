@@ -88,6 +88,8 @@
     <string name="tv">TV &amp; Projektor</string>
     <string name="delete_peer_warning">Das Löschen dieses Geräts wird auch alle zugehörigen Chat-Nachrichten löschen. Diese Aktion kann nicht rückgängig gemacht werden.</string>
     <string name="forward">Weiterleiten</string>
+    <string name="forward_note_optional">Notiz (optional)</string>
+    <string name="forward_unconfirmed">Weiterleitung nicht bestätigt. Prüfe die Zielchats, bevor du erneut sendest.</string>
     <string name="sent">Gesendet</string>
     <string name="device_type">Gerätetyp</string>
     <string name="port">Anschluss</string>

@@ -62,9 +62,9 @@ object Mutation {
         field = "editChatText",
     )
 
-    fun forwardChatItems(id: String, targets: Collection<String>): GraphqlRequest<List<ChatItem>> = GraphqlRequest(
-        $$"mutation($id: ID!, $targets: [String!]!) { forwardChatItems(id: $id, targets: $targets) { $${Fragments.CHAT_ITEM} } }",
-        mapOf(variable("id", id), variable("targets", targets)),
+    fun forwardChatItems(id: String, targets: Collection<String>, note: String?): GraphqlRequest<List<ChatItem>> = GraphqlRequest(
+        $$"mutation($id: ID!, $targets: [String!]!, $note: String) { forwardChatItems(id: $id, targets: $targets, note: $note) { $${Fragments.CHAT_ITEM} } }",
+        mapOf(variable("id", id), variable("targets", targets), variable("note", note)),
         field = "forwardChatItems",
     )
 

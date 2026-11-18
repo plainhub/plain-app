@@ -88,6 +88,8 @@
     <string name="tv">TV &amp; プロジェクター</string>
     <string name="delete_peer_warning">このデバイスを削除すると、関連するすべてのチャットメッセージも削除されます。この操作は元に戻せません。</string>
     <string name="forward">転送</string>
+    <string name="forward_note_optional">メモ（任意）</string>
+    <string name="forward_unconfirmed">転送を確認できませんでした。再送信する前に転送先のチャットを確認してください。</string>
     <string name="sent">送信済み</string>
     <string name="device_type">デバイスタイプ</string>
     <string name="port">ポート</string>

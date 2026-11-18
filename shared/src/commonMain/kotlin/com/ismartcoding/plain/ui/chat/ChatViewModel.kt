@@ -17,6 +17,7 @@ import com.ismartcoding.plain.features.chat.ChatStatus
 import com.ismartcoding.plain.models.ChatItem
 import com.ismartcoding.plain.i18n.Res
 import com.ismartcoding.plain.i18n.sent
+import com.ismartcoding.plain.i18n.send_failed
 import com.ismartcoding.plain.lib.withIO
 import com.ismartcoding.plain.ui.components.DialogHelper
 import com.ismartcoding.plain.ui.state.ISelectableViewModel
@@ -168,12 +169,13 @@ class ChatViewModel internal constructor(
         }
     }
 
-    fun forwardMessage(messageId: String, targets: List<ChatTarget>) {
-        launchSafe {
-            val items = client.forward(messageId, targets)
-            if (items.isNotEmpty() && items.all { it.status == ChatStatus.SENT }) {
-                DialogHelper.showSuccess(Res.string.sent)
-            }
+    suspend fun forwardMessage(messageId: String, targets: List<ChatTarget>, note: String?) {
+        val items = client.forward(messageId, targets, note)
+        check(items.isNotEmpty()) { "Empty forwarding response" }
+        if (items.all { it.status == ChatStatus.SENT }) {
+            DialogHelper.showSuccess(Res.string.sent)
+        } else if (items.any { it.status == ChatStatus.FAILED || it.status == ChatStatus.PARTIAL }) {
+            DialogHelper.showMessage(Res.string.send_failed)
         }
     }
 

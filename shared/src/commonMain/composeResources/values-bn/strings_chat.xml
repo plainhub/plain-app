@@ -88,6 +88,8 @@
     <string name="tv">টিভি এবং প্রজেক্টর</string>
     <string name="delete_peer_warning">এই ডিভাইসটি মুছে ফেলা সমস্ত সম্পর্কিত চ্যাট বার্তা মুছে ফেলবে। এই ক্রিয়াটি পূর্বাবস্থায় ফেরানো যাবে না।</string>
     <string name="forward">সরাসরি</string>
+    <string name="forward_note_optional">বার্তা (ঐচ্ছিক)</string>
+    <string name="forward_unconfirmed">ফরওয়ার্ড হয়েছে কি না নিশ্চিত করা যায়নি। আবার পাঠানোর আগে প্রাপকদের চ্যাট দেখুন।</string>
     <string name="sent">পাঠানো</string>
     <string name="device_type">ডিভাইসের ধরণ</string>
     <string name="port">পোর্ট</string>

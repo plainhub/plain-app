@@ -6,7 +6,7 @@ import com.ismartcoding.plain.features.chat.ShareSendClient
 import com.ismartcoding.plain.features.chat.data.ChatTarget
 import com.ismartcoding.plain.lib.TimeHelper
 import com.ismartcoding.plain.ui.chat.components.FolderShareSheet
-import com.ismartcoding.plain.ui.chat.components.ForwardTargetDialog
+import com.ismartcoding.plain.ui.chat.components.ForwardChatDialog
 import kotlinx.coroutines.launch
 
 @Composable
@@ -16,7 +16,7 @@ internal fun ChatPageDialogs(
     onDismissFolder: () -> Unit,
     forwardMessage: VChat?,
     onDismissForward: () -> Unit,
-    onForward: (VChat, List<ChatTarget>) -> Unit,
+    onForward: suspend (VChat, List<ChatTarget>, String?) -> Unit,
 ) {
     val scope = rememberCoroutineScope()
     val source = com.ismartcoding.plain.ui.navigation.LocalContentSource.current
@@ -32,12 +32,10 @@ internal fun ChatPageDialogs(
         )
     }
     if (forwardMessage != null) {
-        ForwardTargetDialog(
+        ForwardChatDialog(
+            messageId = forwardMessage.id,
             onDismiss = onDismissForward,
-            onTargetsSelected = { targets ->
-                onForward(forwardMessage, targets)
-                onDismissForward()
-            },
+            onForward = { targets, note -> onForward(forwardMessage, targets, note) },
         )
     }
 }

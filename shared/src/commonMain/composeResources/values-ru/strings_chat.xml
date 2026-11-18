@@ -88,6 +88,8 @@
     <string name="tv">ТВ и проектор</string>
     <string name="delete_peer_warning">Удаление этого устройства также удалит все связанные сообщения чата. Это действие нельзя отменить.</string>
     <string name="forward">Передать</string>
+    <string name="forward_note_optional">Примечание (необязательно)</string>
+    <string name="forward_unconfirmed">Не удалось подтвердить пересылку. Перед повторной отправкой проверьте чаты получателей.</string>
     <string name="sent">Отправлено</string>
     <string name="device_type">Тип устройства</string>
     <string name="port">Порт</string>

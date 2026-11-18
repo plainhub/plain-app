@@ -88,6 +88,8 @@
     <string name="tv">டிவி மற்றும் புரொஜெக்டர்</string>
     <string name="delete_peer_warning">இந்த சாதனத்தை நீக்குவது அனைத்து தொடர்புடைய அரட்டை செய்திகளையும் நீக்கும். இந்த செயலை மாற்ற முடியாது.</string>
     <string name="forward">முன்னோக்கி</string>
+    <string name="forward_note_optional">குறிப்பு (விருப்பம்)</string>
+    <string name="forward_unconfirmed">முன்னனுப்பியதை உறுதிப்படுத்த முடியவில்லை. மீண்டும் அனுப்பும் முன் பெறுநர்களின் அரட்டைகளைச் சரிபார்க்கவும்.</string>
     <string name="sent">அனுப்பியது</string>
     <string name="device_type">சாதன வகை</string>
     <string name="port">போர்ட்</string>

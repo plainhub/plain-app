@@ -8,7 +8,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import com.ismartcoding.plain.features.chat.data.ChatTarget
 import com.ismartcoding.plain.i18n.Res
-import com.ismartcoding.plain.ui.resources.forward as ui_drawable_forward
 import com.ismartcoding.plain.ui.base.BottomSpace
 import com.ismartcoding.plain.ui.base.PBottomSheetTopAppBar
 import com.ismartcoding.plain.ui.base.PModalBottomSheet
@@ -23,20 +22,31 @@ import com.ismartcoding.plain.i18n.forward
 @Composable
 fun ForwardTargetDialog(
     onDismiss: () -> Unit,
-    onTargetsSelected: (List<ChatTarget>) -> Unit
+    onTargetsSelected: (List<ChatTarget>) -> Unit,
+    enabled: Boolean = true,
+    sending: Boolean = false,
+    beforeConfirm: @Composable () -> Unit = {},
 ) {
     val options = chatTargetOptions()
     val selectedIds = remember { mutableStateListOf<String>() }
 
-    PModalBottomSheet(onDismissRequest = onDismiss, modifier = Modifier.fillMaxWidth()) {
+    val eligibleSelection = options.filter { it.target.encodedToId in selectedIds }
+    PModalBottomSheet(
+        onDismissRequest = onDismiss,
+        modifier = Modifier.fillMaxWidth(),
+        sheetGesturesEnabled = !sending,
+    ) {
         PBottomSheetTopAppBar(title = stringResource(Res.string.forward))
         ChatTargetPicker(
             options = options,
-            selectedIds = selectedIds.toList(),
+            selectedIds = eligibleSelection.map { it.target.encodedToId },
             onToggle = { id -> if (!selectedIds.remove(id)) selectedIds.add(id) },
             onConfirm = {
-                onTargetsSelected(options.filter { selectedIds.contains(it.target.encodedToId) }.map { it.target })
+                if (enabled && !sending && eligibleSelection.isNotEmpty()) onTargetsSelected(eligibleSelection.map { it.target })
             },
+            enabled = enabled,
+            sending = sending,
+            beforeConfirm = beforeConfirm,
         )
         BottomSpace()
     }

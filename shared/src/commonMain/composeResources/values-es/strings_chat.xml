@@ -88,6 +88,8 @@
     <string name="tv">TV y proyector</string>
     <string name="delete_peer_warning">Eliminar este dispositivo también eliminará todos los mensajes de chat. Esta acción no se puede deshacer.</string>
     <string name="forward">Reenviar</string>
+    <string name="forward_note_optional">Nota (opcional)</string>
+    <string name="forward_unconfirmed">No se pudo confirmar el reenvío. Revisa los chats de destino antes de volver a enviarlo.</string>
     <string name="sent">Enviado</string>
     <string name="device_type">Tipo de dispositivo</string>
     <string name="port">Puerto</string>

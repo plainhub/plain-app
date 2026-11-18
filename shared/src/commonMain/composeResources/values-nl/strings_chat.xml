@@ -88,6 +88,8 @@
     <string name="tv">TV en projector</string>
     <string name="delete_peer_warning">Het verwijderen van dit apparaat zal ook alle gerelateerde chatberichten verwijderen. Deze actie kan niet ongedaan worden gemaakt.</string>
     <string name="forward">Voorwaarts</string>
+    <string name="forward_note_optional">Opmerking (optioneel)</string>
+    <string name="forward_unconfirmed">Doorsturen kon niet worden bevestigd. Controleer de doelchats voordat je opnieuw verzendt.</string>
     <string name="sent">Verzonden</string>
     <string name="device_type">Apparaattype</string>
     <string name="port">Poort</string>

@@ -31,8 +31,8 @@ open class ChatApi internal constructor(private val api: com.ismartcoding.plain.
     suspend fun sendText(target: ChatTarget, text: String): ChatItem =
         sendContent(target, MessageContent(MessageType.MESSAGE, ChatMessage(text = text)))
 
-    suspend fun forward(id: String, targets: List<ChatTarget>): List<ChatItem> =
-        api.execute(Mutation.forwardChatItems(id, targets.map { it.encodedToId }))
+    suspend fun forward(id: String, targets: List<ChatTarget>, note: String?): List<ChatItem> =
+        api.execute(Mutation.forwardChatItems(id, targets.map { it.encodedToId }, note?.takeIf { it.isNotBlank() }))
 
     suspend fun deleteQuery(query: String): Int =
         api.execute(Mutation.deleteChatItems(query)).affectedCount

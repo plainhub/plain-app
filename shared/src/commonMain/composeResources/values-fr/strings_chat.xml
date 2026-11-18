@@ -88,6 +88,8 @@
     <string name="tv">TV &amp; projecteur</string>
     <string name="delete_peer_warning">Supprimer cet appareil supprimera également tous les messages de chat. Cette action ne peut pas être annulée.</string>
     <string name="forward">Transférer</string>
+    <string name="forward_note_optional">Note (facultative)</string>
+    <string name="forward_unconfirmed">Impossible de confirmer le transfert. Consultez les conversations de destination avant de renvoyer le message.</string>
     <string name="sent">Envoyé</string>
     <string name="device_type">Type d'appareil</string>
     <string name="port">Port</string>
