@@ -71,8 +71,8 @@ internal fun ImageEditorProperties(layer: EditorLayer, update: (EditorLayer) -> 
                 is StickerLayer -> {
                     PTextField(false, layer.text, textLabel, singleLine = false, showPasteAction = false, onValueChange = { update(layer.copy(text = it)) })
                     EditorNumberField(stringResource(Res.string.image_editor_font_size), layer.fontSize, 1.0..500.0) { update(layer.copy(fontSize = it)) }
-                    EditorToggle(stringResource(Res.string.image_editor_bold), layer.fontWeight == "bold") { update(layer.copy(fontWeight = if (it) "bold" else "normal")) }
-                    EditorToggle(stringResource(Res.string.image_editor_italic), layer.fontStyle == "italic") { update(layer.copy(fontStyle = if (it) "italic" else "normal")) }
+                    EditorToggle(stringResource(Res.string.image_editor_bold), layer.fontWeight == EditorFontWeight.BOLD) { update(layer.copy(fontWeight = if (it) EditorFontWeight.BOLD else EditorFontWeight.NORMAL)) }
+                    EditorToggle(stringResource(Res.string.image_editor_italic), layer.fontStyle == EditorFontStyle.ITALIC) { update(layer.copy(fontStyle = if (it) EditorFontStyle.ITALIC else EditorFontStyle.NORMAL)) }
                     EditorNumberField(stringResource(Res.string.image_editor_rotation), layer.rotation, -360.0..360.0) { update(layer.copy(rotation = it)) }
                 }
                 is ImageLayer -> {

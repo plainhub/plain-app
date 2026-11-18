@@ -267,37 +267,37 @@ object YjsDocEncoder {
     private fun layerToMap(layer: EditorLayer): Map<String, Any?> {
         return when (layer) {
             is ArrowLayer -> mapOf(
-                "id" to layer.id, "type" to layer.type, "visible" to layer.visible, "name" to layer.name,
+                "id" to layer.id, "type" to layer.type.name, "visible" to layer.visible, "name" to layer.name,
                 "x1" to layer.x1, "y1" to layer.y1, "x2" to layer.x2, "y2" to layer.y2,
                 "color" to layer.color, "lineWidth" to layer.lineWidth, "rotation" to layer.rotation,
             )
             is RectLayer -> mapOf(
-                "id" to layer.id, "type" to layer.type, "visible" to layer.visible, "name" to layer.name,
+                "id" to layer.id, "type" to layer.type.name, "visible" to layer.visible, "name" to layer.name,
                 "x" to layer.x, "y" to layer.y, "w" to layer.w, "h" to layer.h,
                 "color" to layer.color, "lineWidth" to layer.lineWidth,
             )
             is EllipseLayer -> mapOf(
-                "id" to layer.id, "type" to layer.type, "visible" to layer.visible, "name" to layer.name,
+                "id" to layer.id, "type" to layer.type.name, "visible" to layer.visible, "name" to layer.name,
                 "cx" to layer.cx, "cy" to layer.cy, "rx" to layer.rx, "ry" to layer.ry,
                 "color" to layer.color, "lineWidth" to layer.lineWidth,
             )
             is HighlightLayer -> mapOf(
-                "id" to layer.id, "type" to layer.type, "visible" to layer.visible, "name" to layer.name,
+                "id" to layer.id, "type" to layer.type.name, "visible" to layer.visible, "name" to layer.name,
                 "x" to layer.x, "y" to layer.y, "w" to layer.w, "h" to layer.h,
                 "color" to layer.color,
             )
             is MosaicLayer -> mapOf(
-                "id" to layer.id, "type" to layer.type, "visible" to layer.visible, "name" to layer.name,
+                "id" to layer.id, "type" to layer.type.name, "visible" to layer.visible, "name" to layer.name,
                 "x" to layer.x, "y" to layer.y, "w" to layer.w, "h" to layer.h,
                 "blockSize" to layer.blockSize,
             )
             is TextLayer -> mapOf(
-                "id" to layer.id, "type" to layer.type, "visible" to layer.visible, "name" to layer.name,
+                "id" to layer.id, "type" to layer.type.name, "visible" to layer.visible, "name" to layer.name,
                 "x" to layer.x, "y" to layer.y, "text" to layer.text,
                 "fontSize" to layer.fontSize, "color" to layer.color,
-                "fontFamily" to layer.fontFamily, "fontWeight" to layer.fontWeight,
-                "fontStyle" to layer.fontStyle, "textAlign" to layer.textAlign,
-                "letterSpacing" to layer.letterSpacing, "textDecoration" to layer.textDecoration,
+                "fontFamily" to layer.fontFamily, "fontWeight" to layer.fontWeight.name,
+                "fontStyle" to layer.fontStyle.name, "textAlign" to layer.textAlign.name,
+                "letterSpacing" to layer.letterSpacing, "textDecoration" to layer.textDecoration.name,
                 "textStroke" to mapOf("width" to layer.textStroke.width, "color" to layer.textStroke.color),
                 "textShadow" to mapOf(
                     "offsetX" to layer.textShadow.offsetX, "offsetY" to layer.textShadow.offsetY,
@@ -306,21 +306,21 @@ object YjsDocEncoder {
                 "glow" to layer.glow, "rotation" to layer.rotation, "maxWidth" to layer.maxWidth,
             )
             is ImageLayer -> mapOf(
-                "id" to layer.id, "type" to layer.type, "visible" to layer.visible, "name" to layer.name,
+                "id" to layer.id, "type" to layer.type.name, "visible" to layer.visible, "name" to layer.name,
                 "x" to layer.x, "y" to layer.y, "w" to layer.w, "h" to layer.h,
                 "opacity" to layer.opacity, "rotation" to layer.rotation,
             )
             is FreehandLayer -> mapOf(
-                "id" to layer.id, "type" to layer.type, "visible" to layer.visible, "name" to layer.name,
+                "id" to layer.id, "type" to layer.type.name, "visible" to layer.visible, "name" to layer.name,
                 "points" to "array",
                 "color" to layer.color, "lineWidth" to layer.lineWidth,
             )
             is StickerLayer -> mapOf(
-                "id" to layer.id, "type" to layer.type, "visible" to layer.visible, "name" to layer.name,
+                "id" to layer.id, "type" to layer.type.name, "visible" to layer.visible, "name" to layer.name,
                 "x" to layer.x, "y" to layer.y, "w" to layer.w, "h" to layer.h,
                 "color" to layer.color, "text" to layer.text,
-                "fontSize" to layer.fontSize, "fontWeight" to layer.fontWeight,
-                "fontStyle" to layer.fontStyle, "rotation" to layer.rotation,
+                "fontSize" to layer.fontSize, "fontWeight" to layer.fontWeight.name,
+                "fontStyle" to layer.fontStyle.name, "rotation" to layer.rotation,
             )
         }
     }

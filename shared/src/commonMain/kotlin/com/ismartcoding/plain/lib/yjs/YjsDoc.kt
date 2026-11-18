@@ -358,69 +358,69 @@ class YjsDoc(data: ByteArray) {
             }
         }
 
-        val type = layerMap["type"] as String
+        val type = enumValueOf<EditorLayerType>(str(layerMap["type"]))
         val id = layerMap["id"] as String
         val visible = layerMap["visible"] as Boolean
         val name = layerMap["name"] as String
 
         return when (type) {
-            "arrow" -> ArrowLayer(
+            EditorLayerType.ARROW -> ArrowLayer(
                 id = id, visible = visible, name = name,
                 x1 = num(layerMap["x1"]), y1 = num(layerMap["y1"]),
                 x2 = num(layerMap["x2"]), y2 = num(layerMap["y2"]),
                 color = str(layerMap["color"]), lineWidth = num(layerMap["lineWidth"]),
                 rotation = num(layerMap["rotation"]),
             )
-            "rect" -> RectLayer(
+            EditorLayerType.RECT -> RectLayer(
                 id = id, visible = visible, name = name,
                 x = num(layerMap["x"]), y = num(layerMap["y"]),
                 w = num(layerMap["w"]), h = num(layerMap["h"]),
                 color = str(layerMap["color"]), lineWidth = num(layerMap["lineWidth"]),
             )
-            "ellipse" -> EllipseLayer(
+            EditorLayerType.ELLIPSE -> EllipseLayer(
                 id = id, visible = visible, name = name,
                 cx = num(layerMap["cx"]), cy = num(layerMap["cy"]),
                 rx = num(layerMap["rx"]), ry = num(layerMap["ry"]),
                 color = str(layerMap["color"]), lineWidth = num(layerMap["lineWidth"]),
             )
-            "highlight" -> HighlightLayer(
+            EditorLayerType.HIGHLIGHT -> HighlightLayer(
                 id = id, visible = visible, name = name,
                 x = num(layerMap["x"]), y = num(layerMap["y"]),
                 w = num(layerMap["w"]), h = num(layerMap["h"]),
                 color = str(layerMap["color"]),
             )
-            "mosaic" -> MosaicLayer(
+            EditorLayerType.MOSAIC -> MosaicLayer(
                 id = id, visible = visible, name = name,
                 x = num(layerMap["x"]), y = num(layerMap["y"]),
                 w = num(layerMap["w"]), h = num(layerMap["h"]),
                 blockSize = num(layerMap["blockSize"]),
             )
-            "text" -> TextLayer(
+            EditorLayerType.TEXT -> TextLayer(
                 id = id, visible = visible, name = name,
                 x = num(layerMap["x"]), y = num(layerMap["y"]),
                 text = str(layerMap["text"]),
                 fontSize = num(layerMap["fontSize"]),
                 color = str(layerMap["color"]),
                 fontFamily = str(layerMap["fontFamily"]),
-                fontWeight = str(layerMap["fontWeight"]),
-                fontStyle = str(layerMap["fontStyle"]),
-                textAlign = str(layerMap["textAlign"]),
+                fontWeight = enumValueOf<EditorFontWeight>(str(layerMap["fontWeight"])),
+                fontStyle = enumValueOf<EditorFontStyle>(str(layerMap["fontStyle"])),
+                textAlign = enumValueOf<EditorTextAlign>(str(layerMap["textAlign"])),
                 letterSpacing = num(layerMap["letterSpacing"]),
-                textDecoration = str(layerMap["textDecoration"]),
+                textDecoration = enumValueOf<EditorTextDecoration>(str(layerMap["textDecoration"])),
                 textStroke = readTextStroke(layerMap["textStroke"]),
                 textShadow = readTextShadow(layerMap["textShadow"]),
                 glow = layerMap["glow"] as? Boolean ?: false,
                 rotation = num(layerMap["rotation"]),
                 maxWidth = num(layerMap["maxWidth"]),
             )
-            "image" -> ImageLayer(
+            EditorLayerType.IMAGE -> ImageLayer(
                 id = id, visible = visible, name = name,
                 x = num(layerMap["x"]), y = num(layerMap["y"]),
                 w = num(layerMap["w"]), h = num(layerMap["h"]),
                 opacity = num(layerMap["opacity"]),
                 rotation = num(layerMap["rotation"]),
             )
-            "freehand" -> {
+            EditorLayerType.FREEHAND -> {
                 val points = readPoints(layerItemId)
                 FreehandLayer(
                     id = id, visible = visible, name = name,
@@ -429,18 +429,17 @@ class YjsDoc(data: ByteArray) {
                     lineWidth = num(layerMap["lineWidth"]),
                 )
             }
-            "sticker" -> StickerLayer(
+            EditorLayerType.STICKER -> StickerLayer(
                 id = id, visible = visible, name = name,
                 x = num(layerMap["x"]), y = num(layerMap["y"]),
                 w = num(layerMap["w"]), h = num(layerMap["h"]),
                 color = str(layerMap["color"]),
                 text = str(layerMap["text"]),
                 fontSize = num(layerMap["fontSize"]),
-                fontWeight = str(layerMap["fontWeight"]),
-                fontStyle = str(layerMap["fontStyle"]),
+                fontWeight = enumValueOf<EditorFontWeight>(str(layerMap["fontWeight"])),
+                fontStyle = enumValueOf<EditorFontStyle>(str(layerMap["fontStyle"])),
                 rotation = num(layerMap["rotation"]),
             )
-            else -> error("Unsupported image editor layer type")
         }
     }
 

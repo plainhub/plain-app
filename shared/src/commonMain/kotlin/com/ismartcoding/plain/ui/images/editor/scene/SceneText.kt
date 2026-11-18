@@ -15,6 +15,9 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.sp
+import com.ismartcoding.plain.lib.yjs.EditorFontStyle
+import com.ismartcoding.plain.lib.yjs.EditorTextAlign
+import com.ismartcoding.plain.lib.yjs.EditorTextDecoration
 import com.ismartcoding.plain.lib.yjs.TextLayer
 
 internal data class SceneTextLayout(val lines: List<TextLayoutResult>, val lineHeight: Float)
@@ -23,8 +26,8 @@ internal fun measureSceneText(layer: TextLayer, measurer: TextMeasurer): SceneTe
     val style = TextStyle(
         fontSize = layer.fontSize.toFloat().sp,
         fontFamily = sceneFontFamily(layer.fontFamily),
-        fontStyle = if (layer.fontStyle == "italic") FontStyle.Italic else FontStyle.Normal,
-        fontWeight = parseScopeFontWeight(layer.fontWeight),
+        fontStyle = if (layer.fontStyle == EditorFontStyle.ITALIC) FontStyle.Italic else FontStyle.Normal,
+        fontWeight = sceneFontWeight(layer.fontWeight),
         letterSpacing = layer.letterSpacing.toFloat().sp,
     )
     fun measure(text: String) = measurer.measure(text, style, density = Density(1f))
@@ -43,15 +46,15 @@ internal fun DrawScope.drawSceneTextLayer(layer: TextLayer, measurer: TextMeasur
     for ((index, measured) in lines.withIndex()) {
         val width = measured.size.width.toFloat()
         val left = when (layer.textAlign) {
-            "left" -> (layer.x - layer.maxWidth / 2).toFloat()
-            "right" -> (layer.x + layer.maxWidth / 2).toFloat() - width
-            else -> layer.x.toFloat() - width / 2
+            EditorTextAlign.LEFT -> (layer.x - layer.maxWidth / 2).toFloat()
+            EditorTextAlign.RIGHT -> (layer.x + layer.maxWidth / 2).toFloat() - width
+            EditorTextAlign.CENTER -> layer.x.toFloat() - width / 2
         }
         val centerY = layer.y.toFloat() - lines.size * lineHeight / 2 + (index + .5f) * lineHeight
         val position = Offset(left, centerY - measured.size.height / 2f)
         if (layer.textStroke.width > 0) drawText(measured, parseScopeBgColor(layer.textStroke.color), position, shadow = shadow, drawStyle = Stroke(layer.textStroke.width.toFloat(), join = StrokeJoin.Round))
         drawText(measured, parseScopeBgColor(layer.color), position, shadow = shadow, drawStyle = Fill)
-        if (layer.textDecoration == "underline") drawLine(parseScopeBgColor(layer.color), Offset(left, centerY + layer.fontSize.toFloat() * .5f), Offset(left + width, centerY + layer.fontSize.toFloat() * .5f), strokeWidth = (layer.fontSize / 16).toFloat().coerceAtLeast(1f))
+        if (layer.textDecoration == EditorTextDecoration.UNDERLINE) drawLine(parseScopeBgColor(layer.color), Offset(left, centerY + layer.fontSize.toFloat() * .5f), Offset(left + width, centerY + layer.fontSize.toFloat() * .5f), strokeWidth = (layer.fontSize / 16).toFloat().coerceAtLeast(1f))
     }
 }
 

@@ -40,7 +40,7 @@ internal fun EditorToggle(label: String, value: Boolean, onChange: (Boolean) -> 
 }
 
 @Composable
-internal fun EditorChoices(label: String, value: String, choices: List<Pair<String, String>>, onChange: (String) -> Unit) {
+internal fun <T> EditorChoices(label: String, value: T, choices: List<Pair<T, String>>, onChange: (T) -> Unit) {
     Text(label, style = MaterialTheme.typography.labelLarge)
     Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()).semantics { contentDescription = label }, horizontalArrangement = Arrangement.spacedBy(4.dp)) {
         choices.forEach { (key, text) -> PTextButton(text, { onChange(key) }, contentColor = if (value == key) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant) }

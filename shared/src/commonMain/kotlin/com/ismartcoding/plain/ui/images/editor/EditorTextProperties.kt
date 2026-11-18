@@ -2,6 +2,10 @@ package com.ismartcoding.plain.ui.images.editor
 
 import androidx.compose.runtime.Composable
 import com.ismartcoding.plain.i18n.*
+import com.ismartcoding.plain.lib.yjs.EditorFontStyle
+import com.ismartcoding.plain.lib.yjs.EditorFontWeight
+import com.ismartcoding.plain.lib.yjs.EditorTextAlign
+import com.ismartcoding.plain.lib.yjs.EditorTextDecoration
 import com.ismartcoding.plain.lib.yjs.TextLayer
 import org.jetbrains.compose.resources.stringResource
 
@@ -9,10 +13,10 @@ import org.jetbrains.compose.resources.stringResource
 internal fun EditorTextProperties(layer: TextLayer, update: (TextLayer) -> Unit) {
     EditorNumberField(stringResource(Res.string.image_editor_font_size), layer.fontSize, 1.0..500.0) { update(layer.copy(fontSize = it)) }
     EditorChoices(stringResource(Res.string.image_editor_font_family), layer.fontFamily, listOf("sans-serif" to "Sans", "serif" to "Serif", "monospace" to "Mono", "cursive" to "Cursive")) { update(layer.copy(fontFamily = it)) }
-    EditorToggle(stringResource(Res.string.image_editor_bold), layer.fontWeight == "bold") { update(layer.copy(fontWeight = if (it) "bold" else "normal")) }
-    EditorToggle(stringResource(Res.string.image_editor_italic), layer.fontStyle == "italic") { update(layer.copy(fontStyle = if (it) "italic" else "normal")) }
-    EditorToggle(stringResource(Res.string.image_editor_underline), layer.textDecoration == "underline") { update(layer.copy(textDecoration = if (it) "underline" else "none")) }
-    EditorChoices(stringResource(Res.string.image_editor_align), layer.textAlign, listOf("left" to stringResource(Res.string.image_editor_left), "center" to stringResource(Res.string.image_editor_center), "right" to stringResource(Res.string.image_editor_right))) { update(layer.copy(textAlign = it)) }
+    EditorToggle(stringResource(Res.string.image_editor_bold), layer.fontWeight == EditorFontWeight.BOLD) { update(layer.copy(fontWeight = if (it) EditorFontWeight.BOLD else EditorFontWeight.NORMAL)) }
+    EditorToggle(stringResource(Res.string.image_editor_italic), layer.fontStyle == EditorFontStyle.ITALIC) { update(layer.copy(fontStyle = if (it) EditorFontStyle.ITALIC else EditorFontStyle.NORMAL)) }
+    EditorToggle(stringResource(Res.string.image_editor_underline), layer.textDecoration == EditorTextDecoration.UNDERLINE) { update(layer.copy(textDecoration = if (it) EditorTextDecoration.UNDERLINE else EditorTextDecoration.NONE)) }
+    EditorChoices(stringResource(Res.string.image_editor_align), layer.textAlign, listOf(EditorTextAlign.LEFT to stringResource(Res.string.image_editor_left), EditorTextAlign.CENTER to stringResource(Res.string.image_editor_center), EditorTextAlign.RIGHT to stringResource(Res.string.image_editor_right))) { update(layer.copy(textAlign = it)) }
     EditorNumberField(stringResource(Res.string.image_editor_letter_spacing), layer.letterSpacing, -50.0..100.0) { update(layer.copy(letterSpacing = it)) }
     EditorNumberField(stringResource(Res.string.image_editor_text_width), layer.maxWidth, 1.0..8000.0) { update(layer.copy(maxWidth = it)) }
     EditorNumberField(stringResource(Res.string.image_editor_rotation), layer.rotation, -360.0..360.0) { update(layer.copy(rotation = it)) }

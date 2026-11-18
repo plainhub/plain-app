@@ -23,6 +23,8 @@ import com.ismartcoding.plain.lib.yjs.HighlightLayer
 import com.ismartcoding.plain.lib.yjs.ImageLayer
 import com.ismartcoding.plain.lib.yjs.MosaicLayer
 import com.ismartcoding.plain.lib.yjs.RectLayer
+import com.ismartcoding.plain.lib.yjs.EditorFontStyle
+import com.ismartcoding.plain.lib.yjs.EditorFontWeight
 import com.ismartcoding.plain.lib.yjs.StickerLayer
 import com.ismartcoding.plain.lib.yjs.TextLayer
 import kotlin.math.atan2
@@ -120,7 +122,7 @@ private fun DrawScope.drawSceneStickerLayer(layer: StickerLayer, textMeasurer: T
         "#fde68a" -> "#78350f"
         else -> "#374151"
     }
-    val style = TextStyle(fontSize = layer.fontSize.toFloat().sp, fontFamily = androidx.compose.ui.text.font.FontFamily.SansSerif, fontWeight = parseScopeFontWeight(layer.fontWeight), fontStyle = if (layer.fontStyle == "italic") FontStyle.Italic else FontStyle.Normal)
+    val style = TextStyle(fontSize = layer.fontSize.toFloat().sp, fontFamily = androidx.compose.ui.text.font.FontFamily.SansSerif, fontWeight = sceneFontWeight(layer.fontWeight), fontStyle = if (layer.fontStyle == EditorFontStyle.ITALIC) FontStyle.Italic else FontStyle.Normal)
     fun measure(text: String) = textMeasurer.measure(text, style, density = androidx.compose.ui.unit.Density(1f))
     val lines = wrapSceneText(layer.text, layer.w - 28) { measure(it).size.width.toDouble() }
     val lineHeight = layer.fontSize.toFloat() * 1.3f
@@ -232,14 +234,10 @@ private fun parseScopeRgb(value: String): Color {
     return Color(nums[0].toInt(), nums[1].toInt(), nums[2].toInt())
 }
 
-internal fun parseScopeFontWeight(value: String): FontWeight {
-    return when (value) {
-        "bold" -> FontWeight.Bold
-        "semibold", "600" -> FontWeight.SemiBold
-        "medium", "500" -> FontWeight.SemiBold
-        "light", "300" -> FontWeight.Light
-        else -> FontWeight.Normal
-    }
+internal fun sceneFontWeight(value: EditorFontWeight): FontWeight = when (value) {
+    EditorFontWeight.NORMAL -> FontWeight.Normal
+    EditorFontWeight.BOLD -> FontWeight.Bold
+    EditorFontWeight.SEMIBOLD -> FontWeight.SemiBold
 }
 
 private fun parseScopeTextAlign(value: String): TextAlign {

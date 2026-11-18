@@ -1,6 +1,10 @@
 package com.ismartcoding.plain.yjs
 
 import com.ismartcoding.plain.lib.yjs.ArrowLayer
+import com.ismartcoding.plain.lib.yjs.EditorFontStyle
+import com.ismartcoding.plain.lib.yjs.EditorFontWeight
+import com.ismartcoding.plain.lib.yjs.EditorTextAlign
+import com.ismartcoding.plain.lib.yjs.EditorTextDecoration
 import com.ismartcoding.plain.lib.yjs.FreehandLayer
 import com.ismartcoding.plain.lib.yjs.StickerLayer
 import com.ismartcoding.plain.lib.yjs.TextLayer
@@ -10,39 +14,36 @@ import kotlin.io.encoding.Base64
 import kotlin.io.encoding.ExperimentalEncodingApi
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFailsWith
 import kotlin.test.assertTrue
 
 class YjsDocWebPayloadTest {
 
-    // Yjs V1 binary update produced by the web image editor (schema.ts).
-    // Encodes 8 layers: arrow, rect, ellipse, highlight, mosaic, text,
-    // freehand (6 points), sticker. Canvas 1280x720, white bg, imgAlpha=100.
+    // Editor document generated with Yjs encodeStateAsUpdate (binary Update V1).
     private val webPayloadB64 =
-        "AW+lmLT7BgAoAQRtZXRhC2NhbnZhc1dpZHRoAX2AFCgBBG1ldGEMY2FudmFzSGVpZ2h0AX2QCygBBG1ldGEHYmdDb2xvcgF3CSNmZmZmZmZmZigBBG1ldGEK" +
-        "aW1nT2Zmc2V0WAF9ACgBBG1ldGEKaW1nT2Zmc2V0WQF9ACgBBG1ldGEIaW1nQWxwaGEBfaQBBwEGbGF5ZXJzASgApZi0+wYGAmlkAXcHTC1hcnJvdygApZi0" +
-        "+wYGBHR5cGUBdwVhcnJvdygApZi0+wYGB3Zpc2libGUBeCgApZi0+wYGBG5hbWUBdwVBcnJvdygApZi0+wYGAngxAX2QASgApZi0+wYGAnkxAX2QASgApZi0" +
-        "+wYGAngyAX2QBigApZi0+wYGAnkyAX2wAygApZi0+wYGBWNvbG9yAXcHI2ZmMDAwMCgApZi0+wYGCWxpbmVXaWR0aAF9BigApZi0+wYGCHJvdGF0aW9uAX0A" +
-        "h6WYtPsGBgEoAKWYtPsGEgJpZAF3BkwtcmVjdCgApZi0+wYSBHR5cGUBdwRyZWN0KAClmLT7BhIHdmlzaWJsZQF4KAClmLT7BhIEbmFtZQF3BFJlY3QoAKWY" +
-        "tPsGEgF4AX20BygApZi0+wYSAXkBfZABKAClmLT7BhIBdwF9mAQoAKWYtPsGEgFoAX2gAigApZi0+wYSBWNvbG9yAXcHIzAwNjZmZigApZi0+wYSCWxpbmVX" +
-        "aWR0aAF9BIelmLT7BhIBKAClmLT7Bh0CaWQBdwlMLWVsbGlwc2UoAKWYtPsGHQR0eXBlAXcHZWxsaXBzZSgApZi0+wYdB3Zpc2libGUBeCgApZi0+wYdBG5h" +
-        "bWUBdwdFbGxpcHNlKAClmLT7Bh0CY3gBfagPKAClmLT7Bh0CY3kBfbQCKAClmLT7Bh0CcngBfbgBKAClmLT7Bh0CcnkBfZABKAClmLT7Bh0FY29sb3IBdwcj" +
-        "MDBjYzAwKAClmLT7Bh0JbGluZVdpZHRoAX0Eh6WYtPsGHQEoAKWYtPsGKAJpZAF3C0wtaGlnaGxpZ2h0KAClmLT7BigEdHlwZQF3CWhpZ2hsaWdodCgApZi0" +
-        "+wYoB3Zpc2libGUBeCgApZi0+wYoBG5hbWUBdwlIaWdobGlnaHQoAKWYtPsGKAF4AX2QASgApZi0+wYoAXkBfagFKAClmLT7BigBdwF9gAUoAKWYtPsGKAFo" +
-        "AX08KAClmLT7BigFY29sb3IBdxZyZ2JhKDI1NSwgMjU1LCAwLCAwLjQph6WYtPsGKAEoAKWYtPsGMgJpZAF3CEwtbW9zYWljKAClmLT7BjIEdHlwZQF3Bm1v" +
-        "c2FpYygApZi0+wYyB3Zpc2libGUBeCgApZi0+wYyBG5hbWUBdwZNb3NhaWMoAKWYtPsGMgF4AX20BygApZi0+wYyAXkBfagFKAClmLT7BjIBdwF9iAMoAKWY" +
-        "tPsGMgFoAX24ASgApZi0+wYyCWJsb2NrU2l6ZQF9DIelmLT7BjIBKAClmLT7BjwCaWQBdwZMLXRleHQoAKWYtPsGPAR0eXBlAXcEdGV4dCgApZi0+wY8B3Zp" +
-        "c2libGUBeCgApZi0+wY8BG5hbWUBdwRUZXh0KAClmLT7BjwBeAF9kAEoAKWYtPsGPAF5AX2ICCgApZi0+wY8BHRleHQBdxZXZWIgZWRpdG9yIHBhcml0eSB0" +
-        "ZXN0KAClmLT7BjwIZm9udFNpemUBfTgoAKWYtPsGPAVjb2xvcgF3ByMwMDAwMDAoAKWYtPsGPApmb250RmFtaWx5AXcKc2Fucy1zZXJpZigApZi0+wY8CmZv" +
-        "bnRXZWlnaHQBdwRib2xkKAClmLT7BjwJZm9udFN0eWxlAXcGbm9ybWFsKAClmLT7BjwJdGV4dEFsaWduAXcEbGVmdCgApZi0+wY8DWxldHRlclNwYWNpbmcB" +
-        "fQAoAKWYtPsGPA50ZXh0RGVjb3JhdGlvbgF3BG5vbmUnAKWYtPsGPAp0ZXh0U3Ryb2tlASgApZi0+wZMBXdpZHRoAX0CKAClmLT7BkwFY29sb3IBdwcjZmYw" +
-        "MDAwJwClmLT7BjwKdGV4dFNoYWRvdwEoAKWYtPsGTwdvZmZzZXRYAX0DKAClmLT7Bk8Hb2Zmc2V0WQF9AygApZi0+wZPBGJsdXIBfQQoAKWYtPsGTwVjb2xv" +
-        "cgF3D3JnYmEoMCwwLDAsMC43KSgApZi0+wY8BGdsb3cBeSgApZi0+wY8CHJvdGF0aW9uAX0AKAClmLT7BjwIbWF4V2lkdGgBfZgJh6WYtPsGPAEoAKWYtPsG" +
-        "VwJpZAF3CkwtZnJlZWhhbmQoAKWYtPsGVwR0eXBlAXcIZnJlZWhhbmQoAKWYtPsGVwd2aXNpYmxlAXgoAKWYtPsGVwRuYW1lAXcFQnJ1c2gnAKWYtPsGVwZw" +
-        "b2ludHMACAClmLT7BlwGdQJ9oAx9kAZ1An20DH2kBnUCfZINfbgGdQJ9ug19ggd1An2iDn24BnUCfYAPfZoGKAClmLT7BlcFY29sb3IBdwcjZmYwMGZmKACl" +
-        "mLT7BlcJbGluZVdpZHRoAX0Ih6WYtPsGVwEoAKWYtPsGZQJpZAF3CUwtc3RpY2tlcigApZi0+wZlBHR5cGUBdwdzdGlja2VyKAClmLT7BmUHdmlzaWJsZQF4" +
-        "KAClmLT7BmUEbmFtZQF3B1N0aWNrZXIoAKWYtPsGZQF4AX2oDygApZi0+wZlAXkBfaAHKAClmLT7BmUBdwF9iAMoAKWYtPsGZQFoAX24ASgApZi0+wZlBWNv" +
-        "bG9yAXcHI2ZmZWIzYigApZi0+wZlBHRleHQBdwROT1RFKAClmLT7BmUIZm9udFNpemUBfSQoAKWYtPsGZQpmb250V2VpZ2h0AXcEYm9sZCgApZi0+wZlCWZv" +
-        "bnRTdHlsZQF3Bm5vcm1hbCgApZi0+wZlCHJvdGF0aW9uAX0AAA=="
+        "AXwqACgBBG1ldGENZm9ybWF0VmVyc2lvbgF9ASgBBG1ldGELY2FudmFzV2lkdGgBfYAUKAEEbWV0YQxjYW52YXNIZWlnaHQBfZALKAEEbWV0YQdiZ0Nv" +
+        "bG9yAXcJI2ZmZmZmZmZmKAEEbWV0YQppbWdPZmZzZXRYAX0AKAEEbWV0YQppbWdPZmZzZXRZAX0AKAEEbWV0YQhpbWdBbHBoYQF9pAEHAQZsYXllcnMB" +
+        "KAAqBwJpZAF3B0wtYXJyb3coACoHBHR5cGUBdwVBUlJPVygAKgcHdmlzaWJsZQF4KAAqBwRuYW1lAXcFQVJST1coACoHAngxAX2QASgAKgcCeTEBfZAB" +
+        "KAAqBwJ4MgF9kAYoACoHAnkyAX2YAygAKgcFY29sb3IBdwcjZmYwMDAwKAAqBwlsaW5lV2lkdGgBfQYoACoHCHJvdGF0aW9uAX0AhyoHASgAKhMCaWQB" +
+        "dwZMLXJlY3QoACoTBHR5cGUBdwRSRUNUKAAqEwd2aXNpYmxlAXgoACoTBG5hbWUBdwRSRUNUKAAqEwF4AX20BygAKhMBeQF9pAEoACoTAXcBfZgEKAAq" +
+        "EwFoAX2gAigAKhMFY29sb3IBdwcjMDA2NmZmKAAqEwlsaW5lV2lkdGgBfQSHKhMBKAAqHgJpZAF3CUwtZWxsaXBzZSgAKh4EdHlwZQF3B0VMTElQU0Uo" +
+        "ACoeB3Zpc2libGUBeCgAKh4EbmFtZQF3B0VMTElQU0UoACoeAmN4AX2oDygAKh4CY3kBfbQCKAAqHgJyeAF9uAEoACoeAnJ5AX2QASgAKh4FY29sb3IB" +
+        "dwcjMDBjYzAwKAAqHglsaW5lV2lkdGgBfQSHKh4BKAAqKQJpZAF3C0wtaGlnaGxpZ2h0KAAqKQR0eXBlAXcJSElHSExJR0hUKAAqKQd2aXNpYmxlAXgo" +
+        "ACopBG5hbWUBdwlISUdITElHSFQoACopAXgBfZABKAAqKQF5AX2EBCgAKikBdwF9gAUoACopAWgBfTwoACopBWNvbG9yAXcWcmdiYSgyNTUsIDI1NSwg" +
+        "MCwgMC40KYcqKQEoACozAmlkAXcITC1tb3NhaWMoACozBHR5cGUBdwZNT1NBSUMoACozB3Zpc2libGUBeCgAKjMEbmFtZQF3Bk1PU0FJQygAKjMBeAF9" +
+        "tAcoACozAXkBfYQEKAAqMwF3AX2IAygAKjMBaAF9uAEoACozCWJsb2NrU2l6ZQF9DIcqMwEoACo9AmlkAXcGTC10ZXh0KAAqPQR0eXBlAXcEVEVYVCgA" +
+        "Kj0HdmlzaWJsZQF4KAAqPQRuYW1lAXcEVEVYVCgAKj0BeAF9kAEoACo9AXkBfYgIKAAqPQR0ZXh0AXcWV2ViIGVkaXRvciBwYXJpdHkgdGVzdCgAKj0I" +
+        "Zm9udFNpemUBfTgoACo9BWNvbG9yAXcHIzAwMDAwMCgAKj0KZm9udEZhbWlseQF3CnNhbnMtc2VyaWYoACo9CmZvbnRXZWlnaHQBdwRCT0xEKAAqPQlm" +
+        "b250U3R5bGUBdwZJVEFMSUMoACo9CXRleHRBbGlnbgF3BkNFTlRFUigAKj0NbGV0dGVyU3BhY2luZwF9ACgAKj0OdGV4dERlY29yYXRpb24BdwlVTkRF" +
+        "UkxJTkUoACo9BGdsb3cBeSgAKj0Icm90YXRpb24BfQAoACo9CG1heFdpZHRoAX2YCScAKj0KdGV4dFN0cm9rZQEoACpQBXdpZHRoAX0CKAAqUAVjb2xv" +
+        "cgF3ByNmZjAwMDAnACo9CnRleHRTaGFkb3cBKAAqUwdvZmZzZXRYAX0DKAAqUwdvZmZzZXRZAX0DKAAqUwRibHVyAX0EKAAqUwVjb2xvcgF3D3JnYmEo" +
+        "MCwwLDAsMC43KYcqPQEoACpYAmlkAXcKTC1mcmVlaGFuZCgAKlgEdHlwZQF3CEZSRUVIQU5EKAAqWAd2aXNpYmxlAXgoACpYBG5hbWUBdwhGUkVFSEFO" +
+        "RCgAKlgFY29sb3IBdwcjZmYwMGZmKAAqWAlsaW5lV2lkdGgBfQgnACpYBnBvaW50cwAIACpfBnUCfaAMfZAGdQJ9tAx9pAZ1An2IDX2uBnUCfZwNfbgG" +
+        "dQJ9sA19swZ1An2EDn2kBocqWAEoACpmAmlkAXcJTC1zdGlja2VyKAAqZgR0eXBlAXcHU1RJQ0tFUigAKmYHdmlzaWJsZQF4KAAqZgRuYW1lAXcHU1RJ" +
+        "Q0tFUigAKmYBeAF9qA8oACpmAXkBfZAGKAAqZgF3AX2IAygAKmYBaAF9uAEoACpmBWNvbG9yAXcHI2ZmZWIzYigAKmYEdGV4dAF3BE5PVEUoACpmCGZv" +
+        "bnRTaXplAX0kKAAqZgpmb250V2VpZ2h0AXcIU0VNSUJPTEQoACpmCWZvbnRTdHlsZQF3Bk5PUk1BTCgAKmYIcm90YXRpb24BfQCHKmYBKAAqdQJpZAF3" +
+        "B0wtaW1hZ2UoACp1BHR5cGUBdwVJTUFHRSgAKnUHdmlzaWJsZQF4KAAqdQRuYW1lAXcFSU1BR0UoACp1AXgBfQAoACp1AXkBfQAoACp1AXcBfSgoACp1" +
+        "AWgBfSgoACp1B29wYWNpdHkBfaQBKAAqdQhyb3RhdGlvbgF9ACgBBmltYWdlcwdMLWltYWdlAXcaZGF0YTppbWFnZS9wbmc7YmFzZTY0LEFBPT0A"
 
     @OptIn(ExperimentalEncodingApi::class)
     private val bytes = Base64.Default.decode(webPayloadB64)
@@ -68,12 +69,12 @@ class YjsDocWebPayloadTest {
     }
 
     @Test
-    fun extracts_all_8_layers_from_web_payload() {
+    fun extracts_all_layer_types_from_web_payload() {
         val layers = doc.getLayers()
-        assertEquals(8, layers.size)
-        val types = layers.map { it.type }
+        assertEquals(9, layers.size)
+        val types = layers.map { it.type.name }
         assertEquals(
-            listOf("arrow", "rect", "ellipse", "highlight", "mosaic", "text", "freehand", "sticker"),
+            listOf("ARROW", "RECT", "ELLIPSE", "HIGHLIGHT", "MOSAIC", "TEXT", "FREEHAND", "STICKER", "IMAGE"),
             types,
         )
     }
@@ -94,6 +95,10 @@ class YjsDocWebPayloadTest {
         assertEquals("Web editor parity test", text.text)
         assertEquals(56.0, text.fontSize)
         assertEquals("#000000", text.color)
+        assertEquals(EditorFontWeight.BOLD, text.fontWeight)
+        assertEquals(EditorFontStyle.ITALIC, text.fontStyle)
+        assertEquals(EditorTextAlign.CENTER, text.textAlign)
+        assertEquals(EditorTextDecoration.UNDERLINE, text.textDecoration)
         assertEquals(2.0, text.textStroke.width)
         assertEquals("#ff0000", text.textStroke.color)
         assertEquals(3.0, text.textShadow.offsetX)
@@ -118,10 +123,12 @@ class YjsDocWebPayloadTest {
         assertEquals("NOTE", sticker.text)
         assertEquals(36.0, sticker.fontSize)
         assertEquals("#ffeb3b", sticker.color)
+        assertEquals(EditorFontWeight.SEMIBOLD, sticker.fontWeight)
+        assertEquals(EditorFontStyle.NORMAL, sticker.fontStyle)
     }
 
     @Test
-    fun roundtrip_encode_and_reparse_preserves_layer_count() {
+    fun roundtrip_encode_and_reparse_preserves_document_enum_values() {
         val layers = doc.getLayers()
         val encoded = YjsDocEncoder.encode(
             canvasSize = doc.getCanvasSize(),
@@ -130,8 +137,37 @@ class YjsDocWebPayloadTest {
             imgOffset = doc.getImgOffset(),
             imgAlpha = doc.getImgAlpha(),
             layers = layers,
+            images = doc.getImages(),
         )
         val reparsed = YjsDoc(encoded)
-        assertEquals(8, reparsed.getLayers().size)
+        assertEquals(1, (reparsed.getMetaValue("formatVersion") as Number).toInt())
+        assertEquals(layers, reparsed.getLayers())
+        assertEquals(doc.getImages(), reparsed.getImages())
+        val wireText = encoded.decodeToString()
+        for ((field, value) in mapOf(
+            "type" to "STICKER",
+            "fontWeight" to "SEMIBOLD",
+            "fontStyle" to "ITALIC",
+            "textAlign" to "CENTER",
+            "textDecoration" to "UNDERLINE",
+        )) {
+            assertTrue(wireField(field, value) in wireText, "Missing persisted enum $field=$value")
+        }
     }
+
+    @Test
+    fun rejects_lowercase_layer_and_style_wire_values() {
+        for ((field, value) in mapOf("type" to "STICKER", "fontWeight" to "SEMIBOLD")) {
+            val needle = wireField(field, value).encodeToByteArray()
+            val start = (0..bytes.size - needle.size).first { offset ->
+                needle.indices.all { bytes[offset + it] == needle[it] }
+            }
+            val malformed = bytes.copyOf()
+            wireField(field, value.lowercase()).encodeToByteArray().copyInto(malformed, start)
+            assertFailsWith<IllegalArgumentException> { YjsDoc(malformed).getLayers() }
+        }
+    }
+
+    private fun wireField(field: String, value: String): String =
+        "$field\u0001w${value.length.toChar()}$value"
 }
