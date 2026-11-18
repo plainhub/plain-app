@@ -16,9 +16,14 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.*
 
 internal object SystemAppHost {
-    internal suspend fun handle(method: String, params: JsonObject): HostResult = when (method) {
+    internal suspend fun handle(
+        method: String,
+        params: JsonObject,
+        writeClipboard: (String, String, Boolean) -> Unit = ::setClipboardText,
+    ): HostResult = when (method) {
         "systemSetClipboard" -> {
-            setClipboardText("plain", JsonHelper.jsonDecodeFromElement<ClipboardTextRequest>(params).text)
+            val request = JsonHelper.jsonDecodeFromElement<ClipboardTextRequest>(params)
+            writeClipboard(request.label, request.text, request.sensitive)
             hostResult(true)
         }
         "systemAccessFacts" -> {
@@ -50,7 +55,11 @@ internal object SystemAppHost {
 }
 
 @Serializable
-private data class ClipboardTextRequest(val text: String)
+private data class ClipboardTextRequest(
+    val text: String,
+    val label: String = "plain",
+    val sensitive: Boolean = false,
+)
 
 @Serializable
 private data class AccessRequest(val feature: AccessFeature)
