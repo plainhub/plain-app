@@ -1,6 +1,5 @@
 package com.ismartcoding.plain.ui.images.editor
 
-import com.ismartcoding.plain.i18n.*
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -24,7 +23,6 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import org.jetbrains.compose.resources.painterResource
-import org.jetbrains.compose.resources.stringResource
 import com.ismartcoding.plain.platform.system.formatTime
 import com.ismartcoding.plain.ui.resources.Res as UiRes
 import com.ismartcoding.plain.ui.resources.chevron_right as ui_drawable_chevron_right
@@ -69,15 +67,10 @@ fun ImageEditorProjectListItem(
         }
         Column(modifier = Modifier.weight(1f)) {
             Text(
-                text = stringResource(Res.string.image_editor_layer_count, project.layerCount),
+                text = "${project.canvasWidth}×${project.canvasHeight}",
                 style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.SemiBold),
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
-            )
-            Text(
-                text = "${project.canvasWidth}×${project.canvasHeight}",
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
             Text(
                 text = project.updatedAt.formatTime(),

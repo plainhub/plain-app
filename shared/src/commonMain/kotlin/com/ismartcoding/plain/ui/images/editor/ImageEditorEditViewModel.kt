@@ -196,7 +196,7 @@ class ImageEditorEditViewModel(private val projects: ImageEditorProjectsClient, 
                 withContext(ioDispatcher) {
                     val bytes = YjsDocEncoder.encode(saved.canvasSize, saved.bgColor, saved.sourceImage, saved.imgOffset, saved.imgAlpha, saved.layers, saved.images)
                     projects.addOrUpdateAsync(projectId) {
-                        stateB64 = Base64Lenient.encode(bytes); canvasWidth = saved.canvasSize.width; canvasHeight = saved.canvasSize.height; layerCount = saved.layers.size
+                        stateB64 = Base64Lenient.encode(bytes); canvasWidth = saved.canvasSize.width; canvasHeight = saved.canvasSize.height
                     }
                 }
                 if (state.value == saved) dirty.value = false

@@ -6,7 +6,6 @@
     <string name="image_editor_color">Colore</string>
     <string name="image_editor_delete_layer">Elimina livello</string>
     <string name="image_editor_duplicate_layer">Duplica livello</string>
-    <string name="image_editor_layer_count">%1$d livelli</string>
     <string name="image_editor_layer_visibility">Attiva/disattiva visibilità</string>
     <string name="image_editor_layers">Livelli</string>
     <string name="image_editor_line_width">Spessore linea</string>

@@ -12,6 +12,7 @@ import com.ismartcoding.plain.graphql.Query
 import com.ismartcoding.plain.lib.JsonHelper
 import com.ismartcoding.plain.platform.system.DataType
 import com.ismartcoding.plain.models.ImageEditorProject
+import com.ismartcoding.plain.models.ImageEditorProjectSummary
 import kotlin.time.Instant
 import kotlinx.serialization.json.*
 import kotlin.test.*
@@ -208,6 +209,26 @@ class GraphqlArgumentsTest {
     }
 
     @Test
+    fun imageEditorReadsAndWritesProjectDimensionsWithoutLayerCount() {
+        val timestamp = "2026-01-01T00:00:00Z"
+        val summary = JsonHelper.jsonDecode<ImageEditorProjectSummary>(
+            """{"id":"fixture","thumbnail":null,"canvasWidth":640,"canvasHeight":480,"updatedAt":"$timestamp"}"""
+        )
+        val project = JsonHelper.jsonDecode<ImageEditorProject>(
+            """{"id":"fixture","stateB64":"","thumbnail":null,"canvasWidth":640,"canvasHeight":480,"createdAt":"$timestamp","updatedAt":"$timestamp"}"""
+        )
+        assertEquals(640 to 480, summary.canvasWidth to summary.canvasHeight)
+        assertEquals(640 to 480, project.canvasWidth to project.canvasHeight)
+        for (operation in listOf(
+            Query.imageEditorProjects().operation, Query.imageEditorProject(project.id).operation,
+            Mutation.saveImageEditorProject("", project).operation, Mutation.saveImageEditorProject(project.id, project).operation,
+        )) {
+            assertTrue(operation.query.contains("canvasWidth canvasHeight"))
+            assertFalse(operation.query.contains("layerCount"))
+        }
+    }
+
+    @Test
     fun structuredInputsExcludeOutputFieldsAndPreserveDatesAndNulls() {
         val created = Mutation.saveNote("", "title", "body")
         assertEquals("createNote", created.field)
@@ -217,7 +238,7 @@ class GraphqlArgumentsTest {
         assertEquals("updateNote", edited.field)
         assertEquals(JsonPrimitive("id"), edited.operation.variables["id"])
         val project = Mutation.saveImageEditorProject("id", ImageEditorProject("id")).operation.variables.getValue("input").jsonObject
-        assertEquals(setOf("stateB64", "thumbnail", "canvasWidth", "canvasHeight", "layerCount"), project.keys)
+        assertEquals(setOf("stateB64", "thumbnail", "canvasWidth", "canvasHeight"), project.keys)
         assertEquals(JsonNull, project["thumbnail"])
         val expiresAt = Instant.parse("2026-01-01T00:00:00.123456789Z")
         val shareInput = com.ismartcoding.plain.models.ShareInput("name", "", expiresAt, true, listOf(com.ismartcoding.plain.models.SharePath("/file", "/file", false)))

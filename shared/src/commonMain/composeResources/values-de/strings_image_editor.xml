@@ -6,7 +6,6 @@
     <string name="image_editor_color">Farbe</string>
     <string name="image_editor_delete_layer">Ebene löschen</string>
     <string name="image_editor_duplicate_layer">Ebene duplizieren</string>
-    <string name="image_editor_layer_count">%1$d Ebenen</string>
     <string name="image_editor_layer_visibility">Sichtbarkeit umschalten</string>
     <string name="image_editor_layers">Ebenen</string>
     <string name="image_editor_line_width">Linienbreite</string>

@@ -412,7 +412,7 @@ object Mutation {
     )
 
     fun saveImageEditorProject(id: String, project: ImageEditorProject): GraphqlRequest<ImageEditorProject> {
-        val input = ImageEditorProjectInput(project.stateB64, project.thumbnail, project.canvasWidth, project.canvasHeight, project.layerCount)
+        val input = ImageEditorProjectInput(project.stateB64, project.thumbnail, project.canvasWidth, project.canvasHeight)
         return GraphqlRequest(
             $$"mutation($id: ID!, $input: ImageEditorProjectInput!) { saveImageEditorProject(id: $id, input: $input) { $${Fragments.IMAGE_EDITOR_PROJECT} } }",
             mapOf(variable("id", id), variable("input", input)),

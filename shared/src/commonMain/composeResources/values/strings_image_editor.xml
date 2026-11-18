@@ -3,7 +3,6 @@
     <string name="image_editor">Image Editor</string>
     <string name="image_editor_no_projects">No projects yet</string>
     <string name="image_editor_no_projects_desc">Create a project from the web UI or tap + to start</string>
-    <string name="image_editor_layer_count">%1$d layers</string>
     <string name="image_editor_tool_select">Select</string>
     <string name="image_editor_tool_arrow">Arrow</string>
     <string name="image_editor_tool_rect">Rect</string>

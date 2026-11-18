@@ -6,7 +6,6 @@
     <string name="image_editor_color">色</string>
     <string name="image_editor_delete_layer">レイヤーを削除</string>
     <string name="image_editor_duplicate_layer">レイヤーを複製</string>
-    <string name="image_editor_layer_count">%1$d レイヤー</string>
     <string name="image_editor_layer_visibility">表示切替</string>
     <string name="image_editor_layers">レイヤー</string>
     <string name="image_editor_line_width">線の太さ</string>

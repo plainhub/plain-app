@@ -6,7 +6,6 @@
     <string name="image_editor_color">রঙ</string>
     <string name="image_editor_delete_layer">লেয়ার মুছুন</string>
     <string name="image_editor_duplicate_layer">লেয়ার ডুপ্লিকেট</string>
-    <string name="image_editor_layer_count">%1$d লেয়ার</string>
     <string name="image_editor_layer_visibility">দৃশ্যমানতা টগল</string>
     <string name="image_editor_layers">লেয়ার</string>
     <string name="image_editor_line_width">রেখার প্রস্থ</string>

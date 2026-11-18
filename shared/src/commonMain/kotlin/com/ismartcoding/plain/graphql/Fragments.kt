@@ -26,7 +26,7 @@ internal object Fragments {
     const val APP_FILE = "id size mimeType realPath createdAt updatedAt fileName"
     const val SMS = "id body address sentAt serviceCenter read threadId type typeCode subscriptionId isMms attachments { path contentType name }"
     const val DLNA_STATE = "version devices { id hostAddress name } currentDevice { id hostAddress name } items { path title albumArt artist durationMs type } currentUri playing progressMs durationMs supportsCallback"
-    const val IMAGE_EDITOR_SUMMARY = "id thumbnail canvasWidth canvasHeight layerCount updatedAt"
+    const val IMAGE_EDITOR_SUMMARY = "id thumbnail canvasWidth canvasHeight updatedAt"
     const val IMAGE_EDITOR_PROJECT = $$"$$IMAGE_EDITOR_SUMMARY stateB64 createdAt"
     const val PEER_SUMMARY = "id name ip publicKey status port deviceType createdAt updatedAt online managed"
     const val PEER = "id name ip key publicKey status port deviceType token createdAt updatedAt online managed"

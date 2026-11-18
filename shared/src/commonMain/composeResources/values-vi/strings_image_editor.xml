@@ -6,7 +6,6 @@
     <string name="image_editor_color">Màu</string>
     <string name="image_editor_delete_layer">Xóa lớp</string>
     <string name="image_editor_duplicate_layer">Nhân đôi lớp</string>
-    <string name="image_editor_layer_count">%1$d lớp</string>
     <string name="image_editor_layer_visibility">Bật/tắt hiển thị</string>
     <string name="image_editor_layers">Lớp</string>
     <string name="image_editor_line_width">Độ dày nét</string>

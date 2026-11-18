@@ -6,7 +6,6 @@
     <string name="image_editor_color">Kleur</string>
     <string name="image_editor_delete_layer">Laag verwijderen</string>
     <string name="image_editor_duplicate_layer">Laag dupliceren</string>
-    <string name="image_editor_layer_count">%1$d lagen</string>
     <string name="image_editor_layer_visibility">Zichtbaarheid wisselen</string>
     <string name="image_editor_layers">Lagen</string>
     <string name="image_editor_line_width">Lijndikte</string>

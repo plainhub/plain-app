@@ -9,6 +9,5 @@ data class ImageEditorProjectSummary(
     val thumbnail: String?,
     val canvasWidth: Int,
     val canvasHeight: Int,
-    val layerCount: Int,
     val updatedAt: Instant,
 )

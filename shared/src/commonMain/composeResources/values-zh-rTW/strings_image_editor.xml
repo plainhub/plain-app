@@ -6,7 +6,6 @@
     <string name="image_editor_color">顏色</string>
     <string name="image_editor_delete_layer">刪除圖層</string>
     <string name="image_editor_duplicate_layer">複製圖層</string>
-    <string name="image_editor_layer_count">%1$d 個圖層</string>
     <string name="image_editor_layer_visibility">切換可見度</string>
     <string name="image_editor_layers">圖層</string>
     <string name="image_editor_line_width">線條寬度</string>

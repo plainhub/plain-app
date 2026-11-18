@@ -6,7 +6,6 @@
     <string name="image_editor_color">Couleur</string>
     <string name="image_editor_delete_layer">Supprimer le calque</string>
     <string name="image_editor_duplicate_layer">Dupliquer le calque</string>
-    <string name="image_editor_layer_count">%1$d calques</string>
     <string name="image_editor_layer_visibility">Basculer la visibilité</string>
     <string name="image_editor_layers">Calques</string>
     <string name="image_editor_line_width">Largeur de ligne</string>

@@ -6,7 +6,6 @@
     <string name="image_editor_color">색상</string>
     <string name="image_editor_delete_layer">레이어 삭제</string>
     <string name="image_editor_duplicate_layer">레이어 복제</string>
-    <string name="image_editor_layer_count">레이어 %1$d개</string>
     <string name="image_editor_layer_visibility">표시 전환</string>
     <string name="image_editor_layers">레이어</string>
     <string name="image_editor_line_width">선 굵기</string>

@@ -6,7 +6,6 @@
     <string name="image_editor_color">நிறம்</string>
     <string name="image_editor_delete_layer">லேயரை நீக்கு</string>
     <string name="image_editor_duplicate_layer">லேயரை நகலெடு</string>
-    <string name="image_editor_layer_count">%1$d லேயர்கள்</string>
     <string name="image_editor_layer_visibility">தெரிவுநிலையை மாற்று</string>
     <string name="image_editor_layers">லேயர்கள்</string>
     <string name="image_editor_line_width">கோட்டின் அகலம்</string>

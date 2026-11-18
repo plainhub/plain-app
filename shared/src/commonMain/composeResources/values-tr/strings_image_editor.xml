@@ -6,7 +6,6 @@
     <string name="image_editor_color">Renk</string>
     <string name="image_editor_delete_layer">Katmanı sil</string>
     <string name="image_editor_duplicate_layer">Katmanı çoğalt</string>
-    <string name="image_editor_layer_count">%1$d katman</string>
     <string name="image_editor_layer_visibility">Görünürlüğü değiştir</string>
     <string name="image_editor_layers">Katmanlar</string>
     <string name="image_editor_line_width">Çizgi kalınlığı</string>

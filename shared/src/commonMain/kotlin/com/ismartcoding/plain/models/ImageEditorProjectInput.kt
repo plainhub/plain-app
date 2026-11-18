@@ -8,5 +8,4 @@ data class ImageEditorProjectInput(
     var thumbnail: String?,
     var canvasWidth: Int,
     var canvasHeight: Int,
-    var layerCount: Int,
 )

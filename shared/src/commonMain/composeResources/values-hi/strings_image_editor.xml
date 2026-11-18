@@ -6,7 +6,6 @@
     <string name="image_editor_color">रंग</string>
     <string name="image_editor_delete_layer">लेयर हटाएँ</string>
     <string name="image_editor_duplicate_layer">लेयर डुप्लिकेट करें</string>
-    <string name="image_editor_layer_count">%1$d लेयर</string>
     <string name="image_editor_layer_visibility">दृश्यता टॉगल करें</string>
     <string name="image_editor_layers">लेयर</string>
     <string name="image_editor_line_width">रेखा की मोटाई</string>

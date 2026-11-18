@@ -6,7 +6,6 @@
     <string name="image_editor_color">Цвет</string>
     <string name="image_editor_delete_layer">Удалить слой</string>
     <string name="image_editor_duplicate_layer">Дублировать слой</string>
-    <string name="image_editor_layer_count">Слоёв: %1$d</string>
     <string name="image_editor_layer_visibility">Показать/скрыть</string>
     <string name="image_editor_layers">Слои</string>
     <string name="image_editor_line_width">Толщина линии</string>

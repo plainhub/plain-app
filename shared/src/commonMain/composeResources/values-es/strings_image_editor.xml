@@ -6,7 +6,6 @@
     <string name="image_editor_color">Color</string>
     <string name="image_editor_delete_layer">Eliminar capa</string>
     <string name="image_editor_duplicate_layer">Duplicar capa</string>
-    <string name="image_editor_layer_count">%1$d capas</string>
     <string name="image_editor_layer_visibility">Alternar visibilidad</string>
     <string name="image_editor_layers">Capas</string>
     <string name="image_editor_line_width">Ancho de línea</string>

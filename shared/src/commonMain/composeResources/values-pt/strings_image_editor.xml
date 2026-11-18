@@ -6,7 +6,6 @@
     <string name="image_editor_color">Cor</string>
     <string name="image_editor_delete_layer">Excluir camada</string>
     <string name="image_editor_duplicate_layer">Duplicar camada</string>
-    <string name="image_editor_layer_count">%1$d camadas</string>
     <string name="image_editor_layer_visibility">Alternar visibilidade</string>
     <string name="image_editor_layers">Camadas</string>
     <string name="image_editor_line_width">Espessura da linha</string>

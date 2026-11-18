@@ -12,7 +12,6 @@ data class ImageEditorProject(
     @Required var thumbnail: String? = null,
     @Required var canvasWidth: Int = 0,
     @Required var canvasHeight: Int = 0,
-    @Required var layerCount: Int = 0,
     @Required var createdAt: Instant = TimeHelper.now(),
     @Required var updatedAt: Instant = TimeHelper.now(),
 )
