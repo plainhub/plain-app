@@ -13,11 +13,52 @@ import com.ismartcoding.plain.lib.JsonHelper
 import com.ismartcoding.plain.platform.system.DataType
 import com.ismartcoding.plain.models.ImageEditorProject
 import com.ismartcoding.plain.models.ImageEditorProjectSummary
+import com.ismartcoding.plain.features.nearby.PairingMode
+import com.ismartcoding.plain.models.PairPeerInput
 import kotlin.time.Instant
 import kotlinx.serialization.json.*
 import kotlin.test.*
 
 class GraphqlArgumentsTest {
+    @OptIn(kotlinx.serialization.ExperimentalSerializationApi::class)
+    @Test
+    fun pairPeerInputContainsOnlyPairingDetails() {
+        val descriptor = PairPeerInput.serializer().descriptor
+        assertEquals(listOf("mode", "password"), (0 until descriptor.elementsCount).map(descriptor::getElementName))
+    }
+
+    @Test
+    fun pairPeerPassesTheTargetIdOutsideTheInput() {
+        val peerId = "peer-with:opaque-id"
+        val password = "fixture-password"
+        for ((mode, suppliedPassword) in listOf(PairingMode.CHAT to null, PairingMode.MANAGE to password)) {
+            val request = Mutation.pairPeer(peerId, PairPeerInput(mode, suppliedPassword))
+            assertEquals("pairPeer", request.field)
+            assertEquals(
+                $$"mutation($peerId: ID!, $input: PairPeerInput!) { pairPeer(peerId: $peerId, input: $input) }",
+                request.operation.query,
+            )
+            assertEquals(
+                mapOf(
+                    "peerId" to JsonPrimitive(peerId),
+                    "input" to buildJsonObject {
+                        put("mode", mode.name)
+                        put("password", suppliedPassword)
+                    },
+                ),
+                request.operation.variables,
+            )
+        }
+    }
+
+    @Test
+    fun imageEditorSaveRequiresAnExplicitProjectId() {
+        val project = ImageEditorProject("fixture")
+        for (blank in listOf("", "   ")) {
+            assertFailsWith<IllegalArgumentException> { Mutation.saveImageEditorProject(blank, project) }
+        }
+        assertEquals(JsonPrimitive(project.id), Mutation.saveImageEditorProject(project.id, project).operation.variables["id"])
+    }
     @Test
     fun catalog_sorts_use_their_own_graphql_enum() {
         val sorts = listOf(
@@ -221,7 +262,7 @@ class GraphqlArgumentsTest {
         assertEquals(640 to 480, project.canvasWidth to project.canvasHeight)
         for (operation in listOf(
             Query.imageEditorProjects().operation, Query.imageEditorProject(project.id).operation,
-            Mutation.saveImageEditorProject("", project).operation, Mutation.saveImageEditorProject(project.id, project).operation,
+            Mutation.saveImageEditorProject(project.id, project).operation,
         )) {
             assertTrue(operation.query.contains("canvasWidth canvasHeight"))
             assertFalse(operation.query.contains("layerCount"))

@@ -5,7 +5,6 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class PairPeerInput(
-    val peerId: String,
     val mode: PairingMode,
     val password: String? = null,
 )

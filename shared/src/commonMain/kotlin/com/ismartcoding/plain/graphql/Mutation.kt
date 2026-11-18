@@ -80,9 +80,9 @@ object Mutation {
         field = "deleteChatItem",
     )
 
-    fun pairPeer(input: PairPeerInput): GraphqlRequest<Boolean> = GraphqlRequest(
-        $$"mutation($input: PairPeerInput!) { pairPeer(input: $input) }",
-        mapOf(variable("input", input)),
+    fun pairPeer(peerId: String, input: PairPeerInput): GraphqlRequest<Boolean> = GraphqlRequest(
+        $$"mutation($peerId: ID!, $input: PairPeerInput!) { pairPeer(peerId: $peerId, input: $input) }",
+        mapOf(variable("peerId", peerId), variable("input", input)),
         field = "pairPeer",
     )
 
@@ -412,6 +412,7 @@ object Mutation {
     )
 
     fun saveImageEditorProject(id: String, project: ImageEditorProject): GraphqlRequest<ImageEditorProject> {
+        require(id.isNotBlank()) { "Image editor project ID must not be blank" }
         val input = ImageEditorProjectInput(project.stateB64, project.thumbnail, project.canvasWidth, project.canvasHeight)
         return GraphqlRequest(
             $$"mutation($id: ID!, $input: ImageEditorProjectInput!) { saveImageEditorProject(id: $id, input: $input) { $${Fragments.IMAGE_EDITOR_PROJECT} } }",

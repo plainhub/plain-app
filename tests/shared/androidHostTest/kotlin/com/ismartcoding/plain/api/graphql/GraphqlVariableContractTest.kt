@@ -1,9 +1,11 @@
 package com.ismartcoding.plain.api.graphql
 
 import com.ismartcoding.plain.features.files.FileTaskOp
+import com.ismartcoding.plain.features.nearby.PairingMode
 import com.ismartcoding.plain.graphql.Mutation
 import com.ismartcoding.plain.graphql.Query
 import com.ismartcoding.plain.models.ImageEditorProject
+import com.ismartcoding.plain.models.PairPeerInput
 import com.ismartcoding.plain.rust.graphql.GraphqlRequest
 import com.ismartcoding.plain.platform.system.DataType
 import java.lang.reflect.Method
@@ -54,7 +56,7 @@ class GraphqlVariableContractTest {
     private fun supported(type: Class<*>): Boolean = type in setOf(
         String::class.java, Int::class.javaPrimitiveType, Long::class.javaPrimitiveType,
         Float::class.javaPrimitiveType, Boolean::class.javaPrimitiveType, JavaBoolean::class.java,
-        Instant::class.java, ImageEditorProject::class.java,
+        Instant::class.java, ImageEditorProject::class.java, PairPeerInput::class.java,
     ) || type.isEnum || Collection::class.java.isAssignableFrom(type)
 
     private fun argument(method: Method, index: Int, type: Class<*>): Any = when {
@@ -70,6 +72,7 @@ class GraphqlVariableContractTest {
         type == Boolean::class.javaPrimitiveType || type == JavaBoolean::class.java -> false
         type == Instant::class.java -> Instant.parse("2026-01-01T00:00:00Z")
         type == ImageEditorProject::class.java -> ImageEditorProject("fixture")
+        type == PairPeerInput::class.java -> PairPeerInput(PairingMode.CHAT)
         type == DataType::class.java -> DataType.IMAGE
         type.isEnum -> type.enumConstants.first()
         method.name == "createFileTask" -> listOf(FileTaskOp("source", "target"))

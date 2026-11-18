@@ -13,7 +13,7 @@ class ImageEditorProjectsClient(private val api: GraphqlClient) {
         api.execute(Query.imageEditorProject(id))
 
     suspend fun addOrUpdateAsync(id: String, updateItem: ImageEditorProject.() -> Unit): ImageEditorProject {
-        val project = (if (id.isEmpty()) null else getByIdAsync(id)) ?: ImageEditorProject(id)
+        val project = getByIdAsync(id) ?: ImageEditorProject(id)
         project.updateItem()
         return api.execute(Mutation.saveImageEditorProject(id, project))
     }
