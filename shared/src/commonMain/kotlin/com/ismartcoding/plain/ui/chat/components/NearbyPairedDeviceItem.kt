@@ -24,7 +24,7 @@ import com.ismartcoding.plain.ui.nearby.NearbyViewModel
 import com.ismartcoding.plain.ui.platform.system.getIcon
 import com.ismartcoding.plain.ui.theme.PlainTheme
 import com.ismartcoding.plain.ui.resources.Res as UiRes
-import com.ismartcoding.plain.ui.resources.ellipsis_vertical as ui_drawable_ellipsis_vertical
+import com.ismartcoding.plain.ui.resources.more_horiz as ui_drawable_more_horiz
 import org.jetbrains.compose.resources.stringResource
 
 @Composable
@@ -61,7 +61,7 @@ fun NearbyPairedDeviceItem(peer: Peer, device: NearbyDevice?, onPair: (NearbyDev
                 }
                 if (peer.token.isEmpty()) Box {
                     PIconButton(
-                        UiRes.drawable.ui_drawable_ellipsis_vertical,
+                        UiRes.drawable.ui_drawable_more_horiz,
                         contentDescription = stringResource(Res.string.more),
                         click = { showMenu = true },
                     )

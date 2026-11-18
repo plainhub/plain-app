@@ -27,7 +27,7 @@ import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.unit.dp
 import com.ismartcoding.plain.ui.resources.Res as UiRes
-import com.ismartcoding.plain.ui.resources.ellipsis_vertical as ui_drawable_ellipsis_vertical
+import com.ismartcoding.plain.ui.resources.more_horiz as ui_drawable_more_horiz
 import com.ismartcoding.plain.ui.resources.list_checks as ui_drawable_list_checks
 import com.ismartcoding.plain.ui.resources.menu as ui_drawable_menu
 import com.ismartcoding.plain.ui.resources.plus as ui_drawable_plus
@@ -54,13 +54,13 @@ fun ActionButtonDrawer(onClick: () -> Unit) {
 
 @Composable
 fun ActionButtonMore(onClick: () -> Unit) {
-    PIconButton(icon = UiRes.drawable.ui_drawable_ellipsis_vertical, contentDescription = stringResource(Res.string.more),
+    PIconButton(icon = UiRes.drawable.ui_drawable_more_horiz, contentDescription = stringResource(Res.string.more),
         tint = MaterialTheme.colorScheme.onSurface, click = onClick)
 }
 
 @Composable
 fun ActionButtonMoreWithMenu(
-    icon: DrawableResource = UiRes.drawable.ui_drawable_ellipsis_vertical,
+    icon: DrawableResource = UiRes.drawable.ui_drawable_more_horiz,
     content: @Composable ColumnScope.(dismiss: () -> Unit) -> Unit,
 ) {
     var isMenuOpen by remember { mutableStateOf(false) }
