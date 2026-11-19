@@ -10,37 +10,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import com.ismartcoding.plain.features.chat.peer.PeerStatusClient
-import com.ismartcoding.plain.ui.components.ButtonSize
 import com.ismartcoding.plain.ui.platform.system.getIcon
-import com.ismartcoding.plain.events.PermissionsResultEvent
-import com.ismartcoding.plain.events.RequestPermissionsEvent
 import com.ismartcoding.plain.i18n.Res
-import com.ismartcoding.plain.i18n.grant_permission
 import com.ismartcoding.plain.i18n.local_chat
 import com.ismartcoding.plain.i18n.local_chat_desc
-import com.ismartcoding.plain.i18n.nearby_wifi_devices_required_for_chat
-import com.ismartcoding.plain.lib.Channel
-import com.ismartcoding.plain.lib.sendEvent
-import com.ismartcoding.plain.platform.network.BleAvailability
-import com.ismartcoding.plain.platform.network.bleAvailabilityFlow
-import com.ismartcoding.plain.platform.network.canRequestBluetoothAccess
-import com.ismartcoding.plain.platform.network.wifiAwarePermission
-import com.ismartcoding.plain.platform.system.Capability
-import com.ismartcoding.plain.platform.system.getDeviceCapabilities
-import com.ismartcoding.plain.platform.network.ensureBlePermissionAsync
-import com.ismartcoding.plain.platform.permissions.isGranted
-import com.ismartcoding.plain.platform.system.openAppSettings
-import com.ismartcoding.plain.ui.base.AlertType
 import com.ismartcoding.plain.ui.base.BottomSpace
-import com.ismartcoding.plain.ui.base.PAlert
-import com.ismartcoding.plain.ui.base.PTextButton
 import com.ismartcoding.plain.ui.base.TopSpace
 import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.base.pullrefresh.PullToRefresh
@@ -55,9 +32,6 @@ import com.ismartcoding.plain.ui.chat.components.PeerListItem
 import com.ismartcoding.plain.ui.resources.Res as UiRes
 import com.ismartcoding.plain.ui.resources.bot as ui_drawable_bot
 import com.ismartcoding.plain.ui.resources.hash as ui_drawable_hash
-import androidx.compose.material3.MaterialTheme
-import com.ismartcoding.plain.ui.theme.onWarningContainer
-import com.ismartcoding.plain.ui.state.launchSafe
 import org.jetbrains.compose.resources.stringResource
 
 @Composable
@@ -81,28 +55,6 @@ fun ChatListPage(
     }
     val channels = sortChatChannels(channelVM.channels.collectAsStateValue(), latestChats)
 
-    val bleAvailability by bleAvailabilityFlow.collectAsState()
-    val capabilities = getDeviceCapabilities()
-    val awareSupported = Capability.WIFI_AWARE in capabilities
-    val awarePermission = remember { wifiAwarePermission() }
-    var awareReady by remember(awareSupported, awarePermission) { mutableStateOf(!awareSupported || awarePermission?.isGranted() == true) }
-    val bleReady = Capability.BLE !in capabilities || bleAvailability == BleAvailability.READY
-    val scope = rememberCoroutineScope()
-
-    LaunchedEffect(Unit) {
-        Channel.sharedFlow.collect { event ->
-            when (event) {
-                is PermissionsResultEvent -> {
-                    val permission = awarePermission ?: return@collect
-                    val key = permission.toSysPermission()
-                    if (!event.map.containsKey(key)) return@collect
-                    val granted = permission.isGranted()
-                    awareReady = granted
-                }
-            }
-        }
-    }
-
     MainNavScaffold(
         selectedIndex = 1,
         onTabSelected = onTabSelected,
@@ -116,34 +68,6 @@ fun ChatListPage(
         ) {
             LazyColumn(modifier = Modifier.fillMaxSize()) {
                 item { TopSpace() }
-                item {
-                    if (local && (!bleReady || !awareReady)) PAlert(
-                        description = stringResource(Res.string.nearby_wifi_devices_required_for_chat),
-                        type = AlertType.WARNING,
-                        modifier = Modifier.padding(start = 16.dp, end = 16.dp, bottom = 8.dp),
-                    ) {
-                        PTextButton(
-                            text = stringResource(Res.string.grant_permission),
-                            buttonSize = ButtonSize.SMALL,
-                            contentColor = MaterialTheme.colorScheme.onWarningContainer,
-                            onClick = {
-                                when {
-                                    !bleReady -> {
-                                        if (canRequestBluetoothAccess()) {
-                                            scope.launchSafe {
-                                                ensureBlePermissionAsync()
-                                                if (!awareReady) awarePermission?.let { sendEvent(RequestPermissionsEvent(it)) }
-                                            }
-                                        } else {
-                                            openAppSettings()
-                                        }
-                                    }
-                                    else -> awarePermission?.let { sendEvent(RequestPermissionsEvent(it)) }
-                                }
-                            },
-                        )
-                    }
-                }
                 item {
                     PeerListItem(
                         title = stringResource(Res.string.local_chat),

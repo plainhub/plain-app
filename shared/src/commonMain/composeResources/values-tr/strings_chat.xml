@@ -137,8 +137,6 @@
     <string name="delivery_status">Gönderim durumu</string>
     <string name="delivery_status_summary">%1$d / %2$d teslim edildi</string>
     <string name="resend_selected">Seçilenleri yeniden gönder</string>
-    <string name="bluetooth_permission_required_for_nearby">Bluetooth üzerinden yakındaki cihazları keşfetmek için Bluetooth izni gereklidir.</string>
-    <string name="nearby_wifi_devices_required_for_chat">Yakındaki cihazları keşfetmek için Bluetooth ve yakındaki cihazlar izinleri gereklidir.</string>
     <string name="pairing_compare_code">Eşleştirmeye izin vermeden önce bu kodu her iki cihazda karşılaştırın.</string>
     <string name="share_folder">Klasörü Paylaş</string>
     <string name="share_this_folder">Bu Klasörü Paylaş</string>
@@ -188,4 +186,6 @@
     <string name="nearby_enable_remote_access">Diğer cihazda uzaktan erişimi etkinleştirin</string>
     <string name="pairing_identity_changed">Cihazın açık anahtarı değişti. Uygulama yeniden yüklenmiş olabilir. Güvenmeden önce parmak izinin tamamını karşılaştırın.</string>
     <string name="pairing_trust">Güven</string>
+    <string name="nearby_bluetooth_tip">Bluetooth ile yakındaki daha fazla PlainApp cihazını bulun.</string>
+    <string name="nearby_bluetooth_enable">Bluetooth’u etkinleştir</string>
 </resources>

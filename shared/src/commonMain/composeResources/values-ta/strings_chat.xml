@@ -137,8 +137,6 @@
     <string name="delivery_status">டெலிவரி நிலை</string>
     <string name="delivery_status_summary">%1$d / %2$d டெலிவர் செய்யப்பட்டது</string>
     <string name="resend_selected">தேர்வுபடுத்தியவற்றை மீண்டும் அனுப்பு</string>
-    <string name="bluetooth_permission_required_for_nearby">புளூடூத் வழியாக அருகிலுள்ள சாதனங்களைக் கண்டறிய புளூடூத் அனுமதி தேவை.</string>
-    <string name="nearby_wifi_devices_required_for_chat">அருகிலுள்ள சாதனங்களைக் கண்டறிய புளூடூத் மற்றும் அருகிலுள்ள சாதன அனுமதிகள் தேவை.</string>
     <string name="pairing_compare_code">இணைக்க அனுமதிப்பதற்கு முன் இரு சாதனங்களிலும் இந்தக் குறியீடு ஒன்றாக இருப்பதை உறுதிசெய்யவும்.</string>
     <string name="share_folder">கோப்புறையைப் பகிர்</string>
     <string name="share_this_folder">இந்த கோப்புறையைப் பகிர்</string>
@@ -188,4 +186,6 @@
     <string name="nearby_enable_remote_access">மற்ற சாதனத்தில் தொலைநிலை அணுகலை இயக்கவும்</string>
     <string name="pairing_identity_changed">சாதனத்தின் பொதுச் சாவி மாறியுள்ளது. செயலி மீண்டும் நிறுவப்பட்டிருக்கலாம். நம்புவதற்கு முன் முழு கைரேகையையும் ஒப்பிடவும்.</string>
     <string name="pairing_trust">நம்பு</string>
+    <string name="nearby_bluetooth_tip">புளூடூத் மூலம் அருகிலுள்ள மேலும் பல PlainApp சாதனங்களைக் கண்டறியுங்கள்.</string>
+    <string name="nearby_bluetooth_enable">புளூடூத்தை இயக்கவும்</string>
 </resources>

@@ -137,8 +137,6 @@
     <string name="delivery_status">डिलीवरी स्थिति</string>
     <string name="delivery_status_summary">%1$d / %2$d डिलीवर हुआ</string>
     <string name="resend_selected">चयनित फिर से भेजें</string>
-    <string name="bluetooth_permission_required_for_nearby">ब्लूटूथ के माध्यम से आसपास के डिवाइस खोजने के लिए ब्लूटूथ अनुमति आवश्यक है।</string>
-    <string name="nearby_wifi_devices_required_for_chat">आसपास के डिवाइस खोजने के लिए ब्लूटूथ और आसपास के डिवाइस अनुमतियां आवश्यक हैं।</string>
     <string name="pairing_compare_code">पेयरिंग की अनुमति देने से पहले दोनों डिवाइस पर इस कोड का मिलान करें।</string>
     <string name="share_folder">फ़ोल्डर साझा करें</string>
     <string name="share_this_folder">इस फ़ोल्डर को साझा करें</string>
@@ -188,4 +186,6 @@
     <string name="nearby_enable_remote_access">दूसरे डिवाइस पर रिमोट एक्सेस चालू करें</string>
     <string name="pairing_identity_changed">डिवाइस की सार्वजनिक कुंजी बदल गई है। ऐप फिर से इंस्टॉल किया गया हो सकता है। भरोसा करने से पहले पूरे फ़िंगरप्रिंट का मिलान करें।</string>
     <string name="pairing_trust">भरोसा करें</string>
+    <string name="nearby_bluetooth_tip">ब्लूटूथ से आस-पास के और PlainApp डिवाइस खोजें।</string>
+    <string name="nearby_bluetooth_enable">ब्लूटूथ चालू करें</string>
 </resources>

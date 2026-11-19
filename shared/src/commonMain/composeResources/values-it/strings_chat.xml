@@ -137,8 +137,6 @@
     <string name="delivery_status">Stato di consegna</string>
     <string name="delivery_status_summary">%1$d / %2$d consegnati</string>
     <string name="resend_selected">Reinvia selezionati</string>
-    <string name="bluetooth_permission_required_for_nearby">È necessaria l'autorizzazione Bluetooth per scoprire i dispositivi nelle vicinanze tramite Bluetooth.</string>
-    <string name="nearby_wifi_devices_required_for_chat">Sono necessarie le autorizzazioni Bluetooth e dei dispositivi nelle vicinanze per scoprire i dispositivi nelle vicinanze.</string>
     <string name="pairing_compare_code">Confronta questo codice su entrambi i dispositivi prima di consentire l’associazione.</string>
     <string name="share_folder">Condividi cartella</string>
     <string name="share_this_folder">Condividi questa cartella</string>
@@ -188,4 +186,6 @@
     <string name="nearby_enable_remote_access">Attiva l’accesso remoto sull’altro dispositivo</string>
     <string name="pairing_identity_changed">La chiave pubblica del dispositivo è cambiata, forse dopo una reinstallazione. Confronta tutta la sua impronta prima di considerarlo attendibile.</string>
     <string name="pairing_trust">Considera attendibile</string>
+    <string name="nearby_bluetooth_tip">Trova più dispositivi PlainApp nelle vicinanze tramite Bluetooth.</string>
+    <string name="nearby_bluetooth_enable">Attiva il Bluetooth</string>
 </resources>

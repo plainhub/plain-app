@@ -35,11 +35,9 @@ import com.ismartcoding.plain.lib.extensions.toSortName
 import com.ismartcoding.plain.platform.network.BleAvailability
 import com.ismartcoding.plain.platform.network.bleAvailabilityFlow
 import com.ismartcoding.plain.platform.system.openAppSettings
-import com.ismartcoding.plain.ui.base.AlertType
 import com.ismartcoding.plain.ui.base.BottomSpace
 import com.ismartcoding.plain.ui.base.HorizontalSpace
 import com.ismartcoding.plain.ui.components.NavigationBackIcon
-import com.ismartcoding.plain.ui.base.PAlert
 import com.ismartcoding.plain.ui.base.PScaffold
 import com.ismartcoding.plain.ui.base.PTextButton
 import com.ismartcoding.plain.ui.base.PTopAppBar
@@ -148,40 +146,6 @@ fun NearbyPage(
                 .fillMaxSize()
                 .padding(top = paddingValues.calculateTopPadding())
         ) {
-            if (Capability.BLE in getDeviceCapabilities() && bleAvailability != BleAvailability.READY) {
-                item {
-                    val description = when {
-                        bleAvailability == BleAvailability.BLUETOOTH_OFF -> stringResource(Res.string.bluetooth_off)
-                        !canRequestBluetoothAccess() && bleAvailability == BleAvailability.PERMISSION_DENIED ->
-                            stringResource(Res.string.bluetooth_permission_denied)
-                        else -> stringResource(Res.string.bluetooth_permission_required_for_nearby)
-                    }
-                    val openSettings = !canRequestBluetoothAccess() && bleAvailability != BleAvailability.UNKNOWN
-                    PAlert(
-                        description = description,
-                        AlertType.WARNING,
-                        modifier = Modifier.padding(start = 16.dp, end = 16.dp, bottom = 8.dp),
-                    ) {
-                        PTextButton(
-                            text = stringResource(
-                                when {
-                                    openSettings -> Res.string.open_settings
-                                    bleAvailability == BleAvailability.BLUETOOTH_OFF -> Res.string.enable
-                                    else -> Res.string.grant_permission
-                                }
-                            ),
-                            buttonSize = ButtonSize.SMALL,
-                            onClick = {
-                                if (openSettings) {
-                                    openAppSettings()
-                                } else {
-                                    NearbyViewModel.requestBlePermission()
-                                }
-                            },
-                        )
-                    }
-                }
-            }
             if (peers.isNotEmpty()) {
                 item { PSectionTitle(stringResource(Res.string.paired_devices)) }
             }
@@ -214,9 +178,42 @@ fun NearbyPage(
                     }
                 }
             }
+            if (Capability.BLE in getDeviceCapabilities() &&
+                bleAvailability != BleAvailability.READY && bleAvailability != BleAvailability.UNSUPPORTED
+            ) {
+                item { NearbyBluetoothTip(bleAvailability) }
+            }
             item {
                 BottomSpace(paddingValues)
             }
+        }
+    }
+}
+
+@Composable
+private fun NearbyBluetoothTip(availability: BleAvailability) {
+    val canRequest = canRequestBluetoothAccess()
+    val openSettings = availability == BleAvailability.PERMISSION_DENIED && !canRequest
+    Column(modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp)) {
+        Text(
+            text = stringResource(
+                when {
+                    availability == BleAvailability.BLUETOOTH_OFF -> Res.string.bluetooth_off
+                    openSettings -> Res.string.bluetooth_permission_denied
+                    else -> Res.string.nearby_bluetooth_tip
+                }
+            ),
+            style = MaterialTheme.typography.labelLarge,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+        if (canRequest || openSettings) {
+            PTextButton(
+                text = stringResource(if (openSettings) Res.string.open_settings else Res.string.nearby_bluetooth_enable),
+                buttonSize = ButtonSize.SMALL,
+                onClick = {
+                    if (openSettings) openAppSettings() else NearbyViewModel.requestBlePermission()
+                },
+            )
         }
     }
 }
