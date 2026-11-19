@@ -90,6 +90,9 @@ class SharedComponentSpacingTest {
     }) {
         await { nodes().any { it.config.getOrNull(SemanticsProperties.TestTag) == "chat-mixed" } }
         fun height(id: String): Float = tagged("chat-$id").boundsInRoot.height
+        assertTrue("The file attachment must be rendered", nodes().any { node ->
+            node.config.getOrNull(SemanticsProperties.Text)?.any { it.text == "fixture.pdf" } == true
+        })
         assertEquals(8f, height("mixed") - height("image") - height("file") + height("text"), 0.5f)
     }
 

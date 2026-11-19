@@ -235,8 +235,6 @@ fun ChatPage(
                             ChatListItem(
                                 navController = navController,
                                 chatVM = chatVM,
-                                filesAllowed = filesAllowed,
-                                onRequestFilePermission = requestFilePermission,
                                 chatTarget = chatTarget.value,
                                 audioQueueVM = audioQueueVM,
                                 items = itemsState.value,

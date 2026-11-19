@@ -61,8 +61,6 @@ fun ChatListItem(
     focusManager: FocusManager,
     previewerState: MediaPreviewerState,
     onForward: (VChat) -> Unit = {},
-    filesAllowed: Boolean = true,
-    onRequestFilePermission: () -> Unit = {},
 ) {
     val message = m.value as? ChatMessage
     val showContextMenu = remember { mutableStateOf(false) }
@@ -132,15 +130,11 @@ fun ChatListItem(
                                     })
                                 }
                                 if (message.items.isNotEmpty()) {
-                                    if (!filesAllowed) {
-                                        com.ismartcoding.plain.ui.base.PTextButton(text = org.jetbrains.compose.resources.stringResource(com.ismartcoding.plain.i18n.Res.string.request_permission), onClick = onRequestFilePermission)
-                                    } else {
-                                        val images = message.images
-                                        val files = message.files
-                                        if (images.isNotEmpty()) ChatImages(items, m, images, peer, imageWidthDp, imageWidthPx, previewerState, chatVM)
-                                        if (images.isNotEmpty() && files.isNotEmpty()) VerticalSpace(8.dp)
-                                        if (files.isNotEmpty()) ChatFiles(items, navController, m, files, peer, audioQueueVM, previewerState)
-                                    }
+                                    val images = message.images
+                                    val files = message.files
+                                    if (images.isNotEmpty()) ChatImages(items, m, images, peer, imageWidthDp, imageWidthPx, previewerState, chatVM)
+                                    if (images.isNotEmpty() && files.isNotEmpty()) VerticalSpace(8.dp)
+                                    if (files.isNotEmpty()) ChatFiles(items, navController, m, files, peer, audioQueueVM, previewerState)
                                 }
                             }
                         }
