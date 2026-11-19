@@ -50,6 +50,14 @@ import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.chat.PeerViewModel
 import com.ismartcoding.plain.ui.chat.components.NearbyDeviceItem
 import com.ismartcoding.plain.ui.chat.components.NearbyPairedDeviceItem
+import com.ismartcoding.plain.Prefs
+import com.ismartcoding.plain.platform.system.getDeviceName
+import com.ismartcoding.plain.platform.system.getDeviceType
+import com.ismartcoding.plain.ui.app.MainViewModel
+import com.ismartcoding.plain.ui.base.PListItem
+import com.ismartcoding.plain.ui.chat.components.PeerIconWithStatus
+import com.ismartcoding.plain.ui.platform.system.getIcon
+import com.ismartcoding.plain.ui.theme.PlainTheme
 import com.ismartcoding.plain.ui.base.PSectionTitle
 import org.jetbrains.compose.resources.stringResource
 import androidx.compose.runtime.mutableStateOf
@@ -156,6 +164,27 @@ fun NearbyPage(
         ) {
             if (lanGranted?.value == false) {
                 item { NearbyLocalNetworkNotice(lanPermission) }
+            }
+            item(key = "local") {
+                val localName by Prefs.deviceName.collectAsState()
+                val isCurrent = MainViewModel.selectedDevice.value == null
+                PListItem(
+                    modifier = PlainTheme.getCardModifier(),
+                    title = localName.ifEmpty { getDeviceName() },
+                    subtitle = stringResource(Res.string.this_device),
+                    start = { PeerIconWithStatus(getDeviceType().getIcon(), null) },
+                    titleTrailing = {
+                        if (isCurrent) Text(stringResource(Res.string.nearby_current_device), color = MaterialTheme.colorScheme.primary)
+                    },
+                    action = {
+                        if (!isCurrent) PIconButton(
+                            Res.drawable.arrow_left_right,
+                            contentDescription = stringResource(Res.string.nearby_switch_device),
+                            click = { MainViewModel.selectDevice(null) },
+                        )
+                    },
+                )
+                VerticalSpace(8.dp)
             }
             if (peers.isNotEmpty()) {
                 item { PSectionTitle(stringResource(Res.string.paired_devices)) }

@@ -67,10 +67,38 @@ import com.ismartcoding.plain.ui.chat.VChat
 import com.ismartcoding.plain.ui.chat.components.ChatListItem
 import com.ismartcoding.plain.ui.media.viewer.previewer.rememberPreviewerState
 import kotlin.time.Instant
+import com.ismartcoding.plain.i18n.nearby_current_device
+import com.ismartcoding.plain.i18n.nearby_switch_device
 
 @RunWith(AndroidJUnit4::class)
 class SharedComponentSpacingTest {
     private val instrumentation = InstrumentationRegistry.getInstrumentation()
+
+    @Test
+    fun nearbyCanSwitchFromAManagedDeviceBackToThisDevice() {
+        val main = com.ismartcoding.plain.ui.app.MainViewModel
+        val switch = com.ismartcoding.plain.ui.i18n.LocaleHelper.getString(com.ismartcoding.plain.i18n.Res.string.nearby_switch_device)
+        val current = com.ismartcoding.plain.ui.i18n.LocaleHelper.getString(com.ismartcoding.plain.i18n.Res.string.nearby_current_device)
+        try {
+            render({
+                val peers = androidx.compose.runtime.remember {
+                    com.ismartcoding.plain.ui.chat.PeerViewModel(readPeers = { emptyList() }, readLatestChats = { emptyMap() })
+                }
+                com.ismartcoding.plain.ui.nearby.NearbyPage(rememberNavController(), peers)
+            }) {
+                instrumentation.runOnMainSync { main.selectDevice(com.ismartcoding.plain.ui.app.DeviceIdentity("fixture", "fixture-key")) }
+                fun switchNode() = nodes().singleOrNull { switch in it.config.getOrNull(SemanticsProperties.ContentDescription).orEmpty() }
+                await { switchNode() != null }
+                val button = generateSequence(checkNotNull(switchNode())) { it.parent }
+                    .first { it.config.contains(androidx.compose.ui.semantics.SemanticsActions.OnClick) }
+                instrumentation.runOnMainSync { button.config[androidx.compose.ui.semantics.SemanticsActions.OnClick].action!!.invoke() }
+                await { main.selectedDevice.value == null && switchNode() == null }
+                text(current)
+            }
+        } finally {
+            instrumentation.runOnMainSync { main.selectDevice(null) }
+        }
+    }
 
     @Test
     fun mixedChatMessageAddsOnlyTheGapBetweenAttachmentGroups() = render({
