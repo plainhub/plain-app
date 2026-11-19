@@ -24,30 +24,37 @@ import org.jetbrains.compose.resources.stringResource
 import com.ismartcoding.plain.ui.components.RequestVerificationCodeCard
 
 @Composable
-fun PairPeerDialog(device: NearbyDevice, initialMode: PairingMode, qrCode: String? = null, onDismiss: () -> Unit) {
+internal fun PairPeerDialog(
+    device: NearbyDevice,
+    initialMode: PairingMode,
+    qrCode: String? = null,
+    start: suspend (NearbyDevice, PairingMode) -> Boolean = RustPairingRuntime::start,
+    cancel: suspend (String) -> Boolean = RustPairingRuntime::cancel,
+    onDismiss: () -> Unit,
+) {
     val scope = rememberCoroutineScope()
     val failureText = stringResource(Res.string.pairing_failed)
-    var started by remember { mutableStateOf(false) }
+    var ownsRequest by remember { mutableStateOf(false) }
     var submitting by remember { mutableStateOf(false) }
     var disposed by remember { mutableStateOf(false) }
     var error by remember { mutableStateOf<String?>(null) }
-    val state = NearbyViewModel.pairingViews[device.id]?.takeIf { started || submitting || it.active }
+    val state = NearbyViewModel.pairingViews[device.id]?.takeIf { ownsRequest || submitting || it.active }
     val phase = state?.step
     fun failPairing() {
         PairingProjection.failed(PairingProgressNotice(device.id, device.name))
         error = failureText
     }
     fun startPairing() {
-        if (started || submitting) return
+        if (ownsRequest || submitting) return
         PairingProjection.starting(device.id)
         submitting = true
         error = null
         scope.launch {
             try {
                 withContext(NonCancellable) {
-                    started = RustPairingRuntime.start(device, initialMode)
-                    if (!started) failPairing()
-                    else if (disposed && NearbyViewModel.pairingViews[device.id]?.active == true) RustPairingRuntime.cancel(device.id)
+                    ownsRequest = start(device, initialMode)
+                    if (!ownsRequest) failPairing()
+                    else if (disposed && NearbyViewModel.pairingViews[device.id]?.active == true) cancel(device.id)
                 }
             } catch (canceled: CancellationException) { throw canceled }
             catch (_: Exception) { failPairing() }
@@ -58,8 +65,8 @@ fun PairPeerDialog(device: NearbyDevice, initialMode: PairingMode, qrCode: Strin
     DisposableEffect(Unit) {
         onDispose {
             disposed = true
-            if (started && NearbyViewModel.pairingViews[device.id]?.active == true) {
-                scope.launch(NonCancellable) { RustPairingRuntime.cancel(device.id) }
+            if (ownsRequest && NearbyViewModel.pairingViews[device.id]?.active == true) {
+                scope.launch(NonCancellable) { cancel(device.id) }
             }
         }
     }
@@ -88,7 +95,7 @@ fun PairPeerDialog(device: NearbyDevice, initialMode: PairingMode, qrCode: Strin
         )
         return
     }
-    val waiting = started || submitting || state?.active == true
+    val waiting = ownsRequest || submitting || state?.active == true
     val localManageTrust = initialMode == PairingMode.MANAGE && phase == PairingStep.TRUST_REQUIRED
     val expired = state?.expired == true
     val stateError = stringResource(state?.error.messageResource())
@@ -119,6 +126,12 @@ fun PairPeerDialog(device: NearbyDevice, initialMode: PairingMode, qrCode: Strin
                 }
                 if (!expired) (error ?: stateError.takeIf { phase == PairingStep.FAILED })?.let {
                     Text(it, color = MaterialTheme.colorScheme.error)
+                }
+                if (initialMode == PairingMode.MANAGE && phase == PairingStep.WAITING_FOR_PEER && !submitting) {
+                    PTextButton(text = stringResource(Res.string.pair_another_device), onClick = {
+                        ownsRequest = false
+                        onDismiss()
+                    })
                 }
             }
         },

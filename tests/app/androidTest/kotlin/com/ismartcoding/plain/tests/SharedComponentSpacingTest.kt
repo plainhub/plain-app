@@ -72,10 +72,67 @@ import com.ismartcoding.plain.i18n.nearby_switch_device
 import com.ismartcoding.plain.i18n.offline
 import com.ismartcoding.plain.i18n.event_reason_remote_access_disabled
 import com.ismartcoding.plain.i18n.nearby_enable_remote_access
+import com.ismartcoding.plain.features.nearby.PairingMode
+import com.ismartcoding.plain.features.nearby.PeerStatus
+import com.ismartcoding.plain.i18n.Res
+import com.ismartcoding.plain.i18n.cancel
+import com.ismartcoding.plain.i18n.pair_another_device
+import com.ismartcoding.plain.models.NearbyDevice
+import com.ismartcoding.plain.models.PairingProgressNotice
+import com.ismartcoding.plain.platform.system.DeviceType
+import com.ismartcoding.plain.ui.chat.components.NearbyDeviceItem
+import com.ismartcoding.plain.ui.i18n.LocaleHelper
+import com.ismartcoding.plain.ui.nearby.NearbyViewModel
+import com.ismartcoding.plain.ui.nearby.PairPeerDialog
+import com.ismartcoding.plain.ui.nearby.PairingProjection
 
 @RunWith(AndroidJUnit4::class)
 class SharedComponentSpacingTest {
     private val instrumentation = InstrumentationRegistry.getInstrumentation()
+
+    @Test
+    fun pairingAnotherDevicePreservesTheFirstRequestAndKeepsCodesOutOfRows() {
+        val first = NearbyDevice("pair-first", "First phone", "", port = 0, deviceType = DeviceType.PHONE,
+            version = "", platform = "", lastSeen = Instant.fromEpochMilliseconds(0), status = PeerStatus.PAIRED)
+        val second = first.copy(id = "pair-second", name = "Second phone")
+        val selected = mutableStateOf<NearbyDevice?>(first)
+        val canceled = mutableListOf<String>()
+        val code = "01234567"
+        fun clickLabel(value: String) {
+            val button = generateSequence(text(value)) { it.parent }.first { it.config.contains(androidx.compose.ui.semantics.SemanticsActions.OnClick) }
+            instrumentation.runOnMainSync { button.config[androidx.compose.ui.semantics.SemanticsActions.OnClick].action!!.invoke() }
+        }
+        try {
+            render({
+                selected.value?.let { device ->
+                    PairPeerDialog(device, PairingMode.MANAGE, start = { target, _ ->
+                        PairingProjection.started(PairingProgressNotice(target.id, target.name, verificationCode = code))
+                        true
+                    }, cancel = { canceled.add(it) }, onDismiss = { selected.value = null })
+                } ?: NearbyDeviceItem(first, enabled = true) {}
+            }) {
+                await { nodes().any { it.config.getOrNull(SemanticsProperties.TestTag) == "nearby-pair-code" } }
+                text(code)
+                clickLabel(LocaleHelper.getString(Res.string.pair_another_device))
+                await { nodes().any { it.config.getOrNull(SemanticsProperties.TestTag) == "nearby-device:${first.id}" } }
+                assertTrue(nodes().none { node -> node.config.getOrNull(SemanticsProperties.Text)?.any { it.text == code } == true })
+                assertTrue(canceled.isEmpty())
+                instrumentation.runOnMainSync { selected.value = second }
+                await { nodes().any { it.config.getOrNull(SemanticsProperties.TestTag) == "nearby-pair-code" } }
+                clickLabel(LocaleHelper.getString(Res.string.cancel))
+                await { canceled.isNotEmpty() }
+                assertEquals(listOf(second.id), canceled)
+                assertTrue(NearbyViewModel.pairingViews.getValue(first.id).active)
+            }
+        } finally {
+            instrumentation.runOnMainSync {
+                for (device in listOf(first, second)) {
+                    NearbyViewModel.pairingViews.remove(device.id)
+                    NearbyViewModel.itemStatus.remove(device.id)
+                }
+            }
+        }
+    }
 
     @Test
     fun nearbySwitchExplainsUnavailablePeersWithoutSelectingThem() {

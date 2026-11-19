@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="pair_another_device">配对其他设备</string>
     <string name="confirm_to_send_files_to_file_assistant">您要将这些文件发送到文件传输助手吗？</string>
     <string name="confirm_to_send_file_to_file_assistant">您要将这个文件发送到文件传输助手吗？</string>
     <string name="bluetooth">蓝牙</string>
@@ -69,7 +70,7 @@
     <string name="pairing_request">配对请求</string>
     <string name="pairing_request_message">是否要与设备%1$s配对？</string>
     <string name="pairing_request_hint">配对后，你们可以互发消息和文件。</string>
-    <string name="pairing_compare_code">请确认两台设备显示的匹配码一致，再允许配对。</string>
+    <string name="pairing_compare_code">两台设备的配对码一致才允许配对。</string>
     <string name="allow">允许</string>
     <string name="deny">拒绝</string>
     <string name="chat">聊天</string>

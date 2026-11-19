@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="pair_another_device">Pair another device</string>
     <string name="confirm_to_send_files_to_file_assistant">Would you like to send these files to the File Transfer Assistant?</string>
     <string name="confirm_to_send_file_to_file_assistant">Would you like to send this files to the File Transfer Assistant?</string>
     <string name="bluetooth">Bluetooth</string>
@@ -70,7 +71,7 @@
     <string name="pairing_request">Pairing request</string>
     <string name="pairing_request_message">Do you want to pair with device %1$s?</string>
     <string name="pairing_request_hint">After pairing, you can exchange messages between both devices.</string>
-    <string name="pairing_compare_code">Compare this code on both devices before allowing pairing.</string>
+    <string name="pairing_compare_code">Only allow if the codes match.</string>
     <string name="allow">Allow</string>
     <string name="deny">Deny</string>
     <string name="chat">Chat</string>

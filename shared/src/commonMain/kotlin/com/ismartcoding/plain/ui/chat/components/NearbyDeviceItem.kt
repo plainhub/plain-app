@@ -21,16 +21,13 @@ fun NearbyDeviceItem(item: NearbyDevice, enabled: Boolean, onPair: () -> Unit) {
     val pairing = NearbyViewModel.pairingViews[item.id]
     val pending = pairing?.active == true
     val status = NearbyViewModel.getStatus(item.id, false)
-    val detail = when {
-        pairing?.step == PairingStep.FAILED -> stringResource(pairing.error.messageResource())
-        pairing?.step == PairingStep.WAITING_FOR_PEER -> pairing.verificationCode
-        else -> null
-    }
     PListItem(
         modifier = PlainTheme.getCardModifier().testTag("nearby-device:${item.id}"),
         title = item.name,
         subtitle = item.bestIp,
-        titleTrailing = { if (detail != null) Text(detail) },
+        titleTrailing = if (pairing?.step == PairingStep.FAILED) {
+            { Text(stringResource(pairing.error.messageResource())) }
+        } else null,
         start = { PeerIconWithStatus(item.deviceType.getIcon(), null) },
         action = {
             POutlinedButton(
