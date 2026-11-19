@@ -177,7 +177,7 @@
     <string name="no_finished_downloads">Keine abgeschlossenen Downloads</string>
     <string name="saved_n_of_m">%1$d von %2$d Elementen gespeichert</string>
     <string name="saved_to_x">Gespeichert in %1$s</string>
-    <string name="confirm_unpair_device">Kopplung mit %1$s aufheben? Das Löschen des Chatverlaufs entfernt dieses Gerät auch aus der Chatliste und kann nicht rückgängig gemacht werden.</string>
+    <string name="confirm_unpair_device">Kopplung mit „%1$s“ aufheben?</string>
     <string name="delete_chat_history">Chatverlauf löschen</string>
     <string name="nearby_my_devices">Meine Geräte</string>
     <string name="nearby_current_device">Aktuelles Gerät</string>
@@ -188,4 +188,5 @@
     <string name="pairing_trust">Vertrauen</string>
     <string name="nearby_bluetooth_tip">Finde mit Bluetooth mehr PlainApp-Geräte in der Nähe.</string>
     <string name="nearby_bluetooth_enable">Bluetooth aktivieren</string>
+    <string name="unpair_device_hint">Dein Chatverlauf bleibt erhalten. Kopple das Gerät erneut, um es zu verwenden.</string>
 </resources>

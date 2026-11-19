@@ -177,7 +177,7 @@
     <string name="no_finished_downloads">Nessun download completato</string>
     <string name="saved_n_of_m">%1$d di %2$d elementi salvati</string>
     <string name="saved_to_x">Salvato in %1$s</string>
-    <string name="confirm_unpair_device">Annullare l’abbinamento con %1$s? Eliminare la cronologia chat rimuove anche questo dispositivo dall’elenco delle chat e non può essere annullato.</string>
+    <string name="confirm_unpair_device">Dissociare «%1$s»?</string>
     <string name="delete_chat_history">Elimina cronologia chat</string>
     <string name="nearby_my_devices">I miei dispositivi</string>
     <string name="nearby_current_device">Dispositivo attuale</string>
@@ -188,4 +188,5 @@
     <string name="pairing_trust">Considera attendibile</string>
     <string name="nearby_bluetooth_tip">Trova più dispositivi PlainApp nelle vicinanze tramite Bluetooth.</string>
     <string name="nearby_bluetooth_enable">Attiva il Bluetooth</string>
+    <string name="unpair_device_hint">La cronologia delle chat viene conservata. Associa di nuovo il dispositivo per usarlo.</string>
 </resources>

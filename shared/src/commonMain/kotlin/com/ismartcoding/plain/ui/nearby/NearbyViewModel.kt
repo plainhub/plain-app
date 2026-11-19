@@ -78,14 +78,14 @@ object NearbyViewModel {
         }
     }
 
-    fun unpairPeer(deviceId: String, deleteChats: Boolean) {
+    fun unpairPeer(deviceId: String) {
         val current = itemStatus[deviceId]
         if (current == NearbyItemStatus.UNPAIRING || current == NearbyItemStatus.PAIRING) return
         itemStatus[deviceId] = NearbyItemStatus.UNPAIRING
         scope.launchSafe(onDone = {
             itemStatus.remove(deviceId)
         }) {
-            val removed = if (deleteChats) PeerManager.deletePeer(deviceId) else PeerManager.markUnpaired(deviceId)
+            val removed = PeerManager.markUnpaired(deviceId)
             if (removed && com.ismartcoding.plain.ui.app.MainViewModel.selectedDevice.value?.peerId == deviceId) {
                 com.ismartcoding.plain.ui.app.MainViewModel.selectDevice(null)
             }

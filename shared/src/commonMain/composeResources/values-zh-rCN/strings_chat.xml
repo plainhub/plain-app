@@ -190,7 +190,7 @@
     <string name="remote_permission_required">此设备尚未授予访问权限，请请求权限后继续。</string>
     <string name="pairing_failed">配对失败</string>
     <string name="pairing_expired">已过期</string>
-    <string name="confirm_unpair_device">要与 %1$s 解除配对吗？删除聊天记录也会将此设备从聊天列表中移除，此操作无法撤销。</string>
+    <string name="confirm_unpair_device">解除与「%1$s」的配对？</string>
     <string name="delete_chat_history">删除聊天记录</string>
     <string name="nearby_my_devices">我的设备</string>
     <string name="nearby_current_device">当前设备</string>
@@ -201,4 +201,5 @@
     <string name="pairing_trust">信任</string>
     <string name="pairing_scan_qrcode">使用另一台手机扫码，即可与这台手机配对。</string>
     <string name="pairing_manage_identity_changed">此设备的公钥已更改。仅在你认识此设备且确认此更改符合预期时信任它。</string>
+    <string name="unpair_device_hint">聊天记录会保留。下次使用这台设备时，需要重新配对。</string>
 </resources>

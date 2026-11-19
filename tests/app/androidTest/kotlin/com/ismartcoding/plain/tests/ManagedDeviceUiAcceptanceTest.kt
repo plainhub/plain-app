@@ -1559,7 +1559,7 @@ class ManagedDeviceUiAcceptanceTest {
     }
 
     @Test
-    fun unpairRequiresConfirmationAndResetsTheDeleteHistoryCheckbox() = runBlocking {
+    fun unpairRequiresConfirmationAndPreservesChatHistory() = runBlocking {
         val device = com.ismartcoding.plain.models.NearbyDevice(
             id = "unpair-confirmation-${UUID.randomUUID()}", name = "Confirmation device", port = 8443,
             signaturePublicKey = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=",
@@ -1587,12 +1587,13 @@ class ManagedDeviceUiAcceptanceTest {
             try {
                 awaitMainWindowFocus(scenario)
                 repeat(2) { opening ->
-                    click(text(Res.string.unpair), "right-side unpair opens confirmation")
-                    val checkbox = awaitNode("delete chat history checkbox") { it.isCheckable }
-                    assertFalse("Delete history must default to off", checkbox.isChecked)
+                    assertFalse("Unpair must be hidden until More is opened", uiNodes().any { it.text == text(Res.string.unpair) })
+                    click(text(Res.string.more), "open paired-device menu")
+                    click(text(Res.string.unpair), "menu unpair opens confirmation")
+                    awaitNode("chat history is kept") { it.text == text(Res.string.unpair_device_hint) }
+                    assertFalse("Unpair must not offer history deletion", uiNodes().any { it.isCheckable })
+                    assertNull(com.ismartcoding.plain.ui.components.DialogHelper.confirmation.value?.checkbox)
                     assertNull(com.ismartcoding.plain.ui.nearby.NearbyViewModel.itemStatus[device.id])
-                    performClick(checkbox, "toggle delete chat history")
-                    awaitNode("checked delete chat history") { it.isCheckable && it.isChecked }
                     if (opening == 0) captureNavigation("unpair-confirmation")
                     click(text(Res.string.cancel), "cancel unpair")
                     awaitMainWindowFocus(scenario)

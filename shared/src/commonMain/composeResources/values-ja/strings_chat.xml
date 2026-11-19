@@ -177,7 +177,7 @@
     <string name="no_finished_downloads">完了したダウンロードはありません</string>
     <string name="saved_n_of_m">%2$d 件中 %1$d 件を保存しました</string>
     <string name="saved_to_x">%1$s に保存しました</string>
-    <string name="confirm_unpair_device">%1$s とのペアリングを解除しますか？チャット履歴を削除すると、このデバイスもチャット一覧から削除されます。この操作は取り消せません。</string>
+    <string name="confirm_unpair_device">「%1$s」とのペアリングを解除しますか？</string>
     <string name="delete_chat_history">チャット履歴を削除</string>
     <string name="nearby_my_devices">自分のデバイス</string>
     <string name="nearby_current_device">現在のデバイス</string>
@@ -188,4 +188,5 @@
     <string name="pairing_trust">信頼する</string>
     <string name="nearby_bluetooth_tip">Bluetooth で近くの PlainApp デバイスをさらに見つけられます。</string>
     <string name="nearby_bluetooth_enable">Bluetooth を有効にする</string>
+    <string name="unpair_device_hint">チャット履歴は保持されます。このデバイスを使うには、もう一度ペアリングしてください。</string>
 </resources>

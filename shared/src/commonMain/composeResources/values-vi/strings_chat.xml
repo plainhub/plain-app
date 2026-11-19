@@ -177,7 +177,7 @@
     <string name="no_finished_downloads">Không có tải xuống nào hoàn tất</string>
     <string name="saved_n_of_m">Đã lưu %1$d/%2$d mục</string>
     <string name="saved_to_x">Đã lưu vào %1$s</string>
-    <string name="confirm_unpair_device">Hủy ghép đôi với %1$s? Xóa lịch sử trò chuyện cũng sẽ xóa thiết bị này khỏi danh sách trò chuyện và không thể hoàn tác.</string>
+    <string name="confirm_unpair_device">Hủy ghép nối với “%1$s”?</string>
     <string name="delete_chat_history">Xóa lịch sử trò chuyện</string>
     <string name="nearby_my_devices">Thiết bị của tôi</string>
     <string name="nearby_current_device">Thiết bị hiện tại</string>
@@ -188,4 +188,5 @@
     <string name="pairing_trust">Tin cậy</string>
     <string name="nearby_bluetooth_tip">Tìm thêm thiết bị PlainApp ở gần bằng Bluetooth.</string>
     <string name="nearby_bluetooth_enable">Bật Bluetooth</string>
+    <string name="unpair_device_hint">Lịch sử trò chuyện được giữ lại. Hãy ghép nối lại để sử dụng thiết bị này.</string>
 </resources>

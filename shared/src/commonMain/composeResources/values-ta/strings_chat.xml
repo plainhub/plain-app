@@ -177,7 +177,7 @@
     <string name="no_finished_downloads">முடிந்த பதிவிறக்கம் இல்லை</string>
     <string name="saved_n_of_m">%2$d-இல் %1$d சேமிக்கப்பட்டது</string>
     <string name="saved_to_x">%1$s-இல் சேமிக்கப்பட்டது</string>
-    <string name="confirm_unpair_device">%1$s உடனான இணைப்பை நீக்கவா? அரட்டை வரலாற்றை நீக்கினால், இந்தச் சாதனமும் அரட்டைப் பட்டியலிலிருந்து அகற்றப்படும். இதைச் செயல்தவிர்க்க முடியாது.</string>
+    <string name="confirm_unpair_device">“%1$s” சாதனத்தின் இணைப்பை நீக்கவா?</string>
     <string name="delete_chat_history">அரட்டை வரலாற்றை நீக்கு</string>
     <string name="nearby_my_devices">எனது சாதனங்கள்</string>
     <string name="nearby_current_device">தற்போதைய சாதனம்</string>
@@ -188,4 +188,5 @@
     <string name="pairing_trust">நம்பு</string>
     <string name="nearby_bluetooth_tip">புளூடூத் மூலம் அருகிலுள்ள மேலும் பல PlainApp சாதனங்களைக் கண்டறியுங்கள்.</string>
     <string name="nearby_bluetooth_enable">புளூடூத்தை இயக்கவும்</string>
+    <string name="unpair_device_hint">அரட்டை வரலாறு தக்கவைக்கப்படும். இந்தச் சாதனத்தைப் பயன்படுத்த மீண்டும் இணைக்கவும்.</string>
 </resources>

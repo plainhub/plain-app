@@ -177,7 +177,7 @@
     <string name="no_finished_downloads">Nenhum download concluído</string>
     <string name="saved_n_of_m">%1$d de %2$d itens salvos</string>
     <string name="saved_to_x">Salvo em %1$s</string>
-    <string name="confirm_unpair_device">Desemparelhar %1$s? Excluir o histórico de conversas também remove este dispositivo da lista de conversas e não pode ser desfeito.</string>
+    <string name="confirm_unpair_device">Desemparelhar “%1$s”?</string>
     <string name="delete_chat_history">Excluir histórico de conversas</string>
     <string name="nearby_my_devices">Meus dispositivos</string>
     <string name="nearby_current_device">Dispositivo atual</string>
@@ -188,4 +188,5 @@
     <string name="pairing_trust">Confiar</string>
     <string name="nearby_bluetooth_tip">Encontre mais dispositivos com PlainApp por perto usando Bluetooth.</string>
     <string name="nearby_bluetooth_enable">Ativar Bluetooth</string>
+    <string name="unpair_device_hint">Seu histórico de conversas será mantido. Pareie o dispositivo novamente para usá-lo.</string>
 </resources>

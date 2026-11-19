@@ -16,7 +16,6 @@ import com.ismartcoding.plain.ui.base.PDropdownMenuItem
 import com.ismartcoding.plain.ui.base.PListItem
 import com.ismartcoding.plain.ui.base.POutlinedButton
 import com.ismartcoding.plain.ui.components.ButtonSize
-import com.ismartcoding.plain.ui.components.ConfirmDialogCheckbox
 import com.ismartcoding.plain.ui.components.DialogHelper
 import com.ismartcoding.plain.ui.components.PIconButton
 import com.ismartcoding.plain.ui.nearby.NearbyItemStatus
@@ -31,12 +30,11 @@ import org.jetbrains.compose.resources.stringResource
 fun NearbyPairedDeviceItem(peer: Peer, device: NearbyDevice?, onPair: (NearbyDevice) -> Unit) {
     var showMenu by remember(peer.id) { mutableStateOf(false) }
     val status = NearbyViewModel.getStatus(peer.id, true)
-    val active = NearbyViewModel.pairingViews[peer.id]?.active == true
-    val canceling = active || status == NearbyItemStatus.PAIRING
     val selected = MainViewModel.selectedDevice.value?.peerId == peer.id
     val unpairText = stringResource(Res.string.unpair)
-    val unpairMessage = stringResource(Res.string.confirm_unpair_device, peer.name)
-    val deleteChatsText = stringResource(Res.string.delete_chat_history)
+    val actions = pairedDeviceActions(peer, selected)
+    val unpairTitle = stringResource(Res.string.confirm_unpair_device, peer.name)
+    val unpairMessage = stringResource(Res.string.unpair_device_hint)
     val cancelText = stringResource(Res.string.cancel)
     PListItem(
         modifier = PlainTheme.getCardModifier().testTag("nearby-device:${peer.id}"),
@@ -50,50 +48,60 @@ fun NearbyPairedDeviceItem(peer: Peer, device: NearbyDevice?, onPair: (NearbyDev
         },
         start = { PeerIconWithStatus(peer.deviceType.getIcon(), peer.online) },
         action = {
-            Row {
-                if (peer.token.isNotEmpty()) {
-                    if (!selected) POutlinedButton(
-                        text = stringResource(Res.string.nearby_switch_device),
-                        buttonSize = ButtonSize.SMALL,
-                        enabled = peer.online && device?.remoteAccess != false,
-                        onClick = { MainViewModel.selectDevice(DeviceIdentity(peer.id, peer.publicKey)) },
-                    )
-                }
-                if (peer.token.isEmpty()) Box {
+            if (actions == PairedDeviceActions.CANCEL) {
+                POutlinedButton(
+                    text = cancelText,
+                    buttonSize = ButtonSize.SMALL,
+                    onClick = { NearbyViewModel.cancelPairing(peer.id) },
+                )
+            } else Row {
+                if (actions == PairedDeviceActions.SWITCH_AND_MORE) PIconButton(
+                    Res.drawable.arrow_left_right,
+                    contentDescription = stringResource(Res.string.nearby_switch_device),
+                    enabled = peer.online && device?.remoteAccess != false,
+                    click = { MainViewModel.selectDevice(DeviceIdentity(peer.id, peer.publicKey)) },
+                )
+                Box {
                     PIconButton(
                         UiRes.drawable.ui_drawable_more_horiz,
                         contentDescription = stringResource(Res.string.more),
                         click = { showMenu = true },
                     )
                     PDropdownMenu(expanded = showMenu, onDismissRequest = { showMenu = false }) {
-                        PDropdownMenuItem(
-                            text = { Text(stringResource(if (canceling) Res.string.cancel else Res.string.pair_full_control)) },
-                            enabled = status != NearbyItemStatus.STARTING && status != NearbyItemStatus.UNPAIRING &&
-                                (canceling || (peer.online && device?.remoteAccess == true)),
+                        if (peer.token.isEmpty() && !selected) PDropdownMenuItem(
+                            text = { Text(stringResource(Res.string.pair_full_control)) },
+                            enabled = status != NearbyItemStatus.UNPAIRING && peer.online && device?.remoteAccess == true,
                             onClick = {
                                 showMenu = false
-                                if (canceling) NearbyViewModel.cancelPairing(peer.id) else device?.let(onPair)
+                                device?.let(onPair)
+                            },
+                        )
+                        PDropdownMenuItem(
+                            text = { Text(unpairText) },
+                            onClick = {
+                                showMenu = false
+                                DialogHelper.showConfirmDialog(
+                                    title = unpairTitle,
+                                    message = unpairMessage,
+                                    confirmButton = Pair(unpairText) { NearbyViewModel.unpairPeer(peer.id) },
+                                    dismissButton = Pair(cancelText) {},
+                                    danger = true,
+                                )
                             },
                         )
                     }
                 }
-                POutlinedButton(
-                    text = unpairText,
-                    buttonSize = ButtonSize.SMALL,
-                    onClick = {
-                        val checkbox = ConfirmDialogCheckbox(deleteChatsText)
-                        DialogHelper.showConfirmDialog(
-                            title = unpairText,
-                            message = unpairMessage,
-                            confirmButton = Pair(unpairText) { NearbyViewModel.unpairPeer(peer.id, checkbox.checked) },
-                            dismissButton = Pair(cancelText) {},
-                            danger = true,
-                            checkbox = checkbox,
-                        )
-                    },
-                )
             }
         },
     )
 }
 
+internal enum class PairedDeviceActions { CANCEL, MORE, SWITCH_AND_MORE }
+
+internal fun pairedDeviceActions(peer: Peer, selected: Boolean): PairedDeviceActions {
+    val status = NearbyViewModel.itemStatus[peer.id]
+    if (NearbyViewModel.pairingViews[peer.id]?.active == true || status == NearbyItemStatus.STARTING || status == NearbyItemStatus.PAIRING) {
+        return PairedDeviceActions.CANCEL
+    }
+    return if (peer.token.isNotEmpty() && !selected) PairedDeviceActions.SWITCH_AND_MORE else PairedDeviceActions.MORE
+}

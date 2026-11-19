@@ -191,7 +191,7 @@
     <string name="remote_permission_required">This device has not granted access. Request permission to continue.</string>
     <string name="pairing_failed">Pairing failed</string>
     <string name="pairing_expired">Expired</string>
-    <string name="confirm_unpair_device">Unpair %1$s? Deleting chat history also removes this device from the chat list and cannot be undone.</string>
+    <string name="confirm_unpair_device">Unpair “%1$s”?</string>
     <string name="delete_chat_history">Delete chat history</string>
     <string name="nearby_my_devices">My devices</string>
     <string name="nearby_current_device">Current device</string>
@@ -202,4 +202,5 @@
     <string name="pairing_trust">Trust</string>
     <string name="pairing_scan_qrcode">Scan with another phone to pair with this phone.</string>
     <string name="pairing_manage_identity_changed">The device’s public key has changed. Only trust it if you recognize the device and expected this change.</string>
+    <string name="unpair_device_hint">Your chat history is kept. Pair again to use this device.</string>
 </resources>

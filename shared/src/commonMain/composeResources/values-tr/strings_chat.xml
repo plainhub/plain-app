@@ -177,7 +177,7 @@
     <string name="no_finished_downloads">Tamamlanan indirme yok</string>
     <string name="saved_n_of_m">%2$d öğeden %1$d kaydedildi</string>
     <string name="saved_to_x">%1$s konumuna kaydedildi</string>
-    <string name="confirm_unpair_device">%1$s ile eşleştirme kaldırılsın mı? Sohbet geçmişini silmek bu cihazı sohbet listesinden de kaldırır ve geri alınamaz.</string>
+    <string name="confirm_unpair_device">“%1$s” ile eşleşme kaldırılsın mı?</string>
     <string name="delete_chat_history">Sohbet geçmişini sil</string>
     <string name="nearby_my_devices">Cihazlarım</string>
     <string name="nearby_current_device">Geçerli cihaz</string>
@@ -188,4 +188,5 @@
     <string name="pairing_trust">Güven</string>
     <string name="nearby_bluetooth_tip">Bluetooth ile yakındaki daha fazla PlainApp cihazını bulun.</string>
     <string name="nearby_bluetooth_enable">Bluetooth’u etkinleştir</string>
+    <string name="unpair_device_hint">Sohbet geçmişiniz saklanır. Bu cihazı kullanmak için yeniden eşleştirin.</string>
 </resources>

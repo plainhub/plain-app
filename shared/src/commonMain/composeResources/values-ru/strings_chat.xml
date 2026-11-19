@@ -177,7 +177,7 @@
     <string name="no_finished_downloads">Нет завершённых загрузок</string>
     <string name="saved_n_of_m">Сохранено %1$d из %2$d</string>
     <string name="saved_to_x">Сохранено в %1$s</string>
-    <string name="confirm_unpair_device">Отменить сопряжение с %1$s? Удаление истории чата также удалит это устройство из списка чатов. Это действие нельзя отменить.</string>
+    <string name="confirm_unpair_device">Разорвать сопряжение с «%1$s»?</string>
     <string name="delete_chat_history">Удалить историю чата</string>
     <string name="nearby_my_devices">Мои устройства</string>
     <string name="nearby_current_device">Текущее устройство</string>
@@ -188,4 +188,5 @@
     <string name="pairing_trust">Доверять</string>
     <string name="nearby_bluetooth_tip">Находите больше устройств с PlainApp поблизости через Bluetooth.</string>
     <string name="nearby_bluetooth_enable">Включить Bluetooth</string>
+    <string name="unpair_device_hint">История чата сохранится. Чтобы снова использовать это устройство, выполните сопряжение ещё раз.</string>
 </resources>
