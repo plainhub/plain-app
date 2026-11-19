@@ -31,7 +31,6 @@ import kotlinx.serialization.json.jsonPrimitive
 
 object Prefs {
     val passwordType = MutableStateFlow(PasswordType.NONE)
-    val passwordConfigured = MutableStateFlow<Boolean?>(null)
     val loginRequireApproval = MutableStateFlow(false)
     val apiAccessFeatures = MutableStateFlow(emptySet<com.ismartcoding.plain.features.web.AccessFeature>())
     val updateInfo = MutableStateFlow(
@@ -119,7 +118,6 @@ object Prefs {
 
     internal fun update(key: String, value: JsonElement) {
         when (key) {
-            "passwordConfigured" -> passwordConfigured.value = value.jsonPrimitive.boolean
             PrefKeys.PASSWORD_TYPE -> passwordType.value = PasswordType.valueOf(value.jsonPrimitive.content)
             PrefKeys.LOGIN_REQUIRE_APPROVAL -> loginRequireApproval.value = value.jsonPrimitive.boolean
             PrefKeys.API_PERMISSIONS -> apiAccessFeatures.value = JsonHelper.jsonDecodeFromElement(value)

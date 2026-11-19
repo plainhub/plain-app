@@ -2,6 +2,18 @@ use super::management::{parts, reply};
 use super::values::{c_string, input};
 use std::ffi::c_char;
 
+fn password_configured() -> String {
+    reply!((|| {
+        let (_, management) = parts()?;
+        management.password_configured()
+    })())
+}
+
+#[unsafe(no_mangle)]
+pub extern "C" fn plain_password_configured() -> *mut c_char {
+    c_string(password_configured())
+}
+
 fn generate_password() -> String {
     reply!((|| {
         let (runtime, management) = parts()?;
@@ -107,6 +119,16 @@ pub extern "C" fn plain_remove_scan_history(text: *const c_char) -> *mut c_char 
 mod android {
     use super::*;
     use jni::{EnvUnowned, errors::ThrowRuntimeExAndDefault, objects::{JObject, JString}, sys::jstring};
+    #[unsafe(no_mangle)]
+    pub extern "system" fn Java_com_ismartcoding_plain_rust_native_RustNativeBindings_passwordConfigured(
+        mut env: EnvUnowned<'_>,
+        _: JObject<'_>,
+    ) -> jstring {
+        env.with_env(|env| -> jni::errors::Result<_> { env.new_string(password_configured()) })
+            .resolve::<ThrowRuntimeExAndDefault>()
+            .into_raw()
+    }
+
     #[unsafe(no_mangle)]
     pub extern "system" fn Java_com_ismartcoding_plain_rust_native_RustNativeBindings_generatePassword(
         mut env: EnvUnowned<'_>,

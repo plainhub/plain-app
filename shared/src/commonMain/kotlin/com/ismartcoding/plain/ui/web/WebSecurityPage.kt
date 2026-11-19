@@ -25,6 +25,7 @@ import com.ismartcoding.plain.features.settings.PasswordType
 import com.ismartcoding.plain.i18n.*
 import com.ismartcoding.plain.lib.extensions.toSignature
 import com.ismartcoding.plain.lib.logcat.LogCat
+import com.ismartcoding.plain.models.PasswordSettings
 import com.ismartcoding.plain.rust.native.RustNativeApi
 import com.ismartcoding.plain.ui.base.*
 import com.ismartcoding.plain.ui.components.*
@@ -43,18 +44,17 @@ import kotlin.io.encoding.ExperimentalEncodingApi
 fun WebSecurityPage(navController: NavHostController) {
     val scope = rememberCoroutineScope()
     val passwordType = Prefs.passwordType.collectAsStateValue()
-    val passwordConfigured = Prefs.passwordConfigured.collectAsStateValue()
     val loginRequireApproval = Prefs.loginRequireApproval.collectAsStateValue()
     var sslSignature by remember { mutableStateOf("") }
     val state = remember {
         PasswordSettingsState(
-            readSettings = { RustNativeApi.passwordSettings() },
+            readSettings = { PasswordSettings(RustNativeApi.passwordConfigured(), Prefs.passwordType.value) },
             writePassword = { Prefs.setPassword(it) },
             writeEnabled = { Prefs.setPasswordType(if (it) PasswordType.FIXED else PasswordType.NONE) },
             createPassword = { Prefs.generatePassword() },
         )
     }
-    LaunchedEffect(passwordType, passwordConfigured) {
+    LaunchedEffect(passwordType) {
         if (!state.editing) state.refresh()
     }
     DisposableEffect(state) { onDispose { state.clearDraft() } }
