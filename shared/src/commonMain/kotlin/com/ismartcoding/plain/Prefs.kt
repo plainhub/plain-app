@@ -53,7 +53,6 @@ object Prefs {
     val amoledDarkTheme = MutableStateFlow(false)
     val pdfFollowDarkTheme = MutableStateFlow(false)
     val locale = MutableStateFlow("")
-    val backgroundServiceEnabled = MutableStateFlow(false)
     val remoteAccess = MutableStateFlow(false)
     val dlna = MutableStateFlow(false)
     val developerMode = MutableStateFlow(false)
@@ -132,7 +131,6 @@ object Prefs {
             PrefKeys.AMOLED_DARK_THEME -> amoledDarkTheme.value = value.jsonPrimitive.boolean
             PrefKeys.PDF_FOLLOW_DARK_THEME -> pdfFollowDarkTheme.value = value.jsonPrimitive.boolean
             PrefKeys.LOCALE -> locale.value = value.jsonPrimitive.content
-            PrefKeys.BACKGROUND_SERVICE_ENABLED -> backgroundServiceEnabled.value = value.jsonPrimitive.boolean
             PrefKeys.REMOTE_ACCESS -> remoteAccess.value = value.jsonPrimitive.boolean
             PrefKeys.DLNA -> dlna.value = value.jsonPrimitive.boolean
             PrefKeys.DEVELOPER_MODE -> developerMode.value = value.jsonPrimitive.boolean

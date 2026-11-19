@@ -27,7 +27,6 @@ import java.util.UUID
 class SessionLoginRustHttpTest {
     @Test
     fun encryptedLoginConfirmationSessionUiAndRevocationUseRust() = runBlocking {
-        val oldService = Prefs.backgroundServiceEnabled.value
         val oldDesktop = Prefs.remoteAccess.value
         val oldTwoFactor = Prefs.loginRequireApproval.value
         val id = UUID.randomUUID().toString().let { "706c6169${it.substring(8, 14)}8${it.substring(15)}" }
@@ -36,7 +35,6 @@ class SessionLoginRustHttpTest {
         var browser: PasswordLoginFixture? = null
         val activity = ActivityScenario.launch(MainActivity::class.java)
         try {
-            Prefs.backgroundServiceEnabled.value = true
             Prefs.remoteAccess.value = true
             Prefs.setLoginRequireApproval(true)
             withIO { RustRuntime.start() }
@@ -83,7 +81,6 @@ class SessionLoginRustHttpTest {
             RustSessionStore.delete(id)
             Prefs.setLoginRequireApproval(oldTwoFactor)
             Prefs.remoteAccess.value = oldDesktop
-            Prefs.backgroundServiceEnabled.value = oldService
             activity.close()
         }
     }

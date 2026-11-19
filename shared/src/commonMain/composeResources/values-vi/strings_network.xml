@@ -121,15 +121,12 @@
     <string name="desktop_access_instructions">Kết nối hai thiết bị với cùng mạng Wi-Fi, rồi mở địa chỉ này trong trình duyệt trên máy tính.</string>
     <string name="home_remote_access">Truy cập từ xa</string>
     <string name="home_try_other_addresses">Thử địa chỉ khác</string>
-    <string name="keep_online_in_background">Duy trì trực tuyến trong nền</string>
-    <string name="keep_online_in_background_desc">Giữ kết nối khi bạn rời ứng dụng.</string>
     <string name="connection_keeps_dropping">Kết nối liên tục bị ngắt?</string>
     <string name="connection_keeps_dropping_help">Một số điện thoại tạm dừng ứng dụng chạy nền. Hãy thử giữ PlainApp mở với màn hình tối.</string>
     <string name="stay_online_foreground_desc">Truy cập từ xa chỉ hoạt động khi PlainApp ở phía trước. Giữ trực tuyến giữ màn hình sáng và cho phép chuyển sang màn hình đen.</string>
     <string name="expanded">Đã mở rộng</string>
     <string name="collapsed">Đã thu gọn</string>
     <string name="background_online_failed">Không thể tiếp tục chạy trong nền. Hãy thử “Giữ trực tuyến” bên dưới.</string>
-    <string name="turn_off_keep_online_in_background">Tắt chế độ chạy nền</string>
     <string name="enable_desktop_access">Bật truy cập từ máy tính</string>
     <string name="disable_desktop_access">Tắt truy cập từ máy tính</string>
     <string name="services">Dịch vụ</string>

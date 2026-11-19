@@ -121,15 +121,12 @@
     <string name="desktop_access_instructions">Collega entrambi i dispositivi alla stessa rete Wi-Fi e apri questo indirizzo nel browser del computer.</string>
     <string name="home_remote_access">Accesso remoto</string>
     <string name="home_try_other_addresses">Prova altri indirizzi</string>
-    <string name="keep_online_in_background">Resta online in background</string>
-    <string name="keep_online_in_background_desc">Mantieni la connessione quando esci dall’app.</string>
     <string name="connection_keeps_dropping">La connessione continua a interrompersi?</string>
     <string name="connection_keeps_dropping_help">Alcuni telefoni sospendono le app in background. Prova a tenere PlainApp aperta con lo schermo scuro.</string>
     <string name="stay_online_foreground_desc">L’accesso remoto funziona solo quando PlainApp è in primo piano. Resta online mantiene lo schermo acceso e consente di renderlo nero.</string>
     <string name="expanded">Espanso</string>
     <string name="collapsed">Compresso</string>
     <string name="background_online_failed">Impossibile continuare in background. Prova «Resta online» qui sotto.</string>
-    <string name="turn_off_keep_online_in_background">Disattiva la modalità in background</string>
     <string name="enable_desktop_access">Attiva accesso dal computer</string>
     <string name="disable_desktop_access">Disattiva accesso dal computer</string>
     <string name="services">Servizi</string>

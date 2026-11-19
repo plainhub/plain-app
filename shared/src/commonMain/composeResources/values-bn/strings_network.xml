@@ -120,15 +120,12 @@
     <string name="desktop_access_instructions">দুটি ডিভাইস একই Wi-Fi-তে যুক্ত করে কম্পিউটারের ব্রাউজারে এই ঠিকানাটি খুলুন।</string>
     <string name="home_remote_access">রিমোট অ্যাক্সেস</string>
     <string name="home_try_other_addresses">অন্য ঠিকানা চেষ্টা করুন</string>
-    <string name="keep_online_in_background">ব্যাকগ্রাউন্ডে অনলাইনে থাকুন</string>
-    <string name="keep_online_in_background_desc">অ্যাপ থেকে বের হলেও সংযোগ বজায় রাখুন।</string>
     <string name="connection_keeps_dropping">সংযোগ বারবার বিচ্ছিন্ন হচ্ছে?</string>
     <string name="connection_keeps_dropping_help">কিছু ফোন ব্যাকগ্রাউন্ডের অ্যাপ সাময়িকভাবে বন্ধ করে দেয়। স্ক্রিন অন্ধকার রেখে PlainApp খোলা রাখার চেষ্টা করুন।</string>
     <string name="stay_online_foreground_desc">PlainApp সামনে খোলা থাকলেই দূরবর্তী অ্যাক্সেস কাজ করে। অনলাইনে থাকুন স্ক্রিন চালু রাখে এবং কালো স্ক্রিন দেখানোর সুযোগ দেয়।</string>
     <string name="expanded">প্রসারিত</string>
     <string name="collapsed">সংকুচিত</string>
     <string name="background_online_failed">ব্যাকগ্রাউন্ডে চলা চালিয়ে যাওয়া যায়নি। নিচে “অনলাইনে থাকুন” চেষ্টা করুন।</string>
-    <string name="turn_off_keep_online_in_background">ব্যাকগ্রাউন্ড মোড বন্ধ করুন</string>
     <string name="enable_desktop_access">কম্পিউটার অ্যাক্সেস চালু করুন</string>
     <string name="disable_desktop_access">কম্পিউটার অ্যাক্সেস বন্ধ করুন</string>
     <string name="services">পরিষেবা</string>

@@ -39,11 +39,9 @@ class BrowserVideoInstrumentedTest {
     fun publicResourceTranscodesHevcOrReportsUnsupportedMedia() = runBlocking {
         val source = File(appContext.cacheDir, "hevc_probe.mp4")
         assumeTrue("HEVC fixture has not been placed in the app cache", source.isFile && source.canRead())
-        val service = Prefs.backgroundServiceEnabled.value
         val desktop = Prefs.remoteAccess.value
         val output = File(appContext.cacheDir, "browser-video-${UUID.randomUUID()}.mp4")
         try {
-            Prefs.backgroundServiceEnabled.value = true
             Prefs.remoteAccess.value = true
             withIO { RustRuntime.start() }
             val access = GraphqlApi.execute(GraphqlRequest<Access>("query { app { clientId urlToken httpPort } }", field = "app"))
@@ -81,7 +79,6 @@ class BrowserVideoInstrumentedTest {
         } finally {
             output.delete()
             Prefs.remoteAccess.value = desktop
-            Prefs.backgroundServiceEnabled.value = service
         }
     }
 }

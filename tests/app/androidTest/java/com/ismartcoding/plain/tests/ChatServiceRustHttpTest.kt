@@ -41,10 +41,8 @@ class ChatServiceRustHttpTest {
         val ids = mutableSetOf<String>()
         val files = mutableSetOf<String>()
         val shares = mutableSetOf<String>()
-        val oldService = Prefs.backgroundServiceEnabled.value
         suspend fun created(): List<ChatItem> = RustChatStore.getByPeerId("local").filter { com.ismartcoding.plain.lib.JsonHelper.jsonEncode(it.content).contains(marker) }.also { rows -> ids += rows.map { it.id } }
         try {
-            Prefs.backgroundServiceEnabled.value = true
             val longText = marker + "😀".repeat(1100)
             val text = ChatClient.sendText(local, longText).also { ids += it.id }
             assertEquals(ChatStatus.SENT, text.status)
@@ -96,7 +94,6 @@ class ChatServiceRustHttpTest {
             shares.forEach { SharesClient.deleteShare(it) }
             files.forEach { assertFalse(AppFileFixtures.exists(it)) }
             root.deleteRecursively()
-            Prefs.backgroundServiceEnabled.value = oldService
         }
     }
 }

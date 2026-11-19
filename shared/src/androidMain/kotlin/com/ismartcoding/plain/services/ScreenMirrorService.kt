@@ -86,8 +86,8 @@ class ScreenMirrorService : LifecycleService() {
         val notification =
             NotificationHelper.createServiceNotification(
                 this,
-                AppIntents.ACTION_STOP_SCREEN_MIRROR,
-                LocaleHelper.getString(Res.string.screen_mirror_service_is_running),
+                title = LocaleHelper.getString(Res.string.screen_mirror_service_is_running),
+                stopAction = AppIntents.ACTION_STOP_SCREEN_MIRROR,
             )
 
         // On AOSP/Pixel: the consent dialog already sets the project_media AppOp, so

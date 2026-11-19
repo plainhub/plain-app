@@ -5,7 +5,10 @@ import androidx.compose.runtime.snapshotFlow
 import com.ismartcoding.plain.ui.app.MainViewModel
 import com.ismartcoding.plain.lib.Channel
 import com.ismartcoding.plain.events.ExportFileEvent
+import com.ismartcoding.plain.events.PermissionsResultEvent
 import com.ismartcoding.plain.events.PickFileEvent
+import com.ismartcoding.plain.platform.permissions.Permission
+import com.ismartcoding.plain.services.HttpServerForegroundService
 import com.ismartcoding.plain.app.AppHelper
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.flow.map
@@ -32,7 +35,11 @@ internal fun MainActivity.initEvents() {
             when (event) {
                 is PickFileEvent -> handlePickFileEvent(event)
                 is ExportFileEvent -> handleExportFileEvent(event)
-
+                is PermissionsResultEvent -> {
+                    if (event.map[Permission.POST_NOTIFICATIONS.toSysPermission()] == true) {
+                        HttpServerForegroundService.start(this@initEvents, refreshNotification = true)
+                    }
+                }
             }
         }
     }

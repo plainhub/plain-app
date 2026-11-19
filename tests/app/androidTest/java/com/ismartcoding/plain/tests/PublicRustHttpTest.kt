@@ -29,7 +29,6 @@ import javax.net.ssl.X509TrustManager
 class PublicRustHttpTest {
     @Test
     fun rustPublicListenerServesTlsUploadsRangesAndPortal() = runBlocking {
-        val oldService = Prefs.backgroundServiceEnabled.value
         val oldDesktop = Prefs.remoteAccess.value
         val oldHttp = Prefs.httpPort.value
         val oldHttps = Prefs.httpsPort.value
@@ -39,7 +38,6 @@ class PublicRustHttpTest {
         val root = File(appContext.cacheDir, fixtureName).apply { mkdirs() }
         val payload = ByteArray(512 * 1024 + 17) { (it % 251).toByte() }
         try {
-            Prefs.backgroundServiceEnabled.value = true
             Prefs.remoteAccess.value = true
             withIO { RustRuntime.start() }
             assertTrue(RustNativeApi.checkHttp())
@@ -107,7 +105,6 @@ class PublicRustHttpTest {
         } finally {
             if (clientId.isNotEmpty()) RustSessionStore.delete(clientId)
             root.deleteRecursively()
-            Prefs.backgroundServiceEnabled.value = oldService
             Prefs.remoteAccess.value = oldDesktop
             Prefs.httpPort.value = oldHttp
             Prefs.httpsPort.value = oldHttps

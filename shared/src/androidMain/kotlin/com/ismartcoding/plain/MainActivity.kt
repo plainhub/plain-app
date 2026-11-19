@@ -18,6 +18,8 @@ import androidx.core.content.ContextCompat
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsControllerCompat
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.withResumed
 import com.ismartcoding.plain.platform.isTPlus
 import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.features.files.ExportFileType
@@ -26,12 +28,15 @@ import com.ismartcoding.plain.features.files.PickFileTag
 import com.ismartcoding.plain.features.files.PickFileType
 import com.ismartcoding.plain.events.ExportFileResultEvent
 import com.ismartcoding.plain.events.PickFileResultEvent
+import com.ismartcoding.plain.events.RequestPermissionsEvent
 import com.ismartcoding.plain.events.WindowFocusChangedEvent
 import com.ismartcoding.plain.platform.permissions.Permission
 import com.ismartcoding.plain.ui.permissions.Permissions
 import com.ismartcoding.plain.features.bluetooth.client.BluetoothPermission
 import com.ismartcoding.plain.platform.permissions.isGranted
+import com.ismartcoding.plain.platform.permissions.shouldShowRationale
 import com.ismartcoding.plain.receivers.NetworkStateReceiver
+import com.ismartcoding.plain.services.HttpServerForegroundService
 import com.ismartcoding.plain.services.PlainAccessibilityService
 import com.ismartcoding.plain.services.ScreenMirrorService
 import com.ismartcoding.plain.platform.system.FilePickHelper
@@ -41,6 +46,7 @@ import com.ismartcoding.plain.ui.chat.PeerViewModel
 import com.ismartcoding.plain.ui.pomodoro.PomodoroViewModel
 import com.ismartcoding.plain.lib.sendEvent
 import java.lang.ref.WeakReference
+import kotlinx.coroutines.launch
 import android.Manifest
 import com.ismartcoding.plain.ui.app.ActivityUiState
 
@@ -141,6 +147,21 @@ class MainActivity : AppCompatActivity() {
             registerReceiver(networkStateReceiver, IntentFilter(WifiManager.NETWORK_STATE_CHANGED_ACTION))
         }
         installComposeUi()
+        if (savedInstanceState == null && isTPlus()) {
+            lifecycleScope.launch {
+                lifecycle.withResumed {
+                    val permission = Permission.POST_NOTIFICATIONS
+                    if (!permission.isGranted() && !permission.shouldShowRationale()) {
+                        sendEvent(RequestPermissionsEvent(permission))
+                    }
+                }
+            }
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        HttpServerForegroundService.start(this)
     }
 
     override fun onDestroy() {

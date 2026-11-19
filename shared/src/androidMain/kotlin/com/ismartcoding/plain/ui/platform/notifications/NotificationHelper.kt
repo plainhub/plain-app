@@ -159,33 +159,10 @@ object NotificationHelper {
 
     fun createServiceNotification(
         context: Context,
-        action: String,
         title: String,
         description: String = "",
+        stopAction: String? = null,
     ): Notification {
-        val stopPendingIntent =
-            PendingIntent.getBroadcast(
-                context,
-                0,
-                Intent(context, ServiceStopBroadcastReceiver::class.java).apply {
-                    `package` = context.packageName
-                    this.action = action
-                },
-                PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT,
-            )
-        // Android 14+ allows FGS notifications to be swiped away (OS-enforced policy).
-        // When dismissed, the deleteIntent restarts onStartCommand to re-post the notification.
-        val repostPendingIntent =
-            PendingIntent.getBroadcast(
-                context,
-                1,
-                Intent(context, ServiceStopBroadcastReceiver::class.java).apply {
-                    `package` = context.packageName
-                    this.action = AppIntents.ACTION_REPOST_BACKGROUND_NOTIFICATION
-                },
-                PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT,
-            )
-
         return NotificationCompat.Builder(context, Constants.NOTIFICATION_CHANNEL_ID).apply {
             setSmallIcon(notificationDrawableId())
             setColor(BrandPrimary.toArgb())
@@ -197,18 +174,29 @@ object NotificationHelper {
             setWhen(System.currentTimeMillis())
             setAutoCancel(false)
             setOngoing(true)
-            setDeleteIntent(repostPendingIntent)
             if (isSPlus()) {
                 // https://issuetracker.google.com/issues/229000935
                 foregroundServiceBehavior = NotificationCompat.FOREGROUND_SERVICE_IMMEDIATE
             }
             setContentIntent(createContentIntent(context))
-            val stopLabel = if (action == AppIntents.ACTION_DISABLE_BACKGROUND_MODE) {
-                Res.string.turn_off_keep_online_in_background
+            if (stopAction != null) {
+                val stopIntent = PendingIntent.getBroadcast(
+                    context,
+                    0,
+                    Intent(context, ServiceStopBroadcastReceiver::class.java).setAction(stopAction),
+                    PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT,
+                )
+                addAction(-1, LocaleHelper.getString(Res.string.stop_service), stopIntent)
             } else {
-                Res.string.stop_service
+                val repostIntent = PendingIntent.getBroadcast(
+                    context,
+                    1,
+                    Intent(context, ServiceStopBroadcastReceiver::class.java)
+                        .setAction(AppIntents.ACTION_REPOST_BACKGROUND_NOTIFICATION),
+                    PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT,
+                )
+                setDeleteIntent(repostIntent)
             }
-            addAction(-1, LocaleHelper.getString(stopLabel), stopPendingIntent)
             setStyle(NotificationCompat.DecoratedCustomViewStyle())
         }.build()
     }

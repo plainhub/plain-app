@@ -14,6 +14,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.ismartcoding.plain.features.chat.peer.PeerStatusClient
@@ -49,7 +50,7 @@ import com.ismartcoding.plain.ui.settings.UpdateViewModel
 import com.ismartcoding.plain.ui.navigation.MainNavScaffold
 import com.ismartcoding.plain.ui.settings.UpdateDialog
 import com.ismartcoding.plain.HttpServerManager
-import com.ismartcoding.plain.Prefs
+import com.ismartcoding.plain.platform.system.supportsBackgroundService
 import org.jetbrains.compose.resources.stringResource
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -61,7 +62,6 @@ fun HomePage(
 ) {
     val network = NetworkEvents.snapshot.collectAsStateValue()
     val isVpnActive = network.vpnActive
-    val backgroundServiceEnabled = Prefs.backgroundServiceEnabled.collectAsStateValue()
     var systemAlertWindow by remember { mutableStateOf(Permission.SYSTEM_ALERT_WINDOW.isGranted()) }
     val refreshState = rememberRefreshLayoutState {
         PeerStatusClient.reconnectNow("home_pull_refresh")
@@ -71,7 +71,6 @@ fun HomePage(
     val httpServerResourcesError = HttpServerManager.httpServerResourcesError.collectAsStateValue()
     var showStayOnlineOverlay by remember { mutableStateOf(false) }
 
-    val foregroundServiceState = HttpServerManager.foregroundServiceState.collectAsStateValue()
     val foregroundServiceError = HttpServerManager.foregroundServiceError.collectAsStateValue()
 
     LaunchedEffect(Channel.sharedFlow) {
@@ -109,46 +108,44 @@ fun HomePage(
             LazyColumn(Modifier.fillMaxSize()) {
                 item {
                     TopSpace()
-                    if (backgroundServiceEnabled) {
-                        if (isVpnActive) {
-                            PAlert(
-                                description = stringResource(Res.string.vpn_web_conflict_warning),
-                                AlertType.WARNING,
-                                modifier = Modifier.padding(start = 16.dp, end = 16.dp, bottom = 8.dp),
-                            )
-                        }
-                        if (!systemAlertWindow) {
-                            PAlert(
-                                description = stringResource(Res.string.system_alert_window_warning),
-                                AlertType.WARNING,
-                                modifier = Modifier.padding(start = 16.dp, end = 16.dp),
-                            ) {
-                                PTextButton(
-                                    text = stringResource(Res.string.grant_permission),
-                                    buttonSize = ButtonSize.SMALL,
-                                    contentColor = MaterialTheme.colorScheme.onWarningContainer,
-                                    onClick = {
-                                        sendEvent(RequestPermissionsEvent(Permission.SYSTEM_ALERT_WINDOW))
-                                    },
-                                )
-                            }
-                        }
-                    }
-                }
-                item {
                     if (AppFeatureType.CHECK_UPDATES.has()) {
                         UpdateBanner(updateVM)
                     }
                 }
                 item {
-                    PCard(modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN)) {
+                    val showVpnWarning = supportsBackgroundService && isVpnActive
+                    val showOverlayWarning = supportsBackgroundService && !systemAlertWindow
+                    if (showVpnWarning) {
+                        PAlert(
+                            description = stringResource(Res.string.vpn_web_conflict_warning),
+                            type = AlertType.WARNING,
+                            modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN),
+                        )
+                    }
+                    if (showOverlayWarning) {
+                        if (showVpnWarning) VerticalSpace(8.dp)
+                        PAlert(
+                            description = stringResource(Res.string.system_alert_window_warning),
+                            type = AlertType.WARNING,
+                            modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN).testTag("settings-overlay-warning"),
+                        ) {
+                            PTextButton(
+                                text = stringResource(Res.string.grant_permission),
+                                buttonSize = ButtonSize.SMALL,
+                                contentColor = MaterialTheme.colorScheme.onWarningContainer,
+                                onClick = {
+                                    sendEvent(RequestPermissionsEvent(Permission.SYSTEM_ALERT_WINDOW))
+                                },
+                            )
+                        }
+                    }
+                    if (showVpnWarning || showOverlayWarning) VerticalSpace(16.dp)
+                    PCard(modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN).testTag("settings-remote-access")) {
                         DesktopAccessSection(navController)
                     }
                     VerticalSpace(16.dp)
                     PCard(modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN)) {
                         PlainAppServiceSection(
-                            backgroundServiceEnabled = backgroundServiceEnabled,
-                            foregroundServiceState = foregroundServiceState,
                             errorMessage = httpServerError.ifEmpty { httpServerResourcesError }.ifEmpty { foregroundServiceError },
                             onRetry = if (httpServerError.isNotEmpty() || httpServerResourcesError.isNotEmpty()) {
                                 { HttpServerManager.restartHttpServer() }

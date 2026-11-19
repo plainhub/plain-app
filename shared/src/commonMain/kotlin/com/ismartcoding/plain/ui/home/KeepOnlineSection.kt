@@ -4,7 +4,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -13,14 +12,11 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.ismartcoding.plain.HttpServerManager
-import com.ismartcoding.plain.features.settings.ServiceState
 import com.ismartcoding.plain.i18n.*
 import com.ismartcoding.plain.platform.system.supportsBackgroundService
 import com.ismartcoding.plain.ui.base.AlertType
 import com.ismartcoding.plain.ui.base.PAlert
 import com.ismartcoding.plain.ui.base.PExpandableSection
-import com.ismartcoding.plain.ui.base.PListItem
 import com.ismartcoding.plain.ui.base.PFilledButton
 import com.ismartcoding.plain.ui.components.ButtonType
 import com.ismartcoding.plain.ui.base.PTextButton
@@ -30,25 +26,11 @@ import org.jetbrains.compose.resources.stringResource
 
 @Composable
 fun PlainAppServiceSection(
-    backgroundServiceEnabled: Boolean,
-    foregroundServiceState: ServiceState,
     errorMessage: String,
     onRetry: (() -> Unit)?,
     onStayOnline: () -> Unit,
 ) {
     Column {
-        if (supportsBackgroundService) {
-            PListItem(
-                title = stringResource(Res.string.keep_online_in_background),
-                subtitle = stringResource(Res.string.keep_online_in_background_desc),
-            ) {
-                Switch(
-                    checked = backgroundServiceEnabled,
-                    enabled = !foregroundServiceState.isProcessing(),
-                    onCheckedChange = { HttpServerManager.setBackgroundServiceEnabled(it) },
-                )
-            }
-        }
         if (errorMessage.isNotEmpty()) {
             PAlert(description = errorMessage, type = AlertType.ERROR, modifier = Modifier.padding(start = 16.dp, end = 16.dp, bottom = 8.dp)) {
                 if (onRetry != null) {

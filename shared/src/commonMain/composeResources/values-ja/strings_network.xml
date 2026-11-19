@@ -121,15 +121,12 @@
     <string name="desktop_access_instructions">両方の端末を同じ Wi-Fi に接続し、パソコンのブラウザでこのアドレスを開いてください。</string>
     <string name="home_remote_access">リモートアクセス</string>
     <string name="home_try_other_addresses">ほかのアドレスを試す</string>
-    <string name="keep_online_in_background">バックグラウンドで接続を維持</string>
-    <string name="keep_online_in_background_desc">アプリを離れても接続を維持します。</string>
     <string name="connection_keeps_dropping">接続が頻繁に切れますか？</string>
     <string name="connection_keeps_dropping_help">端末によってはバックグラウンドのアプリが一時停止されます。画面を暗くして PlainApp を開いたままにしてみてください。</string>
     <string name="stay_online_foreground_desc">リモートアクセスは PlainApp が前面にある間のみ利用できます。「オンライン状態を維持」で画面の自動ロックを防ぎ、黒い画面に切り替えられます。</string>
     <string name="expanded">展開済み</string>
     <string name="collapsed">折りたたみ済み</string>
     <string name="background_online_failed">バックグラウンドでの実行を継続できませんでした。下の「オンライン状態を維持」をお試しください。</string>
-    <string name="turn_off_keep_online_in_background">バックグラウンドモードをオフにする</string>
     <string name="enable_desktop_access">パソコンからのアクセスを有効にする</string>
     <string name="disable_desktop_access">パソコンからのアクセスを無効にする</string>
     <string name="services">サービス</string>

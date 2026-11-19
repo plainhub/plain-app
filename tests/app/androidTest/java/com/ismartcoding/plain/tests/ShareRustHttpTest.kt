@@ -1,8 +1,5 @@
 package com.ismartcoding.plain.tests
 
-import com.ismartcoding.plain.lib.withIO
-import com.ismartcoding.plain.rust.RustRuntime
-
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.ismartcoding.plain.models.ShareInput
@@ -12,6 +9,7 @@ import java.security.MessageDigest
 import com.ismartcoding.plain.features.shares.SharesClient
 import com.ismartcoding.plain.Prefs
 import com.ismartcoding.plain.network.*
+import com.ismartcoding.plain.platform.system.setRemoteAccessEnabled
 import com.ismartcoding.plain.testing.CryptoFixtures
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.json.*
@@ -20,9 +18,6 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import java.io.ByteArrayInputStream
 import java.io.File
-import java.io.IOException
-import java.net.InetSocketAddress
-import java.net.ServerSocket
 import java.util.UUID
 import java.util.zip.ZipInputStream
 import kotlin.io.encoding.Base64
@@ -34,18 +29,17 @@ class ShareRustHttpTest {
     @Test
     fun sharesResolveFreshRustRootsAndRevokeOldTokens() = runBlocking {
         val marker = "share-rust-${UUID.randomUUID()}"
-        val root = File(InstrumentationRegistry.getInstrumentation().targetContext.cacheDir, marker).apply { mkdirs() }
+        val root = File(InstrumentationRegistry.getInstrumentation().targetContext.cacheDir, "share_open/$marker").apply { mkdirs() }
         val folder = File(root, "photos").apply { mkdirs() }
         val other = File(root, "other").apply { mkdirs() }
         File(folder, "a.txt").writeText("synthetic")
         File(folder, "empty").mkdir()
         val outside = File(other, "secret.txt").apply { writeText("outside") }
         Os.symlink(outside.absolutePath, File(folder, "escape.txt").absolutePath)
-        val service = Prefs.backgroundServiceEnabled.value
+        val remoteAccess = Prefs.remoteAccess.value
         var id: String? = null
         try {
-            Prefs.backgroundServiceEnabled.value = true
-            withIO { RustRuntime.start() }
+            setRemoteAccessEnabled(true)
             val input = ShareInput(marker, "", null, true, listOf(SharePath("/photos", folder.absolutePath, true)))
             val share = SharesClient.createShare(input)
             id = share.id
@@ -78,17 +72,18 @@ class ShareRustHttpTest {
                 val fileKey = Base64.decode(info.getValue("urlToken").jsonPrimitive.content)
                 fun resource(path: String, route: String = "fs"): String {
                     val payload = buildJsonObject { put("type", "SHARED_FILE"); put("id", path) }
-                    val encrypted = XChaCha20Poly1305(fileKey).encrypt(payload.toString().toByteArray(), "FS\u0000s\u0000${share.id}".toByteArray())
+                    val encrypted = XChaCha20Poly1305(fileKey).encrypt(payload.toString().toByteArray(), "FS.s.${share.id}".toByteArray())
                     val encoded = android.util.Base64.encodeToString(encrypted, android.util.Base64.URL_SAFE or android.util.Base64.NO_WRAP or android.util.Base64.NO_PADDING)
                     return "$base/$route?id=s.${share.id}.$encoded" + if (route == "fs") "&action=DOWNLOAD" else ""
                 }
                 val fileUrl = resource("photos/a.txt")
                 client.get(fileUrl).use {
-                    assertEquals(200, it.status.value)
-                    assertEquals("synthetic", it.bodyAsText())
+                    val body = it.bodyAsText()
+                    assertEquals(body, 200, it.status.value)
+                    assertEquals("synthetic", body)
                 }
                 val entries = info.getValue("entries").jsonArray
-                assertEquals(listOf("/photos/a.txt"), entries.filter { !it.jsonObject.getValue("isDir").jsonPrimitive.boolean }
+                assertEquals(listOf("photos/a.txt"), entries.filter { !it.jsonObject.getValue("isDir").jsonPrimitive.boolean }
                     .map { it.jsonObject.getValue("relativePath").jsonPrimitive.content })
                 client.get(resource("photos", "zip/dir")).use {
                     assertEquals(200, it.status.value)
@@ -104,19 +99,11 @@ class ShareRustHttpTest {
                 }
                 assertNotNull(guest("photos/../other").second?.get("errors"))
                 client.get(resource("photos/escape.txt")).use { assertEquals(403, it.status.value) }
-                Prefs.backgroundServiceEnabled.value = false
-                try {
-                    assertEquals(403, guest().first)
-                    client.get(fileUrl).use { assertEquals(403, it.status.value) }
-                } catch (error: IOException) {
-                    ServerSocket().use { socket ->
-                        socket.reuseAddress = true
-                        socket.bind(InetSocketAddress(Prefs.httpPort.value))
-                        assertTrue("Service shutdown must release the listener: $error", socket.isBound)
-                    }
-                }
-                Prefs.backgroundServiceEnabled.value = true
-                withIO { RustRuntime.start() }
+                setRemoteAccessEnabled(false)
+                assertEquals(403, guest().first)
+                client.get(fileUrl).use { assertEquals(403, it.status.value) }
+                assertNotNull(SharesClient.getShare(share.id))
+                setRemoteAccessEnabled(true)
                 val replacement = input.copy(data = listOf(SharePath("/other",other.absolutePath,true)))
                 SharesClient.updateShare(share.id, replacement)
                 client.get(fileUrl).use { assertEquals(403, it.status.value) }
@@ -130,7 +117,7 @@ class ShareRustHttpTest {
             }
         } finally {
             id?.let { SharesClient.deleteShare(it) }
-            Prefs.backgroundServiceEnabled.value = service
+            setRemoteAccessEnabled(remoteAccess)
             root.deleteRecursively()
         }
     }

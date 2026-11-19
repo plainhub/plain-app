@@ -1,16 +1,16 @@
 package com.ismartcoding.plain.services
 
 import android.annotation.SuppressLint
+import android.content.Context
 import android.content.Intent
 import android.content.pm.ServiceInfo
 import androidx.core.app.ServiceCompat
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.LifecycleService
-import com.ismartcoding.plain.app.AppIntents
-import com.ismartcoding.plain.features.settings.ServiceState
 import com.ismartcoding.plain.lib.UrlHelper
 import com.ismartcoding.plain.ui.platform.notifications.NotificationHelper
 import com.ismartcoding.plain.i18n.Res
-import com.ismartcoding.plain.i18n.keep_online_in_background
+import com.ismartcoding.plain.i18n.app_name
 import com.ismartcoding.plain.i18n.background_online_failed
 import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.ui.i18n.LocaleHelper
@@ -26,33 +26,21 @@ class HttpServerForegroundService : LifecycleService() {
 
     @SuppressLint("InlinedApi")
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        if (!Prefs.backgroundServiceEnabled.value) { stopSelf(); return START_NOT_STICKY }
         super.onStartCommand(intent, flags, startId)
 
         try {
-            val notification = NotificationHelper.createServiceNotification(
-                this,
-                AppIntents.ACTION_DISABLE_BACKGROUND_MODE,
-                LocaleHelper.getString(Res.string.keep_online_in_background),
-                getHttpServerUrls()
-            )
-
             ServiceCompat.startForeground(
                 this,
                 notificationId,
-                notification,
+                createNotification(this),
                 ServiceInfo.FOREGROUND_SERVICE_TYPE_SPECIAL_USE
             )
-        } catch (e: Exception) {
-            LogCat.e("Failed to start foreground service: ${e.message}")
-            HttpServerManager.foregroundServiceError.value = "${LocaleHelper.getString(Res.string.background_online_failed)} (${e.message})"
-            HttpServerManager.foregroundServiceState.value = ServiceState.ERROR
+        } catch (error: Exception) {
+            reportStartFailure(error)
             stopSelf()
             return START_NOT_STICKY
         }
-
-        HttpServerManager.foregroundServiceState.value = ServiceState.STARTED
-
+        HttpServerManager.foregroundServiceError.value = ""
         return START_STICKY
     }
 
@@ -60,20 +48,38 @@ class HttpServerForegroundService : LifecycleService() {
         instance = null
         super.onDestroy()
         stopForeground(STOP_FOREGROUND_REMOVE)
-        if (HttpServerManager.foregroundServiceState.value != ServiceState.ERROR) {
-            HttpServerManager.foregroundServiceState.value = ServiceState.STOPPED
-        }
     }
 
     companion object {
         val notificationId: Int by lazy { NotificationHelper.generateId() }
 
         @Volatile
-        var instance: HttpServerForegroundService? = null
+        private var instance: HttpServerForegroundService? = null
 
         fun isRunning(): Boolean = instance != null
 
-        fun getHttpServerUrls(): String {
+        fun start(context: Context, refreshNotification: Boolean = false) {
+            if (isRunning() && !refreshNotification) return
+            try {
+                ContextCompat.startForegroundService(context, Intent(context, HttpServerForegroundService::class.java))
+            } catch (error: Exception) {
+                reportStartFailure(error)
+            }
+        }
+
+        private fun reportStartFailure(error: Exception) {
+            LogCat.e("Start background service", error)
+            HttpServerManager.foregroundServiceError.value =
+                "${LocaleHelper.getString(Res.string.background_online_failed)} (${error.message})"
+        }
+
+        fun createNotification(context: Context) = NotificationHelper.createServiceNotification(
+            context = context,
+            title = LocaleHelper.getString(Res.string.app_name),
+            description = getHttpServerUrls(),
+        )
+
+        private fun getHttpServerUrls(): String {
             val hostname = Prefs.mdnsHostname.value
             val http = UrlHelper.buildUrl("http", hostname, Prefs.httpPort.value)
             val https = UrlHelper.buildUrl("https", hostname, Prefs.httpsPort.value)

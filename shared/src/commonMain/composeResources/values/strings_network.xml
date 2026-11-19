@@ -119,15 +119,12 @@
     <string name="enable_adb_token">Enable ADB token</string>
     <string name="try_more_addresses">Can't connect? Try more addresses</string>
     <string name="collapse_backup_addresses">Collapse backup addresses</string>
-    <string name="keep_online_in_background">Keep online in background</string>
-    <string name="keep_online_in_background_desc">Stay connected when you leave the app.</string>
     <string name="connection_keeps_dropping">Connection keeps dropping?</string>
     <string name="connection_keeps_dropping_help">Some phones pause apps in the background. Try keeping PlainApp open with a dark screen.</string>
     <string name="stay_online_foreground_desc">Remote access only works while PlainApp is in the foreground. Stay Online keeps the screen awake and can show a black screen.</string>
     <string name="expanded">Expanded</string>
     <string name="collapsed">Collapsed</string>
     <string name="background_online_failed">Could not keep running in the background. Try Stay Online below.</string>
-    <string name="turn_off_keep_online_in_background">Turn off background mode</string>
     <string name="enable_desktop_access">Enable Desktop Access</string>
     <string name="disable_desktop_access">Disable Desktop Access</string>
     <string name="login_compare_code">Compare this code on both devices before allowing login.</string>
