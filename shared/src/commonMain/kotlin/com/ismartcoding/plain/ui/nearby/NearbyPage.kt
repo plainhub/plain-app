@@ -26,10 +26,14 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.LinkAnnotation
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.TextLinkStyles
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.withLink
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
-import com.ismartcoding.plain.ui.components.ButtonSize
 import com.ismartcoding.plain.i18n.*
 import com.ismartcoding.plain.lib.extensions.toSortName
 import com.ismartcoding.plain.platform.network.BleAvailability
@@ -39,7 +43,6 @@ import com.ismartcoding.plain.ui.base.BottomSpace
 import com.ismartcoding.plain.ui.base.HorizontalSpace
 import com.ismartcoding.plain.ui.components.NavigationBackIcon
 import com.ismartcoding.plain.ui.base.PScaffold
-import com.ismartcoding.plain.ui.base.PTextButton
 import com.ismartcoding.plain.ui.base.PTopAppBar
 import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.chat.PeerViewModel
@@ -194,28 +197,29 @@ fun NearbyPage(
 private fun NearbyBluetoothTip(availability: BleAvailability) {
     val canRequest = canRequestBluetoothAccess()
     val openSettings = availability == BleAvailability.PERMISSION_DENIED && !canRequest
-    Column(modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp)) {
-        Text(
-            text = stringResource(
-                when {
-                    availability == BleAvailability.BLUETOOTH_OFF -> Res.string.bluetooth_off
-                    openSettings -> Res.string.bluetooth_permission_denied
-                    else -> Res.string.nearby_bluetooth_tip
-                }
-            ),
-            style = MaterialTheme.typography.labelLarge,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-        )
-        if (canRequest || openSettings) {
-            PTextButton(
-                text = stringResource(if (openSettings) Res.string.open_settings else Res.string.nearby_bluetooth_enable),
-                buttonSize = ButtonSize.SMALL,
-                onClick = {
-                    if (openSettings) openAppSettings() else NearbyViewModel.requestBlePermission()
-                },
-            )
+    val description = stringResource(
+        when {
+            availability == BleAvailability.BLUETOOTH_OFF -> Res.string.bluetooth_off
+            openSettings -> Res.string.bluetooth_permission_denied
+            else -> Res.string.nearby_bluetooth_tip
         }
-    }
+    )
+    val action = stringResource(if (openSettings) Res.string.open_settings else Res.string.nearby_bluetooth_enable)
+    val linkStyle = TextLinkStyles(style = SpanStyle(color = MaterialTheme.colorScheme.primary))
+    Text(
+        text = buildAnnotatedString {
+            append(description)
+            if (canRequest || openSettings) {
+                append(" ")
+                withLink(LinkAnnotation.Clickable("bluetooth", linkStyle) {
+                    if (openSettings) openAppSettings() else NearbyViewModel.requestBlePermission()
+                }) { append(action) }
+            }
+        },
+        modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp),
+        style = MaterialTheme.typography.labelLarge,
+        color = MaterialTheme.colorScheme.onSurfaceVariant,
+    )
 }
 
 internal fun LazyListScope.nearbyDeviceListItems(
