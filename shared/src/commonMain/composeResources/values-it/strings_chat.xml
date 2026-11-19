@@ -137,7 +137,7 @@
     <string name="delivery_status">Stato di consegna</string>
     <string name="delivery_status_summary">%1$d / %2$d consegnati</string>
     <string name="resend_selected">Reinvia selezionati</string>
-    <string name="pairing_compare_code">Confronta questo codice su entrambi i dispositivi prima di consentire l’associazione.</string>
+    <string name="pairing_compare_code">Consenti l’associazione solo se i codici coincidono.</string>
     <string name="share_folder">Condividi cartella</string>
     <string name="share_this_folder">Condividi questa cartella</string>
     <string name="folder_card_items">%1$d elementi</string>

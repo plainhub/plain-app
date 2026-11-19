@@ -137,7 +137,7 @@
     <string name="delivery_status">Trạng thái giao</string>
     <string name="delivery_status_summary">%1$d / %2$d đã giao</string>
     <string name="resend_selected">Gửi lại đã chọn</string>
-    <string name="pairing_compare_code">So sánh mã này trên cả hai thiết bị trước khi cho phép ghép đôi.</string>
+    <string name="pairing_compare_code">Chỉ cho phép ghép đôi nếu hai mã trùng nhau.</string>
     <string name="share_folder">Chia sẻ thư mục</string>
     <string name="share_this_folder">Chia sẻ thư mục này</string>
     <string name="folder_card_items">%1$d mục</string>

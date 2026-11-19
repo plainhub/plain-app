@@ -137,7 +137,7 @@
     <string name="delivery_status">டெலிவரி நிலை</string>
     <string name="delivery_status_summary">%1$d / %2$d டெலிவர் செய்யப்பட்டது</string>
     <string name="resend_selected">தேர்வுபடுத்தியவற்றை மீண்டும் அனுப்பு</string>
-    <string name="pairing_compare_code">இணைக்க அனுமதிப்பதற்கு முன் இரு சாதனங்களிலும் இந்தக் குறியீடு ஒன்றாக இருப்பதை உறுதிசெய்யவும்.</string>
+    <string name="pairing_compare_code">குறியீடுகள் பொருந்தினால் மட்டுமே இணைக்க அனுமதிக்கவும்.</string>
     <string name="share_folder">கோப்புறையைப் பகிர்</string>
     <string name="share_this_folder">இந்த கோப்புறையைப் பகிர்</string>
     <string name="folder_card_items">%1$d பொருட்கள்</string>

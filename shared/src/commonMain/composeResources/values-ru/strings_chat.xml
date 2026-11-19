@@ -137,7 +137,7 @@
     <string name="delivery_status">Статус доставки</string>
     <string name="delivery_status_summary">%1$d / %2$d доставлено</string>
     <string name="resend_selected">Повторить выбранные</string>
-    <string name="pairing_compare_code">Прежде чем разрешить сопряжение, сравните этот код на обоих устройствах.</string>
+    <string name="pairing_compare_code">Разрешайте сопряжение, только если коды совпадают.</string>
     <string name="share_folder">Поделиться папкой</string>
     <string name="share_this_folder">Поделиться этой папкой</string>
     <string name="folder_card_items">Элементов: %1$d</string>
