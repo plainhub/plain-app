@@ -207,4 +207,7 @@
     <string name="pair_chat_description">Exchange messages and files</string>
     <string name="pair_control_description">Manage this device and exchange messages and files</string>
     <string name="pair_continue">Continue</string>
+    <string name="pairing_rejected">Pairing request rejected.</string>
+    <string name="pairing_too_many_attempts">Too many pairing attempts. Try again in 1 minute.</string>
+    <string name="pairing_waiting_for_confirmation">Allow this request in PlainApp on the other device.</string>
 </resources>

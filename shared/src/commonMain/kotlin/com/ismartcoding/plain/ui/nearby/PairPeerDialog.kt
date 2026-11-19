@@ -91,6 +91,7 @@ fun PairPeerDialog(device: NearbyDevice, initialMode: PairingMode, qrCode: Strin
     val waiting = started || submitting || state?.active == true
     val localManageTrust = initialMode == PairingMode.MANAGE && phase == PairingStep.TRUST_REQUIRED
     val expired = state?.expired == true
+    val stateError = stringResource(state?.error.messageResource())
     AlertDialog(
         modifier = Modifier.testTag("nearby-pair-dialog"),
         onDismissRequest = onDismiss,
@@ -98,7 +99,7 @@ fun PairPeerDialog(device: NearbyDevice, initialMode: PairingMode, qrCode: Strin
         title = { Text(stringResource(when {
             expired -> Res.string.pairing_expired
             phase == PairingStep.SUCCEEDED -> Res.string.paired
-            waiting && phase != PairingStep.FAILED && !localManageTrust && qrCode == null -> Res.string.waiting_for_confirmation
+            waiting && phase != PairingStep.FAILED && !localManageTrust && qrCode == null -> Res.string.pairing_waiting_for_confirmation
             else -> Res.string.pair_device
         })) },
         text = {
@@ -116,7 +117,7 @@ fun PairPeerDialog(device: NearbyDevice, initialMode: PairingMode, qrCode: Strin
                         }
                     }
                 }
-                if (!expired) (error ?: failureText.takeIf { phase == PairingStep.FAILED })?.let {
+                if (!expired) (error ?: stateError.takeIf { phase == PairingStep.FAILED })?.let {
                     Text(it, color = MaterialTheme.colorScheme.error)
                 }
             }

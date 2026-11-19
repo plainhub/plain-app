@@ -94,6 +94,7 @@ internal fun PairingPasswordPrompt(
     TextFieldDialog(
         title = stringResource(Res.string.password),
         isPassword = true,
+        confirmText = stringResource(Res.string.pair),
         errorText = error ?: if (state.error == PairingErrorCode.INVALID_PASSWORD) stringResource(Res.string.invalid_password) else "",
         validator = { !submitting },
         onDismissRequest = onDismiss,

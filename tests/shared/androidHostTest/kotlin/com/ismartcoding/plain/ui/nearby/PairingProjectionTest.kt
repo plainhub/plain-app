@@ -1,5 +1,6 @@
 package com.ismartcoding.plain.ui.nearby
 
+import com.ismartcoding.plain.i18n.*
 import com.ismartcoding.plain.features.nearby.PairingMode
 import com.ismartcoding.plain.models.PairingErrorCode
 import com.ismartcoding.plain.models.PairingProgressNotice
@@ -17,6 +18,22 @@ class PairingProjectionTest {
         NearbyViewModel.itemStatus.clear()
         MainViewModel.pendingPairingRequest.value = null
     }
+    @Test
+    fun failuresSelectPairingMessagesThroughTheNotificationEntryPoint() {
+        val messages = listOf(
+            PairingErrorCode.TIMEOUT to Res.string.pairing_expired,
+            PairingErrorCode.REJECTED to Res.string.pairing_rejected,
+            PairingErrorCode.TOO_MANY_LOGIN_ATTEMPTS to Res.string.pairing_too_many_attempts,
+            PairingErrorCode.INVALID_PASSWORD to Res.string.invalid_password,
+            PairingErrorCode.INTERNAL_ERROR to Res.string.pairing_failed,
+        )
+        for ((reason, message) in messages) {
+            PairingProjection.starting("peer")
+            PairingProjection.failed(PairingProgressNotice("peer", "Fixture", reason))
+            assertEquals(message, NearbyViewModel.pairingViews.getValue("peer").error.messageResource())
+        }
+    }
+
     @Test
     fun notifications_drive_local_display_and_release_waiting_actions() {
         PairingProjection.starting("peer")

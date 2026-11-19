@@ -11,6 +11,7 @@ import com.ismartcoding.plain.ui.components.ButtonSize
 import com.ismartcoding.plain.ui.nearby.NearbyItemStatus
 import com.ismartcoding.plain.ui.nearby.NearbyViewModel
 import com.ismartcoding.plain.ui.nearby.PairingStep
+import com.ismartcoding.plain.ui.nearby.messageResource
 import com.ismartcoding.plain.ui.platform.system.getIcon
 import com.ismartcoding.plain.ui.theme.PlainTheme
 import org.jetbrains.compose.resources.stringResource
@@ -21,8 +22,7 @@ fun NearbyDeviceItem(item: NearbyDevice, enabled: Boolean, onPair: () -> Unit) {
     val pending = pairing?.active == true
     val status = NearbyViewModel.getStatus(item.id, false)
     val detail = when {
-        pairing?.expired == true -> stringResource(Res.string.pairing_expired)
-        pairing?.step == PairingStep.FAILED -> stringResource(Res.string.pairing_failed)
+        pairing?.step == PairingStep.FAILED -> stringResource(pairing.error.messageResource())
         pairing?.step == PairingStep.WAITING_FOR_PEER -> pairing.verificationCode
         else -> null
     }
