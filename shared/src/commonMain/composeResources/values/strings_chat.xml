@@ -202,6 +202,10 @@
     <string name="pairing_trust">Trust</string>
     <string name="pairing_scan_qrcode">Scan with another phone to pair with this phone.</string>
     <string name="pairing_manage_identity_changed">The device’s public key has changed. Only trust it if you recognize the device and expected this change.</string>
+    <string name="nearby_lan_permission_hint">Allow local network access to find and connect to devices on your Wi-Fi.</string>
+    <string name="nearby_lan_allow">Allow access</string>
+    <string name="wifi_aware_title">Wi-Fi Aware</string>
+    <string name="wifi_aware_transfer_hint">Transfer messages and files directly over Wi-Fi, without a router.</string>
     <string name="unpair_device_hint">Your chat history is kept. Pair again to use this device.</string>
     <string name="pair_choose_connection">Choose how to connect to this device</string>
     <string name="pair_chat_description">Exchange messages and files</string>

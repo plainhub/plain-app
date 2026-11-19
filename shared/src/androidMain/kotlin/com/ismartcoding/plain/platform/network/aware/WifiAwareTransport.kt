@@ -55,6 +55,7 @@ object WifiAwareTransport {
 
     fun unsubscribe(peerId: String) {
         pool.unsubscribe(peerId)
+        if (!pool.hasSubscriptions) stop()
     }
 
     suspend fun openSocket(peerId: String): PeerByteSocket {

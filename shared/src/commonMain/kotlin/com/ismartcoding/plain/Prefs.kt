@@ -73,6 +73,7 @@ object Prefs {
     val editorFontSize = MutableStateFlow(0)
     val editorStatusBar = MutableStateFlow(false)
     val nearbyDiscoverable = MutableStateFlow(false)
+    val wifiAwareEnabled = MutableStateFlow(false)
     val notificationFilter = MutableStateFlow(NotificationFilterData(NotificationFilterMode.BLACKLIST, emptySet()))
     val pomodoroSettings = MutableStateFlow(
         PomodoroSettings(
@@ -151,6 +152,7 @@ object Prefs {
             PrefKeys.EDITOR_FONT_SIZE -> editorFontSize.value = value.jsonPrimitive.int
             PrefKeys.EDITOR_STATUS_BAR -> editorStatusBar.value = value.jsonPrimitive.boolean
             PrefKeys.NEARBY_DISCOVERABLE -> nearbyDiscoverable.value = value.jsonPrimitive.boolean
+            PrefKeys.WIFI_AWARE_ENABLED -> wifiAwareEnabled.value = value.jsonPrimitive.boolean
             PrefKeys.NOTIFICATION_FILTER -> notificationFilter.value = JsonHelper.jsonDecodeFromElement(value)
             PrefKeys.POMODORO_SETTINGS -> pomodoroSettings.value = JsonHelper.jsonDecodeFromElement(value)
             PrefKeys.APP_HOME_FEATURES -> appHomeFeatures.value = value.jsonPrimitive.content

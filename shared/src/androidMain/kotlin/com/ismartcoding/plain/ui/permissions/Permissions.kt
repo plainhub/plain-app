@@ -127,6 +127,7 @@ object Permissions {
             Permission.SEND_SMS,
             Permission.POST_NOTIFICATIONS,
             Permission.NEARBY_WIFI_DEVICES,
+            Permission.ACCESS_LOCAL_NETWORK,
             Permission.ACCESS_FINE_LOCATION,
             Permission.RECORD_AUDIO,
             Permission.READ_MEDIA_IMAGES,

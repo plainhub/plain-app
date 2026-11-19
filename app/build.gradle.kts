@@ -30,7 +30,7 @@ android {
     defaultConfig {
         applicationId = plainApplicationId
         minSdk = 28
-        targetSdk = 36
+        targetSdk = 37
         testInstrumentationRunner = providers.gradleProperty("testInstrumentationRunner")
             .orElse("androidx.test.runner.AndroidJUnitRunner").get()
 

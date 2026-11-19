@@ -201,6 +201,10 @@
     <string name="pairing_trust">信任</string>
     <string name="pairing_scan_qrcode">在另一台设备的 PlainApp 中打开“扫描二维码”，扫描此二维码进行配对。</string>
     <string name="pairing_manage_identity_changed">此设备的身份已变化。确认是同一台设备后再信任，否则请取消。</string>
+    <string name="nearby_lan_permission_hint">允许访问局域网，以发现并连接同一 Wi-Fi 下的设备。</string>
+    <string name="nearby_lan_allow">允许访问</string>
+    <string name="wifi_aware_title">Wi-Fi Aware</string>
+    <string name="wifi_aware_transfer_hint">通过 Wi-Fi 直连传输消息和文件，无需路由器。</string>
     <string name="unpair_device_hint">聊天记录会保留。下次使用这台设备时，需要重新配对。</string>
     <string name="pair_choose_connection">选择与这台设备的连接方式</string>
     <string name="pair_chat_description">互发消息和文件</string>

@@ -38,6 +38,8 @@ import com.ismartcoding.plain.i18n.*
 import com.ismartcoding.plain.lib.extensions.toSortName
 import com.ismartcoding.plain.platform.network.BleAvailability
 import com.ismartcoding.plain.platform.network.bleAvailabilityFlow
+import com.ismartcoding.plain.platform.network.localNetworkPermission
+import com.ismartcoding.plain.ui.permissions.rememberNetworkPermission
 import com.ismartcoding.plain.platform.system.openAppSettings
 import com.ismartcoding.plain.ui.base.BottomSpace
 import com.ismartcoding.plain.ui.base.HorizontalSpace
@@ -78,6 +80,8 @@ fun NearbyPage(
     val isDiscovering by NearbyViewModel.isDiscovering
     var isBleScanning by remember { mutableStateOf(false) }
     val bleAvailability by bleAvailabilityFlow.collectAsState()
+    val lanPermission = remember { localNetworkPermission() }
+    val lanGranted = lanPermission?.let { rememberNetworkPermission(it) }
     val isSearching = isDiscovering || isBleScanning
     val peersMap by peerVM.peersMap.collectAsState()
     val peers = peersMap.values.filter { it.isPaired() }.sortedBy { it.name.toSortName() }
@@ -107,7 +111,8 @@ fun NearbyPage(
     }
     LaunchedEffect(peerVM) { peerVM.observe() }
 
-    LaunchedEffect(Unit) {
+    LaunchedEffect(lanGranted?.value) {
+        if (lanGranted?.value == false) return@LaunchedEffect
         try { RustNearbyDevices.observeDiscovery() }
         catch (canceled: CancellationException) { throw canceled }
         catch (error: Exception) { LogCat.e("Nearby discovery failed", error) }
@@ -149,6 +154,9 @@ fun NearbyPage(
                 .fillMaxSize()
                 .padding(top = paddingValues.calculateTopPadding())
         ) {
+            if (lanGranted?.value == false) {
+                item { NearbyLocalNetworkNotice(lanPermission) }
+            }
             if (peers.isNotEmpty()) {
                 item { PSectionTitle(stringResource(Res.string.paired_devices)) }
             }
@@ -158,7 +166,7 @@ fun NearbyPage(
                 }
                 VerticalSpace(8.dp)
             }
-            nearbySearchingItem(isSearching)
+            if (lanGranted?.value != false) nearbySearchingItem(isSearching)
             nearbyDeviceListItems(newDevices, activeDevice?.id) { device ->
                 if (device.remoteAccess == true) chooseMode = device
                 else NearbyViewModel.startPairing(device, PairingMode.CHAT)

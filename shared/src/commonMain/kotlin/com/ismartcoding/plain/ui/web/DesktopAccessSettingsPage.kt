@@ -70,6 +70,10 @@ fun DesktopAccessSettingsPage(
                     )
                 }
                 VerticalSpace(dp = 16.dp)
+                if (Capability.WIFI_AWARE in getDeviceCapabilities()) {
+                    WifiAwareAccessSettings()
+                    VerticalSpace(dp = 16.dp)
+                }
                 PSectionTitle(title = stringResource(Res.string.access_remote_permissions))
             }
             itemsIndexed(accessItems.value) { index, item ->

@@ -30,6 +30,7 @@ internal class AwareLinkPool(
     private data class Subscription(val peer: AwarePeer, val config: AwareConfig)
     private val configurationLock = Any()
     private val subscribedPeers = ConcurrentHashMap<String, Subscription>()
+    val hasSubscriptions: Boolean get() = subscribedPeers.isNotEmpty()
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
     @Volatile
     private var sweepJob: Job? = null
