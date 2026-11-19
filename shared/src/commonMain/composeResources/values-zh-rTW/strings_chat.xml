@@ -202,4 +202,8 @@
     <string name="pairing_scan_qrcode">使用另一台手機掃碼，即可與這台手機配對。</string>
     <string name="pairing_manage_identity_changed">此裝置的公鑰已變更。僅在你認識此裝置且確定預期有此變更時才信任它。</string>
     <string name="unpair_device_hint">聊天記錄會保留。下次使用這台裝置時，需要重新配對。</string>
+    <string name="pair_choose_connection">選擇連接此裝置的方式</string>
+    <string name="pair_chat_description">交換訊息和檔案</string>
+    <string name="pair_control_description">管理此裝置並交換訊息和檔案</string>
+    <string name="pair_continue">繼續</string>
 </resources>

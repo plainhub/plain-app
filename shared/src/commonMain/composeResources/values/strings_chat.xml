@@ -203,4 +203,8 @@
     <string name="pairing_scan_qrcode">Scan with another phone to pair with this phone.</string>
     <string name="pairing_manage_identity_changed">The device’s public key has changed. Only trust it if you recognize the device and expected this change.</string>
     <string name="unpair_device_hint">Your chat history is kept. Pair again to use this device.</string>
+    <string name="pair_choose_connection">Choose how to connect to this device</string>
+    <string name="pair_chat_description">Exchange messages and files</string>
+    <string name="pair_control_description">Manage this device and exchange messages and files</string>
+    <string name="pair_continue">Continue</string>
 </resources>

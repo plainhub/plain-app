@@ -1646,13 +1646,14 @@ class ManagedDeviceUiAcceptanceTest {
             assertEquals(androidx.compose.ui.semantics.Role.Button, pairAction.semantic.config.getOrNull(SemanticsProperties.Role))
             assertTrue(pairAction.performAction(AccessibilityNodeInfo.ACTION_CLICK))
             if (nearby.remoteAccess == true) {
-                awaitNode("pairing access title") { it.text == text(Res.string.pair_device) }
-                awaitNode("pair dialog belongs to the expected device") { it.text == nearby.name }
+                awaitNode("pair dialog belongs to the expected device") { it.text == text(Res.string.pair_with_device).replace("%1\$s", nearby.name) }
                 val label = text(if (mode == PairingMode.CHAT) Res.string.pair_chat_only else Res.string.pair_full_control)
                 var choices = awaitNode("access choice") { it.text?.toString()?.contains(label) == true }
                 while (choices.semantic.config.getOrNull(SemanticsProperties.Role) != androidx.compose.ui.semantics.Role.RadioButton && choices.parent != null) choices = checkNotNull(choices.parent)
                 assertEquals(androidx.compose.ui.semantics.Role.RadioButton, choices.semantic.config.getOrNull(SemanticsProperties.Role))
                 performClick(choices, "access radio")
+                awaitNode("selected access radio") { it.text?.toString()?.contains(label) == true && it.isChecked }
+                click(text(Res.string.pair_continue), "confirm pairing")
             } else {
                 assertEquals("Remote access must be enabled for full control", PairingMode.CHAT, mode)
                 assertFalse(uiNodes().any { it.overlay && it.text == text(Res.string.pair_full_control) })

@@ -1,18 +1,25 @@
 package com.ismartcoding.plain.ui.nearby
 
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.unit.dp
 import com.ismartcoding.plain.features.nearby.PairingMode
 import com.ismartcoding.plain.i18n.*
 import com.ismartcoding.plain.models.NearbyDevice
 import com.ismartcoding.plain.models.PairingErrorCode
 import com.ismartcoding.plain.ui.base.PDialogRadioRow
+import com.ismartcoding.plain.ui.base.PFilledButton
 import com.ismartcoding.plain.ui.base.POutlinedButton
 import com.ismartcoding.plain.ui.base.PTextButton
 import com.ismartcoding.plain.ui.components.RequestVerificationCodeCard
@@ -22,22 +29,33 @@ import org.jetbrains.compose.resources.stringResource
 
 @Composable
 internal fun NearbyPairModeDialog(name: String, onDismiss: () -> Unit, onMode: (PairingMode) -> Unit) {
+    var mode by remember { mutableStateOf(PairingMode.MANAGE) }
     AlertDialog(
         modifier = Modifier.testTag("nearby-pair-dialog"),
         onDismissRequest = onDismiss,
         containerColor = MaterialTheme.colorScheme.dialogSheetBackground,
-        title = { Text(stringResource(Res.string.pair_device)) },
+        title = { Text(stringResource(Res.string.pair_with_device, name)) },
         text = {
-            Column {
-                Text(name, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                Column(Modifier.selectableGroup()) {
-                    PDialogRadioRow(selected = false, text = stringResource(Res.string.pair_full_control), onClick = { onMode(PairingMode.MANAGE) })
-                    PDialogRadioRow(selected = false, text = stringResource(Res.string.pair_chat_only), onClick = { onMode(PairingMode.CHAT) })
+            Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+                Text(stringResource(Res.string.pair_choose_connection), color = MaterialTheme.colorScheme.onSurfaceVariant)
+                Column(Modifier.selectableGroup(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    PDialogRadioRow(
+                        selected = mode == PairingMode.CHAT,
+                        text = stringResource(Res.string.pair_chat_only),
+                        supportingText = stringResource(Res.string.pair_chat_description),
+                        onClick = { mode = PairingMode.CHAT },
+                    )
+                    PDialogRadioRow(
+                        selected = mode == PairingMode.MANAGE,
+                        text = stringResource(Res.string.pair_full_control),
+                        supportingText = stringResource(Res.string.pair_control_description),
+                        onClick = { mode = PairingMode.MANAGE },
+                    )
                 }
             }
         },
-        confirmButton = {},
-        dismissButton = { PTextButton(text = stringResource(Res.string.close), onClick = onDismiss) },
+        confirmButton = { PFilledButton(text = stringResource(Res.string.pair_continue), onClick = { onMode(mode) }) },
+        dismissButton = { PTextButton(text = stringResource(Res.string.cancel), onClick = onDismiss) },
     )
 }
 

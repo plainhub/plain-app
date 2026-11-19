@@ -202,4 +202,8 @@
     <string name="pairing_scan_qrcode">使用另一台手机扫码，即可与这台手机配对。</string>
     <string name="pairing_manage_identity_changed">此设备的公钥已更改。仅在你认识此设备且确认此更改符合预期时信任它。</string>
     <string name="unpair_device_hint">聊天记录会保留。下次使用这台设备时，需要重新配对。</string>
+    <string name="pair_choose_connection">选择连接此设备的方式</string>
+    <string name="pair_chat_description">交换消息和文件</string>
+    <string name="pair_control_description">管理此设备并交换消息和文件</string>
+    <string name="pair_continue">继续</string>
 </resources>
