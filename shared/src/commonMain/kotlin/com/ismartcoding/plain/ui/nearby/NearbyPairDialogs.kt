@@ -1,7 +1,7 @@
 package com.ismartcoding.plain.ui.nearby
 
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -12,6 +12,7 @@ import com.ismartcoding.plain.features.nearby.PairingMode
 import com.ismartcoding.plain.i18n.*
 import com.ismartcoding.plain.models.NearbyDevice
 import com.ismartcoding.plain.models.PairingErrorCode
+import com.ismartcoding.plain.ui.base.PDialogRadioRow
 import com.ismartcoding.plain.ui.base.POutlinedButton
 import com.ismartcoding.plain.ui.base.PTextButton
 import com.ismartcoding.plain.ui.components.RequestVerificationCodeCard
@@ -29,12 +30,14 @@ internal fun NearbyPairModeDialog(name: String, onDismiss: () -> Unit, onMode: (
         text = {
             Column {
                 Text(name, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                PTextButton(text = stringResource(Res.string.pair_full_control), modifier = Modifier.fillMaxWidth(), onClick = { onMode(PairingMode.MANAGE) })
-                PTextButton(text = stringResource(Res.string.pair_chat_only), modifier = Modifier.fillMaxWidth(), onClick = { onMode(PairingMode.CHAT) })
+                Column(Modifier.selectableGroup()) {
+                    PDialogRadioRow(selected = false, text = stringResource(Res.string.pair_full_control), onClick = { onMode(PairingMode.MANAGE) })
+                    PDialogRadioRow(selected = false, text = stringResource(Res.string.pair_chat_only), onClick = { onMode(PairingMode.CHAT) })
+                }
             }
         },
         confirmButton = {},
-        dismissButton = { PTextButton(text = stringResource(Res.string.cancel), onClick = onDismiss) },
+        dismissButton = { PTextButton(text = stringResource(Res.string.close), onClick = onDismiss) },
     )
 }
 
