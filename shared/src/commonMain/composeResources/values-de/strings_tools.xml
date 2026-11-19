@@ -12,7 +12,7 @@
     <string name="dlna_receiver_step2_title">PlainApp öffnen</string>
     <string name="dlna_receiver_step2_desc">Öffnen Sie PlainApp auf dem anderen Gerät und finden Sie das Video oder die Musik, die Sie abspielen möchten</string>
     <string name="dlna_receiver_step3_title">Zum Caster tippen</string>
-    <string name="dlna_receiver_step3_desc">Tippen Sie auf das Cast-Symbol, wählen Sie "%1$s" aus der Liste und die Wiedergabe beginnt</string>
+    <string name="dlna_receiver_step3_desc">Tippen Sie auf das Cast-Symbol, wählen Sie %1$s aus der Liste und die Wiedergabe beginnt</string>
     <string name="dlna_receiver_protocol_note">Unterstützt DLNA / UPnP-Protokolle, kompatibel mit VLC, Kodi und anderen beliebten Casting-Apps</string>
     <string name="dlna_receiver_exit_player">Player verlassen</string>
     <string name="dlna_receiver_turn_on">Einschalten</string>

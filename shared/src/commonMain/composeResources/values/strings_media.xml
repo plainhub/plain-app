@@ -73,7 +73,7 @@
     <string name="playlist_name">Playlist name</string>
     <string name="rename_playlist">Rename playlist</string>
     <string name="delete_playlist">Delete playlist</string>
-    <string name="delete_playlist_confirm_text">Items in "%1$s" will be removed from the playlist. Audio files will not be deleted.</string>
+    <string name="delete_playlist_confirm_text">Items in %1$s will be removed from the playlist. Audio files will not be deleted.</string>
     <string name="add_n_items">Add %1$d</string>
     <string name="total_minutes">%1$d min</string>
     <string name="play_next">Play next</string>

@@ -12,7 +12,7 @@
     <string name="dlna_receiver_step2_title">Откройте PlainApp</string>
     <string name="dlna_receiver_step2_desc">Откройте PlainApp на другом устройстве и найдите видео или музыку для воспроизведения</string>
     <string name="dlna_receiver_step3_title">Нажмите для трансляции</string>
-    <string name="dlna_receiver_step3_desc">Нажмите на значок трансляции, выберите «%1$s» из списка, и воспроизведение начнётся</string>
+    <string name="dlna_receiver_step3_desc">Нажмите на значок трансляции, выберите %1$s из списка, и воспроизведение начнётся</string>
     <string name="dlna_receiver_protocol_note">Поддерживает протоколы DLNA / UPnP, совместим с VLC, Kodi и другими популярными приложениями для трансляции</string>
     <string name="dlna_receiver_exit_player">Выйти из плеера</string>
     <string name="dlna_receiver_turn_on">Включить</string>

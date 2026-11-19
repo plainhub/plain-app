@@ -65,7 +65,7 @@
     <string name="unpaired">Не сопряжен</string>
     <string name="discovered_devices">Обнаруженные устройства</string>
     <string name="pairing_request">Запрос на сопряжение</string>
-    <string name="pairing_request_message">Хотите сопрячь с устройством "%1$s"?</string>
+    <string name="pairing_request_message">Хотите сопрячь с устройством %1$s?</string>
     <string name="pairing_request_hint">После сопряжения вы сможете обмениваться сообщениями между обоими устройствами.</string>
     <string name="allow">Разрешить</string>
     <string name="deny">Запретить</string>
@@ -125,7 +125,7 @@
     <string name="channel_left_notice">Вы покинули этот канал и больше не можете отправлять сообщения.</string>
     <string name="channel_kicked_notice">Вы были удалены из этого канала и больше не можете отправлять сообщения.</string>
     <string name="channel_invite">Приглашение в канал</string>
-    <string name="channel_invite_message">%1$s пригласил вас присоединиться к каналу "%2$s"</string>
+    <string name="channel_invite_message">%1$s пригласил вас присоединиться к каналу %2$s</string>
     <string name="inviter">Приглашающий</string>
     <string name="decline">Отклонить</string>
     <string name="pending_invite">Ожидающее приглашение</string>
@@ -177,7 +177,7 @@
     <string name="no_finished_downloads">Нет завершённых загрузок</string>
     <string name="saved_n_of_m">Сохранено %1$d из %2$d</string>
     <string name="saved_to_x">Сохранено в %1$s</string>
-    <string name="confirm_unpair_device">Разорвать сопряжение с «%1$s»?</string>
+    <string name="confirm_unpair_device">Разорвать сопряжение с %1$s?</string>
     <string name="delete_chat_history">Удалить историю чата</string>
     <string name="nearby_my_devices">Мои устройства</string>
     <string name="nearby_current_device">Текущее устройство</string>

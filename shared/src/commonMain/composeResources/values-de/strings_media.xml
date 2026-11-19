@@ -73,7 +73,7 @@
     <string name="playlist_name">Wiedergabelistenname</string>
     <string name="rename_playlist">Wiedergabeliste umbenennen</string>
     <string name="delete_playlist">Wiedergabeliste löschen</string>
-    <string name="delete_playlist_confirm_text">Elemente in "%1$s" werden aus der Playlist entfernt. Audiodateien werden nicht gelöscht.</string>
+    <string name="delete_playlist_confirm_text">Elemente in %1$s werden aus der Playlist entfernt. Audiodateien werden nicht gelöscht.</string>
     <string name="add_n_items">%1$d hinzufügen</string>
     <string name="total_minutes">%1$d Min</string>
     <string name="play_next">Als Nächstes</string>

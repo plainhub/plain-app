@@ -65,7 +65,7 @@
     <string name="unpaired">Eşleştirilmedi</string>
     <string name="discovered_devices">Bulunan cihazlar</string>
     <string name="pairing_request">Eşleştirme isteği</string>
-    <string name="pairing_request_message">"%1$s" cihazı ile eşleştirmek istiyor musunuz?</string>
+    <string name="pairing_request_message">%1$s cihazı ile eşleştirmek istiyor musunuz?</string>
     <string name="pairing_request_hint">Eşleştirmeden sonra, her iki cihaz arasında mesaj alışverişi yapabilirsiniz.</string>
     <string name="allow">İzin ver</string>
     <string name="deny">Reddet</string>
@@ -125,7 +125,7 @@
     <string name="channel_left_notice">Bu kanaldan ayrıldınız ve artık mesaj gönderemezsiniz.</string>
     <string name="channel_kicked_notice">Bu kanaldan kaldırıldınız ve artık mesaj gönderemezsiniz.</string>
     <string name="channel_invite">Kanal daveti</string>
-    <string name="channel_invite_message">%1$s sizi "%2$s" kanalına davet ediyor</string>
+    <string name="channel_invite_message">%1$s sizi %2$s kanalına davet ediyor</string>
     <string name="inviter">Davet eden</string>
     <string name="decline">Reddet</string>
     <string name="pending_invite">Bekleyen davet</string>
@@ -177,7 +177,7 @@
     <string name="no_finished_downloads">Tamamlanan indirme yok</string>
     <string name="saved_n_of_m">%2$d öğeden %1$d kaydedildi</string>
     <string name="saved_to_x">%1$s konumuna kaydedildi</string>
-    <string name="confirm_unpair_device">“%1$s” ile eşleşme kaldırılsın mı?</string>
+    <string name="confirm_unpair_device">%1$s ile eşleşme kaldırılsın mı?</string>
     <string name="delete_chat_history">Sohbet geçmişini sil</string>
     <string name="nearby_my_devices">Cihazlarım</string>
     <string name="nearby_current_device">Geçerli cihaz</string>

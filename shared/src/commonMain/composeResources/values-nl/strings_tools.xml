@@ -14,7 +14,7 @@
     <string name="dlna_receiver_step2_title">Open PlainApp</string>
     <string name="dlna_receiver_step2_desc">Open PlainApp op het andere apparaat en zoek de video of muziek die u wilt afspelen</string>
     <string name="dlna_receiver_step3_title">Tik om te casten</string>
-    <string name="dlna_receiver_step3_desc">Tik op het cast-pictogram, selecteer "%1$s" uit de lijst en het afspelen begint</string>
+    <string name="dlna_receiver_step3_desc">Tik op het cast-pictogram, selecteer %1$s uit de lijst en het afspelen begint</string>
     <string name="dlna_receiver_protocol_note">Ondersteunt DLNA / UPnP-protocollen, compatibel met VLC, Kodi en andere populaire cast-apps</string>
     <string name="dlna_receiver_exit_player">Speler afsluiten</string>
     <string name="dlna_receiver_turn_on">Inschakelen</string>

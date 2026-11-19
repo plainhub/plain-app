@@ -67,7 +67,7 @@
     <string name="unpaired">未配對</string>
     <string name="discovered_devices">發現的設備</string>
     <string name="pairing_request">配對請求</string>
-    <string name="pairing_request_message">是否要與設備"%1$s"配對？</string>
+    <string name="pairing_request_message">是否要與設備%1$s配對？</string>
     <string name="pairing_request_hint">配對後，你們可以互發訊息。</string>
     <string name="allow">允許</string>
     <string name="deny">拒絕</string>
@@ -127,7 +127,7 @@
     <string name="channel_left_notice">你已離開此頻道，無法再發送訊息。</string>
     <string name="channel_kicked_notice">你已被踢出此頻道，無法再發送訊息。</string>
     <string name="channel_invite">頻道邀請</string>
-    <string name="channel_invite_message">%1$s 邀請你加入頻道 "%2$s"</string>
+    <string name="channel_invite_message">%1$s 邀請你加入頻道 %2$s</string>
     <string name="inviter">邀請者</string>
     <string name="decline">拒絕</string>
     <string name="pending_invite">待處理的邀請</string>
@@ -190,7 +190,7 @@
     <string name="remote_permission_required">此裝置尚未授予存取權限，請請求權限後繼續。</string>
     <string name="pairing_failed">配對失敗</string>
     <string name="pairing_expired">已過期</string>
-    <string name="confirm_unpair_device">解除與「%1$s」的配對？</string>
+    <string name="confirm_unpair_device">解除與%1$s的配對？</string>
     <string name="delete_chat_history">刪除聊天記錄</string>
     <string name="nearby_my_devices">我的裝置</string>
     <string name="nearby_current_device">目前裝置</string>

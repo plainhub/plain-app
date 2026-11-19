@@ -12,7 +12,7 @@
     <string name="dlna_receiver_step2_title">PlainAppを開く</string>
     <string name="dlna_receiver_step2_desc">もう一方のデバイスでPlainAppを開き、再生したいビデオや音楽を見つけてください</string>
     <string name="dlna_receiver_step3_title">キャストするにはタップ</string>
-    <string name="dlna_receiver_step3_desc">キャストアイコンをタップし、リストから「%1$s」を選択すると再生が始まります</string>
+    <string name="dlna_receiver_step3_desc">キャストアイコンをタップし、リストから%1$sを選択すると再生が始まります</string>
     <string name="dlna_receiver_protocol_note">DLNA / UPnPプロトコルに対応、VLC、Kodiなどの主要なキャストアプリと互換性があります</string>
     <string name="dlna_receiver_exit_player">プレーヤーを終了</string>
     <string name="dlna_receiver_turn_on">オンにする</string>

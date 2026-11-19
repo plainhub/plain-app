@@ -73,7 +73,7 @@
     <string name="playlist_name">প্লেলিস্টের নাম</string>
     <string name="rename_playlist">প্লেলিস্টের নাম বদলান</string>
     <string name="delete_playlist">প্লেলিস্ট মুছুন</string>
-    <string name="delete_playlist_confirm_text">"%1$s"-এর আইটেমগুলি প্লেলিস্ট থেকে সরানো হবে। অডিও ফাইল মুছবে না।</string>
+    <string name="delete_playlist_confirm_text">%1$s-এর আইটেমগুলি প্লেলিস্ট থেকে সরানো হবে। অডিও ফাইল মুছবে না।</string>
     <string name="add_n_items">%1$d যোগ করুন</string>
     <string name="total_minutes">%1$d মিনিট</string>
     <string name="play_next">পরেরটি চালান</string>

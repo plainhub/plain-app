@@ -65,7 +65,7 @@
     <string name="unpaired">अलग किया गया</string>
     <string name="discovered_devices">खोजे गए उपकरण</string>
     <string name="pairing_request">जोड़ने का अनुरोध</string>
-    <string name="pairing_request_message">क्या आप डिवाइस "%1$s" के साथ जोड़ना चाहते हैं?</string>
+    <string name="pairing_request_message">क्या आप डिवाइस %1$s के साथ जोड़ना चाहते हैं?</string>
     <string name="pairing_request_hint">पेयरिंग के बाद, आप दोनों डिवाइस के बीच संदेश भेज सकते हैं।</string>
     <string name="allow">अनुमति दें</string>
     <string name="deny">मना करें</string>
@@ -125,7 +125,7 @@
     <string name="channel_left_notice">आप इस चैनल को छोड़ चुके हैं और संदेश नहीं भेज सकते।</string>
     <string name="channel_kicked_notice">आपको इस चैनल से हटा दिया गया है और संदेश नहीं भेज सकते।</string>
     <string name="channel_invite">चैनल आमंत्रण</string>
-    <string name="channel_invite_message">%1$s ने आपको "%2$s" चैनल में शामिल होने के लिए आमंत्रित किया है</string>
+    <string name="channel_invite_message">%1$s ने आपको %2$s चैनल में शामिल होने के लिए आमंत्रित किया है</string>
     <string name="inviter">आमंत्रणकर्ता</string>
     <string name="decline">अस्वीकार करें</string>
     <string name="pending_invite">लंबित आमंत्रण</string>
@@ -177,7 +177,7 @@
     <string name="no_finished_downloads">कोई पूर्ण डाउनलोड नहीं</string>
     <string name="saved_n_of_m">%2$d में से %1$d सहेजे गए</string>
     <string name="saved_to_x">%1$s में सहेजा गया</string>
-    <string name="confirm_unpair_device">“%1$s” को अनपेयर करें?</string>
+    <string name="confirm_unpair_device">%1$s को अनपेयर करें?</string>
     <string name="delete_chat_history">चैट इतिहास हटाएँ</string>
     <string name="nearby_my_devices">मेरे डिवाइस</string>
     <string name="nearby_current_device">वर्तमान डिवाइस</string>

@@ -65,7 +65,7 @@
     <string name="unpaired">பிரிக்கப்பட்டது</string>
     <string name="discovered_devices">கண்டுபிடிக்கப்பட்ட சாதனங்கள்</string>
     <string name="pairing_request">இணைப்பு கோரிக்கை</string>
-    <string name="pairing_request_message">"%1$s" சாதனத்துடன் இணைக்க விரும்புகிறீர்களா?</string>
+    <string name="pairing_request_message">%1$s சாதனத்துடன் இணைக்க விரும்புகிறீர்களா?</string>
     <string name="pairing_request_hint">இணைத்த பிறகு, இரு சாதனங்களுக்கும் இடையே செய்திகளைப் பரிமாறிக்கொள்ளலாம்.</string>
     <string name="allow">அனுமதி</string>
     <string name="deny">மறுக்க</string>
@@ -125,7 +125,7 @@
     <string name="channel_left_notice">இந்த சேனலை விட்டு வெளியேறி விட்டீர்கள், மீண்டும் செய்திகள் அனுப்ப முடியாது.</string>
     <string name="channel_kicked_notice">இந்த சேனலில் இருந்து நீக்கப்பட்டீர்கள், மீண்டும் செய்திகள் அனுப்ப முடியாது.</string>
     <string name="channel_invite">சேனல் அழைப்பு</string>
-    <string name="channel_invite_message">%1$s உங்களை "%2$s" சேனலில் சேர அழைக்கிறார்</string>
+    <string name="channel_invite_message">%1$s உங்களை %2$s சேனலில் சேர அழைக்கிறார்</string>
     <string name="inviter">அழைப்பாளர்</string>
     <string name="decline">மறு</string>
     <string name="pending_invite">நிலுவையில் உள்ள அழைப்பு</string>
@@ -177,7 +177,7 @@
     <string name="no_finished_downloads">முடிந்த பதிவிறக்கம் இல்லை</string>
     <string name="saved_n_of_m">%2$d-இல் %1$d சேமிக்கப்பட்டது</string>
     <string name="saved_to_x">%1$s-இல் சேமிக்கப்பட்டது</string>
-    <string name="confirm_unpair_device">“%1$s” சாதனத்தின் இணைப்பை நீக்கவா?</string>
+    <string name="confirm_unpair_device">%1$s சாதனத்தின் இணைப்பை நீக்கவா?</string>
     <string name="delete_chat_history">அரட்டை வரலாற்றை நீக்கு</string>
     <string name="nearby_my_devices">எனது சாதனங்கள்</string>
     <string name="nearby_current_device">தற்போதைய சாதனம்</string>

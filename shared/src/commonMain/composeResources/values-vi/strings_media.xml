@@ -73,7 +73,7 @@
     <string name="playlist_name">Tên danh sách phát</string>
     <string name="rename_playlist">Đổi tên danh sách phát</string>
     <string name="delete_playlist">Xóa danh sách phát</string>
-    <string name="delete_playlist_confirm_text">Các mục trong "%1$s" sẽ bị xóa khỏi danh sách phát. Tệp âm thanh sẽ không bị xóa.</string>
+    <string name="delete_playlist_confirm_text">Các mục trong %1$s sẽ bị xóa khỏi danh sách phát. Tệp âm thanh sẽ không bị xóa.</string>
     <string name="add_n_items">Thêm %1$d</string>
     <string name="total_minutes">%1$d phút</string>
     <string name="play_next">Phát tiếp theo</string>

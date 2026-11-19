@@ -65,7 +65,7 @@
     <string name="unpaired">Chưa ghép nối</string>
     <string name="discovered_devices">Thiết bị đã phát hiện</string>
     <string name="pairing_request">Yêu cầu ghép nối</string>
-    <string name="pairing_request_message">Bạn có muốn ghép nối với thiết bị "%1$s"?</string>
+    <string name="pairing_request_message">Bạn có muốn ghép nối với thiết bị %1$s?</string>
     <string name="pairing_request_hint">Sau khi ghép đôi, bạn có thể trao đổi tin nhắn giữa hai thiết bị.</string>
     <string name="allow">Cho phép</string>
     <string name="deny">Từ chối</string>
@@ -125,7 +125,7 @@
     <string name="channel_left_notice">Bạn đã rời khỏi kênh này và không thể gửi tin nhắn.</string>
     <string name="channel_kicked_notice">Bạn đã bị xóa khỏi kênh này và không thể gửi tin nhắn.</string>
     <string name="channel_invite">Mời kênh</string>
-    <string name="channel_invite_message">%1$s mời bạn tham gia kênh "%2$s"</string>
+    <string name="channel_invite_message">%1$s mời bạn tham gia kênh %2$s</string>
     <string name="inviter">Người mời</string>
     <string name="decline">Từ chối</string>
     <string name="pending_invite">Lời mời đang chờ</string>
@@ -177,7 +177,7 @@
     <string name="no_finished_downloads">Không có tải xuống nào hoàn tất</string>
     <string name="saved_n_of_m">Đã lưu %1$d/%2$d mục</string>
     <string name="saved_to_x">Đã lưu vào %1$s</string>
-    <string name="confirm_unpair_device">Hủy ghép nối với “%1$s”?</string>
+    <string name="confirm_unpair_device">Hủy ghép nối với %1$s?</string>
     <string name="delete_chat_history">Xóa lịch sử trò chuyện</string>
     <string name="nearby_my_devices">Thiết bị của tôi</string>
     <string name="nearby_current_device">Thiết bị hiện tại</string>

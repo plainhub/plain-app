@@ -73,7 +73,7 @@
     <string name="playlist_name">プレイリスト名</string>
     <string name="rename_playlist">プレイリストの名前を変更</string>
     <string name="delete_playlist">プレイリストを削除</string>
-    <string name="delete_playlist_confirm_text">「%1$s」のアイテムはプレイリストから削除されます。オーディオファイルは削除されません。</string>
+    <string name="delete_playlist_confirm_text">%1$sのアイテムはプレイリストから削除されます。オーディオファイルは削除されません。</string>
     <string name="add_n_items">%1$d 追加</string>
     <string name="total_minutes">%1$d 分</string>
     <string name="play_next">次に再生</string>

@@ -14,7 +14,7 @@
     <string name="dlna_receiver_step2_title">Apri PlainApp</string>
     <string name="dlna_receiver_step2_desc">Apri PlainApp sull'altro dispositivo e trova il video o la musica che vuoi riprodurre</string>
     <string name="dlna_receiver_step3_title">Tocca per trasmettere</string>
-    <string name="dlna_receiver_step3_desc">Tocca l'icona di trasmissione, seleziona "%1$s" dall'elenco e la riproduzione inizierà</string>
+    <string name="dlna_receiver_step3_desc">Tocca l'icona di trasmissione, seleziona %1$s dall'elenco e la riproduzione inizierà</string>
     <string name="dlna_receiver_protocol_note">Supporta i protocolli DLNA / UPnP, compatibile con VLC, Kodi e altre popolari app di trasmissione</string>
     <string name="dlna_receiver_exit_player">Esci dal lettore</string>
     <string name="dlna_receiver_turn_on">Attiva</string>

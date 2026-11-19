@@ -73,7 +73,7 @@
     <string name="playlist_name">歌单名称</string>
     <string name="rename_playlist">重命名歌单</string>
     <string name="delete_playlist">删除歌单</string>
-    <string name="delete_playlist_confirm_text">「%1$s」中的项目将从歌单移除，音频文件不会被删除。</string>
+    <string name="delete_playlist_confirm_text">%1$s中的项目将从歌单移除，音频文件不会被删除。</string>
     <string name="add_n_items">添加 %1$d</string>
     <string name="total_minutes">%1$d 分钟</string>
     <string name="play_next">下一首播放</string>

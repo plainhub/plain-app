@@ -73,7 +73,7 @@
     <string name="playlist_name">Afspeellijstnaam</string>
     <string name="rename_playlist">Afspeellijst hernoemen</string>
     <string name="delete_playlist">Afspeellijst verwijderen</string>
-    <string name="delete_playlist_confirm_text">Items in "%1$s" worden uit de afspeellijst verwijderd. Audiobestanden worden niet verwijderd.</string>
+    <string name="delete_playlist_confirm_text">Items in %1$s worden uit de afspeellijst verwijderd. Audiobestanden worden niet verwijderd.</string>
     <string name="add_n_items">%1$d toevoegen</string>
     <string name="total_minutes">%1$d min</string>
     <string name="play_next">Volgende afspelen</string>

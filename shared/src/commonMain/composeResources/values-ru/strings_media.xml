@@ -73,7 +73,7 @@
     <string name="playlist_name">Название плейлиста</string>
     <string name="rename_playlist">Переименовать плейлист</string>
     <string name="delete_playlist">Удалить плейлист</string>
-    <string name="delete_playlist_confirm_text">Элементы из "%1$s" будут удалены из плейлиста. Аудиофайлы не будут удалены.</string>
+    <string name="delete_playlist_confirm_text">Элементы из %1$s будут удалены из плейлиста. Аудиофайлы не будут удалены.</string>
     <string name="add_n_items">Добавить %1$d</string>
     <string name="total_minutes">%1$d мин</string>
     <string name="play_next">Играть следующим</string>

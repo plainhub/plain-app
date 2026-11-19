@@ -73,7 +73,7 @@
     <string name="playlist_name">Çalma listesi adı</string>
     <string name="rename_playlist">Çalma listesini yeniden adlandır</string>
     <string name="delete_playlist">Çalma listesini sil</string>
-    <string name="delete_playlist_confirm_text">"%1$s" içindeki öğeler çalma listesinden çıkarılacak. Ses dosyaları silinmeyecek.</string>
+    <string name="delete_playlist_confirm_text">%1$s içindeki öğeler çalma listesinden çıkarılacak. Ses dosyaları silinmeyecek.</string>
     <string name="add_n_items">%1$d ekle</string>
     <string name="total_minutes">%1$d dk</string>
     <string name="play_next">Sıradaki çal</string>

@@ -12,7 +12,7 @@
     <string name="dlna_receiver_step2_title">打开 PlainApp</string>
     <string name="dlna_receiver_step2_desc">在另一台设备上打开 PlainApp，找到要播放的视频或音乐</string>
     <string name="dlna_receiver_step3_title">点击投屏</string>
-    <string name="dlna_receiver_step3_desc">点击投屏图标，从列表中选择"%1$s"，即可开始播放</string>
+    <string name="dlna_receiver_step3_desc">点击投屏图标，从列表中选择%1$s，即可开始播放</string>
     <string name="dlna_receiver_protocol_note">支持 DLNA / UPnP 协议，兼容 VLC、Kodi 等主流投屏应用</string>
     <string name="dlna_receiver_exit_player">退出播放器</string>
     <string name="dlna_receiver_turn_on">开启</string>

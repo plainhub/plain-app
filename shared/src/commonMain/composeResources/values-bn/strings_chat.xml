@@ -65,7 +65,7 @@
     <string name="unpaired">আলাদা করা</string>
     <string name="discovered_devices">আবিষ্কৃত ডিভাইস</string>
     <string name="pairing_request">জোড়া লাগানোর অনুরোধ</string>
-    <string name="pairing_request_message">আপনি কি ডিভাইস "%1$s" এর সাথে জোড়া লাগাতে চান?</string>
+    <string name="pairing_request_message">আপনি কি ডিভাইস %1$s এর সাথে জোড়া লাগাতে চান?</string>
     <string name="pairing_request_hint">পেয়ারিং করার পর, আপনি উভয় ডিভাইসের মধ্যে বার্তা বিনিময় করতে পারবেন।</string>
     <string name="allow">অনুমতি দিন</string>
     <string name="deny">প্রত্যাখ্যান করুন</string>
@@ -125,7 +125,7 @@
     <string name="channel_left_notice">আপনি এই চ্যানেল ছেড়ে গেছেন এবং আর বার্তা পাঠাতে পারবেন না।</string>
     <string name="channel_kicked_notice">আপনাকে এই চ্যানেল থেকে সরিয়ে দেওয়া হয়েছে এবং আর বার্তা পাঠাতে পারবেন না।</string>
     <string name="channel_invite">চ্যানেল আমন্ত্রণ</string>
-    <string name="channel_invite_message">%1$s আপনাকে "%2$s" চ্যানেলে যোগ দিতে আমন্ত্রণ জানিয়েছে</string>
+    <string name="channel_invite_message">%1$s আপনাকে %2$s চ্যানেলে যোগ দিতে আমন্ত্রণ জানিয়েছে</string>
     <string name="inviter">আমন্ত্রণকারী</string>
     <string name="decline">প্রত্যাখ্যান করুন</string>
     <string name="pending_invite">মুলতুবি আমন্ত্রণ</string>
@@ -177,7 +177,7 @@
     <string name="no_finished_downloads">কোনো সম্পন্ন ডাউনলোড নেই</string>
     <string name="saved_n_of_m">%2$dটির মধ্যে %1$dটি সংরক্ষিত</string>
     <string name="saved_to_x">%1$s-এ সংরক্ষিত</string>
-    <string name="confirm_unpair_device">“%1$s” এর সঙ্গে জোড়া খুলবেন?</string>
+    <string name="confirm_unpair_device">%1$s এর সঙ্গে জোড়া খুলবেন?</string>
     <string name="delete_chat_history">চ্যাটের ইতিহাস মুছুন</string>
     <string name="nearby_my_devices">আমার ডিভাইস</string>
     <string name="nearby_current_device">বর্তমান ডিভাইস</string>

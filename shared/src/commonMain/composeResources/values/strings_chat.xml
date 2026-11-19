@@ -68,7 +68,7 @@
     <string name="unpaired">Unpaired</string>
     <string name="discovered_devices">Discovered devices</string>
     <string name="pairing_request">Pairing request</string>
-    <string name="pairing_request_message">Do you want to pair with device "%1$s"?</string>
+    <string name="pairing_request_message">Do you want to pair with device %1$s?</string>
     <string name="pairing_request_hint">After pairing, you can exchange messages between both devices.</string>
     <string name="pairing_compare_code">Compare this code on both devices before allowing pairing.</string>
     <string name="allow">Allow</string>
@@ -108,7 +108,7 @@
     <string name="channel_left_notice">You have left this channel and can no longer send messages.</string>
     <string name="channel_kicked_notice">You were removed from this channel and can no longer send messages.</string>
     <string name="channel_invite">Channel invite</string>
-    <string name="channel_invite_message">%1$s invited you to join channel "%2$s"</string>
+    <string name="channel_invite_message">%1$s invited you to join channel %2$s</string>
     <string name="inviter">Inviter</string>
     <string name="decline">Decline</string>
     <string name="pending_invite">Pending invite</string>
@@ -191,7 +191,7 @@
     <string name="remote_permission_required">This device has not granted access. Request permission to continue.</string>
     <string name="pairing_failed">Pairing failed</string>
     <string name="pairing_expired">Expired</string>
-    <string name="confirm_unpair_device">Unpair “%1$s”?</string>
+    <string name="confirm_unpair_device">Unpair %1$s?</string>
     <string name="delete_chat_history">Delete chat history</string>
     <string name="nearby_my_devices">My devices</string>
     <string name="nearby_current_device">Current device</string>

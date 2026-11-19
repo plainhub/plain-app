@@ -14,7 +14,7 @@
     <string name="dlna_receiver_step2_title">開啟 PlainApp</string>
     <string name="dlna_receiver_step2_desc">在另一台裝置上開啟 PlainApp，找到要播放的影片或音樂</string>
     <string name="dlna_receiver_step3_title">點擊投影</string>
-    <string name="dlna_receiver_step3_desc">點擊投影圖示，從清單中選擇「%1$s」，即可開始播放</string>
+    <string name="dlna_receiver_step3_desc">點擊投影圖示，從清單中選擇%1$s，即可開始播放</string>
     <string name="dlna_receiver_protocol_note">支援 DLNA / UPnP 協議，相容 VLC、Kodi 等主流投影應用</string>
     <string name="dlna_receiver_exit_player">退出播放器</string>
     <string name="dlna_receiver_turn_on">開啟</string>

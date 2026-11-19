@@ -67,7 +67,7 @@
     <string name="unpaired">未配对</string>
     <string name="discovered_devices">发现的设备</string>
     <string name="pairing_request">配对请求</string>
-    <string name="pairing_request_message">是否要与设备"%1$s"配对？</string>
+    <string name="pairing_request_message">是否要与设备%1$s配对？</string>
     <string name="pairing_request_hint">配对后，你们可以互发消息。</string>
     <string name="pairing_compare_code">允许配对前，请核对两台设备显示的匹配码一致。</string>
     <string name="allow">允许</string>
@@ -131,7 +131,7 @@
     <string name="channel_left_notice">你已离开此频道，无法再发送消息。</string>
     <string name="channel_kicked_notice">你已被踢出此频道，无法再发送消息。</string>
     <string name="channel_invite">频道邀请</string>
-    <string name="channel_invite_message">%1$s 邀请你加入频道 "%2$s"</string>
+    <string name="channel_invite_message">%1$s 邀请你加入频道 %2$s</string>
     <string name="inviter">邀请者</string>
     <string name="decline">拒绝</string>
     <string name="pending_invite">待处理的邀请</string>
@@ -190,7 +190,7 @@
     <string name="remote_permission_required">此设备尚未授予访问权限，请请求权限后继续。</string>
     <string name="pairing_failed">配对失败</string>
     <string name="pairing_expired">已过期</string>
-    <string name="confirm_unpair_device">解除与「%1$s」的配对？</string>
+    <string name="confirm_unpair_device">解除与%1$s的配对？</string>
     <string name="delete_chat_history">删除聊天记录</string>
     <string name="nearby_my_devices">我的设备</string>
     <string name="nearby_current_device">当前设备</string>

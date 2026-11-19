@@ -14,7 +14,7 @@
     <string name="dlna_receiver_step2_title">PlainApp खोलें</string>
     <string name="dlna_receiver_step2_desc">दूसरे डिवाइस पर PlainApp खोलें और चलाने चाहिए वीडियो या संगीत को खोजें</string>
     <string name="dlna_receiver_step3_title">कास्ट करने के लिए टैप करें</string>
-    <string name="dlna_receiver_step3_desc">कास्ट आइकन पर टैप करें, सूची से "%1$s" चुनें और चलाना शुरू हो जाएगा</string>
+    <string name="dlna_receiver_step3_desc">कास्ट आइकन पर टैप करें, सूची से %1$s चुनें और चलाना शुरू हो जाएगा</string>
     <string name="dlna_receiver_protocol_note">DLNA / UPnP प्रोटोकॉल का समर्थन करता है, VLC, Kodi और अन्य लोकप्रिय कास्टिंग ऐप्स के साथ संगत</string>
     <string name="dlna_receiver_exit_player">प्लेयर से बाहर निकलें</string>
     <string name="dlna_receiver_turn_on">चालू करें</string>

@@ -73,7 +73,7 @@
     <string name="playlist_name">ப்ளேலிஸ்ட் பெயர்</string>
     <string name="rename_playlist">ப்ளேலிஸ்ட்டை மறுபெயரிடு</string>
     <string name="delete_playlist">ப்ளேலிஸ்ட்டை நீக்கு</string>
-    <string name="delete_playlist_confirm_text">"%1$s" இல் உள்ள உருப்படிகள் ப்ளேலிஸ்டிலிருந்து அகற்றப்படும். ஆடியோ கோப்புகள் நீக்கப்படாது.</string>
+    <string name="delete_playlist_confirm_text">%1$s இல் உள்ள உருப்படிகள் ப்ளேலிஸ்டிலிருந்து அகற்றப்படும். ஆடியோ கோப்புகள் நீக்கப்படாது.</string>
     <string name="add_n_items">%1$d சேர்</string>
     <string name="total_minutes">%1$d நிமிடம்</string>
     <string name="play_next">அடுத்து இயக்கு</string>

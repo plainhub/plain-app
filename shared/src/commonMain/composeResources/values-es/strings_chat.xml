@@ -65,7 +65,7 @@
     <string name="unpaired">No emparejado</string>
     <string name="discovered_devices">Dispositivos descubiertos</string>
     <string name="pairing_request">Solicitud de emparejamiento</string>
-    <string name="pairing_request_message">¿Quieres emparejar con el dispositivo "%1$s"?</string>
+    <string name="pairing_request_message">¿Quieres emparejar con el dispositivo %1$s?</string>
     <string name="pairing_request_hint">Después de emparejar, puede intercambiar mensajes entre ambos dispositivos.</string>
     <string name="allow">Permitir</string>
     <string name="deny">Denegar</string>
@@ -125,7 +125,7 @@
     <string name="channel_left_notice">Has abandonado este canal y ya no puedes enviar mensajes.</string>
     <string name="channel_kicked_notice">Has sido eliminado de este canal y ya no puedes enviar mensajes.</string>
     <string name="channel_invite">Invitación al canal</string>
-    <string name="channel_invite_message">%1$s te invitó a unirte al canal "%2$s"</string>
+    <string name="channel_invite_message">%1$s te invitó a unirte al canal %2$s</string>
     <string name="inviter">Invitador</string>
     <string name="decline">Rechazar</string>
     <string name="pending_invite">Invitación pendiente</string>
@@ -177,7 +177,7 @@
     <string name="no_finished_downloads">No hay descargas terminadas</string>
     <string name="saved_n_of_m">%1$d de %2$d elementos guardados</string>
     <string name="saved_to_x">Guardado en %1$s</string>
-    <string name="confirm_unpair_device">¿Desemparejar «%1$s»?</string>
+    <string name="confirm_unpair_device">¿Desemparejar %1$s?</string>
     <string name="delete_chat_history">Eliminar historial de chat</string>
     <string name="nearby_my_devices">Mis dispositivos</string>
     <string name="nearby_current_device">Dispositivo actual</string>

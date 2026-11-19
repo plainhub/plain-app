@@ -14,7 +14,7 @@
     <string name="dlna_receiver_step2_title">PlainApp 열기</string>
     <string name="dlna_receiver_step2_desc">다른 기기에서 PlainApp을 열고 재생할 동영상이나 음악을 찾으세요</string>
     <string name="dlna_receiver_step3_title">캐스트하려면 탭</string>
-    <string name="dlna_receiver_step3_desc">캐스트 아이콘을 탭하고 목록에서 "%1$s"를 선택하면 재생이 시작됩니다</string>
+    <string name="dlna_receiver_step3_desc">캐스트 아이콘을 탭하고 목록에서 %1$s를 선택하면 재생이 시작됩니다</string>
     <string name="dlna_receiver_protocol_note">DLNA / UPnP 프로토콜 지원, VLC, Kodi 등 주요 캐스트 앱과 호환됩니다</string>
     <string name="dlna_receiver_exit_player">플레이어 종료</string>
     <string name="dlna_receiver_turn_on">켜기</string>

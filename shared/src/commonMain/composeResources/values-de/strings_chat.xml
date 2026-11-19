@@ -65,7 +65,7 @@
     <string name="unpaired">Nicht gekoppelt</string>
     <string name="discovered_devices">Entdeckte Geräte</string>
     <string name="pairing_request">Kopplungsanfrage</string>
-    <string name="pairing_request_message">Möchten Sie mit dem Gerät "%1$s" koppeln?</string>
+    <string name="pairing_request_message">Möchten Sie mit dem Gerät %1$s koppeln?</string>
     <string name="pairing_request_hint">Nach dem Koppeln können Sie Nachrichten zwischen beiden Geräten austauschen.</string>
     <string name="allow">Erlauben</string>
     <string name="deny">Verweigern</string>
@@ -125,7 +125,7 @@
     <string name="channel_left_notice">Sie haben diesen Kanal verlassen und können keine Nachrichten mehr senden.</string>
     <string name="channel_kicked_notice">Sie wurden aus diesem Kanal entfernt und können keine Nachrichten mehr senden.</string>
     <string name="channel_invite">Kanal-Einladung</string>
-    <string name="channel_invite_message">%1$s hat Sie eingeladen, dem Kanal "%2$s" beizutreten</string>
+    <string name="channel_invite_message">%1$s hat Sie eingeladen, dem Kanal %2$s beizutreten</string>
     <string name="inviter">Einladender</string>
     <string name="decline">Ablehnen</string>
     <string name="pending_invite">Ausstehende Einladung</string>
@@ -177,7 +177,7 @@
     <string name="no_finished_downloads">Keine abgeschlossenen Downloads</string>
     <string name="saved_n_of_m">%1$d von %2$d Elementen gespeichert</string>
     <string name="saved_to_x">Gespeichert in %1$s</string>
-    <string name="confirm_unpair_device">Kopplung mit „%1$s“ aufheben?</string>
+    <string name="confirm_unpair_device">Kopplung mit %1$s aufheben?</string>
     <string name="delete_chat_history">Chatverlauf löschen</string>
     <string name="nearby_my_devices">Meine Geräte</string>
     <string name="nearby_current_device">Aktuelles Gerät</string>

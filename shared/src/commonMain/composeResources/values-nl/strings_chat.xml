@@ -65,7 +65,7 @@
     <string name="unpaired">Niet gekoppeld</string>
     <string name="discovered_devices">Ontdekte apparaten</string>
     <string name="pairing_request">Koppelingsverzoek</string>
-    <string name="pairing_request_message">Wilt u koppelen met apparaat "%1$s"?</string>
+    <string name="pairing_request_message">Wilt u koppelen met apparaat %1$s?</string>
     <string name="pairing_request_hint">Na het koppelen kunt u berichten uitwisselen tussen beide apparaten.</string>
     <string name="allow">Toestaan</string>
     <string name="deny">Weigeren</string>
@@ -125,7 +125,7 @@
     <string name="channel_left_notice">U heeft dit kanaal verlaten en kunt geen berichten meer verzenden.</string>
     <string name="channel_kicked_notice">U bent uit dit kanaal verwijderd en kunt geen berichten meer verzenden.</string>
     <string name="channel_invite">Kanaaluitnodiging</string>
-    <string name="channel_invite_message">%1$s nodigt u uit om deel te nemen aan kanaal "%2$s"</string>
+    <string name="channel_invite_message">%1$s nodigt u uit om deel te nemen aan kanaal %2$s</string>
     <string name="inviter">Uitnodiger</string>
     <string name="decline">Afwijzen</string>
     <string name="pending_invite">Openstaande uitnodiging</string>
@@ -177,7 +177,7 @@
     <string name="no_finished_downloads">Geen voltooide downloads</string>
     <string name="saved_n_of_m">%1$d van %2$d items opgeslagen</string>
     <string name="saved_to_x">Opgeslagen in %1$s</string>
-    <string name="confirm_unpair_device">‘%1$s’ ontkoppelen?</string>
+    <string name="confirm_unpair_device">%1$s ontkoppelen?</string>
     <string name="delete_chat_history">Chatgeschiedenis verwijderen</string>
     <string name="nearby_my_devices">Mijn apparaten</string>
     <string name="nearby_current_device">Huidig apparaat</string>

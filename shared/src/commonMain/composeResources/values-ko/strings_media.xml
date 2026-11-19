@@ -73,7 +73,7 @@
     <string name="playlist_name">재생목록 이름</string>
     <string name="rename_playlist">재생목록 이름 바꾸기</string>
     <string name="delete_playlist">재생목록 삭제</string>
-    <string name="delete_playlist_confirm_text">"%1$s"의 항목이 재생목록에서 제거됩니다. 오디오 파일은 삭제되지 않습니다.</string>
+    <string name="delete_playlist_confirm_text">%1$s의 항목이 재생목록에서 제거됩니다. 오디오 파일은 삭제되지 않습니다.</string>
     <string name="add_n_items">%1$d개 추가</string>
     <string name="total_minutes">%1$d분</string>
     <string name="play_next">다음 재생</string>

@@ -65,7 +65,7 @@
     <string name="unpaired">페어링 안됨</string>
     <string name="discovered_devices">발견된 장치</string>
     <string name="pairing_request">페어링 요청</string>
-    <string name="pairing_request_message">장치 "%1$s"와 페어링하시겠습니까?</string>
+    <string name="pairing_request_message">장치 %1$s와 페어링하시겠습니까?</string>
     <string name="pairing_request_hint">페어링 후 두 기기 간에 메시지를 주고받을 수 있습니다.</string>
     <string name="allow">허용</string>
     <string name="deny">거부</string>
@@ -125,7 +125,7 @@
     <string name="channel_left_notice">이 채널에서 나갔으므로 더 이상 메시지를 보낼 수 없습니다.</string>
     <string name="channel_kicked_notice">이 채널에서 추방되었으므로 더 이상 메시지를 보낼 수 없습니다.</string>
     <string name="channel_invite">채널 초대</string>
-    <string name="channel_invite_message">%1$s님이 "%2$s" 채널에 초대했습니다</string>
+    <string name="channel_invite_message">%1$s님이 %2$s 채널에 초대했습니다</string>
     <string name="inviter">초대자</string>
     <string name="decline">거절</string>
     <string name="pending_invite">대기 중인 초대</string>
@@ -177,7 +177,7 @@
     <string name="no_finished_downloads">완료된 다운로드가 없습니다</string>
     <string name="saved_n_of_m">%2$d개 중 %1$d개 저장됨</string>
     <string name="saved_to_x">%1$s에 저장됨</string>
-    <string name="confirm_unpair_device">‘%1$s’ 기기의 페어링을 해제할까요?</string>
+    <string name="confirm_unpair_device">%1$s 기기의 페어링을 해제할까요?</string>
     <string name="delete_chat_history">채팅 기록 삭제</string>
     <string name="nearby_my_devices">내 기기</string>
     <string name="nearby_current_device">현재 기기</string>

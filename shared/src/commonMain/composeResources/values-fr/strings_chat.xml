@@ -65,7 +65,7 @@
     <string name="unpaired">Non couplé</string>
     <string name="discovered_devices">Appareils découverts</string>
     <string name="pairing_request">Demande de couplage</string>
-    <string name="pairing_request_message">Voulez-vous vous coupler avec l'appareil "%1$s" ?</string>
+    <string name="pairing_request_message">Voulez-vous vous coupler avec l'appareil %1$s ?</string>
     <string name="pairing_request_hint">Après l'association, vous pouvez échanger des messages entre les deux appareils.</string>
     <string name="allow">Autoriser</string>
     <string name="deny">Refuser</string>
@@ -125,7 +125,7 @@
     <string name="channel_left_notice">Vous avez quitté ce canal et ne pouvez plus envoyer de messages.</string>
     <string name="channel_kicked_notice">Vous avez été retiré de ce canal et ne pouvez plus envoyer de messages.</string>
     <string name="channel_invite">Invitation au canal</string>
-    <string name="channel_invite_message">%1$s vous a invité à rejoindre le canal "%2$s"</string>
+    <string name="channel_invite_message">%1$s vous a invité à rejoindre le canal %2$s</string>
     <string name="inviter">Invitant</string>
     <string name="decline">Refuser</string>
     <string name="pending_invite">Invitation en attente</string>
@@ -177,7 +177,7 @@
     <string name="no_finished_downloads">Aucun téléchargement terminé</string>
     <string name="saved_n_of_m">%1$d éléments sur %2$d enregistrés</string>
     <string name="saved_to_x">Enregistré dans %1$s</string>
-    <string name="confirm_unpair_device">Dissocier « %1$s » ?</string>
+    <string name="confirm_unpair_device">Dissocier %1$s ?</string>
     <string name="delete_chat_history">Supprimer l’historique des discussions</string>
     <string name="nearby_my_devices">Mes appareils</string>
     <string name="nearby_current_device">Appareil actuel</string>

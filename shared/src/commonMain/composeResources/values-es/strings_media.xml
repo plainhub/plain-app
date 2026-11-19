@@ -73,7 +73,7 @@
     <string name="playlist_name">Nombre de la lista</string>
     <string name="rename_playlist">Renombrar lista</string>
     <string name="delete_playlist">Eliminar lista</string>
-    <string name="delete_playlist_confirm_text">Los elementos de "%1$s" se quitarán de la lista. Los archivos de audio no se eliminarán.</string>
+    <string name="delete_playlist_confirm_text">Los elementos de %1$s se quitarán de la lista. Los archivos de audio no se eliminarán.</string>
     <string name="add_n_items">Añadir %1$d</string>
     <string name="total_minutes">%1$d min</string>
     <string name="play_next">Reproducir después</string>

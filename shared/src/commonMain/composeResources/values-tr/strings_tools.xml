@@ -14,7 +14,7 @@
     <string name="dlna_receiver_step2_title">PlainApp'i açın</string>
     <string name="dlna_receiver_step2_desc">Diğer cihazda PlainApp'i açın ve oynamak istediğiniz videoyu veya müziği bulun</string>
     <string name="dlna_receiver_step3_title">Yayınlamak için dokunun</string>
-    <string name="dlna_receiver_step3_desc">Yayın simgesine dokunun, listeden "%1$s" seçin ve oynatma başlayacak</string>
+    <string name="dlna_receiver_step3_desc">Yayın simgesine dokunun, listeden %1$s seçin ve oynatma başlayacak</string>
     <string name="dlna_receiver_protocol_note">DLNA / UPnP protokollerini destekler, VLC, Kodi ve diğer popüler yayın uygulamalarıyla uyumludur</string>
     <string name="dlna_receiver_exit_player">Oynatıcıdan çık</string>
     <string name="dlna_receiver_turn_on">Aç</string>
