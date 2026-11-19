@@ -10,14 +10,14 @@
 #
 # Usage:
 #   scripts/measure_http_server_latency.sh [adb-serial]
-# Env overrides: PACKAGE, START_MS_MAX (default 1500), STOP_MS_MAX (default 1500)
+# Env overrides: START_MS_MAX (default 1500), STOP_MS_MAX (default 1500)
 #
 # Requires: adb, python3, the githubDebug (or any debug) build installed.
 
 set -euo pipefail
 
 SERIAL="${1:-}"
-PACKAGE="${PACKAGE:-com.ismartcoding.plain.debug}"
+source "$(dirname "${BASH_SOURCE[0]}")/test-lib.sh" --
 START_MS_MAX="${START_MS_MAX:-1500}"
 STOP_MS_MAX="${STOP_MS_MAX:-1500}"
 

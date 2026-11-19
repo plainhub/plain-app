@@ -16,6 +16,8 @@ plugins {
     alias(libs.plugins.play.publisher)
 }
 
+val plainApplicationId = "com.ismartcoding.plain"
+val plainDebugSuffix = ".debug"
 val keystoreProperties = Properties()
 rootProject.file("keystore.properties").let {
     if (it.exists()) {
@@ -26,7 +28,7 @@ rootProject.file("keystore.properties").let {
 android {
     compileSdk = 37
     defaultConfig {
-        applicationId = "com.ismartcoding.plain"
+        applicationId = plainApplicationId
         minSdk = 28
         targetSdk = 36
         testInstrumentationRunner = providers.gradleProperty("testInstrumentationRunner")
@@ -82,7 +84,7 @@ android {
 
     buildTypes {
         debug {
-            applicationIdSuffix = if (providers.gradleProperty("plainAcceptance").orNull == "true") ".acceptance" else ".debug"
+            applicationIdSuffix = plainDebugSuffix
             signingConfig = signingConfigs.getByName("debugPinned")
             isShrinkResources = false
             isMinifyEnabled = false
@@ -291,6 +293,10 @@ val rustPackages = listOf("debug" to "dev", "release" to "release").associate { 
     buildType to (packageRust to packageLicenses)
 }
 androidComponents.onVariants { variant ->
+    val expectedId = if (variant.buildType == "debug") plainApplicationId + plainDebugSuffix else plainApplicationId
+    check(variant.applicationId.get() == expectedId) {
+        "${variant.name} must use the PlainApp application ID: $expectedId"
+    }
     val (nativePackage, licensePackage) = rustPackages.getValue(requireNotNull(variant.buildType))
     variant.sources.jniLibs?.addGeneratedSourceDirectory(nativePackage, PackageNativeFiles::outputDirectory)
     variant.sources.assets?.addGeneratedSourceDirectory(licensePackage, PackageNativeFiles::outputDirectory)

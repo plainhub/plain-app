@@ -8,12 +8,13 @@
 # so a tap that misses, or a list that reorders under us, cannot make the run
 # claim more than it did.
 #
-#   ./scripts/grant-web-access.sh <serial> [package]
+#   ./scripts/grant-web-access.sh <serial>
 set -uo pipefail
 export PATH="/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin:$PATH"
 
-SERIAL="${1:?usage: grant-web-access.sh <serial> [package]}"
-PKG="${2:-com.ismartcoding.plain.debug}"
+SERIAL="${1:?usage: grant-web-access.sh <serial>}"
+source "$(dirname "${BASH_SOURCE[0]}")/test-lib.sh" --
+PKG="$PACKAGE"
 MAX_TAPS="${PLAIN_MAX_TAPS:-30}"
 
 dump() {

@@ -1,22 +1,10 @@
 package com.ismartcoding.plain.tests
 
+import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import java.io.File
 
-/**
- * The test scripts must never name a package or a port themselves.
- *
- * A release build and a debug build live on the same phone, each holding its
- * own port, and the release one keeps running untouched. A probe aimed at the
- * wrong package answers perfectly normally, so the mistake is invisible in the
- * results — it was made once, cost a long detour into "why is the new code not
- * taking effect", and the answer was that the new build was never the thing
- * being measured. The package now comes from `app/build.gradle.kts` and the
- * ports from the build's own log, both behind `verify_app_under_test`.
- *
- * This pins the rule that keeps that from coming back through a new script.
- */
 class TestScriptTargetGuardTest {
 
     private val repoRoot: File
@@ -34,18 +22,27 @@ class TestScriptTargetGuardTest {
 
     @Test
     fun noScriptHardcodesTheAppPackage() {
-        // The bare applicationId, with no debug suffix. test-lib.sh derives the
-        // real one from the gradle file, so a literal here can only be a copy
-        // that drifts from it.
         val offenders = scripts().filter { file ->
             val text = file.readText()
-            Regex("""com\.ismartcoding\.plain(?![\w.])""").containsMatchIn(text)
+            Regex("""com\.ismartcoding\.plain(?:\.(?:debug|acceptance|navtest))?(?![\w.])""").containsMatchIn(text)
         }
         assertTrue(
             "these scripts name the app package literally; source test-lib.sh and use \$PACKAGE: " +
                 offenders.joinToString { it.name },
             offenders.isEmpty(),
         )
+    }
+
+    @Test
+    fun deviceScriptsIgnoreAlternatePackageOverrides() {
+        val process = ProcessBuilder("bash", "-c", "source scripts/test-lib.sh && printf '%s' \"\$PACKAGE\"")
+            .directory(repoRoot)
+            .redirectErrorStream(true)
+            .apply { environment()["PLAIN_PACKAGE"] = "com.example.other" }
+            .start()
+        val output = process.inputStream.bufferedReader().use { it.readText() }
+        assertEquals(output, 0, process.waitFor())
+        assertEquals("com.ismartcoding.plain.debug", output)
     }
 
     @Test

@@ -14,24 +14,11 @@ export PATH=/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin:$HOME/.cargo/bin:$PATH
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 CORE_ROOT="${PLAIN_CORE_ROOT:-$REPO_ROOT/../plain-core}"
 
-# The package under test, derived from the build rather than written down here:
-# `applicationId` plus the `debug` flavor's `applicationIdSuffix`. A hardcoded
-# name is how a debug build ends up installed while the release build gets
-# measured — the two coexist on a phone, they answer on different ports, and
-# nothing about the result looks wrong.
-plain_app_package() {
-  local gradle="$REPO_ROOT/app/build.gradle.kts" base suffix
-  base="$(sed -n 's/^[[:space:]]*applicationId[[:space:]]*=[[:space:]]*"\([^"]*\)".*/\1/p' "$gradle" | head -1)"
-  # `applicationIdSuffix` sits in `buildTypes { debug { … } }`, not in
-  # `productFlavors`, so the block is located by name rather than by position.
-  suffix="$(awk '/buildTypes[[:space:]]*\{/{f=1} f && /applicationIdSuffix/{print; exit}' "$gradle" \
-    | sed -n 's/.*"\([^"]*\)".*/\1/p')"
-  [ -n "$base" ] || { say "!! could not read applicationId from $gradle"; return 1; }
-  printf '%s%s\n' "$base" "$suffix"
-}
-
-PLAIN_APP_ID="$(sed -n 's/^[[:space:]]*applicationId[[:space:]]*=[[:space:]]*"\([^"]*\)".*/\1/p' "$REPO_ROOT/app/build.gradle.kts" | head -1)"
-PACKAGE="${PLAIN_PACKAGE:-$(plain_app_package)}"
+app_gradle="$REPO_ROOT/app/build.gradle.kts"
+app_id="$(sed -n 's/^val plainApplicationId = "\([^"]*\)"$/\1/p' "$app_gradle")"
+debug_suffix="$(sed -n 's/^val plainDebugSuffix = "\([^"]*\)"$/\1/p' "$app_gradle")"
+[ -n "$app_id" ] && [ -n "$debug_suffix" ] || { echo 'Could not read the fixed PlainApp development application ID' >&2; return 1; }
+PACKAGE="$app_id$debug_suffix"
 
 OUTPUT_DIR=""
 while [ $# -gt 0 ]; do
@@ -174,16 +161,7 @@ apk_badging() {
 }
 
 # Refuse to measure anything until the package on the phone is provably the one
-# this checkout produced. Both the release and the debug build are installed on
-# a dev phone, they listen on different ports, and the release one keeps running
-# untouched — so a probe aimed at the wrong package returns plausible numbers
-# and every later conclusion is built on them. Three things have to hold:
-#
-#   * the APK on disk really is the package under test (aapt2, not a guess);
-#   * the phone runs that exact versionCode — compared by code, not by mtime,
-#     because a `touch` or a rebuild of an unrelated flavor would otherwise make
-#     a perfectly good install look stale;
-#   * the release build is not also running, since it answers on its own port.
+# this checkout produced, even when different builds share the same versionCode.
 verify_app_under_test() {
   local dev="$1" port="${2:-}" installed="" running="" apk="" badging="" apk_pkg="" apk_code="" dev_code=""
 
@@ -237,6 +215,16 @@ verify_app_under_test() {
     return 1
   fi
 
+  local installed_apk installed_hash local_hash
+  installed_apk="$(adb -s "$dev" shell pm path "$PACKAGE" | tr -d '\r' | sed -n 's/^package:\(.*\/base\.apk\)$/\1/p')"
+  [ -n "$installed_apk" ] || { say "!! could not find the installed APK for $PACKAGE"; return 1; }
+  installed_hash="$(adb -s "$dev" shell sha256sum "$installed_apk" | awk '{print $1}')"
+  local_hash="$(shasum -a 256 "$apk" | awk '{print $1}')"
+  if [ -z "$local_hash" ] || [ "$installed_hash" != "$local_hash" ]; then
+    say "!! $PACKAGE is not running the APK built by this checkout"
+    return 1
+  fi
+
   if [ -n "$port" ]; then
     # The port under test has to be one this build bound. `netstat -ltnp` shows
     # no pid on Android, so a listening socket cannot be traced back to a
@@ -249,19 +237,7 @@ verify_app_under_test() {
     fi
     if [ "$port" != "$own_http" ] && [ "$port" != "$own_https" ]; then
       say "!! port $port does not belong to $PACKAGE: this build bound $own_http/$own_https"
-      say "   $PLAIN_APP_ID keeps its own port on the same phone"
       say "   point the script at http://<device-ip>:$own_http"
-      return 1
-    fi
-  fi
-
-  if [ -n "$port" ] && [ -n "$PLAIN_APP_ID" ] && [ "$PLAIN_APP_ID" != "$PACKAGE" ]; then
-    local other
-    other="$(adb -s "$dev" shell "pidof $PLAIN_APP_ID" 2>/dev/null | tr -d '\r' | awk '{print $1}')"
-    if [ -n "$other" ]; then
-      say "!! both builds are running: $PACKAGE (pid $installed) and $PLAIN_APP_ID (pid $other)"
-      say "   they answer on different ports and a request to the wrong one looks completely normal"
-      say "   stop the other one: adb -s $dev shell am force-stop $PLAIN_APP_ID"
       return 1
     fi
   fi
