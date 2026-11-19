@@ -69,10 +69,59 @@ import com.ismartcoding.plain.ui.media.viewer.previewer.rememberPreviewerState
 import kotlin.time.Instant
 import com.ismartcoding.plain.i18n.nearby_current_device
 import com.ismartcoding.plain.i18n.nearby_switch_device
+import com.ismartcoding.plain.i18n.offline
+import com.ismartcoding.plain.i18n.event_reason_remote_access_disabled
+import com.ismartcoding.plain.i18n.nearby_enable_remote_access
 
 @RunWith(AndroidJUnit4::class)
 class SharedComponentSpacingTest {
     private val instrumentation = InstrumentationRegistry.getInstrumentation()
+
+    @Test
+    fun nearbySwitchExplainsUnavailablePeersWithoutSelectingThem() {
+        val main = com.ismartcoding.plain.ui.app.MainViewModel
+        val toast = com.ismartcoding.plain.ui.components.ToastManager
+        val instant = Instant.parse("2026-01-01T10:00:00Z")
+        val peer = com.ismartcoding.plain.models.Peer("fixture", "Fixture", "", publicKey = "key", token = "paired",
+            status = com.ismartcoding.plain.features.nearby.PeerStatus.PAIRED, port = null,
+            deviceType = com.ismartcoding.plain.platform.system.DeviceType.PHONE, createdAt = instant, updatedAt = instant)
+        val discovered = com.ismartcoding.plain.models.NearbyDevice(peer.id, peer.name, peer.publicKey, port = 0,
+            remoteAccess = false, deviceType = peer.deviceType, version = "", platform = "", lastSeen = instant, status = peer.status)
+        val access = mutableStateOf<com.ismartcoding.plain.models.NearbyDevice?>(null)
+        val online = mutableStateOf(false)
+        val switch = com.ismartcoding.plain.ui.i18n.LocaleHelper.getString(com.ismartcoding.plain.i18n.Res.string.nearby_switch_device)
+        try {
+            render({
+                com.ismartcoding.plain.ui.chat.components.NearbyPairedDeviceItem(peer.copy(online = online.value), access.value) {}
+            }) {
+                val hint = com.ismartcoding.plain.ui.i18n.LocaleHelper.getString(com.ismartcoding.plain.i18n.Res.string.nearby_enable_remote_access)
+                fun accessOffHintVisible() = nodes().any { node ->
+                    node.config.getOrNull(SemanticsProperties.Text)?.any { it.text == hint } == true
+                }
+                fun clickSwitch() {
+                    await { nodes().any { switch in it.config.getOrNull(SemanticsProperties.ContentDescription).orEmpty() } }
+                    instrumentation.waitForIdleSync()
+                    val icon = nodes().single { switch in it.config.getOrNull(SemanticsProperties.ContentDescription).orEmpty() }
+                    val button = generateSequence(icon) { it.parent }.first { it.config.contains(androidx.compose.ui.semantics.SemanticsActions.OnClick) }
+                    assertTrue("Switch must remain enabled", !button.config.contains(SemanticsProperties.Disabled))
+                    instrumentation.runOnMainSync { button.config[androidx.compose.ui.semantics.SemanticsActions.OnClick].action!!.invoke() }
+                }
+                for ((device, reason) in listOf(null to com.ismartcoding.plain.i18n.Res.string.offline, discovered to com.ismartcoding.plain.i18n.Res.string.event_reason_remote_access_disabled)) {
+                    instrumentation.runOnMainSync { access.value = device }
+                    await { accessOffHintVisible() == (device != null) }
+                    clickSwitch()
+                    assertEquals(peer.name + ": " + com.ismartcoding.plain.ui.i18n.LocaleHelper.getString(reason), toast.current.value?.message)
+                    assertEquals(null, main.selectedDevice.value)
+                }
+                instrumentation.runOnMainSync { online.value = true; access.value = null }
+                await { !accessOffHintVisible() }
+                clickSwitch()
+                assertEquals(peer.id, main.selectedDevice.value?.peerId)
+            }
+        } finally {
+            instrumentation.runOnMainSync { main.selectDevice(null); toast.current.value = null }
+        }
+    }
 
     @Test
     fun nearbyCanSwitchFromAManagedDeviceBackToThisDevice() {
@@ -93,7 +142,8 @@ class SharedComponentSpacingTest {
                     .first { it.config.contains(androidx.compose.ui.semantics.SemanticsActions.OnClick) }
                 instrumentation.runOnMainSync { button.config[androidx.compose.ui.semantics.SemanticsActions.OnClick].action!!.invoke() }
                 await { main.selectedDevice.value == null && switchNode() == null }
-                text(current)
+                assertTrue(nodes().any { current in it.config.getOrNull(SemanticsProperties.ContentDescription).orEmpty() })
+                assertTrue(nodes().none { node -> node.config.getOrNull(SemanticsProperties.Text)?.any { it.text == current } == true })
             }
         } finally {
             instrumentation.runOnMainSync { main.selectDevice(null) }

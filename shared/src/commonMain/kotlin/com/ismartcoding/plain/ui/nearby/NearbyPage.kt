@@ -50,6 +50,7 @@ import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.chat.PeerViewModel
 import com.ismartcoding.plain.ui.chat.components.NearbyDeviceItem
 import com.ismartcoding.plain.ui.chat.components.NearbyPairedDeviceItem
+import com.ismartcoding.plain.ui.chat.components.CurrentDeviceIcon
 import com.ismartcoding.plain.Prefs
 import com.ismartcoding.plain.platform.system.getDeviceName
 import com.ismartcoding.plain.platform.system.getDeviceType
@@ -173,9 +174,7 @@ fun NearbyPage(
                     title = localName.ifEmpty { getDeviceName() },
                     subtitle = stringResource(Res.string.this_device),
                     start = { PeerIconWithStatus(getDeviceType().getIcon(), null) },
-                    titleTrailing = {
-                        if (isCurrent) Text(stringResource(Res.string.nearby_current_device), color = MaterialTheme.colorScheme.primary)
-                    },
+                    titleSuffix = if (isCurrent) { { CurrentDeviceIcon() } } else null,
                     action = {
                         if (!isCurrent) PIconButton(
                             Res.drawable.arrow_left_right,

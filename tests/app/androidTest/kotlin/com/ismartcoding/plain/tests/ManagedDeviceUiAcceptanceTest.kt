@@ -673,7 +673,7 @@ class ManagedDeviceUiAcceptanceTest {
             click(text(Res.string.select_a_device), "open nearby devices")
             awaitNode("nearby devices page") { it.text == text(Res.string.nearby_devices) }
             awaitNode("this device row") { it.text == text(Res.string.this_device) }
-            awaitNode("current device indicator") { it.text == text(Res.string.nearby_current_device) }
+            awaitNode("current device indicator") { it.contentDescription == text(Res.string.nearby_current_device) }
             val deviceName = Prefs.deviceName.value.ifEmpty { com.ismartcoding.plain.platform.system.getDeviceName() }
             awaitNode("local device") { it.text == deviceName }
             assertFalse(uiNodes().any { it.overlay && it.text == text(Res.string.select_a_device) })

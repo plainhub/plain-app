@@ -4,6 +4,13 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.Icon
+import androidx.compose.foundation.layout.size
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
+import org.jetbrains.compose.resources.painterResource
+import com.ismartcoding.plain.ui.resources.check as ui_drawable_check
+import com.ismartcoding.plain.ui.components.ToastManager
 import androidx.compose.runtime.*
 import androidx.compose.ui.platform.testTag
 import com.ismartcoding.plain.i18n.*
@@ -43,9 +50,7 @@ fun NearbyPairedDeviceItem(peer: Peer, device: NearbyDevice?, onPair: (NearbyDev
             peer.ip,
             if (device?.remoteAccess == false) stringResource(Res.string.nearby_enable_remote_access) else null,
         ).filter { it.isNotEmpty() }.joinToString(" · "),
-        titleTrailing = {
-            if (selected) Text(stringResource(Res.string.nearby_current_device), color = MaterialTheme.colorScheme.primary)
-        },
+        titleSuffix = if (selected) { { CurrentDeviceIcon() } } else null,
         start = { PeerIconWithStatus(peer.deviceType.getIcon(), peer.online) },
         action = {
             if (actions == PairedDeviceActions.CANCEL) {
@@ -55,12 +60,21 @@ fun NearbyPairedDeviceItem(peer: Peer, device: NearbyDevice?, onPair: (NearbyDev
                     onClick = { NearbyViewModel.cancelPairing(peer.id) },
                 )
             } else Row {
-                if (actions == PairedDeviceActions.SWITCH_AND_MORE) PIconButton(
-                    Res.drawable.arrow_left_right,
-                    contentDescription = stringResource(Res.string.nearby_switch_device),
-                    enabled = peer.online && device?.remoteAccess != false,
-                    click = { MainViewModel.selectDevice(DeviceIdentity(peer.id, peer.publicKey)) },
-                )
+                if (actions == PairedDeviceActions.SWITCH_AND_MORE) {
+                    val reason = when {
+                        device?.remoteAccess == false -> stringResource(Res.string.event_reason_remote_access_disabled)
+                        !peer.online -> stringResource(Res.string.offline)
+                        else -> null
+                    }
+                    PIconButton(
+                        Res.drawable.arrow_left_right,
+                        contentDescription = stringResource(Res.string.nearby_switch_device),
+                        click = {
+                            if (reason == null) MainViewModel.selectDevice(DeviceIdentity(peer.id, peer.publicKey))
+                            else ToastManager.showInfoToast("${peer.name}: $reason")
+                        },
+                    )
+                }
                 Box {
                     PIconButton(
                         UiRes.drawable.ui_drawable_more_horiz,
@@ -97,6 +111,16 @@ fun NearbyPairedDeviceItem(peer: Peer, device: NearbyDevice?, onPair: (NearbyDev
 }
 
 internal enum class PairedDeviceActions { CANCEL, MORE, SWITCH_AND_MORE }
+
+@Composable
+internal fun CurrentDeviceIcon() {
+    Icon(
+        painterResource(UiRes.drawable.ui_drawable_check),
+        contentDescription = stringResource(Res.string.nearby_current_device),
+        modifier = Modifier.size(16.dp),
+        tint = MaterialTheme.colorScheme.primary,
+    )
+}
 
 internal fun pairedDeviceActions(peer: Peer, selected: Boolean): PairedDeviceActions {
     val status = NearbyViewModel.itemStatus[peer.id]
