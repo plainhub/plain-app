@@ -1,8 +1,6 @@
 package com.ismartcoding.plain.ui.nearby
 
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -13,15 +11,14 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.unit.dp
 import com.ismartcoding.plain.features.nearby.PairingMode
 import com.ismartcoding.plain.i18n.*
 import com.ismartcoding.plain.models.NearbyDevice
 import com.ismartcoding.plain.models.PairingErrorCode
-import com.ismartcoding.plain.ui.base.PDialogRadioRow
-import com.ismartcoding.plain.ui.base.PFilledButton
 import com.ismartcoding.plain.ui.base.POutlinedButton
 import com.ismartcoding.plain.ui.base.PTextButton
+import com.ismartcoding.plain.ui.components.RadioDialog
+import com.ismartcoding.plain.ui.components.RadioDialogOption
 import com.ismartcoding.plain.ui.components.RequestVerificationCodeCard
 import com.ismartcoding.plain.ui.components.TextFieldDialog
 import com.ismartcoding.plain.ui.theme.dialogSheetBackground
@@ -30,32 +27,27 @@ import org.jetbrains.compose.resources.stringResource
 @Composable
 internal fun NearbyPairModeDialog(name: String, onDismiss: () -> Unit, onMode: (PairingMode) -> Unit) {
     var mode by remember { mutableStateOf(PairingMode.MANAGE) }
-    AlertDialog(
+    RadioDialog(
         modifier = Modifier.testTag("nearby-pair-dialog"),
+        title = stringResource(Res.string.pair_with_device, name),
+        description = stringResource(Res.string.pair_choose_connection),
+        options = listOf(
+            RadioDialogOption(
+                text = stringResource(Res.string.pair_chat_only),
+                selected = mode == PairingMode.CHAT,
+                supportingText = stringResource(Res.string.pair_chat_description),
+                onClick = { mode = PairingMode.CHAT },
+            ),
+            RadioDialogOption(
+                text = stringResource(Res.string.pair_full_control),
+                selected = mode == PairingMode.MANAGE,
+                supportingText = stringResource(Res.string.pair_control_description),
+                onClick = { mode = PairingMode.MANAGE },
+            ),
+        ),
+        confirmText = stringResource(Res.string.pair_continue),
+        onConfirm = { onMode(mode) },
         onDismissRequest = onDismiss,
-        containerColor = MaterialTheme.colorScheme.dialogSheetBackground,
-        title = { Text(stringResource(Res.string.pair_with_device, name)) },
-        text = {
-            Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
-                Text(stringResource(Res.string.pair_choose_connection), color = MaterialTheme.colorScheme.onSurfaceVariant)
-                Column(Modifier.selectableGroup(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    PDialogRadioRow(
-                        selected = mode == PairingMode.CHAT,
-                        text = stringResource(Res.string.pair_chat_only),
-                        supportingText = stringResource(Res.string.pair_chat_description),
-                        onClick = { mode = PairingMode.CHAT },
-                    )
-                    PDialogRadioRow(
-                        selected = mode == PairingMode.MANAGE,
-                        text = stringResource(Res.string.pair_full_control),
-                        supportingText = stringResource(Res.string.pair_control_description),
-                        onClick = { mode = PairingMode.MANAGE },
-                    )
-                }
-            }
-        },
-        confirmButton = { PFilledButton(text = stringResource(Res.string.pair_continue), onClick = { onMode(mode) }) },
-        dismissButton = { PTextButton(text = stringResource(Res.string.cancel), onClick = onDismiss) },
     )
 }
 

@@ -2,10 +2,12 @@ package com.ismartcoding.plain.ui.components
 
 import com.ismartcoding.plain.ui.base.PDialogRadioRow
 import com.ismartcoding.plain.ui.base.PTextButton
+import com.ismartcoding.plain.ui.base.PFilledButton
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.selection.selectableGroup
@@ -28,6 +30,9 @@ fun RadioDialog(
     title: String = "",
     options: List<RadioDialogOption> = emptyList(),
     compact: Boolean = false,
+    description: String = "",
+    confirmText: String = stringResource(Res.string.confirm),
+    onConfirm: (() -> Unit)? = null,
     onDismissRequest: () -> Unit = {},
 ) {
     AlertDialog(
@@ -45,22 +50,36 @@ fun RadioDialog(
                 Modifier.selectableGroup(),
                 verticalArrangement = Arrangement.spacedBy(if (compact) 0.dp else 4.dp),
             ) {
+                if (description.isNotEmpty()) item {
+                    Text(
+                        text = description,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.padding(bottom = 16.dp),
+                    )
+                }
                 items(options) { option ->
                     PDialogRadioRow(
                         selected = option.selected,
                         onClick = {
                             option.onClick()
-                            onDismissRequest()
+                            if (onConfirm == null) onDismissRequest()
                         },
                         text = option.text,
+                        supportingText = option.supportingText,
                         modifier = if (compact) Modifier.heightIn(min = 48.dp) else Modifier,
                     )
                 }
             }
         },
         confirmButton = {
-            PTextButton(text = stringResource(Res.string.close), buttonSize = ButtonSize.MEDIUM, onClick = onDismissRequest)
+            if (onConfirm == null) {
+                PTextButton(text = stringResource(Res.string.close), buttonSize = ButtonSize.MEDIUM, onClick = onDismissRequest)
+            } else {
+                PFilledButton(text = confirmText, onClick = onConfirm)
+            }
         },
-        dismissButton = {},
+        dismissButton = {
+            if (onConfirm != null) PTextButton(text = stringResource(Res.string.cancel), onClick = onDismissRequest)
+        },
     )
 }
