@@ -4,7 +4,6 @@ import com.ismartcoding.plain.features.nearby.MdnsSnapshot
 import com.ismartcoding.plain.features.notifications.NotificationFilterMode
 import com.ismartcoding.plain.features.sessions.CreatedSession
 import com.ismartcoding.plain.features.settings.AppUpdateDownload
-import com.ismartcoding.plain.models.PasswordSettings
 import com.ismartcoding.plain.lib.JsonHelper
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
@@ -64,7 +63,7 @@ internal object RustNativeApi {
 
     suspend fun checkAppUpdate(automatic: Boolean): String = nativeCall { RustNativeBindings.checkAppUpdate(automatic) }
 
-    suspend fun passwordSettings(): PasswordSettings = nativeCall { RustNativeBindings.loadPreferencesResponse() }
+    suspend fun passwordConfigured(): Boolean = nativeCall { RustNativeBindings.passwordConfigured() }
 
     suspend fun generatePassword(): String = nativeCall { RustNativeBindings.generatePassword() }
 

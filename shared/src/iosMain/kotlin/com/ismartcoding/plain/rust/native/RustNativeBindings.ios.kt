@@ -66,6 +66,7 @@ import com.ismartcoding.plain.rustprefs.plain_remove_dlna_rule
 import com.ismartcoding.plain.rustprefs.plain_remove_scan_history
 import com.ismartcoding.plain.rustprefs.plain_reset_adb_token
 import com.ismartcoding.plain.rustprefs.plain_generate_password
+import com.ismartcoding.plain.rustprefs.plain_password_configured
 import com.ismartcoding.plain.rustprefs.plain_resource_close
 import com.ismartcoding.plain.rustprefs.plain_resource_file
 import com.ismartcoding.plain.rustprefs.plain_resource_open
@@ -276,6 +277,8 @@ internal actual object RustNativeBindings {
     actual fun cancelAppUpdateDownload(): String = readString(plain_cancel_app_update_download())
 
     actual fun checkAppUpdate(automatic: Boolean): String = readString(plain_check_app_update(automatic))
+
+    actual fun passwordConfigured(): String = readString(plain_password_configured())
 
     actual fun generatePassword(): String = readString(plain_generate_password())
 

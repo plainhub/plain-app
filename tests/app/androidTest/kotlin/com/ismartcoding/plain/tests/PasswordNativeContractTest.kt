@@ -19,7 +19,6 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.withTimeout
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.json.JsonObject
-import kotlinx.serialization.json.boolean
 import kotlinx.serialization.json.jsonPrimitive
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -36,7 +35,8 @@ class PasswordNativeContractTest {
         requireDisposableEmulator()
         assertTrue(RustRuntime.isCoreInitialized)
         val initial = settings()
-        assertFalse(initial.getValue("passwordConfigured").jsonPrimitive.boolean)
+        assertFalse(initial.containsKey("passwordConfigured"))
+        assertFalse(RustNativeApi.passwordConfigured())
         assertEquals("NONE", initial.getValue("password_type").jsonPrimitive.content)
         val initialCredentials = storedCredentials()
         assertTrue("Fresh fixture must not contain a password credential", initialCredentials.isEmpty())
@@ -44,7 +44,7 @@ class PasswordNativeContractTest {
         val generated = Prefs.generatePassword()
         assertEquals(6, generated.length)
         assertTrue(generated.all { it in 'a'..'z' || it in 'A'..'Z' || it in '0'..'9' })
-        assertFalse(settings().getValue("passwordConfigured").jsonPrimitive.boolean)
+        assertFalse(RustNativeApi.passwordConfigured())
         assertEquals("NONE", settings().getValue("password_type").jsonPrimitive.content)
         assertTrue("Generation must not persist credentials", storedCredentials().isEmpty())
 
@@ -103,16 +103,14 @@ class PasswordNativeContractTest {
 
     private suspend fun assertStatus(type: PasswordType) {
         val snapshot = settings()
-        assertTrue(snapshot.getValue("passwordConfigured").jsonPrimitive.boolean)
+        assertFalse(snapshot.containsKey("passwordConfigured"))
+        assertFalse(storedPreferences().containsKey("passwordConfigured"))
         assertEquals(type.name, snapshot.getValue("password_type").jsonPrimitive.content)
         assertEquals("", snapshot.getValue("password").jsonPrimitive.content)
         assertFalse(snapshot.containsKey("opaque_server_setup"))
         assertFalse(snapshot.containsKey("opaque_password_record"))
-        val typed = RustNativeApi.passwordSettings()
-        assertTrue(typed.passwordConfigured)
-        assertEquals(type, typed.passwordType)
+        assertTrue(RustNativeApi.passwordConfigured())
         Prefs.load()
-        assertEquals(true, Prefs.passwordConfigured.value)
         assertEquals(type, Prefs.passwordType.value)
     }
 
