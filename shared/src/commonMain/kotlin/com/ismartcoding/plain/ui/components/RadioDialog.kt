@@ -33,6 +33,7 @@ fun RadioDialog(
     description: String = "",
     confirmText: String = stringResource(Res.string.confirm),
     onConfirm: (() -> Unit)? = null,
+    dismissOnSelect: Boolean = onConfirm == null,
     onDismissRequest: () -> Unit = {},
 ) {
     AlertDialog(
@@ -62,7 +63,7 @@ fun RadioDialog(
                         selected = option.selected,
                         onClick = {
                             option.onClick()
-                            if (onConfirm == null) onDismissRequest()
+                            if (dismissOnSelect) onDismissRequest()
                         },
                         text = option.text,
                         supportingText = option.supportingText,
