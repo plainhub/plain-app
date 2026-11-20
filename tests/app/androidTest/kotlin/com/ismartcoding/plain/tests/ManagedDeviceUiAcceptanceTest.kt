@@ -649,7 +649,7 @@ class ManagedDeviceUiAcceptanceTest {
             scenario.onActivity { activity ->
                 activity.setContent {
                     com.ismartcoding.plain.ui.theme.AppTheme(useDarkTheme = false) {
-                        com.ismartcoding.plain.ui.tools.ManagedError("HTTP 500")
+                        com.ismartcoding.plain.ui.tools.ManagedError(com.ismartcoding.plain.rust.graphql.GraphqlHttpException(500))
                     }
                 }
             }

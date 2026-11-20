@@ -11,7 +11,8 @@ import com.ismartcoding.plain.features.sessions.RustWebLogin
 import com.ismartcoding.plain.helpers.Base64Lenient
 import com.ismartcoding.plain.lib.JsonHelper
 import com.ismartcoding.plain.lib.withIO
-import com.ismartcoding.plain.features.sessions.*
+import com.ismartcoding.plain.rust.native.RustNativeBindings
+import com.ismartcoding.plain.rust.native.nativeCall
 import com.ismartcoding.plain.network.*
 import com.ismartcoding.plain.rust.RustRuntime
 import com.ismartcoding.plain.ui.app.MainViewModel
@@ -54,7 +55,7 @@ class SessionLoginRustHttpTest {
             val loginBrowser = PasswordLoginFixture("http://127.0.0.1:$port/")
             browser = loginBrowser
             loginBrowser.start(id, fixturePassword)
-            run {
+            val token = run {
                 val facts = notification.await()
                 pendingId = facts.requestId
                 val pendingRequest = facts.request
@@ -62,18 +63,27 @@ class SessionLoginRustHttpTest {
                 assertTrue(pendingRequest.appName.isNotEmpty())
                 assertTrue(RustSessionStore.list().none { it.clientId == id })
                 RustWebLogin.complete(pendingId)
-                val token = Base64Lenient.decode(loginBrowser.sessionToken())
+                val token = loginBrowser.sessionToken()
                 loginBrowser.close() // API session survives the authentication/browser socket closing.
                 val session = RustSessionStore.list().single { it.clientId == id }
                 assertTrue(session.appName.isNotEmpty())
                 assertFalse(session.isApiToken)
-                assertArrayEquals(token, Base64Lenient.decode(session.token))
-                assertTrue(renameSessionListItemAsync(id, "Renamed fixture"))
-                assertEquals("Renamed fixture", fetchSessionsListItemsAsync().single { it.clientId == id }.name)
+                assertTrue(RustSessionStore.rename(id, "Renamed fixture"))
+                assertEquals("Renamed fixture", RustSessionStore.list().single { it.clientId == id }.name)
                 assertTrue(runCatching { RustWebLogin.complete(pendingId) }.isFailure)
+                token
             }
-            deleteSessionListItemAsync(id)
-            assertNull(RustSessionStore.list().firstOrNull { it.clientId == id }?.token?.let(Base64Lenient::decode))
+            suspend fun authenticated(): Boolean {
+                val proof = nativeCall<String> { RustNativeBindings.encryptHttpRequest(token, "/init", "") }
+                return http.post("http://127.0.0.1:$port/init", Base64Lenient.decode(proof), headers = mapOf("c-id" to id)).use {
+                    assertEquals(200, it.status.value)
+                    JsonHelper.jsonDecode<LoginBootstrap>(it.bodyAsText()).authenticated
+                }
+            }
+            assertTrue(authenticated())
+            RustSessionStore.delete(id)
+            assertFalse(authenticated())
+            assertTrue(RustSessionStore.list().none { it.clientId == id })
         } finally {
             browser?.close()
             http.close()

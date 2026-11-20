@@ -57,7 +57,7 @@ class ChatServiceRustHttpTest {
             val hash = attachment.uri.removePrefix("fid:").substringBefore('.')
             files += hash
             assertEquals(source.length(), attachment.size)
-            val forward = ChatClient.forward(picked.first().id, listOf(local)).single().also { ids += it.id }
+            val forward = ChatClient.forward(picked.first().id, listOf(local), note = null).single().also { ids += it.id }
             assertEquals(ChatStatus.SENT, forward.status)
             val encoded = ResourceCrypto.encrypt(attachment.uri)
             val request = BleBinaryFixture.file("local", encoded, 0, 8192)

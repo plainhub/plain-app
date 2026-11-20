@@ -60,8 +60,7 @@ class PublicRustHttpTest {
                 client.request("HEAD", "http://127.0.0.1:$port/health").use { assertEquals(200, it.status.value); assertEquals(0, it.bodyAsBytes().size) }
                 client.post("http://127.0.0.1:$port/init", ByteArray(0)).use { assertEquals(400, it.status.value) }
                 client.get("http://127.0.0.1:$port/").use { assertEquals(200, it.status.value); assertTrue(it.bodyAsText().contains("window.__SERVER_TIME__=")) }
-                RustSessionStore.create(fixtureName)
-                val session = RustSessionStore.list().single { it.name == fixtureName }
+                val session = RustSessionStore.create(fixtureName)
                 clientId = session.clientId
                 key = Base64Lenient.decode(session.token)
                 val initBody = chaCha20Encrypt(key, "authenticated-init".encodeToByteArray())
