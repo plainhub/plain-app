@@ -7,10 +7,7 @@ import com.ismartcoding.plain.Prefs
 import com.ismartcoding.plain.lib.Channel
 import com.ismartcoding.plain.events.PermissionsResultEvent
 import com.ismartcoding.plain.events.WindowFocusChangedEvent
-import com.ismartcoding.plain.platform.permissions.requestSystemAccess
 import com.ismartcoding.plain.features.permissions.getWebList
-import kotlinx.coroutines.CoroutineScope
-import com.ismartcoding.plain.ui.state.launchSafe
 
 @Composable
 internal fun WebSettingsEffects(
@@ -32,11 +29,5 @@ internal fun WebSettingsEffects(
                 }
             }
         }
-    }
-}
-
-internal fun toggleAccess(scope: CoroutineScope, m: AccessItem, enable: Boolean) {
-    scope.launchSafe {
-        if (!enable || m.features.requestSystemAccess()) Prefs.setApiAccess(m.features, enable)
     }
 }

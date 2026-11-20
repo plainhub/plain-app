@@ -43,12 +43,10 @@ fun Permission.request(
             val intent = Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION)
             intent.addCategory("android.intent.category.DEFAULT")
             intent.data = Uri.parse("package:${context.packageName}")
-            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
             intentLauncher?.launch(intent)
         } catch (e: Exception) {
             val appDetailsIntent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
                 data = Uri.parse("package:${context.packageName}")
-                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
             }
             if (appDetailsIntent.resolveActivity(packageManager) != null) {
                 intentLauncher?.launch(appDetailsIntent)

@@ -2,7 +2,9 @@ package com.ismartcoding.plain.ui.web
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import com.ismartcoding.plain.ui.state.launchSafe
 import androidx.compose.runtime.snapshotFlow
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.withResumed
@@ -18,6 +20,7 @@ import org.jetbrains.compose.resources.stringResource
 @Composable
 internal fun WebAccessRequestDialog() {
     val scope = rememberCoroutineScope()
+    val access = remember { AccessSettingsState() }
     val request = MainViewModel.pendingWebAccessRequest.value ?: return
     val lifecycle = LocalLifecycleOwner.current.lifecycle
     val dismissRequest = {
@@ -36,7 +39,7 @@ internal fun WebAccessRequestDialog() {
             message = message,
             confirmButton = Pair(getString(if (permission == null) Res.string.ok else Res.string.grant_access)) {
                 dismissRequest()
-                if (permission != null) toggleAccess(scope, permission, true)
+                if (permission != null) scope.launchSafe { access.setEnabled(permission.features, true) }
             },
             dismissButton = Pair(getString(Res.string.reject), dismissRequest),
         )
