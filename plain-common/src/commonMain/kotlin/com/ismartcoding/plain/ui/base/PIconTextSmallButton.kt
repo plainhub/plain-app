@@ -9,6 +9,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
@@ -23,17 +24,34 @@ fun PIconTextSmallButton(
     enabled: Boolean = true,
     onClick: () -> Unit,
 ) {
+    PIconTextSmallButton(icon, text, modifier, enabled, compact = false, onClick = onClick)
+}
+
+@Composable
+fun PIconTextSmallButton(
+    icon: DrawableResource,
+    text: String,
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true,
+    compact: Boolean,
+    contentColor: Color = Color.Unspecified,
+    onClick: () -> Unit,
+) {
     IconLabelContent(
         text = text,
-        style = MaterialTheme.typography.labelSmall,
-        modifier = modifier.defaultMinSize(minWidth = 64.dp, minHeight = 48.dp)
+        style = MaterialTheme.typography.labelSmall.copy(color = contentColor),
+        modifier = modifier.defaultMinSize(minWidth = if (compact) 48.dp else 64.dp, minHeight = 48.dp)
             .clip(MaterialTheme.shapes.small)
             .clickable(enabled = enabled, role = Role.Button, onClick = onClick)
             .alpha(if (enabled) 1f else 0.38f)
-            .padding(vertical = 8.dp),
-        spacing = 8.dp,
+            .padding(vertical = if (compact) 4.dp else 8.dp),
+        spacing = if (compact) 4.dp else 8.dp,
+        horizontalPadding = if (compact) 0.dp else 4.dp,
     ) {
-            Icon(painterResource(icon), contentDescription = null, modifier = Modifier.size(20.dp),
-                tint = MaterialTheme.colorScheme.primary)
+        Icon(
+            painterResource(icon), contentDescription = null,
+            modifier = Modifier.size(if (compact) 24.dp else 20.dp),
+            tint = if (contentColor == Color.Unspecified) MaterialTheme.colorScheme.primary else contentColor,
+        )
     }
 }

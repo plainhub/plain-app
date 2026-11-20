@@ -23,4 +23,8 @@
     <string name="image_editor_tool_select">নির্বাচন</string>
     <string name="image_editor_tool_sticker">স্টিকার</string>
     <string name="image_editor_tool_text">টেক্সট</string>
+    <string name="image_editor_export_short">রপ্তানি</string>
+    <string name="image_editor_order_short">ক্রম</string>
+    <string name="image_editor_replace_short">বদলান</string>
+    <string name="image_editor_selection_hint">একটি টুল বাছুন বা ক্যানভাসে কোনো বস্তুতে ট্যাপ করুন</string>
 </resources>

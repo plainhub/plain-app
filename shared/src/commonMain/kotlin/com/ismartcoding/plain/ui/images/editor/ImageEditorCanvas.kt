@@ -2,6 +2,7 @@ package com.ismartcoding.plain.ui.images.editor
 
 import com.ismartcoding.plain.i18n.*
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.awaitEachGesture
@@ -30,6 +31,7 @@ import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.graphics.drawscope.DrawScope
@@ -358,9 +360,8 @@ internal fun ImageEditorCanvas(
                         }
                     }
             ) {
-            Canvas(modifier = Modifier.fillMaxSize()) {
-                drawDarkCheckerboard(size.width, size.height)
-            }
+            val colors = MaterialTheme.colorScheme
+            Box(Modifier.fillMaxSize().background(lerp(colors.surface, colors.onSurface, 0.12f)))
 
             Box(
                 modifier = Modifier
@@ -370,7 +371,7 @@ internal fun ImageEditorCanvas(
                     )
                     .align(Alignment.Center)
                     .offset { IntOffset(pan.x.roundToInt(), pan.y.roundToInt()) }
-                    .border(1.dp, Color(0xFF888888)),
+                    .border(1.dp, colors.outlineVariant),
             ) {
                 val renderList = if (drawingLayer != null && vm.currentTool.value != ImageEditorTool.CROP) layers + drawingLayer!! else layers
                 NativeEditorCanvas(
@@ -426,28 +427,6 @@ private fun ZoomIndicator(
                 style = MaterialTheme.typography.labelSmall,
             )
         }
-    }
-}
-
-private fun DrawScope.drawDarkCheckerboard(w: Float, h: Float, tile: Float = 16f) {
-    val c1 = Color(0xFF1E1E1E)
-    val c2 = Color(0xFF2A2A2A)
-    var y = 0f
-    var row = 0
-    while (y < h) {
-        var x = 0f
-        var col = 0
-        while (x < w) {
-            drawRect(
-                color = if ((row + col) % 2 == 0) c1 else c2,
-                topLeft = Offset(x, y),
-                size = Size(tile, tile),
-            )
-            x += tile
-            col++
-        }
-        y += tile
-        row++
     }
 }
 

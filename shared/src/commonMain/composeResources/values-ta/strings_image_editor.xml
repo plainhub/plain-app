@@ -23,4 +23,8 @@
     <string name="image_editor_tool_select">தேர்வு</string>
     <string name="image_editor_tool_sticker">ஸ்டிக்கர்</string>
     <string name="image_editor_tool_text">உரை</string>
+    <string name="image_editor_export_short">ஏற்றுமதி</string>
+    <string name="image_editor_order_short">வரிசை</string>
+    <string name="image_editor_replace_short">மாற்று</string>
+    <string name="image_editor_selection_hint">ஒரு கருவியைத் தேர்ந்தெடுக்கவும் அல்லது கேன்வாஸில் உள்ள பொருளைத் தட்டவும்</string>
 </resources>

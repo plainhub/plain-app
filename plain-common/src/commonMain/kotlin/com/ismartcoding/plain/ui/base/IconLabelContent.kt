@@ -19,6 +19,7 @@ internal fun IconLabelContent(
     style: TextStyle,
     modifier: Modifier,
     spacing: Dp,
+    horizontalPadding: Dp = 4.dp,
     maxLines: Int = Int.MAX_VALUE,
     icon: @Composable () -> Unit,
 ) {
@@ -29,6 +30,6 @@ internal fun IconLabelContent(
     ) {
         icon()
         Text(text, style = style, textAlign = TextAlign.Center, maxLines = maxLines,
-            overflow = TextOverflow.Ellipsis, modifier = Modifier.padding(horizontal = 4.dp))
+            overflow = TextOverflow.Ellipsis, modifier = Modifier.padding(horizontal = horizontalPadding))
     }
 }

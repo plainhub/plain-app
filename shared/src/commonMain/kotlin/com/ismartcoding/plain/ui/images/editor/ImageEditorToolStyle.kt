@@ -25,6 +25,12 @@ internal fun ImageEditorToolStyle(vm: ImageEditorEditViewModel, dismiss: () -> U
             if (vm.currentTool.value == ImageEditorTool.MOSAIC) {
                 EditorNumberField(stringResource(Res.string.image_editor_block_size), vm.mosaicBlockSize.value, 1.0..100.0) { vm.mosaicBlockSize.value = it }
             } else {
+                if (vm.currentTool.value == ImageEditorTool.FREEHAND || vm.currentTool.value == ImageEditorTool.HIGHLIGHT) {
+                    EditorChoices(stringResource(Res.string.image_editor_tool_freehand), vm.currentTool.value,
+                        listOf(ImageEditorTool.FREEHAND, ImageEditorTool.HIGHLIGHT).map { it to stringResource(editorToolLabel(it)) }) {
+                        vm.currentTool.value = it
+                    }
+                }
                 EditorChoices(stringResource(Res.string.image_editor_color), vm.color.value,
                     listOf("#ff0000", "#00cc00", "#0066ff", "#ffcc00", "#ff8800", "#ff00ff", "#00cccc", "#000000").map { it to it }) { vm.color.value = it }
                 EditorColorField(stringResource(Res.string.image_editor_custom_color), vm.color.value) { vm.color.value = it }

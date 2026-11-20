@@ -23,4 +23,8 @@
     <string name="image_editor_tool_select">Seleccionar</string>
     <string name="image_editor_tool_sticker">Pegatina</string>
     <string name="image_editor_tool_text">Texto</string>
+    <string name="image_editor_export_short">Exportar</string>
+    <string name="image_editor_order_short">Orden</string>
+    <string name="image_editor_replace_short">Sustituir</string>
+    <string name="image_editor_selection_hint">Elige una herramienta o toca un objeto en el lienzo</string>
 </resources>

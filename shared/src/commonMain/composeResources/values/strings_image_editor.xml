@@ -80,4 +80,8 @@
     <string name="image_editor_delete_project_confirm">Delete this image project and all its layers?</string>
     <string name="image_editor_shapes">Shapes</string>
     <string name="image_editor_layer_order">Layer order</string>
+    <string name="image_editor_export_short">Export</string>
+    <string name="image_editor_order_short">Order</string>
+    <string name="image_editor_replace_short">Replace</string>
+    <string name="image_editor_selection_hint">Choose a tool or tap an object on the canvas</string>
 </resources>

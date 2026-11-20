@@ -55,7 +55,7 @@ internal fun DrawScope.drawSceneCheckerboard(cw: Float, ch: Float, tile: Float =
             drawRect(
                 color = if ((row + col) % 2 == 0) light else dark,
                 topLeft = Offset(x, y),
-                size = Size(tile, tile),
+                size = Size(minOf(tile, cw - x), minOf(tile, ch - y)),
             )
             x += tile
             col++

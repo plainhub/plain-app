@@ -23,4 +23,8 @@
     <string name="image_editor_tool_select">Selecionar</string>
     <string name="image_editor_tool_sticker">Adesivo</string>
     <string name="image_editor_tool_text">Texto</string>
+    <string name="image_editor_export_short">Exportar</string>
+    <string name="image_editor_order_short">Ordem</string>
+    <string name="image_editor_replace_short">Substituir</string>
+    <string name="image_editor_selection_hint">Escolha uma ferramenta ou toque em um objeto na tela</string>
 </resources>

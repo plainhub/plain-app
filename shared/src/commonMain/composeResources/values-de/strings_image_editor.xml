@@ -23,4 +23,8 @@
     <string name="image_editor_tool_select">Auswählen</string>
     <string name="image_editor_tool_sticker">Sticker</string>
     <string name="image_editor_tool_text">Text</string>
+    <string name="image_editor_export_short">Export</string>
+    <string name="image_editor_order_short">Ebene</string>
+    <string name="image_editor_replace_short">Ersetzen</string>
+    <string name="image_editor_selection_hint">Werkzeug wählen oder ein Objekt auf der Leinwand antippen</string>
 </resources>

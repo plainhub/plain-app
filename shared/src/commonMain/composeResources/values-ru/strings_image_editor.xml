@@ -23,4 +23,8 @@
     <string name="image_editor_tool_select">Выбор</string>
     <string name="image_editor_tool_sticker">Стикер</string>
     <string name="image_editor_tool_text">Текст</string>
+    <string name="image_editor_export_short">Экспорт</string>
+    <string name="image_editor_order_short">Порядок</string>
+    <string name="image_editor_replace_short">Заменить</string>
+    <string name="image_editor_selection_hint">Выберите инструмент или нажмите на объект на холсте</string>
 </resources>

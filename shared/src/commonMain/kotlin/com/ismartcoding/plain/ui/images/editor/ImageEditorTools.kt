@@ -14,7 +14,7 @@ import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.stringResource
 import com.ismartcoding.plain.ui.resources.Res as UiRes
 
-internal enum class EditorToolGroup { BRUSH, SHAPES, MORE }
+internal enum class EditorToolGroup { SHAPES, MORE }
 
 @Composable
 internal fun ImageEditorTools(
@@ -26,7 +26,6 @@ internal fun ImageEditorTools(
     onDismiss: () -> Unit,
 ) {
     val title = when (group) {
-        EditorToolGroup.BRUSH -> Res.string.image_editor_tool_freehand
         EditorToolGroup.SHAPES -> Res.string.image_editor_shapes
         EditorToolGroup.MORE -> Res.string.more
     }
@@ -35,24 +34,21 @@ internal fun ImageEditorTools(
             PIconButton(UiRes.drawable.x, contentDescription = stringResource(Res.string.close), click = onDismiss)
         })
         Column(Modifier.padding(bottom = 24.dp)) {
-            when (group) {
-                EditorToolGroup.BRUSH -> {
-                    PSheetActionRow(UiRes.drawable.pen, stringResource(Res.string.image_editor_tool_freehand)) { onTool(ImageEditorTool.FREEHAND) }
-                    PSheetActionRow(UiRes.drawable.highlighter, stringResource(Res.string.image_editor_tool_highlight)) { onTool(ImageEditorTool.HIGHLIGHT) }
-                }
-                EditorToolGroup.SHAPES -> {
-                    PSheetActionRow(UiRes.drawable.arrow_up_right, stringResource(Res.string.image_editor_tool_arrow)) { onTool(ImageEditorTool.ARROW) }
-                    PSheetActionRow(UiRes.drawable.square, stringResource(Res.string.image_editor_tool_rect)) { onTool(ImageEditorTool.RECT) }
-                    PSheetActionRow(UiRes.drawable.circle, stringResource(Res.string.image_editor_tool_ellipse)) { onTool(ImageEditorTool.ELLIPSE) }
-                }
-                EditorToolGroup.MORE -> {
-                    PSheetActionRow(UiRes.drawable.image, stringResource(Res.string.image_editor_add_image), onClick = onAddImage)
-                    PSheetActionRow(UiRes.drawable.sticky_note, stringResource(Res.string.image_editor_tool_sticker)) { onTool(ImageEditorTool.STICKER) }
-                    PSheetActionRow(UiRes.drawable.scissors, stringResource(Res.string.image_editor_crop)) { onTool(ImageEditorTool.CROP) }
-                    PSheetActionRow(UiRes.drawable.settings, stringResource(Res.string.image_editor_canvas_settings), onClick = onCanvas)
-                    PSheetActionRow(UiRes.drawable.eye, stringResource(Res.string.image_editor_preview), onClick = onPreview)
-                }
+            val actions = when (group) {
+                EditorToolGroup.SHAPES -> listOf(
+                    EditorAction(UiRes.drawable.arrow_up_right, stringResource(Res.string.image_editor_tool_arrow)) { onTool(ImageEditorTool.ARROW) },
+                    EditorAction(UiRes.drawable.square, stringResource(Res.string.image_editor_tool_rect)) { onTool(ImageEditorTool.RECT) },
+                    EditorAction(UiRes.drawable.circle, stringResource(Res.string.image_editor_tool_ellipse)) { onTool(ImageEditorTool.ELLIPSE) },
+                )
+                EditorToolGroup.MORE -> listOf(
+                    EditorAction(UiRes.drawable.image, stringResource(Res.string.image_editor_add_image), onClick = onAddImage),
+                    EditorAction(UiRes.drawable.sticky_note, stringResource(Res.string.image_editor_tool_sticker)) { onTool(ImageEditorTool.STICKER) },
+                    EditorAction(UiRes.drawable.scissors, stringResource(Res.string.image_editor_crop)) { onTool(ImageEditorTool.CROP) },
+                    EditorAction(UiRes.drawable.settings, stringResource(Res.string.image_editor_canvas_settings), onClick = onCanvas),
+                    EditorAction(UiRes.drawable.eye, stringResource(Res.string.image_editor_preview), onClick = onPreview),
+                )
             }
+            EditorActions(actions, maxColumns = 3)
         }
     }
 }

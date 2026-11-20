@@ -80,4 +80,8 @@
     <string name="image_editor_delete_project_confirm">删除此图片项目及其全部图层？</string>
     <string name="image_editor_shapes">形状</string>
     <string name="image_editor_layer_order">层级</string>
+    <string name="image_editor_export_short">导出</string>
+    <string name="image_editor_order_short">层级</string>
+    <string name="image_editor_replace_short">替换</string>
+    <string name="image_editor_selection_hint">选择工具，或点选画布中的对象</string>
 </resources>

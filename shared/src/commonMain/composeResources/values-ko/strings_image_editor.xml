@@ -23,4 +23,8 @@
     <string name="image_editor_tool_select">선택</string>
     <string name="image_editor_tool_sticker">스티커</string>
     <string name="image_editor_tool_text">텍스트</string>
+    <string name="image_editor_export_short">내보내기</string>
+    <string name="image_editor_order_short">순서</string>
+    <string name="image_editor_replace_short">교체</string>
+    <string name="image_editor_selection_hint">도구를 선택하거나 캔버스의 개체를 누르세요</string>
 </resources>

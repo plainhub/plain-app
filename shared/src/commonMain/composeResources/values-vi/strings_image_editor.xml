@@ -23,4 +23,8 @@
     <string name="image_editor_tool_select">Chọn</string>
     <string name="image_editor_tool_sticker">Nhãn dán</string>
     <string name="image_editor_tool_text">Văn bản</string>
+    <string name="image_editor_export_short">Xuất</string>
+    <string name="image_editor_order_short">Thứ tự</string>
+    <string name="image_editor_replace_short">Thay thế</string>
+    <string name="image_editor_selection_hint">Chọn công cụ hoặc chạm vào đối tượng trên khung vẽ</string>
 </resources>

@@ -23,4 +23,8 @@
     <string name="image_editor_tool_select">選択</string>
     <string name="image_editor_tool_sticker">スタンプ</string>
     <string name="image_editor_tool_text">テキスト</string>
+    <string name="image_editor_export_short">書き出し</string>
+    <string name="image_editor_order_short">重なり順</string>
+    <string name="image_editor_replace_short">置換</string>
+    <string name="image_editor_selection_hint">ツールを選ぶか、キャンバス上のオブジェクトをタップしてください</string>
 </resources>

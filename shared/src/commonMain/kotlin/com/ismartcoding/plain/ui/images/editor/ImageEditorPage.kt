@@ -19,6 +19,7 @@ import com.ismartcoding.plain.lib.yjs.StickerLayer
 import com.ismartcoding.plain.ui.base.NoDataColumn
 import com.ismartcoding.plain.ui.base.PScaffold
 import com.ismartcoding.plain.ui.base.PTopAppBar
+import com.ismartcoding.plain.ui.base.PFilledButton
 import com.ismartcoding.plain.ui.base.PTextButton
 import com.ismartcoding.plain.ui.components.DialogHelper
 import com.ismartcoding.plain.ui.components.NoDataView
@@ -129,6 +130,7 @@ fun ImageEditorPage(
     }
     if (showOrder && selectedLayer != null) ImageEditorLayerOrder(selectedLayer, vm) { showOrder = false }
     if (showExport) ImageEditorExportSheet(
+        preview = { previewImage = imageActions.render(textMeasurer) },
         copy = { scope.launchSafe { imageActions.copy(textMeasurer); DialogHelper.showSuccess(Res.string.copied) } },
         export = { imageActions.export(it, textMeasurer) }, dismiss = { showExport = false },
     )
@@ -151,14 +153,14 @@ fun ImageEditorPage(
                 navigationIcon = { NavigationBackIcon { handleBack() } },
                 title = stringResource(Res.string.image_editor),
                 actions = {
-                    PTextButton(stringResource(Res.string.image_editor_export), { showExport = true }, enabled = vm.loadState.value == EditorLoadState.Ready)
+                    PFilledButton(stringResource(Res.string.image_editor_export_short), { showExport = true }, enabled = vm.loadState.value == EditorLoadState.Ready)
                 },
             )
         },
         bottomBar = {
             if (vm.loadState.value == EditorLoadState.Ready) {
                 ImageEditorBottomAppBar(
-                    vm = vm, selectedLayer = selectedLayer, onToolSelected = ::selectTool,
+                    vm = vm, layerCount = layers.size, selectedLayer = selectedLayer, onToolSelected = ::selectTool,
                     onGroup = { toolGroup = it }, onStyle = { showStyle = true }, onEditText = { editText = true },
                     onReplaceImage = { imageActions.pick(EditorImageTarget.Replacement(checkNotNull(selectedLayer).id)) },
                     onOrder = { showOrder = true },

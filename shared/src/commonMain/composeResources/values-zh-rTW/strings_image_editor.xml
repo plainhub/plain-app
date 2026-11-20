@@ -80,4 +80,8 @@
     <string name="image_editor_delete_project_confirm">刪除此圖片專案及其全部圖層？</string>
     <string name="image_editor_shapes">形狀</string>
     <string name="image_editor_layer_order">層級</string>
+    <string name="image_editor_export_short">匯出</string>
+    <string name="image_editor_order_short">層級</string>
+    <string name="image_editor_replace_short">替換</string>
+    <string name="image_editor_selection_hint">選擇工具，或點選畫布中的物件</string>
 </resources>

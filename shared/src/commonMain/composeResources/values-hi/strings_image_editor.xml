@@ -23,4 +23,8 @@
     <string name="image_editor_tool_select">चुनें</string>
     <string name="image_editor_tool_sticker">स्टिकर</string>
     <string name="image_editor_tool_text">टेक्स्ट</string>
+    <string name="image_editor_export_short">निर्यात</string>
+    <string name="image_editor_order_short">क्रम</string>
+    <string name="image_editor_replace_short">बदलें</string>
+    <string name="image_editor_selection_hint">कोई टूल चुनें या कैनवास पर किसी ऑब्जेक्ट को टैप करें</string>
 </resources>

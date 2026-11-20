@@ -23,4 +23,8 @@
     <string name="image_editor_tool_select">Selecteren</string>
     <string name="image_editor_tool_sticker">Sticker</string>
     <string name="image_editor_tool_text">Tekst</string>
+    <string name="image_editor_export_short">Exporteer</string>
+    <string name="image_editor_order_short">Volgorde</string>
+    <string name="image_editor_replace_short">Vervang</string>
+    <string name="image_editor_selection_hint">Kies een gereedschap of tik op een object op het canvas</string>
 </resources>
