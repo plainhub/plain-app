@@ -22,7 +22,7 @@ import com.ismartcoding.plain.features.files.toFileSortBy
 import com.ismartcoding.plain.platform.system.DataType
 
 object FileMediaStoreHelper : BaseContentHelper() {
-    override val uriExternal: Uri = MediaStore.Files.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY)
+    override val uriExternal: Uri = MediaStore.Files.getContentUri(MediaStore.VOLUME_EXTERNAL)
 
     override fun getProjection(): Array<String> {
         return arrayOf(
