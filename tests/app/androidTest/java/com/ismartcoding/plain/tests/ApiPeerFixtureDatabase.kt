@@ -11,8 +11,8 @@ import java.util.UUID
 @Serializable
 internal data class ApiPeerFixture(val id: String, val key: String, val publicKey: String) {
     fun validate() {
-        check(id.startsWith("api-fixture-"))
-        UUID.fromString(id.removePrefix("api-fixture-"))
+        val uuid = UUID.fromString(id)
+        check(uuid.toString() == id && id.startsWith("706c6169-") && uuid.version() == 8 && uuid.variant() == 2)
         check(Base64.decode(key, Base64.NO_WRAP).size == 32)
         check(Base64.decode(publicKey, Base64.NO_WRAP).size == 32)
     }
