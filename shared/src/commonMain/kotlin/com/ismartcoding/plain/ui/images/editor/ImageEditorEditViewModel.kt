@@ -38,6 +38,7 @@ class ImageEditorEditViewModel(private val projects: ImageEditorProjectsClient, 
     val selectedLayerId = mutableStateOf<String?>(null)
     val color = mutableStateOf("#ef4444")
     val lineWidth = mutableStateOf(4.0)
+    val mosaicBlockSize = mutableStateOf(10.0)
     val showLayerPanel = mutableStateOf(false)
     val canUndo = mutableStateOf(false)
     val canRedo = mutableStateOf(false)
@@ -200,16 +201,6 @@ class ImageEditorEditViewModel(private val projects: ImageEditorProjectsClient, 
                     }
                 }
                 if (state.value == saved) dirty.value = false
-            }
-            onDone()
-        }
-    }
-    fun deleteProject(onDone: () -> Unit) {
-        autoSaveJob?.cancel()
-        viewModelScope.launchSafe {
-            saveMutex.withLock {
-                if (id.value.isNotEmpty()) withContext(ioDispatcher) { projects.deleteAsync(id.value) }
-                dirty.value = false
             }
             onDone()
         }

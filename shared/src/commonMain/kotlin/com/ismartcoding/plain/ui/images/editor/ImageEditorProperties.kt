@@ -14,15 +14,16 @@ import com.ismartcoding.plain.i18n.*
 import com.ismartcoding.plain.lib.yjs.*
 import com.ismartcoding.plain.ui.base.PBottomSheetTopAppBar
 import com.ismartcoding.plain.ui.base.PModalBottomSheet
-import com.ismartcoding.plain.ui.base.PTextButton
-import com.ismartcoding.plain.ui.base.PTextField
+import com.ismartcoding.plain.ui.components.PIconButton
+import com.ismartcoding.plain.ui.resources.x
+import com.ismartcoding.plain.ui.resources.Res as UiRes
 import org.jetbrains.compose.resources.stringResource
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-internal fun ImageEditorProperties(layer: EditorLayer, update: (EditorLayer) -> Unit, replaceImage: () -> Unit, dismiss: () -> Unit) {
-    PModalBottomSheet(onDismissRequest = dismiss, fullHeight = true) {
-        PBottomSheetTopAppBar(title = stringResource(Res.string.image_editor_properties), actions = { PTextButton(stringResource(Res.string.close), dismiss) })
+internal fun ImageEditorProperties(layer: EditorLayer, update: (EditorLayer) -> Unit, dismiss: () -> Unit) {
+    PModalBottomSheet(onDismissRequest = dismiss) {
+        PBottomSheetTopAppBar(title = stringResource(Res.string.style), subtitle = editorLayerTitle(layer), navigationIcon = { PIconButton(UiRes.drawable.x, contentDescription = stringResource(Res.string.close), click = dismiss) })
         Column(Modifier.fillMaxWidth().verticalScroll(rememberScrollState()).padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
             val color = when (layer) {
                 is ArrowLayer -> layer.color
@@ -62,14 +63,11 @@ internal fun ImageEditorProperties(layer: EditorLayer, update: (EditorLayer) -> 
                     else -> layer
                 })
             } }
-            val textLabel = stringResource(Res.string.image_editor_text_content)
             when (layer) {
                 is TextLayer -> {
-                    PTextField(false, layer.text, textLabel, singleLine = false, showPasteAction = false, onValueChange = { update(layer.copy(text = it)) })
                     EditorTextProperties(layer) { update(it) }
                 }
                 is StickerLayer -> {
-                    PTextField(false, layer.text, textLabel, singleLine = false, showPasteAction = false, onValueChange = { update(layer.copy(text = it)) })
                     EditorNumberField(stringResource(Res.string.image_editor_font_size), layer.fontSize, 1.0..500.0) { update(layer.copy(fontSize = it)) }
                     EditorToggle(stringResource(Res.string.image_editor_bold), layer.fontWeight == EditorFontWeight.BOLD) { update(layer.copy(fontWeight = if (it) EditorFontWeight.BOLD else EditorFontWeight.NORMAL)) }
                     EditorToggle(stringResource(Res.string.image_editor_italic), layer.fontStyle == EditorFontStyle.ITALIC) { update(layer.copy(fontStyle = if (it) EditorFontStyle.ITALIC else EditorFontStyle.NORMAL)) }
@@ -78,7 +76,6 @@ internal fun ImageEditorProperties(layer: EditorLayer, update: (EditorLayer) -> 
                 is ImageLayer -> {
                     EditorNumberField(stringResource(Res.string.image_editor_opacity), layer.opacity * 100, 0.0..100.0) { update(layer.copy(opacity = it / 100)) }
                     EditorNumberField(stringResource(Res.string.image_editor_rotation), layer.rotation, -360.0..360.0) { update(layer.copy(rotation = it)) }
-                    PTextButton(stringResource(Res.string.image_editor_replace_image), replaceImage)
                 }
                 is MosaicLayer -> EditorNumberField(stringResource(Res.string.image_editor_block_size), layer.blockSize, 1.0..100.0) { update(layer.copy(blockSize = it)) }
                 is ArrowLayer -> EditorNumberField(stringResource(Res.string.image_editor_rotation), layer.rotation, -360.0..360.0) { update(layer.copy(rotation = it)) }

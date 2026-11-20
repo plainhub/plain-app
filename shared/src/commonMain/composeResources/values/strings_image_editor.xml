@@ -78,4 +78,6 @@
     <string name="image_editor_canvas">Image canvas</string>
     <string name="image_editor_delete_project">Delete project</string>
     <string name="image_editor_delete_project_confirm">Delete this image project and all its layers?</string>
+    <string name="image_editor_shapes">Shapes</string>
+    <string name="image_editor_layer_order">Layer order</string>
 </resources>

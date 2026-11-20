@@ -78,4 +78,6 @@
     <string name="image_editor_canvas">圖片畫布</string>
     <string name="image_editor_delete_project">刪除專案</string>
     <string name="image_editor_delete_project_confirm">刪除此圖片專案及其全部圖層？</string>
+    <string name="image_editor_shapes">形狀</string>
+    <string name="image_editor_layer_order">層級</string>
 </resources>

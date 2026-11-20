@@ -28,6 +28,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.ismartcoding.plain.ui.base.BottomSpace
 import com.ismartcoding.plain.ui.base.NoDataColumn
+import com.ismartcoding.plain.ui.components.confirmActionAsync
 import com.ismartcoding.plain.ui.components.PCapsuleMoreClose
 import com.ismartcoding.plain.ui.base.PScaffold
 import com.ismartcoding.plain.ui.base.PTopAppBar
@@ -102,6 +103,16 @@ fun ImageEditorListPage(
                             ImageEditorProjectListItem(
                                 project = project,
                                 onClick = { navController.navigate(Routing.ImageEditorDetail(project.id)) },
+                                onDelete = {
+                                    scope.launch {
+                                        confirmActionAsync(
+                                            Res.string.delete,
+                                            Res.string.confirm_to_delete,
+                                            danger = true,
+                                            callback = { vm.deleteProject(project.id) },
+                                        )
+                                    }
+                                },
                             )
                             VerticalSpace(dp = 8.dp)
                         }

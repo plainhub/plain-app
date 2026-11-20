@@ -180,7 +180,7 @@ internal fun ImageEditorCanvas(
                                     }
                                     if (mode == DragMode.NONE) {
                                         previewId = generateId()
-                                        drawingLayer = createShape(tool, previewId, startPoint, startPoint, vm.color.value, vm.lineWidth.value)
+                                        drawingLayer = createShape(tool, previewId, startPoint, startPoint, vm.color.value, vm.lineWidth.value, vm.mosaicBlockSize.value)
                                     }
                                 }
                                 tool == ImageEditorTool.FREEHAND -> {
@@ -206,6 +206,7 @@ internal fun ImageEditorCanvas(
                                         end = startPoint,
                                         color = vm.color.value,
                                         lineWidth = vm.lineWidth.value,
+                                        mosaicBlockSize = vm.mosaicBlockSize.value,
                                     )
                                 }
                             }
@@ -286,7 +287,7 @@ internal fun ImageEditorCanvas(
                                             when (mode) {
                                                 DragMode.CROP_MOVE -> onCropChange(moveEditorCrop(checkNotNull(cropOriginal), point.x - startPoint.x, point.y - startPoint.y, vm.document.value.canvasSize))
                                                 DragMode.CROP_RESIZE -> onCropChange(resizeEditorCrop(checkNotNull(cropOriginal), checkNotNull(cropHandle), point, vm.document.value.canvasSize))
-                                                else -> drawingLayer = createShape(tool, checkNotNull(previewId), startPoint, point, vm.color.value, vm.lineWidth.value)
+                                                else -> drawingLayer = createShape(tool, checkNotNull(previewId), startPoint, point, vm.color.value, vm.lineWidth.value, vm.mosaicBlockSize.value)
                                             }
                                         }
                                         ImageEditorTool.FREEHAND -> {
@@ -309,6 +310,7 @@ internal fun ImageEditorCanvas(
                                                 end = cur,
                                                 color = vm.color.value,
                                                 lineWidth = vm.lineWidth.value,
+                                                mosaicBlockSize = vm.mosaicBlockSize.value,
                                             )
                                         }
                                     }
@@ -449,13 +451,14 @@ private fun DrawScope.drawDarkCheckerboard(w: Float, h: Float, tile: Float = 16f
     }
 }
 
-private fun createShape(
+internal fun createShape(
     tool: ImageEditorTool,
     id: String,
     start: Point,
     end: Point,
     color: String,
     lineWidth: Double,
+    mosaicBlockSize: Double,
 ): EditorLayer {
     val x1 = min(start.x, end.x)
     val y1 = min(start.y, end.y)
@@ -477,7 +480,7 @@ private fun createShape(
             id = id, x = x1, y = y1, w = w, h = h, color = color,
         )
         ImageEditorTool.MOSAIC -> MosaicLayer(
-            id = id, x = x1, y = y1, w = w, h = h,
+            id = id, x = x1, y = y1, w = w, h = h, blockSize = mosaicBlockSize,
         )
         else -> error("The selected tool does not create shapes")
     }

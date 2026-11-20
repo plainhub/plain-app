@@ -1,214 +1,116 @@
+@file:OptIn(androidx.compose.material3.ExperimentalMaterial3Api::class)
+
 package com.ismartcoding.plain.ui.images.editor
 
-import com.ismartcoding.plain.i18n.*
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.horizontalScroll
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.navigationBarsPadding
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Icon
+import androidx.compose.foundation.layout.*
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.rememberTextMeasurer
+import androidx.compose.ui.semantics.selected
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
+import com.ismartcoding.plain.i18n.*
+import com.ismartcoding.plain.lib.yjs.EditorLayer
+import com.ismartcoding.plain.lib.yjs.ImageLayer
+import com.ismartcoding.plain.lib.yjs.StickerLayer
+import com.ismartcoding.plain.lib.yjs.TextLayer
+import com.ismartcoding.plain.ui.base.PIconTextSmallButton
+import com.ismartcoding.plain.ui.base.PTextButton
+import com.ismartcoding.plain.ui.components.PIconButton
+import com.ismartcoding.plain.ui.resources.*
 import org.jetbrains.compose.resources.DrawableResource
-import org.jetbrains.compose.resources.StringResource
-import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
-import com.ismartcoding.plain.ui.images.editor.ImageEditorTool
-import com.ismartcoding.plain.ui.resources.image
-import com.ismartcoding.plain.ui.resources.scissors
 import com.ismartcoding.plain.ui.resources.Res as UiRes
-import com.ismartcoding.plain.ui.resources.arrow_up_right as ui_drawable_arrow_up_right
-import com.ismartcoding.plain.ui.resources.circle as ui_drawable_circle
-import com.ismartcoding.plain.ui.resources.grid_3x3 as ui_drawable_grid_3x3
-import com.ismartcoding.plain.ui.resources.highlighter as ui_drawable_highlighter
-import com.ismartcoding.plain.ui.resources.layers as ui_drawable_layers
-import com.ismartcoding.plain.ui.resources.looks_one as ui_drawable_looks_one
-import com.ismartcoding.plain.ui.resources.looks_two as ui_drawable_looks_two
-import com.ismartcoding.plain.ui.resources.mouse_pointer as ui_drawable_mouse_pointer
-import com.ismartcoding.plain.ui.resources.pen as ui_drawable_pen
-import com.ismartcoding.plain.ui.resources.square as ui_drawable_square
-import com.ismartcoding.plain.ui.resources.sticky_note as ui_drawable_sticky_note
-import com.ismartcoding.plain.ui.resources.trash_2 as ui_drawable_trash_2
-import com.ismartcoding.plain.ui.resources.type as ui_drawable_type
-import com.ismartcoding.plain.i18n.type
-import androidx.compose.material3.IconButton
-
-private data class ToolItem(
-    val tool: ImageEditorTool,
-    val icon: DrawableResource,
-    val labelRes: StringResource,
-)
-
-private val TOOL_LIST_1 = listOf(
-    ToolItem(ImageEditorTool.SELECT, UiRes.drawable.ui_drawable_mouse_pointer, Res.string.image_editor_tool_select),
-    ToolItem(ImageEditorTool.CROP, UiRes.drawable.scissors, Res.string.image_editor_crop),
-    ToolItem(ImageEditorTool.FREEHAND, UiRes.drawable.ui_drawable_pen, Res.string.image_editor_tool_freehand),
-    ToolItem(ImageEditorTool.ARROW, UiRes.drawable.ui_drawable_arrow_up_right, Res.string.image_editor_tool_arrow),
-    ToolItem(ImageEditorTool.RECT, UiRes.drawable.ui_drawable_square, Res.string.image_editor_tool_rect),
-    ToolItem(ImageEditorTool.ELLIPSE, UiRes.drawable.ui_drawable_circle, Res.string.image_editor_tool_ellipse),
-)
-
-private val TOOL_LIST_2 = listOf(
-    ToolItem(ImageEditorTool.HIGHLIGHT, UiRes.drawable.ui_drawable_highlighter, Res.string.image_editor_tool_highlight),
-    ToolItem(ImageEditorTool.MOSAIC, UiRes.drawable.ui_drawable_grid_3x3, Res.string.image_editor_tool_mosaic),
-    ToolItem(ImageEditorTool.TEXT, UiRes.drawable.ui_drawable_type, Res.string.image_editor_tool_text),
-    ToolItem(ImageEditorTool.STICKER, UiRes.drawable.ui_drawable_sticky_note, Res.string.image_editor_tool_sticker),
-)
 
 @Composable
-fun ImageEditorBottomAppBar(
-    currentTool: ImageEditorTool,
+internal fun ImageEditorBottomAppBar(
+    vm: ImageEditorEditViewModel,
+    selectedLayer: EditorLayer?,
     onToolSelected: (ImageEditorTool) -> Unit,
-    onAddImage: () -> Unit,
-    onClear: () -> Unit,
-    onLayerPanel: () -> Unit,
+    onGroup: (EditorToolGroup) -> Unit,
+    onStyle: () -> Unit,
+    onEditText: () -> Unit,
+    onReplaceImage: () -> Unit,
+    onOrder: () -> Unit,
+    cropActions: @Composable () -> Unit,
 ) {
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .background(MaterialTheme.colorScheme.surfaceContainer)
-            .navigationBarsPadding(),
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(56.dp),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            val scrollState = rememberScrollState()
-            val toolsLabel = stringResource(Res.string.image_editor_tools)
-            Row(
-                modifier = Modifier
-                    .weight(1f)
-                    .horizontalScroll(scrollState)
-                    .semantics { contentDescription = toolsLabel }
-                    .padding(horizontal = 4.dp),
-                horizontalArrangement = Arrangement.spacedBy(4.dp),
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                val toolList = TOOL_LIST_1 + TOOL_LIST_2
-                toolList.forEach { item ->
-                    ToolButton(
-                        item = item,
-                        selected = currentTool == item.tool,
-                        onClick = { onToolSelected(item.tool) },
-                    )
+    Column(Modifier.fillMaxWidth().background(MaterialTheme.colorScheme.surfaceContainer).navigationBarsPadding()) {
+        Row(Modifier.fillMaxWidth().padding(horizontal = 8.dp), verticalAlignment = Alignment.CenterVertically) {
+            PIconButton(UiRes.drawable.undo, contentDescription = stringResource(Res.string.undo), enabled = vm.canUndo.value, click = vm::undo)
+            PIconButton(UiRes.drawable.redo, contentDescription = stringResource(Res.string.redo), enabled = vm.canRedo.value, click = vm::redo)
+            Spacer(Modifier.weight(1f))
+            PTextButton(stringResource(Res.string.image_editor_layers), { vm.showLayerPanel.value = true })
+        }
+        if (selectedLayer != null) {
+            Row(Modifier.fillMaxWidth().padding(horizontal = 16.dp), verticalAlignment = Alignment.CenterVertically) {
+                Text(editorLayerTitle(selectedLayer), style = MaterialTheme.typography.titleSmall, modifier = Modifier.weight(1f))
+                PTextButton(stringResource(Res.string.done), { vm.selectLayer(null); vm.currentTool.value = ImageEditorTool.SELECT })
+            }
+            EditorActions(buildList {
+                when (selectedLayer) {
+                    is TextLayer, is StickerLayer -> add(EditorAction(UiRes.drawable.type, stringResource(Res.string.edit), onClick = onEditText))
+                    is ImageLayer -> add(EditorAction(UiRes.drawable.image, stringResource(Res.string.image_editor_replace_image), onClick = onReplaceImage))
+                    else -> Unit
                 }
-                ActionButton(UiRes.drawable.image, stringResource(Res.string.image_editor_add_image), true, onAddImage)
-                run {
-                    ActionButton(
-                        icon = UiRes.drawable.ui_drawable_trash_2,
-                        label = stringResource(Res.string.image_editor_clear_all),
-                        enabled = true,
-                        onClick = onClear,
-                    )
-                    ActionButton(
-                        icon = UiRes.drawable.ui_drawable_layers,
-                        label = stringResource(Res.string.image_editor_layers),
-                        enabled = true,
-                        onClick = onLayerPanel,
-                    )
+                add(EditorAction(UiRes.drawable.settings, stringResource(Res.string.style), onClick = onStyle))
+                add(EditorAction(UiRes.drawable.copy, stringResource(Res.string.image_editor_duplicate_layer), onClick = { vm.duplicateLayer(selectedLayer.id) }))
+                add(EditorAction(UiRes.drawable.layers, stringResource(Res.string.image_editor_layer_order), onClick = onOrder))
+                add(EditorAction(UiRes.drawable.trash_2, stringResource(Res.string.delete), onClick = { vm.deleteLayer(selectedLayer.id) }))
+            })
+        } else {
+            val tool = vm.currentTool.value
+            if (tool in listOf(ImageEditorTool.FREEHAND, ImageEditorTool.HIGHLIGHT, ImageEditorTool.ARROW, ImageEditorTool.RECT, ImageEditorTool.ELLIPSE, ImageEditorTool.MOSAIC)) {
+                Row(Modifier.fillMaxWidth().padding(horizontal = 16.dp), verticalAlignment = Alignment.CenterVertically) {
+                    Text(stringResource(editorToolLabel(tool)), style = MaterialTheme.typography.titleSmall, modifier = Modifier.weight(1f))
+                    PTextButton(stringResource(Res.string.style), onStyle)
                 }
             }
-
+            if (tool == ImageEditorTool.CROP) cropActions()
+            else {
+                EditorActions(listOf(
+                    EditorAction(UiRes.drawable.mouse_pointer, stringResource(Res.string.image_editor_tool_select), tool == ImageEditorTool.SELECT) { onToolSelected(ImageEditorTool.SELECT) },
+                    EditorAction(UiRes.drawable.pen, stringResource(Res.string.image_editor_tool_freehand), tool in listOf(ImageEditorTool.FREEHAND, ImageEditorTool.HIGHLIGHT)) { onGroup(EditorToolGroup.BRUSH) },
+                    EditorAction(UiRes.drawable.square, stringResource(Res.string.image_editor_shapes), tool in listOf(ImageEditorTool.ARROW, ImageEditorTool.RECT, ImageEditorTool.ELLIPSE)) { onGroup(EditorToolGroup.SHAPES) },
+                    EditorAction(UiRes.drawable.type, stringResource(Res.string.image_editor_tool_text), tool == ImageEditorTool.TEXT) { onToolSelected(ImageEditorTool.TEXT) },
+                    EditorAction(UiRes.drawable.grid_3x3, stringResource(Res.string.image_editor_tool_mosaic), tool == ImageEditorTool.MOSAIC) { onToolSelected(ImageEditorTool.MOSAIC) },
+                    EditorAction(UiRes.drawable.more_horiz, stringResource(Res.string.more), tool == ImageEditorTool.STICKER) { onGroup(EditorToolGroup.MORE) },
+                ))
+            }
         }
     }
 }
 
-@Composable
-private fun ToolButton(
-    item: ToolItem,
-    selected: Boolean,
-    onClick: () -> Unit,
-) {
-    val containerColor = if (selected) {
-        MaterialTheme.colorScheme.primary.copy(alpha = 0.15f)
-    } else {
-        Color.Transparent
-    }
-    val tint = if (selected) {
-        MaterialTheme.colorScheme.primary
-    } else {
-        MaterialTheme.colorScheme.onSurfaceVariant
-    }
-    Column(
-        modifier = Modifier
-            .width(64.dp)
-            .clip(RoundedCornerShape(8.dp))
-            .background(containerColor)
-            .clickable { onClick() }
-            .padding(vertical = 4.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(4.dp),
-    ) {
-        Icon(
-            painter = painterResource(item.icon),
-            contentDescription = stringResource(item.labelRes),
-            tint = tint,
-            modifier = Modifier.size(24.dp),
-        )
-        Text(
-            text = stringResource(item.labelRes),
-            style = MaterialTheme.typography.labelSmall,
-            color = tint,
-            maxLines = 1,
-        )
-    }
-}
+private data class EditorAction(val icon: DrawableResource, val label: String, val selected: Boolean = false, val onClick: () -> Unit)
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
-private fun ActionButton(
-    icon: DrawableResource,
-    label: String,
-    enabled: Boolean,
-    onClick: () -> Unit,
-) {
-    val tint = if (enabled) {
-        MaterialTheme.colorScheme.onSurfaceVariant
-    } else {
-        MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.38f)
-    }
-    Column(
-        modifier = Modifier
-            .width(64.dp)
-            .clip(RoundedCornerShape(8.dp))
-            .clickable(enabled = enabled) { onClick() }
-            .padding(vertical = 4.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(4.dp),
-    ) {
-        Icon(
-            painter = painterResource(icon),
-            contentDescription = label,
-            tint = tint,
-            modifier = Modifier.size(24.dp),
-        )
-        Text(
-            text = label,
-            style = MaterialTheme.typography.labelSmall,
-            color = tint,
-            maxLines = 1,
-        )
+private fun EditorActions(actions: List<EditorAction>) {
+    val measurer = rememberTextMeasurer()
+    val density = LocalDensity.current
+    val style = MaterialTheme.typography.labelSmall
+    val labelWidth = actions.maxOf { action -> action.label.split(' ').maxOf { measurer.measure(AnnotatedString(it), style).size.width } }
+    val itemWidth = maxOf(48.dp, with(density) { labelWidth.toDp() } + 8.dp)
+    BoxWithConstraints(Modifier.fillMaxWidth().padding(horizontal = 8.dp)) {
+        val fitting = (maxWidth / itemWidth).toInt().coerceAtLeast(1)
+        val columns = if (fitting >= actions.size) actions.size else minOf(3, fitting)
+        FlowRow(maxItemsInEachRow = columns, verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            actions.forEach { action ->
+                PIconTextSmallButton(
+                    icon = action.icon,
+                    text = action.label,
+                    modifier = Modifier.weight(1f).heightIn(min = 64.dp).clip(MaterialTheme.shapes.small)
+                        .background(if (action.selected) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surfaceContainer)
+                        .semantics { selected = action.selected },
+                    onClick = action.onClick,
+                )
+            }
+        }
     }
 }
