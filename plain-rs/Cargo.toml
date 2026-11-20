@@ -17,6 +17,7 @@ tokio = { version = "1", features = ["rt-multi-thread", "sync"] }
 plain-server = { git = "https://github.com/plainhub/plain-core.git", branch = "main", default-features = false, features = ["media"] }
 
 [target.'cfg(target_os = "android")'.dependencies]
+plain-rs = { git = "https://github.com/plainhub/plain-core.git", branch = "main", default-features = false, features = ["media"] }
 jni = "0.22"
 
 [profile.dev]
