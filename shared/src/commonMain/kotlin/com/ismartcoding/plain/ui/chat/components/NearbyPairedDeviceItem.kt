@@ -36,7 +36,7 @@ import org.jetbrains.compose.resources.stringResource
 @Composable
 fun NearbyPairedDeviceItem(peer: Peer, device: NearbyDevice?, onPair: (NearbyDevice) -> Unit) {
     var showMenu by remember(peer.id) { mutableStateOf(false) }
-    val status = NearbyViewModel.getStatus(peer.id, true)
+    val isUnpairing = NearbyViewModel.itemStatus[peer.id] == NearbyItemStatus.UNPAIRING
     val selected = MainViewModel.selectedDevice.value?.peerId == peer.id
     val unpairText = stringResource(Res.string.unpair)
     val actions = pairedDeviceActions(peer, selected)
@@ -84,7 +84,7 @@ fun NearbyPairedDeviceItem(peer: Peer, device: NearbyDevice?, onPair: (NearbyDev
                     PDropdownMenu(expanded = showMenu, onDismissRequest = { showMenu = false }) {
                         if (peer.token.isEmpty() && !selected) PDropdownMenuItem(
                             text = { Text(stringResource(Res.string.pair_full_control)) },
-                            enabled = status != NearbyItemStatus.UNPAIRING && peer.online && device?.remoteAccess == true,
+                            enabled = !isUnpairing && peer.online && device?.remoteAccess == true,
                             onClick = {
                                 showMenu = false
                                 device?.let(onPair)

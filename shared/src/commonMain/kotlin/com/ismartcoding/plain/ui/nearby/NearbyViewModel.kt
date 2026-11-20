@@ -110,15 +110,6 @@ object NearbyViewModel {
         }
     }
 
-    fun getStatus(deviceId: String, isPaired: Boolean): NearbyItemStatus {
-        return when (itemStatus[deviceId]) {
-            NearbyItemStatus.UNPAIRING -> NearbyItemStatus.UNPAIRING
-            NearbyItemStatus.STARTING -> NearbyItemStatus.STARTING
-            NearbyItemStatus.PAIRING -> if (isPaired) NearbyItemStatus.PAIRED else NearbyItemStatus.PAIRING
-            else -> if (isPaired) NearbyItemStatus.PAIRED else NearbyItemStatus.UNPAIRED
-        }
-    }
-
     fun handlePairingSuccess(deviceId: String) {
         itemStatus[deviceId] = NearbyItemStatus.PAIRED
     }

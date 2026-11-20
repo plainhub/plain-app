@@ -137,7 +137,6 @@ fun NearbyPage(
     PScaffold(
         topBar = {
             PTopAppBar(
-                onNavigateBack = { navController.navigateUp() },
                 navigationIcon = {
                     NavigationBackIcon { navController.navigateUp() }
                 },
@@ -167,22 +166,7 @@ fun NearbyPage(
                 item { NearbyLocalNetworkNotice(lanPermission) }
             }
             item(key = "local") {
-                val localName by Prefs.deviceName.collectAsState()
-                val isCurrent = MainViewModel.selectedDevice.value == null
-                PListItem(
-                    modifier = PlainTheme.getCardModifier(),
-                    title = localName.ifEmpty { getDeviceName() },
-                    subtitle = stringResource(Res.string.this_device),
-                    start = { PeerIconWithStatus(getDeviceType().getIcon(), null) },
-                    titleSuffix = if (isCurrent) { { CurrentDeviceIcon() } } else null,
-                    action = {
-                        if (!isCurrent) PIconButton(
-                            Res.drawable.arrow_left_right,
-                            contentDescription = stringResource(Res.string.nearby_switch_device),
-                            click = { MainViewModel.selectDevice(null) },
-                        )
-                    },
-                )
+                LocalDeviceItem()
                 VerticalSpace(8.dp)
             }
             if (peers.isNotEmpty()) {
@@ -227,6 +211,26 @@ fun NearbyPage(
             }
         }
     }
+}
+
+@Composable
+private fun LocalDeviceItem() {
+    val localName by Prefs.deviceName.collectAsState()
+    val isCurrent = MainViewModel.selectedDevice.value == null
+    PListItem(
+        modifier = PlainTheme.getCardModifier(),
+        title = localName.ifEmpty { getDeviceName() },
+        subtitle = stringResource(Res.string.this_device),
+        start = { PeerIconWithStatus(getDeviceType().getIcon(), null) },
+        titleSuffix = if (isCurrent) { { CurrentDeviceIcon() } } else null,
+        action = {
+            if (!isCurrent) PIconButton(
+                Res.drawable.arrow_left_right,
+                contentDescription = stringResource(Res.string.nearby_switch_device),
+                click = { MainViewModel.selectDevice(null) },
+            )
+        },
+    )
 }
 
 @Composable

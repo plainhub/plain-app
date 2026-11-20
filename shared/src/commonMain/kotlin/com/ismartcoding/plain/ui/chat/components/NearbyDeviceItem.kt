@@ -20,7 +20,7 @@ import org.jetbrains.compose.resources.stringResource
 fun NearbyDeviceItem(item: NearbyDevice, enabled: Boolean, onPair: () -> Unit) {
     val pairing = NearbyViewModel.pairingViews[item.id]
     val pending = pairing?.active == true
-    val status = NearbyViewModel.getStatus(item.id, false)
+    val isUnpairing = NearbyViewModel.itemStatus[item.id] == NearbyItemStatus.UNPAIRING
     PListItem(
         modifier = PlainTheme.getCardModifier().testTag("nearby-device:${item.id}"),
         title = item.name,
@@ -37,7 +37,7 @@ fun NearbyDeviceItem(item: NearbyDevice, enabled: Boolean, onPair: () -> Unit) {
                     else -> Res.string.pair_chat_only
                 }),
                 buttonSize = ButtonSize.SMALL,
-                enabled = enabled && status != NearbyItemStatus.UNPAIRING,
+                enabled = enabled && !isUnpairing,
                 onClick = { if (pending) NearbyViewModel.cancelPairing(item.id) else onPair() },
             )
         },
