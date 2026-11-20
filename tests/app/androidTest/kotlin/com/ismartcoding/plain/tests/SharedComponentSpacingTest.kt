@@ -279,11 +279,14 @@ class SharedComponentSpacingTest {
         await { nodes().any { it.config.getOrNull(SemanticsProperties.TestTag) == "fix-action" } }
         val action = tagged("fix-action").touchBoundsInRoot
         val alert = tagged("with-button").boundsInRoot
+        val message = text("Network permission is needed to find nearby devices.").boundsInRoot
+        assertEquals(8f, message.top - alert.top, 1f)
+        assertEquals(0f, action.top - message.bottom, 0.5f)
         assertTrue("action touch height: ${action.height}", action.height >= 48f)
         assertEquals(4f, alert.bottom - action.bottom, 0.5f)
         val plain = tagged("without-button").boundsInRoot
         assertEquals(plain.height, tagged("empty-button").boundsInRoot.height, 0.5f)
-        assertEquals(12f, tagged("with-detail").boundsInRoot.bottom - tagged("detail-content").boundsInRoot.bottom, 0.5f)
+        assertEquals(8f, tagged("with-detail").boundsInRoot.bottom - tagged("detail-content").boundsInRoot.bottom, 0.5f)
     }
 
     @Test
