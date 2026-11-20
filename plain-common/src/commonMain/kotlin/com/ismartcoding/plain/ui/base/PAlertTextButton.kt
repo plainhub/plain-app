@@ -67,7 +67,7 @@ fun PAlertTextButton(
             contentAlignment = Alignment.CenterEnd,
         ) {
             Box(Modifier.matchParentSize().clip(CircleShape).indication(interactionSource, ripple()))
-            Box(Modifier.padding(start = Spacing.xl)) {
+            Box(Modifier.padding(horizontal = Spacing.sm)) {
                 ButtonContent(text = text, icon = null, size = size, loading = isLoading)
             }
         }

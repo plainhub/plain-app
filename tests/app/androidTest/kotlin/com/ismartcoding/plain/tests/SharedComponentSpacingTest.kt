@@ -298,6 +298,9 @@ class SharedComponentSpacingTest {
         assertEquals(32f, tagged("fix-action").boundsInRoot.height, 0.5f)
         assertEquals(48f, tagged("regular-action").touchBoundsInRoot.height, 0.5f)
         assertEquals(4f, alert.bottom - action.bottom, 0.5f)
+        assertEquals(8f, alert.right - action.right, 0.5f)
+        assertEquals(8f, alert.right - message.right, 0.5f)
+        assertEquals(8f, action.right - text("Fix now").boundsInRoot.right, 0.5f)
         assertEquals(16f, alert.right - text("Fix now").boundsInRoot.right, 0.5f)
         val plain = tagged("without-button").boundsInRoot
         assertEquals(plain.height, tagged("empty-button").boundsInRoot.height, 0.5f)
@@ -315,7 +318,8 @@ class SharedComponentSpacingTest {
         await { nodes().any { it.config.getOrNull(SemanticsProperties.TestTag) == "rtl-action" } }
         val alert = tagged("rtl-alert").boundsInRoot
         val action = tagged("rtl-action").touchBoundsInRoot
-        assertEquals(16f, action.left - alert.left, 0.5f)
+        assertEquals(8f, action.left - alert.left, 0.5f)
+        assertEquals(8f, text("OK").boundsInRoot.left - action.left, 0.5f)
         assertEquals(16f, text("OK").boundsInRoot.left - alert.left, 0.5f)
         assertEquals(4f, alert.bottom - action.bottom, 0.5f)
     }

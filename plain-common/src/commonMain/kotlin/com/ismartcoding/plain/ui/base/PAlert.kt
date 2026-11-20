@@ -82,7 +82,7 @@ fun PAlert(
         AlertLayout(
             modifier = Modifier
                 .then(if (onClick != null) Modifier.clip(shape).clickable(onClick = onClick) else Modifier)
-                .padding(horizontal = Spacing.lg),
+                .padding(start = Spacing.lg, end = Spacing.sm),
             header = {
                 Row(verticalAlignment = Alignment.Top, horizontalArrangement = Arrangement.spacedBy(Spacing.sm)) {
                     Icon(
