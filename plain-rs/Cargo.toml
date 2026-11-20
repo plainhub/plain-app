@@ -10,7 +10,7 @@ crate-type = ["cdylib", "staticlib"]
 [dependencies]
 plain-libs = { git = "https://github.com/plainhub/plain-core.git", branch = "main", default-features = false }
 plain-server = { git = "https://github.com/plainhub/plain-core.git", branch = "main", default-features = false, features = ["core", "http_transport"] }
-plain-rs = { git = "https://github.com/plainhub/plain-core.git", branch = "main", default-features = false, features = ["ble-native", "prefs"] }
+plain-rs = { git = "https://github.com/plainhub/plain-core.git", branch = "main", default-features = false, features = ["ai-image-search", "ble-native", "prefs"] }
 tokio = { version = "1", features = ["rt-multi-thread", "sync"] }
 
 [target.'cfg(target_os = "ios")'.dependencies]
