@@ -16,10 +16,10 @@ import com.ismartcoding.plain.i18n.*
 import com.ismartcoding.plain.platform.system.supportsBackgroundService
 import com.ismartcoding.plain.ui.base.AlertType
 import com.ismartcoding.plain.ui.base.PAlert
+import com.ismartcoding.plain.ui.base.PAlertTextButton
 import com.ismartcoding.plain.ui.base.PExpandableSection
 import com.ismartcoding.plain.ui.base.PFilledButton
 import com.ismartcoding.plain.ui.components.ButtonType
-import com.ismartcoding.plain.ui.base.PTextButton
 import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.theme.tipsText
 import org.jetbrains.compose.resources.stringResource
@@ -34,7 +34,7 @@ fun PlainAppServiceSection(
         if (errorMessage.isNotEmpty()) {
             PAlert(description = errorMessage, type = AlertType.ERROR, modifier = Modifier.padding(start = 16.dp, end = 16.dp, bottom = 8.dp)) {
                 if (onRetry != null) {
-                    PTextButton(
+                    PAlertTextButton(
                         text = stringResource(Res.string.retry),
                         contentColor = MaterialTheme.colorScheme.onErrorContainer,
                         onClick = onRetry,

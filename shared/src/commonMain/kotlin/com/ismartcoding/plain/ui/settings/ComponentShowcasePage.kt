@@ -22,6 +22,7 @@ import com.ismartcoding.plain.i18n.settings
 import com.ismartcoding.plain.ui.base.AlertType
 import com.ismartcoding.plain.ui.base.BottomSpace
 import com.ismartcoding.plain.ui.base.PAlert
+import com.ismartcoding.plain.ui.base.PAlertTextButton
 import com.ismartcoding.plain.ui.base.PBanner
 import com.ismartcoding.plain.ui.base.PCard
 import com.ismartcoding.plain.ui.base.PFilledButton
@@ -29,7 +30,6 @@ import com.ismartcoding.plain.ui.base.PFilterChip
 import com.ismartcoding.plain.ui.base.PListItem
 import com.ismartcoding.plain.ui.base.POutlinedButton
 import com.ismartcoding.plain.ui.base.PScaffold
-import com.ismartcoding.plain.ui.base.PTextButton
 import com.ismartcoding.plain.ui.base.PTopAppBar
 import com.ismartcoding.plain.ui.base.PSectionTitle
 import com.ismartcoding.plain.ui.base.Tips
@@ -81,7 +81,7 @@ private fun ShowcaseAlerts() {
     PAlert(description = "This is an info alert.", type = AlertType.INFO, modifier = Modifier.padding(horizontal = 16.dp))
     VerticalSpace(8.dp)
     PAlert(description = "Alert with action.", type = AlertType.WARNING, modifier = Modifier.padding(horizontal = 16.dp)) {
-        PTextButton(text = "Fix Now", buttonSize = ButtonSize.SMALL, onClick = {})
+        PAlertTextButton(text = "Fix Now", onClick = {})
     }
     VerticalSpace(16.dp)
 }

@@ -19,7 +19,6 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.ismartcoding.plain.features.chat.peer.PeerStatusClient
 import com.ismartcoding.plain.platform.system.AppFeatureType
-import com.ismartcoding.plain.ui.components.ButtonSize
 import com.ismartcoding.plain.platform.system.has
 import com.ismartcoding.plain.events.OpenNotificationSettingsEvent
 import com.ismartcoding.plain.events.PermissionsResultEvent
@@ -37,8 +36,8 @@ import com.ismartcoding.plain.platform.permissions.isGranted
 import com.ismartcoding.plain.ui.base.AlertType
 import com.ismartcoding.plain.ui.base.BottomSpace
 import com.ismartcoding.plain.ui.base.PAlert
+import com.ismartcoding.plain.ui.base.PAlertTextButton
 import com.ismartcoding.plain.ui.base.PCard
-import com.ismartcoding.plain.ui.base.PTextButton
 import com.ismartcoding.plain.ui.base.TopSpace
 import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.base.pullrefresh.PullToRefresh
@@ -175,9 +174,8 @@ private fun PermissionWarning(description: String, tag: String, onGrant: () -> U
         type = AlertType.WARNING,
         modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN).testTag(tag),
     ) {
-        PTextButton(
+        PAlertTextButton(
             text = stringResource(Res.string.grant_permission),
-            buttonSize = ButtonSize.SMALL,
             contentColor = MaterialTheme.colorScheme.onWarningContainer,
             onClick = onGrant,
         )

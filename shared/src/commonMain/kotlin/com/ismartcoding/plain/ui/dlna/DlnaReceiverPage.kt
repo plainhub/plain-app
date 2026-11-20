@@ -23,14 +23,13 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.ismartcoding.plain.Prefs
-import com.ismartcoding.plain.ui.components.ButtonSize
 import com.ismartcoding.plain.features.dlna.DlnaRendererState
 import com.ismartcoding.plain.ui.base.AlertType
 import com.ismartcoding.plain.ui.base.BottomSpace
 import com.ismartcoding.plain.ui.base.PAlert
+import com.ismartcoding.plain.ui.base.PAlertTextButton
 import com.ismartcoding.plain.ui.base.PCard
 import com.ismartcoding.plain.ui.base.PFilledButton
-import com.ismartcoding.plain.ui.base.PTextButton
 import com.ismartcoding.plain.ui.components.PIconButton
 import com.ismartcoding.plain.ui.base.PScaffold
 import com.ismartcoding.plain.ui.base.PTopAppBar
@@ -73,9 +72,8 @@ fun DlnaReceiverPage(navController: NavHostController) {
                         description = startError,
                         type = AlertType.ERROR,
                         actions = {
-                            PTextButton(
+                            PAlertTextButton(
                                 stringResource(Res.string.retry),
-                                buttonSize = ButtonSize.SMALL,
                                 isLoading = isRetrying,
                                 onClick = { DlnaRendererState.retry() }
                             )

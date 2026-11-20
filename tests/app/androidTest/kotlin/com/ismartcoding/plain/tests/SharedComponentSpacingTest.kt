@@ -39,6 +39,7 @@ import androidx.test.platform.app.InstrumentationRegistry
 import com.ismartcoding.plain.MainActivity
 import com.ismartcoding.plain.ui.base.AlertType
 import com.ismartcoding.plain.ui.base.PAlert
+import com.ismartcoding.plain.ui.base.PAlertTextButton
 import com.ismartcoding.plain.ui.base.PTextButton
 import com.ismartcoding.plain.ui.base.PBottomSheetTopAppBar
 import com.ismartcoding.plain.ui.base.PSheetPrimaryActionsCard
@@ -266,15 +267,16 @@ class SharedComponentSpacingTest {
     }
 
     @Test
-    fun alertKeepsButtonTouchSizeWithoutAnExtraBottomGutter() = render({
+    fun alertTextActionUsesA32DpTouchTarget() = render({
         PAlert("Network permission is needed to find nearby devices.", AlertType.WARNING, Modifier.testTag("with-button")) {
-            PTextButton("Fix now", {}, Modifier.testTag("fix-action"), buttonSize = ButtonSize.SMALL)
+            PAlertTextButton("Fix now", {}, Modifier.testTag("fix-action"))
         }
         PAlert("No alert action", AlertType.INFO, Modifier.testTag("without-button"))
         PAlert("No alert action", AlertType.INFO, Modifier.testTag("empty-button"), actions = {}, content = {})
         PAlert("More details", AlertType.ERROR, Modifier.testTag("with-detail"), content = {
             Text("Description", Modifier.testTag("detail-content"))
         })
+        PTextButton("Outside alert", {}, Modifier.testTag("regular-action"), buttonSize = ButtonSize.SMALL)
     }) {
         await { nodes().any { it.config.getOrNull(SemanticsProperties.TestTag) == "fix-action" } }
         val action = tagged("fix-action").touchBoundsInRoot
@@ -282,7 +284,9 @@ class SharedComponentSpacingTest {
         val message = text("Network permission is needed to find nearby devices.").boundsInRoot
         assertEquals(8f, message.top - alert.top, 1f)
         assertEquals(0f, action.top - message.bottom, 0.5f)
-        assertTrue("action touch height: ${action.height}", action.height >= 48f)
+        assertEquals(32f, action.height, 0.5f)
+        assertEquals(32f, tagged("fix-action").boundsInRoot.height, 0.5f)
+        assertEquals(48f, tagged("regular-action").touchBoundsInRoot.height, 0.5f)
         assertEquals(4f, alert.bottom - action.bottom, 0.5f)
         val plain = tagged("without-button").boundsInRoot
         assertEquals(plain.height, tagged("empty-button").boundsInRoot.height, 0.5f)
@@ -293,7 +297,7 @@ class SharedComponentSpacingTest {
     fun alertKeepsActionsAtTheLogicalEndInRtl() = render({
         CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
             PAlert("Network permission is needed to find nearby devices.", AlertType.ERROR, Modifier.testTag("rtl-alert")) {
-                PTextButton("Configure now", {}, Modifier.testTag("rtl-action"), buttonSize = ButtonSize.SMALL)
+                PAlertTextButton("Configure now", {}, Modifier.testTag("rtl-action"))
             }
         }
     }) {

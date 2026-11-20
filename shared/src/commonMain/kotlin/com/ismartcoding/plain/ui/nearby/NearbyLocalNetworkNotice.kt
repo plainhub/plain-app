@@ -19,8 +19,7 @@ import com.ismartcoding.plain.platform.permissions.shouldShowRationale
 import com.ismartcoding.plain.platform.system.openAppSettings
 import com.ismartcoding.plain.ui.base.AlertType
 import com.ismartcoding.plain.ui.base.PAlert
-import com.ismartcoding.plain.ui.base.PTextButton
-import com.ismartcoding.plain.ui.components.ButtonSize
+import com.ismartcoding.plain.ui.base.PAlertTextButton
 import org.jetbrains.compose.resources.stringResource
 
 @Composable
@@ -38,9 +37,8 @@ internal fun NearbyLocalNetworkNotice(permission: Permission) {
         type = AlertType.WARNING,
         modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
     ) {
-        PTextButton(
+        PAlertTextButton(
             text = stringResource(if (settingsRequired) Res.string.open_settings else Res.string.nearby_lan_allow),
-            buttonSize = ButtonSize.SMALL,
             onClick = {
                 if (settingsRequired) openAppSettings() else sendEvent(RequestPermissionsEvent(permission))
             },

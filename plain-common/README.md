@@ -47,7 +47,7 @@ For a local Maven cache, run `./gradlew :plain-common:publishToMavenLocal`.
 Shared Compose Multiplatform components in `com.ismartcoding.plain.ui`.
 This is the component selection entry point for PlainApp and PlainNet (plain-router-app).
 
-Readable UI text has a minimum size of 14sp, including supporting text, timestamps, navigation labels and button labels. Use the shared `MaterialTheme.typography` styles; do not shrink text to fit. Let labels wrap or adjust layout, and preserve system font scaling. Compact controls retain a 48dp touch target. Keep page calls to state, events and layout modifiers; shared visual defaults belong to components and the theme.
+Readable UI text has a minimum size of 14sp, including supporting text, timestamps, navigation labels and button labels. Use the shared `MaterialTheme.typography` styles; do not shrink text to fit. Let labels wrap or adjust layout, and preserve system font scaling. Compact controls retain a 48dp touch target unless the component specifies an exception. Keep page calls to state, events and layout modifiers; shared visual defaults belong to components and the theme.
 Before editing UI, choose the scene below, open its compiled example, and read the actual component signature. Pages compose existing components and connect state and events.
 
 | Scene | Use | Compiled example |
@@ -75,7 +75,7 @@ Use `AppTheme` as the complete theme entry. Keep the brand palette, soft dark te
 
 `NoDataColumn` is a static centered empty state with no internal scroll container; it can be placed inside an existing lazy-list item.
 
-`PAlert` owns 16dp horizontal and 8dp vertical content insets. Its decorative icon centers on the first rendered line of body text. Visible actions start immediately below the header and, when last, have a 4dp bottom inset. Button touch targets retain their standard size. Visible details have an 8dp gap above them. Empty or collapsed sections add no gap. Callers supply outer margins through their layout or the root modifier.
+`PAlert` owns 16dp horizontal and 8dp vertical content insets. Its decorative icon centers on the first rendered line of body text. Visible actions start immediately below the header and, when last, have a 4dp bottom inset. Use `PAlertTextButton` for text actions with a 32dp minimum touch height. Visible details have an 8dp gap above them. Empty or collapsed sections add no gap. Callers supply outer margins through their layout or the root modifier.
 
 Use the `PListItem` content-slot overload for a third description line or custom content. Slots supply text; the component provides the standard title, subtitle and description typography and owns line spacing, leading/trailing layout, dimming, and merged semantics. Rows own 16dp horizontal and 8dp vertical padding. Titles and subtitles have a 4dp gap; descriptions have an 8dp gap after a subtitle or 4dp after a title. The final text line adds no trailing gap, including key/value rows. Optional `minHeight` keeps compact rows; `statusColor` draws a 4dp stripe at the layout start. String and key/value calls retain their existing defaults.
 
