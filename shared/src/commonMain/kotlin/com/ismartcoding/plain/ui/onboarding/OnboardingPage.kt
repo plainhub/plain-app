@@ -45,18 +45,11 @@ fun OnboardingPage(navController: NavHostController) {
     PBackHandler { complete(false) }
     PScaffold { insets ->
         Column(Modifier.fillMaxSize().padding(insets).padding(horizontal = 24.dp)) {
-            Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween) {
-                Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-                    repeat(pages.pageCount) { index ->
-                        Spacer(Modifier.size(24.dp, 4.dp).background(
-                            if (index == pages.currentPage) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant,
-                            MaterialTheme.shapes.small,
-                        ))
-                    }
-                }
-                PTextButton(stringResource(Res.string.onboarding_skip), onClick = { complete(false) })
-            }
+            PTextButton(
+                text = stringResource(Res.string.onboarding_skip),
+                onClick = { complete(false) },
+                modifier = Modifier.align(Alignment.End),
+            )
             HorizontalPager(pages, Modifier.weight(1f)) { page ->
                 Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(vertical = 8.dp)) {
                     when (page) {
@@ -83,6 +76,14 @@ fun OnboardingPage(navController: NavHostController) {
                             }
                         }
                     }
+                }
+            }
+            Row(Modifier.align(Alignment.CenterHorizontally), horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                repeat(pages.pageCount) { index ->
+                    Spacer(Modifier.size(24.dp, 4.dp).background(
+                        if (index == pages.currentPage) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant,
+                        MaterialTheme.shapes.small,
+                    ))
                 }
             }
             val last = pages.currentPage == pages.pageCount - 1
