@@ -33,4 +33,18 @@
     <string name="onboarding_step3_desc">브라우저에 휴대폰 화면에 표시된 주소 입력</string>
     <string name="onboarding_revisit_hint">설정 → 사용 방법에서 언제든 이 소개를 다시 볼 수 있습니다</string>
     <string name="onboarding_replay">소개 다시 보기</string>
+    <string name="wizard_connect_body">두 기기를 같은 네트워크에 연결하세요. 휴대전화 홈 화면에서 원격 액세스를 켜고 표시된 주소를 컴퓨터 브라우저에 입력하세요.</string>
+    <string name="wizard_access_title">원격으로 접근할 기능 선택</string>
+    <string name="wizard_view_guide">사용 방법 보기</string>
+    <string name="wizard_example_address">예시 주소</string>
+    <string name="guide_enable">원격 액세스 켜기</string>
+    <string name="guide_enable_desc">홈 화면의 스위치를 켜면 아래에 주소가 표시됩니다.</string>
+    <string name="guide_address_desc">프로토콜과 표시된 포트 번호를 포함한 전체 주소를 입력하세요.</string>
+    <string name="guide_unreachable">같은 네트워크에 연결했는지, 원격 액세스가 켜져 있는지 확인하세요. 대체 주소가 있으면 사용해 보세요.</string>
+    <string name="guide_certificate">자체 서명 인증서를 사용하면 경고가 표시될 수 있습니다. HTTPS 주소가 휴대전화에 표시된 주소와 일치하는지 확인하세요.</string>
+    <string name="guide_missing_feature">기능이 보이지 않나요?</string>
+    <string name="guide_permissions">액세스 설정에서 기능이 켜져 있는지, 필요한 시스템 권한이 있는지 확인하세요.</string>
+    <string name="wizard_connect_title">컴퓨터에서 휴대폰 관리</string>
+    <string name="wizard_access_body">원격 클라이언트가 접근할 수 있는 휴대전화 데이터와 기능을 선택하세요.</string>
+    <string name="guide_connect">빠른 시작</string>
 </resources>

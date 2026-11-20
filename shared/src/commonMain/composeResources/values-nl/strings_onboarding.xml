@@ -33,4 +33,18 @@
     <string name="onboarding_step3_desc">Typ het adres van het telefoonscherm in de browser</string>
     <string name="onboarding_revisit_hint">Je kunt deze introductie op elk moment bekijken via Instellingen → Hoe te gebruiken</string>
     <string name="onboarding_replay">Introductie opnieuw bekijken</string>
+    <string name="wizard_connect_body">Verbind beide apparaten met hetzelfde netwerk. Schakel externe toegang in op het startscherm en open het getoonde adres in de browser op je computer.</string>
+    <string name="wizard_access_title">Kies wat toegankelijk is</string>
+    <string name="wizard_view_guide">Handleiding bekijken</string>
+    <string name="wizard_example_address">Voorbeeldadres</string>
+    <string name="guide_enable">Schakel externe toegang in</string>
+    <string name="guide_enable_desc">Gebruik de schakelaar op het startscherm. Het adres verschijnt eronder.</string>
+    <string name="guide_address_desc">Voer het volledige adres in, inclusief protocol en eventuele poort.</string>
+    <string name="guide_unreachable">Controleer het netwerk en de externe toegang. Probeer een ander adres als het startscherm dat toont.</string>
+    <string name="guide_certificate">Een zelfondertekend certificaat kan deze melding veroorzaken. Controleer of het HTTPS-adres overeenkomt met dat op de telefoon.</string>
+    <string name="guide_missing_feature">Waarom ontbreekt een functie?</string>
+    <string name="guide_permissions">Controleer de toegangsinstellingen en de vereiste systeemrechten.</string>
+    <string name="wizard_connect_title">Beheer je telefoon vanaf de computer</string>
+    <string name="wizard_access_body">Kies welke telefoongegevens en functies externe clients mogen gebruiken.</string>
+    <string name="guide_connect">Snelstart</string>
 </resources>

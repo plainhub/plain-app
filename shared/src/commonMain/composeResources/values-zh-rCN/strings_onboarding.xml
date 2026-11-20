@@ -33,4 +33,18 @@
     <string name="onboarding_step3_desc">浏览器输入手机屏幕上显示的网址</string>
     <string name="onboarding_revisit_hint">随时可在 设置 → 使用方法 重新查看</string>
     <string name="onboarding_replay">重新查看引导</string>
+    <string name="wizard_connect_title">在电脑上打开手机</string>
+    <string name="wizard_connect_body">让两台设备连上同一网络，在手机首页打开「远程访问」，然后在电脑浏览器输入首页显示的完整地址。</string>
+    <string name="wizard_access_title">决定哪些内容可以远程访问</string>
+    <string name="wizard_access_body">在首页打开「访问设置」，选择允许访问的功能。你也可以在这里管理会话和安全设置。</string>
+    <string name="wizard_view_guide">查看使用方法</string>
+    <string name="wizard_example_address">示例地址</string>
+    <string name="guide_connect">从电脑连接手机</string>
+    <string name="guide_enable">打开「远程访问」</string>
+    <string name="guide_enable_desc">在手机首页打开开关，查看下方的地址。</string>
+    <string name="guide_address_desc">输入完整地址，包括协议和显示的端口号。</string>
+    <string name="guide_unreachable">检查两台设备是否在同一网络、手机首页的「远程访问」是否已开启。有备用地址时，可展开「尝试其他地址」。</string>
+    <string name="guide_certificate">使用自签名证书时，浏览器可能显示警告。先核对浏览器中的 HTTPS 地址与手机首页显示的地址。</string>
+    <string name="guide_missing_feature">为什么看不到某项功能？</string>
+    <string name="guide_permissions">打开「访问设置」，检查是否允许远程访问该功能，以及手机是否已授予所需权限。</string>
 </resources>

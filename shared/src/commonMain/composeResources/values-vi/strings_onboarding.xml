@@ -33,4 +33,18 @@
     <string name="onboarding_step3_desc">Nhập vào trình duyệt địa chỉ hiển thị trên màn hình điện thoại</string>
     <string name="onboarding_revisit_hint">Bạn có thể xem lại phần giới thiệu này bất cứ lúc nào trong Cài đặt → Cách sử dụng</string>
     <string name="onboarding_replay">Xem lại phần giới thiệu</string>
+    <string name="wizard_connect_body">Kết nối hai thiết bị vào cùng mạng. Bật truy cập từ xa trên màn hình chính của điện thoại rồi mở địa chỉ hiển thị trong trình duyệt máy tính.</string>
+    <string name="wizard_access_title">Chọn nội dung cho phép truy cập</string>
+    <string name="wizard_view_guide">Xem hướng dẫn</string>
+    <string name="wizard_example_address">Địa chỉ ví dụ</string>
+    <string name="guide_enable">Bật truy cập từ xa</string>
+    <string name="guide_enable_desc">Bật công tắc trên màn hình chính. Địa chỉ sẽ xuất hiện bên dưới.</string>
+    <string name="guide_address_desc">Nhập toàn bộ địa chỉ, gồm giao thức và số cổng nếu có.</string>
+    <string name="guide_unreachable">Kiểm tra mạng và truy cập từ xa. Hãy thử địa chỉ khác nếu màn hình chính có hiển thị.</string>
+    <string name="guide_certificate">Chứng chỉ tự ký có thể gây ra cảnh báo này. Kiểm tra xem địa chỉ HTTPS có khớp với địa chỉ trên điện thoại không.</string>
+    <string name="guide_missing_feature">Vì sao không thấy một tính năng?</string>
+    <string name="guide_permissions">Kiểm tra tính năng trong cài đặt truy cập và các quyền hệ thống cần thiết.</string>
+    <string name="wizard_connect_title">Quản lý điện thoại từ máy tính</string>
+    <string name="wizard_access_body">Chọn dữ liệu và tính năng trên điện thoại mà máy khách từ xa được phép truy cập.</string>
+    <string name="guide_connect">Bắt đầu nhanh</string>
 </resources>

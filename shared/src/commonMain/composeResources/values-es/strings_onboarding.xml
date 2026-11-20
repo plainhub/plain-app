@@ -33,4 +33,18 @@
     <string name="onboarding_step3_desc">Escribe en el navegador la dirección que muestra la pantalla del móvil</string>
     <string name="onboarding_revisit_hint">Puedes volver a ver esta introducción en Ajustes → Cómo usar</string>
     <string name="onboarding_replay">Ver la introducción de nuevo</string>
+    <string name="wizard_connect_body">Conecta los dos dispositivos a la misma red. Activa el acceso remoto en la pantalla de inicio y abre la dirección que aparece allí en el navegador del ordenador.</string>
+    <string name="wizard_access_title">Elige qué se puede compartir</string>
+    <string name="wizard_view_guide">Ver instrucciones</string>
+    <string name="wizard_example_address">Dirección de ejemplo</string>
+    <string name="guide_enable">Activa el acceso remoto</string>
+    <string name="guide_enable_desc">Usa el interruptor de la pantalla de inicio. La dirección aparecerá debajo.</string>
+    <string name="guide_address_desc">Introduce la dirección completa con el protocolo y el puerto, si aparece.</string>
+    <string name="guide_unreachable">Comprueba la red y el acceso remoto. Si hay otras direcciones en la pantalla de inicio, prueba una de ellas.</string>
+    <string name="guide_certificate">Un certificado autofirmado puede provocar este aviso. Comprueba que la dirección HTTPS coincide con la del teléfono.</string>
+    <string name="guide_missing_feature">¿Por qué falta una función?</string>
+    <string name="guide_permissions">Comprueba si la función está activada en los ajustes de acceso y si tiene los permisos del sistema necesarios.</string>
+    <string name="wizard_connect_title">Gestiona tu móvil desde el ordenador</string>
+    <string name="wizard_access_body">Elige a qué datos y funciones del teléfono pueden acceder los clientes remotos.</string>
+    <string name="guide_connect">Inicio rápido</string>
 </resources>

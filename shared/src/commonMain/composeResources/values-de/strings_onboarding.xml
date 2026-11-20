@@ -33,4 +33,18 @@
     <string name="onboarding_step3_desc">Gib die im Handy angezeigte Adresse im Browser ein</string>
     <string name="onboarding_revisit_hint">Du kannst die Einführung jederzeit unter Einstellungen → Verwendung erneut ansehen</string>
     <string name="onboarding_replay">Einführung erneut ansehen</string>
+    <string name="wizard_connect_body">Verbinde beide Geräte mit demselben Netzwerk. Aktiviere den Fernzugriff auf der Startseite und öffne die dort angezeigte Adresse im Browser am Computer.</string>
+    <string name="wizard_access_title">Zugriff auf Inhalte festlegen</string>
+    <string name="wizard_view_guide">Anleitung ansehen</string>
+    <string name="wizard_example_address">Beispieladresse</string>
+    <string name="guide_enable">Fernzugriff aktivieren</string>
+    <string name="guide_enable_desc">Schalte den Fernzugriff auf der Startseite ein. Darunter erscheint die Adresse.</string>
+    <string name="guide_address_desc">Gib die vollständige Adresse mit Protokoll und gegebenenfalls Port ein.</string>
+    <string name="guide_unreachable">Prüfe Netzwerk und Fernzugriff. Versuche bei Bedarf eine andere Adresse auf der Startseite.</string>
+    <string name="guide_certificate">Ein selbstsigniertes Zertifikat kann diese Warnung auslösen. Vergleiche die HTTPS-Adresse mit der auf deinem Telefon.</string>
+    <string name="guide_missing_feature">Warum fehlt eine Funktion?</string>
+    <string name="guide_permissions">Prüfe die Zugriffseinstellungen und die erforderlichen Systemberechtigungen.</string>
+    <string name="wizard_connect_title">Verwalte dein Handy vom Computer</string>
+    <string name="wizard_access_body">Wähle, auf welche Telefondaten und Funktionen entfernte Clients zugreifen dürfen.</string>
+    <string name="guide_connect">Schnellstart</string>
 </resources>

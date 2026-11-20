@@ -33,4 +33,18 @@
     <string name="onboarding_step3_desc">Digite no navegador o endereço mostrado na tela do celular</string>
     <string name="onboarding_revisit_hint">Você pode rever esta introdução em Configurações → Como usar</string>
     <string name="onboarding_replay">Rever a introdução</string>
+    <string name="wizard_connect_body">Conecte os dois dispositivos à mesma rede. Ative o acesso remoto na tela inicial e abra o endereço exibido no navegador do computador.</string>
+    <string name="wizard_access_title">Escolha o que pode ser acessado</string>
+    <string name="wizard_view_guide">Ver instruções</string>
+    <string name="wizard_example_address">Endereço de exemplo</string>
+    <string name="guide_enable">Ative o acesso remoto</string>
+    <string name="guide_enable_desc">Use o interruptor na tela inicial. O endereço aparece abaixo.</string>
+    <string name="guide_address_desc">Digite o endereço completo com o protocolo e a porta indicada.</string>
+    <string name="guide_unreachable">Verifique a rede e o acesso remoto. Tente outro endereço se houver alternativas na tela inicial.</string>
+    <string name="guide_certificate">Um certificado autoassinado pode causar esse aviso. Confira se o endereço HTTPS é o mesmo exibido no telefone.</string>
+    <string name="guide_missing_feature">Por que um recurso não aparece?</string>
+    <string name="guide_permissions">Confira as configurações de acesso e as permissões do sistema necessárias.</string>
+    <string name="wizard_connect_title">Gerencie o celular pelo computador</string>
+    <string name="wizard_access_body">Escolha os dados e funções do telefone a que os clientes remotos podem aceder.</string>
+    <string name="guide_connect">Início rápido</string>
 </resources>

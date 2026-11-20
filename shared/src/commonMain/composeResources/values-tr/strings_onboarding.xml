@@ -33,4 +33,18 @@
     <string name="onboarding_step3_desc">Tarayıcıya telefon ekranında görünen adresi yaz</string>
     <string name="onboarding_revisit_hint">Bu tanıtımı Ayarlar → Nasıl kullanılır bölümünden istediğin an yeniden izleyebilirsin</string>
     <string name="onboarding_replay">Tanıtımı yeniden izle</string>
+    <string name="wizard_connect_body">İki cihazı aynı ağa bağlayın. Telefonun ana ekranında uzaktan erişimi açın ve gösterilen adresi bilgisayar tarayıcısına girin.</string>
+    <string name="wizard_access_title">Nelerin erişilebilir olduğunu seçin</string>
+    <string name="wizard_view_guide">Kullanım kılavuzunu aç</string>
+    <string name="wizard_example_address">Örnek adres</string>
+    <string name="guide_enable">Uzaktan erişimi açın</string>
+    <string name="guide_enable_desc">Ana ekrandaki anahtarı açın. Adres altında görünür.</string>
+    <string name="guide_address_desc">Protokol ve gösterilen bağlantı noktası dahil adresin tamamını girin.</string>
+    <string name="guide_unreachable">Ağı ve uzaktan erişimi kontrol edin. Ana ekranda başka adresler varsa onları deneyin.</string>
+    <string name="guide_certificate">Kendinden imzalı sertifika bu uyarıya neden olabilir. HTTPS adresinin telefondaki adresle eşleştiğini kontrol edin.</string>
+    <string name="guide_missing_feature">Bir özellik neden görünmüyor?</string>
+    <string name="guide_permissions">Erişim ayarlarını ve gerekli sistem izinlerini kontrol edin.</string>
+    <string name="wizard_connect_title">Telefonunu bilgisayardan yönet</string>
+    <string name="wizard_access_body">Uzaktaki istemcilerin erişebileceği telefon verilerini ve özelliklerini seçin.</string>
+    <string name="guide_connect">Hızlı başlangıç</string>
 </resources>

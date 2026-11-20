@@ -33,4 +33,18 @@
     <string name="onboarding_step3_desc">Saisissez dans le navigateur l'adresse affichée sur l'écran du téléphone</string>
     <string name="onboarding_revisit_hint">Vous pouvez revoir cette présentation à tout moment dans Paramètres → Comment utiliser</string>
     <string name="onboarding_replay">Revoir la présentation</string>
+    <string name="wizard_connect_body">Connectez les deux appareils au même réseau. Activez l’accès à distance sur l’écran d’accueil et saisissez l’adresse affichée dans le navigateur de l’ordinateur.</string>
+    <string name="wizard_access_title">Choisir les contenus accessibles</string>
+    <string name="wizard_view_guide">Voir le mode d’emploi</string>
+    <string name="wizard_example_address">Exemple d’adresse</string>
+    <string name="guide_enable">Activer l’accès à distance</string>
+    <string name="guide_enable_desc">Utilisez le bouton sur l’écran d’accueil. L’adresse apparaît en dessous.</string>
+    <string name="guide_address_desc">Saisissez l’adresse complète avec le protocole et le port indiqué.</string>
+    <string name="guide_unreachable">Vérifiez le réseau et l’accès à distance. Essayez une autre adresse si l’écran d’accueil en propose.</string>
+    <string name="guide_certificate">Un certificat autosigné peut déclencher cet avertissement. Vérifiez que l’adresse HTTPS correspond à celle du téléphone.</string>
+    <string name="guide_missing_feature">Pourquoi une fonction est-elle absente ?</string>
+    <string name="guide_permissions">Vérifiez les paramètres d’accès et les autorisations système requises.</string>
+    <string name="wizard_connect_title">Gérez votre téléphone depuis un ordinateur</string>
+    <string name="wizard_access_body">Choisissez les données et fonctions du téléphone accessibles aux clients distants.</string>
+    <string name="guide_connect">Démarrage rapide</string>
 </resources>

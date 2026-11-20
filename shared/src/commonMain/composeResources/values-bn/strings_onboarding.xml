@@ -33,4 +33,18 @@
     <string name="onboarding_step3_desc">ব্রাউজারে ফোনের স্ক্রিনে দেখানো ঠিকানাটি লিখুন</string>
     <string name="onboarding_revisit_hint">এই পরিচিতিটি যেকোনো সময় সেটিংস → ব্যবহারের নির্দেশনা-তে আবার দেখতে পারেন</string>
     <string name="onboarding_replay">পরিচিতি আবার দেখুন</string>
+    <string name="wizard_connect_body">দুটি ডিভাইস একই নেটওয়ার্কে যুক্ত করুন। ফোনের হোম স্ক্রিনে দূরবর্তী অ্যাক্সেস চালু করে দেখানো ঠিকানাটি কম্পিউটারের ব্রাউজারে খুলুন।</string>
+    <string name="wizard_access_title">কোন সুবিধায় অ্যাক্সেস দেবেন বেছে নিন</string>
+    <string name="wizard_view_guide">ব্যবহারবিধি দেখুন</string>
+    <string name="wizard_example_address">উদাহরণ ঠিকানা</string>
+    <string name="guide_enable">দূরবর্তী অ্যাক্সেস চালু করুন</string>
+    <string name="guide_enable_desc">হোম স্ক্রিনের সুইচ চালু করুন। নিচে ঠিকানা দেখা যাবে।</string>
+    <string name="guide_address_desc">প্রোটোকল ও দেখানো পোর্টসহ সম্পূর্ণ ঠিকানা লিখুন।</string>
+    <string name="guide_unreachable">নেটওয়ার্ক ও দূরবর্তী অ্যাক্সেস পরীক্ষা করুন। হোম স্ক্রিনে বিকল্প ঠিকানা থাকলে চেষ্টা করুন।</string>
+    <string name="guide_certificate">স্বাক্ষরিত নিজস্ব সার্টিফিকেটের কারণে এই সতর্কতা আসতে পারে। ফোনের সঙ্গে HTTPS ঠিকানা মিলিয়ে দেখুন।</string>
+    <string name="guide_missing_feature">কোনো সুবিধা দেখা যাচ্ছে না কেন?</string>
+    <string name="guide_permissions">অ্যাক্সেস সেটিংস ও প্রয়োজনীয় সিস্টেম অনুমতি পরীক্ষা করুন।</string>
+    <string name="wizard_connect_title">কম্পিউটার থেকে ফোন পরিচালনা করুন</string>
+    <string name="wizard_access_body">দূরবর্তী ক্লায়েন্ট ফোনের কোন ডেটা ও বৈশিষ্ট্য ব্যবহার করতে পারবে তা বেছে নিন।</string>
+    <string name="guide_connect">দ্রুত শুরু</string>
 </resources>

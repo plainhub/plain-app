@@ -33,4 +33,18 @@
     <string name="onboarding_step3_desc">Enter the web address shown on your phone screen in the browser</string>
     <string name="onboarding_revisit_hint">You can watch this intro again in Settings → How to use</string>
     <string name="onboarding_replay">Replay intro</string>
+    <string name="wizard_connect_title">Open your phone on your computer</string>
+    <string name="wizard_connect_body">Connect both devices to the same network. Turn on Remote access on the phone’s home screen, then enter the full address shown there in your computer browser.</string>
+    <string name="wizard_access_title">Choose what can be accessed remotely</string>
+    <string name="wizard_access_body">Open Access settings on the home screen to choose which features to share and manage sessions and security.</string>
+    <string name="wizard_view_guide">View how to use</string>
+    <string name="wizard_example_address">Example address</string>
+    <string name="guide_connect">Connect from a computer</string>
+    <string name="guide_enable">Turn on Remote access</string>
+    <string name="guide_enable_desc">Use the switch on the phone’s home screen. The address appears below it.</string>
+    <string name="guide_address_desc">Enter the full address, including the protocol and any port shown.</string>
+    <string name="guide_unreachable">Check that both devices are on the same network and Remote access is on. If available, expand Try other addresses on the home screen.</string>
+    <string name="guide_certificate">A self-signed certificate can trigger this warning. Check that the HTTPS address matches the one shown on your phone.</string>
+    <string name="guide_missing_feature">Why is a feature missing?</string>
+    <string name="guide_permissions">In Access settings, check whether the feature is enabled and the required system permission is granted.</string>
 </resources>

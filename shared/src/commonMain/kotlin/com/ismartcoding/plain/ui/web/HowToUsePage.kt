@@ -1,180 +1,70 @@
 package com.ismartcoding.plain.ui.web
 
-import com.ismartcoding.plain.preferences.*
-
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.ui.Alignment
+import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
-import com.ismartcoding.plain.i18n.*
-import com.ismartcoding.plain.ui.base.BottomSpace
-import com.ismartcoding.plain.ui.components.FaqItem
-import com.ismartcoding.plain.ui.base.HorizontalSpace
-import com.ismartcoding.plain.ui.base.PCard
-import com.ismartcoding.plain.ui.base.PListItem
-import com.ismartcoding.plain.ui.base.PScaffold
-import com.ismartcoding.plain.ui.base.PTopAppBar
-import com.ismartcoding.plain.ui.components.StepItem
-import com.ismartcoding.plain.ui.base.PSectionTitle
-import com.ismartcoding.plain.ui.base.TopSpace
-import com.ismartcoding.plain.ui.base.VerticalSpace
-import com.ismartcoding.plain.ui.web.components.WebAddressPager
-import com.ismartcoding.plain.ui.media.extensions.collectAsStateValue
 import com.ismartcoding.plain.features.web.WebHelper
+import com.ismartcoding.plain.i18n.*
+import com.ismartcoding.plain.ui.base.*
+import com.ismartcoding.plain.ui.components.StepItem
 import com.ismartcoding.plain.ui.navigation.Routing
 import com.ismartcoding.plain.ui.settings.DesktopAccessSettingsViewModel
 import com.ismartcoding.plain.ui.theme.PlainTheme
-import com.ismartcoding.plain.ui.theme.green
-import com.ismartcoding.plain.ui.theme.grey
-import com.ismartcoding.plain.ui.theme.orange
-import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.stringResource
-import com.ismartcoding.plain.ui.resources.Res as UiRes
-import com.ismartcoding.plain.ui.resources.circle_alert as ui_drawable_circle_alert
-import com.ismartcoding.plain.ui.resources.circle_help as ui_drawable_circle_help
-import com.ismartcoding.plain.ui.resources.lock as ui_drawable_lock
-import com.ismartcoding.plain.ui.resources.refresh_ccw as ui_drawable_refresh_ccw
-import com.ismartcoding.plain.ui.resources.smartphone as ui_drawable_smartphone
-import com.ismartcoding.plain.ui.resources.troubleshoot as ui_drawable_troubleshoot
-import com.ismartcoding.plain.i18n.troubleshoot
 
 private const val TROUBLESHOOTING_GUIDE_URL = "https://plainapp.app/docs/troubleshooting"
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HowToUsePage(
-    navController: NavHostController,
-    webVM: DesktopAccessSettingsViewModel,
-) {
-    val lanIpv4Addresses = webVM.lanIpv4Addresses.collectAsStateValue()
-    val demoIp = lanIpv4Addresses?.firstOrNull() ?: "192.0.2.20"
-    LaunchedEffect(webVM) { webVM.observeNetworkAddresses() }
-
-    PScaffold(
-        topBar = {
-            PTopAppBar(onNavigateBack = { navController.navigateUp() }, title = stringResource(Res.string.how_to_use))
-        },
-        content = { paddingValues ->
-            LazyColumn(modifier = Modifier.padding(top = paddingValues.calculateTopPadding())) {
-                item {
-                    TopSpace()
-                    PSectionTitle(title = stringResource(Res.string.quick_start))
-                    PCard(modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN)) {
-                        Column(modifier = Modifier.padding(vertical = 8.dp)) {
-                            StepItem(index = 1, title = stringResource(Res.string.step_connect_network_title))
-                            VerticalSpace(dp = 8.dp)
-                            Box(modifier = Modifier.padding(horizontal = 16.dp)) {
-                                SameNetworkDemo()
-                            }
-                            VerticalSpace(dp = 16.dp)
-                            StepItem(index = 2, title = stringResource(Res.string.step_choose_ip_title))
-                            VerticalSpace(dp = 8.dp)
-                            lanIpv4Addresses?.let { WebAddressPager(lanIpv4Addresses = it) }
-                            VerticalSpace(dp = 16.dp)
-                            StepItem(index = 3, title = stringResource(Res.string.step_open_url_title))
-                            VerticalSpace(dp = 8.dp)
-                            Box(modifier = Modifier.padding(horizontal = 16.dp)) {
-                                OpenAddressDemo(serverIp = demoIp)
-                            }
-                        }
-                    }
-                    VerticalSpace(dp = 16.dp)
-                    PCard(modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN)) {
-                        PListItem(
-                            modifier = Modifier.clickable { navController.navigate(Routing.Onboarding) },
-                            icon = UiRes.drawable.ui_drawable_refresh_ccw,
-                            title = stringResource(Res.string.onboarding_replay),
-                            showMore = true,
-                        )
-                    }
-                    VerticalSpace(dp = 16.dp)
-                }
-                item {
-                    PSectionTitle(title = stringResource(Res.string.troubleshooting))
-                    PCard(modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN)) {
-                        FaqItem(
-                            icon = UiRes.drawable.ui_drawable_circle_alert,
-                            tint = MaterialTheme.colorScheme.error,
-                            question = stringResource(Res.string.faq_cannot_open_q),
-                            answer = stringResource(Res.string.faq_cannot_open_a),
-                        ) {
-                            RunDiagnosticsChip(onClick = webVM::checkHttpServerHealth)
-                        }
-                        FaqItem(
-                            icon = UiRes.drawable.ui_drawable_lock,
-                            tint = MaterialTheme.colorScheme.orange,
-                            question = stringResource(Res.string.faq_https_warning_q),
-                            answer = stringResource(Res.string.browser_https_error_tips),
-                            answerFooter = { FaqCertDemo(serverIp = demoIp) },
-                            answerFooterFullWidth = true,
-                        )
-                        FaqItem(
-                            icon = UiRes.drawable.ui_drawable_smartphone,
-                            tint = MaterialTheme.colorScheme.orange,
-                            question = stringResource(Res.string.faq_stay_online_q),
-                            answer = stringResource(Res.string.faq_stay_online_a),
-                            answerFooter = { FaqStayOnlineDemo(serverIp = demoIp) },
-                            answerFooterFullWidth = true,
-                        )
-                    }
-                    VerticalSpace(dp = 16.dp)
-                    PCard(modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN)) {
-                        PListItem(
-                            modifier = Modifier.clickable { WebHelper.open(TROUBLESHOOTING_GUIDE_URL) },
-                            icon = UiRes.drawable.ui_drawable_circle_help,
-                            title = stringResource(Res.string.more_help),
-                            showMore = true,
-                        )
-                    }
-                    BottomSpace(paddingValues)
-                }
+fun HowToUsePage(navController: NavHostController, webVM: DesktopAccessSettingsViewModel) {
+    PScaffold(topBar = {
+        PTopAppBar(onNavigateBack = { navController.navigateUp() }, title = stringResource(Res.string.how_to_use))
+    }) { insets ->
+        Column(Modifier.padding(insets).verticalScroll(rememberScrollState())
+            .padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN, vertical = 16.dp)) {
+            PSectionTitle(stringResource(Res.string.guide_connect))
+            PCard {
+                StepItem(1, stringResource(Res.string.step_connect_network_title), stringResource(Res.string.step_connect_network_desc))
+                StepItem(2, stringResource(Res.string.guide_enable), stringResource(Res.string.guide_enable_desc))
+                StepItem(3, stringResource(Res.string.step_open_url_title), stringResource(Res.string.guide_address_desc))
             }
-        },
-    )
+            VerticalSpace(16.dp)
+            PSectionTitle(stringResource(Res.string.troubleshooting))
+            PCard {
+                GuideQuestion(Res.string.faq_cannot_open_q, Res.string.guide_unreachable) {
+                    PTextButton(stringResource(Res.string.run_diagnostics), onClick = webVM::checkHttpServerHealth)
+                }
+                GuideQuestion(Res.string.faq_https_warning_q, Res.string.guide_certificate)
+                GuideQuestion(Res.string.faq_stay_online_q, Res.string.faq_stay_online_a)
+                GuideQuestion(Res.string.guide_missing_feature, Res.string.guide_permissions)
+            }
+            VerticalSpace(8.dp)
+            FlowRow(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                PTextButton(stringResource(Res.string.onboarding_replay), onClick = { navController.navigate(Routing.Onboarding) })
+                PTextButton(stringResource(Res.string.more_help), onClick = { WebHelper.open(TROUBLESHOOTING_GUIDE_URL) })
+            }
+        }
+    }
 }
 
 @Composable
-private fun RunDiagnosticsChip(onClick: () -> Unit) {
-    Box(
-        modifier = Modifier
-            .clip(RoundedCornerShape(8.dp))
-            .background(MaterialTheme.colorScheme.primaryContainer)
-            .clickable(onClick = onClick)
-            .padding(horizontal = 12.dp, vertical = 8.dp),
-        contentAlignment = Alignment.Center,
-    ) {
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            Icon(
-                painter = painterResource(UiRes.drawable.ui_drawable_troubleshoot),
-                contentDescription = null,
-                tint = MaterialTheme.colorScheme.primary,
-                modifier = Modifier.size(16.dp),
-            )
-            HorizontalSpace(dp = 4.dp)
-            Text(
-                text = stringResource(Res.string.run_diagnostics),
-                style = MaterialTheme.typography.labelLarge,
-                color = MaterialTheme.colorScheme.primary,
-            )
+private fun GuideQuestion(question: StringResource, answer: StringResource, action: (@Composable () -> Unit)? = null) {
+    var expanded by rememberSaveable { mutableStateOf(false) }
+    PExpandableSection(text = stringResource(question), expanded = expanded,
+        stateDescription = stringResource(if (expanded) Res.string.expanded else Res.string.collapsed),
+        onClick = { expanded = !expanded }) {
+        Column(Modifier.padding(start = 16.dp, end = 16.dp, bottom = 16.dp)) {
+            Text(stringResource(answer), style = MaterialTheme.typography.bodyMedium)
+            action?.invoke()
         }
     }
 }

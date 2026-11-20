@@ -33,4 +33,18 @@
     <string name="onboarding_step3_desc">Digita nel browser l'indirizzo mostrato sullo schermo del telefono</string>
     <string name="onboarding_revisit_hint">Puoi rivedere questa introduzione in Impostazioni → Come si usa</string>
     <string name="onboarding_replay">Rivedi l'introduzione</string>
+    <string name="wizard_connect_body">Collega entrambi i dispositivi alla stessa rete. Attiva l’accesso remoto nella schermata iniziale e apri l’indirizzo visualizzato nel browser del computer.</string>
+    <string name="wizard_access_title">Scegli cosa rendere accessibile</string>
+    <string name="wizard_view_guide">Visualizza le istruzioni</string>
+    <string name="wizard_example_address">Indirizzo di esempio</string>
+    <string name="guide_enable">Attiva l’accesso remoto</string>
+    <string name="guide_enable_desc">Usa l’interruttore nella schermata iniziale. L’indirizzo appare sotto.</string>
+    <string name="guide_address_desc">Inserisci l’indirizzo completo con protocollo e porta, se indicata.</string>
+    <string name="guide_unreachable">Verifica la rete e l’accesso remoto. Prova un altro indirizzo se disponibile nella schermata iniziale.</string>
+    <string name="guide_certificate">Un certificato autofirmato può causare questo avviso. Controlla che l’indirizzo HTTPS corrisponda a quello sul telefono.</string>
+    <string name="guide_missing_feature">Perché manca una funzione?</string>
+    <string name="guide_permissions">Controlla le impostazioni di accesso e le autorizzazioni di sistema necessarie.</string>
+    <string name="wizard_connect_title">Gestisci il telefono dal computer</string>
+    <string name="wizard_access_body">Scegli a quali dati e funzioni del telefono possono accedere i client remoti.</string>
+    <string name="guide_connect">Avvio rapido</string>
 </resources>

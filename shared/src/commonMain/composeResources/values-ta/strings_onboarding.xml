@@ -33,4 +33,18 @@
     <string name="onboarding_step3_desc">ஃபோன் திரையில் காட்டப்படும் முகவரியை உலாவியில் உள்ளிடவும்</string>
     <string name="onboarding_revisit_hint">இந்த அறிமுகத்தை எப்போது வேண்டுமானாலும் அமைப்புகள் → எப்படி பயன்படுத்துவது இல் மீண்டும் பார்க்கலாம்</string>
     <string name="onboarding_replay">அறிமுகத்தை மீண்டும் பார்</string>
+    <string name="wizard_connect_body">இரு சாதனங்களையும் ஒரே பிணையத்தில் இணைக்கவும். கைப்பேசியின் முகப்புத் திரையில் தொலைநிலை அணுகலை இயக்கி, காட்டப்படும் முகவரியைக் கணினி உலாவியில் திறக்கவும்.</string>
+    <string name="wizard_access_title">அணுக அனுமதிக்கும் அம்சங்களைத் தேர்வுசெய்யவும்</string>
+    <string name="wizard_view_guide">பயன்பாட்டு வழிமுறைகள்</string>
+    <string name="wizard_example_address">எடுத்துக்காட்டு முகவரி</string>
+    <string name="guide_enable">தொலைநிலை அணுகலை இயக்கவும்</string>
+    <string name="guide_enable_desc">முகப்புத் திரையில் சுவிட்சை இயக்கவும். முகவரி அதன் கீழே தோன்றும்.</string>
+    <string name="guide_address_desc">நெறிமுறை மற்றும் காட்டப்படும் போர்ட் எண் உட்பட முழு முகவரியையும் உள்ளிடவும்.</string>
+    <string name="guide_unreachable">பிணையத்தையும் தொலைநிலை அணுகலையும் சரிபார்க்கவும். முகப்புத் திரையில் மாற்று முகவரிகள் இருந்தால் முயலவும்.</string>
+    <string name="guide_certificate">சுய கையொப்பச் சான்றிதழால் இந்த எச்சரிக்கை தோன்றலாம். HTTPS முகவரி கைப்பேசியில் உள்ளதுடன் பொருந்துகிறதா எனப் பார்க்கவும்.</string>
+    <string name="guide_missing_feature">ஓர் அம்சம் ஏன் தோன்றவில்லை?</string>
+    <string name="guide_permissions">அணுகல் அமைப்புகளையும் தேவையான கணினி அனுமதிகளையும் சரிபார்க்கவும்.</string>
+    <string name="wizard_connect_title">கணினியிலிருந்து ஃபோனை நிர்வகிக்கவும்</string>
+    <string name="wizard_access_body">தொலைநிலை கிளையன்ட்கள் அணுகக்கூடிய ஃபோன் தரவையும் அம்சங்களையும் தேர்வுசெய்யவும்.</string>
+    <string name="guide_connect">விரைவுத் தொடக்கம்</string>
 </resources>

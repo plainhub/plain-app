@@ -33,4 +33,18 @@
     <string name="onboarding_step3_desc">スマホ画面に表示されたアドレスをブラウザに入力</string>
     <string name="onboarding_revisit_hint">設定 → 使い方 からいつでもこの案内をもう一度見られます</string>
     <string name="onboarding_replay">案内をもう一度見る</string>
+    <string name="wizard_connect_body">両方の端末を同じネットワークに接続します。スマートフォンのホーム画面でリモートアクセスをオンにし、表示されたアドレスをパソコンのブラウザで開きます。</string>
+    <string name="wizard_access_title">アクセスを許可する機能を選ぶ</string>
+    <string name="wizard_view_guide">使い方を見る</string>
+    <string name="wizard_example_address">アドレスの例</string>
+    <string name="guide_enable">リモートアクセスをオンにする</string>
+    <string name="guide_enable_desc">ホーム画面のスイッチをオンにすると、その下にアドレスが表示されます。</string>
+    <string name="guide_address_desc">プロトコルと表示されたポート番号を含むアドレス全体を入力します。</string>
+    <string name="guide_unreachable">同じネットワークに接続し、リモートアクセスがオンになっているか確認します。別のアドレスがあればそちらも試してください。</string>
+    <string name="guide_certificate">自己署名証明書では警告が表示される場合があります。HTTPS アドレスがスマートフォンの表示と一致するか確認してください。</string>
+    <string name="guide_missing_feature">機能が表示されない場合は？</string>
+    <string name="guide_permissions">アクセス設定で機能が有効か、必要なシステム権限が許可されているか確認します。</string>
+    <string name="wizard_connect_title">パソコンからスマホを管理</string>
+    <string name="wizard_access_body">リモートクライアントがアクセスできるスマートフォンのデータと機能を選択します。</string>
+    <string name="guide_connect">クイックスタート</string>
 </resources>

@@ -33,4 +33,18 @@
     <string name="onboarding_step3_desc">瀏覽器輸入手機螢幕上顯示的網址</string>
     <string name="onboarding_revisit_hint">隨時可在 設置 → 使用方式 重新查看</string>
     <string name="onboarding_replay">重新查看導覽</string>
+    <string name="wizard_connect_title">在電腦上開啟手機</string>
+    <string name="wizard_connect_body">讓兩台裝置連上同一網路，在手機首頁開啟「遠端存取」，然後在電腦瀏覽器輸入首頁顯示的完整網址。</string>
+    <string name="wizard_access_title">決定哪些內容可以遠端存取</string>
+    <string name="wizard_access_body">在首頁開啟存取設定，選擇允許存取的功能。你也可以在這裡管理工作階段和安全設定。</string>
+    <string name="wizard_view_guide">查看使用方法</string>
+    <string name="wizard_example_address">範例網址</string>
+    <string name="guide_connect">從電腦連接手機</string>
+    <string name="guide_enable">開啟遠端存取</string>
+    <string name="guide_enable_desc">在手機首頁開啟開關，查看下方的網址。</string>
+    <string name="guide_address_desc">輸入完整網址，包括通訊協定和顯示的連接埠。</string>
+    <string name="guide_unreachable">確認兩台裝置位於同一網路，而且手機首頁已開啟遠端存取。如果有備用網址，可以展開查看。</string>
+    <string name="guide_certificate">使用自簽憑證時，瀏覽器可能顯示警告。請先核對 HTTPS 網址是否與手機首頁相同。</string>
+    <string name="guide_missing_feature">為什麼看不到某項功能？</string>
+    <string name="guide_permissions">開啟存取設定，檢查是否允許遠端存取該功能，以及手機是否已授予所需權限。</string>
 </resources>

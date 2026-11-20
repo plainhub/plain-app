@@ -33,4 +33,18 @@
     <string name="onboarding_step3_desc">Введите в браузере адрес с экрана телефона</string>
     <string name="onboarding_revisit_hint">Эту инструкцию можно снова посмотреть в Настройки → Как пользоваться</string>
     <string name="onboarding_replay">Посмотреть инструкцию снова</string>
+    <string name="wizard_connect_body">Подключите устройства к одной сети. Включите удалённый доступ на главном экране телефона и откройте указанный адрес в браузере компьютера.</string>
+    <string name="wizard_access_title">Выберите, к чему разрешить доступ</string>
+    <string name="wizard_view_guide">Открыть инструкцию</string>
+    <string name="wizard_example_address">Пример адреса</string>
+    <string name="guide_enable">Включите удалённый доступ</string>
+    <string name="guide_enable_desc">Включите переключатель на главном экране. Под ним появится адрес.</string>
+    <string name="guide_address_desc">Введите адрес целиком, включая протокол и порт, если он указан.</string>
+    <string name="guide_unreachable">Проверьте сеть и удалённый доступ. Попробуйте другой адрес, если он указан на главном экране.</string>
+    <string name="guide_certificate">Самоподписанный сертификат может вызвать предупреждение. Сверьте HTTPS-адрес с адресом на телефоне.</string>
+    <string name="guide_missing_feature">Почему функция недоступна?</string>
+    <string name="guide_permissions">Проверьте настройки доступа к функции и необходимые системные разрешения.</string>
+    <string name="wizard_connect_title">Управляйте телефоном с компьютера</string>
+    <string name="wizard_access_body">Выберите данные и функции телефона, доступные удалённым клиентам.</string>
+    <string name="guide_connect">Быстрый старт</string>
 </resources>
