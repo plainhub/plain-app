@@ -47,4 +47,5 @@
     <string name="wizard_connect_title">কম্পিউটার থেকে ফোন পরিচালনা করুন</string>
     <string name="wizard_access_body">দূরবর্তী ক্লায়েন্ট ফোনের কোন ডেটা ও বৈশিষ্ট্য ব্যবহার করতে পারবে তা বেছে নিন।</string>
     <string name="guide_connect">দ্রুত শুরু</string>
+    <string name="onboarding_log_in">লগ ইন</string>
 </resources>

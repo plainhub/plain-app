@@ -47,4 +47,5 @@
     <string name="wizard_connect_title">Gerencie o celular pelo computador</string>
     <string name="wizard_access_body">Escolha os dados e funções do telefone a que os clientes remotos podem aceder.</string>
     <string name="guide_connect">Início rápido</string>
+    <string name="onboarding_log_in">Entrar</string>
 </resources>

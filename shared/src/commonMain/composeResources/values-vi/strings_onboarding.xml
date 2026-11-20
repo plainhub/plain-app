@@ -47,4 +47,5 @@
     <string name="wizard_connect_title">Quản lý điện thoại từ máy tính</string>
     <string name="wizard_access_body">Chọn dữ liệu và tính năng trên điện thoại mà máy khách từ xa được phép truy cập.</string>
     <string name="guide_connect">Bắt đầu nhanh</string>
+    <string name="onboarding_log_in">Đăng nhập</string>
 </resources>

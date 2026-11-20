@@ -47,4 +47,5 @@
     <string name="guide_certificate">A self-signed certificate can trigger this warning. Check that the HTTPS address matches the one shown on your phone.</string>
     <string name="guide_missing_feature">Why is a feature missing?</string>
     <string name="guide_permissions">In Access settings, check whether the feature is enabled and the required system permission is granted.</string>
+    <string name="onboarding_log_in">Log in</string>
 </resources>

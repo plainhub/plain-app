@@ -47,4 +47,5 @@
     <string name="wizard_connect_title">Gérez votre téléphone depuis un ordinateur</string>
     <string name="wizard_access_body">Choisissez les données et fonctions du téléphone accessibles aux clients distants.</string>
     <string name="guide_connect">Démarrage rapide</string>
+    <string name="onboarding_log_in">Se connecter</string>
 </resources>

@@ -47,4 +47,5 @@
     <string name="wizard_connect_title">कंप्यूटर से फ़ोन प्रबंधित करें</string>
     <string name="wizard_access_body">चुनें कि रिमोट क्लाइंट फ़ोन के किन डेटा और सुविधाओं का उपयोग कर सकते हैं।</string>
     <string name="guide_connect">त्वरित प्रारंभ</string>
+    <string name="onboarding_log_in">लॉग इन करें</string>
 </resources>

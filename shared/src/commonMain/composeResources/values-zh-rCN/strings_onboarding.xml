@@ -47,4 +47,5 @@
     <string name="guide_certificate">使用自签名证书时，浏览器可能显示警告。先核对浏览器中的 HTTPS 地址与手机首页显示的地址。</string>
     <string name="guide_missing_feature">为什么看不到某项功能？</string>
     <string name="guide_permissions">打开「访问设置」，检查是否允许远程访问该功能，以及手机是否已授予所需权限。</string>
+    <string name="onboarding_log_in">登录</string>
 </resources>

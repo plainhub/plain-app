@@ -9,10 +9,8 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
@@ -67,11 +65,12 @@ fun OnboardingPage(navController: NavHostController) {
             }
             HorizontalPager(pages, Modifier.weight(1f)) { page ->
                 Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(vertical = 8.dp)) {
-                    Box(Modifier.fillMaxWidth().background(MaterialTheme.colorScheme.secondaryContainer, MaterialTheme.shapes.extraLarge)
+                    if (page == 1) {
+                        RemoteAccessAnimation(active = pages.settledPage == page)
+                    } else Box(Modifier.fillMaxWidth().background(MaterialTheme.colorScheme.secondaryContainer, MaterialTheme.shapes.extraLarge)
                         .heightIn(min = 240.dp).padding(24.dp), contentAlignment = Alignment.Center) {
                         when (page) {
                             0 -> Image(painterResource(Res.drawable.onboarding_devices), null, Modifier.fillMaxWidth().height(176.dp))
-                            1 -> RemoteAccessPreview()
                             else -> PCard {
                                 Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
                                     Text(stringResource(Res.string.access_settings), fontWeight = FontWeight.Bold)
@@ -113,27 +112,6 @@ fun OnboardingPage(navController: NavHostController) {
                     if (last) complete(true)
                     else scope.launch { pages.animateScrollToPage(pages.currentPage + 1) }
                 }, buttonSize = ButtonSize.LARGE, modifier = Modifier.fillMaxWidth().padding(vertical = 16.dp))
-        }
-    }
-}
-
-@Composable
-private fun RemoteAccessPreview() {
-    var https by rememberSaveable { mutableStateOf(true) }
-    PCard {
-        Column(Modifier.padding(16.dp)) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(stringResource(Res.string.home_remote_access), Modifier.weight(1f), fontWeight = FontWeight.Bold)
-                Switch(checked = true, onCheckedChange = null)
-            }
-            Row {
-                listOf(false, true).forEach { secure ->
-                    PTextButton(if (secure) "HTTPS" else "HTTP", onClick = { https = secure },
-                        contentColor = if (secure == https) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant)
-                }
-            }
-            Text(if (https) "https://192.0.2.20" else "http://192.0.2.20", fontFamily = FontFamily.Monospace)
-            Text(stringResource(Res.string.wizard_example_address), style = MaterialTheme.typography.bodyMedium)
         }
     }
 }

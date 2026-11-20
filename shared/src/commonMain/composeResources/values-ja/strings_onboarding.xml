@@ -47,4 +47,5 @@
     <string name="wizard_connect_title">パソコンからスマホを管理</string>
     <string name="wizard_access_body">リモートクライアントがアクセスできるスマートフォンのデータと機能を選択します。</string>
     <string name="guide_connect">クイックスタート</string>
+    <string name="onboarding_log_in">ログイン</string>
 </resources>

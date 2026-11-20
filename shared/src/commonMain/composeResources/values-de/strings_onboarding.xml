@@ -47,4 +47,5 @@
     <string name="wizard_connect_title">Verwalte dein Handy vom Computer</string>
     <string name="wizard_access_body">Wähle, auf welche Telefondaten und Funktionen entfernte Clients zugreifen dürfen.</string>
     <string name="guide_connect">Schnellstart</string>
+    <string name="onboarding_log_in">Anmelden</string>
 </resources>

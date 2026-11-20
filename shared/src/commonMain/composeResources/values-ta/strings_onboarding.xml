@@ -47,4 +47,5 @@
     <string name="wizard_connect_title">கணினியிலிருந்து ஃபோனை நிர்வகிக்கவும்</string>
     <string name="wizard_access_body">தொலைநிலை கிளையன்ட்கள் அணுகக்கூடிய ஃபோன் தரவையும் அம்சங்களையும் தேர்வுசெய்யவும்.</string>
     <string name="guide_connect">விரைவுத் தொடக்கம்</string>
+    <string name="onboarding_log_in">உள்நுழை</string>
 </resources>

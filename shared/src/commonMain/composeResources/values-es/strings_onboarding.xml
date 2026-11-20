@@ -47,4 +47,5 @@
     <string name="wizard_connect_title">Gestiona tu móvil desde el ordenador</string>
     <string name="wizard_access_body">Elige a qué datos y funciones del teléfono pueden acceder los clientes remotos.</string>
     <string name="guide_connect">Inicio rápido</string>
+    <string name="onboarding_log_in">Iniciar sesión</string>
 </resources>

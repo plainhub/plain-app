@@ -47,4 +47,5 @@
     <string name="wizard_connect_title">Beheer je telefoon vanaf de computer</string>
     <string name="wizard_access_body">Kies welke telefoongegevens en functies externe clients mogen gebruiken.</string>
     <string name="guide_connect">Snelstart</string>
+    <string name="onboarding_log_in">Inloggen</string>
 </resources>

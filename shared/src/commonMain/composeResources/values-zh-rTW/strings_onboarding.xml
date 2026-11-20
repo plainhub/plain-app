@@ -47,4 +47,5 @@
     <string name="guide_certificate">使用自簽憑證時，瀏覽器可能顯示警告。請先核對 HTTPS 網址是否與手機首頁相同。</string>
     <string name="guide_missing_feature">為什麼看不到某項功能？</string>
     <string name="guide_permissions">開啟存取設定，檢查是否允許遠端存取該功能，以及手機是否已授予所需權限。</string>
+    <string name="onboarding_log_in">登入</string>
 </resources>

@@ -47,4 +47,5 @@
     <string name="wizard_connect_title">Управляйте телефоном с компьютера</string>
     <string name="wizard_access_body">Выберите данные и функции телефона, доступные удалённым клиентам.</string>
     <string name="guide_connect">Быстрый старт</string>
+    <string name="onboarding_log_in">Войти</string>
 </resources>
