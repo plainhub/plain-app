@@ -21,10 +21,12 @@ import com.ismartcoding.plain.features.chat.peer.PeerStatusClient
 import com.ismartcoding.plain.platform.system.AppFeatureType
 import com.ismartcoding.plain.ui.components.ButtonSize
 import com.ismartcoding.plain.platform.system.has
+import com.ismartcoding.plain.events.OpenNotificationSettingsEvent
 import com.ismartcoding.plain.events.PermissionsResultEvent
 import com.ismartcoding.plain.events.RequestPermissionsEvent
 import com.ismartcoding.plain.events.WindowFocusChangedEvent
 import com.ismartcoding.plain.i18n.Res
+import com.ismartcoding.plain.i18n.service_notification_prompt
 import com.ismartcoding.plain.i18n.grant_permission
 import com.ismartcoding.plain.i18n.system_alert_window_warning
 import com.ismartcoding.plain.i18n.vpn_web_conflict_warning
@@ -63,6 +65,7 @@ fun HomePage(
     val network = NetworkEvents.snapshot.collectAsStateValue()
     val isVpnActive = network.vpnActive
     var systemAlertWindow by remember { mutableStateOf(Permission.SYSTEM_ALERT_WINDOW.isGranted()) }
+    var notificationsGranted by remember { mutableStateOf(Permission.POST_NOTIFICATIONS.isGranted()) }
     val refreshState = rememberRefreshLayoutState {
         PeerStatusClient.reconnectNow("home_pull_refresh")
         setRefreshState(RefreshContentState.Finished)
@@ -77,11 +80,13 @@ fun HomePage(
         Channel.sharedFlow.collect { event ->
             when (event) {
                 is PermissionsResultEvent -> {
+                    notificationsGranted = Permission.POST_NOTIFICATIONS.isGranted()
                     systemAlertWindow = Permission.SYSTEM_ALERT_WINDOW.isGranted()
                 }
 
                 is WindowFocusChangedEvent -> {
                     NetworkEvents.changed()
+                    notificationsGranted = Permission.POST_NOTIFICATIONS.isGranted()
                     systemAlertWindow = Permission.SYSTEM_ALERT_WINDOW.isGranted()
                 }
             }
@@ -122,24 +127,20 @@ fun HomePage(
                             modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN),
                         )
                     }
-                    if (showOverlayWarning) {
+                    val showNotificationWarning = supportsBackgroundService && !notificationsGranted
+                    if (showNotificationWarning) {
                         if (showVpnWarning) VerticalSpace(8.dp)
-                        PAlert(
-                            description = stringResource(Res.string.system_alert_window_warning),
-                            type = AlertType.WARNING,
-                            modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN).testTag("settings-overlay-warning"),
-                        ) {
-                            PTextButton(
-                                text = stringResource(Res.string.grant_permission),
-                                buttonSize = ButtonSize.SMALL,
-                                contentColor = MaterialTheme.colorScheme.onWarningContainer,
-                                onClick = {
-                                    sendEvent(RequestPermissionsEvent(Permission.SYSTEM_ALERT_WINDOW))
-                                },
-                            )
+                        PermissionWarning(stringResource(Res.string.service_notification_prompt), "settings-notification-warning") {
+                            sendEvent(OpenNotificationSettingsEvent)
                         }
                     }
-                    if (showVpnWarning || showOverlayWarning) VerticalSpace(16.dp)
+                    if (showOverlayWarning) {
+                        if (showVpnWarning || showNotificationWarning) VerticalSpace(8.dp)
+                        PermissionWarning(stringResource(Res.string.system_alert_window_warning), "settings-overlay-warning") {
+                            sendEvent(RequestPermissionsEvent(Permission.SYSTEM_ALERT_WINDOW))
+                        }
+                    }
+                    if (showVpnWarning || showNotificationWarning || showOverlayWarning) VerticalSpace(16.dp)
                     PCard(modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN).testTag("settings-remote-access")) {
                         DesktopAccessSection(navController)
                     }
@@ -164,5 +165,21 @@ fun HomePage(
                 }
             }
         }
+    }
+}
+
+@Composable
+private fun PermissionWarning(description: String, tag: String, onGrant: () -> Unit) {
+    PAlert(
+        description = description,
+        type = AlertType.WARNING,
+        modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN).testTag(tag),
+    ) {
+        PTextButton(
+            text = stringResource(Res.string.grant_permission),
+            buttonSize = ButtonSize.SMALL,
+            contentColor = MaterialTheme.colorScheme.onWarningContainer,
+            onClick = onGrant,
+        )
     }
 }

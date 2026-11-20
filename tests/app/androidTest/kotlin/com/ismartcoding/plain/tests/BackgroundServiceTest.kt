@@ -108,18 +108,22 @@ class BackgroundServiceTest {
             }
             ActivityScenario.launch(MainActivity::class.java).use {
                 val deadline = SystemClock.elapsedRealtime() + 10_000
+                var notificationWarningVisible = false
                 var gap: Float? = null
                 while (gap == null && SystemClock.elapsedRealtime() < deadline) {
                     instrumentation.runOnMainSync {
                         val nodes = WindowInspector.getGlobalWindowViews().filter(View::isShown)
                             .flatMap(::composeRoots)
                             .flatMap { flatten(it.semanticsOwner.unmergedRootSemanticsNode) }
+                        notificationWarningVisible = nodes.any { it.config.getOrNull(SemanticsProperties.TestTag) == "settings-notification-warning" }
                         val alert = nodes.firstOrNull { it.config.getOrNull(SemanticsProperties.TestTag) == "settings-overlay-warning" }
                         val card = nodes.firstOrNull { it.config.getOrNull(SemanticsProperties.TestTag) == "settings-remote-access" }
                         if (alert != null && card != null) gap = card.boundsInRoot.top - alert.boundsInRoot.bottom
                     }
                     if (gap == null) SystemClock.sleep(50)
                 }
+                assertEquals("Settings should prompt when notifications are disabled",
+                    !context.getSystemService(NotificationManager::class.java).areNotificationsEnabled(), notificationWarningVisible)
                 val density = context.resources.displayMetrics.density
                 assertEquals(16f * density, checkNotNull(gap) { "Settings warning and Remote Access card must be visible" }, 1f)
             }

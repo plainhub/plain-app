@@ -16,6 +16,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
+import com.ismartcoding.plain.events.OpenNotificationSettingsEvent
+import com.ismartcoding.plain.i18n.grant_permission
+import com.ismartcoding.plain.i18n.service_notification_prompt
+import com.ismartcoding.plain.lib.sendEvent
+import com.ismartcoding.plain.platform.permissions.Permission
+import com.ismartcoding.plain.platform.permissions.isGranted
+import com.ismartcoding.plain.platform.system.supportsBackgroundService
+import com.ismartcoding.plain.ui.components.confirmActionAsync
 import com.ismartcoding.plain.Prefs
 import com.ismartcoding.plain.features.sessions.onlineClientIds
 import com.ismartcoding.plain.i18n.Res
@@ -49,7 +57,13 @@ fun DesktopAccessSection(navController: NavHostController) {
             subtitle = stringResource(if (remoteAccessEnabled) Res.string.desktop_access_instructions else Res.string.desktop_access_desc)
         ) {
             Switch(checked = remoteAccessEnabled, onCheckedChange = { enable ->
-                scope.launchSafe { setRemoteAccessEnabled(enable) }
+                scope.launchSafe {
+                    if (setRemoteAccessEnabled(enable) && enable && supportsBackgroundService && !Permission.POST_NOTIFICATIONS.isGranted()) {
+                        confirmActionAsync(Res.string.grant_permission, Res.string.service_notification_prompt, callback = {
+                            sendEvent(OpenNotificationSettingsEvent)
+                        })
+                    }
+                }
             })
         }
         if (remoteAccessEnabled) {

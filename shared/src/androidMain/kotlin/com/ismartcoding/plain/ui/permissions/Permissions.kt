@@ -17,6 +17,7 @@ import com.ismartcoding.plain.platform.isTPlus
 import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.appContext
 import com.ismartcoding.plain.mainActivity
+import com.ismartcoding.plain.events.OpenNotificationSettingsEvent
 import com.ismartcoding.plain.events.PermissionsResultEvent
 import com.ismartcoding.plain.events.RequestPermissionsEvent
 import com.ismartcoding.plain.lib.receiveEventHandler
@@ -165,6 +166,9 @@ object Permissions {
             sendEvent(PermissionsResultEvent(permissions))
         }
 
+        events.add(receiveEventHandler<OpenNotificationSettingsEvent> {
+            intentLauncherMap.getValue(Permission.POST_NOTIFICATIONS).launch(getPermissionEnableNotificationIntent(activity))
+        })
         events.add(
             receiveEventHandler<RequestPermissionsEvent> { event ->
                 if (event.permissions.size == 1) {
