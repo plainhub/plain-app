@@ -1,6 +1,5 @@
 package com.ismartcoding.plain.ui.onboarding
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.pager.HorizontalPager
@@ -20,13 +19,8 @@ import com.ismartcoding.plain.ui.base.*
 import com.ismartcoding.plain.ui.components.ButtonSize
 import com.ismartcoding.plain.ui.navigation.PBackHandler
 import com.ismartcoding.plain.ui.navigation.Routing
-import com.ismartcoding.plain.ui.resources.Res as UiRes
-import com.ismartcoding.plain.ui.resources.devices
-import com.ismartcoding.plain.ui.resources.lock
-import com.ismartcoding.plain.ui.resources.settings
 import com.ismartcoding.plain.ui.theme.cardBackgroundNormal
 import kotlinx.coroutines.launch
-import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 
 @Composable
@@ -65,25 +59,10 @@ fun OnboardingPage(navController: NavHostController) {
             }
             HorizontalPager(pages, Modifier.weight(1f)) { page ->
                 Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(vertical = 8.dp)) {
-                    if (page == 1) {
-                        RemoteAccessAnimation(active = pages.settledPage == page)
-                    } else Box(Modifier.fillMaxWidth().background(MaterialTheme.colorScheme.secondaryContainer, MaterialTheme.shapes.extraLarge)
-                        .heightIn(min = 240.dp).padding(24.dp), contentAlignment = Alignment.Center) {
-                        when (page) {
-                            0 -> Image(painterResource(Res.drawable.onboarding_devices), null, Modifier.fillMaxWidth().height(176.dp))
-                            else -> PCard {
-                                Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
-                                    Text(stringResource(Res.string.access_settings), fontWeight = FontWeight.Bold)
-                                    listOf(UiRes.drawable.devices to Res.string.connections, UiRes.drawable.lock to Res.string.security,
-                                        UiRes.drawable.settings to Res.string.access_remote_permissions).forEach { (icon, label) ->
-                                        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                                            Icon(painterResource(icon), null, Modifier.size(20.dp), tint = MaterialTheme.colorScheme.primary)
-                                            Text(stringResource(label))
-                                        }
-                                    }
-                                }
-                            }
-                        }
+                    when (page) {
+                        0 -> DirectConnectionIllustration()
+                        1 -> RemoteAccessAnimation(active = pages.settledPage == page)
+                        else -> AccessSettingsIllustration()
                     }
                     VerticalSpace(24.dp)
                     val (title, body) = when (page) {
