@@ -62,4 +62,5 @@
     <string name="location_required_for_aware_chat">சில Android சாதனங்களில், அருகிலுள்ள சாதன தகவல்தொடர்புக்கு இருப்பிட அனுமதி தேவை. PlainApp உங்களைக் கண்காணிக்க உங்கள் இருப்பிடத்தைப் பயன்படுத்துவதில்லை.</string>
     <string name="go_to_settings">அமைப்புகளுக்குச் செல்</string>
     <string name="permission_denied_message">அனுமதி மறுக்கப்பட்டது. இந்த அம்சத்தைப் பயன்படுத்த அமைப்புகளில் இயக்கவும்.</string>
+    <string name="service_notification_prompt">பிற சாதனங்கள் உங்கள் ஃபோனுடன் தொடர்ந்து இணைக்க, Android கேட்கும் பின்னணி அறிவிப்பைக் காட்ட அனுமதியுங்கள்.</string>
 </resources>

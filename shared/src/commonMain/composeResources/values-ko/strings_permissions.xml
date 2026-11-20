@@ -62,4 +62,5 @@
     <string name="location_required_for_aware_chat">일부 Android 기기에서는 근처 기기 통신을 위해 위치 권한이 필요합니다. PlainApp은 사용자를 추적하기 위해 위치를 사용하지 않습니다.</string>
     <string name="go_to_settings">설정으로 이동</string>
     <string name="permission_denied_message">권한이 거부되었습니다. 이 기능을 사용하려면 설정에서 활성화하세요.</string>
+    <string name="service_notification_prompt">다른 기기가 계속 휴대전화에 연결할 수 있도록 Android에서 요구하는 백그라운드 알림을 허용해 주세요.</string>
 </resources>

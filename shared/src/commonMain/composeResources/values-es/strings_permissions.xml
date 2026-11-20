@@ -62,4 +62,5 @@
     <string name="location_required_for_aware_chat">En algunos dispositivos Android, se requiere permiso de ubicación para la comunicación con dispositivos cercanos. PlainApp no usa su ubicación para rastrearlo.</string>
     <string name="go_to_settings">Ir a Configuración</string>
     <string name="permission_denied_message">Permiso denegado. Habilítelo en Configuración para usar esta función.</string>
+    <string name="service_notification_prompt">Permite la notificación en segundo plano que requiere Android para que otros dispositivos puedan seguir conectándose a tu teléfono.</string>
 </resources>

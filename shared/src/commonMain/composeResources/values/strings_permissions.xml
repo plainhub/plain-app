@@ -62,5 +62,5 @@
     <string name="call_phone_permission_required">In order to make phone calls through the app, please allow phone access.</string>
     <string name="permission_denied_message">Permission was denied. Please enable it in Settings to use this feature.</string>
     <string name="go_to_settings">Go to Settings</string>
-    <string name="service_notification_prompt">Allow notifications to see the address your computer can use to connect to your phone even when PlainApp is in the background.</string>
+    <string name="service_notification_prompt">Please allow the background notification Android requires so other devices can still connect to your phone.</string>
 </resources>
