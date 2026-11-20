@@ -1,5 +1,13 @@
 package com.ismartcoding.plain.tests
 
+import android.graphics.Bitmap
+import android.graphics.Rect
+import android.os.Handler
+import android.os.Looper
+import android.os.SystemClock
+import android.view.InputDevice
+import android.view.MotionEvent
+import android.view.PixelCopy
 import android.view.View
 import android.view.ViewGroup
 import android.view.inspector.WindowInspector
@@ -94,6 +102,8 @@ import com.ismartcoding.plain.ui.nearby.NearbyViewModel
 import com.ismartcoding.plain.ui.nearby.PairPeerDialog
 import com.ismartcoding.plain.ui.nearby.PairingProjection
 import com.ismartcoding.plain.ui.settings.SettingsPage
+import java.util.concurrent.CompletableFuture
+import java.util.concurrent.TimeUnit
 import org.junit.Assume.assumeTrue
 
 @RunWith(AndroidJUnit4::class)
@@ -288,6 +298,7 @@ class SharedComponentSpacingTest {
         assertEquals(32f, tagged("fix-action").boundsInRoot.height, 0.5f)
         assertEquals(48f, tagged("regular-action").touchBoundsInRoot.height, 0.5f)
         assertEquals(4f, alert.bottom - action.bottom, 0.5f)
+        assertEquals(16f, alert.right - text("Fix now").boundsInRoot.right, 0.5f)
         val plain = tagged("without-button").boundsInRoot
         assertEquals(plain.height, tagged("empty-button").boundsInRoot.height, 0.5f)
         assertEquals(8f, tagged("with-detail").boundsInRoot.bottom - tagged("detail-content").boundsInRoot.bottom, 0.5f)
@@ -297,7 +308,7 @@ class SharedComponentSpacingTest {
     fun alertKeepsActionsAtTheLogicalEndInRtl() = render({
         CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
             PAlert("Network permission is needed to find nearby devices.", AlertType.ERROR, Modifier.testTag("rtl-alert")) {
-                PAlertTextButton("Configure now", {}, Modifier.testTag("rtl-action"))
+                PAlertTextButton("OK", {}, Modifier.testTag("rtl-action"))
             }
         }
     }) {
@@ -305,7 +316,54 @@ class SharedComponentSpacingTest {
         val alert = tagged("rtl-alert").boundsInRoot
         val action = tagged("rtl-action").touchBoundsInRoot
         assertEquals(16f, action.left - alert.left, 0.5f)
+        assertEquals(16f, text("OK").boundsInRoot.left - alert.left, 0.5f)
         assertEquals(4f, alert.bottom - action.bottom, 0.5f)
+    }
+
+    @Test
+    fun alertTextActionClipsOnlyThePressFeedbackToACapsule() = render({
+        PAlert("Permission is needed", AlertType.WARNING, Modifier.padding(top = 96.dp)) {
+            PAlertTextButton("Fix now", {}, Modifier.testTag("ripple-action"))
+        }
+    }) { activity ->
+        await { nodes().any { it.config.getOrNull(SemanticsProperties.TestTag) == "ripple-action" } }
+        val button = tagged("ripple-action")
+        val touch = button.positionOnScreen
+        val x = button.positionInWindow.x.toInt() + 2
+        val y = button.positionInWindow.y.toInt()
+        val sample = Rect(x, y + 2, x + 1, y + 17)
+        val handler = Handler(Looper.getMainLooper())
+        fun feedbackPixels(): Pair<Int, Int> {
+            val screenshot = Bitmap.createBitmap(sample.width(), sample.height(), Bitmap.Config.ARGB_8888)
+            return try {
+                val result = CompletableFuture<Int>()
+                PixelCopy.request(activity.window, sample, screenshot, { result.complete(it) }, handler)
+                assertEquals(PixelCopy.SUCCESS, result.get(3, TimeUnit.SECONDS).toInt())
+                screenshot.getPixel(0, 14) to screenshot.getPixel(0, 0)
+            } finally {
+                screenshot.recycle()
+            }
+        }
+
+        val idle = feedbackPixels()
+        val down = SystemClock.uptimeMillis()
+        fun sendTouch(action: Int) {
+            val event = MotionEvent.obtain(down, SystemClock.uptimeMillis(), action, touch.x + 12, touch.y + 4, 0)
+            try {
+                event.source = InputDevice.SOURCE_TOUCHSCREEN
+                instrumentation.sendPointerSync(event)
+            } finally {
+                event.recycle()
+            }
+        }
+
+        try {
+            sendTouch(MotionEvent.ACTION_DOWN)
+            await { feedbackPixels().first != idle.first }
+            assertEquals("Button corner should stay transparent when pressed", idle.second, feedbackPixels().second)
+        } finally {
+            sendTouch(MotionEvent.ACTION_CANCEL)
+        }
     }
 
     @Test
@@ -398,9 +456,11 @@ class SharedComponentSpacingTest {
         }
     }
 
-    private fun render(content: @Composable () -> Unit, verify: () -> Unit) {
+    private fun render(content: @Composable () -> Unit, verify: (MainActivity) -> Unit) {
         ActivityScenario.launch(MainActivity::class.java).use { scenario ->
+            lateinit var host: MainActivity
             scenario.onActivity { activity ->
+                host = activity
                 activity.setContent {
                     CompositionLocalProvider(LocalDensity provides Density(1f)) {
                         AppTheme(useDarkTheme = false) {
@@ -409,7 +469,7 @@ class SharedComponentSpacingTest {
                     }
                 }
             }
-            verify()
+            verify(host)
         }
     }
 
