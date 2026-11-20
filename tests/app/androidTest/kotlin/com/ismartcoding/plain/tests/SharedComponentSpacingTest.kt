@@ -26,6 +26,7 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.platform.ViewRootForTest
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.semantics.SemanticsActions
 import androidx.compose.ui.semantics.SemanticsNode
 import androidx.compose.ui.semantics.SemanticsProperties
 import androidx.compose.ui.semantics.getOrNull
@@ -53,7 +54,9 @@ import org.junit.Test
 import org.junit.runner.RunWith
 
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.rememberNavController
+import com.ismartcoding.plain.Prefs
 import com.ismartcoding.plain.features.chat.ChatStatus
 import com.ismartcoding.plain.features.chat.data.ChatTarget
 import com.ismartcoding.plain.features.chat.models.ChatAttachmentType
@@ -76,19 +79,50 @@ import com.ismartcoding.plain.features.nearby.PairingMode
 import com.ismartcoding.plain.features.nearby.PeerStatus
 import com.ismartcoding.plain.i18n.Res
 import com.ismartcoding.plain.i18n.cancel
+import com.ismartcoding.plain.i18n.dark_theme
+import com.ismartcoding.plain.i18n.donation_title
 import com.ismartcoding.plain.i18n.pair_another_device
 import com.ismartcoding.plain.models.NearbyDevice
 import com.ismartcoding.plain.models.PairingProgressNotice
+import com.ismartcoding.plain.platform.system.AppFeatureType
 import com.ismartcoding.plain.platform.system.DeviceType
+import com.ismartcoding.plain.platform.system.has
 import com.ismartcoding.plain.ui.chat.components.NearbyDeviceItem
 import com.ismartcoding.plain.ui.i18n.LocaleHelper
 import com.ismartcoding.plain.ui.nearby.NearbyViewModel
 import com.ismartcoding.plain.ui.nearby.PairPeerDialog
 import com.ismartcoding.plain.ui.nearby.PairingProjection
+import com.ismartcoding.plain.ui.settings.SettingsPage
+import org.junit.Assume.assumeTrue
 
 @RunWith(AndroidJUnit4::class)
 class SharedComponentSpacingTest {
     private val instrumentation = InstrumentationRegistry.getInstrumentation()
+
+    @Test
+    fun settingsKeepsOneGapWhenTheUpdateBannerIsHidden() {
+        assumeTrue(AppFeatureType.CHECK_UPDATES.has())
+        val updateAvailable = Prefs.appUpdateAvailable.value
+        Prefs.appUpdateAvailable.value = false
+        try {
+            render({ SettingsPage(rememberNavController(), viewModel(), viewModel()) }) {
+                val donationTitle = LocaleHelper.getString(Res.string.donation_title)
+                val darkThemeTitle = LocaleHelper.getString(Res.string.dark_theme)
+                await {
+                    val labels = nodes().flatMap { it.config.getOrNull(SemanticsProperties.Text).orEmpty() }.map { it.text }
+                    donationTitle in labels && darkThemeTitle in labels
+                }
+                fun boundsOfClickable(label: String) = generateSequence(text(label)) { it.parent }
+                    .first { it.config.contains(SemanticsActions.OnClick) }.boundsInRoot
+
+                val donation = boundsOfClickable(donationTitle)
+                val darkTheme = boundsOfClickable(darkThemeTitle)
+                assertEquals(16f, darkTheme.top - donation.bottom, 0.5f)
+            }
+        } finally {
+            Prefs.appUpdateAvailable.value = updateAvailable
+        }
+    }
 
     @Test
     fun pairingAnotherDevicePreservesTheFirstRequestAndKeepsCodesOutOfRows() {

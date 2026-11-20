@@ -116,7 +116,6 @@ fun SettingsPage(navController: NavHostController, updateViewModel: UpdateViewMo
                 item {
                     if (AppFeatureType.CHECK_UPDATES.has()) {
                         UpdateBanner(updateViewModel)
-                        VerticalSpace(dp = 16.dp)
                     }
                 }
                 item { SettingsCardItems(navController) }
