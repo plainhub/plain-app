@@ -5,6 +5,7 @@ package com.ismartcoding.plain.ui.platform.media
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.pager.PagerState
+import androidx.compose.runtime.key
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
@@ -29,7 +30,7 @@ fun MediaViewer(
     gesture: GestureScope,
     boundClip: Boolean = true,
 ) {
-    androidx.compose.runtime.LaunchedEffect(model.path) {
+    androidx.compose.runtime.LaunchedEffect(model.source, model.path) {
         try {
             model.prepareResource()
         } catch (canceled: kotlinx.coroutines.CancellationException) {
@@ -46,12 +47,14 @@ fun MediaViewer(
     Box(modifier = modifier) {
         val onMounted: () -> Unit = { scope.launch { state.mountedFlow.emit(true) } }
         if (model.isVideo()) {
-            MediaVideo(
-                pagerState = pagerState, videoState = videoState, page = page, model = model,
-                scale = state.scale.value, offsetX = state.offsetX.value, offsetY = state.offsetY.value,
-                rotation = state.rotation.value, gesture = rawGesture, onMounted = onMounted,
-                onSizeChange = sizeChange, boundClip = boundClip,
-            )
+            key(model.source, model.id, model.resourcePath, model.tlsCertificateSha256) {
+                MediaVideo(
+                    pagerState = pagerState, videoState = videoState, page = page, model = model,
+                    scale = state.scale.value, offsetX = state.offsetX.value, offsetY = state.offsetY.value,
+                    rotation = state.rotation.value, gesture = rawGesture, onMounted = onMounted,
+                    onSizeChange = sizeChange, boundClip = boundClip,
+                )
+            }
         } else if (imageRenderer != null) {
             imageRenderer.Content(
                 model, state.scale.value, state.offsetX.value, state.offsetY.value,

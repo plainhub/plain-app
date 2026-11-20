@@ -1,5 +1,10 @@
 package com.ismartcoding.plain.ui.media.viewer.video
 
+import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.CoroutineStart
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.test.runTest
+import kotlinx.coroutines.yield
 import kotlin.test.assertNull
 
 import com.ismartcoding.plain.models.Video as MediaVideo
@@ -53,6 +58,57 @@ private class FakeVideoPlayerController : VideoPlayerController {
 }
 
 class VideoStateTest {
+    @Test
+    fun switchedOrClosedVideoCannotSeekOrClaimFocusAfterLateHistory() = runTest {
+        var generation = 0
+        fun select(id: Int, gate: CompletableDeferred<Long>, player: FakeVideoPlayerController) =
+            launch(start = CoroutineStart.UNDISPATCHED) {
+                startVideoPlayback(player, { player.prepare() }, { gate.await() }, { generation == id }) {}
+            }
+        val players = List(4) { FakeVideoPlayerController() }
+        val reads = List(4) { CompletableDeferred<Long>() }
+        val jobs = players.mapIndexed { i, player ->
+            generation = i
+            select(i, reads[i], player).also {
+                yield()
+                assertEquals(1, player.prepareCount)
+                assertFalse(player.focusRequested)
+            }
+        }
+        reads[3].complete(1234L)
+        jobs[3].join()
+        generation++ // Close before earlier reads finish.
+        for (i in 2 downTo 0) {
+            reads[i].complete(777L)
+            jobs[i].join()
+            assertTrue(players[i].seekPositions.isEmpty())
+            assertFalse(players[i].focusRequested)
+            assertEquals(0, players[i].playCount)
+        }
+        assertEquals(listOf(1234L), players[3].seekPositions)
+        assertEquals(1, players[3].playCount)
+    }
+
+
+    @Test
+    fun cancelledVisitCannotPlayWhenTheSamePageBecomesCurrentAgain() = runTest {
+        val player = FakeVideoPlayerController()
+        val oldHistory = CompletableDeferred<Long>()
+        val oldRead = CompletableDeferred<Unit>()
+        val retired = launch {
+            startVideoPlayback(player, { player.prepare() }, {
+                oldRead.complete(Unit)
+                kotlinx.coroutines.withContext(kotlinx.coroutines.NonCancellable) { oldHistory.await() }
+            }, { true }) {}
+        }
+        oldRead.await()
+        retired.cancel()
+        startVideoPlayback(player, { player.prepare() }, { 2500L }, { true }) {}
+        oldHistory.complete(9000L)
+        retired.join()
+        assertEquals(listOf(2500L), player.seekPositions)
+        assertEquals(1, player.playCount)
+    }
 
     @Test
     fun `initData sets controller and applies current speed`() {

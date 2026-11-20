@@ -9,7 +9,10 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import com.ismartcoding.plain.features.media.MediaPlayHistoryClient
+import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.ensureActive
 import com.ismartcoding.plain.platform.media.getVideoMediaId
 import com.ismartcoding.plain.models.PlaybackType
 import com.ismartcoding.plain.ui.media.viewer.PreviewItem
@@ -40,6 +43,14 @@ internal fun rememberMediaVideoController(
         val positionMs = controller.currentPositionMs
         if (id.isEmpty() || positionMs < 0) return
         model.source.history.saveProgress(id, PlaybackType.VIDEO, positionMs)
+    }
+
+    suspend fun prepareVideo() {
+        if (preparedPath == model.resourcePath) return
+        controller.setMediaItem(model.resourcePath, model.tlsCertificateSha256)
+        currentCoroutineContext().ensureActive()
+        controller.prepare()
+        preparedPath = model.resourcePath
     }
 
     controller.setEventListener { event ->
@@ -79,32 +90,23 @@ internal fun rememberMediaVideoController(
                 return@launchSafe
             }
             if (isActive) {
-                if (mediaId.isEmpty() && model.source is com.ismartcoding.plain.rust.graphql.ContentSource.Local) mediaId = getVideoMediaId(model.path).orEmpty()
-                val savedPos = if (mediaId.isNotEmpty()) {
-                    model.source.history.find(mediaId, PlaybackType.VIDEO, Clock.System.now() - 30.days)?.positionMs
-                } else null
-                if (!videoState.isPreviewerOpen || pagerState.settledPage != page) return@launchSafe
-                videoState.initData(controller)
                 val expectedTotalMs = (model.data as? MediaVideo)?.durationMs ?: 0L
-                if (expectedTotalMs > 0L) videoState.totalTime = expectedTotalMs
-                val atEnd = savedPos != null && savedPos > 0 && expectedTotalMs > 0 && savedPos >= expectedTotalMs - 1000
-                val positionMs = if (savedPos != null && savedPos > 0 && !atEnd) savedPos else 0L
-                videoState.currentTime = positionMs
-                if (preparedPath != model.resourcePath) {
-                    controller.setMediaItem(model.resourcePath, model.tlsCertificateSha256)
-                    controller.prepare()
-                    preparedPath = model.resourcePath
+                startVideoPlayback(controller, prepare = ::prepareVideo, resumePosition = {
+                    if (mediaId.isEmpty() && model.source is com.ismartcoding.plain.rust.graphql.ContentSource.Local) {
+                        mediaId = getVideoMediaId(model.path).orEmpty()
+                    }
+                    val saved = if (mediaId.isNotEmpty()) {
+                        model.source.history.find(mediaId, PlaybackType.VIDEO, Clock.System.now() - 30.days)?.positionMs
+                    } else null
+                    saved?.takeIf { it > 0 && (expectedTotalMs <= 0 || it < expectedTotalMs - 1000) } ?: 0L
+                }, current = { videoState.isPreviewerOpen && pagerState.settledPage == page }) { position ->
+                    videoState.initData(controller)
+                    if (expectedTotalMs > 0L) videoState.totalTime = expectedTotalMs
+                    videoState.currentTime = position
+                    wasActive = true
                 }
-                controller.seekTo(positionMs)
-                controller.requestAudioFocus()
-                wasActive = true
-                controller.play()
             } else if (abs(page - pagerState.settledPage) <= 1) {
-                if (preparedPath != model.resourcePath) {
-                    controller.setMediaItem(model.resourcePath, model.tlsCertificateSha256)
-                    controller.prepare()
-                    preparedPath = model.resourcePath
-                }
+                prepareVideo()
                 controller.pause()
                 controller.abandonAudioFocus()
             } else {
@@ -123,4 +125,22 @@ internal fun rememberMediaVideoController(
         }
     }
     return controller
+}
+
+internal suspend fun startVideoPlayback(
+    controller: VideoPlayerController,
+    prepare: suspend () -> Unit,
+    resumePosition: suspend () -> Long,
+    current: () -> Boolean,
+    onStart: (Long) -> Unit,
+) = coroutineScope {
+    val history = async { resumePosition() }
+    prepare()
+    val position = history.await()
+    ensureActive()
+    if (!current()) return@coroutineScope
+    onStart(position)
+    controller.seekTo(position)
+    controller.requestAudioFocus()
+    controller.play()
 }
