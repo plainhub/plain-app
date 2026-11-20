@@ -178,7 +178,7 @@ object Query {
     )
 
     fun calls(query: String, limit: Int, offset: Int): GraphqlRequest<List<Call>> = GraphqlRequest(
-        $$"query($query: String!, $limit: Int!, $offset: Int!) { calls(query: $query, limit: $limit, offset: $offset) { id number name photo startedAt durationSec type typeCode accountId } }",
+        $$"query($query: String!, $limit: Int!, $offset: Int!) { calls(query: $query, limit: $limit, offset: $offset) { id number name photo startedAt durationSec type accountId } }",
         mapOf(variable("query", query), variable("limit", limit), variable("offset", offset)),
         field = "calls",
     )

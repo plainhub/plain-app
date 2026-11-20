@@ -8,5 +8,4 @@ data class ContactIm(
     var value: String,
     var protocol: ContactImProtocol,
     var customProtocol: String,
-    var typeCode: Int = 0,
 )

@@ -9,5 +9,4 @@ data class ContactPhoneNumber(
     var type: ContactPhoneType,
     var label: String,
     var normalizedNumber: String,
-    var typeCode: Int = 0,
 )

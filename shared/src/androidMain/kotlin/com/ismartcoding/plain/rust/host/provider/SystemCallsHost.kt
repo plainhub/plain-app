@@ -5,7 +5,6 @@ import com.ismartcoding.plain.platform.media.provider.CallMediaStoreHelper
 import com.ismartcoding.plain.platform.permissions.Permission
 import com.ismartcoding.plain.platform.permissions.isGranted
 import com.ismartcoding.plain.lib.JsonHelper
-import com.ismartcoding.plain.models.Call as PhoneCall
 import com.ismartcoding.plain.platform.media.call
 import com.ismartcoding.plain.platform.media.countMedia
 import com.ismartcoding.plain.platform.media.getMediaIds
@@ -20,7 +19,7 @@ internal object SystemCallsHost {
             val request = JsonHelper.jsonDecodeFromElement<ProviderPageRequest>(params)
             hostResult(
                 if (!Permission.READ_CALL_LOG.isGranted()) emptyList()
-                else CallMediaStoreHelper.searchAsync(appContext, request.plan.where(), request.limit, request.offset).map(::callFacts)
+                else CallMediaStoreHelper.searchAsync(appContext, request.plan.where(), request.limit, request.offset)
             )
         }
         "systemCallCount" -> hostResult(
@@ -44,11 +43,6 @@ internal object SystemCallsHost {
         }
         else -> error("Unsupported provider operation")
     }
-
-    private fun callFacts(call: PhoneCall) = CallFacts(
-        id = call.id, number = call.number, name = call.name, photoUri = call.photo,
-        startedAt = call.startedAt.toString(), durationSec = call.durationSec, type = call.typeCode, accountId = call.accountId,
-    )
 }
 
 @Serializable

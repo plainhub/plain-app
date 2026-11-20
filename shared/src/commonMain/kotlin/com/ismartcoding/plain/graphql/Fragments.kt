@@ -4,7 +4,7 @@ import com.ismartcoding.plain.platform.system.DataType
 
 internal object Fragments {
     const val CHAT_ITEM = "id fromId toId channelId content { ... on ChatMessageContent { __typename text format items { type attachment { id uri size durationMs width height summary fileName } } linkPreviews { url title description image imageWidth imageHeight siteName domain createdAt } } ... on ChatShareContent { __typename shareId urlToken peerInfo { id ip port } name itemCount totalSize expiresAt } } createdAt updatedAt status deliveryResults { peerId peerName error }"
-    const val CONTACT = "id prefix firstName middleName lastName suffix nickname photoId phoneNumbers { value type typeCode label normalizedNumber } emails { value type typeCode label } addresses { value type typeCode label } events { value type typeCode label } websites { value type typeCode label } ims { value protocol customProtocol typeCode } source starred contactId thumbnailId notes groups { id name } organization { company title } ringtone updatedAt"
+    const val CONTACT = "id prefix firstName middleName lastName suffix nickname photoId phoneNumbers { value type label normalizedNumber } emails { value type label } addresses { value type label } events { value type label } websites { value type label } ims { value protocol customProtocol } source starred contactId thumbnailId notes groups { id name } organization { company title } ringtone updatedAt"
     const val NEARBY_DEVICE_FIELDS = "id name signaturePublicKey ips port deviceType version platform lastSeen discoveryMethods bestIp status remoteAccess"
     const val MDNS_STATUS = "runtimeId revision running scanning"
     const val MDNS_DEBUG = "services { serviceType instanceName instanceFqdn hostname port txtRecords ips ip6s complete } packetsIn { time direction srcIp srcPort dstIp dstPort size summary detail } packetsOut { time direction srcIp srcPort dstIp dstPort size summary detail }"
@@ -24,7 +24,7 @@ internal object Fragments {
     const val MEDIA_COMMON = "id title path size bucketId createdAt updatedAt"
     const val CLIPBOARD_ITEM = "id text source label sensitive createdAt"
     const val APP_FILE = "id size mimeType realPath createdAt updatedAt fileName"
-    const val SMS = "id body address sentAt serviceCenter read threadId type typeCode subscriptionId isMms attachments { path contentType name }"
+    const val SMS = "id body address sentAt serviceCenter read threadId type subscriptionId isMms attachments { path contentType name }"
     const val DLNA_STATE = "version devices { id hostAddress name } currentDevice { id hostAddress name } items { path title albumArt artist durationMs type } currentUri playing progressMs durationMs supportsCallback"
     const val IMAGE_EDITOR_SUMMARY = "id thumbnail canvasWidth canvasHeight updatedAt"
     const val IMAGE_EDITOR_PROJECT = $$"$$IMAGE_EDITOR_SUMMARY stateB64 createdAt"

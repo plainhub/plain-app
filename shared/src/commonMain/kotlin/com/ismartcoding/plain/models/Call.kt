@@ -16,5 +16,4 @@ data class Call(
     var type: CallType,
     var accountId: String,
     var geo: PhoneGeo? = null,
-    var typeCode: Int = 0,
 ) : IData

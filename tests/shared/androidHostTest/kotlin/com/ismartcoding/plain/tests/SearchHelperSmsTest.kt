@@ -28,11 +28,11 @@ class SearchHelperSmsTest {
 
     @Test
     fun parse_type_filter() {
-        val fields = SearchHelper.parse("type:1")
+        val fields = SearchHelper.parse("type:INBOX")
         assertEquals(1, fields.size)
         assertEquals("type", fields[0].name)
         assertEquals("=", fields[0].op)
-        assertEquals("1", fields[0].value)
+        assertEquals("INBOX", fields[0].value)
     }
 
     @Test

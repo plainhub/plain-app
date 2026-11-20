@@ -8,5 +8,4 @@ data class ContactAddress(
     var value: String,
     var type: ContactPostalType,
     var label: String,
-    var typeCode: Int = 0,
 )
