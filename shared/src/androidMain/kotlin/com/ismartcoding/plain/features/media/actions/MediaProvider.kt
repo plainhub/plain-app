@@ -72,7 +72,7 @@ internal object MediaProvider {
                     var count = 0
                     var after: MediaProviderRow? = null
                     try {
-                        val uri = Uri.parse(getSystemMediaItemUriString(type, id))
+                        val uri = writeUri(type, write)
                         val selection = "${MediaStore.MediaColumns.DATA} = ?"
                         val args = arrayOf(write.expectedPath)
                         val extras = matching().apply {
@@ -98,6 +98,20 @@ internal object MediaProvider {
                 })
             }
         }
+    }
+
+    private fun writeUri(type: DataType, write: MediaProviderWrite): Uri {
+        if (!isRPlus()) return Uri.parse(getSystemMediaItemUriString(type, write.id))
+        val storage = appContext.getSystemService(StorageManager::class.java)
+        val volume = requireNotNull(storage.getStorageVolume(File(write.expectedPath))?.mediaStoreVolumeName)
+        val collection = when (type) {
+            DataType.IMAGE -> MediaStore.Images.Media.getContentUri(volume)
+            DataType.VIDEO -> MediaStore.Video.Media.getContentUri(volume)
+            DataType.AUDIO -> MediaStore.Audio.Media.getContentUri(volume)
+            DataType.DOC -> MediaStore.Files.getContentUri(volume)
+            else -> error("Unsupported media type")
+        }
+        return android.content.ContentUris.withAppendedId(collection, write.id.toLong())
     }
 
     private fun matching() = Bundle().apply { putInt(MediaStore.QUERY_ARG_MATCH_TRASHED, MediaStore.MATCH_INCLUDE) }
