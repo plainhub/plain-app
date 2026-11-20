@@ -13,7 +13,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.ismartcoding.plain.i18n.*
-import com.ismartcoding.plain.platform.system.supportsBackgroundService
 import com.ismartcoding.plain.ui.base.AlertType
 import com.ismartcoding.plain.ui.base.PAlert
 import com.ismartcoding.plain.ui.base.PAlertTextButton
@@ -26,6 +25,7 @@ import org.jetbrains.compose.resources.stringResource
 
 @Composable
 fun PlainAppServiceSection(
+    supportsBackgroundService: Boolean,
     errorMessage: String,
     onRetry: (() -> Unit)?,
     onStayOnline: () -> Unit,
@@ -68,6 +68,7 @@ fun PlainAppServiceSection(
                 content = stayOnlineContent,
             )
         } else {
+            VerticalSpace(16.dp)
             stayOnlineContent()
         }
     }

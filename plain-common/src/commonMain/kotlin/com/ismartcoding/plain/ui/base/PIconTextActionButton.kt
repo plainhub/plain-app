@@ -23,6 +23,7 @@ fun PIconTextActionButton(
     text: String,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
+    maxLines: Int = Int.MAX_VALUE,
     onClick: () -> Unit,
 ) {
     IconLabelContent(
@@ -34,6 +35,7 @@ fun PIconTextActionButton(
             .alpha(if (enabled) 1f else 0.38f)
             .padding(vertical = 8.dp),
         spacing = 8.dp,
+        maxLines = maxLines,
     ) {
         Box(
             Modifier.size(48.dp),

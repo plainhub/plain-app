@@ -38,6 +38,7 @@ import androidx.compose.ui.semantics.SemanticsActions
 import androidx.compose.ui.semantics.SemanticsNode
 import androidx.compose.ui.semantics.SemanticsProperties
 import androidx.compose.ui.semantics.getOrNull
+import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
@@ -48,6 +49,7 @@ import com.ismartcoding.plain.MainActivity
 import com.ismartcoding.plain.ui.base.AlertType
 import com.ismartcoding.plain.ui.base.PAlert
 import com.ismartcoding.plain.ui.base.PAlertTextButton
+import com.ismartcoding.plain.ui.base.PCard
 import com.ismartcoding.plain.ui.base.PTextButton
 import com.ismartcoding.plain.ui.base.PBottomSheetTopAppBar
 import com.ismartcoding.plain.ui.base.PSheetPrimaryActionsCard
@@ -90,25 +92,69 @@ import com.ismartcoding.plain.i18n.Res
 import com.ismartcoding.plain.i18n.cancel
 import com.ismartcoding.plain.i18n.dark_theme
 import com.ismartcoding.plain.i18n.donation_title
+import com.ismartcoding.plain.i18n.images
 import com.ismartcoding.plain.i18n.pair_another_device
+import com.ismartcoding.plain.i18n.stay_online_foreground_desc
 import com.ismartcoding.plain.models.NearbyDevice
 import com.ismartcoding.plain.models.PairingProgressNotice
 import com.ismartcoding.plain.platform.system.AppFeatureType
 import com.ismartcoding.plain.platform.system.DeviceType
 import com.ismartcoding.plain.platform.system.has
 import com.ismartcoding.plain.ui.chat.components.NearbyDeviceItem
+import com.ismartcoding.plain.ui.home.PlainAppServiceSection
 import com.ismartcoding.plain.ui.i18n.LocaleHelper
 import com.ismartcoding.plain.ui.nearby.NearbyViewModel
 import com.ismartcoding.plain.ui.nearby.PairPeerDialog
 import com.ismartcoding.plain.ui.nearby.PairingProjection
+import com.ismartcoding.plain.ui.resources.image
+import com.ismartcoding.plain.ui.resources.timer
 import com.ismartcoding.plain.ui.settings.SettingsPage
+import com.ismartcoding.plain.ui.tools.FeatureItem
+import com.ismartcoding.plain.ui.tools.FeatureItemsGrid
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.TimeUnit
 import org.junit.Assume.assumeTrue
+import com.ismartcoding.plain.ui.resources.Res as UiRes
 
 @RunWith(AndroidJUnit4::class)
 class SharedComponentSpacingTest {
     private val instrumentation = InstrumentationRegistry.getInstrumentation()
+
+    @Test
+    fun foregroundStayOnlineDescriptionHasTopInset() = render({
+        PCard(Modifier.testTag("stay-online-card")) {
+            PlainAppServiceSection(supportsBackgroundService = false, errorMessage = "", onRetry = null, onStayOnline = {})
+        }
+    }) {
+        val label = LocaleHelper.getString(Res.string.stay_online_foreground_desc)
+        await { nodes().any { it.config.getOrNull(SemanticsProperties.Text)?.any { text -> text.text == label } == true } }
+        val card = tagged("stay-online-card").boundsInRoot
+        val description = text(label).boundsInRoot
+        assertEquals(16f, description.top - card.top, 0.5f)
+    }
+
+    @Test
+    fun homeFeatureTitlesUseOneLineAndEllipsizeWhenNeeded() = render({
+        FeatureItemsGrid(
+            features = listOf(
+                FeatureItem(AppFeatureType.IMAGES, Res.string.images, UiRes.drawable.image) {},
+                FeatureItem(AppFeatureType.POMODORO_TIMER, Res.string.stay_online_foreground_desc, UiRes.drawable.timer) {},
+            ),
+            modifier = Modifier.width(216.dp),
+        )
+    }) {
+        for ((resource, ellipsized) in listOf(Res.string.stay_online_foreground_desc to true, Res.string.images to false)) {
+            val label = LocaleHelper.getString(resource)
+            await { nodes().any { it.config.getOrNull(SemanticsProperties.Text)?.any { text -> text.text == label } == true } }
+            val title = text(label)
+            instrumentation.runOnMainSync {
+                val layouts = mutableListOf<TextLayoutResult>()
+                assertTrue(title.config.getOrNull(SemanticsActions.GetTextLayoutResult)?.action?.invoke(layouts) == true)
+                assertEquals(1, layouts.single().lineCount)
+                assertEquals(ellipsized, layouts.single().isLineEllipsized(0))
+            }
+        }
+    }
 
     @Test
     fun settingsKeepsOneGapWhenTheUpdateBannerIsHidden() {

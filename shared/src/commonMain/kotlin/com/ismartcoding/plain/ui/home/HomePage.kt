@@ -146,6 +146,7 @@ fun HomePage(
                     VerticalSpace(16.dp)
                     PCard(modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN)) {
                         PlainAppServiceSection(
+                            supportsBackgroundService = supportsBackgroundService,
                             errorMessage = httpServerError.ifEmpty { httpServerResourcesError }.ifEmpty { foregroundServiceError },
                             onRetry = if (httpServerError.isNotEmpty() || httpServerResourcesError.isNotEmpty()) {
                                 { HttpServerManager.restartHttpServer() }

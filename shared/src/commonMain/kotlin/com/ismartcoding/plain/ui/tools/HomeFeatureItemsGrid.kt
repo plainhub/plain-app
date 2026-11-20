@@ -86,6 +86,7 @@ private fun FeatureItemAction(item: FeatureItem, modifier: Modifier = Modifier) 
     PCard {
         PIconTextActionButton(
             icon = item.iconRes, text = stringResource(item.titleRes),
+            maxLines = 1,
             modifier = modifier.fillMaxWidth().heightIn(min = 88.dp), onClick = item.click,
         )
     }
