@@ -2,6 +2,7 @@
 
 package com.ismartcoding.plain.platform.files
 
+import com.ismartcoding.plain.features.files.DriveType
 import kotlinx.cinterop.ExperimentalForeignApi
 import platform.Foundation.NSFileSystemFreeSize
 import platform.Foundation.NSFileSystemSize
@@ -18,12 +19,9 @@ actual fun getInternalStoragePath(): String = documentsDirectory
 
 actual fun getInternalStorageName(): String = "Internal Storage"
 
-actual fun getSDCardPath(): String = ""
+internal actual fun storageRoots(): List<StorageRoot> = listOf(StorageRoot(documentsDirectory, DriveType.INTERNAL_STORAGE))
 
-actual fun getUsbDiskPaths(): List<String> = emptyList()
-
-actual fun getInternalStorageStats(): StorageStats {
-    val path = getInternalStoragePath()
+internal actual fun storageStats(path: String): StorageStats? {
     return try {
         val attrs = NSFileManager.defaultManager.attributesOfFileSystemForPath(path, null)
             ?: return StorageStats(0, 0)
@@ -34,10 +32,6 @@ actual fun getInternalStorageStats(): StorageStats {
         StorageStats(0, 0)
     }
 }
-
-actual fun getSDCardStorageStats(): StorageStats = StorageStats(0, 0)
-
-actual fun getUSBStorageStats(): List<StorageStats> = emptyList()
 
 internal actual fun grantedStorageDirectories(): List<String> =
     checkNotNull(com.ismartcoding.plain.platform.system.IosPlatformRegistry.filePicker()).grantedDirectories()

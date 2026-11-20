@@ -31,9 +31,8 @@ import com.ismartcoding.plain.ui.i18n.LocaleHelper
 import com.ismartcoding.plain.platform.system.appDir
 import com.ismartcoding.plain.platform.files.fileExists
 import com.ismartcoding.plain.platform.files.getInternalStorageName
-import com.ismartcoding.plain.platform.files.getInternalStoragePath
-import com.ismartcoding.plain.platform.files.getSDCardPath
-import com.ismartcoding.plain.platform.files.getUsbDiskPaths
+import com.ismartcoding.plain.features.files.DriveType
+import com.ismartcoding.plain.platform.files.storageRoots
 import com.ismartcoding.plain.ui.components.DialogHelper
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -147,15 +146,10 @@ class FilesViewModel internal constructor(val source: ContentSource = ContentSou
 
     fun inferFileTypeFromRoot(rootPath: String): FilesType {
         if (source is ContentSource.Remote) return if (rootPath == source.appPath) FilesType.APP else FilesType.INTERNAL_STORAGE
-        val internalStoragePath = getInternalStoragePath()
-        val appDataPath = appDir()
-        val sdCardPath = getSDCardPath()
-        val usbPaths = getUsbDiskPaths()
-        return when {
-            rootPath == appDataPath -> FilesType.APP
-            rootPath == sdCardPath -> FilesType.SDCARD
-            usbPaths.contains(rootPath) -> FilesType.USB_STORAGE
-            rootPath == internalStoragePath -> FilesType.INTERNAL_STORAGE
+        if (rootPath == appDir()) return FilesType.APP
+        return when (storageRoots().find { it.path == rootPath }?.type) {
+            DriveType.SDCARD -> FilesType.SDCARD
+            DriveType.USB_STORAGE -> FilesType.USB_STORAGE
             else -> FilesType.INTERNAL_STORAGE
         }
     }

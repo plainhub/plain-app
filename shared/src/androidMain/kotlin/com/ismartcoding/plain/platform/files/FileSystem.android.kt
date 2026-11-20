@@ -1,19 +1,26 @@
 package com.ismartcoding.plain.platform.files
 
-import com.ismartcoding.plain.appContext
+import android.os.Environment
+import android.os.StatFs
+import com.ismartcoding.plain.i18n.Res
+import com.ismartcoding.plain.i18n.internal_storage
+import com.ismartcoding.plain.platform.isRPlus
+import com.ismartcoding.plain.storageManager
+import com.ismartcoding.plain.ui.i18n.LocaleHelper
 
-actual fun getInternalStoragePath(): String = FileSystemHelper.getInternalStoragePath()
+actual fun getInternalStoragePath(): String {
+    if (isRPlus()) storageManager.primaryStorageVolume.directory?.let { return it.path }
+    return Environment.getExternalStorageDirectory().absolutePath
+}
 
-actual fun getInternalStorageName(): String = FileSystemHelper.getInternalStorageName()
+actual fun getInternalStorageName(): String = LocaleHelper.getString(Res.string.internal_storage)
 
-actual fun getSDCardPath(): String = FileSystemHelper.getSDCardPath(appContext)
-
-actual fun getUsbDiskPaths(): List<String> = FileSystemHelper.getUsbDiskPaths()
-
-actual fun getInternalStorageStats(): StorageStats = FileSystemHelper.getInternalStorageStats()
-
-actual fun getSDCardStorageStats(): StorageStats = FileSystemHelper.getSDCardStorageStats(appContext)
-
-actual fun getUSBStorageStats(): List<StorageStats> = FileSystemHelper.getUSBStorageStats()
+internal actual fun storageStats(path: String): StorageStats? = try {
+    val stat = StatFs(path)
+    StorageStats(stat.totalBytes, stat.availableBytes)
+} catch (_: IllegalArgumentException) {
+    // The volume may have been unmounted since enumeration.
+    null
+}
 
 internal actual fun grantedStorageDirectories(): List<String> = emptyList()

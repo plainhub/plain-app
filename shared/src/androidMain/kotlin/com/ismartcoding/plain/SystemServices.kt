@@ -3,7 +3,6 @@ package com.ismartcoding.plain
 import android.app.ActivityManager
 import android.app.AlarmManager
 import android.app.UiModeManager
-import android.app.usage.StorageStatsManager
 import android.content.ClipboardManager
 import android.content.ContentResolver
 import android.content.pm.PackageManager
@@ -52,10 +51,6 @@ val connectivityManager: ConnectivityManager by lazy {
 
 val mediaProjectionManager: MediaProjectionManager by lazy {
     appContext.getSystemServiceCompat(MediaProjectionManager::class.java)
-}
-
-val storageStatsManager: StorageStatsManager by lazy {
-    appContext.getSystemServiceCompat(StorageStatsManager::class.java)
 }
 
 val storageManager: StorageManager by lazy {
