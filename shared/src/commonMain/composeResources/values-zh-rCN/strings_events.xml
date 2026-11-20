@@ -23,4 +23,5 @@
     <string name="event_reason_peer_identity_changed">客户端身份已变化</string>
     <string name="event_reason_password_setup_required">尚未配置登录密码</string>
     <string name="event_reason_internal_error">服务器内部错误</string>
+    <string name="event_view_raw">查看原始数据</string>
 </resources>

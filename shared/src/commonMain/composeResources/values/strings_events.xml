@@ -23,4 +23,5 @@
     <string name="event_reason_peer_identity_changed">Client identity changed</string>
     <string name="event_reason_password_setup_required">Sign-in password is not configured</string>
     <string name="event_reason_internal_error">Internal server error</string>
+    <string name="event_view_raw">View raw data</string>
 </resources>

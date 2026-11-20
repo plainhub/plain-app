@@ -35,10 +35,11 @@ class EventsViewModel(
 
     fun search(value: String) { search = value; refresh() }
     fun refresh() = load(true)
-    fun loadMore() = load(false)
+    fun loadMore() {
+        if (!loading) load(false)
+    }
 
-    private fun load(reset: Boolean) {
-        if (loading && !reset) return
+    private fun load(reset: Boolean): Job {
         if (reset) request?.cancel()
         val ticket = ++generation
         val offset = if (reset) 0 else nextOffset
@@ -46,7 +47,7 @@ class EventsViewModel(
         if (reset) { entries = emptyList(); hasMore = false }
         loading = true
         error = ""
-        request = viewModelScope.launch {
+        val job = viewModelScope.launch {
             try {
                 val page = read(query, offset, 50)
                 if (ticket != generation) return@launch
@@ -61,5 +62,7 @@ class EventsViewModel(
                 if (ticket == generation) loading = false
             }
         }
+        request = job
+        return job
     }
 }

@@ -23,4 +23,5 @@
     <string name="event_reason_peer_identity_changed">用戶端身分已變更</string>
     <string name="event_reason_password_setup_required">尚未設定登入密碼</string>
     <string name="event_reason_internal_error">伺服器內部錯誤</string>
+    <string name="event_view_raw">檢視原始資料</string>
 </resources>
