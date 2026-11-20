@@ -8,7 +8,6 @@ import android.provider.Settings
 import android.view.View
 import android.view.ViewGroup
 import android.view.inspector.WindowInspector
-import android.view.accessibility.AccessibilityNodeInfo
 import androidx.compose.ui.platform.ViewRootForTest
 import androidx.compose.ui.semantics.SemanticsNode
 import androidx.compose.ui.semantics.SemanticsProperties
@@ -65,34 +64,21 @@ class BackgroundServiceTest {
     }
 
     @Test
-    fun openingAppRequestsNotificationsAndPostsForegroundNotificationAfterGrant() {
+    fun openingAppKeepsNotificationPermissionUnrequested() {
         assumeTrue(Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU)
         val notifications = context.getSystemService(NotificationManager::class.java)
         assumeFalse(notifications.areNotificationsEnabled())
 
-        ActivityScenario.launch(MainActivity::class.java).use {
-            fun permissionButton(): AccessibilityNodeInfo? {
-                return instrumentation.uiAutomation.rootInActiveWindow
-                    ?.findAccessibilityNodeInfosByViewId("com.android.permissioncontroller:id/permission_allow_button")
-                    ?.firstOrNull()
-            }
-
-            val promptDeadline = SystemClock.elapsedRealtime() + 5_000
-            while (permissionButton() == null && SystemClock.elapsedRealtime() < promptDeadline) {
-                SystemClock.sleep(50)
-            }
-            val allow = checkNotNull(permissionButton()) { "Opening PlainApp should request notification permission" }
-            assertTrue(allow.performAction(AccessibilityNodeInfo.ACTION_CLICK))
-            val notificationDeadline = SystemClock.elapsedRealtime() + 5_000
-            fun serviceNotification() = notifications.activeNotifications.singleOrNull {
-                it.id == HttpServerForegroundService.notificationId
-            }?.notification
-            while (serviceNotification() == null && SystemClock.elapsedRealtime() < notificationDeadline) {
-                SystemClock.sleep(50)
-            }
-            val notification = checkNotNull(serviceNotification()) { "Granting permission should post the foreground service notification" }
-            assertTrue(notification.flags and android.app.Notification.FLAG_FOREGROUND_SERVICE != 0)
-            assertTrue(notification.actions.isNullOrEmpty())
+        ActivityScenario.launch(MainActivity::class.java).use { scenario ->
+            val deadline = SystemClock.elapsedRealtime() + 5_000
+            do {
+                val window = instrumentation.uiAutomation.rootInActiveWindow
+                assertTrue("Opening PlainApp must not launch the system permission prompt",
+                    window?.findAccessibilityNodeInfosByViewId("com.android.permissioncontroller:id/permission_allow_button").isNullOrEmpty())
+                SystemClock.sleep(100)
+            } while (SystemClock.elapsedRealtime() < deadline)
+            scenario.onActivity { assertTrue("PlainApp should retain focus", it.hasWindowFocus()) }
+            assertTrue(!notifications.areNotificationsEnabled())
         }
     }
 
