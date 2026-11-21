@@ -1,5 +1,6 @@
 package com.ismartcoding.plain.tests
 
+import androidx.core.view.descendants
 import android.os.SystemClock
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
@@ -33,6 +34,43 @@ import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
 class VideoFirstFrameTest {
+    @Test
+    fun knownVideoSizeProducesANonEmptySurfaceOnItsFirstLayout() {
+        val instrumentation = InstrumentationRegistry.getInstrumentation()
+        val file = File.createTempFile("first-layout-", ".mp4", instrumentation.targetContext.cacheDir)
+        try {
+            requireNotNull(javaClass.classLoader?.getResourceAsStream("video-start.mp4")).use { input ->
+                file.outputStream().use { input.copyTo(it) }
+            }
+            val model = PreviewItem(file.name, file.path, file.length()).apply { intrinsicSize = IntSize(640, 360) }
+            ActivityScenario.launch(MainActivity::class.java).use { scenario ->
+                val measured = CountDownLatch(1)
+                var size = IntSize.Zero
+                scenario.onActivity { activity ->
+                    val root = activity.window.decorView as android.view.ViewGroup
+                    root.viewTreeObserver.addOnGlobalLayoutListener(object : android.view.ViewTreeObserver.OnGlobalLayoutListener {
+                        override fun onGlobalLayout() {
+                            val surface = root.descendants.filterIsInstance<android.view.TextureView>().firstOrNull() ?: return
+                            if (!surface.isLaidOut) return
+                            size = IntSize(surface.width, surface.height)
+                            root.viewTreeObserver.removeOnGlobalLayoutListener(this)
+                            measured.countDown()
+                        }
+                    })
+                    activity.setContent {
+                        val state = androidx.compose.runtime.remember { VideoState() }
+                        MediaVideo(pagerState = rememberPagerState { 1 }, videoState = state, page = 0, model = model)
+                    }
+                }
+                assertTrue(measured.await(10, TimeUnit.SECONDS))
+                assertTrue("First video surface layout was $size", size.width > 0 && size.height > 0)
+                assertTrue("First layout must fit the video", kotlin.math.abs(size.width * 9 - size.height * 16) <= 16)
+            }
+        } finally {
+            file.delete()
+        }
+    }
+
     @Test
     fun localVideoRendersItsFirstFrameOnOpen() = verifyPlayback(initiallyOpen = true)
 

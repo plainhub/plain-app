@@ -1,10 +1,7 @@
 package com.ismartcoding.plain.ui.media.viewer.video
 
 import kotlinx.coroutines.CompletableDeferred
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.runTest
-import kotlinx.coroutines.yield
-import kotlin.test.assertNull
 
 import com.ismartcoding.plain.models.Video as MediaVideo
 import kotlin.test.Test
@@ -60,11 +57,39 @@ private class FakeVideoPlayerController : VideoPlayerController {
 
 class VideoStateTest {
     @Test
+    fun selectedPageStartsOnTheFrameCallbackWithoutAnotherComposition() {
+        val start = VideoPlaybackStart()
+        var plays = 0
+        start.resume { plays++ }
+        assertEquals(0, plays)
+        start.frameRendered()
+        assertEquals(1, plays)
+        start.frameRendered()
+        assertEquals(1, plays)
+    }
+
+    @Test
+    fun lateFrameCannotStartARetiredVisitAndAPrewarmedPageCanResume() {
+        val start = VideoPlaybackStart()
+        val visits = mutableListOf<String>()
+        start.resume { visits.add("retired") }
+        start.cancel()
+        start.frameRendered()
+        assertTrue(visits.isEmpty())
+        start.resume { visits.add("current") }
+        assertEquals(listOf("current"), visits)
+    }
+
+    @Test
     fun preparationUsesSavedPositionBeforeAnyFrameOrAudioCanStart() = runTest {
         val player = FakeVideoPlayerController()
         val history = CompletableDeferred<Long>()
-        val job = launch { prepareVideoPlayback(player, "clip", null) { history.await() } }
-        yield()
+        var requested = false
+        val job = prepareVideoPlayback(player, "clip", null) {
+            requested = true
+            history.await()
+        }
+        assertTrue(requested, "History lookup must start during page attachment")
         assertEquals(0, player.prepareCount)
         assertTrue(player.mediaItems.isEmpty())
         history.complete(3000L)
@@ -81,15 +106,13 @@ class VideoStateTest {
         val player = FakeVideoPlayerController()
         val oldHistory = CompletableDeferred<Long>()
         val oldRead = CompletableDeferred<Unit>()
-        val retired = launch {
-            prepareVideoPlayback(player, "clip", null) {
-                oldRead.complete(Unit)
-                kotlinx.coroutines.withContext(kotlinx.coroutines.NonCancellable) { oldHistory.await() }
-            }
+        val retired = prepareVideoPlayback(player, "clip", null) {
+            oldRead.complete(Unit)
+            kotlinx.coroutines.withContext(kotlinx.coroutines.NonCancellable) { oldHistory.await() }
         }
         oldRead.await()
         retired.cancel()
-        prepareVideoPlayback(player, "clip", null) { 2500L }
+        prepareVideoPlayback(player, "clip", null) { 2500L }.join()
         oldHistory.complete(9000L)
         retired.join()
         assertEquals("clip", player.mediaItems.single().first)

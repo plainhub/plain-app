@@ -13,7 +13,7 @@ import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.foundation.gestures.waitForUpOrCancellation
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.pager.PagerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -24,7 +24,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.onSizeChanged
-import androidx.compose.ui.platform.LocalDensity
+import com.ismartcoding.plain.ui.extensions.getRotatedSize
 import androidx.compose.ui.unit.IntSize
 import com.ismartcoding.plain.ui.platform.media.VideoPlayerSurface
 import com.ismartcoding.plain.ui.media.viewer.DEFAULT_OFFSET_X
@@ -56,9 +56,13 @@ fun MediaVideo(
     if (page != pagerState.settledPage && (!videoState.isPreviewerOpen || kotlin.math.abs(page - pagerState.settledPage) > 1)) return
     val viewerAlpha = remember { Animatable(0F) }
     var bSize by remember { mutableStateOf(IntSize(0, 0)) }
-    var vSize by remember { mutableStateOf(IntSize(0, 0)) }
+    var vSize by remember(model) {
+        val size = if (model.intrinsicSize != IntSize.Zero) model.intrinsicSize
+            else (model.data as? MediaVideo)?.getRotatedSize() ?: IntSize.Zero
+        mutableStateOf(size)
+    }
     val sizing = MediaVideoSizing(bSize, vSize)
-    var videoSpecified by remember { mutableStateOf(false) }
+    val videoSpecified = vSize.width > 0 && vSize.height > 0
     LaunchedEffect(vSize, bSize) {
         if (vSize != IntSize.Zero && bSize != IntSize.Zero) {
             onSizeChange(SizeChangeContent(defaultSize = sizing.displaySize, containerSize = bSize, maxScale = sizing.maxScale))
@@ -83,12 +87,11 @@ fun MediaVideo(
         }
         if (model.intrinsicSize != IntSize.Zero) {
             vSize = model.intrinsicSize
-            videoSpecified = true
         }
     }
 
     var firstFrameRendered by remember { mutableStateOf(false) }
-    val controller = rememberMediaVideoController(pagerState, videoState, page, model, firstFrameRendered) {
+    val controller = rememberMediaVideoController(pagerState, videoState, page, model) {
         firstFrameRendered = true
     }
     LaunchedEffect(firstFrameRendered) {
@@ -135,18 +138,10 @@ fun MediaVideo(
                 rotationZ = rotation
             }
         }
-        val surfaceModifier = if (videoState.isFullscreenMode) {
-            videoModifier
-                .align(Alignment.Center)
-                .fillMaxSize()
-        } else {
-            videoModifier
-                .align(Alignment.Center)
-                .size(
-                    LocalDensity.current.run { sizing.displaySize.width.toDp() },
-                    LocalDensity.current.run { sizing.displaySize.height.toDp() },
-                )
-        }
+        val surfaceModifier = videoModifier.align(Alignment.Center).then(
+            if (videoState.isFullscreenMode || !videoSpecified) Modifier.fillMaxSize()
+            else Modifier.aspectRatio(sizing.videoRatio)
+        )
         VideoPlayerSurface(
             modifier = surfaceModifier,
             controller = controller,

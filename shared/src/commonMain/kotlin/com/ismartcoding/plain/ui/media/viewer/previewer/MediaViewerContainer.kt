@@ -12,13 +12,12 @@ import com.ismartcoding.plain.ui.media.viewer.DEFAULT_SOFT_ANIMATION_SPEC
 import com.ismartcoding.plain.ui.media.viewer.MediaViewerState
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Deferred
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.CoroutineStart
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.takeWhile
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.flow.first
 
 internal class ViewerContainerState(
     var scope: CoroutineScope = MainScope(),
@@ -64,17 +63,18 @@ internal class ViewerContainerState(
     }
 
     suspend fun awaitOpenTransform() {
-        openTransformJob = scope.async {
-            doAwaitViewerLoading()
+        cancelOpenTransform()
+        val opening = scope.async(start = CoroutineStart.UNDISPATCHED) {
+            ensureActive()
+            viewerState.mountedFlow.first { it }
             transformSnapToViewer(true)
         }
-        openTransformJob?.await()
-        openTransformJob = null
-    }
-
-    suspend fun doAwaitViewerLoading() {
-        viewerState.mountedFlow.apply {
-            withContext(Dispatchers.Default) { takeWhile { !it }.collect() }
+        openTransformJob = opening
+        try {
+            opening.await()
+        } finally {
+            opening.cancel()
+            if (openTransformJob === opening) openTransformJob = null
         }
     }
 
