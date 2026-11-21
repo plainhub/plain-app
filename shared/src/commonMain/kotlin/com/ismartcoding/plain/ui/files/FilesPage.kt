@@ -80,6 +80,11 @@ fun FilesPage(
     val scope = rememberCoroutineScope()
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
     val drawerState = rememberDrawerState(DrawerValue.Closed)
+    var showTrash by remember(source) { mutableStateOf(false) }
+    if (showTrash) {
+        FilesTrashPage(source, onBack = { showTrash = false })
+        return
+    }
     val previewerState = rememberPreviewerState()
     val itemsState by filesVM.itemsFlow.collectAsState()
     var systemExpanded by remember(filesVM.selectedPath, filesVM.queryText.value) { mutableStateOf(false) }
@@ -134,6 +139,7 @@ fun FilesPage(
                     filesVM = filesVM,
                     drawerState = drawerState,
                     navController = navController,
+                    onTrash = { scope.launch { drawerState.close(); showTrash = true } },
                     onSelect = { folder ->
                         filesVM.offset = 0
                         filesVM.drawerFolderTitle.value = if (folder.isFavoriteFolder) folder.fullPath to folder.title else null

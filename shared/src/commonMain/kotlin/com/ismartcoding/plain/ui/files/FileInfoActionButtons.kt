@@ -65,13 +65,13 @@ internal fun FileInfoPrimaryActions(
         PSheetPrimaryAction(UiRes.drawable.ui_drawable_copy, stringResource(Res.string.copy)) {
             performCopyFiles(filesVM, listOf(file), onShowPasteBar) { onDismiss() }
         }
-        PSheetPrimaryDeleteAction(stringResource(Res.string.delete)) {
+        PSheetPrimaryDeleteAction(stringResource(Res.string.move_to_trash)) {
             scope.launch {
                 confirmActionAsync(
-                    Res.string.delete,
-                    Res.string.confirm_to_delete,
+                    Res.string.move_to_trash,
+                    Res.string.confirm_move_files_to_trash,
                     callback = {
-                        filesVM.deleteFiles(setOf(file.path))
+                        filesVM.trashFiles(setOf(file.path))
                         onDismiss()
                     },
                     danger = true

@@ -59,4 +59,6 @@
     <string name="manage_files">Manage Files</string>
     <string name="title_asc">Title (A to Z)</string>
     <string name="title_desc">Title (Z to A)</string>
+    <string name="confirm_move_files_to_trash">Move the selected items to Trash?</string>
+    <string name="permanently_delete_file">Permanently delete</string>
 </resources>

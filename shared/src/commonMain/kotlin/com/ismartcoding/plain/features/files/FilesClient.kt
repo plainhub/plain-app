@@ -9,6 +9,9 @@ import com.ismartcoding.plain.rust.graphql.GraphqlApi
 import com.ismartcoding.plain.platform.files.fileUriPath
 import kotlinx.coroutines.CancellationException
 
+@kotlinx.serialization.Serializable
+data class TrashedFile(val id: String, val displayName: String, val originalPath: String)
+
 object FilesClient : FilesApi(GraphqlApi, RustUploadChunks::replace)
 
 open class FilesApi internal constructor(
@@ -88,6 +91,19 @@ open class FilesApi internal constructor(
         api.execute(Mutation.renameFile(path, name))
 
     suspend fun delete(path: String): Boolean = deleteMany(listOf(path)) > 0
+
+    suspend fun trash(paths: Collection<String>): Int = api.execute(Mutation.trashFiles(paths)).affectedCount
+
+    suspend fun trashed(): List<TrashedFile> = buildList {
+        do {
+            val page = api.execute(Query.trashedFiles(size, 200))
+            addAll(page)
+        } while (page.size == 200)
+    }
+
+    suspend fun restore(ids: Collection<String>): Int = api.execute(Mutation.restoreFiles(ids)).affectedCount
+
+    suspend fun deleteTrashed(ids: Collection<String>): Int = api.execute(Mutation.deleteTrashedFiles(ids)).affectedCount
 
     suspend fun deleteMany(paths: List<String>): Int =
         api.execute(Mutation.deleteFiles(paths)).affectedCount

@@ -344,6 +344,24 @@ object Mutation {
         field = "renameFile",
     )
 
+    fun trashFiles(paths: Collection<String>): GraphqlRequest<ActionResult> = GraphqlRequest(
+        $$"mutation($paths: [String!]!) { trashFiles(paths: $paths) { affectedCount } }",
+        mapOf(variable("paths", paths)),
+        field = "trashFiles",
+    )
+
+    fun restoreFiles(paths: Collection<String>): GraphqlRequest<ActionResult> = GraphqlRequest(
+        $$"mutation($paths: [String!]!) { restoreFiles(paths: $paths) { affectedCount } }",
+        mapOf(variable("paths", paths)),
+        field = "restoreFiles",
+    )
+
+    fun deleteTrashedFiles(paths: Collection<String>): GraphqlRequest<ActionResult> = GraphqlRequest(
+        $$"mutation($paths: [String!]!) { deleteTrashedFiles(paths: $paths) { affectedCount } }",
+        mapOf(variable("paths", paths)),
+        field = "deleteTrashedFiles",
+    )
+
     fun deleteFiles(paths: Collection<String>): GraphqlRequest<ActionResult> = GraphqlRequest(
         $$"mutation($paths: [String!]!) { deleteFiles(paths: $paths) { affectedCount } }",
         mapOf(variable("paths", paths)),

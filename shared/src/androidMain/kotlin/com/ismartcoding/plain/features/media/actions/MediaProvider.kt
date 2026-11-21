@@ -45,6 +45,7 @@ import java.io.File
 
 internal object MediaProvider {
     fun handle(method: String, params: JsonObject): JsonElement {
+        if (method == "mediaProviderTrashRows") return trashedRows()
         val request: MediaProviderRequest = when (method) {
             "mediaProviderRows" -> JsonHelper.jsonDecodeFromElement<MediaProviderRowsRequest>(params)
             "mediaProviderWrite" -> JsonHelper.jsonDecodeFromElement<MediaProviderWritesRequest>(params)
@@ -98,6 +99,32 @@ internal object MediaProvider {
                 })
             }
         }
+    }
+
+    private fun trashedRows(): JsonElement {
+        check(isRPlus() && Permission.WRITE_EXTERNAL_STORAGE.isGranted()) { "File trash permission denied" }
+        val columns = arrayOf(
+            MediaStore.Files.FileColumns._ID, MediaStore.MediaColumns.DATA, MediaStore.MediaColumns.DISPLAY_NAME,
+            MediaStore.Files.FileColumns.MEDIA_TYPE, MediaStore.MediaColumns.MIME_TYPE,
+            MediaStore.MediaColumns.SIZE,
+        )
+        val args = Bundle().apply { putInt(MediaStore.QUERY_ARG_MATCH_TRASHED, MediaStore.MATCH_ONLY) }
+        val storage = appContext.getSystemService(StorageManager::class.java)
+        val rows = mutableListOf<TrashRow>()
+        val externalVolumes = MediaStore.getExternalVolumeNames(appContext)
+        for (volume in storage.storageVolumes) {
+            val name = volume.mediaStoreVolumeName ?: continue
+            val directory = volume.directory ?: continue
+            if (name !in externalVolumes) continue
+            val uri = MediaStore.Files.getContentUri(name)
+            checkNotNull(appContext.contentResolver.query(uri, columns, args, null)).use { cursor ->
+                while (cursor.moveToNext()) {
+                    rows.add(TrashRow(cursor.getLong(0).toString(), cursor.getString(1), cursor.getString(2),
+                        directory.path, cursor.getInt(3), cursor.getString(4), cursor.getLong(5)))
+                }
+            }
+        }
+        return JsonHelper.jsonEncodeToElement(rows)
     }
 
     private fun writeUri(type: DataType, write: MediaProviderWrite): Uri {
@@ -169,3 +196,10 @@ private data class MediaProviderRow(
 
 @Serializable
 private data class MediaProviderWriteResult(val id: String, val count: Int, val row: MediaProviderRow?)
+
+
+@Serializable
+private data class TrashRow(
+    val id: String, val path: String, val displayName: String, val volumeRoot: String,
+    val mediaType: Int, val mimeType: String?, val size: Long,
+)

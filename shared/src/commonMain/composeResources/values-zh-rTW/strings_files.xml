@@ -59,4 +59,6 @@
     <string name="manage_files">管理檔案</string>
     <string name="title_asc">標題（升冪）</string>
     <string name="title_desc">標題（降冪）</string>
+    <string name="confirm_move_files_to_trash">將所選項目移到資源回收筒？</string>
+    <string name="permanently_delete_file">永久刪除</string>
 </resources>

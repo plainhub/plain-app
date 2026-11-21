@@ -59,4 +59,6 @@
     <string name="manage_files">管理文件</string>
     <string name="title_asc">标题（升序）</string>
     <string name="title_desc">标题（降序）</string>
+    <string name="confirm_move_files_to_trash">将所选项目移到回收站？</string>
+    <string name="permanently_delete_file">永久删除</string>
 </resources>

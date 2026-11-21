@@ -14,7 +14,7 @@ import com.ismartcoding.plain.platform.system.shareFiles
 import com.ismartcoding.plain.ui.base.BottomActionButtons
 import com.ismartcoding.plain.ui.components.IconTextSmallButtonCopy
 import com.ismartcoding.plain.ui.components.IconTextSmallButtonCut
-import com.ismartcoding.plain.ui.components.IconTextSmallButtonDelete
+import com.ismartcoding.plain.ui.components.IconTrashButton
 import com.ismartcoding.plain.ui.components.IconTextSmallButtonRename
 import com.ismartcoding.plain.ui.components.IconTextSmallButtonShare
 import com.ismartcoding.plain.ui.components.IconTextSmallButtonShareLink
@@ -27,7 +27,6 @@ import com.ismartcoding.plain.ui.components.DialogHelper
 import com.ismartcoding.plain.ui.components.confirmActionAsync
 import com.ismartcoding.plain.ui.state.exitSelectMode
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.CancellationException
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
@@ -77,27 +76,15 @@ fun FilesSelectModeBottomActions(
                 filesVM.shareItems.addAll(selectedFiles)
                 filesVM.showCreateShareDialog.value = true
             }
-            IconTextSmallButtonDelete {
+            IconTrashButton {
+                val paths = filesVM.selectedIds.toSet()
                 scope.launch {
                     confirmActionAsync(
-                        Res.string.delete,
-                        Res.string.confirm_to_delete,
+                        Res.string.move_to_trash,
+                        Res.string.confirm_move_files_to_trash,
                         callback = {
-                            scope.launch {
-                                val paths = filesVM.selectedIds.toSet()
-                                DialogHelper.showLoading()
-                                try {
-                                    withIO {
-                                        filesVM.source.files.deleteMany(paths.toList())
-                                    }
-                                } catch (canceled: CancellationException) { throw canceled }
-                                catch (error: Exception) { DialogHelper.showMessage(error) }
-                                finally {
-                                    DialogHelper.hideLoading()
-                                    filesVM.loadAsync()
-                                    filesVM.exitSelectMode()
-                                }
-                            }
+                            filesVM.trashFiles(paths)
+                            filesVM.exitSelectMode()
                         },
                         danger = true
                     )

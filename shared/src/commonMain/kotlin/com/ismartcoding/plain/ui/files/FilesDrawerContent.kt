@@ -24,6 +24,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.ismartcoding.plain.ui.resources.trash_2
 import androidx.navigation.NavHostController
 import com.ismartcoding.plain.features.files.FilesType
 import com.ismartcoding.plain.models.Share
@@ -65,6 +66,7 @@ fun FilesDrawerContent(
     filesVM: FilesViewModel,
     drawerState: DrawerState,
     navController: NavHostController,
+    onTrash: () -> Unit,
     onSelect: (FolderOption) -> Unit,
 ) {
     val recentsText = stringResource(Res.string.recents)
@@ -122,6 +124,9 @@ fun FilesDrawerContent(
                 isSelected = item.isChecked,
                 onClick = { onSelect(item) }
             )
+            if (item.type == FilesType.RECENTS) {
+                SidebarItem(label = stringResource(Res.string.trash), icon = UiRes.drawable.trash_2, isSelected = false, onClick = onTrash)
+            }
         }
 
         if (favorites.isNotEmpty()) {

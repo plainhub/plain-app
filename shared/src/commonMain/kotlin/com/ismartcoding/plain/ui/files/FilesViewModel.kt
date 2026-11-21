@@ -240,12 +240,12 @@ class FilesViewModel internal constructor(val source: ContentSource = ContentSou
         }
     }
 
-    fun deleteFiles(paths: Set<String>) {
+    fun trashFiles(paths: Set<String>) {
         viewModelScope.launch {
             DialogHelper.showLoading()
             try {
                 withIO {
-                    source.files.deleteMany(paths.toList())
+                    source.files.trash(paths)
                 }
             } catch (canceled: CancellationException) { throw canceled }
             catch (error: Exception) { DialogHelper.showMessage(error) }

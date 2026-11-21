@@ -316,6 +316,12 @@ object Query {
         field = "indexedFiles",
     )
 
+    fun trashedFiles(offset: Int, limit: Int): GraphqlRequest<List<com.ismartcoding.plain.features.files.TrashedFile>> = GraphqlRequest(
+        $$"""query($offset: Int!, $limit: Int!) { trashedFiles(query: "", offset: $offset, limit: $limit, sortBy: DATE_DESC) { id displayName originalPath } }""",
+        mapOf(variable("offset", offset), variable("limit", limit)),
+        field = "trashedFiles",
+    )
+
     fun recentFiles(): GraphqlRequest<List<FileEntry>> = GraphqlRequest(
         $$"query { recentFiles { $${Fragments.FILE} } }",
         field = "recentFiles",

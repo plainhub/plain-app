@@ -51,7 +51,7 @@ internal actual suspend fun executePlatformHostRequest(method: String, params: J
     "systemFileIndexId", "systemFileIndexRows", "systemFileIndexCount" -> SystemFilesHost.handle(method, params)
     "systemMediaBucketItemFacts", "systemMediaRows", "systemMediaCount", "systemMediaIdsFacts" -> SystemMediaHost.handle(method, params)
     "fileTaskScan", "fileTaskMediaSnapshot" -> FileTaskHost.handle(method, params)
-    "mediaProviderRows", "mediaProviderWrite" -> hostResult(handleMediaProvider(method, params))
+    "mediaProviderTrashRows", "mediaProviderRows", "mediaProviderWrite" -> hostResult(handleMediaProvider(method, params))
     "audioLibraryResolve" -> {
         val request = JsonHelper.jsonDecodeFromElement<AudioLibraryResolveRequest>(params)
         hostResult(audioLibraryResolve(request.ids, request.paths))
