@@ -5,14 +5,12 @@ import com.ismartcoding.plain.appContext
 import android.content.ContentProviderOperation
 import android.content.ContentUris
 import android.content.Context
+import android.database.Cursor
 import android.net.Uri
 import android.provider.ContactsContract
 import com.ismartcoding.plain.helpers.ContentWhere
-import com.ismartcoding.plain.features.files.SortBy
-import com.ismartcoding.plain.features.files.SortDirection
 import com.ismartcoding.plain.lib.extensions.count
 import com.ismartcoding.plain.lib.extensions.getIntValue
-import com.ismartcoding.plain.lib.extensions.getPagingCursor
 import com.ismartcoding.plain.lib.extensions.getSearchCursor
 import com.ismartcoding.plain.lib.extensions.getStringValue
 import com.ismartcoding.plain.lib.extensions.getTimeValue
@@ -212,33 +210,50 @@ object ContactMediaStoreHelper {
         limit: Int,
         offset: Int,
     ): ContactPageFacts = withIO {
+        if (limit <= 0) return@withIO ContactPageFacts()
         readContactPage(readRows = {
-            context.contentResolver.getPagingCursor(
-                uriExternal, getProjection(), where, limit, offset,
-                SortBy(ContactsContract.Data.DISPLAY_NAME_PRIMARY, SortDirection.ASC)
-            )?.map { cursor, cache ->
-                val accountName = cursor.getStringValue(ContactsContract.RawContacts.ACCOUNT_NAME, cache)
-                val rawId = cursor.getStringValue(ContactsContract.Data.RAW_CONTACT_ID, cache)
-                val prefix = cursor.getStringValue(ContactsContract.CommonDataKinds.StructuredName.PREFIX, cache)
-                val givenName = cursor.getStringValue(ContactsContract.CommonDataKinds.StructuredName.GIVEN_NAME, cache)
-                val middleName = cursor.getStringValue(ContactsContract.CommonDataKinds.StructuredName.MIDDLE_NAME, cache)
-                val familyName = cursor.getStringValue(ContactsContract.CommonDataKinds.StructuredName.FAMILY_NAME, cache)
-                val suffix = cursor.getStringValue(ContactsContract.CommonDataKinds.StructuredName.SUFFIX, cache)
-                val photoUri = cursor.getStringValue(ContactsContract.CommonDataKinds.StructuredName.PHOTO_URI, cache)
-                val starred = cursor.getIntValue(ContactsContract.CommonDataKinds.StructuredName.STARRED, cache)
-                val contactId = cursor.getStringValue(ContactsContract.Data.CONTACT_ID, cache)
-                val thumbnailUri = cursor.getStringValue(ContactsContract.CommonDataKinds.StructuredName.PHOTO_THUMBNAIL_URI, cache)
-                val ringtone = cursor.getStringValue(ContactsContract.CommonDataKinds.StructuredName.CUSTOM_RINGTONE, cache)
-                val updatedAt = cursor.getTimeValue(ContactsContract.Data.CONTACT_LAST_UPDATED_TIMESTAMP, cache)
-
-                ContactFacts(
-                    id = rawId, prefix = prefix, firstName = givenName, middleName = middleName,
-                    lastName = familyName, suffix = suffix, photoId = photoUri, source = accountName,
-                    starred = starred != 0, contactId = contactId, thumbnailId = thumbnailUri,
-                    ringtone = ringtone, updatedAt = updatedAt.toString(),
-                )
+            // ContactsContract.Data ignores the MediaStore paging bundle. Use
+            // the ordered, filtered cursor and load details only for this page.
+            context.contentResolver.query(
+                uriExternal,
+                getProjection(),
+                where.toSelection(),
+                where.args.toTypedArray(),
+                "${ContactsContract.Data.DISPLAY_NAME_PRIMARY} ASC, ${ContactsContract.Data.RAW_CONTACT_ID} ASC",
+            )?.use { cursor ->
+                buildList {
+                    if (cursor.moveToPosition(offset.coerceAtLeast(0))) {
+                        val cache = mutableMapOf<String, Int>()
+                        do {
+                            add(cursor.toContactFacts(cache))
+                        } while (size < limit && cursor.moveToNext())
+                    }
+                }
             } ?: emptyList()
         }, readDetails = { ids -> ContactDataHelper.rows(context, ids) },
             readGroups = { GroupHelper.getAll(context) })
+    }
+
+    private fun Cursor.toContactFacts(cache: MutableMap<String, Int>): ContactFacts {
+        val accountName = getStringValue(ContactsContract.RawContacts.ACCOUNT_NAME, cache)
+        val rawId = getStringValue(ContactsContract.Data.RAW_CONTACT_ID, cache)
+        val prefix = getStringValue(ContactsContract.CommonDataKinds.StructuredName.PREFIX, cache)
+        val givenName = getStringValue(ContactsContract.CommonDataKinds.StructuredName.GIVEN_NAME, cache)
+        val middleName = getStringValue(ContactsContract.CommonDataKinds.StructuredName.MIDDLE_NAME, cache)
+        val familyName = getStringValue(ContactsContract.CommonDataKinds.StructuredName.FAMILY_NAME, cache)
+        val suffix = getStringValue(ContactsContract.CommonDataKinds.StructuredName.SUFFIX, cache)
+        val photoUri = getStringValue(ContactsContract.CommonDataKinds.StructuredName.PHOTO_URI, cache)
+        val starred = getIntValue(ContactsContract.CommonDataKinds.StructuredName.STARRED, cache)
+        val contactId = getStringValue(ContactsContract.Data.CONTACT_ID, cache)
+        val thumbnailUri = getStringValue(ContactsContract.CommonDataKinds.StructuredName.PHOTO_THUMBNAIL_URI, cache)
+        val ringtone = getStringValue(ContactsContract.CommonDataKinds.StructuredName.CUSTOM_RINGTONE, cache)
+        val updatedAt = getTimeValue(ContactsContract.Data.CONTACT_LAST_UPDATED_TIMESTAMP, cache)
+
+        return ContactFacts(
+            id = rawId, prefix = prefix, firstName = givenName, middleName = middleName,
+            lastName = familyName, suffix = suffix, photoId = photoUri, source = accountName,
+            starred = starred != 0, contactId = contactId, thumbnailId = thumbnailUri,
+            ringtone = ringtone, updatedAt = updatedAt.toString(),
+        )
     }
 }
