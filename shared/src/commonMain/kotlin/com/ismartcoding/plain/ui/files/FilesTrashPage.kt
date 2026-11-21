@@ -92,10 +92,10 @@ internal fun FilesTrashPage(source: ContentSource, onBack: () -> Unit) {
                 PIconTextSmallButton(UiRes.drawable.archive_restore, stringResource(Res.string.restore), enabled = !busy) {
                     apply(selected, false)
                 }
-                PIconTextSmallButton(UiRes.drawable.delete_forever, stringResource(Res.string.permanently_delete_file), enabled = !busy) {
+                PIconTextSmallButton(UiRes.drawable.delete_forever, stringResource(Res.string.delete), enabled = !busy) {
                     val ids = selected
                     scope.launchSafe {
-                        confirmActionAsync(Res.string.permanently_delete_file, Res.string.confirm_to_delete,
+                        confirmActionAsync(Res.string.delete, Res.string.confirm_to_delete,
                             callback = { apply(ids, true) }, danger = true)
                     }
                 }
