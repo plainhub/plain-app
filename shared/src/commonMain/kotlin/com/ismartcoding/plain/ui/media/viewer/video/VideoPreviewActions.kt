@@ -118,8 +118,9 @@ fun VideoPreviewActions(
                     color = PreviewerSoftWhite,
                     textAlign = TextAlign.Center,
                 )
-                // More button — opens FileInfoBottomSheet
-                MoreIconButton { state.showMediaInfo = true }
+                if (m.pickedMediaType == null) {
+                    MoreIconButton { state.showMediaInfo = true }
+                }
             }
 
             // Row 2: control bar [Speed][Sound][Play][Pip][Fullscreen]

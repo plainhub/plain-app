@@ -64,6 +64,7 @@ fun MediaPreviewer(
     deleteAction: (PreviewItem) -> Unit = {},
     onTagsChanged: () -> Unit = {},
 ) {
+    val items = MediaPreviewData.items
     LaunchedEffect(key1 = state.animateContainerVisibleState, key2 = state.animateContainerVisibleState.currentState) {
         state.onAnimateContainerStateChanged()
     }
@@ -74,9 +75,7 @@ fun MediaPreviewer(
         //    Image preview has no top bar (floating chips only), so it stays
         //    fully immersive regardless of showActions.
         //  - Fullscreen video forces immersive (handled by VideoPlayerSurface).
-        val currentIsVideo = remember(state.pagerState.currentPage, MediaPreviewData.items.size) {
-            MediaPreviewData.items.getOrNull(state.pagerState.currentPage)?.isVideo() == true
-        }
+        val currentIsVideo = items.getOrNull(state.pagerState.currentPage)?.isVideo() == true
         LaunchedEffect(currentIsVideo, state.showActions, state.videoState.isFullscreenMode) {
             when {
                 state.videoState.isFullscreenMode -> setSystemBarsVisible(false)
@@ -120,45 +119,43 @@ fun MediaPreviewer(
                 beyondViewportPageCount = 1,
                 userScrollEnabled = state.pagerUserScrollEnabled,
             ) { page ->
-                val viewerContainerState = rememberSaveable(saver = ViewerContainerState.Saver) { ViewerContainerState() }
-                viewerContainerState.scope = scope
-                viewerContainerState.viewerState = rememberViewerState()
-                viewerContainerState.transformState = rememberTransformContentState()
-                LaunchedEffect(key1 = state.pagerState.currentPage) {
-                    if (state.pagerState.currentPage == page) {
-                        state.viewerContainerState = viewerContainerState
-                    }
-                }
-
-                viewerContainerState.apply {
-                    Box(
-                        modifier = Modifier
-                            .alpha(state.viewerAlpha.value)
-                            .fillMaxSize()
-                            .onGloballyPositioned { containerSize = it.size }
-                            .graphicsLayer {
-                                scaleX = scale.value
-                                scaleY = scale.value
-                                translationX = offsetX.value
-                                translationY = offsetY.value
-                            },
-                    ) {
-                        Box(
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .alpha(transformContentAlpha.value),
-                        ) {
-                            TransformContentView(transformState)
+                val item = items.getOrNull(page)
+                key(item?.id) {
+                    val viewerContainerState = rememberSaveable(saver = ViewerContainerState.Saver) { ViewerContainerState() }
+                    viewerContainerState.scope = scope
+                    viewerContainerState.viewerState = rememberViewerState()
+                    viewerContainerState.transformState = rememberTransformContentState()
+                    LaunchedEffect(key1 = state.pagerState.currentPage) {
+                        if (state.pagerState.currentPage == page) {
+                            state.viewerContainerState = viewerContainerState
                         }
+                    }
+
+                    viewerContainerState.apply {
                         Box(
                             modifier = Modifier
+                                .alpha(state.viewerAlpha.value)
                                 .fillMaxSize()
-                                .alpha(viewerContainerAlpha.value),
+                                .onGloballyPositioned { containerSize = it.size }
+                                .graphicsLayer {
+                                    scaleX = scale.value
+                                    scaleY = scale.value
+                                    translationX = offsetX.value
+                                    translationY = offsetY.value
+                                },
                         ) {
-                            key(page) {
-                                val item = remember(page, MediaPreviewData.items.size) {
-                                    MediaPreviewData.items.getOrNull(page)
-                                }
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .alpha(transformContentAlpha.value),
+                            ) {
+                                TransformContentView(transformState)
+                            }
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .alpha(viewerContainerAlpha.value),
+                            ) {
                                 if (item != null) {
                                     MediaViewer(
                                         modifier = Modifier.fillMaxSize(),
@@ -179,38 +176,36 @@ fun MediaPreviewer(
                                     )
                                 }
                             }
-                        }
-                        val viewerMounted by viewerState.mountedFlow.collectAsState(initial = false)
-                        if (showLoading) {
-                            val placeholder = PreviewerPlaceholder()
-                            // Show the loading icon only after the grace period:
-                            // quick switches never flash a loading state, only
-                            // genuinely slow loads reveal it (Douyin-like).
-                            var showLoadingIcon by remember { mutableStateOf(false) }
-                            LaunchedEffect(viewerMounted) {
-                                if (!viewerMounted) {
-                                    delay(LOADING_GRACE_MILLIS)
-                                    showLoadingIcon = true
-                                } else {
-                                    showLoadingIcon = false
+                            val viewerMounted by viewerState.mountedFlow.collectAsState(initial = false)
+                            if (showLoading) {
+                                val placeholder = PreviewerPlaceholder()
+                                // Show the loading icon only after the grace period:
+                                // quick switches never flash a loading state, only
+                                // genuinely slow loads reveal it (Douyin-like).
+                                var showLoadingIcon by remember { mutableStateOf(false) }
+                                LaunchedEffect(viewerMounted) {
+                                    if (!viewerMounted) {
+                                        delay(LOADING_GRACE_MILLIS)
+                                        showLoadingIcon = true
+                                    } else {
+                                        showLoadingIcon = false
+                                    }
                                 }
+                                AnimatedVisibility(
+                                    visible = showLoadingIcon,
+                                    enter = placeholder.enterTransition,
+                                    exit = placeholder.exitTransition,
+                                ) { placeholder.content() }
                             }
-                            AnimatedVisibility(
-                                visible = showLoadingIcon,
-                                enter = placeholder.enterTransition,
-                                exit = placeholder.exitTransition,
-                            ) { placeholder.content() }
                         }
                     }
                 }
             }
-            val m = remember(state.pagerState.currentPage, MediaPreviewData.items.size) {
-                MediaPreviewData.items.getOrNull(state.pagerState.currentPage)
-            }
+            val m = items.getOrNull(state.pagerState.currentPage)
             if (m != null) {
                 if (m.isVideo()) {
                     VideoPreviewActions(m = m, state = state)
-                } else {
+                } else if (m.pickedMediaType == null) {
                     ImagePreviewActions(castViewModel = castVM, m = m, state = state)
                 }
             }
@@ -219,7 +214,7 @@ fun MediaPreviewer(
         }
     }
     if (state.showMediaInfo) {
-        val m = MediaPreviewData.items.getOrNull(state.pagerState.currentPage)
+        val m = items.getOrNull(state.pagerState.currentPage)
         if (m != null) {
             ViewMediaBottomSheet(
                 m,

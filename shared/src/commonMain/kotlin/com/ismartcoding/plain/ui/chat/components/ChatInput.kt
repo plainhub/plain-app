@@ -2,6 +2,7 @@ package com.ismartcoding.plain.ui.chat.components
 
 import com.ismartcoding.plain.i18n.*
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.layout.Arrangement
@@ -24,20 +25,32 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.semantics.Role
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.text.style.TextOverflow
 import coil3.compose.AsyncImage
+import coil3.compose.LocalPlatformContext
 import coil3.compose.rememberAsyncImagePainter
+import coil3.request.ImageRequest
+import com.ismartcoding.plain.features.chat.ChatDraftAttachment
+import com.ismartcoding.plain.features.media.MediaType
 import com.ismartcoding.plain.lib.extensions.getFilenameExtension
+import com.ismartcoding.plain.platform.files.fileUriPath
+import com.ismartcoding.plain.platform.media.applyForceVideoDecoder
+import com.ismartcoding.plain.ui.media.MediaPreviewData
 import com.ismartcoding.plain.ui.media.fileIconData
+import com.ismartcoding.plain.ui.media.viewer.PreviewItem
+import com.ismartcoding.plain.ui.media.viewer.previewer.MediaPreviewerState
 import com.ismartcoding.plain.ui.base.PIcon
 import com.ismartcoding.plain.ui.base.PTextButton
 import com.ismartcoding.plain.features.files.PickFileTag
@@ -51,10 +64,12 @@ import com.ismartcoding.plain.ui.resources.folders as ui_drawable_folders
 import com.ismartcoding.plain.ui.resources.image as ui_drawable_image
 import com.ismartcoding.plain.ui.resources.markdown as ui_drawable_markdown
 import com.ismartcoding.plain.ui.resources.send as ui_drawable_send
+import kotlinx.coroutines.launch
 
 @Composable
 fun ChatInput(
     value: String,
+    previewerState: MediaPreviewerState,
     hint: String = "",
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
     onSend: () -> Unit = {},
@@ -62,25 +77,28 @@ fun ChatInput(
     onShareFolder: () -> Unit = {},
     filesAllowed: Boolean = true,
     onRequestFilePermission: () -> Unit = {},
-    attachments: Map<String, String> = emptyMap(),
+    attachments: Map<String, ChatDraftAttachment> = emptyMap(),
     markdown: Boolean = false,
     sending: Boolean = false,
     onRemoveAttachment: (String) -> Unit = {},
     onChangeFormat: () -> Unit = {},
-    imageAttachments: Set<String> = emptySet(),
 ) {
     var hasFocus by remember { mutableStateOf(false) }
     Column(modifier = Modifier.fillMaxWidth()) {
         if (attachments.isNotEmpty()) {
             Column(Modifier.heightIn(max = 128.dp).verticalScroll(rememberScrollState())) {
-                attachments.forEach { (uri, name) ->
+                attachments.forEach { (uri, attachment) ->
                     Row(
                         Modifier.fillMaxWidth().padding(horizontal = 16.dp),
                         horizontalArrangement = Arrangement.spacedBy(8.dp),
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
-                        DraftAttachmentPreview(uri, name, uri in imageAttachments)
-                        Text(name, modifier = Modifier.weight(1f), maxLines = 1, overflow = TextOverflow.Ellipsis)
+                        DraftAttachmentPreview(uri, attachment, previewerState)
+                        if (attachment.mediaType == null) {
+                            Text(attachment.name, modifier = Modifier.weight(1f), maxLines = 1, overflow = TextOverflow.Ellipsis)
+                        } else {
+                            Spacer(Modifier.weight(1f))
+                        }
                         PTextButton(text = stringResource(Res.string.remove), enabled = !sending, onClick = { onRemoveAttachment(uri) })
                     }
                 }
@@ -174,16 +192,36 @@ fun ChatInput(
 }
 
 @Composable
-private fun DraftAttachmentPreview(uri: String, name: String, image: Boolean) {
+private fun DraftAttachmentPreview(uri: String, attachment: ChatDraftAttachment, previewerState: MediaPreviewerState) {
+    val name = attachment.name
     val icon = remember(name) { fileIconData(name.getFilenameExtension()) }
-    val localImage = image && (uri.startsWith("content://") || uri.startsWith("file://"))
-    val iconPainter = if (localImage) rememberAsyncImagePainter(icon) else null
+    val mediaType = attachment.mediaType
+    if (mediaType == null) {
+        AsyncImage(model = icon, contentDescription = null, modifier = Modifier.size(36.dp).clip(MaterialTheme.shapes.extraSmall))
+        return
+    }
+    val context = LocalPlatformContext.current
+    val request = remember(context, uri, mediaType) {
+        ImageRequest.Builder(context).data(uri).applyForceVideoDecoder(mediaType == MediaType.VIDEO).build()
+    }
+    val iconPainter = rememberAsyncImagePainter(icon)
+    val scope = rememberCoroutineScope()
+    val keyboard = LocalSoftwareKeyboardController.current
     AsyncImage(
-        model = if (localImage) uri else icon,
-        contentDescription = null,
+        model = request,
+        contentDescription = name,
         placeholder = iconPainter,
         error = iconPainter,
-        contentScale = if (localImage) ContentScale.Crop else ContentScale.Fit,
-        modifier = Modifier.size(36.dp).clip(MaterialTheme.shapes.extraSmall),
+        contentScale = ContentScale.Crop,
+        modifier = Modifier.size(48.dp).clip(MaterialTheme.shapes.extraSmall)
+            .clickable(role = Role.Button, onClickLabel = stringResource(Res.string.preview)) {
+                if (previewerState.visible || previewerState.animating) return@clickable
+                keyboard?.hide()
+                scope.launch {
+                    val path = if (uri.startsWith("file://")) fileUriPath(uri) else uri
+                    MediaPreviewData.items = listOf(PreviewItem(id = uri, path = path, pickedMediaType = mediaType))
+                    previewerState.open()
+                }
+            },
     )
 }

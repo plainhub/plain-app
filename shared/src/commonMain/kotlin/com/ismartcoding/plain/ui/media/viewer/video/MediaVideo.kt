@@ -6,6 +6,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 
 import com.ismartcoding.plain.models.Video as MediaVideo
+import com.ismartcoding.plain.platform.files.isContentUri
 import androidx.compose.animation.core.Animatable
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.gestures.awaitEachGesture
@@ -70,7 +71,7 @@ fun MediaVideo(
     }
 
     LaunchedEffect(model.path) {
-        if (model.intrinsicSize == IntSize.Zero) {
+        if (model.intrinsicSize == IntSize.Zero && !isContentUri(model.path)) {
             when (val data = model.data) {
                 is MediaVideo -> model.initAsync(data)
                 else -> {

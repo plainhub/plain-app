@@ -8,6 +8,7 @@ import com.ismartcoding.plain.features.chat.models.ChatTextFormat
 import com.ismartcoding.plain.features.chat.models.MessageContent
 import com.ismartcoding.plain.features.chat.models.MessageFile
 import com.ismartcoding.plain.features.chat.models.MessageType
+import com.ismartcoding.plain.features.media.MediaType
 import com.ismartcoding.plain.lib.extensions.isImageFast
 import com.ismartcoding.plain.lib.extensions.isVideoFast
 import com.ismartcoding.plain.ui.chat.ChatViewModel
@@ -41,7 +42,11 @@ suspend fun sendPickedAttachments(
     }
 }
 
-internal data class ChatDraftAttachment(val type: ChatAttachmentType, val name: String, val previewImage: Boolean = false)
+data class ChatDraftAttachment(
+    val type: ChatAttachmentType,
+    val name: String,
+    val mediaType: MediaType? = null,
+)
 
 internal suspend fun sendChatDraft(
     chatVM: ChatViewModel,

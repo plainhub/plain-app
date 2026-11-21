@@ -79,9 +79,11 @@ import com.ismartcoding.plain.features.chat.ChatDraftAttachment
 import com.ismartcoding.plain.features.chat.models.ChatAttachmentType
 import com.ismartcoding.plain.features.chat.models.ChatTextFormat
 import com.ismartcoding.plain.features.files.PickFileType
+import com.ismartcoding.plain.features.media.MediaType
 import com.ismartcoding.plain.lib.withIO
 import com.ismartcoding.plain.platform.files.queryPickedFileInfo
 import com.ismartcoding.plain.lib.extensions.isImageFast
+import com.ismartcoding.plain.lib.extensions.isVideoFast
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
@@ -141,10 +143,17 @@ fun ChatPage(
                 event.uris.associateWith { uri ->
                     val info = queryPickedFileInfo(uri)
                     val name = info?.displayName ?: uri.substringAfterLast('/')
+                    val mimeType = info?.mimeType.orEmpty()
                     ChatDraftAttachment(
-                        if (event.type == PickFileType.IMAGE_VIDEO) ChatAttachmentType.IMAGE else ChatAttachmentType.FILE,
-                        name,
-                        previewImage = info?.mimeType?.startsWith("image/", ignoreCase = true) == true || name.isImageFast(),
+                        type = if (event.type == PickFileType.IMAGE_VIDEO) ChatAttachmentType.IMAGE else ChatAttachmentType.FILE,
+                        name = name,
+                        mediaType = when {
+                            mimeType.startsWith("image/", ignoreCase = true) -> MediaType.IMAGE
+                            mimeType.startsWith("video/", ignoreCase = true) -> MediaType.VIDEO
+                            name.isImageFast() -> MediaType.IMAGE
+                            name.isVideoFast() -> MediaType.VIDEO
+                            else -> null
+                        },
                     )
                 }
             }
@@ -288,8 +297,8 @@ fun ChatPage(
                             chatVM.client.writeDraft(id, it)
                         }
                     },
-                    attachments = attachments.mapValues { it.value.name },
-                    imageAttachments = attachments.filterValues { it.previewImage }.keys,
+                    attachments = attachments,
+                    previewerState = previewerState,
                     markdown = chatFormat == ChatTextFormat.MARKDOWN,
                     sending = sending,
                     onRemoveAttachment = { attachments = attachments - it },

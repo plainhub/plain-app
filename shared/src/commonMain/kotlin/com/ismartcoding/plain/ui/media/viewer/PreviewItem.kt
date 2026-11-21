@@ -10,6 +10,7 @@ import com.ismartcoding.plain.models.Video as MediaVideo
 import com.ismartcoding.plain.models.Image as MediaImage
 import androidx.compose.ui.unit.IntSize
 import com.ismartcoding.plain.features.chat.models.MessageFile
+import com.ismartcoding.plain.features.media.MediaType
 import com.ismartcoding.plain.IData
 import com.ismartcoding.plain.lib.extensions.getMimeType
 import com.ismartcoding.plain.lib.extensions.isImageFast
@@ -24,6 +25,7 @@ data class PreviewItem(
     val mediaId: String = "",
     val source: ContentSource = ContentSource.Local,
     val data: IData? = null, // MessageFile, MediaVideo, MediaImage
+    val pickedMediaType: MediaType? = null,
 ) {
     private var remoteResource by mutableStateOf<com.ismartcoding.plain.platform.media.ViewerResource?>(null)
     val resourcePath: String get() = if (source is ContentSource.Local) path else remoteResource?.path.orEmpty()
@@ -44,6 +46,7 @@ data class PreviewItem(
     var rotation: Int = -1
 
     fun isVideo(): Boolean {
+        pickedMediaType?.let { return it == MediaType.VIDEO }
         if (path.isVideoFast()) return true
         return when (val d = data) {
             is MessageFile -> d.fileName.isVideoFast()
@@ -59,6 +62,7 @@ data class PreviewItem(
     }
 
     fun isImage(): Boolean {
+        pickedMediaType?.let { return it == MediaType.IMAGE }
         if (path.isImageFast()) return true
         return when (val d = data) {
             is MessageFile -> d.fileName.isImageFast()

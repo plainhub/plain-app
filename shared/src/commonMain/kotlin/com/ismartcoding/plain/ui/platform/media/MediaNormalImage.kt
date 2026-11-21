@@ -98,9 +98,9 @@ fun MediaNormalImage(
         scope.launch { viewerAlpha.animateTo(1F, DEFAULT_CROSS_FADE_ANIMATE_SPEC); onMounted() }
     }
 
-    val isUrl = model.resourcePath.isUrl()
+    val usePainterSize = model.resourcePath.isUrl() || model.pickedMediaType != null
     val painter: Painter = rememberAsyncImagePainter(
-        model = if (isUrl) {
+        model = if (usePainterSize) {
             ImageRequest.Builder(LocalPlatformContext.current)
                 .data(model.imageModel)
                 .size(Size.ORIGINAL)
@@ -113,7 +113,7 @@ fun MediaNormalImage(
     var imageSpecified by remember { mutableStateOf(false) }
     var isMounted by remember { mutableStateOf(false) }
 
-    if (isUrl) {
+    if (usePainterSize) {
         imageSpecified = painter.intrinsicSize.isSpecified
         LaunchedEffect(painter.intrinsicSize) {
             if (imageSpecified) {
@@ -161,7 +161,7 @@ fun MediaNormalImage(
                 rotationZ = rotation
             }
         }
-        if (isUrl && painter.intrinsicSize.isSpecified && uSize != IntSize.Zero) {
+        if (usePainterSize && painter.intrinsicSize.isSpecified && uSize != IntSize.Zero) {
             Image(
                 painter = painter,
                 contentDescription = null,

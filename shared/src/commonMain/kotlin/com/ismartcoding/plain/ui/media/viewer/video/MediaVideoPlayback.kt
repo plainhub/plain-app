@@ -70,7 +70,7 @@ internal fun rememberMediaVideoController(
     val scope = rememberCoroutineScope()
     DisposableEffect(controller) {
         val preparation = scope.prepareVideoPlayback(controller, model.resourcePath, model.tlsCertificateSha256) {
-            if (mediaId.isEmpty() && model.source is com.ismartcoding.plain.rust.graphql.ContentSource.Local) {
+            if (mediaId.isEmpty() && model.pickedMediaType == null && model.source is com.ismartcoding.plain.rust.graphql.ContentSource.Local) {
                 mediaId = getVideoMediaId(model.path).orEmpty()
             }
             val id = mediaId

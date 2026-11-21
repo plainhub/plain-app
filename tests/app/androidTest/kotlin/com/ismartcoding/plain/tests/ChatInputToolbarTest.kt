@@ -2,6 +2,10 @@ package com.ismartcoding.plain.tests
 
 import android.graphics.Bitmap
 import android.graphics.Color
+import android.os.SystemClock
+import android.view.InputDevice
+import android.view.KeyEvent
+import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.view.inspector.WindowInspector
@@ -22,11 +26,24 @@ import androidx.test.core.app.ActivityScenario
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.ismartcoding.plain.MainActivity
+import com.ismartcoding.plain.events.PickFileResultEvent
+import com.ismartcoding.plain.features.chat.ChatDraftAttachment
+import com.ismartcoding.plain.features.chat.models.ChatAttachmentType
+import com.ismartcoding.plain.features.files.PickFileTag
+import com.ismartcoding.plain.features.files.PickFileType
 import com.ismartcoding.plain.i18n.Res
+import com.ismartcoding.plain.i18n.chat_input_hint
+import com.ismartcoding.plain.i18n.close
+import com.ismartcoding.plain.i18n.local_chat
+import com.ismartcoding.plain.i18n.onboarding_skip
+import com.ismartcoding.plain.i18n.pause
 import com.ismartcoding.plain.i18n.remove
 import com.ismartcoding.plain.i18n.share_folder
+import com.ismartcoding.plain.lib.sendEvent
 import com.ismartcoding.plain.ui.chat.components.ChatInput
 import com.ismartcoding.plain.ui.chat.components.FolderShareSheet
+import com.ismartcoding.plain.ui.i18n.LocaleHelper
+import com.ismartcoding.plain.ui.media.viewer.previewer.rememberPreviewerState
 import com.ismartcoding.plain.ui.theme.AppTheme
 import org.jetbrains.compose.resources.stringResource
 import org.junit.Assert.assertEquals
@@ -53,7 +70,8 @@ class ChatInputToolbarTest {
                         SideEffect { shareLabel = label }
                         ChatInput(
                             value = "",
-                            attachments = mapOf("fixture" to "fixture.txt"),
+                            previewerState = rememberPreviewerState(),
+                            attachments = mapOf("fixture" to ChatDraftAttachment(ChatAttachmentType.FILE, "fixture.txt")),
                             markdown = markdown,
                             onChangeFormat = { markdown = !markdown },
                             onShareFolder = { sharing = true },
@@ -76,56 +94,110 @@ class ChatInputToolbarTest {
     }
 
     @Test
-    fun showsPickedLocalImageAndKeepsFileNameAndRemoveAction() {
+    fun previewsPickedMediaWithoutShowingNamesAndKeepsOrdinaryFileAndRemoveAction() {
         val context = instrumentation.targetContext
-        val file = File(context.cacheDir, "chat-preview-fixture.png")
-        Bitmap.createBitmap(24, 24, Bitmap.Config.ARGB_8888).apply {
+        val image = File.createTempFile("chat-preview-image-", ".png", context.cacheDir)
+        val video = File.createTempFile("chat-preview-video-", ".mp4", context.cacheDir)
+        val document = File.createTempFile("chat-preview-document-", ".txt", context.cacheDir)
+        fun uri(file: File) = FileProvider.getUriForFile(context, "${context.packageName}.provider", file).toString()
+        Bitmap.createBitmap(240, 120, Bitmap.Config.ARGB_8888).apply {
             eraseColor(Color.MAGENTA)
-            file.outputStream().use { compress(Bitmap.CompressFormat.PNG, 100, it) }
+            image.outputStream().use { compress(Bitmap.CompressFormat.PNG, 100, it) }
             recycle()
         }
-        val imageUri = FileProvider.getUriForFile(context, "${context.packageName}.provider", file).toString()
-        var density = 1f
-        var removeLabel = ""
         try {
-            ActivityScenario.launch(MainActivity::class.java).use { scenario ->
-                scenario.onActivity { activity ->
-                    density = activity.resources.displayMetrics.density
-                    activity.setContent {
-                        AppTheme(useDarkTheme = false) {
-                            var attachments by remember {
-                                mutableStateOf(linkedMapOf(imageUri to "Photo", "fixture" to "Report.pdf").toMap())
-                            }
-                            val label = stringResource(Res.string.remove)
-                            SideEffect { removeLabel = label }
-                            ChatInput(
-                                value = "",
-                                attachments = attachments,
-                                imageAttachments = setOf(imageUri),
-                                onRemoveAttachment = { attachments = attachments - it },
-                            )
-                        }
+            requireNotNull(javaClass.classLoader?.getResourceAsStream("video-start.mp4")).use { input ->
+                video.outputStream().use { input.copyTo(it) }
+            }
+            document.writeText("Draft attachment test")
+            ActivityScenario.launch(MainActivity::class.java).use {
+                val localChat = LocaleHelper.getString(Res.string.local_chat)
+                val skip = LocaleHelper.getString(Res.string.onboarding_skip)
+                val hint = LocaleHelper.getString(Res.string.chat_input_hint)
+                val close = LocaleHelper.getString(Res.string.close)
+                val pause = LocaleHelper.getString(Res.string.pause)
+                val remove = LocaleHelper.getString(Res.string.remove)
+                await("local conversation or onboarding") { findText(it, skip) ?: findText(it, localChat) }
+                findText(nodes(), skip)?.let(::clickable)?.let(::click)
+                click(await("local conversation") { nodes -> findText(nodes, localChat)?.let(::clickable) })
+                await("chat composer") { nodes ->
+                    findText(nodes, hint) ?: nodes.firstOrNull { it.config.getOrNull(SemanticsActions.SetText) != null }
+                }
+                instrumentation.waitForIdleSync()
+                sendEvent(PickFileResultEvent(PickFileTag.SEND_MESSAGE, PickFileType.IMAGE_VIDEO, linkedSetOf(uri(image), uri(video))))
+                sendEvent(PickFileResultEvent(PickFileTag.SEND_MESSAGE, PickFileType.FILE, setOf(uri(document))))
+                await("ordinary file name") { findText(it, document.name) }
+                assertTrue("Image filename should be hidden", findText(nodes(), image.name) == null)
+                assertTrue("Video filename should be hidden", findText(nodes(), video.name) == null)
+                val imageThumb = await("rendered image thumbnail") {
+                    control(it, image.name)?.takeIf { node ->
+                        val center = node.boundsInWindow.center
+                        screenshotPixel(center.x.toInt(), center.y.toInt()) == Color.MAGENTA
                     }
                 }
-                val filename = await("image filename") { findText(it, "Photo") }
-                await("rendered image thumbnail") {
-                    val screenshot = instrumentation.uiAutomation.takeScreenshot() ?: return@await null
-                    try {
-                        val x = (filename.boundsInWindow.left - 26 * density).toInt()
-                        val y = filename.boundsInWindow.center.y.toInt()
-                        filename.takeIf { x in 0 until screenshot.width && y in 0 until screenshot.height && screenshot.getPixel(x, y) == Color.MAGENTA }
-                    } finally { screenshot.recycle() }
+                click(imageThumb)
+                await("full-screen image") { nodes ->
+                    control(nodes, close)?.takeIf { screenshotPixel() == Color.MAGENTA }
                 }
-                await("generic file remains named") { findText(it, "Report.pdf") }
-                click(await("remove action") { nodes ->
-                    findText(nodes, removeLabel)?.let { generateSequence(it) { node -> node.parent }.firstOrNull { node -> node.config.getOrNull(SemanticsActions.OnClick) != null } }
+                assertTrue(screenshotPixel(verticalOffset = 0.2f) != Color.MAGENTA)
+                doubleTapPreviewCenter()
+                await("zoomed image") { screenshotPixel(verticalOffset = 0.2f)?.takeIf { it == Color.MAGENTA } }
+                instrumentation.sendKeyDownUpSync(KeyEvent.KEYCODE_BACK)
+                val videoThumb = await("rendered video thumbnail") { nodes ->
+                    control(nodes, video.name)?.takeIf { node ->
+                        val center = node.boundsInWindow.center
+                        screenshotPixel(center.x.toInt(), center.y.toInt())?.let { Color.blue(it) > 200 && Color.red(it) < 40 } == true
+                    }
+                }
+                click(videoThumb)
+                await("video playback") { nodes ->
+                    control(nodes, pause)?.takeIf {
+                        screenshotPixel()?.let { Color.blue(it) > 200 && Color.red(it) < 40 } == true
+                    }
+                }
+                click(await("close video preview") { control(it, close) })
+                click(await("remove first attachment") { nodes ->
+                    findText(nodes, remove)?.let(::clickable)
                 })
-                await("only selected image removed") { nodes ->
-                    findText(nodes, "Report.pdf")?.takeIf { findText(nodes, "Photo") == null }
+                await("only the first attachment removed") { nodes ->
+                    findText(nodes, document.name)?.takeIf { control(nodes, image.name) == null && control(nodes, video.name) != null }
                 }
             }
         } finally {
-            file.delete()
+            image.delete()
+            video.delete()
+            document.delete()
+        }
+    }
+
+    private fun screenshotPixel(x: Int? = null, y: Int? = null, verticalOffset: Float = 0f): Int? {
+        val screenshot = instrumentation.uiAutomation.takeScreenshot() ?: return null
+        return try {
+            val column = x ?: screenshot.width / 2
+            val row = y ?: (screenshot.height * (0.5f + verticalOffset)).toInt()
+            if (column in 0 until screenshot.width && row in 0 until screenshot.height) screenshot.getPixel(column, row) else null
+        } finally {
+            screenshot.recycle()
+        }
+    }
+
+    private fun doubleTapPreviewCenter() {
+        val screenshot = requireNotNull(instrumentation.uiAutomation.takeScreenshot())
+        val x = screenshot.width / 2f
+        val y = screenshot.height / 2f
+        screenshot.recycle()
+        repeat(2) { index ->
+            if (index == 1) SystemClock.sleep(60)
+            val down = SystemClock.uptimeMillis()
+            for (action in listOf(MotionEvent.ACTION_DOWN, MotionEvent.ACTION_UP)) {
+                val event = MotionEvent.obtain(down, SystemClock.uptimeMillis(), action, x, y, 0)
+                event.source = InputDevice.SOURCE_TOUCHSCREEN
+                try {
+                    instrumentation.sendPointerSync(event)
+                } finally {
+                    event.recycle()
+                }
+            }
         }
     }
 
@@ -134,7 +206,10 @@ class ChatInputToolbarTest {
 
     private fun control(nodes: List<SemanticsNode>, label: String): SemanticsNode? =
         nodes.firstOrNull { label in it.config.getOrNull(SemanticsProperties.ContentDescription).orEmpty() }
-            ?.let { generateSequence(it) { node -> node.parent }.firstOrNull { node -> node.config.getOrNull(SemanticsActions.OnClick) != null } }
+            ?.let(::clickable)
+
+    private fun clickable(node: SemanticsNode): SemanticsNode? =
+        generateSequence(node) { it.parent }.firstOrNull { it.config.getOrNull(SemanticsActions.OnClick) != null }
 
     private fun click(node: SemanticsNode) = instrumentation.runOnMainSync {
         assertTrue(node.config.getOrNull(SemanticsActions.OnClick)?.action?.invoke() == true)
@@ -155,7 +230,7 @@ class ChatInputToolbarTest {
         return result
     }
 
-    private fun await(expected: String, find: (List<SemanticsNode>) -> SemanticsNode?): SemanticsNode {
+    private fun <T : Any> await(expected: String, find: (List<SemanticsNode>) -> T?): T {
         val deadline = System.nanoTime() + 10_000_000_000L
         while (System.nanoTime() < deadline) {
             find(nodes())?.let { return it }

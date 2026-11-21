@@ -59,13 +59,17 @@ class ForceVideoDecoder(
 ) : Decoder {
 
     override suspend fun decode(): DecodeResult {
-        val filePath = source.file().toString()
-
+        val content = source.metadata as? ContentMetadata
+        val path = content?.uri?.toString() ?: source.file().toString()
         val retriever = MediaMetadataRetriever()
         try {
-            retriever.setDataSource(filePath)
+            if (content != null) {
+                retriever.setDataSource(options.context, content.uri.toAndroidUri())
+            } else {
+                retriever.setDataSource(path)
+            }
             val bitmap = retriever.getFrameAtTime(-1L, MediaMetadataRetriever.OPTION_CLOSEST_SYNC)
-                ?: throw IOException("ForceVideoDecoder: failed to extract video frame from $filePath")
+                ?: throw IOException("ForceVideoDecoder: failed to extract video frame from $path")
 
             // getFrameAtTime returns a full-resolution frame (a 4K frame is ~33MB);
             // scale it to the requested size before it reaches the memory cache.
@@ -92,7 +96,6 @@ class ForceVideoDecoder(
             options: Options,
             imageLoader: ImageLoader,
         ): Decoder? {
-            // Only applicable to file-backed sources (fid: / regular file paths)
             return ForceVideoDecoder(result.source, options)
         }
     }
@@ -218,7 +221,7 @@ class ThumbnailDecoder(
             options: Options,
             imageLoader: ImageLoader,
         ): Decoder? {
-            if (!isApplicable(result)) return null
+            if (options.size == Size.ORIGINAL || !isApplicable(result)) return null
             return ThumbnailDecoder(result.source, options)
         }
 
