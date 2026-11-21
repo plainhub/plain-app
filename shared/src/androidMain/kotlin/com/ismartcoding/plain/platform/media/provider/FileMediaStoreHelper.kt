@@ -43,10 +43,11 @@ object FileMediaStoreHelper : BaseContentHelper() {
         limit: Int,
         offset: Int,
         sortBy: FileSortBy,
+        includeTrashed: Boolean,
     ): List<FileEntry> = withIO {
         val items = context.contentResolver.getPagingCursor(
             uriExternal, getProjection(), where,
-            limit, offset, sortBy.toFileSortBy()
+            limit, offset, sortBy.toFileSortBy(), includeTrashed,
         )?.map { cursor, cache ->
             cursor.toFile(cache)
         } ?: emptyList()

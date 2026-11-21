@@ -6,7 +6,13 @@ import kotlinx.serialization.Serializable
 internal data class ProviderPageRequest(val plan: ProviderPlan, val limit: Int, val offset: Int)
 
 @Serializable
-internal data class FileIndexRowsRequest(val plan: ProviderPlan, val limit: Int, val offset: Int, val sortBy: String)
+internal data class FileIndexRowsRequest(
+    val plan: ProviderPlan,
+    val limit: Int,
+    val offset: Int,
+    val sortBy: String,
+    val includeTrashed: Boolean = false,
+)
 
 @Serializable
 internal data class MediaPlanRequest(val dataType: String, val plan: ProviderPlan)

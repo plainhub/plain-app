@@ -102,10 +102,11 @@ fun ContentResolver.getPagingCursor(
     limit: Int,
     offset: Int,
     sortBy: SortBy,
+    includeTrashed: Boolean = false,
 ): Cursor? {
     return if (isRPlus()) {
         // From Android 11, LIMIT and OFFSET should be retrieved using Bundle
-        getPagingCursorWithBundle(uri, projection, where, limit, offset, sortBy)
+        getPagingCursorWithBundle(uri, projection, where, limit, offset, sortBy, includeTrashed)
     } else {
         try {
             getPagingCursorWithSql(uri, projection, where, limit, offset, sortBy)
@@ -124,6 +125,7 @@ fun ContentResolver.getPagingCursorWithBundle(
     limit: Int,
     offset: Int,
     sortBy: SortBy,
+    includeTrashed: Boolean = false,
 ): Cursor? {
     return try {
         query(
@@ -133,14 +135,10 @@ fun ContentResolver.getPagingCursorWithBundle(
                 paging(offset, limit)
                 sort(sortBy)
                 where(where.toSelection(), where.args)
-                // MediaStore owns the phone's trash and answers a trashed-only
-                // read with this argument, not a selection clause: it parses a
-                // legacy selection with a strict grammar that rejects
-                // `is_trashed`. `createTrashRequest` is the wrapper that asks
-                // the user first — skipping it skips the dialog, not the trash.
-                if (where.trash == true) {
-                    if (isRPlus()) {
-                        putInt(MediaStore.QUERY_ARG_MATCH_TRASHED, MediaStore.MATCH_ONLY)
+                if (isRPlus()) {
+                    when {
+                        includeTrashed -> putInt(MediaStore.QUERY_ARG_MATCH_TRASHED, MediaStore.MATCH_INCLUDE)
+                        where.trash == true -> putInt(MediaStore.QUERY_ARG_MATCH_TRASHED, MediaStore.MATCH_ONLY)
                     }
                 }
             },

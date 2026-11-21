@@ -48,7 +48,13 @@ suspend fun mediaBucketItemFacts(dataType: DataType, plan: ProviderPlan): List<M
 }
 
 suspend fun fileIndexId(path: String): String? = withIO { FileMediaStoreHelper.getIdByPathAsync(appContext, path) }
-suspend fun fileIndexRows(plan: ProviderPlan, limit: Int, offset: Int, sortBy: FileSortBy): List<FileEntry> = FileMediaStoreHelper.searchAsync(appContext, plan.where(), limit, offset, sortBy)
+suspend fun fileIndexRows(
+    plan: ProviderPlan,
+    limit: Int,
+    offset: Int,
+    sortBy: FileSortBy,
+    includeTrashed: Boolean = false,
+): List<FileEntry> = FileMediaStoreHelper.searchAsync(appContext, plan.where(), limit, offset, sortBy, includeTrashed)
 suspend fun fileIndexCount(plan: ProviderPlan): Int = withIO {
     plan.wheres().sumOf { FileMediaStoreHelper.countAsync(appContext, it) }
 }

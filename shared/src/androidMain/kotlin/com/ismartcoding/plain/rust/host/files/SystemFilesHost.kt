@@ -19,7 +19,7 @@ internal object SystemFilesHost {
             val request = JsonHelper.jsonDecodeFromElement<FileIndexRowsRequest>(params)
             hostResult(fileIndexRows(
                 request.plan, request.limit, request.offset,
-                FileSortBy.valueOf(request.sortBy),
+                FileSortBy.valueOf(request.sortBy), request.includeTrashed,
             ).map(::fileFacts))
         }
         else -> error("Unsupported provider operation")
