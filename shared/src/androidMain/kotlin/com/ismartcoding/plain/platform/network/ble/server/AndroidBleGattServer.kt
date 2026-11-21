@@ -96,7 +96,7 @@ class AndroidBleGattServer : BleGattServer {
         val requestId = protocol.nearbyRequestId(mac) ?: return false
         val device = connectedDevices[mac] ?: return false
         scope.launch {
-            try { sendChunkedResponse(device, UUID.fromString(charUuid), BleMessage(requestId, RustBleWire.nearby(value))) }
+            try { sendChunkedResponse(device, UUID.fromString(charUuid), BleMessage(requestId, RustBleWire.nearby(value)), ::sendNotificationBlocking) }
             catch (canceled: CancellationException) { throw canceled }
             catch (error: Exception) { LogCat.e("GATT notification error: ${error.message}") }
         }
@@ -165,7 +165,7 @@ class AndroidBleGattServer : BleGattServer {
         check(server.addService(service)) { "BLE service registration failed" }
     }
 
-    private val gattCallback = object : BluetoothGattServerCallback() {
+    internal val gattCallback = object : BluetoothGattServerCallback() {
         override fun onConnectionStateChange(
             device: BluetoothDevice,
             status: Int,
@@ -218,8 +218,7 @@ class AndroidBleGattServer : BleGattServer {
 
             scope.launch(start = CoroutineStart.UNDISPATCHED) {
                 try {
-                    val response = protocol.handleWrite(mac, charUuid, value)
-                    if (response != null) sendChunkedResponse(device, characteristic.uuid, response)
+                    respondToWrite(device, characteristic.uuid, value)
                 } catch (canceled: CancellationException) { throw canceled }
                 catch (error: Exception) { protocol.clearClient(mac); LogCat.e("BLE exchange failed: ${error.message}") }
             }
@@ -259,7 +258,23 @@ class AndroidBleGattServer : BleGattServer {
         }
     }
 
-    private suspend fun sendChunkedResponse(device: BluetoothDevice, charUuid: UUID, response: BleMessage) {
+    internal suspend fun respondToWrite(
+        device: BluetoothDevice,
+        charUuid: UUID,
+        value: ByteArray,
+        notify: suspend (String, String, ByteArray) -> Boolean = ::sendNotificationBlocking,
+    ) {
+        val connection = connectedDevices[device.address] ?: return
+        val response = protocol.handleWrite(connection.address, charUuid.toString(), value) ?: return
+        sendChunkedResponse(connection, charUuid, response, notify)
+    }
+
+    private suspend fun sendChunkedResponse(
+        device: BluetoothDevice,
+        charUuid: UUID,
+        response: BleMessage,
+        notify: suspend (String, String, ByteArray) -> Boolean,
+    ) {
         val mac = device.address
         sending.getOrPut(mac) { Mutex() }.withLock {
             val limit = minOf((mtus[mac] ?: 23) - 3, 512)
@@ -267,7 +282,7 @@ class AndroidBleGattServer : BleGattServer {
             try {
                 while (connectedDevices[mac] === device) {
                     val frame = encoder.next() ?: break
-                    check(sendNotificationBlocking(mac, charUuid.toString(), frame)) { "BLE response notification failed" }
+                    check(notify(mac, charUuid.toString(), frame)) { "BLE response notification failed" }
                 }
             } finally { encoder.close() }
         }

@@ -6,7 +6,6 @@ import com.ismartcoding.plain.features.chat.models.MessageContent
 import com.ismartcoding.plain.features.chat.models.ChatMessage
 import com.ismartcoding.plain.features.chat.models.ChatTextFormat
 import com.ismartcoding.plain.features.chat.models.MessageType
-import com.ismartcoding.plain.features.chat.models.toJSONString
 import com.ismartcoding.plain.models.ChatItem
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.Dispatchers
@@ -34,7 +33,7 @@ class ChatSendTest {
     )
 
     @Test
-    fun pendingMessageAppearsBeforeSendReturnsAndIsReplacedWithoutEventDuplicates() = runTest {
+    fun committedPendingMessageIsTheOnlyRowWhileDeliveryIsInFlight() = runTest {
         ChatViewModel.local.initializeTargetAsync("peer:fixture")
         val target = ChatViewModel.local.target.value
         val started = CompletableDeferred<Unit>()
@@ -47,25 +46,28 @@ class ChatSendTest {
             }
         }
         started.await()
-        assertEquals(ChatStatus.PENDING, ChatViewModel.local.itemsFlow.value.single().status)
-        assertEquals("hello", (ChatViewModel.local.itemsFlow.value.single().value as ChatMessage).text)
-        ChatViewModel.local.onMessagesCreated(target, listOf(sent(target)))
+        val pending = sent(target).copy(status = ChatStatus.PENDING)
+        ChatViewModel.local.onMessagesCreated(target, listOf(pending), scroll = true)
+        val rowsDuringDelivery = ChatViewModel.local.itemsFlow.value
         release.complete(Unit)
         assertTrue(sending.await())
+        assertEquals(listOf(pending.id to ChatStatus.PENDING), rowsDuringDelivery.map { it.id to it.status })
         assertEquals(listOf("committed"), ChatViewModel.local.itemsFlow.value.map { it.id })
         assertEquals(ChatStatus.SENT, ChatViewModel.local.itemsFlow.value.single().status)
-        ChatViewModel.local.onMessagesCreated(target, listOf(sent(target)))
-        assertEquals(1, ChatViewModel.local.itemsFlow.value.size)
+        ChatViewModel.local.onMessagesCreated(target, listOf(pending), scroll = true)
+        assertEquals(ChatStatus.SENT, ChatViewModel.local.itemsFlow.value.single().status)
     }
 
     @Test
-    fun failedSendKeepsMessageAndRetryReplacesIt() = runTest {
+    fun failureBeforeCommitReportsTheErrorWithoutInsertingAMessage() = runTest {
         ChatViewModel.local.initializeTargetAsync("peer:fixture")
         val target = ChatViewModel.local.target.value
-        assertFalse(ChatViewModel.local.sendMessage(target, content) { _, _ -> error("Offline") })
-        val failed = ChatViewModel.local.itemsFlow.value.single()
-        assertEquals(ChatStatus.FAILED, failed.status)
-        assertTrue(ChatViewModel.local.sendMessage(target, content, pendingId = failed.id) { to, _ -> sent(to) })
+        val failure = assertFailsWith<IllegalStateException> {
+            ChatViewModel.local.sendMessage(target, content) { _, _ -> error("Offline") }
+        }
+        assertEquals("Offline", failure.message)
+        assertTrue(ChatViewModel.local.itemsFlow.value.isEmpty())
+        assertTrue(ChatViewModel.local.sendMessage(target, content) { to, _ -> sent(to) })
         assertEquals(listOf("committed"), ChatViewModel.local.itemsFlow.value.map { it.id })
     }
 

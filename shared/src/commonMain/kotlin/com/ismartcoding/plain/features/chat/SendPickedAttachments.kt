@@ -35,9 +35,7 @@ suspend fun sendPickedAttachments(
         val content = MessageContent(MessageType.MESSAGE, ChatMessage(text = body, items = items))
         coroutineScope {
             targets.distinct().map { target -> async {
-                val item = chatVM.client.sendContent(target, content)
-                chatVM.onMessagesCreated(target, listOf(item), scroll = true)
-                item.status == ChatStatus.SENT
+                chatVM.sendMessage(target, content)
             } }.awaitAll().all { it }
         }
     }

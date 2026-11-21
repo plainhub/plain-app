@@ -7,10 +7,6 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import com.ismartcoding.plain.features.chat.data.ChatTarget
 import com.ismartcoding.plain.features.chat.data.ChatTargetType
-import com.ismartcoding.plain.features.chat.models.MessageType
-import com.ismartcoding.plain.lib.generateId
-import com.ismartcoding.plain.lib.TimeHelper
-import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.features.chat.models.MessageContent
 import com.ismartcoding.plain.features.chat.peer.transport.PeerTransportType
 import com.ismartcoding.plain.features.chat.ChatStatus
@@ -21,7 +17,6 @@ import com.ismartcoding.plain.i18n.send_failed
 import com.ismartcoding.plain.lib.withIO
 import com.ismartcoding.plain.ui.components.DialogHelper
 import com.ismartcoding.plain.ui.state.ISelectableViewModel
-import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -117,14 +112,13 @@ class ChatViewModel internal constructor(
         }
     }
 
-    fun addAll(items: List<ChatItem>) {
-        _itemsFlow.update { items.map { VChat.from(it) } + it.filterNot { existing -> items.any { incoming -> incoming.id == existing.id } } }
-    }
-
-    fun addAllAndScroll(items: List<ChatItem>) {
-        val previousTopId = _itemsFlow.value.firstOrNull()?.id
-        addAll(items)
-        _scrollToLatest.trySend(previousTopId)
+    private fun insertMessages(items: List<ChatItem>, scroll: Boolean) {
+        val previous = _itemsFlow.value
+        val newItems = items.filterNot { incoming -> previous.any { it.id == incoming.id } }
+        if (newItems.isEmpty()) return
+        val rows = newItems.map(VChat::from)
+        _itemsFlow.update { rows + it }
+        if (scroll) _scrollToLatest.trySend(previous.firstOrNull()?.id)
     }
 
     fun update(item: ChatItem) {
@@ -154,12 +148,7 @@ class ChatViewModel internal constructor(
 
     fun resendMessage(messageId: String) {
         launchSafe {
-            if (messageId.startsWith("pending_")) {
-                val item = itemsFlow.value.firstOrNull { it.id == messageId } ?: return@launchSafe
-                sendMessage(target.value, MessageContent(item.type, item.value), pendingId = messageId)
-            } else {
-                update(client.retry(messageId))
-            }
+            update(client.retry(messageId))
         }
     }
 
@@ -181,7 +170,7 @@ class ChatViewModel internal constructor(
 
     fun delete(ids: Set<String>) {
         launchSafe {
-            client.deleteByIds(ids.filterNot { it.startsWith("pending_") }.toSet())
+            client.deleteByIds(ids)
             _itemsFlow.update { it.filterNot { m -> ids.contains(m.id) } }
         }
     }
@@ -189,54 +178,21 @@ class ChatViewModel internal constructor(
     internal suspend fun sendMessage(
         target: ChatTarget,
         content: MessageContent,
-        pendingId: String = "pending_${generateId()}",
         send: suspend (ChatTarget, MessageContent) -> ChatItem = client::sendContent,
     ): Boolean {
-        val pending = VChat(pendingId, "me", TimeHelper.now(), content.type, ChatStatus.PENDING, value = content.value)
-        if (_target.value == target) {
-            val previousTopId = _itemsFlow.value.firstOrNull()?.id
-            _itemsFlow.update { listOf(pending) + it.filterNot { item -> item.id == pendingId } }
-            _scrollToLatest.trySend(previousTopId)
-        }
-        return try {
-            val item = send(target, content)
-            mutex.withLock {
-                if (_target.value == target) {
-                    _itemsFlow.update { current ->
-                        val remaining = current.filterNot { it.id == item.id }
-                        if (remaining.any { it.id == pendingId }) {
-                            remaining.map { if (it.id == pendingId) VChat.from(item) else it }
-                        } else listOf(VChat.from(item)) + remaining
-                    }
-                }
+        val item = send(target, content)
+        mutex.withLock {
+            if (_target.value == target) {
+                if (_itemsFlow.value.any { it.id == item.id }) update(item)
+                else insertMessages(listOf(item), scroll = true)
             }
-            item.status == ChatStatus.SENT
-        } catch (canceled: CancellationException) {
-            throw canceled
-        } catch (error: Exception) {
-            _itemsFlow.update { current ->
-                current.map { if (it.id == pendingId) it.copy(status = ChatStatus.FAILED) else it }
-            }
-            LogCat.e("Send chat message", error)
-            false
         }
+        return item.status == ChatStatus.SENT
     }
 
-    /**
-     * Entry point for non-UI writers delivering already-persisted messages
-     * (share-to-chat, incoming WebSocket, GraphQL-created messages). Updates
-     * the open conversation when the target matches. Root message events
-     * are forwarded to desktop clients by the Rust core.
-     */
     suspend fun onMessagesCreated(target: ChatTarget, items: List<ChatItem>, scroll: Boolean = false) = mutex.withLock {
         if (_target.value == target) {
-            if (scroll) {
-                val previousTopId = _itemsFlow.value.firstOrNull()?.id
-                _itemsFlow.update { items.map { VChat.from(it) } + it.filterNot { existing -> items.any { incoming -> incoming.id == existing.id } } }
-                _scrollToLatest.trySend(previousTopId)
-            } else {
-                _itemsFlow.update { items.map { VChat.from(it) } + it.filterNot { existing -> items.any { incoming -> incoming.id == existing.id } } }
-            }
+            insertMessages(items, scroll)
         }
     }
 
