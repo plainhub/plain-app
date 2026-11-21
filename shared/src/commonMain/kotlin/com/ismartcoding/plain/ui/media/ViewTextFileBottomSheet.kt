@@ -1,5 +1,6 @@
 package com.ismartcoding.plain.ui.media
 
+import com.ismartcoding.plain.ui.components.PSwitch
 import com.ismartcoding.plain.features.files.FilesClient
 
 import com.ismartcoding.plain.models.File as FileEntry
@@ -30,7 +31,6 @@ import com.ismartcoding.plain.ui.base.PModalBottomSheet
 import com.ismartcoding.plain.ui.base.PSheetPrimaryAction
 import com.ismartcoding.plain.ui.base.PSheetPrimaryDeleteAction
 import com.ismartcoding.plain.ui.base.PSheetPrimaryActionsCard
-import androidx.compose.material3.Switch
 import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.components.confirmActionAsync
 import com.ismartcoding.plain.ui.files.text.TextFileViewModel
@@ -129,7 +129,7 @@ fun ViewTextFileBottomSheet(
             VerticalSpace(dp = 16.dp)
             PCard(modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN)) {
                 PListItem(title = stringResource(Res.string.wrap_content), action = {
-                    Switch(
+                    PSwitch(
                         checked = textFileVM.controller.wrapContent.value,
                         onCheckedChange = {
                             textFileVM.toggleWrapContent()
@@ -170,7 +170,7 @@ private fun EditorDisplayActionsCard(textFileVM: TextFileViewModel, scope: Corou
             scope.launchSafe { Prefs.set(PrefKeys.EDITOR_FONT_SIZE, next)}
         }
         PListItem(title = stringResource(Res.string.status_bar), action = {
-            Switch(checked = controller.statusBarVisible.value, onCheckedChange = {
+            PSwitch(checked = controller.statusBarVisible.value, onCheckedChange = {
                 controller.statusBarVisible.value = !controller.statusBarVisible.value
                 scope.launchSafe { Prefs.set(PrefKeys.EDITOR_STATUS_BAR, controller.statusBarVisible.value)}
             })

@@ -4,7 +4,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -19,6 +18,7 @@ import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
+import com.ismartcoding.plain.ui.components.PSwitch
 import com.ismartcoding.plain.ui.base.PBanner
 import com.ismartcoding.plain.ui.base.PFilledButton
 import com.ismartcoding.plain.ui.base.PInputChip
@@ -43,15 +43,15 @@ internal fun ShowcaseComponentStates() {
     PSectionTitle("States and accessibility")
     Column(Modifier.padding(horizontal = 16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
         Row {
-            Switch(enabled, onCheckedChange = { enabled = it })
+            PSwitch(enabled, onCheckedChange = { enabled = it })
             Text("Enabled")
-            Switch(loading, onCheckedChange = { loading = it })
+            PSwitch(loading, onCheckedChange = { loading = it })
             Text("Loading")
         }
         Row {
-            Switch(rtl, onCheckedChange = { rtl = it })
+            PSwitch(rtl, onCheckedChange = { rtl = it })
             Text("RTL")
-            Switch(largeText, onCheckedChange = { largeText = it })
+            PSwitch(largeText, onCheckedChange = { largeText = it })
             Text("Large text")
         }
         Text("Actions: $clicks")

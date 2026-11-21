@@ -10,12 +10,12 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.ismartcoding.plain.ui.components.PSwitch
 import com.ismartcoding.plain.i18n.*
 import com.ismartcoding.plain.ui.base.PTextButton
 import com.ismartcoding.plain.ui.base.PTextField
@@ -35,7 +35,7 @@ internal fun EditorNumberField(label: String, value: Double, range: ClosedFloati
 internal fun EditorToggle(label: String, value: Boolean, onChange: (Boolean) -> Unit) {
     Row(Modifier.fillMaxWidth().toggleable(value = value, role = Role.Switch, onValueChange = onChange), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
         Text(label, modifier = Modifier.weight(1f), style = MaterialTheme.typography.bodyLarge)
-        Switch(checked = value, onCheckedChange = null)
+        PSwitch(checked = value, onCheckedChange = null)
     }
 }
 

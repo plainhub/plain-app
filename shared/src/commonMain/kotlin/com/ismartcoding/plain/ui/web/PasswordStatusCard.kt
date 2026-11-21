@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -15,6 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
+import com.ismartcoding.plain.ui.components.PSwitch
 import com.ismartcoding.plain.features.settings.PasswordType
 import com.ismartcoding.plain.i18n.*
 import com.ismartcoding.plain.ui.base.AlertType
@@ -53,7 +53,7 @@ internal fun PasswordStatusCard(
         PListItem(
             title = loginLabel,
         ) {
-            Switch(
+            PSwitch(
                 modifier = Modifier.semantics { contentDescription = loginLabel },
                 checked = enabled, onCheckedChange = onToggle, enabled = !state.busy,
             )

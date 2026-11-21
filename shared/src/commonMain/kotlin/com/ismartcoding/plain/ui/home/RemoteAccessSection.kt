@@ -5,7 +5,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Switch
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -16,6 +15,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
+import com.ismartcoding.plain.ui.components.PSwitch
 import com.ismartcoding.plain.events.OpenNotificationSettingsEvent
 import com.ismartcoding.plain.i18n.grant_permission
 import com.ismartcoding.plain.i18n.service_notification_prompt
@@ -56,7 +56,7 @@ fun DesktopAccessSection(navController: NavHostController) {
             title = stringResource(Res.string.home_remote_access),
             subtitle = stringResource(if (remoteAccessEnabled) Res.string.desktop_access_instructions else Res.string.desktop_access_desc)
         ) {
-            Switch(checked = remoteAccessEnabled, onCheckedChange = { enable ->
+            PSwitch(checked = remoteAccessEnabled, onCheckedChange = { enable ->
                 scope.launchSafe {
                     if (setRemoteAccessEnabled(enable) && enable && supportsBackgroundService && !Permission.POST_NOTIFICATIONS.isGranted()) {
                         confirmActionAsync(Res.string.grant_permission, Res.string.service_notification_prompt, callback = {

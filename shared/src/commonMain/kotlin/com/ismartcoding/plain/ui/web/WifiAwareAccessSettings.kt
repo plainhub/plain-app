@@ -2,7 +2,6 @@ package com.ismartcoding.plain.ui.web
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Switch
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -11,6 +10,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.ismartcoding.plain.ui.components.PSwitch
 import com.ismartcoding.plain.Prefs
 import com.ismartcoding.plain.events.PermissionsResultEvent
 import com.ismartcoding.plain.events.RequestPermissionsEvent
@@ -66,7 +66,7 @@ internal fun WifiAwareAccessSettings() {
             subtitle = stringResource(Res.string.wifi_aware_transfer_hint),
             modifier = Modifier.clickable(enabled = !busy) { toggle(!(enabled && granted)) },
         ) {
-            Switch(checked = enabled && granted, enabled = !busy, onCheckedChange = toggle)
+            PSwitch(checked = enabled && granted, enabled = !busy, onCheckedChange = toggle)
         }
     }
 }

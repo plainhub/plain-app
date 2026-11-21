@@ -1,6 +1,7 @@
 package com.ismartcoding.plain.ui.media
 import androidx.compose.foundation.layout.padding
 import androidx.compose.ui.Modifier
+import com.ismartcoding.plain.ui.components.PSwitch
 import com.ismartcoding.plain.ui.theme.PlainTheme
 
 import com.ismartcoding.plain.i18n.*
@@ -18,7 +19,6 @@ import com.ismartcoding.plain.ui.base.PSheetPrimaryAction
 import com.ismartcoding.plain.ui.base.PSheetPrimaryActionsCard
 import com.ismartcoding.plain.ui.base.PListItem
 import com.ismartcoding.plain.ui.base.PModalBottomSheet
-import androidx.compose.material3.Switch
 import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.files.text.TextFileViewModel
 import com.ismartcoding.plain.ui.resources.Res as UiRes
@@ -65,7 +65,7 @@ fun ViewTextContentBottomSheet(
                 VerticalSpace(dp = 24.dp)
                 PCard(modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN)) {
                     PListItem(title = stringResource(Res.string.wrap_content), action = {
-                        Switch(
+                        PSwitch(
                             checked = textFileVM.controller.wrapContent.value,
                             onCheckedChange = {
                                 textFileVM.toggleWrapContent()

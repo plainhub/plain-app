@@ -1,5 +1,6 @@
 package com.ismartcoding.plain.ui.settings.developer
 
+import com.ismartcoding.plain.ui.components.PSwitch
 import com.ismartcoding.plain.ui.media.extensions.collectAsStateValue
 
 import com.ismartcoding.plain.ui.theme.PlainTheme
@@ -9,7 +10,6 @@ import com.ismartcoding.plain.i18n.*
 
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material3.Switch
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -54,7 +54,7 @@ fun WebDevPage(
                     TopSpace()
                     PCard(modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN)) {
                         PListItem(title = stringResource(Res.string.adb_automation)) {
-                            Switch(checked = enabled, onCheckedChange = onEnabledChange)
+                            PSwitch(checked = enabled, onCheckedChange = onEnabledChange)
                         }
                     }
                     if (enabled) {

@@ -1,5 +1,6 @@
 package com.ismartcoding.plain.ui.settings
 
+import com.ismartcoding.plain.ui.components.PSwitch
 import com.ismartcoding.plain.HttpServerManager
 import com.ismartcoding.plain.preferences.*
 import androidx.compose.foundation.layout.padding
@@ -32,7 +33,6 @@ import com.ismartcoding.plain.platform.system.Capability
 import com.ismartcoding.plain.platform.system.getDeviceCapabilities
 import com.ismartcoding.plain.ui.base.PCard
 import com.ismartcoding.plain.ui.base.PListItem
-import androidx.compose.material3.Switch
 import com.ismartcoding.plain.Prefs
 import com.ismartcoding.plain.ui.navigation.Routing
 import kotlinx.coroutines.Dispatchers
@@ -83,7 +83,7 @@ internal fun DeveloperSettingsCard(
                     title = stringResource(Res.string.allow_any_host),
                     subtitle = stringResource(Res.string.allow_any_host_desc),
                 ) {
-                    Switch(checked = allowAnyHost, onCheckedChange = {
+                    PSwitch(checked = allowAnyHost, onCheckedChange = {
                         scope.launch(Dispatchers.Default) {
                             Prefs.set(PrefKeys.ALLOW_ANY_HOST, it)
                             HttpServerManager.restartHttpServer()

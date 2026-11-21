@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -22,6 +21,7 @@ import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
+import com.ismartcoding.plain.ui.components.PSwitch
 import com.ismartcoding.plain.ui.base.PCard
 import com.ismartcoding.plain.ui.base.PListItem
 import com.ismartcoding.plain.ui.base.PSectionTitle
@@ -41,9 +41,9 @@ fun ShowcaseListItemValues() {
     PSectionTitle("PListItem cases")
     Column(Modifier.padding(horizontal = 16.dp)) {
         PCard {
-            PListItem(title = "RTL", action = { Switch(rtl, onCheckedChange = { rtl = it }) })
-            PListItem(title = "Large text (150%)", action = { Switch(largeText, onCheckedChange = { largeText = it }) })
-            PListItem(title = "Narrow width (75%)", action = { Switch(narrow, onCheckedChange = { narrow = it }) })
+            PListItem(title = "RTL", action = { PSwitch(rtl, onCheckedChange = { rtl = it }) })
+            PListItem(title = "Large text (150%)", action = { PSwitch(largeText, onCheckedChange = { largeText = it }) })
+            PListItem(title = "Narrow width (75%)", action = { PSwitch(narrow, onCheckedChange = { narrow = it }) })
         }
     }
     CompositionLocalProvider(
@@ -96,9 +96,9 @@ private fun ShowcaseListItemActions() {
     PCard {
         PListItem(title = "Chevron only", showMore = true)
         PListItem(title = "Subtitle and chevron", subtitle = "Supporting text", showMore = true)
-        PListItem(title = "Switch", action = { Switch(checked, onCheckedChange = { checked = it }) })
-        PListItem(title = "Subtitle and switch", subtitle = "Supporting text", action = { Switch(checked, onCheckedChange = { checked = it }) })
-        PListItem(title = "Separated switch", separatedActions = true, action = { Switch(checked, onCheckedChange = { checked = it }) })
+        PListItem(title = "Switch", action = { PSwitch(checked, onCheckedChange = { checked = it }) })
+        PListItem(title = "Subtitle and switch", subtitle = "Supporting text", action = { PSwitch(checked, onCheckedChange = { checked = it }) })
+        PListItem(title = "Separated switch", separatedActions = true, action = { PSwitch(checked, onCheckedChange = { checked = it }) })
         PListItem(title = "Action and chevron", showMore = true, action = { PTextButton("Open", onClick = { clicks++ }) })
         PListItem(title = "Separated action and chevron", separatedActions = true, showMore = true, action = { PTextButton("Open", onClick = { clicks++ }) })
         PListItem(title = "Separated chevron", separatedActions = true, showMore = true)
@@ -125,7 +125,7 @@ private fun ShowcaseListItemKeyValues() {
         PListItem(title = "Custom leading", value = "Enabled", start = { StepNumber(3, modifier = Modifier) })
         PListItem(title = "Empty value", value = "", showMore = true)
         PListItem(title = "Null value", value = null, showMore = true)
-        PListItem(title = "Empty value with action", value = "", action = { Switch(true, onCheckedChange = null) })
+        PListItem(title = "Empty value with action", value = "", action = { PSwitch(true, onCheckedChange = null) })
     }
 }
 
@@ -142,7 +142,7 @@ private fun ShowcaseListItemSlots() {
             subtitle = { Text("A supporting text slot that wraps across multiple lines at the current width and font scale") },
             description = { Text("A longer description that also wraps, retaining the spacing between visible text blocks.") },
             icon = UiRes.drawable.ui_drawable_settings,
-            action = { Switch(true, onCheckedChange = null) },
+            action = { PSwitch(true, onCheckedChange = null) },
         )
         PListItem(title = { Text("Custom leading and action") }, subtitle = { Text("Supporting text") }, start = { StepNumber(4, modifier = Modifier) }, action = { PTextButton("Open", onClick = {}) })
         PListItem(title = { Text("Compact row (48dp minimum)") }, minHeight = 48.dp)

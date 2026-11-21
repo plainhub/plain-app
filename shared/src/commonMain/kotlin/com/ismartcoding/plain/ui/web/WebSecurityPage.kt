@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Switch
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
@@ -19,6 +18,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import com.ismartcoding.plain.ui.components.PSwitch
 import com.ismartcoding.plain.HttpServerManager
 import com.ismartcoding.plain.Prefs
 import com.ismartcoding.plain.features.settings.PasswordType
@@ -132,7 +132,7 @@ fun WebSecurityPage(navController: NavHostController) {
                         modifier = Modifier.clickable { scope.launch(Dispatchers.Default) { Prefs.setLoginRequireApproval(!loginRequireApproval )} },
                         title = stringResource(Res.string.require_confirmation)
                     ) {
-                        Switch(checked = loginRequireApproval, onCheckedChange = {
+                        PSwitch(checked = loginRequireApproval, onCheckedChange = {
                             scope.launch(Dispatchers.Default) { Prefs.setLoginRequireApproval(it )}
                         })
                     }

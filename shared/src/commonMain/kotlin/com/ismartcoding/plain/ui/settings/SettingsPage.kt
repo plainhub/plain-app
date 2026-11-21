@@ -1,5 +1,6 @@
 package com.ismartcoding.plain.ui.settings
 
+import com.ismartcoding.plain.ui.components.PSwitch
 import com.ismartcoding.plain.features.settings.AppUpdateDownloadStatus
 import com.ismartcoding.plain.ui.theme.PlainTheme
 
@@ -11,7 +12,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Switch
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -142,7 +142,7 @@ fun SettingsPage(navController: NavHostController, updateViewModel: UpdateViewMo
                         )
                         if (developerMode || developerModeRevealed) {
                             PListItem(title = stringResource(Res.string.developer_mode)) {
-                                Switch(checked = developerMode, onCheckedChange = {
+                                PSwitch(checked = developerMode, onCheckedChange = {
                                     scope.launch(Dispatchers.Default) {
                                         Prefs.set(PrefKeys.DEVELOPER_MODE, it)
                                     }

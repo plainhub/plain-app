@@ -1,5 +1,6 @@
 package com.ismartcoding.plain.ui.settings
 
+import com.ismartcoding.plain.ui.components.PSwitch
 import com.ismartcoding.plain.ui.media.extensions.collectAsStateValue
 import com.ismartcoding.plain.ui.theme.PlainTheme
 
@@ -26,7 +27,6 @@ import com.ismartcoding.plain.ui.base.BottomSpace
 import com.ismartcoding.plain.ui.base.PCard
 import com.ismartcoding.plain.ui.base.PListItem
 import com.ismartcoding.plain.ui.base.PScaffold
-import androidx.compose.material3.Switch
 import com.ismartcoding.plain.Prefs
 import com.ismartcoding.plain.ui.base.PTopAppBar
 import com.ismartcoding.plain.ui.base.TopSpace
@@ -80,7 +80,7 @@ fun DarkThemePage(navController: NavHostController) {
                             },
                             title = stringResource(Res.string.amoled_dark_theme),
                         ) {
-                            Switch(checked = amoledDarkTheme, onCheckedChange = {
+                            PSwitch(checked = amoledDarkTheme, onCheckedChange = {
                                 scope.launch {
                                     Prefs.set(PrefKeys.AMOLED_DARK_THEME, !amoledDarkTheme)
                                 }
@@ -98,7 +98,7 @@ fun DarkThemePage(navController: NavHostController) {
                             title = stringResource(Res.string.pdf_follow_dark_theme),
                             subtitle = stringResource(Res.string.pdf_follow_dark_theme_desc),
                         ) {
-                            Switch(checked = pdfFollowDarkTheme, onCheckedChange = {
+                            PSwitch(checked = pdfFollowDarkTheme, onCheckedChange = {
                                 scope.launch {
                                     Prefs.set(PrefKeys.PDF_FOLLOW_DARK_THEME, !pdfFollowDarkTheme)
                                 }

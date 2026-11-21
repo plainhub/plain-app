@@ -7,13 +7,13 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.ismartcoding.plain.ui.components.PSwitch
 import com.ismartcoding.plain.ui.extensions.timeAgo
 import com.ismartcoding.plain.ui.feeds.FeedWorkerState
 import com.ismartcoding.plain.features.feeds.FeedWorkerStatus
@@ -135,7 +135,7 @@ fun ViewFeedBottomSheet(
                 m.fetchContent = feedsVM.editFetchContent.value
                 feedsVM.updateFetchContent(m.id, feedsVM.editFetchContent.value)
             }, title = stringResource(Res.string.auto_fetch_full_content), action = {
-                Switch(
+                PSwitch(
                     checked = feedsVM.editFetchContent.value,
                     onCheckedChange = {
                         feedsVM.editFetchContent.value = it

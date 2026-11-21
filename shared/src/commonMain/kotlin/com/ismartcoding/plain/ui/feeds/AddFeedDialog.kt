@@ -1,5 +1,6 @@
 package com.ismartcoding.plain.ui.feeds
 
+import com.ismartcoding.plain.ui.components.PSwitch
 import com.ismartcoding.plain.i18n.*
 import androidx.compose.foundation.layout.Column
 import androidx.compose.material3.AlertDialog
@@ -19,7 +20,6 @@ import com.ismartcoding.plain.ui.components.ClipboardTextField
 import com.ismartcoding.plain.ui.base.HorizontalSpace
 import com.ismartcoding.plain.ui.base.PDialogTips
 import com.ismartcoding.plain.ui.base.PFilledButton
-import androidx.compose.material3.Switch
 import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.feeds.FeedsViewModel
 import com.ismartcoding.plain.ui.theme.dialogSheetBackground
@@ -81,7 +81,7 @@ fun AddFeedDialog(feedsVM: FeedsViewModel) {
                         PListItem(
                             title = stringResource(Res.string.auto_fetch_full_content),
                         ) {
-                            Switch(
+                            PSwitch(
                                 checked = feedsVM.editFetchContent.value,
                                 onCheckedChange = {
                                     feedsVM.editFetchContent.value = it

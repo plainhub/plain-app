@@ -1,5 +1,6 @@
 package com.ismartcoding.plain.ui.settings
 
+import com.ismartcoding.plain.ui.components.PSwitch
 import com.ismartcoding.plain.ui.media.extensions.collectAsStateValue
 
 import com.ismartcoding.plain.ui.theme.PlainTheme
@@ -18,7 +19,6 @@ import com.ismartcoding.plain.ui.base.BottomSpace
 import com.ismartcoding.plain.ui.base.PCard
 import com.ismartcoding.plain.ui.base.PListItem
 import com.ismartcoding.plain.ui.base.PScaffold
-import androidx.compose.material3.Switch
 import com.ismartcoding.plain.Prefs
 import com.ismartcoding.plain.ui.base.PTopAppBar
 import com.ismartcoding.plain.ui.base.TopSpace
@@ -49,7 +49,7 @@ fun AutoCheckUpdatePage(navController: NavHostController, updateViewModel: Updat
                 item {
                     PCard(modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN)) {
                         PListItem(title = stringResource(Res.string.auto_check_update), subtitle = stringResource(Res.string.auto_check_update_desc)) {
-                            Switch(checked = autoCheckUpdate, onCheckedChange = { newValue -> scope.launch(Dispatchers.Default) {
+                            PSwitch(checked = autoCheckUpdate, onCheckedChange = { newValue -> scope.launch(Dispatchers.Default) {
                                 Prefs.setAutoCheckUpdate(newValue) }
                             })
                         }

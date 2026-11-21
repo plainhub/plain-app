@@ -1,4 +1,5 @@
 package com.ismartcoding.plain.ui.feeds
+import com.ismartcoding.plain.ui.components.PSwitch
 import com.ismartcoding.plain.ui.theme.PlainTheme
 
 import com.ismartcoding.plain.i18n.*
@@ -28,7 +29,6 @@ import com.ismartcoding.plain.ui.base.PCard
 import com.ismartcoding.plain.ui.base.PListItem
 import com.ismartcoding.plain.ui.base.POutlinedButton
 import com.ismartcoding.plain.ui.base.PScaffold
-import androidx.compose.material3.Switch
 import com.ismartcoding.plain.ui.base.PTopAppBar
 import com.ismartcoding.plain.ui.components.RadioDialog
 import com.ismartcoding.plain.ui.components.RadioDialogOption
@@ -83,7 +83,7 @@ fun FeedSettingsPage(
                         },
                         title = stringResource(Res.string.auto_refresh_feeds),
                     ) {
-                        Switch(
+                        PSwitch(
                             checked = feedSettingsVM.autoRefresh.value,
                             onCheckedChange = {
                                 feedSettingsVM.setAutoRefresh(it)
@@ -106,7 +106,7 @@ fun FeedSettingsPage(
                             },
                             title = stringResource(Res.string.auto_refresh_only_over_wifi),
                         ) {
-                            Switch(
+                            PSwitch(
                                 checked = feedSettingsVM.autoRefreshOnlyWifi.value,
                                 onCheckedChange = {
                                     feedSettingsVM.setAutoRefreshOnlyWifi(it)

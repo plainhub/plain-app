@@ -1,5 +1,6 @@
 package com.ismartcoding.plain.ui.settings
 
+import com.ismartcoding.plain.ui.components.PSwitch
 import com.ismartcoding.plain.ui.media.extensions.collectAsStateValue
 import androidx.compose.foundation.layout.padding
 import com.ismartcoding.plain.ui.theme.PlainTheme
@@ -15,7 +16,6 @@ import androidx.compose.runtime.rememberCoroutineScope
 import com.ismartcoding.plain.ui.theme.DarkTheme
 import com.ismartcoding.plain.ui.base.PCard
 import com.ismartcoding.plain.ui.base.PListItem
-import androidx.compose.material3.Switch
 import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.navigation.Routing
 import androidx.navigation.NavHostController
@@ -41,7 +41,7 @@ internal fun SettingsCardItems(navController: NavHostController) {
             subtitle = DarkTheme.entries.find { it == darkTheme }?.getText() ?: "",
             separatedActions = true,
         ) {
-            Switch(
+            PSwitch(
                 checked = DarkTheme.isDarkTheme(darkTheme),
                 onCheckedChange = {
                     scope.launch {

@@ -1,5 +1,6 @@
 package com.ismartcoding.plain.ui.pomodoro
 
+import com.ismartcoding.plain.ui.components.PSwitch
 import com.ismartcoding.plain.rust.native.RustNativeApi
 
 import com.ismartcoding.plain.models.PomodoroSettings
@@ -19,7 +20,6 @@ import com.ismartcoding.plain.events.PickFileResultEvent
 import com.ismartcoding.plain.platform.files.queryPickedFileInfo
 import kotlinx.coroutines.CancellationException
 import com.ismartcoding.plain.ui.base.PFilledButton
-import androidx.compose.material3.Switch
 import com.ismartcoding.plain.ui.base.PTextButton
 import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.theme.dialogSheetBackground
@@ -81,11 +81,11 @@ fun PomodoroSettingsDialog(
                         label = { Text(stringResource(Res.string.pomodoros_before_long_break)) }, modifier = Modifier.fillMaxWidth())
                     VerticalSpace(dp = 16.dp)
                     PListItem(title = stringResource(Res.string.show_notification)) {
-                        Switch(checked = showNotification, onCheckedChange = { showNotification = it })
+                        PSwitch(checked = showNotification, onCheckedChange = { showNotification = it })
                     }
                     VerticalSpace(dp = 8.dp)
                     PListItem(title = stringResource(Res.string.play_sound_on_complete)) {
-                        Switch(checked = playSoundOnComplete, onCheckedChange = { playSoundOnComplete = it })
+                        PSwitch(checked = playSoundOnComplete, onCheckedChange = { playSoundOnComplete = it })
                     }
                     VerticalSpace(dp = 16.dp)
                 }
