@@ -12,12 +12,15 @@ import androidx.test.platform.app.InstrumentationRegistry
 import com.ismartcoding.plain.MainActivity
 import com.ismartcoding.plain.appContext
 import com.ismartcoding.plain.features.files.FavoriteFoldersClient
+import com.ismartcoding.plain.features.files.FilesClient
 import com.ismartcoding.plain.i18n.*
 import com.ismartcoding.plain.platform.files.getInternalStoragePath
+import com.ismartcoding.plain.platform.files.scanFileTaskPaths
 import java.io.File
 import java.util.UUID
 import kotlinx.coroutines.runBlocking
 import org.jetbrains.compose.resources.getString
+import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -78,19 +81,83 @@ class FileUiWorkflowTest {
         }
     }
 
-    private fun click(label: String) {
+    @Test
+    fun moves_files_to_trash_with_one_tap_from_details_and_selection() = runBlocking {
+        check(appContext.applicationInfo.flags and ApplicationInfo.FLAG_DEBUGGABLE != 0)
+        check(Build.HARDWARE == "ranchu" || Build.HARDWARE == "goldfish")
+        check(InstrumentationRegistry.getArguments().getString("plainUiFixture") == "isolated")
+        val storage = getInternalStoragePath()
+        val root = File(storage, "Download/PlainUiFixture/${UUID.randomUUID()}")
+        val alias = "Trash UI fixture"
+        val files = listOf("single", "first", "second").map { File(root, "$it-${root.name.take(8)}.txt") }
+        try {
+            ActivityScenario.launch(MainActivity::class.java).use {
+                val tools = getString(Res.string.tools)
+                val skip = getString(Res.string.onboarding_skip)
+                val entry = awaitNode { it.isVisibleToUser && (it.hasLabel(tools) || it.hasLabel(skip)) }
+                if (entry.hasLabel(skip)) click(skip)
+                assertTrue(root.mkdirs())
+                files.forEach { it.writeText(it.name) }
+                scanFileTaskPaths(files.map { it.path })
+                FavoriteFoldersClient.add(storage, root.path)
+                FavoriteFoldersClient.rename(root.path, alias)
+                click(tools)
+                click(getString(Res.string.files))
+                click(getString(Res.string.folders))
+                click(alias)
+
+                click(files[0].name, longPress = true)
+                trashFromUi(listOf(files[0]))
+
+                click(files[1].name, longPress = true)
+                click(getString(Res.string.select))
+                click(files[2].name)
+                trashFromUi(files.drop(1))
+
+                click(getString(Res.string.folders))
+                click(getString(Res.string.trash))
+                files.forEach { file -> awaitNode { it.isVisibleToUser && it.text?.toString() == file.name } }
+            }
+        } finally {
+            if (root.exists()) {
+                FavoriteFoldersClient.remove(root.path)
+                val names = files.map { it.name }.toSet()
+                val trashedPaths = FilesClient.trashed().filter { it.name in names }.map { it.path }
+                if (trashedPaths.isNotEmpty()) FilesClient.restore(trashedPaths)
+                assertTrue(root.deleteRecursively())
+            }
+        }
+    }
+
+    private suspend fun trashFromUi(files: List<File>) {
+        val trash = getString(Res.string.trash)
+        val moveToTrash = getString(Res.string.move_to_trash)
+        val label = awaitNode { it.isVisibleToUser && it.text?.toString() in listOf(trash, moveToTrash) }.text.toString()
+        click(label)
+        val deadline = SystemClock.uptimeMillis() + 5_000
+        while (files.any { it.exists() } && SystemClock.uptimeMillis() < deadline) {
+            SystemClock.sleep(50)
+        }
+        assertTrue("One tap should move the selected files to Trash", files.none { it.exists() })
+        assertEquals(trash, label)
+    }
+
+    private fun click(label: String, longPress: Boolean = false) {
         instrumentation.uiAutomation.waitForIdle(300, 5000)
-        var node = awaitNode { it.isVisibleToUser && it.isEnabled && (it.text?.toString() == label || it.contentDescription?.toString() == label) }
+        var node = awaitNode { it.isVisibleToUser && it.isEnabled && it.hasLabel(label) }
         repeat(16) {
-            if (node.isClickable) {
+            if (if (longPress) node.isLongClickable else node.isClickable) {
                 assertTrue("Control is not visible: $label", node.isVisibleToUser)
-                assertTrue("Click failed: $label", node.performAction(AccessibilityNodeInfo.ACTION_CLICK))
+                val action = if (longPress) AccessibilityNodeInfo.ACTION_LONG_CLICK else AccessibilityNodeInfo.ACTION_CLICK
+                assertTrue("Click failed: $label", node.performAction(action))
                 return
             }
             node = checkNotNull(node.parent) { "Control has no clickable parent: $label" }
         }
         error("Control parent limit reached: $label")
     }
+
+    private fun AccessibilityNodeInfo.hasLabel(label: String) = text?.toString() == label || contentDescription?.toString() == label
 
     private fun awaitNode(predicate: (AccessibilityNodeInfo) -> Boolean): AccessibilityNodeInfo {
         repeat(300) {

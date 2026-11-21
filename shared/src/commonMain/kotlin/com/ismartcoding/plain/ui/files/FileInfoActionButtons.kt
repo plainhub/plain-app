@@ -17,13 +17,11 @@ import com.ismartcoding.plain.ui.base.PSheetActionRow
 import com.ismartcoding.plain.ui.base.PSheetPrimaryAction
 import com.ismartcoding.plain.ui.base.PSheetPrimaryDeleteAction
 import com.ismartcoding.plain.ui.base.PSheetPrimaryActionsRow
-import com.ismartcoding.plain.ui.components.confirmActionAsync
 import com.ismartcoding.plain.ui.files.FilesViewModel
 import com.ismartcoding.plain.ui.state.enterSelectMode
 import com.ismartcoding.plain.ui.state.select
 import com.ismartcoding.plain.ui.theme.PlainTheme
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
 import com.ismartcoding.plain.ui.resources.Res as UiRes
 import com.ismartcoding.plain.ui.resources.check as ui_drawable_check
@@ -65,18 +63,9 @@ internal fun FileInfoPrimaryActions(
         PSheetPrimaryAction(UiRes.drawable.ui_drawable_copy, stringResource(Res.string.copy)) {
             performCopyFiles(filesVM, listOf(file), onShowPasteBar) { onDismiss() }
         }
-        PSheetPrimaryDeleteAction(stringResource(Res.string.move_to_trash)) {
-            scope.launch {
-                confirmActionAsync(
-                    Res.string.move_to_trash,
-                    Res.string.confirm_move_files_to_trash,
-                    callback = {
-                        filesVM.trashFiles(setOf(file.path))
-                        onDismiss()
-                    },
-                    danger = true
-                )
-            }
+        PSheetPrimaryDeleteAction(stringResource(Res.string.trash)) {
+            filesVM.trashFiles(setOf(file.path))
+            onDismiss()
         }
     }
 }

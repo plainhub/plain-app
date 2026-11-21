@@ -12,9 +12,9 @@ import androidx.compose.runtime.rememberCoroutineScope
 import com.ismartcoding.plain.lib.withIO
 import com.ismartcoding.plain.platform.system.shareFiles
 import com.ismartcoding.plain.ui.base.BottomActionButtons
+import com.ismartcoding.plain.ui.base.PIconTextSmallButton
 import com.ismartcoding.plain.ui.components.IconTextSmallButtonCopy
 import com.ismartcoding.plain.ui.components.IconTextSmallButtonCut
-import com.ismartcoding.plain.ui.components.IconTrashButton
 import com.ismartcoding.plain.ui.components.IconTextSmallButtonRename
 import com.ismartcoding.plain.ui.components.IconTextSmallButtonShare
 import com.ismartcoding.plain.ui.components.IconTextSmallButtonShareLink
@@ -24,9 +24,11 @@ import com.ismartcoding.plain.ui.base.PBottomAppBar
 import com.ismartcoding.plain.ui.components.FileRenameDialog
 import com.ismartcoding.plain.ui.files.FilesViewModel
 import com.ismartcoding.plain.ui.components.DialogHelper
-import com.ismartcoding.plain.ui.components.confirmActionAsync
+import com.ismartcoding.plain.ui.resources.Res as UiRes
+import com.ismartcoding.plain.ui.resources.trash_2
 import com.ismartcoding.plain.ui.state.exitSelectMode
 import kotlinx.coroutines.launch
+import org.jetbrains.compose.resources.stringResource
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
@@ -76,19 +78,9 @@ fun FilesSelectModeBottomActions(
                 filesVM.shareItems.addAll(selectedFiles)
                 filesVM.showCreateShareDialog.value = true
             }
-            IconTrashButton {
-                val paths = filesVM.selectedIds.toSet()
-                scope.launch {
-                    confirmActionAsync(
-                        Res.string.move_to_trash,
-                        Res.string.confirm_move_files_to_trash,
-                        callback = {
-                            filesVM.trashFiles(paths)
-                            filesVM.exitSelectMode()
-                        },
-                        danger = true
-                    )
-                }
+            PIconTextSmallButton(UiRes.drawable.trash_2, text = stringResource(Res.string.trash)) {
+                filesVM.trashFiles(filesVM.selectedIds.toSet())
+                filesVM.exitSelectMode()
             }
             IconTextSmallButtonZip {
                 performZipFiles(scope, filesVM, selectedFiles) { filesVM.exitSelectMode() }
