@@ -62,6 +62,7 @@ class MediaPreviewerState(
             this.animating = animating
             this.visible = visible
             this.visibleTarget = visibleTarget
+            videoState.isPreviewerOpen = visible && !animating
         }
     }
 
@@ -359,6 +360,7 @@ class MediaPreviewerState(
                 previewerState.animateContainerVisibleState = MutableTransitionState(it[MediaPreviewerState::animateContainerVisibleState.name] as Boolean)
                 previewerState.uiAlpha = Animatable(it[MediaPreviewerState::uiAlpha.name] as Float)
                 previewerState.visible = it[MediaPreviewerState::visible.name] as Boolean
+                previewerState.videoState.isPreviewerOpen = previewerState.visible
                 previewerState
             })
         }

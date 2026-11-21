@@ -3,8 +3,15 @@ package com.ismartcoding.plain.tests
 import android.os.SystemClock
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.withFrameNanos
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.lifecycle.Lifecycle
+import com.ismartcoding.plain.ui.platform.media.ExoPlayerVideoController
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.IntSize
 import androidx.test.core.app.ActivityScenario
@@ -18,6 +25,8 @@ import com.ismartcoding.plain.ui.theme.AppTheme
 import java.io.File
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -25,7 +34,77 @@ import org.junit.runner.RunWith
 @RunWith(AndroidJUnit4::class)
 class VideoFirstFrameTest {
     @Test
-    fun localVideoRendersItsFirstFrameOnOpen() {
+    fun localVideoRendersItsFirstFrameOnOpen() = verifyPlayback(initiallyOpen = true)
+
+    @Test
+    fun openingVideoRendersBeforeTheTransitionCanStartPlayback() = verifyPlayback(initiallyOpen = false)
+
+    @Test
+    fun onlyTheLastSelectedVideoPlaysAfterReturningToTheActivity() {
+        val context = InstrumentationRegistry.getInstrumentation().targetContext
+        val files = List(3) { File.createTempFile("switch-", ".mp4", context.cacheDir) }
+        try {
+            files.forEach { file ->
+                requireNotNull(javaClass.classLoader?.getResourceAsStream("video-start.mp4")).use { input ->
+                    file.outputStream().use { input.copyTo(it) }
+                }
+            }
+            val items = files.map { PreviewItem(it.name, it.path, it.length()).apply { intrinsicSize = IntSize(640, 360) } }
+            val state = VideoState().apply { isPreviewerOpen = true }
+            ActivityScenario.launch(MainActivity::class.java).use { scenario ->
+                lateinit var pager: PagerState
+                lateinit var scope: CoroutineScope
+                scenario.onActivity { activity ->
+                    activity.setContent {
+                        AppTheme(useDarkTheme = false) {
+                            pager = rememberPagerState { items.size }
+                            scope = rememberCoroutineScope()
+                            HorizontalPager(pager, beyondViewportPageCount = 1) { page ->
+                                MediaVideo(pagerState = pager, videoState = state, page = page, model = items[page])
+                            }
+                        }
+                    }
+                }
+                fun awaitPlayer(page: Int): ExoPlayerVideoController {
+                    val deadline = SystemClock.elapsedRealtime() + 15000
+                    while (SystemClock.elapsedRealtime() < deadline) {
+                        var current: ExoPlayerVideoController? = null
+                        scenario.onActivity {
+                            val player = state.controller as? ExoPlayerVideoController
+                            if (player?.isPlaying == true && player.exoPlayer.currentMediaItem?.localConfiguration?.uri?.path == files[page].path) current = player
+                        }
+                        current?.let { return it }
+                        SystemClock.sleep(10)
+                    }
+                    error("Selected video did not play: $page")
+                }
+                val first = awaitPlayer(0)
+                scenario.onActivity { scope.launch { pager.scrollToPage(1) } }
+                val second = awaitPlayer(1)
+                scenario.onActivity { scope.launch { pager.scrollToPage(0) } }
+                awaitPlayer(0)
+                scenario.onActivity {
+                    scope.launch {
+                        pager.scrollToPage(1)
+                        withFrameNanos { }
+                        pager.scrollToPage(2)
+                    }
+                }
+                awaitPlayer(2)
+                scenario.moveToState(Lifecycle.State.CREATED)
+                scenario.moveToState(Lifecycle.State.RESUMED)
+                awaitPlayer(2)
+                scenario.onActivity {
+                    assertFalse(first.isPlaying)
+                    assertFalse(second.isPlaying)
+                }
+            }
+        } finally {
+            files.forEach { it.delete() }
+        }
+    }
+
+    private fun verifyPlayback(initiallyOpen: Boolean) {
         val instrumentation = InstrumentationRegistry.getInstrumentation()
         val file = File.createTempFile("first-frame-", ".mp4", instrumentation.targetContext.cacheDir)
         try {
@@ -35,6 +114,7 @@ class VideoFirstFrameTest {
             val model = PreviewItem(file.name, file.path, file.length()).apply { intrinsicSize = IntSize(640, 360) }
             ActivityScenario.launch(MainActivity::class.java).use { scenario ->
                 val rendered = CountDownLatch(1)
+                val state = VideoState().apply { isPreviewerOpen = initiallyOpen }
                 scenario.onActivity { activity ->
                     val start = SystemClock.elapsedRealtime()
                     activity.setContent {
@@ -42,7 +122,7 @@ class VideoFirstFrameTest {
                             MediaVideo(
                                 modifier = Modifier.fillMaxSize(),
                                 pagerState = rememberPagerState { 1 },
-                                videoState = remember { VideoState().apply { isPreviewerOpen = true } },
+                                videoState = state,
                                 page = 0,
                                 model = model,
                                 onMounted = {
@@ -54,6 +134,10 @@ class VideoFirstFrameTest {
                     }
                 }
                 assertTrue("Expected a decoded video frame", rendered.await(15, TimeUnit.SECONDS))
+                if (!initiallyOpen) scenario.onActivity {
+                    assertNull(state.controller)
+                    assertFalse(state.isPlaying)
+                }
             }
         } finally {
             file.delete()

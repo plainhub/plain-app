@@ -67,9 +67,6 @@ fun MediaPreviewer(
     LaunchedEffect(key1 = state.animateContainerVisibleState, key2 = state.animateContainerVisibleState.currentState) {
         state.onAnimateContainerStateChanged()
     }
-    LaunchedEffect(state.visible) {
-        state.videoState.isPreviewerOpen = state.visible
-    }
     if (state.visible) {
         // System bar policy (see docs/media-viewer-system-bars.md):
         //  - Bottom system bar (gesture / 3-button) is ALWAYS hidden.

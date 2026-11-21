@@ -9,8 +9,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import kotlinx.coroutines.async
-import kotlinx.coroutines.coroutineScope
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.ensureActive
 import com.ismartcoding.plain.platform.media.getVideoMediaId
@@ -18,7 +19,6 @@ import com.ismartcoding.plain.models.PlaybackType
 import com.ismartcoding.plain.ui.media.viewer.PreviewItem
 import com.ismartcoding.plain.ui.platform.media.rememberVideoPlayerController
 import com.ismartcoding.plain.ui.state.launchSafe
-import kotlin.math.abs
 import kotlin.time.Clock
 import kotlin.time.Duration.Companion.days
 import com.ismartcoding.plain.models.Video as MediaVideo
@@ -30,117 +30,94 @@ internal fun rememberMediaVideoController(
     videoState: VideoState,
     page: Int,
     model: PreviewItem,
+    frameReady: Boolean,
     onFirstFrameRendered: () -> Unit,
 ): VideoPlayerController {
     val controller = rememberVideoPlayerController()
     var mediaId by remember(model.path, model.mediaId) { mutableStateOf(model.mediaId) }
-    var wasActive by remember { mutableStateOf(false) }
-    var playRecorded by remember { mutableStateOf(false) }
-    var preparedPath by remember { mutableStateOf<String?>(null) }
-
-    fun saveProgress() {
-        val id = mediaId
-        val positionMs = controller.currentPositionMs
-        if (id.isEmpty() || positionMs < 0) return
-        model.source.history.saveProgress(id, PlaybackType.VIDEO, positionMs)
-    }
-
-    suspend fun prepareVideo() {
-        if (preparedPath == model.resourcePath) return
-        controller.setMediaItem(model.resourcePath, model.tlsCertificateSha256)
-        currentCoroutineContext().ensureActive()
-        controller.prepare()
-        preparedPath = model.resourcePath
-    }
+    val selected = pagerState.settledPage == page
+    var playRecorded by remember(selected, videoState.isPreviewerOpen) { mutableStateOf(false) }
+    val duration = (model.data as? MediaVideo)?.durationMs ?: 0L
+    val lifecycle = LocalLifecycleOwner.current.lifecycle
 
     controller.setEventListener { event ->
-        when (event) {
-            is VideoPlayerEvent.StateChanged -> {
-                if (!videoState.isPreviewerOpen || pagerState.settledPage != page) return@setEventListener
-                if (event.durationMs > 0L) videoState.totalTime = event.durationMs
-                val id = mediaId
-                val positionMs = controller.currentPositionMs
-                if (event.isPlaying && !playRecorded && id.isNotEmpty() && positionMs >= 0) {
-                    model.source.history.recordPlay(id, PlaybackType.VIDEO, positionMs)
-                    playRecorded = true
+        if (event == VideoPlayerEvent.FirstFrameRendered) {
+            onFirstFrameRendered()
+        } else if (videoState.controller === controller && pagerState.settledPage == page) {
+            when (event) {
+                is VideoPlayerEvent.StateChanged -> {
+                    if (event.durationMs > 0L) videoState.totalTime = event.durationMs
+                    if (event.isPlaying && !playRecorded && mediaId.isNotEmpty()) {
+                        playRecorded = true
+                        model.source.history.recordPlay(mediaId, PlaybackType.VIDEO, controller.currentPositionMs)
+                    }
+                    videoState.updateTime()
                 }
-                videoState.isPlaying = event.isPlaying
-                videoState.updateTime()
+                VideoPlayerEvent.PositionDiscontinuity -> videoState.isSeeking = false
+                else -> Unit
             }
-            VideoPlayerEvent.PositionDiscontinuity -> {
-                if (!videoState.isPreviewerOpen || pagerState.settledPage != page) return@setEventListener
-                videoState.isSeeking = false
-            }
-            VideoPlayerEvent.FirstFrameRendered -> onFirstFrameRendered()
         }
     }
 
-    LaunchedEffect(controller, pagerState.settledPage, videoState.isPreviewerOpen) {
+    LaunchedEffect(controller) {
         launchSafe {
-            val isActive = videoState.isPreviewerOpen && pagerState.settledPage == page
-            if (wasActive && !isActive) saveProgress()
-            if (!isActive) {
-                playRecorded = false
-                wasActive = false
-            }
-            if (!videoState.isPreviewerOpen) {
-                controller.abandonAudioFocus()
-                controller.stop()
-                preparedPath = null
-                return@launchSafe
-            }
-            if (isActive) {
-                val expectedTotalMs = (model.data as? MediaVideo)?.durationMs ?: 0L
-                startVideoPlayback(controller, prepare = ::prepareVideo, resumePosition = {
-                    if (mediaId.isEmpty() && model.source is com.ismartcoding.plain.rust.graphql.ContentSource.Local) {
-                        mediaId = getVideoMediaId(model.path).orEmpty()
-                    }
-                    val saved = if (mediaId.isNotEmpty()) {
-                        model.source.history.find(mediaId, PlaybackType.VIDEO, Clock.System.now() - 30.days)?.positionMs
-                    } else null
-                    saved?.takeIf { it > 0 && (expectedTotalMs <= 0 || it < expectedTotalMs - 1000) } ?: 0L
-                }, current = { videoState.isPreviewerOpen && pagerState.settledPage == page }) { position ->
-                    videoState.initData(controller)
-                    if (expectedTotalMs > 0L) videoState.totalTime = expectedTotalMs
-                    videoState.currentTime = position
-                    wasActive = true
+            prepareVideoPlayback(controller, model.resourcePath, model.tlsCertificateSha256) {
+                if (mediaId.isEmpty() && model.source is com.ismartcoding.plain.rust.graphql.ContentSource.Local) {
+                    mediaId = getVideoMediaId(model.path).orEmpty()
                 }
-            } else if (abs(page - pagerState.settledPage) <= 1) {
-                prepareVideo()
-                controller.pause()
-                controller.abandonAudioFocus()
-            } else {
-                controller.stop()
-                preparedPath = null
+                val saved = if (mediaId.isNotEmpty()) {
+                    model.source.history.find(mediaId, PlaybackType.VIDEO, Clock.System.now() - 30.days)?.positionMs
+                } else null
+                saved?.takeIf { it > 0 && (duration <= 0 || it < duration - 1000) } ?: 0L
             }
         }
     }
 
     DisposableEffect(controller) {
+        onDispose { controller.release() }
+    }
+
+    val active = selected && videoState.isPreviewerOpen && frameReady
+    DisposableEffect(controller, active, lifecycle) {
+        val observer = LifecycleEventObserver { _, event ->
+            if (event == Lifecycle.Event.ON_RESUME && videoState.isPreviewerOpen && pagerState.settledPage == page) {
+                videoState.initData(controller)
+                videoState.totalTime = controller.durationMs.takeIf { it > 0 } ?: duration
+                videoState.currentTime = controller.currentPositionMs
+                controller.requestAudioFocus()
+                controller.play()
+            } else if (event == Lifecycle.Event.ON_PAUSE && !videoState.enablePip) {
+                controller.pause()
+                controller.abandonAudioFocus()
+            }
+        }
+        if (active) lifecycle.addObserver(observer)
         onDispose {
-            if (wasActive) saveProgress()
-            controller.abandonAudioFocus()
-            controller.stop()
-            controller.release()
+            if (active) lifecycle.removeObserver(observer)
+            if (active && videoState.controller === controller) {
+                val position = controller.currentPositionMs
+                controller.pause()
+                controller.abandonAudioFocus()
+                if (mediaId.isNotEmpty()) model.source.history.saveProgress(mediaId, PlaybackType.VIDEO, position)
+                if (pagerState.settledPage != page && duration > 0 && position >= duration - 1000) controller.seekTo(0)
+                videoState.controller = null
+                videoState.isPlaying = false
+                videoState.isSeeking = false
+            }
         }
     }
     return controller
 }
 
-internal suspend fun startVideoPlayback(
+internal suspend fun prepareVideoPlayback(
     controller: VideoPlayerController,
-    prepare: suspend () -> Unit,
+    path: String,
+    tlsCertificateSha256: String?,
     resumePosition: suspend () -> Long,
-    current: () -> Boolean,
-    onStart: (Long) -> Unit,
-) = coroutineScope {
-    val history = async { resumePosition() }
-    prepare()
-    val position = history.await()
-    ensureActive()
-    if (!current()) return@coroutineScope
-    onStart(position)
-    controller.seekTo(position)
-    controller.requestAudioFocus()
-    controller.play()
+) {
+    val position = resumePosition()
+    currentCoroutineContext().ensureActive()
+    controller.setMediaItem(path, tlsCertificateSha256, position)
+    currentCoroutineContext().ensureActive()
+    controller.prepare()
 }

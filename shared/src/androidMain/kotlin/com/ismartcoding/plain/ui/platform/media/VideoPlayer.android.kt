@@ -203,10 +203,7 @@ actual fun VideoPlayerSurface(
             val observer = LifecycleEventObserver { _, event ->
                 when (event) {
                     Lifecycle.Event.ON_PAUSE -> {
-                        if (!videoState.enablePip) {
-                            exoPlayer.pause()
-                        }
-                        if (videoState.enablePip && exoPlayer.playWhenReady) {
+                        if (videoState.controller === controller && videoState.enablePip && exoPlayer.playWhenReady) {
                             isPendingPipMode = true
                             Handler(Looper.getMainLooper()).post {
                                 if (enterPipMode(videoState)) {
@@ -220,9 +217,6 @@ actual fun VideoPlayerSurface(
 
                     Lifecycle.Event.ON_RESUME -> {
                         videoState.enablePip = context.isActivityStatePipMode()
-                        if (!videoState.enablePip) {
-                            exoPlayer.play()
-                        }
                     }
 
                     else -> {}
@@ -295,7 +289,7 @@ internal fun Context.isActivityStatePipMode(): Boolean {
 @OptIn(UnstableApi::class)
 class ExoPlayerVideoController(
     val exoPlayer: ExoPlayer,
-    context: Context,
+    private val context: Context,
     private val claimAudioSession: Boolean,
     private val resource: java.util.concurrent.atomic.AtomicReference<com.ismartcoding.plain.models.ManagedResource?>,
 ) : VideoPlayerController {
@@ -332,7 +326,11 @@ class ExoPlayerVideoController(
 
     init {
         exoPlayer.addListener(playerListener)
-        if (claimAudioSession) {
+    }
+
+    override fun play() {
+        exoPlayer.play()
+        if (claimAudioSession && mediaSession == null) {
             mediaSession = try {
                 MediaSession.Builder(
                     context.applicationContext,
@@ -345,7 +343,6 @@ class ExoPlayerVideoController(
         }
     }
 
-    override fun play() = exoPlayer.play()
     override fun pause() = exoPlayer.pause()
     override fun stop() = exoPlayer.stop()
     override fun prepare() = exoPlayer.prepare()
@@ -356,16 +353,16 @@ class ExoPlayerVideoController(
     }
 
     override fun release() {
-        mediaSession?.release()
-        mediaSession = null
-        focusManager?.abandonFocus()
+        abandonAudioFocus()
         exoPlayer.removeListener(playerListener)
         exoPlayer.release()
     }
 
-    override suspend fun setMediaItem(path: String, tlsCertificateSha256: String?) {
+    override suspend fun setMediaItem(path: String, tlsCertificateSha256: String?, startPositionMs: Long?) {
         resource.set(tlsCertificateSha256?.let { com.ismartcoding.plain.models.ManagedResource(path, it) })
-        exoPlayer.setMediaItem(MediaItem.fromUri(path.pathToUri()))
+        val item = MediaItem.fromUri(path.pathToUri())
+        if (startPositionMs == null) exoPlayer.setMediaItem(item)
+        else exoPlayer.setMediaItem(item, startPositionMs)
     }
 
     override fun setEventListener(listener: (VideoPlayerEvent) -> Unit) {
@@ -376,6 +373,8 @@ class ExoPlayerVideoController(
         focusManager?.requestFocus(exoPlayer)
     }
     override fun abandonAudioFocus() {
+        mediaSession?.release()
+        mediaSession = null
         focusManager?.abandonFocus()
     }
 
@@ -398,7 +397,8 @@ class VideoAudioFocusManager(private val audioManager: AudioManager) {
 
     fun requestFocus(player: ExoPlayer) {
         focusRequest?.let { audioManager.abandonAudioFocusRequest(it) }
-        val req = AudioFocusRequest.Builder(AudioManager.AUDIOFOCUS_GAIN_TRANSIENT)
+        lateinit var req: AudioFocusRequest
+        req = AudioFocusRequest.Builder(AudioManager.AUDIOFOCUS_GAIN_TRANSIENT)
             .setAudioAttributes(
                 AndroidAudioAttributes.Builder()
                     .setContentType(AndroidAudioAttributes.CONTENT_TYPE_MOVIE)
@@ -406,6 +406,7 @@ class VideoAudioFocusManager(private val audioManager: AudioManager) {
                     .build()
             )
             .setOnAudioFocusChangeListener { change ->
+                if (focusRequest !== req) return@setOnAudioFocusChangeListener
                 when (change) {
                     AudioManager.AUDIOFOCUS_LOSS_TRANSIENT,
                     AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK -> player.pause()

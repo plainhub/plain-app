@@ -17,7 +17,7 @@ interface VideoPlayerController {
     fun setPlaybackSpeed(speed: Float)
     fun setMuted(muted: Boolean)
     fun release()
-    suspend fun setMediaItem(path: String, tlsCertificateSha256: String? = null)
+    suspend fun setMediaItem(path: String, tlsCertificateSha256: String? = null, startPositionMs: Long? = null)
     fun setEventListener(listener: (VideoPlayerEvent) -> Unit)
     fun requestAudioFocus()
     fun abandonAudioFocus()

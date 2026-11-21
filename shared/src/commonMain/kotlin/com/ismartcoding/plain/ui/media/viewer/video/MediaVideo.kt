@@ -53,6 +53,7 @@ fun MediaVideo(
     onSizeChange: suspend (SizeChangeContent) -> Unit = {},
     boundClip: Boolean = true,
 ) {
+    if (page != pagerState.settledPage && (!videoState.isPreviewerOpen || kotlin.math.abs(page - pagerState.settledPage) > 1)) return
     val viewerAlpha = remember { Animatable(0F) }
     var bSize by remember { mutableStateOf(IntSize(0, 0)) }
     var vSize by remember { mutableStateOf(IntSize(0, 0)) }
@@ -87,7 +88,7 @@ fun MediaVideo(
     }
 
     var firstFrameRendered by remember { mutableStateOf(false) }
-    val controller = rememberMediaVideoController(pagerState, videoState, page, model) {
+    val controller = rememberMediaVideoController(pagerState, videoState, page, model, firstFrameRendered) {
         firstFrameRendered = true
     }
     LaunchedEffect(firstFrameRendered) {

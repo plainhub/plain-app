@@ -1,7 +1,6 @@
 package com.ismartcoding.plain.ui.media.viewer.video
 
 import kotlinx.coroutines.CompletableDeferred
-import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.yield
@@ -26,7 +25,7 @@ private class FakeVideoPlayerController : VideoPlayerController {
     var speeds = mutableListOf<Float>()
     var mutedValues = mutableListOf<Boolean>()
     var released = false
-    var mediaItems = mutableListOf<String>()
+    val mediaItems = mutableListOf<Pair<String, Long?>>()
     var focusRequested = false
     var focusAbandoned = false
     var listener: ((VideoPlayerEvent) -> Unit)? = null
@@ -45,7 +44,9 @@ private class FakeVideoPlayerController : VideoPlayerController {
     override fun setPlaybackSpeed(speed: Float) { speeds.add(speed) }
     override fun setMuted(muted: Boolean) { mutedValues.add(muted) }
     override fun release() { released = true }
-    override suspend fun setMediaItem(path: String, tlsCertificateSha256: String?) { mediaItems.add(path) }
+    override suspend fun setMediaItem(path: String, tlsCertificateSha256: String?, startPositionMs: Long?) {
+        mediaItems.add(path to startPositionMs)
+    }
     override fun setEventListener(listener: (VideoPlayerEvent) -> Unit) { this.listener = listener }
     override fun requestAudioFocus() { focusRequested = true }
     override fun abandonAudioFocus() { focusAbandoned = true }
@@ -59,55 +60,42 @@ private class FakeVideoPlayerController : VideoPlayerController {
 
 class VideoStateTest {
     @Test
-    fun switchedOrClosedVideoCannotSeekOrClaimFocusAfterLateHistory() = runTest {
-        var generation = 0
-        fun select(id: Int, gate: CompletableDeferred<Long>, player: FakeVideoPlayerController) =
-            launch(start = CoroutineStart.UNDISPATCHED) {
-                startVideoPlayback(player, { player.prepare() }, { gate.await() }, { generation == id }) {}
-            }
-        val players = List(4) { FakeVideoPlayerController() }
-        val reads = List(4) { CompletableDeferred<Long>() }
-        val jobs = players.mapIndexed { i, player ->
-            generation = i
-            select(i, reads[i], player).also {
-                yield()
-                assertEquals(1, player.prepareCount)
-                assertFalse(player.focusRequested)
-            }
-        }
-        reads[3].complete(1234L)
-        jobs[3].join()
-        generation++ // Close before earlier reads finish.
-        for (i in 2 downTo 0) {
-            reads[i].complete(777L)
-            jobs[i].join()
-            assertTrue(players[i].seekPositions.isEmpty())
-            assertFalse(players[i].focusRequested)
-            assertEquals(0, players[i].playCount)
-        }
-        assertEquals(listOf(1234L), players[3].seekPositions)
-        assertEquals(1, players[3].playCount)
+    fun preparationUsesSavedPositionBeforeAnyFrameOrAudioCanStart() = runTest {
+        val player = FakeVideoPlayerController()
+        val history = CompletableDeferred<Long>()
+        val job = launch { prepareVideoPlayback(player, "clip", null) { history.await() } }
+        yield()
+        assertEquals(0, player.prepareCount)
+        assertTrue(player.mediaItems.isEmpty())
+        history.complete(3000L)
+        job.join()
+        assertEquals("clip", player.mediaItems.single().first)
+        assertEquals(3000L, player.mediaItems.single().second)
+        assertEquals(1, player.prepareCount)
+        assertFalse(player.focusRequested)
+        assertEquals(0, player.playCount)
     }
 
-
     @Test
-    fun cancelledVisitCannotPlayWhenTheSamePageBecomesCurrentAgain() = runTest {
+    fun cancelledVisitCannotPrepareWhenTheSamePageBecomesCurrentAgain() = runTest {
         val player = FakeVideoPlayerController()
         val oldHistory = CompletableDeferred<Long>()
         val oldRead = CompletableDeferred<Unit>()
         val retired = launch {
-            startVideoPlayback(player, { player.prepare() }, {
+            prepareVideoPlayback(player, "clip", null) {
                 oldRead.complete(Unit)
                 kotlinx.coroutines.withContext(kotlinx.coroutines.NonCancellable) { oldHistory.await() }
-            }, { true }) {}
+            }
         }
         oldRead.await()
         retired.cancel()
-        startVideoPlayback(player, { player.prepare() }, { 2500L }, { true }) {}
+        prepareVideoPlayback(player, "clip", null) { 2500L }
         oldHistory.complete(9000L)
         retired.join()
-        assertEquals(listOf(2500L), player.seekPositions)
-        assertEquals(1, player.playCount)
+        assertEquals("clip", player.mediaItems.single().first)
+        assertEquals(2500L, player.mediaItems.single().second)
+        assertEquals(1, player.prepareCount)
+        assertEquals(0, player.playCount)
     }
 
     @Test

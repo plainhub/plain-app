@@ -23,6 +23,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.ensureActive
 import platform.AVFoundation.AVLayerVideoGravityResizeAspect
 import platform.AVFoundation.AVPlayer
 import platform.AVFoundation.AVPlayerItem
@@ -103,7 +104,7 @@ private class AVPlayerVideoController : VideoPlayerController {
         eventListener = null
     }
 
-    override suspend fun setMediaItem(path: String, tlsCertificateSha256: String?) {
+    override suspend fun setMediaItem(path: String, tlsCertificateSha256: String?, startPositionMs: Long?) {
         stopPolling()
         player?.pause()
         player?.replaceCurrentItemWithPlayerItem(null)
@@ -113,6 +114,11 @@ private class AVPlayerVideoController : VideoPlayerController {
             val url = if (path.startsWith("http")) NSURL.URLWithString(path) else NSURL.fileURLWithPath(path)
             checkNotNull(url) { "Video resource URL required" }
             AVPlayerItem(uRL = url)
+        }
+        kotlinx.coroutines.currentCoroutineContext().ensureActive()
+        if (startPositionMs != null && startPositionMs > 0) {
+            val zero = CMTimeMake(0, 1000)
+            item.seekToTime(CMTimeMake(startPositionMs, 1000), zero, zero, null)
         }
         firstFrameReported = false
         val existing = player
