@@ -8,7 +8,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import com.ismartcoding.plain.features.files.TrashedFile
+import com.ismartcoding.plain.models.File
 import com.ismartcoding.plain.i18n.*
 import com.ismartcoding.plain.rust.graphql.*
 import com.ismartcoding.plain.ui.base.BottomActionButtons
@@ -37,7 +37,7 @@ import org.jetbrains.compose.resources.stringResource
 internal fun FilesTrashPage(source: ContentSource, onBack: () -> Unit) {
     val scope = rememberCoroutineScope()
     val previewerState = rememberPreviewerState()
-    var entries by remember(source) { mutableStateOf<List<TrashedFile>>(emptyList()) }
+    var entries by remember(source) { mutableStateOf<List<File>>(emptyList()) }
     var selected by remember(source) { mutableStateOf(emptySet<String>()) }
     var busy by remember(source) { mutableStateOf(false) }
     var loaded by remember(source) { mutableStateOf(false) }
@@ -56,19 +56,19 @@ internal fun FilesTrashPage(source: ContentSource, onBack: () -> Unit) {
             } else {
                 try {
                     entries = source.files.trashed()
-                    selected = selected.intersect(entries.map { it.id }.toSet())
+                    selected = selected.intersect(entries.map { it.path }.toSet())
                     loaded = true
                 } catch (canceled: CancellationException) { throw canceled }
                 catch (error: Exception) { DialogHelper.showMessage(error) }
             }
         }
     }
-    fun apply(ids: Set<String>, purge: Boolean) {
+    fun apply(paths: Set<String>, purge: Boolean) {
         if (busy) return
         busy = true
         scope.launchSafe(onDone = { busy = false }) {
-            if (purge) source.files.deleteTrashed(ids)
-            else source.files.restore(ids)
+            if (purge) source.files.deleteTrashed(paths)
+            else source.files.restore(paths)
         }
     }
     PScaffold(topBar = {
@@ -81,7 +81,7 @@ internal fun FilesTrashPage(source: ContentSource, onBack: () -> Unit) {
                     val allSelected = selected.size == entries.size
                     PTopRightButton(
                         label = stringResource(if (allSelected) Res.string.unselect_all else Res.string.select_all),
-                        click = { selected = if (allSelected) emptySet() else entries.map { it.id }.toSet() },
+                        click = { selected = if (allSelected) emptySet() else entries.map { it.path }.toSet() },
                     )
                 }
             },
@@ -93,10 +93,10 @@ internal fun FilesTrashPage(source: ContentSource, onBack: () -> Unit) {
                     apply(selected, false)
                 }
                 PIconTextSmallButton(UiRes.drawable.delete_forever, stringResource(Res.string.delete), enabled = !busy) {
-                    val ids = selected
+                    val paths = selected
                     scope.launchSafe {
                         confirmActionAsync(Res.string.delete, Res.string.confirm_to_delete,
-                            callback = { apply(ids, true) }, danger = true)
+                            callback = { apply(paths, true) }, danger = true)
                     }
                 }
             }
@@ -106,9 +106,9 @@ internal fun FilesTrashPage(source: ContentSource, onBack: () -> Unit) {
             NoDataView(modifier = Modifier.padding(padding), icon = null)
         } else {
             LazyColumn(modifier = Modifier.padding(padding), contentPadding = PaddingValues(vertical = 8.dp)) {
-                items(entries, key = { it.id }) { item ->
-                    FileTrashItem(item, item.id in selected, selecting, previewerState) {
-                        selected = if (item.id in selected) selected - item.id else selected + item.id
+                items(entries, key = { it.path }) { item ->
+                    FileTrashItem(item, item.path in selected, selecting, previewerState) {
+                        selected = if (item.path in selected) selected - item.path else selected + item.path
                     }
                 }
             }

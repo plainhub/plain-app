@@ -33,7 +33,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -105,12 +104,10 @@ fun FileListItem(
 
     Column {
         FileListRow(
-            title = file.name,
-            subtitle = if (file.isDir) pluralStringResource(Res.plurals.items, file.childCount, file.childCount) + ", " + file.updatedAt.formatDateTime()
-                else file.size.formatBytes() + ", " + file.updatedAt.formatDateTime(),
+            file = file, itemState = itemState, previewerState = previewerState,
             isSelected = isSelected, isSelectMode = isSelectMode, isCurrentlyPlaying = isCurrentlyPlaying,
             onClick = onClick, onLongClick = onLongClick,
-        ) { FileListItemThumbnail(file.name, file.path, file.isDir, itemState, previewerState) }
+        )
 
         if (isCurrentlyPlaying) {
             FileListItemPlayer(isSelected = isSelected, isPlaying = isPlaying, progress = progress, durationMs = durationMs,
@@ -129,15 +126,14 @@ fun FileListItem(
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 internal fun FileListRow(
-    title: String,
-    subtitle: String,
+    file: FileEntry,
+    itemState: TransformItemState,
+    previewerState: MediaPreviewerState,
     isSelected: Boolean,
     isSelectMode: Boolean,
     onClick: () -> Unit,
     onLongClick: () -> Unit,
     isCurrentlyPlaying: Boolean = false,
-    subtitleMaxLines: Int = Int.MAX_VALUE,
-    thumbnail: @Composable () -> Unit,
 ) {
     Box(modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 4.dp)
         .clip(RoundedCornerShape(topStart = 8.dp, topEnd = 8.dp,
@@ -151,13 +147,14 @@ internal fun FileListRow(
                 CheckCircle(selected = isSelected)
                 Spacer(modifier = Modifier.width(8.dp))
             }
-            thumbnail()
+            FileListItemThumbnail(file.name, file.path, file.isDir, itemState, previewerState)
             Spacer(modifier = Modifier.width(16.dp))
             Column(modifier = Modifier.weight(1f)) {
-                Text(text = title, style = MaterialTheme.typography.bodyLarge,
+                Text(text = file.name, style = MaterialTheme.typography.bodyLarge,
                     color = if (isCurrentlyPlaying) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface)
                 VerticalSpace(4.dp)
-                Text(text = subtitle, maxLines = subtitleMaxLines, overflow = TextOverflow.Ellipsis,
+                val detail = if (file.isDir) pluralStringResource(Res.plurals.items, file.childCount, file.childCount) else file.size.formatBytes()
+                Text(text = detail + ", " + file.updatedAt.formatDateTime(),
                     style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
         }
@@ -165,7 +162,7 @@ internal fun FileListRow(
 }
 
 @Composable
-internal fun FileListItemThumbnail(
+private fun FileListItemThumbnail(
     name: String, path: String, isDir: Boolean, itemState: TransformItemState, previewerState: MediaPreviewerState,
 ) {
     val source = com.ismartcoding.plain.ui.navigation.LocalContentSource.current
