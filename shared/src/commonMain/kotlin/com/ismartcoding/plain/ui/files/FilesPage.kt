@@ -55,6 +55,11 @@ import com.ismartcoding.plain.ui.platform.media.MediaPreviewer
 import com.ismartcoding.plain.ui.media.viewer.previewer.rememberPreviewerState
 import com.ismartcoding.plain.ui.audio.AudioQueueViewModel
 import com.ismartcoding.plain.ui.files.FilesViewModel
+import com.ismartcoding.plain.ui.navigation.PBackHandler
+import com.ismartcoding.plain.ui.files.components.FileRows
+import com.ismartcoding.plain.ui.files.components.FileTrashItem
+import com.ismartcoding.plain.ui.state.select
+import com.ismartcoding.plain.ui.state.exitSearchMode
 import com.ismartcoding.plain.ui.state.enterSearchMode
 import com.ismartcoding.plain.ui.state.exitSelectMode
 import com.ismartcoding.plain.ui.state.showBottomActions
@@ -81,16 +86,13 @@ fun FilesPage(
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
     val drawerState = rememberDrawerState(DrawerValue.Closed)
     var showTrash by remember(source) { mutableStateOf(false) }
-    if (showTrash) {
-        FilesTrashPage(source, onBack = { showTrash = false })
-        return
-    }
     val previewerState = rememberPreviewerState()
     val itemsState by filesVM.itemsFlow.collectAsState()
     var systemExpanded by remember(filesVM.selectedPath, filesVM.queryText.value) { mutableStateOf(false) }
-    val groupSystem = !(filesVM.showSearchBar.value && filesVM.getQuery().isNotEmpty()) && filesVM.type != FilesType.RECENTS && !ZipBrowserHelper.isZipPath(filesVM.selectedPath)
+    val groupSystem = !showTrash && !(filesVM.showSearchBar.value && filesVM.getQuery().isNotEmpty()) && filesVM.type != FilesType.RECENTS && !ZipBrowserHelper.isZipPath(filesVM.selectedPath)
     val systemFiles = if (groupSystem) itemsState.filter { it.isSystem } else emptyList()
-    val regularFiles = if (groupSystem) itemsState.filterNot { it.isSystem } else itemsState
+    val trashFiles = if (showTrash) rememberTrashFiles(filesVM).value else null
+    val regularFiles = if (showTrash) trashFiles.orEmpty() else if (groupSystem) itemsState.filterNot { it.isSystem } else itemsState
     val visibleFiles = if (systemExpanded) systemFiles + regularFiles else regularFiles
     var showMoreSheet by remember { mutableStateOf(false) }
     val canBrowse = filesVM.source is ContentSource.Local || filesVM.hasPermission.value
@@ -104,17 +106,25 @@ fun FilesPage(
         scope.launch { filesVM.loadAsync(); setRefreshState(RefreshContentState.Finished) }
     }
 
-    FilesPageEffects(filesVM, scope, folderPath, previewerState, audioQueueVM)
-    if (canBrowse) FilesPageDialogs(filesVM, scope)
+    FilesPageEffects(filesVM, scope, folderPath, previewerState, audioQueueVM, showTrash)
+    if (canBrowse && !showTrash) FilesPageDialogs(filesVM, scope)
 
-    if (canBrowse && showMoreSheet) {
+    if (canBrowse && !showTrash && showMoreSheet) {
         FilesMoreActionsSheet(filesVM = filesVM, onDismiss = { showMoreSheet = false })
+    }
+
+    PBackHandler(enabled = showTrash && !drawerState.isOpen) {
+        if (filesVM.selectMode.value) filesVM.exitSelectMode() else {
+            showTrash = false
+            scope.launch { filesVM.loadAsync() }
+        }
     }
 
     val drawerFolderTitle = filesVM.currentFolderTitleOverride()
     val title = when {
         filesVM.selectMode.value -> stringResource(Res.string.x_selected, filesVM.selectedIds.size)
 
+        showTrash -> stringResource(Res.string.trash)
         drawerFolderTitle != null -> drawerFolderTitle
         filesVM.type == FilesType.RECENTS -> stringResource(Res.string.recents)
         ZipBrowserHelper.isZipPath(filesVM.selectedPath) -> ZipBrowserHelper.getDisplayName(filesVM.selectedPath)
@@ -139,8 +149,16 @@ fun FilesPage(
                     filesVM = filesVM,
                     drawerState = drawerState,
                     navController = navController,
-                    onTrash = { scope.launch { drawerState.close(); showTrash = true } },
+                    showingTrash = showTrash,
+                    onTrash = {
+                        filesVM.exitSelectMode()
+                        filesVM.exitSearchMode()
+                        showTrash = true
+                        scope.launch { drawerState.close() }
+                    },
                     onSelect = { folder ->
+                        filesVM.exitSelectMode()
+                        showTrash = false
                         filesVM.offset = 0
                         filesVM.drawerFolderTitle.value = if (folder.isFavoriteFolder) folder.fullPath to folder.title else null
                         filesVM.initSelectedPath(folder.rootPath, folder.type, folder.fullPath, folder.fullPath)
@@ -163,19 +181,20 @@ fun FilesPage(
             subtitle = subtitle,
             navigationIcon = { if (filesVM.selectMode.value) NavigationCloseIcon { filesVM.exitSelectMode() } else PIconButton(icon = UiRes.drawable.ui_drawable_left_panel_open, contentDescription = stringResource(Res.string.folders), click = { scope.launch { if (drawerState.isOpen) drawerState.close() else drawerState.open() } }) },
             actions = {
-                if (!filesVM.selectMode.value) {
+                if (!showTrash && !filesVM.selectMode.value) {
                     ActionButtonSearch { filesVM.enterSearchMode() }
                     PCapsuleMoreClose(
                         onClose = { navController.navigateUp() },
                         onMore = { showMoreSheet = true },
                     )
-                } else {
+                } else if (filesVM.selectMode.value) {
                     PTopRightButton(
                         label = stringResource(if (visibleFiles.all { it.id in filesVM.selectedIds }) Res.string.unselect_all else Res.string.select_all),
                         click = {
                             val allSelected = visibleFiles.all { it.id in filesVM.selectedIds }
                             filesVM.selectedIds.clear()
                             if (!allSelected) filesVM.selectedIds.addAll(visibleFiles.map { it.id })
+                            else if (showTrash) filesVM.exitSelectMode()
                         }); HorizontalSpace(dp = 8.dp)
                 }
             },
@@ -185,7 +204,9 @@ fun FilesPage(
             }
             })
     }, bottomBar = {
-        AnimatedVisibility(
+        if (showTrash) {
+            if (canBrowse && filesVM.showBottomActions()) FilesTrashActions(source, filesVM.selectedIds.toSet())
+        } else AnimatedVisibility(
             visible = canBrowse && filesVM.showBottomActions() && !ZipBrowserHelper.isZipPath(filesVM.selectedPath),
             enter = slideInVertically { it } + fadeIn(),
             exit = slideOutVertically { it } + fadeOut()) {
@@ -194,7 +215,7 @@ fun FilesPage(
                 onShowPasteBar = { filesVM.showPasteBar.value = it })
         }
         AnimatedVisibility(
-            visible = canBrowse && filesVM.showPasteBar.value && !ZipBrowserHelper.isZipPath(filesVM.selectedPath),
+            visible = !showTrash && canBrowse && filesVM.showPasteBar.value && !ZipBrowserHelper.isZipPath(filesVM.selectedPath),
             enter = slideInVertically { it } + fadeIn(),
             exit = slideOutVertically { it } + fadeOut()) {
             FilePasteBar(
@@ -210,6 +231,15 @@ fun FilesPage(
         ) {
             if (!filesVM.hasPermission.value && (filesVM.source is com.ismartcoding.plain.rust.graphql.ContentSource.Remote || filesVM.type != FilesType.APP)) {
                 NeedPermissionColumn(UiRes.drawable.ui_drawable_folder, AppFeatureType.FILES.getPermission()!!)
+                return@Column
+            }
+            if (showTrash) {
+                FileRows(regularFiles, loading = trashFiles == null) { file ->
+                    FileTrashItem(file, file.path in filesVM.selectedIds, filesVM.selectMode.value, previewerState) {
+                        filesVM.select(file.path)
+                        filesVM.selectMode.value = filesVM.selectedIds.isNotEmpty()
+                    }
+                }
                 return@Column
             }
             if (filesVM.type != FilesType.RECENTS) {

@@ -3,6 +3,8 @@ package com.ismartcoding.plain.ui.files
 import com.ismartcoding.plain.rust.graphql.ContentSource
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberUpdatedState
 import com.ismartcoding.plain.lib.Channel
 import com.ismartcoding.plain.ui.navigation.PBackHandler
 import com.ismartcoding.plain.platform.system.appDir
@@ -28,9 +30,11 @@ internal fun FilesPageEffects(
     filesVM: FilesViewModel, scope: CoroutineScope,
     folderPath: String, previewerState: MediaPreviewerState,
     audioQueueVM: AudioQueueViewModel,
+    showingTrash: Boolean,
 ) {
+    val trashActive by rememberUpdatedState(showingTrash)
     val reloadAfterGrant: () -> Unit = {
-        scope.launchSafe { filesVM.loadAsync() }
+        if (!trashActive) scope.launchSafe { filesVM.loadAsync() }
     }
     if (filesVM.source is ContentSource.Local) StoragePermissionResumeEffect(filesVM.hasPermission, reloadAfterGrant)
     else com.ismartcoding.plain.ui.permissions.RemotePermissionEffects(
@@ -71,7 +75,7 @@ internal fun FilesPageEffects(
                 }
                 audioQueueVM.loadAsync()
                 Prefs.showHiddenFiles.collect {
-                    if (filesVM.hasPermission.value || filesVM.type == FilesType.APP) {
+                    if (!trashActive && (filesVM.hasPermission.value || filesVM.type == FilesType.APP)) {
                         try { filesVM.loadAsync() }
                         catch (canceled: kotlinx.coroutines.CancellationException) { throw canceled }
                         catch (error: Exception) { com.ismartcoding.plain.ui.components.DialogHelper.showMessage(error) }

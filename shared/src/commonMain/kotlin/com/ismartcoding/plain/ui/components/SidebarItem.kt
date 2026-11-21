@@ -17,6 +17,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.selected
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
@@ -55,6 +57,7 @@ fun SidebarItem(
             .clip(MaterialTheme.shapes.extraLarge)
             .background(if (isSelected) MaterialTheme.colorScheme.surfaceContainerHighest else Color.Transparent)
             .combinedClickable(onClick = onClick, onLongClick = onLongClick)
+            .semantics { selected = isSelected }
             .padding(horizontal = 16.dp, vertical = if (subtitle != null) 8.dp else 14.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {

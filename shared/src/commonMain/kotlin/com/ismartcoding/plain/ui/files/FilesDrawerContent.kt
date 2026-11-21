@@ -66,6 +66,7 @@ fun FilesDrawerContent(
     filesVM: FilesViewModel,
     drawerState: DrawerState,
     navController: NavHostController,
+    showingTrash: Boolean,
     onTrash: () -> Unit,
     onSelect: (FolderOption) -> Unit,
 ) {
@@ -121,11 +122,11 @@ fun FilesDrawerContent(
             SidebarItem(
                 label = item.title,
                 icon = if (item.type == FilesType.RECENTS) UiRes.drawable.ui_drawable_history else UiRes.drawable.ui_drawable_folder,
-                isSelected = item.isChecked,
+                isSelected = !showingTrash && item.isChecked,
                 onClick = { onSelect(item) }
             )
             if (item.type == FilesType.RECENTS) {
-                SidebarItem(label = stringResource(Res.string.trash), icon = UiRes.drawable.trash_2, isSelected = false, onClick = onTrash)
+                SidebarItem(label = stringResource(Res.string.trash), icon = UiRes.drawable.trash_2, isSelected = showingTrash, onClick = onTrash)
             }
         }
 
@@ -142,7 +143,7 @@ fun FilesDrawerContent(
                         SidebarItem(
                             label = item.title,
                             icon = UiRes.drawable.ui_drawable_folder,
-                            isSelected = item.isChecked,
+                            isSelected = !showingTrash && item.isChecked,
                             onLongClick = { contextMenuPath = item.fullPath },
                             onClick = { onSelect(item) }
                         )

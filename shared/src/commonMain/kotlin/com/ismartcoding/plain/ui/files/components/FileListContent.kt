@@ -40,7 +40,54 @@ fun FileListContent(
     previewerState: MediaPreviewerState,
     audioQueueVM: AudioQueueViewModel
 ) {
-    if (filesVM.isLoading.value) {
+    FileRows(files, filesVM.isLoading.value, systemCount, systemExpanded, onToggleSystem,
+        onRefresh = { loadFiles(emptyList(), true) }) { file ->
+        val itemState = rememberTransformItemState()
+        FileListItem(
+            file = file,
+            isSelected = filesVM.selectedIds.contains(file.path),
+            isSelectMode = filesVM.selectMode.value,
+            itemState = itemState,
+            previewerState = previewerState,
+            onClick = {
+                if (filesVM.selectMode.value) {
+                    filesVM.select(file.path)
+                } else {
+                    if (file.isDir) {
+                        filesVM.navigateToDirectory(file.path)
+                    } else if (!ZipBrowserHelper.isZipPath(file.path) && file.extension.lowercase() == "zip") {
+                        // Enter the zip as a virtual directory
+                        filesVM.navigateToDirectory(ZipBrowserHelper.joinPath(file.path, ""))
+                    } else {
+                        openFile(files, file, navController, previewerState, itemState, audioQueueVM, filesVM.source)
+                    }
+                }
+            },
+            onLongClick = {
+                // Disable select-mode for entries inside a zip archive (read-only)
+                if (ZipBrowserHelper.isZipPath(file.path)) return@FileListItem
+                if (!filesVM.selectMode.value) {
+                    filesVM.selectedFile.value = file
+                } else {
+                    filesVM.select(file.path)
+                }
+            },
+            audioQueueVM = audioQueueVM
+        )
+    }
+}
+
+@Composable
+internal fun FileRows(
+    files: List<FileEntry>,
+    loading: Boolean,
+    systemCount: Int = 0,
+    systemExpanded: Boolean = false,
+    onToggleSystem: () -> Unit = {},
+    onRefresh: (() -> Unit)? = null,
+    fileRow: @Composable (FileEntry) -> Unit,
+) {
+    if (loading) {
         Box(
             modifier = Modifier.fillMaxSize(),
             contentAlignment = Alignment.Center
@@ -51,45 +98,11 @@ fun FileListContent(
         NoDataView(
             icon = null,
             message = stringResource(Res.string.no_data),
-            showRefreshButton = true,
-            onRefresh = { loadFiles(emptyList(), true) }
+            showRefreshButton = onRefresh != null,
+            onRefresh = { onRefresh?.invoke() }
         )
     } else {
         val lazyListState = rememberLazyListState()
-        val fileRow: @Composable (FileEntry) -> Unit = { file ->
-            val itemState = rememberTransformItemState()
-            FileListItem(
-                file = file,
-                isSelected = filesVM.selectedIds.contains(file.path),
-                isSelectMode = filesVM.selectMode.value,
-                itemState = itemState,
-                previewerState = previewerState,
-                onClick = {
-                    if (filesVM.selectMode.value) {
-                        filesVM.select(file.path)
-                    } else {
-                        if (file.isDir) {
-                            filesVM.navigateToDirectory(file.path)
-                        } else if (!ZipBrowserHelper.isZipPath(file.path) && file.extension.lowercase() == "zip") {
-                            // Enter the zip as a virtual directory
-                            filesVM.navigateToDirectory(ZipBrowserHelper.joinPath(file.path, ""))
-                        } else {
-                            openFile(files, file, navController, previewerState, itemState, audioQueueVM, filesVM.source)
-                        }
-                    }
-                },
-                onLongClick = {
-                    // Disable select-mode for entries inside a zip archive (read-only)
-                    if (ZipBrowserHelper.isZipPath(file.path)) return@FileListItem
-                    if (!filesVM.selectMode.value) {
-                        filesVM.selectedFile.value = file
-                    } else {
-                        filesVM.select(file.path)
-                    }
-                },
-                audioQueueVM = audioQueueVM
-            )
-        }
         LazyColumn(
             modifier = Modifier.fillMaxSize(),
             state = lazyListState,
