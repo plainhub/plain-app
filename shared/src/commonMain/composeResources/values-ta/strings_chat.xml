@@ -184,6 +184,8 @@
     <string name="nearby_switch_device">மாற்று</string>
     <string name="pair_full_control">முழுக் கட்டுப்பாடு</string>
     <string name="nearby_enable_remote_access">மற்ற சாதனத்தில் தொலைநிலை அணுகலை இயக்கவும்</string>
+    <string name="nearby_remote_access_unknown">தொலைநிலை அணுகலைச் சரிபார்க்க முடியவில்லை. மற்ற சாதனத்தில் PlainApp-ஐத் திறந்து வைத்துவிட்டு மீண்டும் முயற்சிக்கவும்.</string>
+    <string name="nearby_unpair_in_progress">இந்தச் சாதனத்தின் இணைப்பு நீக்கப்படுகிறது.</string>
     <string name="pairing_identity_changed">சாதனத்தின் பொதுச் சாவி மாறியுள்ளது. செயலி மீண்டும் நிறுவப்பட்டிருக்கலாம். நம்புவதற்கு முன் முழு கைரேகையையும் ஒப்பிடவும்.</string>
     <string name="pairing_trust">நம்பு</string>
     <string name="nearby_bluetooth_tip">புளூடூத் மூலம் அருகிலுள்ள மேலும் பல PlainApp சாதனங்களைக் கண்டறியுங்கள்.</string>

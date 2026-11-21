@@ -184,6 +184,8 @@
     <string name="nearby_switch_device">전환</string>
     <string name="pair_full_control">전체 제어</string>
     <string name="nearby_enable_remote_access">상대 기기에서 원격 액세스를 켜세요</string>
+    <string name="nearby_remote_access_unknown">원격 액세스 상태를 확인할 수 없습니다. 상대 기기에서 PlainApp을 열어 둔 채 다시 시도하세요.</string>
+    <string name="nearby_unpair_in_progress">이 기기의 페어링을 해제하고 있습니다.</string>
     <string name="pairing_identity_changed">기기의 공개 키가 변경되었습니다. 앱을 재설치했을 수 있습니다. 전체 지문을 확인한 후 신뢰하세요.</string>
     <string name="pairing_trust">신뢰</string>
     <string name="nearby_bluetooth_tip">블루투스로 주변의 PlainApp 기기를 더 찾아보세요.</string>

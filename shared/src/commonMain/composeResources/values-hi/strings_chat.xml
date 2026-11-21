@@ -184,6 +184,8 @@
     <string name="nearby_switch_device">बदलें</string>
     <string name="pair_full_control">पूर्ण नियंत्रण</string>
     <string name="nearby_enable_remote_access">दूसरे डिवाइस पर रिमोट एक्सेस चालू करें</string>
+    <string name="nearby_remote_access_unknown">रिमोट एक्सेस की जाँच नहीं हो सकी। दूसरे डिवाइस पर PlainApp खुला रखें और फिर से कोशिश करें।</string>
+    <string name="nearby_unpair_in_progress">इस डिवाइस की पेयरिंग हटाई जा रही है।</string>
     <string name="pairing_identity_changed">डिवाइस की सार्वजनिक कुंजी बदल गई है। ऐप फिर से इंस्टॉल किया गया हो सकता है। भरोसा करने से पहले पूरे फ़िंगरप्रिंट का मिलान करें।</string>
     <string name="pairing_trust">भरोसा करें</string>
     <string name="nearby_bluetooth_tip">ब्लूटूथ से आस-पास के और PlainApp डिवाइस खोजें।</string>

@@ -184,6 +184,8 @@
     <string name="nearby_switch_device">Wechseln</string>
     <string name="pair_full_control">Vollzugriff</string>
     <string name="nearby_enable_remote_access">Remotezugriff auf dem anderen Gerät aktivieren</string>
+    <string name="nearby_remote_access_unknown">Der Fernzugriff konnte nicht geprüft werden. Lass PlainApp auf dem anderen Gerät geöffnet und versuche es erneut.</string>
+    <string name="nearby_unpair_in_progress">Die Kopplung mit diesem Gerät wird gerade aufgehoben.</string>
     <string name="pairing_identity_changed">Der öffentliche Geräteschlüssel hat sich geändert, möglicherweise durch eine Neuinstallation. Vor dem Vertrauen den vollständigen Fingerabdruck vergleichen.</string>
     <string name="pairing_trust">Vertrauen</string>
     <string name="nearby_bluetooth_tip">Finde mit Bluetooth mehr PlainApp-Geräte in der Nähe.</string>
