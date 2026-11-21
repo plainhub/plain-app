@@ -5,7 +5,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import com.ismartcoding.plain.features.files.TrashedFileType
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -17,8 +16,8 @@ import com.ismartcoding.plain.ui.base.PBottomAppBar
 import com.ismartcoding.plain.ui.base.PIconTextSmallButton
 import com.ismartcoding.plain.ui.components.NavigationCloseIcon
 import com.ismartcoding.plain.ui.components.NoDataView
-import com.ismartcoding.plain.ui.files.components.FileListRow
-import com.ismartcoding.plain.ui.media.FileEntryThumb
+import com.ismartcoding.plain.ui.files.components.FileTrashItem
+import com.ismartcoding.plain.ui.media.viewer.previewer.rememberPreviewerState
 import com.ismartcoding.plain.ui.resources.Res as UiRes
 import com.ismartcoding.plain.ui.resources.archive_restore
 import com.ismartcoding.plain.ui.resources.delete_forever
@@ -37,6 +36,7 @@ import org.jetbrains.compose.resources.stringResource
 @Composable
 internal fun FilesTrashPage(source: ContentSource, onBack: () -> Unit) {
     val scope = rememberCoroutineScope()
+    val previewerState = rememberPreviewerState()
     var entries by remember(source) { mutableStateOf<List<TrashedFile>>(emptyList()) }
     var selected by remember(source) { mutableStateOf(emptySet<String>()) }
     var busy by remember(source) { mutableStateOf(false) }
@@ -107,14 +107,8 @@ internal fun FilesTrashPage(source: ContentSource, onBack: () -> Unit) {
         } else {
             LazyColumn(modifier = Modifier.padding(padding), contentPadding = PaddingValues(vertical = 8.dp)) {
                 items(entries, key = { it.id }) { item ->
-                    val toggle = { selected = if (item.id in selected) selected - item.id else selected + item.id }
-                    FileListRow(
-                        title = item.displayName, subtitle = item.originalPath, subtitleMaxLines = 2,
-                        isSelected = item.id in selected, isSelectMode = selecting,
-                        onClick = toggle, onLongClick = toggle,
-                    ) {
-                        FileEntryThumb(name = item.displayName, path = item.originalPath,
-                            isDir = item.type == TrashedFileType.DIR, isMedia = false)
+                    FileTrashItem(item, item.id in selected, selecting, previewerState) {
+                        selected = if (item.id in selected) selected - item.id else selected + item.id
                     }
                 }
             }

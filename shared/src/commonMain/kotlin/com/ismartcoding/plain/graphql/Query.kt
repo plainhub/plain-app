@@ -317,7 +317,7 @@ object Query {
     )
 
     fun trashedFiles(offset: Int, limit: Int): GraphqlRequest<List<com.ismartcoding.plain.features.files.TrashedFile>> = GraphqlRequest(
-        $$"""query($offset: Int!, $limit: Int!) { trashedFiles(query: "", offset: $offset, limit: $limit, sortBy: DATE_DESC) { id displayName originalPath type } }""",
+        $$"""query($offset: Int!, $limit: Int!) { trashedFiles(query: "", offset: $offset, limit: $limit, sortBy: DATE_DESC) { id displayName originalPath trashedPath type } }""",
         mapOf(variable("offset", offset), variable("limit", limit)),
         field = "trashedFiles",
     )

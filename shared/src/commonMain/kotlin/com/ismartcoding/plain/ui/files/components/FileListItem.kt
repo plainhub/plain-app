@@ -67,7 +67,6 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
-import androidx.compose.ui.unit.Density
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -78,7 +77,6 @@ fun FileListItem(
 ) {
     val source = com.ismartcoding.plain.ui.navigation.LocalContentSource.current
     val scope = rememberCoroutineScope()
-    val density = LocalDensity.current
     val isAudio = file.path.isAudioFast()
     val isCurrentlyPlaying = audioQueueVM.selectedPath.value == file.path && isAudio
     val isPlaying by audioIsPlayingFlow().collectAsState()
@@ -112,7 +110,7 @@ fun FileListItem(
                 else file.size.formatBytes() + ", " + file.updatedAt.formatDateTime(),
             isSelected = isSelected, isSelectMode = isSelectMode, isCurrentlyPlaying = isCurrentlyPlaying,
             onClick = onClick, onLongClick = onLongClick,
-        ) { FileListItemThumbnail(file, itemState, previewerState, density) }
+        ) { FileListItemThumbnail(file.name, file.path, file.isDir, itemState, previewerState) }
 
         if (isCurrentlyPlaying) {
             FileListItemPlayer(isSelected = isSelected, isPlaying = isPlaying, progress = progress, durationMs = durationMs,
@@ -167,34 +165,34 @@ internal fun FileListRow(
 }
 
 @Composable
-private fun FileListItemThumbnail(
-    file: FileEntry, itemState: TransformItemState, previewerState: MediaPreviewerState, density: Density,
+internal fun FileListItemThumbnail(
+    name: String, path: String, isDir: Boolean, itemState: TransformItemState, previewerState: MediaPreviewerState,
 ) {
     val source = com.ismartcoding.plain.ui.navigation.LocalContentSource.current
-    val isMedia = file.path.isImageFast() || file.path.isVideoFast()
-    val isZipEntry = ZipBrowserHelper.isZipPath(file.path)
+    val isMedia = name.isImageFast() || name.isVideoFast()
+    val isZipEntry = ZipBrowserHelper.isZipPath(path)
 
     // For zip entries that are images/videos, extract to cache asynchronously so
     // we can show a real thumbnail instead of a generic icon.
-    var zipCachedPath by remember(file.path) { mutableStateOf<String?>(null) }
+    var zipCachedPath by remember(path) { mutableStateOf<String?>(null) }
     if (isMedia && isZipEntry) {
-        LaunchedEffect(file.path) {
-            zipCachedPath = withIO { source.files.cacheZipEntry(file.path) }
+        LaunchedEffect(path) {
+            zipCachedPath = withIO { source.files.cacheZipEntry(path) }
         }
     }
 
-    val widthPx = with(density) { 48.dp.toPx() }.toInt()
+    val widthPx = with(LocalDensity.current) { 48.dp.toPx() }.toInt()
     // Empty display path while a zip entry is still extracting: the shared
     // thumb falls back to the type icon until the cached path arrives.
     val displayPath = when {
-        !isZipEntry -> file.path
+        !isZipEntry -> path
         zipCachedPath != null -> zipCachedPath!!
         else -> ""
     }
     FileEntryThumb(
-        name = file.name,
+        name = name,
         path = displayPath,
-        isDir = file.isDir,
+        isDir = isDir,
         isMedia = isMedia,
         itemState = itemState,
         previewerState = previewerState,
