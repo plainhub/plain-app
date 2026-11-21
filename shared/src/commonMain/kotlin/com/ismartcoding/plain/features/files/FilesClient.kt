@@ -10,7 +10,10 @@ import com.ismartcoding.plain.platform.files.fileUriPath
 import kotlinx.coroutines.CancellationException
 
 @kotlinx.serialization.Serializable
-data class TrashedFile(val id: String, val displayName: String, val originalPath: String)
+data class TrashedFile(val id: String, val displayName: String, val originalPath: String, val type: TrashedFileType)
+
+@kotlinx.serialization.Serializable
+enum class TrashedFileType { FILE, DIR }
 
 object FilesClient : FilesApi(GraphqlApi, RustUploadChunks::replace)
 

@@ -33,6 +33,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -105,30 +106,13 @@ fun FileListItem(
     }
 
     Column {
-        Box(modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 4.dp)
-            .clip(RoundedCornerShape(topStart = 8.dp, topEnd = 8.dp,
-                bottomStart = if (isCurrentlyPlaying) 0.dp else 8.dp,
-                bottomEnd = if (isCurrentlyPlaying) 0.dp else 8.dp))
-            .combinedClickable(onClick = onClick, onLongClick = onLongClick)
-            .background(if (isSelected) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.cardBackgroundNormal),
-            contentAlignment = Alignment.Center) {
-            Row(modifier = Modifier.fillMaxWidth().padding(12.dp), verticalAlignment = Alignment.CenterVertically) {
-                if (isSelectMode) {
-                    CheckCircle(selected = isSelected)
-                    Spacer(modifier = Modifier.width(8.dp))
-                }
-                FileListItemThumbnail(file, itemState, previewerState, density)
-                Spacer(modifier = Modifier.width(16.dp))
-                Column(modifier = Modifier.weight(1f)) {
-                    Text(text = file.name, style = MaterialTheme.typography.bodyLarge,
-                        color = if (isCurrentlyPlaying) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface)
-                    VerticalSpace(4.dp)
-                    Text(text = if (file.isDir) pluralStringResource(Res.plurals.items, file.childCount, file.childCount) + ", " + file.updatedAt.formatDateTime()
-                        else file.size.formatBytes() + ", " + file.updatedAt.formatDateTime(),
-                        style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                }
-            }
-        }
+        FileListRow(
+            title = file.name,
+            subtitle = if (file.isDir) pluralStringResource(Res.plurals.items, file.childCount, file.childCount) + ", " + file.updatedAt.formatDateTime()
+                else file.size.formatBytes() + ", " + file.updatedAt.formatDateTime(),
+            isSelected = isSelected, isSelectMode = isSelectMode, isCurrentlyPlaying = isCurrentlyPlaying,
+            onClick = onClick, onLongClick = onLongClick,
+        ) { FileListItemThumbnail(file, itemState, previewerState, density) }
 
         if (isCurrentlyPlaying) {
             FileListItemPlayer(isSelected = isSelected, isPlaying = isPlaying, progress = progress, durationMs = durationMs,
@@ -141,6 +125,44 @@ fun FileListItem(
 
     if (showAudioPlayer) {
         AudioPlayerPage(audioQueueVM, onDismissRequest = { showAudioPlayer = false })
+    }
+}
+
+@OptIn(ExperimentalFoundationApi::class)
+@Composable
+internal fun FileListRow(
+    title: String,
+    subtitle: String,
+    isSelected: Boolean,
+    isSelectMode: Boolean,
+    onClick: () -> Unit,
+    onLongClick: () -> Unit,
+    isCurrentlyPlaying: Boolean = false,
+    subtitleMaxLines: Int = Int.MAX_VALUE,
+    thumbnail: @Composable () -> Unit,
+) {
+    Box(modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 4.dp)
+        .clip(RoundedCornerShape(topStart = 8.dp, topEnd = 8.dp,
+            bottomStart = if (isCurrentlyPlaying) 0.dp else 8.dp,
+            bottomEnd = if (isCurrentlyPlaying) 0.dp else 8.dp))
+        .combinedClickable(onClick = onClick, onLongClick = onLongClick)
+        .background(if (isSelected) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.cardBackgroundNormal),
+        contentAlignment = Alignment.Center) {
+        Row(modifier = Modifier.fillMaxWidth().padding(12.dp), verticalAlignment = Alignment.CenterVertically) {
+            if (isSelectMode) {
+                CheckCircle(selected = isSelected)
+                Spacer(modifier = Modifier.width(8.dp))
+            }
+            thumbnail()
+            Spacer(modifier = Modifier.width(16.dp))
+            Column(modifier = Modifier.weight(1f)) {
+                Text(text = title, style = MaterialTheme.typography.bodyLarge,
+                    color = if (isCurrentlyPlaying) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface)
+                VerticalSpace(4.dp)
+                Text(text = subtitle, maxLines = subtitleMaxLines, overflow = TextOverflow.Ellipsis,
+                    style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            }
+        }
     }
 }
 
