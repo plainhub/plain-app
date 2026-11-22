@@ -16,6 +16,8 @@ import com.ismartcoding.plain.models.Peer
 import com.ismartcoding.plain.models.UploadChunkInfo
 import com.ismartcoding.plain.rust.native.RustNativeBindings
 import com.ismartcoding.plain.rust.native.nativeCall
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withTimeoutOrNull
 import kotlin.io.encoding.Base64
 
@@ -40,9 +42,29 @@ internal class PeerHttpClient(
         nativeCall { RustNativeBindings.decryptHttpResponse(token, request, response) }
     },
     private val clientId: () -> String = { Prefs.clientId.value },
-    internal val encryptResourceReference: suspend (String, String) -> String = { token, path -> nativeCall { RustNativeBindings.encryptResourceReference(token, JsonHelper.jsonEncode(mapOf("clientId" to clientId(), "path" to path))) } },
+    private val encryptResourceReference: suspend (String, String, String) -> String = { token, client, path ->
+        nativeCall { RustNativeBindings.encryptResourceReference(token, JsonHelper.jsonEncode(mapOf("clientId" to client, "path" to path))) }
+    },
 ) {
     private val expected = peer.copy()
+
+    private data class FileIdScope(val clientId: String, val urlToken: String)
+
+    private val fileIdMutex = Mutex()
+    private val fileIds = LinkedHashMap<String, String>()
+    private var fileIdScope: FileIdScope? = null
+
+    internal suspend fun getFileId(urlToken: String, path: String): String = fileIdMutex.withLock {
+        val scope = FileIdScope(clientId(), urlToken)
+        if (fileIdScope != scope) {
+            fileIds.clear()
+            fileIdScope = scope
+        }
+        val id = fileIds.remove(path) ?: encryptResourceReference(urlToken, scope.clientId, path)
+        if (fileIds.size == 4096) fileIds.remove(fileIds.keys.first())
+        fileIds[path] = id
+        id
+    }
 
     internal suspend fun current(): Peer {
         val current = peers().find { it.id == expected.id } ?: throw BusinessException(PeerConnectionErrorCode.PEER_REMOVED.wire)

@@ -1,10 +1,12 @@
 package com.ismartcoding.plain.features.chat.peer
 
+import com.ismartcoding.plain.features.files.FileAction
 import com.ismartcoding.plain.features.nearby.PeerStatus
 import com.ismartcoding.plain.lib.JsonHelper
 import com.ismartcoding.plain.models.Peer
 import com.ismartcoding.plain.features.web.AccessFeature
 import com.ismartcoding.plain.platform.system.DeviceType
+import com.ismartcoding.plain.platform.system.imageCacheKey
 import com.ismartcoding.plain.rust.graphql.ContentSource
 import com.ismartcoding.plain.rust.graphql.GraphqlHttpResponse
 import com.ismartcoding.plain.rust.graphql.GraphqlHttpTransport
@@ -23,6 +25,9 @@ import com.ismartcoding.plain.ui.components.ToastManager
 import com.ismartcoding.plain.ui.tags.TagsViewModel
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.yield
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.test.runTest
@@ -30,11 +35,74 @@ import kotlin.io.encoding.Base64
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
+import kotlin.test.assertNotEquals
+import kotlin.test.assertNull
 import kotlin.test.assertTrue
 import kotlin.test.assertFailsWith
 import kotlin.time.Instant
 
 class ManagedDeviceLoadTest {
+    @Test
+    fun remote_file_ids_are_reused_for_the_same_reference_and_session() = runTest {
+        val peer = Peer(
+            id = "fixture-peer", name = "Device", ip = "device.test", status = PeerStatus.PAIRED, port = 8443,
+            deviceType = DeviceType.COMPUTER, createdAt = Instant.fromEpochMilliseconds(0), updatedAt = Instant.fromEpochMilliseconds(0),
+            publicKey = "fixture-key", token = "fixture-pairing-token",
+        )
+        var urlToken = "resource-token"
+        var clientId = "fixture-client"
+        var currentPeer = peer
+        var encryptions = 0
+        val http = PeerHttpClient(
+            peer, peers = { listOf(currentPeer) }, clientId = { clientId },
+            encryptResourceReference = { _, _, _ ->
+                yield()
+                "encrypted-${++encryptions}"
+            },
+            encrypt = { _, _, _ -> Base64.encode(byteArrayOf(1)) },
+            decrypt = { _, _, _ ->
+                Base64.encode(
+                    """{"data":{"app":{"deviceName":"Device","capabilities":[],"access":["IMAGES"],"appDir":"app://","downloadsDir":"/downloads","urlToken":"$urlToken","tlsCertificateSha256":"fixture-certificate"}}}"""
+                        .encodeToByteArray(),
+                )
+            },
+            transport = object : GraphqlHttpTransport {
+                override suspend fun post(url: String, clientId: String, body: ByteArray, contentType: String, tlsCertificateSha256: String?) =
+                    GraphqlHttpResponse(200, byteArrayOf(2))
+            },
+        )
+        val client = ManagedDeviceClient.load(peer, http)
+        val path = "/fixture/photo.jpg"
+
+        val thumbnails = List(3) { async { client.resource(path, ResourceSize.SM) } }.awaitAll()
+        assertEquals(1, thumbnails.distinct().size)
+        val thumbnail = thumbnails.first()
+        assertEquals(thumbnail, client.resource(path, ResourceSize.SM))
+        val versioned = client.resource(path, ResourceSize.SM, version = Instant.fromEpochMilliseconds(1))
+        assertEquals(thumbnail.url + "&v=1970-01-01T00%3A00%3A00.001Z", versioned.url)
+        assertNull(thumbnail.imageCacheKey())
+        assertEquals(versioned.imageCacheKey(), client.resource(path, ResourceSize.SM, version = Instant.fromEpochMilliseconds(1)).imageCacheKey())
+        assertNotEquals(versioned.imageCacheKey(), client.resource(path, ResourceSize.SM, version = Instant.fromEpochMilliseconds(2)).imageCacheKey())
+        assertNotEquals(versioned.imageCacheKey(), versioned.copy(tlsCertificateSha256 = "other-pin").imageCacheKey())
+        assertEquals("https://device.test:8443/fs?id=encrypted-1&action=PREVIEW&size=LG", client.resource(path, ResourceSize.LG).url)
+        assertEquals("https://device.test:8443/fs?id=encrypted-1&action=DOWNLOAD", client.resource(path, action = FileAction.DOWNLOAD).url)
+        assertEquals(1, encryptions)
+        assertNotEquals(thumbnail, client.resource("/fixture/other.jpg", ResourceSize.SM))
+
+        urlToken = "new-resource-token"
+        client.info()
+        val rotated = client.resource(path, ResourceSize.SM)
+        assertNotEquals(thumbnail, rotated)
+        assertEquals(rotated, client.resource(path, ResourceSize.SM))
+
+        clientId = "new-client"
+        assertNotEquals(rotated, client.resource(path, ResourceSize.SM))
+        assertEquals(4, encryptions)
+
+        currentPeer = peer.copy(token = "changed-pairing-token")
+        assertEquals("PEER_IDENTITY_CHANGED", assertFailsWith<IllegalStateException> { client.resource(path, ResourceSize.SM) }.message)
+    }
+
     @Test
     fun remote_media_timeout_surfaces_the_error_and_leaves_the_page_usable() = runTest {
         val peer = Peer(
@@ -93,7 +161,7 @@ class ManagedDeviceLoadTest {
         val requests = mutableListOf<GraphqlOperation>()
         var response = """{"data":{"app":{"deviceName":"Device","capabilities":[],"access":["IMAGES","AUDIO","VIDEOS","APPS"],"appDir":"app://","downloadsDir":"/downloads","urlToken":"resource-token","tlsCertificateSha256":"fixture-certificate"}}}"""
         val http = PeerHttpClient(peer, peers = { listOf(currentPeer) }, clientId = { "706c6169-b9ef-8b64-b37d-1162ef232835" },
-            encryptResourceReference = { token, path ->
+            encryptResourceReference = { token, _, path ->
                 assertEquals("resource-token", token)
                 assertEquals("/target.mp3", path)
                 "encrypted-resource"

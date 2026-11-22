@@ -9,5 +9,8 @@ import com.ismartcoding.plain.models.ManagedResource
 
 internal class ManagedImageFetcher : Fetcher.Factory<ManagedResource> {
     override fun create(data: ManagedResource, options: Options, imageLoader: ImageLoader): Fetcher? =
-        NetworkFetcher.Factory(networkClient = { IosImageNetworkClient(data.tlsCertificateSha256) }).create(data.url.toUri(), options, imageLoader)
+        NetworkFetcher.Factory(
+            networkClient = { IosImageNetworkClient(data.tlsCertificateSha256) },
+            cacheStrategy = { ManagedImageCacheStrategy },
+        ).create(data.url.toUri(), data.imageFetchOptions(options), imageLoader)
 }

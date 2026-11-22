@@ -113,6 +113,7 @@ internal actual fun platformImageLoaderBuilder(context: PlatformContext): ImageL
 
     return ImageLoader.Builder(appContext)
         .components {
+            add(ManagedImageCacheKeyer)
             add(ManagedImageFetcher())
             add(PackageIconMapper())
             add(SvgDecoder.Factory(true))

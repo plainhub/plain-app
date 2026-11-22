@@ -18,4 +18,8 @@ data class ManagedDeviceInfo(
 @Serializable
 data class ManagedStorageRoot(val name: String, val path: String)
 
-data class ManagedResource(val url: String, val tlsCertificateSha256: String)
+data class ManagedResource(
+    val url: String,
+    val tlsCertificateSha256: String,
+    val versionedThumbnail: Boolean = false,
+)

@@ -20,6 +20,7 @@ import com.ismartcoding.plain.rust.graphql.GraphqlOperation
 import com.ismartcoding.plain.rust.graphql.GraphqlResponse
 import com.ismartcoding.plain.rust.graphql.SubscriptionUpdate
 import com.ismartcoding.plain.rust.graphql.RustGraphqlSubscriptions
+import kotlin.time.Instant
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.transform
 import kotlinx.coroutines.flow.asStateFlow
@@ -90,13 +91,18 @@ internal class ManagedDeviceClient private constructor(
     suspend fun absoluteResourceUrl(url: String): String =
         if (url.startsWith("/")) http.current().getBaseUrl().trimEnd('/') + url else url
 
-    suspend fun resource(path: String, size: ResourceSize? = null, action: FileAction = FileAction.PREVIEW): com.ismartcoding.plain.models.ManagedResource {
-        val info = currentInfo
+    suspend fun resource(
+        path: String,
+        size: ResourceSize? = null,
+        action: FileAction = FileAction.PREVIEW,
+        version: Instant? = null,
+    ): com.ismartcoding.plain.models.ManagedResource {
         val current = http.current()
-        val fileId = http.encryptResourceReference(info.urlToken, path)
-        val base = current.getBaseUrl()
-        val url = managedResourceUrl(base, fileId, size, action)
-        return com.ismartcoding.plain.models.ManagedResource(url, info.tlsCertificateSha256 ?: throw BusinessException(PeerConnectionErrorCode.PEER_HTTPS_UNAVAILABLE.wire))
+        val info = currentInfo
+        val fingerprint = info.tlsCertificateSha256 ?: throw BusinessException(PeerConnectionErrorCode.PEER_HTTPS_UNAVAILABLE.wire)
+        val fileId = http.getFileId(info.urlToken, path)
+        val url = managedResourceUrl(current.getBaseUrl(), fileId, size, action, version)
+        return com.ismartcoding.plain.models.ManagedResource(url, fingerprint, versionedThumbnail = size != null && version != null)
     }
 
     suspend fun downloadFile(path: String, name: String): String {
@@ -108,7 +114,13 @@ internal class ManagedDeviceClient private constructor(
     }
 }
 
-internal fun managedResourceUrl(base: String, fileId: String, size: ResourceSize?, action: FileAction = FileAction.PREVIEW): String =
+internal fun managedResourceUrl(
+    base: String,
+    fileId: String,
+    size: ResourceSize?,
+    action: FileAction = FileAction.PREVIEW,
+    version: Instant? = null,
+): String =
     buildString {
         append(base.trimEnd('/'))
         append("/fs?id=")
@@ -116,4 +128,5 @@ internal fun managedResourceUrl(base: String, fileId: String, size: ResourceSize
         append("&action=")
         append(action.name)
         size?.let { append("&size=").append(it.name) }
+        version?.let { append("&v=").append(it.toString().urlEncode()) }
     }

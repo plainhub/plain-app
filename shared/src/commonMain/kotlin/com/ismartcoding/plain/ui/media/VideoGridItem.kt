@@ -92,6 +92,7 @@ fun VideoGridItem(
         MediaGridThumbnail(
             path = m.path,
             key = m.id,
+            updatedAt = m.updatedAt,
             uri = getMediaItemUriString(videosVM.dataType, m.id, m.path),
             itemState = itemState,
             previewerState = previewerState,

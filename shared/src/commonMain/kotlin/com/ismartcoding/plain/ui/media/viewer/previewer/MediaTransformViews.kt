@@ -28,6 +28,9 @@ import coil3.compose.AsyncImagePainter
 import coil3.compose.LocalPlatformContext
 import coil3.compose.rememberAsyncImagePainter
 import coil3.request.ImageRequest
+import coil3.network.HttpException
+import com.ismartcoding.plain.lib.logcat.LogCat
+import kotlin.time.Instant
 import com.ismartcoding.plain.lib.extensions.isImageFast
 import com.ismartcoding.plain.platform.media.applyForceVideoDecoder
 import kotlinx.coroutines.launch
@@ -41,15 +44,24 @@ fun TransformImageViewWithUri(
     modifier: Modifier = Modifier,
     path: String, fileName: String, key: String, uri: String? = null,
     itemState: TransformItemState, previewerState: MediaPreviewerState,
-    widthPx: Int, forceVideoDecoder: Boolean = false,
+    widthPx: Int, forceVideoDecoder: Boolean = false, version: Instant? = null,
 ) {
     val source = com.ismartcoding.plain.ui.navigation.LocalContentSource.current
-    val resource by com.ismartcoding.plain.ui.navigation.rememberContentResource(source, path, com.ismartcoding.plain.features.chat.peer.ResourceSize.SM)
+    val resource by com.ismartcoding.plain.ui.navigation.rememberContentResource(
+        source, path, com.ismartcoding.plain.features.chat.peer.ResourceSize.SM, version,
+    )
     TransformImageView(modifier = modifier, key = key, itemState = itemState, contentState = previewerState.transformState) { itemKey ->
         key(itemKey) {
             val painter = rememberAsyncImagePainter(
                 model = ImageRequest.Builder(LocalPlatformContext.current).data(if (source is com.ismartcoding.plain.rust.graphql.ContentSource.Local) uri ?: path else resource?.getOrNull()).size(widthPx)
                     .applyForceVideoDecoder(forceVideoDecoder && source is com.ismartcoding.plain.rust.graphql.ContentSource.Local).build(),
+                onError = { state ->
+                    if (source is com.ismartcoding.plain.rust.graphql.ContentSource.Remote && resource?.isSuccess == true) {
+                        val cause = state.result.throwable
+                        val reason = if (cause is HttpException) "HTTP ${cause.response.code}" else cause::class.simpleName
+                        LogCat.w("Remote thumbnail request failed: $reason")
+                    }
+                },
                 filterQuality = FilterQuality.None
             )
             val imageState by painter.state.collectAsState()

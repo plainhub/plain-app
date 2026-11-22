@@ -93,6 +93,7 @@ fun ImageGridItem(
             uri = getMediaItemUriString(imagesVM.dataType, m.id, m.path),
             path = m.path,
             key = m.id,
+            updatedAt = m.updatedAt,
             itemState = itemState,
             previewerState = previewerState,
         )
