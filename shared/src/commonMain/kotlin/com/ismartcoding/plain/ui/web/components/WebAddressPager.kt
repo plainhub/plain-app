@@ -46,39 +46,34 @@ fun WebAddressPager(
             Prefs.set(PrefKeys.HTTPS, page == 1)
         }
     }
-    Column(
-        modifier = modifier.fillMaxWidth()
-            .padding(top = 8.dp),
-    ) {
-        val labelStyle = MaterialTheme.typography.labelLarge
-        val textMeasurer = rememberTextMeasurer()
-        val optionWidth = with(LocalDensity.current) {
-            textMeasurer.measure("HTTPS", labelStyle.copy(fontWeight = FontWeight.Bold)).size.width.toDp() + 16.dp
-        }.coerceAtLeast(48.dp)
-        Row(Modifier.selectableGroup().padding(start = 16.dp)) {
-            listOf("HTTP", "HTTPS").forEachIndexed { page, label ->
-                val selected = pagerState.currentPage == page
-                Box(
-                    modifier = Modifier.width(optionWidth).heightIn(min = 48.dp).selectable(
-                        selected = selected,
-                        role = Role.Tab,
-                        interactionSource = null,
-                        indication = null,
-                        onClick = { scope.launch { pagerState.animateScrollToPage(page) } },
-                    ),
-                    contentAlignment = Alignment.CenterStart,
-                ) {
-                    Text(
-                        text = label,
-                        style = labelStyle,
-                        fontWeight = if (selected) FontWeight.Bold else FontWeight.Normal,
-                        color = if (selected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
-                    )
-                }
+    val labelStyle = MaterialTheme.typography.labelLarge
+    val textMeasurer = rememberTextMeasurer()
+    val optionWidth = with(LocalDensity.current) {
+        textMeasurer.measure("HTTPS", labelStyle.copy(fontWeight = FontWeight.Bold)).size.width.toDp() + 16.dp
+    }.coerceAtLeast(48.dp)
+    Row(Modifier.selectableGroup().padding(start = 16.dp)) {
+        listOf("HTTP", "HTTPS").forEachIndexed { page, label ->
+            val selected = pagerState.currentPage == page
+            Box(
+                modifier = Modifier.width(optionWidth).heightIn(min = 48.dp).selectable(
+                    selected = selected,
+                    role = Role.Tab,
+                    interactionSource = null,
+                    indication = null,
+                    onClick = { scope.launch { pagerState.animateScrollToPage(page) } },
+                ),
+                contentAlignment = Alignment.CenterStart,
+            ) {
+                Text(
+                    text = label,
+                    style = labelStyle,
+                    fontWeight = if (selected) FontWeight.Bold else FontWeight.Normal,
+                    color = if (selected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
+                )
             }
         }
-        HorizontalPager(state = pagerState, modifier = Modifier.fillMaxWidth()) { page ->
-            WebAddressBar(isHttps = page == 1, lanIpv4Addresses = lanIpv4Addresses)
-        }
+    }
+    HorizontalPager(state = pagerState, modifier = Modifier.fillMaxWidth()) { page ->
+        WebAddressBar(isHttps = page == 1, lanIpv4Addresses = lanIpv4Addresses)
     }
 }

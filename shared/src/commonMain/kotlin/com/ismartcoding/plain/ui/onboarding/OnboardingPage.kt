@@ -51,7 +51,10 @@ fun OnboardingPage(navController: NavHostController) {
                 modifier = Modifier.align(Alignment.End),
             )
             HorizontalPager(pages, Modifier.weight(1f)) { page ->
-                Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(vertical = 8.dp)) {
+                Column(
+                    Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(vertical = 8.dp),
+                    verticalArrangement = Arrangement.Center,
+                ) {
                     when (page) {
                         0 -> DirectConnectionIllustration()
                         1 -> RemoteAccessAnimation(active = pages.settledPage == page)
@@ -78,14 +81,12 @@ fun OnboardingPage(navController: NavHostController) {
                     }
                 }
             }
-            Row(Modifier.align(Alignment.CenterHorizontally), horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-                repeat(pages.pageCount) { index ->
-                    Spacer(Modifier.size(24.dp, 4.dp).background(
-                        if (index == pages.currentPage) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant,
-                        MaterialTheme.shapes.small,
-                    ))
-                }
-            }
+            PRangeDots(
+                items = (0 until pages.pageCount).toList(),
+                selected = pages.currentPage,
+                onSelect = { page -> scope.launch { pages.animateScrollToPage(page) } },
+                modifier = Modifier.align(Alignment.CenterHorizontally),
+            )
             val last = pages.currentPage == pages.pageCount - 1
             PFilledButton(text = stringResource(if (last) Res.string.wizard_view_guide else Res.string.onboarding_next),
                 onClick = {

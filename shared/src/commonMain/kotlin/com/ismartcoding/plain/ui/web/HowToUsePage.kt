@@ -26,6 +26,10 @@ private const val TROUBLESHOOTING_GUIDE_URL = "https://plainapp.app/docs/trouble
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HowToUsePage(navController: NavHostController, webVM: DesktopAccessSettingsViewModel) {
+    val addresses by webVM.lanIpv4Addresses.collectAsState()
+    val demoIp = addresses?.firstOrNull() ?: "192.0.2.20"
+    LaunchedEffect(webVM) { webVM.observeNetworkAddresses() }
+
     PScaffold(topBar = {
         PTopAppBar(onNavigateBack = { navController.navigateUp() }, title = stringResource(Res.string.how_to_use))
     }) { insets ->
@@ -43,8 +47,14 @@ fun HowToUsePage(navController: NavHostController, webVM: DesktopAccessSettingsV
                 GuideQuestion(Res.string.faq_cannot_open_q, Res.string.guide_unreachable) {
                     PTextButton(stringResource(Res.string.run_diagnostics), onClick = webVM::checkHttpServerHealth)
                 }
-                GuideQuestion(Res.string.faq_https_warning_q, Res.string.guide_certificate)
-                GuideQuestion(Res.string.faq_stay_online_q, Res.string.faq_stay_online_a)
+                GuideQuestion(Res.string.faq_https_warning_q, Res.string.guide_certificate) {
+                    VerticalSpace(8.dp)
+                    FaqCertDemo(serverIp = demoIp)
+                }
+                GuideQuestion(Res.string.faq_stay_online_q, Res.string.faq_stay_online_a) {
+                    VerticalSpace(8.dp)
+                    FaqStayOnlineDemo()
+                }
                 GuideQuestion(Res.string.guide_missing_feature, Res.string.guide_permissions)
             }
             VerticalSpace(8.dp)
