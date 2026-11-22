@@ -184,8 +184,10 @@
     <string name="nearby_switch_device">Cambia</string>
     <string name="pair_full_control">Controllo completo</string>
     <string name="nearby_enable_remote_access">Attiva l’accesso remoto sull’altro dispositivo</string>
+    <string name="nearby_full_control_unavailable">Controllo completo non disponibile</string>
+    <string name="nearby_full_control_offline">L’altro dispositivo è offline. Verifica che sia connesso alla rete, poi apri PlainApp su quel dispositivo e riprova.</string>
+    <string name="nearby_full_control_remote_access_disabled">L’accesso remoto è disattivato sull’altro dispositivo. Attivalo in PlainApp su quel dispositivo e riprova.</string>
     <string name="nearby_remote_access_unknown">Impossibile verificare l’accesso remoto. Lascia PlainApp aperta sull’altro dispositivo e riprova.</string>
-    <string name="nearby_unpair_in_progress">È in corso la rimozione dell’abbinamento con questo dispositivo.</string>
     <string name="pairing_identity_changed">La chiave pubblica del dispositivo è cambiata, forse dopo una reinstallazione. Confronta tutta la sua impronta prima di considerarlo attendibile.</string>
     <string name="pairing_trust">Considera attendibile</string>
     <string name="nearby_bluetooth_tip">Trova più dispositivi PlainApp nelle vicinanze tramite Bluetooth.</string>

@@ -198,8 +198,10 @@
     <string name="nearby_switch_device">切換</string>
     <string name="pair_full_control">完全控制</string>
     <string name="nearby_enable_remote_access">請在對方裝置開啟遠端存取</string>
+    <string name="nearby_full_control_unavailable">無法使用完整控制</string>
+    <string name="nearby_full_control_offline">對方裝置目前離線。請確認它已連上網路，並在對方裝置上開啟 PlainApp，再試一次。</string>
+    <string name="nearby_full_control_remote_access_disabled">對方裝置未開啟遠端存取。請在對方裝置的 PlainApp 中開啟後再試。</string>
     <string name="nearby_remote_access_unknown">暫時無法確認對方的遠端存取狀態。請在對方裝置上開啟 PlainApp 後再試一次。</string>
-    <string name="nearby_unpair_in_progress">正在解除與此裝置的配對。</string>
     <string name="pairing_identity_changed">對方公鑰已改變，可能重新安裝了應用程式。請核對完整指紋後再信任。</string>
     <string name="pairing_trust">信任</string>
     <string name="pairing_scan_qrcode">使用另一台手機掃碼，即可與這台手機配對。</string>

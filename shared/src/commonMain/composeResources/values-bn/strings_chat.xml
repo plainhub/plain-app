@@ -184,8 +184,10 @@
     <string name="nearby_switch_device">পরিবর্তন</string>
     <string name="pair_full_control">সম্পূর্ণ নিয়ন্ত্রণ</string>
     <string name="nearby_enable_remote_access">অন্য ডিভাইসে রিমোট অ্যাক্সেস চালু করুন</string>
+    <string name="nearby_full_control_unavailable">সম্পূর্ণ নিয়ন্ত্রণ ব্যবহার করা যাচ্ছে না</string>
+    <string name="nearby_full_control_offline">অন্য ডিভাইসটি অফলাইনে আছে। সেটি নেটওয়ার্কে সংযুক্ত আছে কি না দেখুন, তারপর সেখানে PlainApp খুলে আবার চেষ্টা করুন।</string>
+    <string name="nearby_full_control_remote_access_disabled">অন্য ডিভাইসে রিমোট অ্যাক্সেস বন্ধ আছে। সেই ডিভাইসে PlainApp থেকে এটি চালু করে আবার চেষ্টা করুন।</string>
     <string name="nearby_remote_access_unknown">রিমোট অ্যাক্সেস চালু আছে কি না যাচাই করা যায়নি। অন্য ডিভাইসে PlainApp খোলা রেখে আবার চেষ্টা করুন।</string>
-    <string name="nearby_unpair_in_progress">এই ডিভাইসের পেয়ারিং সরানো হচ্ছে।</string>
     <string name="pairing_identity_changed">ডিভাইসের পাবলিক কী বদলেছে। অ্যাপটি আবার ইনস্টল করা হয়ে থাকতে পারে। বিশ্বাস করার আগে সম্পূর্ণ ফিঙ্গারপ্রিন্ট মিলিয়ে নিন।</string>
     <string name="pairing_trust">বিশ্বাস করুন</string>
     <string name="nearby_bluetooth_tip">ব্লুটুথ দিয়ে কাছাকাছি আরও PlainApp ডিভাইস খুঁজুন।</string>

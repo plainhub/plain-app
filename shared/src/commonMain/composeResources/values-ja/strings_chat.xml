@@ -184,8 +184,10 @@
     <string name="nearby_switch_device">切り替え</string>
     <string name="pair_full_control">完全なコントロール</string>
     <string name="nearby_enable_remote_access">相手のデバイスでリモートアクセスを有効にしてください</string>
+    <string name="nearby_full_control_unavailable">完全なコントロールを利用できません</string>
+    <string name="nearby_full_control_offline">相手の端末はオフラインです。ネットワークに接続されていることを確認し、その端末で PlainApp を開いてから、もう一度お試しください。</string>
+    <string name="nearby_full_control_remote_access_disabled">相手の端末でリモートアクセスがオフになっています。その端末の PlainApp でオンにしてから、もう一度お試しください。</string>
     <string name="nearby_remote_access_unknown">リモートアクセスの状態を確認できませんでした。相手の端末で PlainApp を開いたまま、もう一度お試しください。</string>
-    <string name="nearby_unpair_in_progress">この端末のペアリングを解除しています。</string>
     <string name="pairing_identity_changed">相手の公開鍵が変わりました。アプリを再インストールした可能性があります。完全なフィンガープリントを照合してから信頼してください。</string>
     <string name="pairing_trust">信頼する</string>
     <string name="nearby_bluetooth_tip">Bluetooth で近くの PlainApp デバイスをさらに見つけられます。</string>

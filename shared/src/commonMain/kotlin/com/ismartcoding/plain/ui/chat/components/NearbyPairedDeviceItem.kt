@@ -3,10 +3,14 @@ package com.ismartcoding.plain.ui.chat.components
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.material3.Icon
 import androidx.compose.foundation.layout.size
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.painterResource
 import com.ismartcoding.plain.ui.resources.check as ui_drawable_check
@@ -35,7 +39,6 @@ import org.jetbrains.compose.resources.stringResource
 
 @Composable
 fun NearbyPairedDeviceItem(peer: Peer, device: NearbyDevice?, onPair: (NearbyDevice) -> Unit) {
-    var showMenu by remember(peer.id) { mutableStateOf(false) }
     val isUnpairing = NearbyViewModel.itemStatus[peer.id] == NearbyItemStatus.UNPAIRING
     val selected = MainViewModel.selectedDevice.value?.peerId == peer.id
     val unpairText = stringResource(Res.string.unpair)
@@ -75,7 +78,16 @@ fun NearbyPairedDeviceItem(peer: Peer, device: NearbyDevice?, onPair: (NearbyDev
                         },
                     )
                 }
-                Box {
+                if (isUnpairing) {
+                    val loading = stringResource(Res.string.loading)
+                    Box(Modifier.size(48.dp), contentAlignment = Alignment.Center) {
+                        CircularProgressIndicator(
+                            modifier = Modifier.size(20.dp).semantics { contentDescription = loading },
+                            strokeWidth = 2.dp,
+                        )
+                    }
+                } else Box {
+                    var showMenu by remember(peer.id) { mutableStateOf(false) }
                     PIconButton(
                         UiRes.drawable.ui_drawable_more_horiz,
                         contentDescription = stringResource(Res.string.more),
@@ -84,11 +96,11 @@ fun NearbyPairedDeviceItem(peer: Peer, device: NearbyDevice?, onPair: (NearbyDev
                     PDropdownMenu(expanded = showMenu, onDismissRequest = { showMenu = false }) {
                         if (peer.token.isEmpty() && !selected) {
                             val fullControl = stringResource(Res.string.pair_full_control)
+                            val unavailableTitle = stringResource(Res.string.nearby_full_control_unavailable)
                             val ok = stringResource(Res.string.ok)
                             val reason = when {
-                                isUnpairing -> stringResource(Res.string.nearby_unpair_in_progress)
-                                !peer.online -> stringResource(Res.string.offline)
-                                device?.remoteAccess == false -> stringResource(Res.string.nearby_enable_remote_access)
+                                !peer.online -> stringResource(Res.string.nearby_full_control_offline)
+                                device?.remoteAccess == false -> stringResource(Res.string.nearby_full_control_remote_access_disabled)
                                 device?.remoteAccess == null -> stringResource(Res.string.nearby_remote_access_unknown)
                                 else -> null
                             }
@@ -97,7 +109,7 @@ fun NearbyPairedDeviceItem(peer: Peer, device: NearbyDevice?, onPair: (NearbyDev
                                 onClick = {
                                     showMenu = false
                                     if (reason != null) {
-                                        DialogHelper.showConfirmDialog(fullControl, reason, confirmButton = Pair(ok) {})
+                                        DialogHelper.showConfirmDialog(unavailableTitle, reason, confirmButton = Pair(ok) {})
                                     } else {
                                         device?.let(onPair)
                                     }

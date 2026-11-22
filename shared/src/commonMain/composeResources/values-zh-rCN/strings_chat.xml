@@ -198,8 +198,10 @@
     <string name="nearby_switch_device">切换</string>
     <string name="pair_full_control">完全控制</string>
     <string name="nearby_enable_remote_access">请在对方设备的 PlainApp 中开启远程访问。</string>
+    <string name="nearby_full_control_unavailable">无法使用完整控制</string>
+    <string name="nearby_full_control_offline">对方设备当前离线。请确认它已联网，并在对方设备上打开 PlainApp，再试一次。</string>
+    <string name="nearby_full_control_remote_access_disabled">对方设备没有开启远程访问。请在对方设备的 PlainApp 中开启后再试。</string>
     <string name="nearby_remote_access_unknown">暂时无法确认对方的远程访问状态。请在对方设备上打开 PlainApp 后重试。</string>
-    <string name="nearby_unpair_in_progress">正在解除与此设备的配对。</string>
     <string name="pairing_identity_changed">此设备的身份已变化，请核对两端匹配码。无法确认是同一台设备时，请取消。</string>
     <string name="pairing_trust">信任</string>
     <string name="pairing_scan_qrcode">在另一台设备的 PlainApp 中打开“扫描二维码”，扫描此二维码进行配对。</string>

@@ -184,8 +184,10 @@
     <string name="nearby_switch_device">Wisselen</string>
     <string name="pair_full_control">Volledige controle</string>
     <string name="nearby_enable_remote_access">Schakel externe toegang in op het andere apparaat</string>
+    <string name="nearby_full_control_unavailable">Volledige controle niet beschikbaar</string>
+    <string name="nearby_full_control_offline">Het andere apparaat is offline. Controleer of het met het netwerk is verbonden, open PlainApp op dat apparaat en probeer het opnieuw.</string>
+    <string name="nearby_full_control_remote_access_disabled">Externe toegang is uitgeschakeld op het andere apparaat. Schakel die daar in PlainApp in en probeer het opnieuw.</string>
     <string name="nearby_remote_access_unknown">Externe toegang kon niet worden gecontroleerd. Laat PlainApp op het andere apparaat open en probeer het opnieuw.</string>
-    <string name="nearby_unpair_in_progress">Dit apparaat wordt ontkoppeld.</string>
     <string name="pairing_identity_changed">De openbare apparaatsleutel is gewijzigd, mogelijk door een herinstallatie. Vergelijk de volledige vingerafdruk voordat je het apparaat vertrouwt.</string>
     <string name="pairing_trust">Vertrouwen</string>
     <string name="nearby_bluetooth_tip">Vind meer PlainApp-apparaten in de buurt via Bluetooth.</string>

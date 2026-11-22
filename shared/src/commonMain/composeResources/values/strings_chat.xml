@@ -199,8 +199,10 @@
     <string name="nearby_switch_device">Switch</string>
     <string name="pair_full_control">Full control</string>
     <string name="nearby_enable_remote_access">Enable remote access on the other device</string>
+    <string name="nearby_full_control_unavailable">Full control unavailable</string>
+    <string name="nearby_full_control_offline">The other device is offline. Make sure it’s connected, then open PlainApp on it and try again.</string>
+    <string name="nearby_full_control_remote_access_disabled">Remote access is turned off on the other device. Turn it on in PlainApp on that device, then try again.</string>
     <string name="nearby_remote_access_unknown">Couldn’t check remote access. Keep PlainApp open on the other device and try again.</string>
-    <string name="nearby_unpair_in_progress">This device is being unpaired.</string>
     <string name="pairing_identity_changed">The device public key has changed. It may have been reinstalled. Compare the full fingerprint before trusting it.</string>
     <string name="pairing_trust">Trust</string>
     <string name="pairing_scan_qrcode">Scan with another phone to pair with this phone.</string>
