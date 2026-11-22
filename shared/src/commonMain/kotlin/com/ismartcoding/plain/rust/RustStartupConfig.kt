@@ -1,5 +1,7 @@
 package com.ismartcoding.plain.rust
 
+import kotlinx.serialization.EncodeDefault
+import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -37,6 +39,8 @@ internal data class RustStartupConfig(
     val androidJavaVmVersion: String? = null,
     val androidGlEsVersion: String? = null,
     val androidBuildTime: Long? = null,
+    @OptIn(ExperimentalSerializationApi::class)
+    @EncodeDefault(EncodeDefault.Mode.NEVER)
     val legacyStorage: LegacyStorage? = null,
 )
 

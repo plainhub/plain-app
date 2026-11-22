@@ -5,6 +5,7 @@ internal actual object RustNativeBindings {
 
     actual external fun fileIcon(extension: String): String
     actual external fun startCore(dataDir: String, token: String, configJson: String): String
+    external fun legacyDataUpgrade(action: String): String
     actual external fun graphql(request: String): String
     actual external fun encryptHttpRequest(token: String, endpoint: String, payload: String): String
     actual external fun encryptResourceReference(token: String, payload: String): String

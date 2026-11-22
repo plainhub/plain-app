@@ -1,6 +1,8 @@
 pub(crate) mod assets;
 #[cfg(target_os = "android")]
 mod ble;
+#[cfg(target_os = "android")]
+mod legacy_upgrade;
 pub(crate) mod host;
 pub(crate) mod graphql;
 pub(crate) mod management;

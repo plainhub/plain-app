@@ -7,6 +7,7 @@ import com.ismartcoding.plain.ui.theme.PlainTheme
 import com.ismartcoding.plain.preferences.*
 
 import com.ismartcoding.plain.i18n.*
+import com.ismartcoding.plain.features.upgrade.LegacyDataUpgradeClient
 import androidx.compose.foundation.clickable
 import androidx.compose.ui.Modifier
 import org.jetbrains.compose.resources.stringResource
@@ -74,10 +75,12 @@ internal fun SettingsCardItems(navController: NavHostController) {
             icon = UiRes.drawable.ui_drawable_database_backup,
             showMore = true,
         )
-        PListItem(
-            modifier = Modifier.clickable { navController.navigate(Routing.LegacyDataUpgrade()) },
-            title = stringResource(Res.string.legacy_data_upgrade),
-            showMore = true,
-        )
+        if (LegacyDataUpgradeClient.supported) {
+            PListItem(
+                modifier = Modifier.clickable { navController.navigate(Routing.LegacyDataUpgrade()) },
+                title = stringResource(Res.string.legacy_data_upgrade),
+                showMore = true,
+            )
+        }
     }
 }

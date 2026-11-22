@@ -5,17 +5,13 @@ import com.ismartcoding.plain.buildChannel
 import com.ismartcoding.plain.platform.media.getDownloadsDirPath
 import com.ismartcoding.plain.platform.network.isWifiAwareSupported
 import com.ismartcoding.plain.rust.RustStartupConfig
-import com.ismartcoding.plain.rust.LegacyStorage
 import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonPrimitive
 import platform.CoreGraphics.CGRectGetHeight
 import platform.CoreGraphics.CGRectGetWidth
 import platform.Foundation.NSBundle
-import platform.Foundation.NSDocumentDirectory
 import platform.Foundation.NSLocale
-import platform.Foundation.NSSearchPathForDirectoriesInDomains
-import platform.Foundation.NSUserDomainMask
 import platform.Foundation.currentLocale
 import platform.Foundation.languageCode
 import platform.UIKit.UIScreen
@@ -24,9 +20,6 @@ import platform.UIKit.UIDevice
 internal actual fun createRustStartupConfig(): RustStartupConfig = RustStartupConfig(
     debug = isDebugBuild(),
     cacheDir = cacheDirPath(),
-    legacyStorage = (NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, true)[0] as String).let { documents ->
-        LegacyStorage(documents, documents, documents)
-    },
     name = UIDevice.currentDevice.name,
     deviceType = getDeviceType().name,
     buildChannel = AppChannelType.fromString(buildChannel).name,

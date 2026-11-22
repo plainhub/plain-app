@@ -33,6 +33,7 @@ pub(crate) fn start(data_dir: &str, token: &str, config: &str) -> Result<String,
         let prefs = Arc::new(
             plain_rs::features::prefs::Prefs::load(&paths.prefs()).map_err(|e| e.to_string())?,
         );
+        #[cfg(target_os = "android")]
         if let Some(storage) = &config.legacy_storage {
             storage.validate().map_err(|error| error.to_string())?;
             if storage.present(&paths.database()).map_err(|error| error.to_string())?

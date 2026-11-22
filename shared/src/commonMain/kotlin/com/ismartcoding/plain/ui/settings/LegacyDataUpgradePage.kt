@@ -24,7 +24,6 @@ import com.ismartcoding.plain.features.upgrade.LegacyDataUpgradeAction
 import com.ismartcoding.plain.features.upgrade.LegacyDataUpgradeClient
 import com.ismartcoding.plain.features.upgrade.LegacyDataUpgradeStatus
 import com.ismartcoding.plain.i18n.*
-import com.ismartcoding.plain.rust.graphql.SubscriptionUpdate
 import com.ismartcoding.plain.ui.base.BottomSpace
 import com.ismartcoding.plain.ui.base.PFilledButton
 import com.ismartcoding.plain.ui.base.PScaffold
@@ -51,12 +50,13 @@ internal fun LegacyDataUpgradePage(navController: NavHostController, startup: Bo
 
     LaunchedEffect(lifecycle) {
         lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
-            LegacyDataUpgradeClient.observe().collect { update ->
-                when (update) {
-                    is SubscriptionUpdate.Data -> status = update.value
-                    is SubscriptionUpdate.Failed -> failure = true
-                    SubscriptionUpdate.Attached -> Unit
-                }
+            try {
+                status = LegacyDataUpgradeClient.execute(LegacyDataUpgradeAction.STATUS)
+                failure = false
+            } catch (canceled: CancellationException) {
+                throw canceled
+            } catch (_: Exception) {
+                failure = true
             }
         }
     }
@@ -67,7 +67,7 @@ internal fun LegacyDataUpgradePage(navController: NavHostController, startup: Bo
             failure = false
             scope.launch {
                 try {
-                    LegacyDataUpgradeClient.update(next)
+                    status = LegacyDataUpgradeClient.execute(next)
                     if (next == LegacyDataUpgradeAction.SKIP) navController.navigateUp()
                 } catch (canceled: CancellationException) {
                     throw canceled

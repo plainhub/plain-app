@@ -36,12 +36,12 @@ import com.ismartcoding.plain.ui.dlna.DlnaReceiverOverlay
 import com.ismartcoding.plain.ui.audio.player.AudioPlayerPage
 import com.ismartcoding.plain.ui.media.ShortcutMediaPreviewer
 import com.ismartcoding.plain.ui.theme.backgroundNormal
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.flow.firstOrNull
+import com.ismartcoding.plain.features.upgrade.LegacyDataUpgradeAction
 import com.ismartcoding.plain.features.upgrade.LegacyDataUpgradeClient
 import com.ismartcoding.plain.features.upgrade.LegacyDataUpgradeStatus
-import com.ismartcoding.plain.rust.graphql.SubscriptionUpdate
 
 @Composable
 fun Main(
@@ -84,8 +84,13 @@ fun Main(
     }
 
     LaunchedEffect(navController) {
-        val upgrade = LegacyDataUpgradeClient.observe().firstOrNull { it !is SubscriptionUpdate.Attached }
-        val status = (upgrade as? SubscriptionUpdate.Data)?.value
+        val status = try {
+            LegacyDataUpgradeClient.execute(LegacyDataUpgradeAction.STATUS)
+        } catch (canceled: CancellationException) {
+            throw canceled
+        } catch (_: Exception) {
+            null
+        }
         if (status == LegacyDataUpgradeStatus.PENDING) {
             navController.navigate(Routing.LegacyDataUpgrade(startup = true)) { launchSingleTop = true }
         } else if (status in setOf(null, LegacyDataUpgradeStatus.UNAVAILABLE) && !Prefs.onboardingCompleted.value) {
