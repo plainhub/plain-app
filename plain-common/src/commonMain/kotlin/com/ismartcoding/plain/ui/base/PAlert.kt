@@ -84,7 +84,6 @@ fun PAlert(
                 .then(if (onClick != null) Modifier.clip(shape).clickable(onClick = onClick) else Modifier)
                 .padding(start = Spacing.lg, end = Spacing.sm),
             header = {
-                VerticalSpace(4.dp)
                 Row(verticalAlignment = Alignment.Top, horizontalArrangement = Arrangement.spacedBy(Spacing.sm)) {
                     Icon(
                         painter = painterResource(iconRes),
