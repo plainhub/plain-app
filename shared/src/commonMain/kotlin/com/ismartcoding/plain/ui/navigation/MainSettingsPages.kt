@@ -20,6 +20,7 @@ import com.ismartcoding.plain.ui.settings.ComponentShowcasePage
 import com.ismartcoding.plain.ui.settings.DarkThemePage
 import com.ismartcoding.plain.ui.settings.DesktopAccessSettingsViewModel
 import com.ismartcoding.plain.ui.settings.LanguagePage
+import com.ismartcoding.plain.ui.settings.LegacyDataUpgradePage
 import com.ismartcoding.plain.ui.settings.MarkdownThemePreviewPage
 import com.ismartcoding.plain.ui.settings.MdnsDebugPage
 import com.ismartcoding.plain.ui.settings.ServiceDebugPage
@@ -48,6 +49,9 @@ internal fun NavGraphBuilder.addMainSettingsPages(
     }
     composable<Routing.Language> { LanguagePage(navController) }
     composable<Routing.BackupRestore> { BackupRestorePage(navController) }
+    composable<Routing.LegacyDataUpgrade> { entry ->
+        LegacyDataUpgradePage(navController, entry.toRoute<Routing.LegacyDataUpgrade>().startup)
+    }
     composable<Routing.DesktopAccessSettings> { DesktopAccessSettingsPage(navController, batterySettings = batterySettings) }
     composable<Routing.ClipboardHistory> { ClipboardHistoryPage(navController) }
     composable<Routing.Connections> { ConnectionsPage(navController) }

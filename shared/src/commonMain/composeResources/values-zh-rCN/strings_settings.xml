@@ -158,4 +158,13 @@
     <string name="clipboard_source_local">本机</string>
     <string name="clipboard_sync_tips_dir">每台电脑同步哪些内容，在电脑端设置里选。</string>
     <string name="app_restore_ready">备份已校验并暂存，关闭并重新打开应用后完成恢复。</string>
+    <string name="legacy_data_upgrade">升级数据</string>
+    <string name="legacy_data_upgrade_prompt">将旧版应用数据导入新版。你也可以稍后从设置中进行导入。</string>
+    <string name="legacy_data_upgrade_skip">跳过</string>
+    <string name="legacy_data_upgrade_retained">数据已导入，旧数据仍保留在此设备上。</string>
+    <string name="legacy_data_upgrade_cleared">已导入的旧数据已从原位置删除。</string>
+    <string name="legacy_data_upgrade_unavailable">此设备上没有可导入的旧数据。</string>
+    <string name="legacy_data_upgrade_error">操作未能完成，请重试。</string>
+    <string name="legacy_data_upgrade_delete">删除旧数据</string>
+    <string name="legacy_data_upgrade_delete_prompt">删除已导入数据的旧副本？导入的数据仍可在新版应用中使用。</string>
 </resources>

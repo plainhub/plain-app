@@ -74,5 +74,10 @@ internal fun SettingsCardItems(navController: NavHostController) {
             icon = UiRes.drawable.ui_drawable_database_backup,
             showMore = true,
         )
+        PListItem(
+            modifier = Modifier.clickable { navController.navigate(Routing.LegacyDataUpgrade()) },
+            title = stringResource(Res.string.legacy_data_upgrade),
+            showMore = true,
+        )
     }
 }

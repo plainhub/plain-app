@@ -37,6 +37,14 @@ internal data class RustStartupConfig(
     val androidJavaVmVersion: String? = null,
     val androidGlEsVersion: String? = null,
     val androidBuildTime: Long? = null,
+    val legacyStorage: LegacyStorage? = null,
+)
+
+@Serializable
+internal data class LegacyStorage(
+    val databaseDirectory: String,
+    val preferencesDirectory: String,
+    val filesDirectory: String,
 )
 
 @Serializable

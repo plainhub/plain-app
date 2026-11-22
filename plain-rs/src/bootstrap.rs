@@ -33,6 +33,14 @@ pub(crate) fn start(data_dir: &str, token: &str, config: &str) -> Result<String,
         let prefs = Arc::new(
             plain_rs::features::prefs::Prefs::load(&paths.prefs()).map_err(|e| e.to_string())?,
         );
+        if let Some(storage) = &config.legacy_storage {
+            storage.validate().map_err(|error| error.to_string())?;
+            if storage.present(&paths.database()).map_err(|error| error.to_string())?
+                && let Err(error) = storage.prepare_identity(&prefs)
+            {
+                log::write_log(Level::Error, &format!("Legacy identity import failed: {error}"));
+            }
+        }
         let runtime = tokio::runtime::Builder::new_multi_thread()
             .worker_threads(2)
             .enable_all()

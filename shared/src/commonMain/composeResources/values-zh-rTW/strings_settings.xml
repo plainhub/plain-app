@@ -157,4 +157,13 @@
     <string name="clipboard_history">剪貼簿歷史</string>
     <string name="clipboard_source_local">本機</string>
     <string name="clipboard_sync_tips_dir">每台電腦同步哪些內容，在電腦端設定裡選。</string>
+    <string name="legacy_data_upgrade">升級資料</string>
+    <string name="legacy_data_upgrade_prompt">將舊版應用程式資料匯入新版。你也可以稍後從設定中進行匯入。</string>
+    <string name="legacy_data_upgrade_skip">略過</string>
+    <string name="legacy_data_upgrade_retained">資料已匯入，舊資料仍保留在此裝置上。</string>
+    <string name="legacy_data_upgrade_cleared">已匯入的舊資料已從原位置刪除。</string>
+    <string name="legacy_data_upgrade_unavailable">此裝置上沒有可匯入的舊資料。</string>
+    <string name="legacy_data_upgrade_error">無法完成操作，請重試。</string>
+    <string name="legacy_data_upgrade_delete">刪除舊資料</string>
+    <string name="legacy_data_upgrade_delete_prompt">刪除已匯入資料的舊副本？匯入的資料仍可在新版應用程式中使用。</string>
 </resources>

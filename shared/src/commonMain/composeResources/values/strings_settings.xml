@@ -159,4 +159,13 @@
     <string name="clipboard_source_local">This device</string>
     <string name="clipboard_sync_tips_dir">Choose what each desktop syncs in the desktop settings.</string>
     <string name="app_restore_ready">The backup is ready to restore. Close and reopen the app to apply it.</string>
+    <string name="legacy_data_upgrade">Data upgrade</string>
+    <string name="legacy_data_upgrade_prompt">Import your old app data. You can also do this later from Settings.</string>
+    <string name="legacy_data_upgrade_skip">Skip</string>
+    <string name="legacy_data_upgrade_retained">Your data has been imported. A copy of the old data is still on this device.</string>
+    <string name="legacy_data_upgrade_cleared">The imported old data was removed from its previous location.</string>
+    <string name="legacy_data_upgrade_unavailable">There is no old data to import on this device.</string>
+    <string name="legacy_data_upgrade_error">The operation could not finish. Try again.</string>
+    <string name="legacy_data_upgrade_delete">Delete old data</string>
+    <string name="legacy_data_upgrade_delete_prompt">Delete the old copies of the data you imported? Your imported data stays available in the app.</string>
 </resources>

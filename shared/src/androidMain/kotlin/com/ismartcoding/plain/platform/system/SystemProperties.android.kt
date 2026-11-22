@@ -8,6 +8,7 @@ import com.ismartcoding.plain.buildChannel
 import com.ismartcoding.plain.platform.media.getDownloadsDirPath
 import com.ismartcoding.plain.platform.network.isWifiAwareSupported
 import com.ismartcoding.plain.rust.RustStartupConfig
+import com.ismartcoding.plain.rust.LegacyStorage
 import com.ismartcoding.plain.rust.StartupUpdateAssetRule
 import com.ismartcoding.plain.rust.StartupUpdateSource
 import kotlinx.serialization.json.JsonElement
@@ -19,6 +20,11 @@ internal actual fun createRustStartupConfig(): RustStartupConfig {
     return RustStartupConfig(
         debug = isDebugBuild(),
         cacheDir = cacheDirPath(),
+        legacyStorage = LegacyStorage(
+            databaseDirectory = appContext.getDatabasePath("plain.db").parentFile!!.absolutePath,
+            preferencesDirectory = appContext.filesDir.absolutePath,
+            filesDirectory = (appContext.getExternalFilesDir(null) ?: appContext.filesDir).absolutePath,
+        ),
         name = PhoneHelper.getDeviceName(appContext),
         deviceType = getDeviceType().name,
         buildChannel = AppChannelType.fromString(buildChannel).name,
