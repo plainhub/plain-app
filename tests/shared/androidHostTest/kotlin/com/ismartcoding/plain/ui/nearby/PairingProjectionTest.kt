@@ -6,7 +6,11 @@ import com.ismartcoding.plain.models.PairingErrorCode
 import com.ismartcoding.plain.models.PairingProgressNotice
 import com.ismartcoding.plain.models.PairingRequestNotice
 import com.ismartcoding.plain.platform.system.DeviceType
+import com.ismartcoding.plain.rust.graphql.GraphqlError
+import com.ismartcoding.plain.rust.graphql.GraphqlException
 import com.ismartcoding.plain.ui.app.MainViewModel
+import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.JsonPrimitive
 import kotlin.test.AfterTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -25,12 +29,31 @@ class PairingProjectionTest {
             PairingErrorCode.REJECTED to Res.string.pairing_rejected,
             PairingErrorCode.TOO_MANY_LOGIN_ATTEMPTS to Res.string.pairing_too_many_attempts,
             PairingErrorCode.INVALID_PASSWORD to Res.string.invalid_password,
+            PairingErrorCode.PEER_IDENTITY_CHANGED to Res.string.pairing_manage_identity_changed,
             PairingErrorCode.INTERNAL_ERROR to Res.string.pairing_failed,
         )
         for ((reason, message) in messages) {
             PairingProjection.starting("peer")
             PairingProjection.failed(PairingProgressNotice("peer", "Fixture", reason))
             assertEquals(message, NearbyViewModel.pairingViews.getValue("peer").error.messageResource())
+        }
+    }
+
+    @Test
+    fun failedPairingCommandUsesTheServerErrorCodeRatherThanItsRawMessage() {
+        val notice = PairingProgressNotice("peer", "Fixture")
+        for ((wire, expected) in listOf(
+            "REJECTED" to Res.string.pairing_rejected,
+            "UNKNOWN_CODE" to Res.string.pairing_failed,
+        )) {
+            PairingProjection.starting(notice.deviceId)
+            val failure = GraphqlException(listOf(GraphqlError("unlocalized server text",
+                extensions = JsonObject(mapOf("code" to JsonPrimitive(wire))))))
+            PairingProjection.failed(notice, failure)
+            val view = NearbyViewModel.pairingViews.getValue(notice.deviceId)
+            assertEquals(PairingStep.FAILED, view.step)
+            assertEquals(expected, view.error.messageResource())
+            assertEquals(null, NearbyViewModel.itemStatus[notice.deviceId])
         }
     }
 

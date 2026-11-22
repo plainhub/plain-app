@@ -93,9 +93,14 @@ import com.ismartcoding.plain.i18n.cancel
 import com.ismartcoding.plain.i18n.dark_theme
 import com.ismartcoding.plain.i18n.donation_title
 import com.ismartcoding.plain.i18n.images
+import com.ismartcoding.plain.i18n.pair
 import com.ismartcoding.plain.i18n.pair_another_device
+import com.ismartcoding.plain.i18n.pairing_expired
+import com.ismartcoding.plain.i18n.pairing_failed
+import com.ismartcoding.plain.i18n.pairing_rejected
 import com.ismartcoding.plain.i18n.stay_online_foreground_desc
 import com.ismartcoding.plain.models.NearbyDevice
+import com.ismartcoding.plain.models.PairingErrorCode
 import com.ismartcoding.plain.models.PairingProgressNotice
 import com.ismartcoding.plain.platform.system.AppFeatureType
 import com.ismartcoding.plain.platform.system.DeviceType
@@ -221,6 +226,41 @@ class SharedComponentSpacingTest {
                     NearbyViewModel.pairingViews.remove(device.id)
                     NearbyViewModel.itemStatus.remove(device.id)
                 }
+            }
+        }
+    }
+
+    @Test
+    fun nearbyPairingErrorsAppearBelowTheAddressAndKeepThePairButton() {
+        val device = NearbyDevice("pair-error", "Test phone", "", port = 8080, remoteAccess = true,
+            deviceType = DeviceType.PHONE, version = "", platform = "", lastSeen = Instant.fromEpochMilliseconds(0),
+            bestIp = "192.0.2.42", status = PeerStatus.PAIRED)
+        val pairLabel = LocaleHelper.getString(Res.string.pair)
+        try {
+            render({ NearbyDeviceItem(device, enabled = true) {} }) {
+                for ((code, resource) in listOf(
+                    PairingErrorCode.INTERNAL_ERROR to Res.string.pairing_failed,
+                    PairingErrorCode.REJECTED to Res.string.pairing_rejected,
+                    PairingErrorCode.TIMEOUT to Res.string.pairing_expired,
+                )) {
+                    instrumentation.runOnMainSync {
+                        PairingProjection.starting(device.id)
+                        PairingProjection.failed(PairingProgressNotice(device.id, device.name, code))
+                    }
+                    val label = LocaleHelper.getString(resource)
+                    await { nodes().any { it.config.getOrNull(SemanticsProperties.Text)?.any { text -> text.text == label } == true } }
+                    val title = text(device.name).boundsInRoot
+                    val address = text(device.bestIp).boundsInRoot
+                    val error = text(label).boundsInRoot
+                    assertTrue("Pairing error must be below the address", error.top >= address.bottom)
+                    assertEquals(title.left, error.left, 0.5f)
+                    assertTrue(text(pairLabel).boundsInRoot.left > title.left)
+                }
+            }
+        } finally {
+            instrumentation.runOnMainSync {
+                NearbyViewModel.pairingViews.remove(device.id)
+                NearbyViewModel.itemStatus.remove(device.id)
             }
         }
     }

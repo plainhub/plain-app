@@ -32,5 +32,6 @@ internal fun PairingErrorCode?.messageResource(): StringResource = when (this) {
     PairingErrorCode.REJECTED -> Res.string.pairing_rejected
     PairingErrorCode.TOO_MANY_LOGIN_ATTEMPTS -> Res.string.pairing_too_many_attempts
     PairingErrorCode.INVALID_PASSWORD -> Res.string.invalid_password
+    PairingErrorCode.PEER_IDENTITY_CHANGED -> Res.string.pairing_manage_identity_changed
     else -> Res.string.pairing_failed
 }

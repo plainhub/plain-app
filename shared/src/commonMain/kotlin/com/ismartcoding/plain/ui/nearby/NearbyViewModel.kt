@@ -68,7 +68,7 @@ object NearbyViewModel {
         val attempt = nearbyAttempt
         val previous = pairingCommand
         fun stillPending() = nearbyAttempt === attempt && pairingViews[device.id]?.active == true
-        pairingCommand = scope.launchSafe(onError = { if (stillPending()) PairingProjection.failed(notice) }) {
+        pairingCommand = scope.launchSafe(onError = { if (stillPending()) PairingProjection.failed(notice, it) }) {
             previous?.join()
             if (!stillPending()) return@launchSafe
             val started = send()
