@@ -24,7 +24,12 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 
-abstract class BaseMediaViewModel<T : IData> internal constructor(val source: ContentSource = ContentSource.Local, val dataType: DataType) : ISearchableViewModel<T>, ViewModel() {
+abstract class BaseMediaViewModel<T : IData> internal constructor(
+    val source: ContentSource = ContentSource.Local,
+    val dataType: DataType,
+    protected val pageSize: Int = 1000,
+    private val initialPageSize: Int = pageSize,
+) : ISearchableViewModel<T>, ViewModel() {
     internal var onMediaChanged: (suspend () -> Unit)? = null
 
     internal val _itemsFlow = MutableStateFlow<List<T>>(emptyList())
@@ -45,8 +50,6 @@ abstract class BaseMediaViewModel<T : IData> internal constructor(val source: Co
     var total = mutableIntStateOf(0)
     var totalTrash = mutableIntStateOf(0)
     val noMore = mutableStateOf(false)
-    val offset = mutableIntStateOf(0)
-    val limit = mutableIntStateOf(1000)
     val sortBy = mutableStateOf(mediaSortBy(dataType, "UPDATED_AT_DESC"))
     var selectedItem = mutableStateOf<T?>(null)
     val showRenameDialog = mutableStateOf(false)
@@ -100,21 +103,20 @@ abstract class BaseMediaViewModel<T : IData> internal constructor(val source: Co
     }
 
     suspend fun moreAsync(tagsVM: TagsViewModel) = withIO {
-        offset.intValue += limit.intValue
-        val items = searchMediaAsync(getQuery())
+        val items = searchMediaAsync(getQuery(), _itemsFlow.value.size)
+        noMore.value = items.size < pageSize
         _itemsFlow.update { it + items }
         tagsVM.loadMoreAsync(items.map { it.id }.toSet())
-        noMore.value = items.size < limit.intValue
         showLoading.value = false
     }
 
     open suspend fun loadAsync(tagsVM: TagsViewModel) = withIO {
-        offset.intValue = 0
-        _itemsFlow.value = searchMediaAsync(getQuery())
-        tagsVM.loadAsync(_itemsFlow.value.map { it.id }.toSet())
+        val items = searchMediaAsync(getQuery(), limit = initialPageSize)
+        noMore.value = items.size < initialPageSize
+        _itemsFlow.value = items
+        tagsVM.loadAsync(items.map { it.id }.toSet())
         total.intValue = countMediaAsync(getTotalQuery())
         totalTrash.intValue = countMediaAsync(getTrashQuery())
-        noMore.value = _itemsFlow.value.size < limit.intValue
         showLoading.value = false
     }
 
@@ -171,7 +173,9 @@ abstract class BaseMediaViewModel<T : IData> internal constructor(val source: Co
     @Suppress("UNCHECKED_CAST")
     suspend fun searchMediaAsync(
         query: String,
+        offset: Int = 0,
+        limit: Int = pageSize,
     ): List<T> = withIO {
-        source.catalog.rows(dataType, query, limit.intValue, offset.intValue, sortBy.value) as List<T>
+        source.catalog.rows(dataType, query, limit, offset, sortBy.value) as List<T>
     }
 }

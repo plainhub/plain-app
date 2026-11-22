@@ -5,6 +5,7 @@ import com.ismartcoding.plain.preferences.PrefKeys
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -14,6 +15,7 @@ import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
+import androidx.compose.foundation.lazy.layout.LazyLayoutCacheWindow
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
@@ -72,7 +74,10 @@ import kotlinx.coroutines.launch
 import com.ismartcoding.plain.ui.resources.Res as UiRes
 import com.ismartcoding.plain.ui.resources.video as ui_drawable_video
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalFoundationApi::class)
+internal val remoteVideosCacheWindow = LazyLayoutCacheWindow(aheadFraction = 2f, behindFraction = 0.5f)
+
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 fun VideosPage(
     navController: NavHostController,
@@ -92,7 +97,11 @@ fun VideosPage(
     }
     val tagsState by tagsVM.itemsFlow.collectAsState()
     val itemsState by videosVM.itemsFlow.collectAsState()
-    val scrollState = rememberLazyGridState()
+    val scrollState = if (videosVM.source is com.ismartcoding.plain.rust.graphql.ContentSource.Remote) {
+        rememberLazyGridState(cacheWindow = remoteVideosCacheWindow)
+    } else {
+        rememberLazyGridState()
+    }
     videosVM.scrollStateMap[0] = scrollState
     val dragSelectState = rememberDragSelectState({ scrollState })
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(canScroll = {

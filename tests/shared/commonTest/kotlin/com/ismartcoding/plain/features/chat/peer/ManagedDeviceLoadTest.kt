@@ -1,20 +1,25 @@
 package com.ismartcoding.plain.features.chat.peer
 
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.ui.unit.Density
 import com.ismartcoding.plain.features.files.FileAction
 import com.ismartcoding.plain.features.nearby.PeerStatus
 import com.ismartcoding.plain.lib.JsonHelper
 import com.ismartcoding.plain.models.Peer
+import com.ismartcoding.plain.models.Video
 import com.ismartcoding.plain.features.web.AccessFeature
 import com.ismartcoding.plain.platform.system.DeviceType
 import com.ismartcoding.plain.platform.system.imageCacheKey
 import com.ismartcoding.plain.rust.graphql.ContentSource
 import com.ismartcoding.plain.rust.graphql.GraphqlHttpResponse
+import com.ismartcoding.plain.rust.graphql.GraphqlHttpException
 import com.ismartcoding.plain.rust.graphql.GraphqlHttpTransport
 import com.ismartcoding.plain.rust.graphql.GraphqlOperation
 import com.ismartcoding.plain.rust.graphql.PeerHttpClient
 import com.ismartcoding.plain.ui.images.ImagesViewModel
 import com.ismartcoding.plain.ui.audio.AudioViewModel
 import com.ismartcoding.plain.ui.videos.VideosViewModel
+import com.ismartcoding.plain.ui.videos.remoteVideosCacheWindow
 import com.ismartcoding.plain.ui.apps.AppsViewModel
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.collect
@@ -25,12 +30,18 @@ import com.ismartcoding.plain.ui.components.ToastManager
 import com.ismartcoding.plain.ui.tags.TagsViewModel
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.yield
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.test.runTest
+import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.resetMain
+import kotlinx.coroutines.test.setMain
+import kotlinx.serialization.json.int
+import kotlinx.serialization.json.jsonPrimitive
 import kotlin.io.encoding.Base64
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -101,6 +112,78 @@ class ManagedDeviceLoadTest {
 
         currentPeer = peer.copy(token = "changed-pairing-token")
         assertEquals("PEER_IDENTITY_CHANGED", assertFailsWith<IllegalStateException> { client.resource(path, ResourceSize.SM) }.message)
+    }
+
+    @Test
+    @OptIn(ExperimentalFoundationApi::class)
+    fun remote_video_grid_warms_two_viewports_and_keeps_half_a_viewport_behind() = with(remoteVideosCacheWindow) {
+        with(Density(2f)) {
+            assertEquals(2400, calculateAheadWindow(1200))
+            assertEquals(600, calculateBehindWindow(1200))
+        }
+    }
+
+    @Test
+    fun remote_videos_load_small_pages_and_retry_the_same_offset() = runTest {
+        val instant = Instant.fromEpochMilliseconds(0)
+        val peer = Peer(
+            id = "fixture-peer", name = "Device", ip = "device.test", status = PeerStatus.PAIRED, port = 8443,
+            deviceType = DeviceType.COMPUTER, createdAt = instant, updatedAt = instant,
+            publicKey = "fixture-key", token = "fixture-token",
+        )
+        val clips = List(401) { index ->
+            Video("clip-$index", "Clip $index", "/videos/$index.mp4", 1000, 1024, "videos", instant, instant, instant)
+        }
+        val pages = mutableListOf<Pair<Int, Int>>()
+        var failNextPage = false
+        val transport = object : GraphqlHttpTransport {
+            override suspend fun post(url: String, clientId: String, body: ByteArray, contentType: String, tlsCertificateSha256: String?): GraphqlHttpResponse {
+                val operation = JsonHelper.jsonDecode<GraphqlOperation>(body.decodeToString())
+                val fields = when {
+                    "videos(" in operation.query -> {
+                        val offset = operation.variables.getValue("offset").jsonPrimitive.int
+                        val limit = operation.variables.getValue("limit").jsonPrimitive.int
+                        pages.add(offset to limit)
+                        if (failNextPage) return GraphqlHttpResponse(500, byteArrayOf())
+                        "\"videos\":${JsonHelper.jsonEncode(clips.drop(offset).take(limit))}"
+                    }
+                    "videoCount(" in operation.query -> "\"videoCount\":${clips.size}"
+                    "tagRelations(" in operation.query -> "\"tagRelations\":[]"
+                    "tags(" in operation.query -> "\"tags\":[]"
+                    "app {" in operation.query -> """"app":{"deviceName":"Device","capabilities":[],"access":["VIDEOS"],"appDir":"app://","downloadsDir":"/downloads","urlToken":"resource-token","tlsCertificateSha256":"fixture-certificate"}"""
+                    else -> error("Unexpected operation: ${operation.query}")
+                }
+                return GraphqlHttpResponse(200, """{"data":{$fields}}""".encodeToByteArray())
+            }
+        }
+        val http = PeerHttpClient(
+            peer, transport = transport, peers = { listOf(peer) }, clientId = { "fixture-client" },
+            encrypt = { _, _, payload -> Base64.encode(payload.encodeToByteArray()) },
+            decrypt = { _, _, response -> response },
+        )
+        val source = ContentSource.Remote(ManagedDeviceClient.load(peer, http))
+        val vm = VideosViewModel(source)
+        val tags = TagsViewModel(source.tags)
+        Dispatchers.setMain(StandardTestDispatcher(testScheduler))
+        try {
+            vm.loadAsync(tags)
+            assertEquals(listOf(0 to 128), pages)
+            assertEquals(clips.take(128), vm.itemsFlow.value)
+            assertFalse(vm.noMore.value)
+            failNextPage = true
+            assertFailsWith<GraphqlHttpException> { vm.moreAsync(tags) }
+            assertEquals(clips.take(128), vm.itemsFlow.value)
+            failNextPage = false
+            vm.moreAsync(tags)
+            assertEquals(clips.take(384), vm.itemsFlow.value)
+            assertFalse(vm.noMore.value)
+            vm.moreAsync(tags)
+            assertEquals(listOf(0 to 128, 128 to 256, 128 to 256, 384 to 256), pages)
+            assertEquals(clips, vm.itemsFlow.value)
+            assertTrue(vm.noMore.value)
+        } finally {
+            Dispatchers.resetMain()
+        }
     }
 
     @Test

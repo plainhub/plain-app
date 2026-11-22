@@ -45,12 +45,11 @@ class DocsViewModel internal constructor(source: ContentSource = ContentSource.L
     }
 
     override suspend fun loadAsync(tagsVM: TagsViewModel) = withIO {
-        offset.intValue = 0
         _itemsFlow.value = searchMediaAsync(getQuery())
         tagsVM.loadAsync(_itemsFlow.value.map { it.id }.toSet())
         total.intValue = countMediaAsync(getTotalQuery())
         totalTrash.intValue = countMediaAsync(getTrashQuery())
-        noMore.value = _itemsFlow.value.size < limit.intValue
+        noMore.value = _itemsFlow.value.size < pageSize
         if (!trash.value) {
             val extGroups = source.catalog.docExtGroups(super.getQuery())
             val trashTabs = if (Capability.MEDIA_TRASH in source.capabilities) listOf(VTabData(LocaleHelper.getStringAsync(Res.string.trash), "trash", totalTrash.intValue)) else emptyList()
