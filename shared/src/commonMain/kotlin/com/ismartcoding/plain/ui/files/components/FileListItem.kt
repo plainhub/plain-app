@@ -21,7 +21,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -135,10 +135,10 @@ internal fun FileListRow(
     onLongClick: () -> Unit,
     isCurrentlyPlaying: Boolean = false,
 ) {
+    val rowShape = MaterialTheme.shapes.extraSmall
+    val shape = if (isCurrentlyPlaying) rowShape.copy(bottomStart = CornerSize(0.dp), bottomEnd = CornerSize(0.dp)) else rowShape
     Box(modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 4.dp)
-        .clip(RoundedCornerShape(topStart = 8.dp, topEnd = 8.dp,
-            bottomStart = if (isCurrentlyPlaying) 0.dp else 8.dp,
-            bottomEnd = if (isCurrentlyPlaying) 0.dp else 8.dp))
+        .clip(shape)
         .combinedClickable(onClick = onClick, onLongClick = onLongClick)
         .background(if (isSelected) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.cardBackgroundNormal),
         contentAlignment = Alignment.Center) {
