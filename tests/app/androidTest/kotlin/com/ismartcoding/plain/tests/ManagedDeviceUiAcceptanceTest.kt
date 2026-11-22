@@ -5,6 +5,9 @@ import com.ismartcoding.plain.ui.resources.srl_header_finish
 import com.ismartcoding.plain.ui.resources.srl_header_failed
 import com.ismartcoding.plain.ui.resources.srl_header_refreshing
 import androidx.activity.compose.setContent
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.snapshotFlow
+import androidx.navigation.compose.rememberNavController
 import com.ismartcoding.plain.features.audio.toPlaylistAudio
 import androidx.compose.foundation.background
 import androidx.compose.runtime.collectAsState
@@ -55,6 +58,7 @@ import com.ismartcoding.plain.features.chat.ChatClient
 import com.ismartcoding.plain.features.chat.models.getBaseUrl
 import com.ismartcoding.plain.features.chat.ChatQueries
 import com.ismartcoding.plain.features.chat.ChatStatus
+import com.ismartcoding.plain.features.chat.peer.ManagedDeviceClient
 import com.ismartcoding.plain.features.chat.data.ChatTarget
 import com.ismartcoding.plain.features.chat.data.ChatTargetType
 import com.ismartcoding.plain.features.chat.models.ChatMessage
@@ -68,7 +72,25 @@ import androidx.compose.ui.state.ToggleableState
 import androidx.compose.ui.text.AnnotatedString
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
+import kotlinx.serialization.json.JsonNull
+import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.Serializable
+import com.ismartcoding.plain.rust.graphql.ContentSource
+import com.ismartcoding.plain.rust.graphql.GraphqlResponse
+import com.ismartcoding.plain.rust.graphql.PeerHttpClient
+import com.ismartcoding.plain.ui.audio.AudioQueueViewModel
+import com.ismartcoding.plain.ui.components.DialogHelper
+import com.ismartcoding.plain.ui.files.FilesPage
+import com.ismartcoding.plain.ui.files.stored.AppFilesPage
+import com.ismartcoding.plain.ui.navigation.LocalContentSource
+import com.ismartcoding.plain.ui.navigation.MainDialogs
+import com.ismartcoding.plain.ui.theme.AppTheme
+import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.emptyFlow
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.withTimeout
 import org.junit.Assert.*
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -2471,6 +2493,138 @@ class ManagedDeviceUiAcceptanceTest {
             assertTrue(com.ismartcoding.plain.features.media.MediaCatalogClient.rows(type, query, 10, 0, com.ismartcoding.plain.models.mediaSortBy(type, "UPDATED_AT_DESC")).isEmpty())
             report("remote_media_page", feature + "_target_catalog_existing_page_and_preview_verified")
         }
+    }
+
+    @Test
+    fun previewsRemoteAppFilesImageWithoutGlobalLoading() = verifyRemoteFileImagePreview(appFiles = true)
+
+    @Test
+    fun previewsRemoteFilesImageWithoutGlobalLoading() = verifyRemoteFileImagePreview(appFiles = false)
+
+    private fun verifyRemoteFileImagePreview(appFiles: Boolean) = runBlocking {
+        val image = android.graphics.Bitmap.createBitmap(240, 120, android.graphics.Bitmap.Config.ARGB_8888)
+        val bytes = try {
+            image.eraseColor(android.graphics.Color.MAGENTA)
+            java.io.ByteArrayOutputStream().use {
+                check(image.compress(android.graphics.Bitmap.CompressFormat.PNG, 100, it))
+                it.toByteArray()
+            }
+        } finally {
+            image.recycle()
+        }
+        java.net.ServerSocket(0, 1, java.net.InetAddress.getByName("127.0.0.1")).use { server ->
+            val serving = launch(Dispatchers.IO) {
+                try {
+                    server.accept().use { connection ->
+                        connection.soTimeout = 5_000
+                        val input = connection.getInputStream().bufferedReader()
+                        while (input.readLine()?.isNotEmpty() == true) { }
+                        val output = connection.getOutputStream()
+                        output.write("HTTP/1.1 200 OK\r\nContent-Length: ${bytes.size}\r\nContent-Type: image/png\r\nConnection: close\r\n\r\n".toByteArray())
+                        output.write(bytes)
+                        output.flush()
+                    }
+                } catch (error: java.net.SocketException) {
+                    if (!server.isClosed) throw error
+                }
+            }
+            val name = "remote-preview-${UUID.randomUUID()}.png"
+            val path = "http://127.0.0.1:${server.localPort}/$name"
+            val metadataRequested = CompletableDeferred<Unit>()
+            val releaseMetadata = CompletableDeferred<Unit>()
+            try {
+                val source = remoteFileImageSource(name, path, bytes.size.toLong()) {
+                    metadataRequested.complete(Unit)
+                    releaseMetadata.await()
+                }
+                ActivityScenario.launch(MainActivity::class.java).use { scenario ->
+                    scenario.onActivity { activity ->
+                        activity.setContent {
+                            AppTheme(useDarkTheme = false) {
+                                CompositionLocalProvider(LocalContentSource provides source) {
+                                    val navController = rememberNavController()
+                                    val audioQueue = androidx.lifecycle.viewmodel.compose.viewModel {
+                                        AudioQueueViewModel(source, sourceChanges = emptyFlow())
+                                    }
+                                    if (appFiles) AppFilesPage(navController, audioQueue)
+                                    else FilesPage(navController, audioQueue)
+                                    MainDialogs()
+                                }
+                            }
+                        }
+                    }
+                    awaitNode("remote image row") { it.text == name }
+                    val globalLoadingShown = async(Dispatchers.Main) { snapshotFlow { DialogHelper.loading.value }.first { it } }
+                    try {
+                        click(name, "open remote image")
+                        withTimeout(10_000) { metadataRequested.await() }
+                        var loadingDuringMetadata = false
+                        scenario.onActivity { loadingDuringMetadata = DialogHelper.loading.value }
+                        releaseMetadata.complete(Unit)
+                        awaitNode("image preview close button") { it.contentDescription == text(Res.string.close) }
+                        assertNoteImageRendered(scenario, colorTolerance = 4)
+                        click(text(Res.string.close), "close image preview")
+                        awaitNode("remote image row after closing") { it.text == name }
+                        assertFalse("Global loading while waiting for remote image metadata", loadingDuringMetadata)
+                        assertFalse("Global loading while opening the remote preview", globalLoadingShown.isCompleted)
+                    } finally {
+                        globalLoadingShown.cancel()
+                    }
+                }
+            } finally {
+                releaseMetadata.complete(Unit)
+                server.close()
+                serving.join()
+            }
+        }
+    }
+
+    private suspend fun remoteFileImageSource(
+        name: String,
+        path: String,
+        size: Long,
+        readImageMetadata: suspend () -> Unit,
+    ): ContentSource.Remote {
+        val now = kotlin.time.Instant.fromEpochMilliseconds(0)
+        val peer = Peer(
+            id = "remote-image-fixture", name = "Remote image fixture", ip = "device.test", port = 8443,
+            status = com.ismartcoding.plain.features.nearby.PeerStatus.PAIRED,
+            deviceType = com.ismartcoding.plain.platform.system.DeviceType.PHONE,
+            createdAt = now, updatedAt = now, publicKey = "fixture-key", token = "fixture-token",
+        )
+        val appFile = com.ismartcoding.plain.models.AppFile("fixture-image", size, "image/png", path, name, now, now)
+        val file = com.ismartcoding.plain.models.File(
+            name = name, path = path, createdAt = now, updatedAt = now, size = size, isDir = false, childCount = 0,
+        )
+        val info = com.ismartcoding.plain.models.ManagedDeviceInfo(
+            peer.name, emptyList(), listOf(com.ismartcoding.plain.features.web.AccessFeature.FILES),
+            "/fixture", "/downloads", "fixture-resource-token", null,
+        )
+        val http = PeerHttpClient(
+            peer, peers = { listOf(peer) }, clientId = { "fixture-client" },
+            executeGraphql = { _, operation ->
+                val data = when {
+                    "app {" in operation.query -> JsonHelper.jsonEncodeToElement(ManagedFixtureApp(info)).jsonObject
+                    "appFileCount(" in operation.query -> JsonObject(mapOf("appFileCount" to JsonPrimitive(1)))
+                    "appFiles(" in operation.query -> JsonHelper.jsonEncodeToElement(mapOf("appFiles" to listOf(appFile))).jsonObject
+                    "files(" in operation.query -> JsonHelper.jsonEncodeToElement(mapOf("files" to listOf(file))).jsonObject
+                    "fileInfo(" in operation.query -> {
+                        assertEquals(path, operation.variables.getValue("path").jsonPrimitive.content)
+                        readImageMetadata()
+                        JsonHelper.jsonDecode<JsonObject>("""{"fileInfo":{"data":{"__typename":"ImageFileInfo","width":240,"height":120,"location":null}}}""")
+                    }
+                    "keyValue(" in operation.query -> JsonObject(mapOf("keyValue" to JsonNull))
+                    "mounts {" in operation.query -> JsonHelper.jsonDecode<JsonObject>("""{"mounts":[]}""")
+                    "favoriteFolders {" in operation.query -> JsonHelper.jsonDecode<JsonObject>("""{"favoriteFolders":[]}""")
+                    "audioPlayback {" in operation.query -> JsonHelper.jsonDecode<JsonObject>(
+                        """{"audioPlayback":{"mediaId":null,"path":null},"prefs":{},"count":0,"items":[],"queuedIds":[]}""",
+                    )
+                    else -> error("Unexpected image fixture query: ${operation.query}")
+                }
+                GraphqlResponse(data)
+            },
+        )
+        return ContentSource.Remote(ManagedDeviceClient.load(peer, http, updates = { emptyFlow() }))
     }
 
     @Test

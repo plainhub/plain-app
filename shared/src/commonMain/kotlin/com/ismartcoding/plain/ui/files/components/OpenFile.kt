@@ -48,12 +48,19 @@ fun openFile(
 ) {
     if (source is com.ismartcoding.plain.rust.graphql.ContentSource.Remote) {
         coMain {
-            DialogHelper.showLoading()
+            val isImage = file.name.isImageFast()
+            val isZipEntry = ZipBrowserHelper.isZipPath(file.path)
+            val showGlobalLoading = isZipEntry || !isImage
+            if (showGlobalLoading) DialogHelper.showLoading()
             try {
-                val path = if (ZipBrowserHelper.isZipPath(file.path)) source.files.cacheZipEntry(file.path) ?: throw BusinessException(ArchiveErrorCode.ARCHIVE_ENTRY_UNAVAILABLE.wire) else file.path
+                val path = if (isZipEntry) {
+                    source.files.cacheZipEntry(file.path) ?: throw BusinessException(ArchiveErrorCode.ARCHIVE_ENTRY_UNAVAILABLE.wire)
+                } else {
+                    file.path
+                }
                 when {
-                    file.name.isImageFast() || file.name.isVideoFast() -> {
-                        val previewFiles = if (ZipBrowserHelper.isZipPath(file.path)) listOf(file.copy(path = path)) else files.filter { it.path.isImageFast() || it.path.isVideoFast() }
+                    isImage || file.name.isVideoFast() -> {
+                        val previewFiles = if (isZipEntry) listOf(file.copy(path = path)) else files.filter { it.path.isImageFast() || it.path.isVideoFast() }
                         val selected = file.copy(path = path).toPreviewItem(source)
                         MediaPreviewData.setDataAsync(itemState, previewFiles.map { it.toPreviewItem(source) }, selected)
                         previewerState.openTransform(index = MediaPreviewData.items.indexOfFirst { it.id == path }, itemState = itemState)
@@ -69,7 +76,7 @@ fun openFile(
             } catch (error: Exception) {
                 DialogHelper.showMessage(error)
             } finally {
-                DialogHelper.hideLoading()
+                if (showGlobalLoading) DialogHelper.hideLoading()
             }
         }
         return
