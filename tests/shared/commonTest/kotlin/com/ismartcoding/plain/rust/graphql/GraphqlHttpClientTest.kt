@@ -1,13 +1,10 @@
 package com.ismartcoding.plain.rust.graphql
 
-import com.ismartcoding.plain.models.HttpErrorCode
-import com.ismartcoding.plain.models.PeerConnectionErrorCode
 
 import com.ismartcoding.plain.features.nearby.PeerStatus
 import com.ismartcoding.plain.lib.JsonHelper
 import com.ismartcoding.plain.models.Peer
 import com.ismartcoding.plain.platform.system.DeviceType
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.test.runTest
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonPrimitive
@@ -23,147 +20,51 @@ class GraphqlHttpClientTest {
 
     )
     private val request = GraphqlRequest<String>("query { deviceName }", field = "deviceName")
-    private fun encodedResult() = Base64.encode(JsonHelper.jsonEncode(GraphqlResponse(
-        data = JsonObject(mapOf("deviceName" to JsonPrimitive("Remote"))),
-    )).encodeToByteArray())
-
     @Test
-    fun binds_token_identity_and_request_response_without_native_data_fallback() = runTest {
-        val peer = peer()
-        var posts = 0
-        val ciphertext = Base64.encode("request ciphertext".encodeToByteArray())
-        val client = PeerHttpClient(peer,
-            peers = { listOf(peer.copy()) }, clientId = { "706c6169-a5ec-8cb0-b41d-c3030368d632" },
-            encrypt = { token, endpoint, payload ->
-                assertEquals(peer.token, token)
-                assertEquals("/graphql", endpoint)
-                assertEquals(request.operation, JsonHelper.jsonDecode<GraphqlOperation>(payload))
-                ciphertext
+    fun remote_graphql_sends_the_selected_peer_and_not_the_old_address() = runTest {
+        val saved = peer()
+        var selected = saved
+        val result = GraphqlResponse(data = JsonObject(mapOf("deviceName" to JsonPrimitive("Remote"))))
+        val client = PeerHttpClient(
+            saved, peers = { listOf(selected) },
+            executeGraphql = { target, operation ->
+                assertEquals(saved.id, target.id)
+                assertEquals(saved.publicKey, target.publicKey)
+                assertEquals(request.operation, operation)
+                selected = selected.copy(ip = "new-address.test")
+                result
             },
-            decrypt = { token, body, response ->
-                assertEquals(peer.token, token)
-                assertEquals(ciphertext, body)
-                assertEquals(Base64.encode("response ciphertext".encodeToByteArray()), response)
-                encodedResult()
-            },
-            transport = object : GraphqlHttpTransport {
-                override suspend fun post(url: String, clientId: String, body: ByteArray, contentType: String, tlsCertificateSha256: String?): GraphqlHttpResponse {
-                    posts++
-                    assertEquals("https://device.test:8443/graphql", url)
-                    assertEquals("706c6169-a5ec-8cb0-b41d-c3030368d632", clientId)
-                    assertContentEquals(Base64.decode(ciphertext), body)
-                    return GraphqlHttpResponse(200, "response ciphertext".encodeToByteArray())
-                }
-            },
-        ).graphql
-        assertEquals("Remote", client.execute(request))
-        assertEquals(1, posts)
+        )
+        assertEquals("Remote", client.graphql.execute(request))
     }
 
     @Test
-    fun rejects_invalid_peer_hosts_before_transport() = runTest {
-        for (ip in listOf("http://device.test", "", "/path")) {
-            val original = peer()
-            val peer = original.copy(ip = ip)
-            val client = PeerHttpClient(peer, peers = { listOf(peer) },
-                encrypt = { _, _, _ -> Base64.encode(byteArrayOf(1)) },
-                transport = object : GraphqlHttpTransport {
-                    override suspend fun post(url: String, clientId: String, body: ByteArray, contentType: String, tlsCertificateSha256: String?): GraphqlHttpResponse =
-                        error("Invalid management addresses must not reach the transport")
-                },
+    fun remote_graphql_rejects_a_response_after_the_pairing_identity_changes() = runTest {
+        val saved = peer()
+        var selected = saved
+        val client = PeerHttpClient(
+            saved, peers = { listOf(selected) },
+            executeGraphql = { _, _ ->
+                selected = selected.copy(publicKey = "different-device")
+                GraphqlResponse(data = JsonObject(mapOf("deviceName" to JsonPrimitive("Wrong peer"))))
+            },
+        )
+        assertEquals("PEER_IDENTITY_CHANGED", assertFailsWith<IllegalStateException> {
+            client.graphql.execute(request)
+        }.message)
+    }
+
+    @Test
+    fun rejects_removed_revoked_and_unpaired_devices_before_native_dispatch() = runTest {
+        val saved = peer()
+        for (rows in listOf(emptyList(), listOf(saved.copy(token = "")), listOf(saved.copy(status = PeerStatus.UNPAIRED)))) {
+            val client = PeerHttpClient(saved, peers = { rows }, executeGraphql = { _, _ ->
+                error("An unauthorized peer must not reach Core")
+            })
+            assertIs<com.ismartcoding.plain.models.BusinessException>(
+                assertFailsWith<IllegalStateException> { client.graphql.execute(request) },
             )
-            assertEquals(PeerConnectionErrorCode.PEER_ADDRESS_UNAVAILABLE.wire,
-                assertFailsWith<com.ismartcoding.plain.models.BusinessException> { client.graphql.execute(request) }.code)
         }
-    }
-
-    @Test
-    fun rejects_chat_only_removed_and_changed_credentials_before_network_effects() = runTest {
-        val peer = peer()
-        val cases = listOf(emptyList(), listOf(peer.copy(token = "")), listOf(peer.copy(status = PeerStatus.UNPAIRED)), listOf(peer.copy(publicKey = "changed")), listOf(peer.copy(token = "changed")))
-        for (rows in cases) {
-            val client = PeerHttpClient(peer, peers = { rows },
-                encrypt = { _, _, _ -> error("Encryption must not start") },
-                transport = object : GraphqlHttpTransport {
-                    override suspend fun post(url: String, clientId: String, body: ByteArray, contentType: String, tlsCertificateSha256: String?): GraphqlHttpResponse = error("No network effects")
-                },
-            ).graphql
-            assertFailsWith<IllegalStateException> { client.execute(request) }
-        }
-    }
-
-    @Test
-    fun chat_rekeying_does_not_replace_the_independent_management_identity() = runTest {
-        val expected = peer().copy(key = "previous-chat-key")
-        var current = expected.copy()
-        var posts = 0
-        val client = PeerHttpClient(expected, peers = { listOf(current) }, clientId = { "706c6169-a5ec-8cb0-b41d-c3030368d632" },
-            encrypt = { _, _, _ -> Base64.encode(byteArrayOf(1)) }, decrypt = { _, _, _ -> encodedResult() },
-            transport = object : GraphqlHttpTransport {
-                override suspend fun post(url: String, clientId: String, body: ByteArray, contentType: String, tlsCertificateSha256: String?): GraphqlHttpResponse {
-                    posts++
-                    current = current.copy(key = "new-chat-key")
-                    return GraphqlHttpResponse(200, byteArrayOf(2))
-                }
-            },
-        ).graphql
-        assertEquals("Remote", client.execute(request))
-        assertEquals(1, posts)
-    }
-
-    @Test
-    fun discards_a_response_when_the_selected_device_changes_in_flight() = runTest {
-        val peer = peer()
-        var current = peer.copy()
-        val client = PeerHttpClient(peer, peers = { listOf(current) },
-            encrypt = { _, _, _ -> Base64.encode(byteArrayOf(1)) }, decrypt = { _, _, _ -> encodedResult() },
-            transport = object : GraphqlHttpTransport {
-                override suspend fun post(url: String, clientId: String, body: ByteArray, contentType: String, tlsCertificateSha256: String?): GraphqlHttpResponse {
-                    current = current.copy(publicKey = "different-device")
-                    return GraphqlHttpResponse(200, byteArrayOf(2))
-                }
-            },
-        ).graphql
-        assertEquals("PEER_IDENTITY_CHANGED", assertFailsWith<IllegalStateException> { client.execute(request) }.message)
-    }
-
-    @Test
-    fun does_not_decrypt_or_retry_rejected_sessions_and_redirects() = runTest {
-        val peer = peer()
-        for (status in listOf(301, 401, 403, 404, 500)) {
-            var posts = 0
-            val client = PeerHttpClient(peer, peers = { listOf(peer) },
-                encrypt = { _, _, _ -> Base64.encode(byteArrayOf(1)) },
-                decrypt = { _, _, _ -> error("Rejected response must not be decoded") },
-                transport = object : GraphqlHttpTransport {
-                    override suspend fun post(url: String, clientId: String, body: ByteArray, contentType: String, tlsCertificateSha256: String?): GraphqlHttpResponse {
-                        posts++
-                        return GraphqlHttpResponse(status, byteArrayOf())
-                    }
-                },
-            ).graphql
-            val error = assertFailsWith<IllegalStateException> { client.execute(request) }
-            if (status != 401 && status != 403) {
-                assertEquals(status, assertIs<GraphqlHttpException>(error).status)
-                assertEquals(HttpErrorCode.NETWORK_ERROR.wire, assertIs<com.ismartcoding.plain.models.BusinessException>(error).code)
-                assertEquals("HTTP $status", error.message)
-            }
-            assertEquals(1, posts)
-        }
-    }
-    @Test
-    fun reports_a_request_timeout_as_a_recoverable_error() = runTest {
-        val peer = peer()
-        val client = PeerHttpClient(peer, peers = { listOf(peer) },
-            encrypt = { _, _, _ -> Base64.encode(byteArrayOf(1)) },
-            transport = object : GraphqlHttpTransport {
-                override suspend fun post(url: String, clientId: String, body: ByteArray, contentType: String, tlsCertificateSha256: String?): GraphqlHttpResponse {
-                    delay(60_000)
-                    error("The timed out request must be canceled")
-                }
-            },
-        ).graphql
-        assertEquals("CONNECTION_TIMEOUT", assertFailsWith<IllegalStateException> { client.execute(request) }.message)
     }
 
     @Test

@@ -38,9 +38,7 @@ internal class PeerHttpClient(
     private val transport: GraphqlHttpTransport = createGraphqlHttpTransport(),
     private val peers: suspend () -> List<Peer> = { GraphqlApi.execute(Query.peers()) },
     private val encrypt: suspend (String, String, String) -> String = { token, endpoint, payload -> nativeCall { RustNativeBindings.encryptHttpRequest(token, endpoint, payload) } },
-    private val decrypt: suspend (String, String, String) -> String = { token, request, response ->
-        nativeCall { RustNativeBindings.decryptHttpResponse(token, request, response) }
-    },
+    private val executeGraphql: suspend (Peer, GraphqlOperation) -> GraphqlResponse = ::executePeerGraphql,
     private val clientId: () -> String = { Prefs.clientId.value },
     private val encryptResourceReference: suspend (String, String, String) -> String = { token, client, path ->
         nativeCall { RustNativeBindings.encryptResourceReference(token, JsonHelper.jsonEncode(mapOf("clientId" to client, "path" to path))) }
@@ -89,13 +87,10 @@ internal class PeerHttpClient(
         return response
     }
 
-    val graphql = GraphqlClient("http") { operation ->
-        val peer = current()
-        val encoded = encrypt(peer.token, "/graphql", JsonHelper.jsonEncode(operation))
-        val response = post(peer, "/graphql", Base64.decode(encoded))
-        val plain = decrypt(peer.token, encoded, Base64.encode(response.body))
+    val graphql = GraphqlClient("native-peer") { operation ->
+        val response = executeGraphql(current(), operation)
         current()
-        JsonHelper.jsonDecode<GraphqlResponse>(Base64.decode(plain).decodeToString())
+        response
     }
 
     suspend fun uploadChunk(id: String, index: Long, bytes: ByteArray, tlsCertificateSha256: String): String {

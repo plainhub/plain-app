@@ -18,8 +18,6 @@ import com.ismartcoding.plain.rust.graphql.GraphqlHttpException
 import com.ismartcoding.plain.models.Peer
 import com.ismartcoding.plain.platform.system.DeviceType
 import com.ismartcoding.plain.rust.graphql.ContentSource
-import com.ismartcoding.plain.rust.graphql.GraphqlHttpResponse
-import com.ismartcoding.plain.rust.graphql.GraphqlHttpTransport
 import com.ismartcoding.plain.rust.graphql.GraphqlOperation
 import com.ismartcoding.plain.rust.graphql.GraphqlResponse
 import com.ismartcoding.plain.rust.graphql.PeerHttpClient
@@ -36,7 +34,6 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.int
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
-import kotlin.io.encoding.Base64
 import kotlin.test.*
 import kotlin.time.Instant
 
@@ -290,9 +287,12 @@ class GlobalSearchDevicesTest {
         suspend fun source(): ContentSource.Remote {
             val peer = peer()
             val http = PeerHttpClient(peer, peers = { listOf(peer) }, clientId = { "706c6169-b9ef-8b64-b37d-1162ef232835" },
-                encrypt = { _, _, payload -> Base64.encode(payload.encodeToByteArray()) },
-                decrypt = { _, encoded, _ ->
-                    val operation = JsonHelper.jsonDecode<GraphqlOperation>(Base64.decode(encoded).decodeToString())
+                executeGraphql = { _, operation ->
+                    when (httpStatus) {
+                        401 -> throw BusinessException(com.ismartcoding.plain.models.AccessErrorCode.UNAUTHORIZED.wire)
+                        403 -> throw BusinessException(com.ismartcoding.plain.models.AuthErrorCode.REMOTE_ACCESS_DISABLED.wire)
+                        !in 200..299 -> throw GraphqlHttpException(httpStatus)
+                    }
                     val data = if ("app {" in operation.query) {
                         JsonHelper.jsonEncodeToElement(AppData(ManagedDeviceInfo(name, emptyList(), emptyList(), "app://", "/downloads", "resource-token", null)))
                     } else {
@@ -305,10 +305,7 @@ class GlobalSearchDevicesTest {
                             JsonHelper.jsonEncodeToElement(ChatData(chats.size, chats.drop(offset).take(limit), listOf(peer)))
                         } else JsonHelper.jsonEncodeToElement(NotesData(rows.size, rows.drop(offset).take(limit), rows.firstOrNull { it.id == operation.variables["id"]?.jsonPrimitive?.content }))
                     }
-                    Base64.encode(JsonHelper.jsonEncode(GraphqlResponse(data = data.jsonObject)).encodeToByteArray())
-                },
-                transport = object : GraphqlHttpTransport {
-                    override suspend fun post(url: String, clientId: String, body: ByteArray, contentType: String, tlsCertificateSha256: String?) = GraphqlHttpResponse(httpStatus, byteArrayOf(1))
+                    GraphqlResponse(data = data.jsonObject)
                 },
             )
             return ContentSource.Remote(ManagedDeviceClient.load(peer, http))

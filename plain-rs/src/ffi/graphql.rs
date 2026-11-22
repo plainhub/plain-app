@@ -27,10 +27,55 @@ fn execute_graphql(
     runtime: &Handle,
     executor: NativeGraphqlExecutor,
 ) -> Result<String, String> {
-    let parsed = plain_libs::serde_json::from_str(request).map_err(|e| e.to_string())?;
+    let mut body: plain_libs::serde_json::Value =
+        plain_libs::serde_json::from_str(request).map_err(|error| error.to_string())?;
+    let target = body
+        .get_mut("extensions")
+        .and_then(plain_libs::serde_json::Value::as_object_mut)
+        .and_then(|extensions| extensions.remove("nativeTarget"))
+        .map(
+            plain_libs::serde_json::from_value::<
+                plain_rs::infrastructure::protocols::graphql::PeerSubscriptionTarget,
+            >,
+        )
+        .transpose()
+        .map_err(|error| error.to_string())?;
+    let parsed = plain_libs::serde_json::from_value(body).map_err(|error| error.to_string())?;
+    let selected = target
+        .map(|target| super::server::with_core(|core| (target, core.server.runtime().clone())))
+        .transpose()?;
     execute_on_runtime(runtime, async move {
-        plain_libs::serde_json::to_string(&executor.execute(parsed).await)
-            .map_err(|e| e.to_string())
+        let response = if let Some((target, state)) = selected {
+            let selected = || -> Result<(), String> {
+                let peer = plain_rs::infrastructure::db::chat_store::peers::get(
+                    &state.db,
+                    &target.peer_id,
+                )
+                .map_err(|error| error.to_string())?
+                .ok_or("PEER_REMOVED")?;
+                if !peer.is_paired()
+                    || peer.public_key != target.public_key
+                    || peer.token.is_empty()
+                {
+                    return Err("PEER_IDENTITY_CHANGED".into());
+                }
+                Ok(())
+            };
+            selected()?;
+            let response = executor
+                .execute_peer_scoped(
+                    &target.peer_id,
+                    parsed,
+                    Default::default(),
+                    std::time::Duration::from_secs(30),
+                )
+                .await?;
+            selected()?;
+            response
+        } else {
+            executor.execute(parsed).await
+        };
+        plain_libs::serde_json::to_string(&response).map_err(|error| error.to_string())
     })?
 }
 fn public(request: &str) -> String {

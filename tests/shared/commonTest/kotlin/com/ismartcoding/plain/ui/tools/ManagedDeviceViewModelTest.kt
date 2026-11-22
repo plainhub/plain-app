@@ -1,5 +1,6 @@
 package com.ismartcoding.plain.ui.tools
 
+import com.ismartcoding.plain.rust.graphql.GraphqlHttpException
 import androidx.lifecycle.ViewModelStore
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
@@ -13,7 +14,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.async
 import kotlinx.coroutines.test.*
-import kotlin.io.encoding.Base64
 import kotlin.test.*
 import kotlin.time.Instant
 
@@ -112,26 +112,17 @@ class ManagedDeviceViewModelTest {
         var responseGate: CompletableDeferred<Unit>? = null
         var name = peer.name
         val requests = mutableListOf<GraphqlOperation>()
-        private lateinit var operation: GraphqlOperation
-        val http = PeerHttpClient(peer, peers = { listOf(currentPeer) }, clientId = { "706c6169-b9ef-8b64-b37d-1162ef232835" },
-            encrypt = { _, _, payload ->
-                operation = JsonHelper.jsonDecode(payload)
+        val http = PeerHttpClient(peer, peers = { listOf(currentPeer) },
+            executeGraphql = { target, operation ->
+                assertEquals(peer.id, target.id)
                 requests.add(operation)
-                Base64.encode(byteArrayOf(1))
-            },
-            decrypt = { _, _, _ ->
+                responseGate?.await()
+                if (fail) throw GraphqlHttpException(500)
                 val response = if ("updateDeviceName(" in operation.query) {
                     name = operation.variables.getValue("name").let { (it as kotlinx.serialization.json.JsonPrimitive).content }
                     """{"data":{"updateDeviceName":true}}"""
                 } else """{"data":{"app":{"deviceName":"$name","capabilities":[],"access":[],"appDir":"app://","downloadsDir":"/downloads","urlToken":"fixture-resource","tlsCertificateSha256":null}}}"""
-                Base64.encode(response.encodeToByteArray())
-            },
-            transport = object : GraphqlHttpTransport {
-                override suspend fun post(url: String, clientId: String, body: ByteArray, contentType: String, tlsCertificateSha256: String?): GraphqlHttpResponse {
-                    assertEquals("https://device.test:8443/graphql", url)
-                    responseGate?.await()
-                    return GraphqlHttpResponse(if (fail) 500 else 200, byteArrayOf(2))
-                }
+                JsonHelper.jsonDecode(response)
             },
         )
     }

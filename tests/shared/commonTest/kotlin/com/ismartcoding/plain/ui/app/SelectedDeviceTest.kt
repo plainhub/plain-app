@@ -1,18 +1,16 @@
 package com.ismartcoding.plain.ui.app
 
+import com.ismartcoding.plain.lib.JsonHelper
 import com.ismartcoding.plain.features.chat.peer.ManagedDeviceClient
 import com.ismartcoding.plain.features.nearby.PeerStatus
 import com.ismartcoding.plain.models.Peer
 import com.ismartcoding.plain.platform.system.DeviceType
 import com.ismartcoding.plain.rust.graphql.ContentSource
-import com.ismartcoding.plain.rust.graphql.GraphqlHttpResponse
-import com.ismartcoding.plain.rust.graphql.GraphqlHttpTransport
 import com.ismartcoding.plain.rust.graphql.PeerHttpClient
 import com.ismartcoding.plain.ui.navigation.Routing
 import com.ismartcoding.plain.ui.search.GlobalSearchAction
 import com.ismartcoding.plain.ui.search.GlobalSearchHit
 import kotlinx.coroutines.test.runTest
-import kotlin.io.encoding.Base64
 import kotlin.test.*
 import kotlin.time.Instant
 
@@ -84,12 +82,8 @@ class SelectedDeviceTest {
 
         )
         val response = """{"data":{"app":{"deviceName":"Remote","capabilities":[],"access":[],"appDir":"app://","downloadsDir":"/downloads","urlToken":"resource-token","tlsCertificateSha256":null}}}"""
-        val http = PeerHttpClient(peer, peers = { listOf(peer) }, clientId = { "706c6169-b9ef-8b64-b37d-1162ef232835" },
-            encrypt = { _, _, _ -> Base64.encode(byteArrayOf(1)) },
-            decrypt = { _, _, _ -> Base64.encode(response.encodeToByteArray()) },
-            transport = object : GraphqlHttpTransport {
-                override suspend fun post(url: String, clientId: String, body: ByteArray, contentType: String, tlsCertificateSha256: String?) = GraphqlHttpResponse(200, byteArrayOf(2))
-            },
+        val http = PeerHttpClient(peer, peers = { listOf(peer) },
+            executeGraphql = { _, _ -> JsonHelper.jsonDecode(response) },
         )
         return ContentSource.Remote(ManagedDeviceClient.load(peer, http))
     }

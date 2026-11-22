@@ -11,9 +11,7 @@ import com.ismartcoding.plain.features.web.AccessFeature
 import com.ismartcoding.plain.platform.system.DeviceType
 import com.ismartcoding.plain.platform.system.imageCacheKey
 import com.ismartcoding.plain.rust.graphql.ContentSource
-import com.ismartcoding.plain.rust.graphql.GraphqlHttpResponse
 import com.ismartcoding.plain.rust.graphql.GraphqlHttpException
-import com.ismartcoding.plain.rust.graphql.GraphqlHttpTransport
 import com.ismartcoding.plain.rust.graphql.GraphqlOperation
 import com.ismartcoding.plain.rust.graphql.PeerHttpClient
 import com.ismartcoding.plain.ui.images.ImagesViewModel
@@ -42,7 +40,6 @@ import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.setMain
 import kotlinx.serialization.json.int
 import kotlinx.serialization.json.jsonPrimitive
-import kotlin.io.encoding.Base64
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
@@ -70,16 +67,8 @@ class ManagedDeviceLoadTest {
                 yield()
                 "encrypted-${++encryptions}"
             },
-            encrypt = { _, _, _ -> Base64.encode(byteArrayOf(1)) },
-            decrypt = { _, _, _ ->
-                Base64.encode(
-                    """{"data":{"app":{"deviceName":"Device","capabilities":[],"access":["IMAGES"],"appDir":"app://","downloadsDir":"/downloads","urlToken":"$urlToken","tlsCertificateSha256":"fixture-certificate"}}}"""
-                        .encodeToByteArray(),
-                )
-            },
-            transport = object : GraphqlHttpTransport {
-                override suspend fun post(url: String, clientId: String, body: ByteArray, contentType: String, tlsCertificateSha256: String?) =
-                    GraphqlHttpResponse(200, byteArrayOf(2))
+            executeGraphql = { _, _ ->
+                JsonHelper.jsonDecode("""{"data":{"app":{"deviceName":"Device","capabilities":[],"access":["IMAGES"],"appDir":"app://","downloadsDir":"/downloads","urlToken":"$urlToken","tlsCertificateSha256":"fixture-certificate"}}}""")
             },
         )
         val client = ManagedDeviceClient.load(peer, http)
@@ -136,31 +125,23 @@ class ManagedDeviceLoadTest {
         }
         val pages = mutableListOf<Pair<Int, Int>>()
         var failNextPage = false
-        val transport = object : GraphqlHttpTransport {
-            override suspend fun post(url: String, clientId: String, body: ByteArray, contentType: String, tlsCertificateSha256: String?): GraphqlHttpResponse {
-                val operation = JsonHelper.jsonDecode<GraphqlOperation>(body.decodeToString())
-                val fields = when {
-                    "videos(" in operation.query -> {
-                        val offset = operation.variables.getValue("offset").jsonPrimitive.int
-                        val limit = operation.variables.getValue("limit").jsonPrimitive.int
-                        pages.add(offset to limit)
-                        if (failNextPage) return GraphqlHttpResponse(500, byteArrayOf())
-                        "\"videos\":${JsonHelper.jsonEncode(clips.drop(offset).take(limit))}"
-                    }
-                    "videoCount(" in operation.query -> "\"videoCount\":${clips.size}"
-                    "tagRelations(" in operation.query -> "\"tagRelations\":[]"
-                    "tags(" in operation.query -> "\"tags\":[]"
-                    "app {" in operation.query -> """"app":{"deviceName":"Device","capabilities":[],"access":["VIDEOS"],"appDir":"app://","downloadsDir":"/downloads","urlToken":"resource-token","tlsCertificateSha256":"fixture-certificate"}"""
-                    else -> error("Unexpected operation: ${operation.query}")
+        val http = PeerHttpClient(peer, peers = { listOf(peer) }, executeGraphql = { _, operation ->
+            val fields = when {
+                "videos(" in operation.query -> {
+                    val offset = operation.variables.getValue("offset").jsonPrimitive.int
+                    val limit = operation.variables.getValue("limit").jsonPrimitive.int
+                    pages.add(offset to limit)
+                    if (failNextPage) throw GraphqlHttpException(500)
+                    "\"videos\":${JsonHelper.jsonEncode(clips.drop(offset).take(limit))}"
                 }
-                return GraphqlHttpResponse(200, """{"data":{$fields}}""".encodeToByteArray())
+                "videoCount(" in operation.query -> "\"videoCount\":${clips.size}"
+                "tagRelations(" in operation.query -> "\"tagRelations\":[]"
+                "tags(" in operation.query -> "\"tags\":[]"
+                "app {" in operation.query -> """"app":{"deviceName":"Device","capabilities":[],"access":["VIDEOS"],"appDir":"app://","downloadsDir":"/downloads","urlToken":"resource-token","tlsCertificateSha256":"fixture-certificate"}"""
+                else -> error("Unexpected operation: ${operation.query}")
             }
-        }
-        val http = PeerHttpClient(
-            peer, transport = transport, peers = { listOf(peer) }, clientId = { "fixture-client" },
-            encrypt = { _, _, payload -> Base64.encode(payload.encodeToByteArray()) },
-            decrypt = { _, _, response -> response },
-        )
+            JsonHelper.jsonDecode("""{"data":{$fields}}""")
+        })
         val source = ContentSource.Remote(ManagedDeviceClient.load(peer, http))
         val vm = VideosViewModel(source)
         val tags = TagsViewModel(source.tags)
@@ -199,13 +180,10 @@ class ManagedDeviceLoadTest {
         val timeout = IllegalStateException("fixture response timeout")
         val http = PeerHttpClient(
             peer, peers = { listOf(peer) }, clientId = { "fixture-client" },
-            encrypt = { _, _, payload -> requests.add(JsonHelper.jsonDecode(payload)); Base64.encode(byteArrayOf(1)) },
-            decrypt = { _, _, _ -> Base64.encode(response.encodeToByteArray()) },
-            transport = object : GraphqlHttpTransport {
-                override suspend fun post(url: String, clientId: String, body: ByteArray, contentType: String, tlsCertificateSha256: String?): GraphqlHttpResponse {
-                    if (failWithTimeout) throw timeout
-                    return GraphqlHttpResponse(200, byteArrayOf(2))
-                }
+            executeGraphql = { _, operation ->
+                requests.add(operation)
+                if (failWithTimeout) throw timeout
+                JsonHelper.jsonDecode(response)
             },
         )
         val source = ContentSource.Remote(ManagedDeviceClient.load(peer, http))
@@ -249,10 +227,9 @@ class ManagedDeviceLoadTest {
                 assertEquals("/target.mp3", path)
                 "encrypted-resource"
             },
-            encrypt = { _, _, payload -> requests.add(JsonHelper.jsonDecode(payload)); Base64.encode(byteArrayOf(1)) },
-            decrypt = { _, _, _ -> Base64.encode(response.encodeToByteArray()) },
-            transport = object : GraphqlHttpTransport {
-                override suspend fun post(url: String, clientId: String, body: ByteArray, contentType: String, tlsCertificateSha256: String?) = GraphqlHttpResponse(200, byteArrayOf(2))
+            executeGraphql = { _, operation ->
+                requests.add(operation)
+                JsonHelper.jsonDecode(response)
             },
         )
         val subscribed = mutableListOf<GraphqlOperation>()

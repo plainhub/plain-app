@@ -538,61 +538,56 @@ class ManagedDeviceUiAcceptanceTest {
         val downloads = java.util.concurrent.atomic.AtomicReference<List<com.ismartcoding.plain.models.Download>>(emptyList())
         val http = com.ismartcoding.plain.rust.graphql.PeerHttpClient(
             peer, peers = { listOf(peer) }, clientId = { "706c6169-b9ef-8b64-b37d-1162ef232835" },
-            encrypt = { _, _, payload -> kotlin.io.encoding.Base64.encode(payload.encodeToByteArray()) },
-            decrypt = { _, _, response -> response },
-            transport = object : com.ismartcoding.plain.rust.graphql.GraphqlHttpTransport {
-                override suspend fun post(url: String, clientId: String, body: ByteArray, contentType: String, tlsCertificateSha256: String?): com.ismartcoding.plain.rust.graphql.GraphqlHttpResponse {
-                    val operation = JsonHelper.jsonDecode<com.ismartcoding.plain.rust.graphql.GraphqlOperation>(body.decodeToString())
-                    requests.add(operation)
-                    if (failRead(operation)) error("connection_timeout")
-                    val response = when {
-                        operation.query.contains("app {") -> JsonHelper.jsonEncode(com.ismartcoding.plain.rust.graphql.GraphqlResponse(
-                            data = JsonHelper.jsonEncodeToElement(ManagedFixtureApp(com.ismartcoding.plain.models.ManagedDeviceInfo(
-                                "Target fixture", capabilities, listOf(com.ismartcoding.plain.features.web.AccessFeature.FILES), "/target-share-root", "/target-downloads", "fixture-resource-token", "fixture-certificate",
-                            ))).jsonObject,
-                        ))
-                        operation.query.contains("prefs(keys:") -> JsonHelper.jsonEncode(com.ismartcoding.plain.rust.graphql.GraphqlResponse(
-                            data = JsonHelper.jsonEncodeToElement(ManagedFixturePrefs(mapOf("app_home_features" to readFeatures()))).jsonObject,
-                        ))
-                        operation.query.contains("setKeyValue(") -> """{"data":{"setKeyValue":true}}"""
-                        operation.query.contains("share(") -> """{"data":{"share":{"id":"share-ui-fixture","name":"Target fixture share","password":"","readOnly":true,"expiresAt":null,"data":[{"virtualPath":"/root","realPath":"/target-share-root/existing.txt","isDir":false}],"url":"https://device.test:8443/s/share-ui-fixture#fixture-share-token"}}}"""
-                        operation.query.contains("sendShare(") -> """{"data":{"sendShare":[]}}"""
-                        operation.query.contains("peers {") -> JsonHelper.jsonEncode(mapOf("data" to mapOf("peers" to JsonHelper.jsonEncodeToElement(readPeers()))))
-                        operation.query.contains("chatChannels") || operation.query.contains("chatConversations") -> """{"data":{"chatChannels":[],"chatConversations":[],"peers":[]}}"""
-                        operation.query.contains("chatItem(") -> JsonHelper.jsonEncode(mapOf("data" to mapOf("chatItem" to JsonHelper.jsonEncodeToElement(chat))))
-                        operation.query.contains("downloads {") -> JsonHelper.jsonEncode(mapOf("data" to mapOf("downloads" to JsonHelper.jsonEncodeToElement(downloads.get()))))
-                        operation.query.contains("keyValue(") -> """{"data":{"keyValue":null}}"""
-                        operation.query.contains("createDownload(") -> {
-                            val input = JsonHelper.jsonDecodeFromElement<com.ismartcoding.plain.models.DownloadInput>(operation.variables.getValue("input"))
-                            val resources = checkNotNull(input.resources)
-                            val task = com.ismartcoding.plain.models.Download(
-                                "fixture-download", "Target shared download", com.ismartcoding.plain.models.ResourceDownloadSource(resources.urls), resources.targetDir, resources.zipName,
-                                com.ismartcoding.plain.features.downloads.DownloadStatus.DOWNLOADING, 4, 8, 4, 1, 0, "target-card-file.txt", "", emptyList(),
-                            )
-                            downloads.set(listOf(task))
-                            JsonHelper.jsonEncode(mapOf("data" to mapOf("createDownload" to JsonHelper.jsonEncodeToElement(task))))
-                        }
-                        operation.query.contains("cancelDownload(") -> {
-                            downloads.updateAndGet { current -> current.map { it.copy(status = com.ismartcoding.plain.features.downloads.DownloadStatus.CANCELED) } }
-                            """{"data":{"cancelDownload":true}}"""
-                        }
-                        operation.query.contains("removeDownload(") -> {
-                            downloads.set(emptyList())
-                            """{"data":{"removeDownload":true}}"""
-                        }
-                        operation.query.contains("mounts {") -> """{"data":{"mounts":[{"name":"Target storage","path":"/target-public"},{"name":"Target secondary","path":"/target-secondary"}]}}"""
-                        operation.query.contains("files(") -> when (operation.variables["root"]) {
-                            kotlinx.serialization.json.JsonPrimitive(card.browserUrl()) -> JsonHelper.jsonEncode(mapOf("data" to mapOf("files" to JsonHelper.jsonEncodeToElement(browsed))))
-                            kotlinx.serialization.json.JsonPrimitive("/target-share-root") -> """{"data":{"files":[{"name":"target-only-share-item.txt","path":"/target-share-root/target-only-share-item.txt","createdAt":null,"updatedAt":"2026-01-01T00:00:00Z","size":8,"isDir":false,"childCount":0}]}}"""
-                            kotlinx.serialization.json.JsonPrimitive("/target-public") -> """{"data":{"files":[{"name":"target-public-file.txt","path":"/target-public/target-public-file.txt","createdAt":null,"updatedAt":"2026-01-01T00:00:00Z","size":8,"isDir":false,"childCount":0},{"name":"target-folder","path":"/target-public/target-folder","createdAt":null,"updatedAt":"2026-01-01T00:00:00Z","size":0,"isDir":true,"childCount":0}]}}"""
-                            kotlinx.serialization.json.JsonPrimitive("/target-secondary") -> """{"data":{"files":[{"name":"target-secondary-file.txt","path":"/target-secondary/target-secondary-file.txt","createdAt":null,"updatedAt":"2026-01-01T00:00:00Z","size":8,"isDir":false,"childCount":0}]}}"""
-                            kotlinx.serialization.json.JsonPrimitive("/target-public/target-folder") -> """{"data":{"files":[]}}"""
-                            else -> error("Unexpected target fixture directory")
-                        }
-                        else -> error("Unexpected share fixture operation")
+            executeGraphql = { _, operation ->
+                requests.add(operation)
+                if (failRead(operation)) error("connection_timeout")
+                val response = when {
+                    operation.query.contains("app {") -> JsonHelper.jsonEncode(com.ismartcoding.plain.rust.graphql.GraphqlResponse(
+                        data = JsonHelper.jsonEncodeToElement(ManagedFixtureApp(com.ismartcoding.plain.models.ManagedDeviceInfo(
+                            "Target fixture", capabilities, listOf(com.ismartcoding.plain.features.web.AccessFeature.FILES), "/target-share-root", "/target-downloads", "fixture-resource-token", "fixture-certificate",
+                        ))).jsonObject,
+                    ))
+                    operation.query.contains("prefs(keys:") -> JsonHelper.jsonEncode(com.ismartcoding.plain.rust.graphql.GraphqlResponse(
+                        data = JsonHelper.jsonEncodeToElement(ManagedFixturePrefs(mapOf("app_home_features" to readFeatures()))).jsonObject,
+                    ))
+                    operation.query.contains("setKeyValue(") -> """{"data":{"setKeyValue":true}}"""
+                    operation.query.contains("share(") -> """{"data":{"share":{"id":"share-ui-fixture","name":"Target fixture share","password":"","readOnly":true,"expiresAt":null,"data":[{"virtualPath":"/root","realPath":"/target-share-root/existing.txt","isDir":false}],"url":"https://device.test:8443/s/share-ui-fixture#fixture-share-token"}}}"""
+                    operation.query.contains("sendShare(") -> """{"data":{"sendShare":[]}}"""
+                    operation.query.contains("peers {") -> JsonHelper.jsonEncode(mapOf("data" to mapOf("peers" to JsonHelper.jsonEncodeToElement(readPeers()))))
+                    operation.query.contains("chatChannels") || operation.query.contains("chatConversations") -> """{"data":{"chatChannels":[],"chatConversations":[],"peers":[]}}"""
+                    operation.query.contains("chatItem(") -> JsonHelper.jsonEncode(mapOf("data" to mapOf("chatItem" to JsonHelper.jsonEncodeToElement(chat))))
+                    operation.query.contains("downloads {") -> JsonHelper.jsonEncode(mapOf("data" to mapOf("downloads" to JsonHelper.jsonEncodeToElement(downloads.get()))))
+                    operation.query.contains("keyValue(") -> """{"data":{"keyValue":null}}"""
+                    operation.query.contains("createDownload(") -> {
+                        val input = JsonHelper.jsonDecodeFromElement<com.ismartcoding.plain.models.DownloadInput>(operation.variables.getValue("input"))
+                        val resources = checkNotNull(input.resources)
+                        val task = com.ismartcoding.plain.models.Download(
+                            "fixture-download", "Target shared download", com.ismartcoding.plain.models.ResourceDownloadSource(resources.urls), resources.targetDir, resources.zipName,
+                            com.ismartcoding.plain.features.downloads.DownloadStatus.DOWNLOADING, 4, 8, 4, 1, 0, "target-card-file.txt", "", emptyList(),
+                        )
+                        downloads.set(listOf(task))
+                        JsonHelper.jsonEncode(mapOf("data" to mapOf("createDownload" to JsonHelper.jsonEncodeToElement(task))))
                     }
-                    return com.ismartcoding.plain.rust.graphql.GraphqlHttpResponse(200, response.encodeToByteArray())
+                    operation.query.contains("cancelDownload(") -> {
+                        downloads.updateAndGet { current -> current.map { it.copy(status = com.ismartcoding.plain.features.downloads.DownloadStatus.CANCELED) } }
+                        """{"data":{"cancelDownload":true}}"""
+                    }
+                    operation.query.contains("removeDownload(") -> {
+                        downloads.set(emptyList())
+                        """{"data":{"removeDownload":true}}"""
+                    }
+                    operation.query.contains("mounts {") -> """{"data":{"mounts":[{"name":"Target storage","path":"/target-public"},{"name":"Target secondary","path":"/target-secondary"}]}}"""
+                    operation.query.contains("files(") -> when (operation.variables["root"]) {
+                        kotlinx.serialization.json.JsonPrimitive(card.browserUrl()) -> JsonHelper.jsonEncode(mapOf("data" to mapOf("files" to JsonHelper.jsonEncodeToElement(browsed))))
+                        kotlinx.serialization.json.JsonPrimitive("/target-share-root") -> """{"data":{"files":[{"name":"target-only-share-item.txt","path":"/target-share-root/target-only-share-item.txt","createdAt":null,"updatedAt":"2026-01-01T00:00:00Z","size":8,"isDir":false,"childCount":0}]}}"""
+                        kotlinx.serialization.json.JsonPrimitive("/target-public") -> """{"data":{"files":[{"name":"target-public-file.txt","path":"/target-public/target-public-file.txt","createdAt":null,"updatedAt":"2026-01-01T00:00:00Z","size":8,"isDir":false,"childCount":0},{"name":"target-folder","path":"/target-public/target-folder","createdAt":null,"updatedAt":"2026-01-01T00:00:00Z","size":0,"isDir":true,"childCount":0}]}}"""
+                        kotlinx.serialization.json.JsonPrimitive("/target-secondary") -> """{"data":{"files":[{"name":"target-secondary-file.txt","path":"/target-secondary/target-secondary-file.txt","createdAt":null,"updatedAt":"2026-01-01T00:00:00Z","size":8,"isDir":false,"childCount":0}]}}"""
+                        kotlinx.serialization.json.JsonPrimitive("/target-public/target-folder") -> """{"data":{"files":[]}}"""
+                        else -> error("Unexpected target fixture directory")
+                    }
+                    else -> error("Unexpected share fixture operation")
                 }
+                JsonHelper.jsonDecode(response)
             },
         )
         return com.ismartcoding.plain.rust.graphql.ContentSource.Remote(com.ismartcoding.plain.features.chat.peer.ManagedDeviceClient.load(peer, http, updates = { updates }))
