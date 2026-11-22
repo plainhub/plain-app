@@ -5,6 +5,7 @@ import com.ismartcoding.plain.i18n.*
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.key
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
@@ -19,10 +20,11 @@ fun MediaSidebarBucketItem(
     m: MediaBucket,
     isMedia: Boolean = false,
     isSelected: Boolean = false,
-    drawerOpen: Boolean,
+    coversEnabled: Boolean,
+    coverRevision: Int,
     onClick: () -> Unit,
 ) {
-    val thumbnailPaths = sidebarBucketThumbnailPaths(m, isMedia, drawerOpen)
+    val thumbnailPaths = sidebarBucketThumbnailPaths(m, isMedia, coversEnabled)
     val showThumbnail = thumbnailPaths.isNotEmpty()
     SidebarItem(
         label = m.name,
@@ -32,16 +34,18 @@ fun MediaSidebarBucketItem(
         icon = if (showThumbnail) null else UiRes.drawable.ui_drawable_folder,
         leading = if (showThumbnail) {
             {
-                MediaThumbnailGrid(
-                    paths = thumbnailPaths,
-                    contentDescription = null,
-                    modifier = Modifier.size(40.dp).clip(MaterialTheme.shapes.medium),
-                )
+                key(coverRevision) {
+                    MediaThumbnailGrid(
+                        paths = thumbnailPaths,
+                        contentDescription = null,
+                        modifier = Modifier.size(40.dp).clip(MaterialTheme.shapes.medium),
+                    )
+                }
             }
         } else null,
         onClick = onClick,
     )
 }
 
-internal fun sidebarBucketThumbnailPaths(bucket: MediaBucket, isMedia: Boolean, drawerOpen: Boolean): List<String> =
-    if (isMedia && drawerOpen) bucket.topItemPaths else emptyList()
+internal fun sidebarBucketThumbnailPaths(bucket: MediaBucket, isMedia: Boolean, coversEnabled: Boolean): List<String> =
+    if (isMedia && coversEnabled) bucket.topItemPaths else emptyList()

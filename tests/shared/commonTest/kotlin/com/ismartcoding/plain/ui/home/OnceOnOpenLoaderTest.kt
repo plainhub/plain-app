@@ -10,13 +10,16 @@ import kotlin.test.assertTrue
 
 class OnceOnOpenLoaderTest {
     @Test
-    fun closedDrawerNeverSelectsThumbnailRequests() {
+    fun loadedDrawersRetainFolderCoversAcrossCloseAndReopen() {
         val paths = listOf("/fixture/one.jpg", "/fixture/two.jpg")
         val bucket = MediaBucket("fixture", "Fixture", paths.size, paths)
-        assertEquals(emptyList(), sidebarBucketThumbnailPaths(bucket, isMedia = true, drawerOpen = false))
-        assertEquals(paths, sidebarBucketThumbnailPaths(bucket, isMedia = true, drawerOpen = true))
-        assertEquals(emptyList(), sidebarBucketThumbnailPaths(bucket, isMedia = true, drawerOpen = false))
-        assertEquals(emptyList(), sidebarBucketThumbnailPaths(bucket, isMedia = false, drawerOpen = true))
+        val loader = OnceOnOpenLoader()
+        val coversAcrossToggles = listOf(false, true, false, true).map { isOpen ->
+            loader.shouldLoad(isOpen)
+            sidebarBucketThumbnailPaths(bucket, isMedia = true, coversEnabled = loader.hasOpened)
+        }
+        assertEquals(listOf(emptyList(), paths, paths, paths), coversAcrossToggles)
+        assertEquals(emptyList(), sidebarBucketThumbnailPaths(bucket, isMedia = false, coversEnabled = loader.hasOpened))
     }
 
     @Test

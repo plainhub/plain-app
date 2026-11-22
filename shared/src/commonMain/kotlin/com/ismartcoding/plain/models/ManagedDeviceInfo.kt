@@ -21,5 +21,7 @@ data class ManagedStorageRoot(val name: String, val path: String)
 data class ManagedResource(
     val url: String,
     val tlsCertificateSha256: String,
-    val versionedThumbnail: Boolean = false,
+    val thumbnail: ManagedThumbnail? = null,
 )
+
+data class ManagedThumbnail(val cacheId: String, val versioned: Boolean)

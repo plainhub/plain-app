@@ -4,10 +4,9 @@ import com.ismartcoding.plain.platform.system.getDeviceCapabilities
 import com.ismartcoding.plain.platform.system.Capability
 import com.ismartcoding.plain.i18n.*
 
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.DrawerState
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -61,7 +60,6 @@ fun <T : IData> MediaSidebarDrawer(
     val buckets by mediaFoldersVM.itemsFlow.collectAsState()
     val tags by tagsVM.itemsFlow.collectAsState()
     val scope = rememberCoroutineScope()
-    val scrollState = rememberScrollState()
 
     var foldersExpanded by remember { mutableStateOf(true) }
     var tagsExpanded by remember { mutableStateOf(true) }
@@ -76,7 +74,7 @@ fun <T : IData> MediaSidebarDrawer(
     LaunchedEffect(drawerState.targetValue) {
         if (openLoader.shouldLoad(drawerState.targetValue == DrawerValue.Open)) {
             scope.launchSafe {
-                mediaFoldersVM.loadAsync()
+                if (mediaFoldersVM.coverRevision == 0) mediaFoldersVM.loadAsync()
                 tagsVM.loadAsync()
             }
         }
@@ -95,73 +93,65 @@ fun <T : IData> MediaSidebarDrawer(
         }
     }
 
-    Column(
-        modifier = Modifier
-            .verticalScroll(scrollState)
-            .padding(NavigationDrawerItemDefaults.ItemPadding)
-    ) {
-        // Header spacer
-        VerticalSpace(dp = 16.dp)
-
-        // All
-        SidebarItem(
-            label = stringResource(Res.string.all),
-            icon = UiRes.drawable.ui_drawable_layout_grid,
-            isSelected = !mediaVM.trash.value && mediaVM.bucketId.value.isEmpty() && mediaVM.tag.value == null && (mediaVM !is DocsViewModel || (mediaVM as DocsViewModel).fileType.value.isEmpty()),
-            onClick = {
-                mediaVM.trash.value = false
-                mediaVM.bucketId.value = ""
-                mediaVM.tag.value = null
-                if (mediaVM is DocsViewModel) (mediaVM as DocsViewModel).fileType.value = ""
-                loadMedia()
-                scope.launch { drawerState.close() }
-            },
-            badge = mediaFoldersVM.totalBucket.value?.itemCount?.toString() ?: "0"
-        )
-
-        // Trash
-        if (Capability.MEDIA_TRASH in getDeviceCapabilities()) {
+    LazyColumn(contentPadding = NavigationDrawerItemDefaults.ItemPadding) {
+        item { VerticalSpace(dp = 16.dp) }
+        item {
             SidebarItem(
-                label = stringResource(Res.string.trash),
-                icon = UiRes.drawable.ui_drawable_trash_2,
-                isSelected = mediaVM.trash.value,
+                label = stringResource(Res.string.all),
+                icon = UiRes.drawable.ui_drawable_layout_grid,
+                isSelected = !mediaVM.trash.value && mediaVM.bucketId.value.isEmpty() && mediaVM.tag.value == null && (mediaVM !is DocsViewModel || mediaVM.fileType.value.isEmpty()),
                 onClick = {
-                    mediaVM.trash.value = true
+                    mediaVM.trash.value = false
                     mediaVM.bucketId.value = ""
                     mediaVM.tag.value = null
-                    if (mediaVM is DocsViewModel) (mediaVM as DocsViewModel).fileType.value = ""
+                    if (mediaVM is DocsViewModel) mediaVM.fileType.value = ""
                     loadMedia()
                     scope.launch { drawerState.close() }
                 },
-                badge = mediaFoldersVM.trashCount.intValue.toString()
+                badge = mediaFoldersVM.totalBucket.value?.itemCount?.toString() ?: "0"
             )
         }
-
-        HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
-
-        // Extensions Section (Docs only)
-        if (mediaVM.dataType == DataType.DOC && mediaVM is DocsViewModel) {
-            val docsVM = mediaVM as DocsViewModel
-            val extensionTabs = docsVM.tabs.value.filter { it.value != "all" && it.value != "trash" && it.value != "" }
-            
-            if (extensionTabs.isNotEmpty()) {
-                SidebarSectionHeader(
-                    title = stringResource(Res.string.type),
-                    isExpanded = extensionsExpanded,
-                    onToggle = { extensionsExpanded = !extensionsExpanded }
+        if (Capability.MEDIA_TRASH in getDeviceCapabilities()) {
+            item {
+                SidebarItem(
+                    label = stringResource(Res.string.trash),
+                    icon = UiRes.drawable.ui_drawable_trash_2,
+                    isSelected = mediaVM.trash.value,
+                    onClick = {
+                        mediaVM.trash.value = true
+                        mediaVM.bucketId.value = ""
+                        mediaVM.tag.value = null
+                        if (mediaVM is DocsViewModel) mediaVM.fileType.value = ""
+                        loadMedia()
+                        scope.launch { drawerState.close() }
+                    },
+                    badge = mediaFoldersVM.trashCount.intValue.toString()
                 )
+            }
+        }
+        item { HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp)) }
 
+        if (mediaVM is DocsViewModel) {
+            val tabs = mediaVM.tabs.value.filter { it.value != "all" && it.value != "trash" && it.value != "" }
+            if (tabs.isNotEmpty()) {
+                item {
+                    SidebarSectionHeader(
+                        title = stringResource(Res.string.type),
+                        isExpanded = extensionsExpanded,
+                        onToggle = { extensionsExpanded = !extensionsExpanded }
+                    )
+                }
                 if (extensionsExpanded) {
-                    extensionTabs.forEach { tab ->
+                    items(tabs, key = { "extension:${it.value}" }) { tab ->
                         SidebarItem(
                             label = tab.title,
                             icon = UiRes.drawable.ui_drawable_file_digit,
-                            isSelected = !mediaVM.trash.value && docsVM.fileType.value == tab.value,
+                            isSelected = !mediaVM.trash.value && mediaVM.fileType.value == tab.value,
                             onClick = {
                                 mediaVM.trash.value = false
                                 mediaVM.bucketId.value = ""
                                 mediaVM.tag.value = null
-                                docsVM.fileType.value = tab.value
+                                mediaVM.fileType.value = tab.value
                                 loadMedia()
                                 scope.launch { drawerState.close() }
                             },
@@ -169,33 +159,35 @@ fun <T : IData> MediaSidebarDrawer(
                         )
                     }
                 }
-                HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
+                item { HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp)) }
             }
         }
 
-        // Folders Section (hidden when the platform reports no bucket data, e.g. older Android)
         if (buckets.isNotEmpty()) {
-            SidebarSectionHeader(
-                title = stringResource(Res.string.folders),
-                isExpanded = foldersExpanded,
-                onToggle = { foldersExpanded = !foldersExpanded },
-                onAction = null // No action for folders header yet
-            )
-
+            item {
+                SidebarSectionHeader(
+                    title = stringResource(Res.string.folders),
+                    isExpanded = foldersExpanded,
+                    onToggle = { foldersExpanded = !foldersExpanded },
+                    onAction = null
+                )
+            }
             if (foldersExpanded) {
                 val isMedia = mediaVM.dataType == DataType.IMAGE || mediaVM.dataType == DataType.VIDEO
-                val drawerOpen = drawerState.isOpen || drawerState.targetValue == DrawerValue.Open
-                buckets.forEach { bucket ->
+                val coversEnabled = openLoader.hasOpened
+                val coverRevision = mediaFoldersVM.coverRevision
+                items(buckets, key = { "bucket:${it.id}" }) { bucket ->
                     MediaSidebarBucketItem(
                         m = bucket,
                         isMedia = isMedia,
-                        drawerOpen = drawerOpen,
+                        coversEnabled = coversEnabled,
+                        coverRevision = coverRevision,
                         isSelected = !mediaVM.trash.value && mediaVM.bucketId.value == bucket.id,
                         onClick = {
                             mediaVM.trash.value = false
                             mediaVM.bucketId.value = bucket.id
                             mediaVM.tag.value = null
-                            if (mediaVM is DocsViewModel) (mediaVM as DocsViewModel).fileType.value = ""
+                            if (mediaVM is DocsViewModel) mediaVM.fileType.value = ""
                             loadMedia()
                             scope.launch { drawerState.close() }
                         }
@@ -204,21 +196,20 @@ fun <T : IData> MediaSidebarDrawer(
             }
         }
 
-        HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
-
-        // Tags Section
-        SidebarSectionHeader(
-            title = stringResource(Res.string.tags),
-            isExpanded = tagsExpanded,
-            onToggle = { tagsExpanded = !tagsExpanded },
-            onAction = {
-                tagsVM.showAddDialog()
-            },
-            actionIcon = UiRes.drawable.ui_drawable_plus
-        )
-
+        item { HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp)) }
+        item {
+            SidebarSectionHeader(
+                title = stringResource(Res.string.tags),
+                isExpanded = tagsExpanded,
+                onToggle = { tagsExpanded = !tagsExpanded },
+                onAction = {
+                    tagsVM.showAddDialog()
+                },
+                actionIcon = UiRes.drawable.ui_drawable_plus
+            )
+        }
         if (tagsExpanded) {
-            tags.forEach { tag ->
+            items(tags, key = { "tag:${it.id}" }) { tag ->
                 MediaSidebarTagItem(
                     tag = tag,
                     isSelected = !mediaVM.trash.value && mediaVM.tag.value?.id == tag.id,
@@ -239,14 +230,14 @@ fun <T : IData> MediaSidebarDrawer(
                         mediaVM.trash.value = false
                         mediaVM.bucketId.value = ""
                         mediaVM.tag.value = tag
-                        if (mediaVM is DocsViewModel) (mediaVM as DocsViewModel).fileType.value = ""
+                        if (mediaVM is DocsViewModel) mediaVM.fileType.value = ""
                         loadMedia()
                         scope.launch { drawerState.close() }
                     }
                 )
             }
         }
-        BottomSpace()
+        item { BottomSpace() }
     }
 
     TagNameDialog(tagsVM) {
@@ -254,17 +245,13 @@ fun <T : IData> MediaSidebarDrawer(
     }
 }
 
-/**
- * Fires exactly once, on the first observed "open" state — used to defer a
- * hidden drawer's data load until the user actually opens it. Pure state
- * machine so the firing rule is unit-testable without composition.
- */
 class OnceOnOpenLoader {
-    private var fired = false
+    var hasOpened by mutableStateOf(false)
+        private set
 
     fun shouldLoad(isOpen: Boolean): Boolean {
-        if (!isOpen || fired) return false
-        fired = true
+        if (!isOpen || hasOpened) return false
+        hasOpened = true
         return true
     }
 }

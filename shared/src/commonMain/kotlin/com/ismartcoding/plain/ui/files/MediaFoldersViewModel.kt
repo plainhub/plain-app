@@ -5,6 +5,8 @@ import com.ismartcoding.plain.models.MediaBucket
 import com.ismartcoding.plain.i18n.*
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ismartcoding.plain.lib.TimeHelper
@@ -25,6 +27,8 @@ class MediaFoldersViewModel internal constructor(val source: ContentSource = Con
     val itemsFlow: StateFlow<List<MediaBucket>> = _itemsFlow.asStateFlow()
     val totalBucket = mutableStateOf<MediaBucket?>(null)
     val trashCount = mutableIntStateOf(0)
+    internal var coverRevision by mutableIntStateOf(0)
+        private set
 
     val bucketsMapFlow: StateFlow<Map<String, MediaBucket>> =
         _itemsFlow
@@ -37,6 +41,7 @@ class MediaFoldersViewModel internal constructor(val source: ContentSource = Con
     suspend fun loadAsync() = withIO {
         val startTime = TimeHelper.nowMillis()
         _itemsFlow.value = source.catalog.buckets(dataType.value)
+        coverRevision++
         trashCount.intValue = source.catalog.count(dataType.value, "trash:true")
 
         var totalValue = 0

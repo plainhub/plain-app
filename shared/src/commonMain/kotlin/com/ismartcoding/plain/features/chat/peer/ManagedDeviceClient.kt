@@ -1,5 +1,6 @@
 package com.ismartcoding.plain.features.chat.peer
 
+import com.ismartcoding.plain.Prefs
 import com.ismartcoding.plain.models.AuthErrorCode
 import com.ismartcoding.plain.models.PeerConnectionErrorCode
 
@@ -10,8 +11,12 @@ import com.ismartcoding.plain.features.files.FileAction
 import com.ismartcoding.plain.features.notes.NotesApi
 import com.ismartcoding.plain.graphql.Mutation
 import com.ismartcoding.plain.graphql.Query
+import com.ismartcoding.plain.lib.JsonHelper
+import com.ismartcoding.plain.lib.crypto.sha256
 import com.ismartcoding.plain.lib.extensions.urlEncode
 import com.ismartcoding.plain.models.ManagedDeviceInfo
+import com.ismartcoding.plain.models.ManagedResource
+import com.ismartcoding.plain.models.ManagedThumbnail
 import com.ismartcoding.plain.models.Peer
 import com.ismartcoding.plain.rust.graphql.changes
 import com.ismartcoding.plain.rust.graphql.GraphqlApi
@@ -96,13 +101,37 @@ internal class ManagedDeviceClient private constructor(
         size: ResourceSize? = null,
         action: FileAction = FileAction.PREVIEW,
         version: Instant? = null,
-    ): com.ismartcoding.plain.models.ManagedResource {
-        val current = http.current()
+    ): ManagedResource = resource(http.current(), currentInfo, path, size, action, version)
+
+    suspend fun thumbnailResources(paths: List<String>): Map<String, ManagedResource> {
+        if (paths.isEmpty()) return emptyMap()
+        val peer = http.current()
         val info = currentInfo
+        return paths.distinct().associateWith { path ->
+            resource(peer, info, path, ResourceSize.SM, FileAction.PREVIEW, version = null)
+        }
+    }
+
+    private suspend fun resource(
+        current: Peer,
+        info: ManagedDeviceInfo,
+        path: String,
+        size: ResourceSize?,
+        action: FileAction,
+        version: Instant?,
+    ): ManagedResource {
         val fingerprint = info.tlsCertificateSha256 ?: throw BusinessException(PeerConnectionErrorCode.PEER_HTTPS_UNAVAILABLE.wire)
         val fileId = http.getFileId(info.urlToken, path)
         val url = managedResourceUrl(current.getBaseUrl(), fileId, size, action, version)
-        return com.ismartcoding.plain.models.ManagedResource(url, fingerprint, versionedThumbnail = size != null && version != null)
+        val thumbnail = if (action == FileAction.PREVIEW && size != null) {
+            val identity = listOf(
+                current.id, current.publicKey, current.token, Prefs.clientId.value, info.urlToken,
+                path, size.name, version?.toString(),
+            )
+            val cacheId = sha256(JsonHelper.jsonEncode(identity).encodeToByteArray()).toHexString()
+            ManagedThumbnail(cacheId, versioned = version != null)
+        } else null
+        return ManagedResource(url, fingerprint, thumbnail)
     }
 
     suspend fun downloadFile(path: String, name: String): String {

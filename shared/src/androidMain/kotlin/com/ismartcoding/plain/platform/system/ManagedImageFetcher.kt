@@ -12,6 +12,6 @@ internal class ManagedImageFetcher : Fetcher.Factory<ManagedResource> {
     override fun create(data: ManagedResource, options: Options, imageLoader: ImageLoader): Fetcher? =
         OkHttpNetworkFetcherFactory(
             callFactory = { peerImageHttpClient(data) },
-            cacheStrategy = { ManagedImageCacheStrategy },
+            cacheStrategy = { data.imageCacheStrategy() },
         ).create(data.url.toUri(), data.imageFetchOptions(options), imageLoader)
 }

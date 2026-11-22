@@ -11,6 +11,6 @@ internal class ManagedImageFetcher : Fetcher.Factory<ManagedResource> {
     override fun create(data: ManagedResource, options: Options, imageLoader: ImageLoader): Fetcher? =
         NetworkFetcher.Factory(
             networkClient = { IosImageNetworkClient(data.tlsCertificateSha256) },
-            cacheStrategy = { ManagedImageCacheStrategy },
+            cacheStrategy = { data.imageCacheStrategy() },
         ).create(data.url.toUri(), data.imageFetchOptions(options), imageLoader)
 }
