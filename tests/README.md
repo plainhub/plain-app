@@ -39,6 +39,16 @@ Run on a connected Android test device or emulator.
 ./gradlew :app:connectedGithubDebugAndroidTest
 ```
 
+Generate synthetic 3.3.25 data with the published Room schema for upgrade tests.
+
+```bash
+python3 tests/app/legacy_upgrade_fixture.py "$(mktemp -d)/legacy-upgrade"
+```
+
+The output contains two paired devices with separate app sandboxes. For emulator tests, use
+`--stored-files-root` to set the device path stored in share and favorite-folder records.
+Use `--room-version 8` for a 3.0.0 fixture or `--room-version 16` for a 3.2.3 fixture.
+
 ## iOS simulator tests
 
 Run on an iOS simulator.
