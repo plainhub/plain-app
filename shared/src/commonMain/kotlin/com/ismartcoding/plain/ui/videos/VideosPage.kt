@@ -31,7 +31,6 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.ismartcoding.plain.platform.system.AppFeatureType
 import com.ismartcoding.plain.models.VideoSortBy
-import com.ismartcoding.plain.lib.withIO
 import com.ismartcoding.plain.ui.platform.media.MediaPreviewer
 import com.ismartcoding.plain.ui.navigation.PBackHandler
 import com.ismartcoding.plain.ui.platform.system.isGestureInteractionMode
@@ -46,6 +45,7 @@ import com.ismartcoding.plain.ui.base.fastscroll.LazyVerticalGridScrollbar
 import com.ismartcoding.plain.ui.components.pinchZoomGrid
 import com.ismartcoding.plain.ui.base.pullrefresh.LoadMoreRefreshContent
 import com.ismartcoding.plain.ui.base.pullrefresh.PullToRefresh
+import com.ismartcoding.plain.ui.components.ToastManager
 import com.ismartcoding.plain.ui.base.pullrefresh.RefreshContentState
 import com.ismartcoding.plain.ui.base.pullrefresh.rememberRefreshLayoutState
 import com.ismartcoding.plain.ui.base.pullrefresh.setRefreshState
@@ -103,9 +103,15 @@ fun VideosPage(
     val bucketsMap by mediaFoldersVM.bucketsMapFlow.collectAsState()
     val cellsPerRow = remember { mutableIntStateOf(Prefs.videoGridCellsPerRow.value) }
     val topRefreshLayoutState = rememberRefreshLayoutState {
-        scope.launch {
+        scope.launchSafe(
+            onError = { error ->
+                setRefreshState(RefreshContentState.Failed)
+                ToastManager.showErrorToast(error.message ?: error.toString())
+            },
+            onDone = { videosVM.showLoading.value = false },
+        ) {
             videosVM.loadAsync(tagsVM)
-            withIO { mediaFoldersVM.loadAsync() }
+            mediaFoldersVM.loadAsync()
             setRefreshState(RefreshContentState.Finished)
         }
     }
@@ -117,18 +123,15 @@ fun VideosPage(
             castVM.castMode.value -> castVM.exitCastMode()
             videosVM.showSearchBar.value && (!videosVM.searchActive.value || videosVM.queryText.value.isEmpty()) -> {
                 videosVM.exitSearchMode(); videosVM.showLoading.value = true
-                scope.launch(Dispatchers.Default) { videosVM.loadAsync(tagsVM) }
+                scope.launchSafe(onDone = { videosVM.showLoading.value = false }) { videosVM.loadAsync(tagsVM) }
             }
         }
     }
 
     val reloadAfterGrant: () -> Unit = {
-        scope.launch(Dispatchers.Default) {
-            cellsPerRow.value = Prefs.videoGridCellsPerRow.value
-            videosVM.sortBy.value = Prefs.videoSortBy.value
-            videosVM.loadAsync(tagsVM)
-            mediaFoldersVM.loadAsync()
-        }
+        cellsPerRow.value = Prefs.videoGridCellsPerRow.value
+        videosVM.sortBy.value = Prefs.videoSortBy.value
+        videosVM.loadFromPage(scope, tagsVM, mediaFoldersVM::loadAsync)
     }
 
     MediaPermissionEffects(videosVM.hasPermission, initialLoadGate, reloadAfterGrant, videosVM.source, feature = videosVM.accessFeature)
@@ -163,13 +166,13 @@ fun VideosPage(
                 itemsState = itemsState,
                 scrollToTop = { scope.launch { scrollState.scrollToItem(0) } },
                 onSortSelected = { sortBy ->
-                    scope.launch(Dispatchers.Default) {
+                    scope.launchSafe(onDone = { videosVM.showLoading.value = false }) {
                         Prefs.set(PrefKeys.VIDEO_SORT_BY, sortBy.name)
                         videosVM.sortBy.value = sortBy
                         videosVM.loadAsync(tagsVM)
                     }
                 },
-                onSearchAction = { tv -> scope.launch(Dispatchers.Default) { videosVM.loadAsync(tv) } },
+                onSearchAction = { tv -> scope.launchSafe(onDone = { videosVM.showLoading.value = false }) { videosVM.loadAsync(tv) } },
         bottomBar = {
             AnimatedBottomAction(visible = dragSelectState.showBottomActions()) {
                 MediaFilesSelectModeBottomActions(
@@ -255,7 +258,7 @@ fun VideosPage(
                                 }
                                 item(span = { GridItemSpan(maxLineSpan) }, key = "loadMore") {
                                     if (itemsState.isNotEmpty() && !videosVM.noMore.value) {
-                                        LaunchedEffect(Unit) { scope.launch(Dispatchers.Default) { videosVM.moreAsync(tagsVM) } }
+                                        LaunchedEffect(Unit) { scope.launchSafe { videosVM.moreAsync(tagsVM) } }
                                     }
                                     LoadMoreRefreshContent(videosVM.noMore.value)
                                 }
@@ -275,7 +278,7 @@ fun VideosPage(
         tagsVM = tagsVM,
         tagsMap = tagsMapState,
         tagsState = tagsState,
-        onRenamed = { scope.launch(Dispatchers.Default) { videosVM.loadAsync(tagsVM) } },
+        onRenamed = { scope.launchSafe(onDone = { videosVM.showLoading.value = false }) { videosVM.loadAsync(tagsVM) } },
         deleteAction = { item ->
             scope.launch(Dispatchers.Default) {
                 videosVM.delete(tagsVM, setOf(item.mediaId))

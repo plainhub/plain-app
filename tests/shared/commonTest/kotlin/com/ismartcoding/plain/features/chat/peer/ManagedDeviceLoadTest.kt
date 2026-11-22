@@ -19,6 +19,12 @@ import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.flowOf
 import com.ismartcoding.plain.rust.graphql.GraphqlResponse
 import com.ismartcoding.plain.rust.graphql.SubscriptionUpdate
+import com.ismartcoding.plain.ui.components.ToastManager
+import com.ismartcoding.plain.ui.tags.TagsViewModel
+import kotlinx.coroutines.CoroutineExceptionHandler
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.test.runTest
 import kotlin.io.encoding.Base64
 import kotlin.test.Test
@@ -29,6 +35,52 @@ import kotlin.test.assertFailsWith
 import kotlin.time.Instant
 
 class ManagedDeviceLoadTest {
+    @Test
+    fun remote_media_timeout_surfaces_the_error_and_leaves_the_page_usable() = runTest {
+        val peer = Peer(
+            id = "fixture-peer", name = "Device", ip = "device.test", status = PeerStatus.PAIRED, port = 8443,
+            deviceType = DeviceType.COMPUTER, createdAt = Instant.fromEpochMilliseconds(0), updatedAt = Instant.fromEpochMilliseconds(0),
+            publicKey = "fixture-key", token = "fixture-token",
+        )
+        val response = """{"data":{"app":{"deviceName":"Device","capabilities":[],"access":["IMAGES","VIDEOS"],"appDir":"app://","downloadsDir":"/downloads","urlToken":"resource-token","tlsCertificateSha256":"fixture-certificate"}}}"""
+        val requests = mutableListOf<GraphqlOperation>()
+        var failWithTimeout = false
+        val timeout = IllegalStateException("fixture response timeout")
+        val http = PeerHttpClient(
+            peer, peers = { listOf(peer) }, clientId = { "fixture-client" },
+            encrypt = { _, _, payload -> requests.add(JsonHelper.jsonDecode(payload)); Base64.encode(byteArrayOf(1)) },
+            decrypt = { _, _, _ -> Base64.encode(response.encodeToByteArray()) },
+            transport = object : GraphqlHttpTransport {
+                override suspend fun post(url: String, clientId: String, body: ByteArray, contentType: String, tlsCertificateSha256: String?): GraphqlHttpResponse {
+                    if (failWithTimeout) throw timeout
+                    return GraphqlHttpResponse(200, byteArrayOf(2))
+                }
+            },
+        )
+        val source = ContentSource.Remote(ManagedDeviceClient.load(peer, http))
+        val failures = mutableListOf<Throwable>()
+        val page = CoroutineScope(coroutineContext + SupervisorJob() + CoroutineExceptionHandler { _, error -> failures.add(error) })
+        val previousToast = ToastManager.current.value
+        failWithTimeout = true
+        try {
+            val tags = TagsViewModel(source.tags)
+            var folderRequests = 0
+            for ((field, vm) in listOf("videos" to VideosViewModel(source), "images" to ImagesViewModel(source))) {
+                ToastManager.current.value = null
+                vm.loadFromPage(page, tags) { folderRequests++ }.join()
+                assertTrue(requests.last().query.contains("$field("))
+                assertTrue(failures.isEmpty(), "A page load must not terminate the app")
+                assertEquals(timeout.message, ToastManager.current.value?.message)
+                assertFalse(vm.showLoading.value)
+                assertTrue(vm.itemsFlow.value.isEmpty())
+            }
+            assertEquals(0, folderRequests)
+        } finally {
+            page.cancel()
+            ToastManager.current.value = previousToast
+        }
+    }
+
     @Test
     fun entry_loads_access_once_and_media_starts_with_the_authoritative_grant() = runTest {
         val peer = Peer(

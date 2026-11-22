@@ -11,9 +11,18 @@ import javax.net.ssl.TrustManager
 import javax.net.ssl.X509TrustManager
 import java.util.concurrent.TimeUnit
 
-internal fun createPeerResourceHttpClient(resource: ManagedResource): OkHttpClient {
-    val origin = resource.url.toHttpUrl()
-    require(origin.isHttps) { "Peer resources require HTTPS" }
+private data class PinnedOrigin(val host: String, val port: Int, val fingerprint: String)
+
+private fun ManagedResource.pinnedOrigin(): PinnedOrigin {
+    val url = url.toHttpUrl()
+    require(url.isHttps) { "Peer resources require HTTPS" }
+    return PinnedOrigin(url.host, url.port, tlsCertificateSha256)
+}
+
+internal fun createPeerResourceHttpClient(resource: ManagedResource): OkHttpClient =
+    createPeerResourceHttpClient(resource.pinnedOrigin())
+
+private fun createPeerResourceHttpClient(origin: PinnedOrigin): OkHttpClient {
     val trust = object : X509TrustManager {
         override fun getAcceptedIssuers(): Array<X509Certificate> = emptyArray()
         override fun checkClientTrusted(chain: Array<X509Certificate>, authType: String) = throw CertificateException("Client certificates are unsupported")
@@ -21,7 +30,7 @@ internal fun createPeerResourceHttpClient(resource: ManagedResource): OkHttpClie
             val leaf = chain.firstOrNull() ?: throw CertificateException("Missing peer certificate")
             val digest = MessageDigest.getInstance("SHA-256").digest(leaf.encoded)
                 .joinToString("") { "%02x".format(it.toInt() and 0xff) }
-            if (digest != resource.tlsCertificateSha256) throw CertificateException("Peer certificate changed")
+            if (digest != origin.fingerprint) throw CertificateException("Peer certificate changed")
         }
     }
     val ssl = SSLContext.getInstance("TLS").apply { init(null, arrayOf<TrustManager>(trust), null) }
@@ -33,4 +42,17 @@ internal fun createPeerResourceHttpClient(resource: ManagedResource): OkHttpClie
         .retryOnConnectionFailure(false)
         .callTimeout(0, TimeUnit.MILLISECONDS)
         .build()
+}
+
+private const val MAX_IMAGE_ORIGINS = 8
+private val imageClients = LinkedHashMap<PinnedOrigin, OkHttpClient>(MAX_IMAGE_ORIGINS, 0.75f, true)
+
+internal fun peerImageHttpClient(resource: ManagedResource): OkHttpClient {
+    val origin = resource.pinnedOrigin()
+    return synchronized(imageClients) {
+        imageClients.getOrPut(origin) {
+            if (imageClients.size == MAX_IMAGE_ORIGINS) imageClients.remove(imageClients.keys.first())
+            createPeerResourceHttpClient(origin)
+        }
+    }
 }

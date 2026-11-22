@@ -19,6 +19,7 @@ import com.ismartcoding.plain.platform.media.deleteMedia
 import com.ismartcoding.plain.platform.media.restoreMedia
 import com.ismartcoding.plain.platform.media.trashMedia
 import com.ismartcoding.plain.ui.components.DialogHelper
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
@@ -87,6 +88,15 @@ abstract class BaseMediaViewModel<T : IData> internal constructor(val source: Co
             query += " bucket_id:${bucketId.value}"
         }
         return query
+    }
+
+    internal fun loadFromPage(
+        scope: CoroutineScope,
+        tagsVM: TagsViewModel,
+        loadFolders: suspend () -> Unit,
+    ) = scope.launchSafe(onDone = { showLoading.value = false }) {
+        loadAsync(tagsVM)
+        loadFolders()
     }
 
     suspend fun moreAsync(tagsVM: TagsViewModel) = withIO {

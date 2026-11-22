@@ -20,6 +20,8 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 import kotlin.test.assertFalse
+import kotlin.test.assertNotSame
+import kotlin.test.assertSame
 import kotlin.test.assertTrue
 
 class PeerResourceHttpClientTest {
@@ -40,6 +42,18 @@ class PeerResourceHttpClientTest {
         val keys = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm()).apply { init(store, charArrayOf()) }
         return SSLContext.getInstance("TLS").apply { init(keys.keyManagers, null, null) }
             .serverSocketFactory.createServerSocket(0) as SSLServerSocket
+    }
+
+    @Test
+    fun thumbnails_share_a_client_only_for_the_same_pinned_origin() {
+        val first = ManagedResource("https://127.0.0.1:8443/fs?id=first", fingerprint)
+        val second = first.copy(url = "https://127.0.0.1:8443/fs?id=second")
+
+        val client = peerImageHttpClient(first)
+        assertSame(client, peerImageHttpClient(second))
+        assertNotSame(client, peerImageHttpClient(second.copy(tlsCertificateSha256 = "0".repeat(64))))
+        assertNotSame(client, peerImageHttpClient(second.copy(url = "https://localhost:8443/fs?id=second")))
+        assertNotSame(client, peerImageHttpClient(second.copy(url = "https://127.0.0.1:9443/fs?id=second")))
     }
 
     @Test

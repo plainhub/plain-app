@@ -1,11 +1,23 @@
 package com.ismartcoding.plain.ui.home
 
+import com.ismartcoding.plain.models.MediaBucket
+import com.ismartcoding.plain.ui.components.sidebarBucketThumbnailPaths
 import com.ismartcoding.plain.ui.media.OnceOnOpenLoader
 import kotlin.test.Test
+import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
 class OnceOnOpenLoaderTest {
+    @Test
+    fun closedDrawerNeverSelectsThumbnailRequests() {
+        val paths = listOf("/fixture/one.jpg", "/fixture/two.jpg")
+        val bucket = MediaBucket("fixture", "Fixture", paths.size, paths)
+        assertEquals(emptyList(), sidebarBucketThumbnailPaths(bucket, isMedia = true, drawerOpen = false))
+        assertEquals(paths, sidebarBucketThumbnailPaths(bucket, isMedia = true, drawerOpen = true))
+        assertEquals(emptyList(), sidebarBucketThumbnailPaths(bucket, isMedia = true, drawerOpen = false))
+        assertEquals(emptyList(), sidebarBucketThumbnailPaths(bucket, isMedia = false, drawerOpen = true))
+    }
 
     @Test
     fun closedDrawerNeverFires() {

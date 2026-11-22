@@ -6,6 +6,7 @@ import com.ismartcoding.plain.models.Tag
 import com.ismartcoding.plain.models.TagRelation
 import com.ismartcoding.plain.ui.media.viewer.previewer.MediaPreviewerState
 import com.ismartcoding.plain.ui.platform.media.MediaPreviewer
+import com.ismartcoding.plain.ui.state.launchSafe
 import com.ismartcoding.plain.ui.tags.TagsViewModel
 import kotlinx.coroutines.launch
 
@@ -24,7 +25,7 @@ internal fun ImagesPagePreviewer(
         tagsMap = tagsMapState,
         tagsState = tagsState,
         onRenamed = {
-            scope.launch {
+            scope.launchSafe(onDone = { imagesVM.showLoading.value = false }) {
                 imagesVM.loadAsync(tagsVM)
             }
         },

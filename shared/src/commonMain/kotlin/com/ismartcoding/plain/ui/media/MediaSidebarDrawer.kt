@@ -37,7 +37,7 @@ import com.ismartcoding.plain.ui.components.confirmActionAsync
 import com.ismartcoding.plain.ui.files.documents.DocsViewModel
 import com.ismartcoding.plain.ui.files.MediaFoldersViewModel
 import com.ismartcoding.plain.ui.tags.TagsViewModel
-import kotlinx.coroutines.Dispatchers
+import com.ismartcoding.plain.ui.state.launchSafe
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
 import com.ismartcoding.plain.ui.resources.Res as UiRes
@@ -75,7 +75,7 @@ fun <T : IData> MediaSidebarDrawer(
     val openLoader = remember { OnceOnOpenLoader() }
     LaunchedEffect(drawerState.targetValue) {
         if (openLoader.shouldLoad(drawerState.targetValue == DrawerValue.Open)) {
-            scope.launch(Dispatchers.Default) {
+            scope.launchSafe {
                 mediaFoldersVM.loadAsync()
                 tagsVM.loadAsync()
             }
@@ -90,7 +90,7 @@ fun <T : IData> MediaSidebarDrawer(
     }
 
     fun loadMedia() {
-        scope.launch(Dispatchers.Default) {
+        scope.launchSafe(onDone = { mediaVM.showLoading.value = false }) {
             mediaVM.loadAsync(tagsVM)
         }
     }
@@ -184,10 +184,12 @@ fun <T : IData> MediaSidebarDrawer(
 
             if (foldersExpanded) {
                 val isMedia = mediaVM.dataType == DataType.IMAGE || mediaVM.dataType == DataType.VIDEO
+                val drawerOpen = drawerState.isOpen || drawerState.targetValue == DrawerValue.Open
                 buckets.forEach { bucket ->
                     MediaSidebarBucketItem(
                         m = bucket,
                         isMedia = isMedia,
+                        drawerOpen = drawerOpen,
                         isSelected = !mediaVM.trash.value && mediaVM.bucketId.value == bucket.id,
                         onClick = {
                             mediaVM.trash.value = false

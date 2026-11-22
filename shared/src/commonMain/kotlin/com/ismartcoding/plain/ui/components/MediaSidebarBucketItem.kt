@@ -19,9 +19,11 @@ fun MediaSidebarBucketItem(
     m: MediaBucket,
     isMedia: Boolean = false,
     isSelected: Boolean = false,
+    drawerOpen: Boolean,
     onClick: () -> Unit,
 ) {
-    val showThumbnail = isMedia && m.topItemPaths.isNotEmpty()
+    val thumbnailPaths = sidebarBucketThumbnailPaths(m, isMedia, drawerOpen)
+    val showThumbnail = thumbnailPaths.isNotEmpty()
     SidebarItem(
         label = m.name,
         subtitle = m.size.formatBytes(),
@@ -31,7 +33,7 @@ fun MediaSidebarBucketItem(
         leading = if (showThumbnail) {
             {
                 MediaThumbnailGrid(
-                    paths = m.topItemPaths,
+                    paths = thumbnailPaths,
                     contentDescription = null,
                     modifier = Modifier.size(40.dp).clip(MaterialTheme.shapes.medium),
                 )
@@ -40,3 +42,6 @@ fun MediaSidebarBucketItem(
         onClick = onClick,
     )
 }
+
+internal fun sidebarBucketThumbnailPaths(bucket: MediaBucket, isMedia: Boolean, drawerOpen: Boolean): List<String> =
+    if (isMedia && drawerOpen) bucket.topItemPaths else emptyList()

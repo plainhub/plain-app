@@ -46,6 +46,7 @@ import com.ismartcoding.plain.ui.base.fastscroll.LazyVerticalGridScrollbar
 import com.ismartcoding.plain.ui.components.pinchZoomGrid
 import com.ismartcoding.plain.ui.base.pullrefresh.LoadMoreRefreshContent
 import com.ismartcoding.plain.ui.base.pullrefresh.PullToRefresh
+import com.ismartcoding.plain.ui.components.ToastManager
 import com.ismartcoding.plain.ui.base.pullrefresh.RefreshContentState
 import com.ismartcoding.plain.ui.base.pullrefresh.rememberRefreshLayoutState
 import com.ismartcoding.plain.ui.base.pullrefresh.setRefreshState
@@ -66,7 +67,6 @@ import com.ismartcoding.plain.ui.state.exitSearchMode
 import com.ismartcoding.plain.ui.navigation.NavLoadGate
 import com.ismartcoding.plain.ui.casting.CastDialog
 import com.ismartcoding.plain.ui.tags.TagsBottomSheet
-import kotlinx.coroutines.Dispatchers
 import com.ismartcoding.plain.ui.state.launchSafe
 import kotlinx.coroutines.launch
 import com.ismartcoding.plain.ui.resources.Res as UiRes
@@ -100,7 +100,13 @@ fun ImagesPage(
     val bucketsMap by mediaFoldersVM.bucketsMapFlow.collectAsState()
     val cellsPerRow = remember { mutableIntStateOf(Prefs.imageGridCellsPerRow.value) }
     val topRefreshLayoutState = rememberRefreshLayoutState {
-        scope.launch {
+        scope.launchSafe(
+            onError = { error ->
+                setRefreshState(RefreshContentState.Failed)
+                ToastManager.showErrorToast(error.message ?: error.toString())
+            },
+            onDone = { imagesVM.showLoading.value = false },
+        ) {
             imagesVM.loadAsync(tagsVM)
             mediaFoldersVM.loadAsync()
             setRefreshState(RefreshContentState.Finished)
@@ -115,7 +121,7 @@ fun ImagesPage(
             imagesVM.showSearchBar.value && (!imagesVM.searchActive.value || imagesVM.queryText.value.isEmpty()) -> {
                 imagesVM.exitSearchMode()
                 imagesVM.showLoading.value = true
-                scope.launch {
+                scope.launchSafe(onDone = { imagesVM.showLoading.value = false }) {
                     imagesVM.loadAsync(tagsVM)
                 }
             }
@@ -123,12 +129,9 @@ fun ImagesPage(
     }
 
     val reloadAfterGrant: () -> Unit = {
-        scope.launchSafe(onDone = { imagesVM.showLoading.value = false }) {
-            cellsPerRow.value = Prefs.imageGridCellsPerRow.value
-            imagesVM.sortBy.value = Prefs.imageSortBy.value
-            imagesVM.loadAsync(tagsVM)
-            mediaFoldersVM.loadAsync()
-        }
+        cellsPerRow.value = Prefs.imageGridCellsPerRow.value
+        imagesVM.sortBy.value = Prefs.imageSortBy.value
+        imagesVM.loadFromPage(scope, tagsVM, mediaFoldersVM::loadAsync)
     }
 
     MediaPermissionEffects(imagesVM.hasPermission, initialLoadGate, reloadAfterGrant, imagesVM.source, imagesVM.accessFeature, imageLibraryPermission())
@@ -173,14 +176,14 @@ fun ImagesPage(
                     }
                 },
                 onSortSelected = { sortBy ->
-                    scope.launch {
+                    scope.launchSafe(onDone = { imagesVM.showLoading.value = false }) {
                         Prefs.set(PrefKeys.IMAGE_SORT_BY, sortBy.name)
                         imagesVM.sortBy.value = sortBy
                         imagesVM.loadAsync(tagsVM)
                     }
                 },
                 onSearchAction = { tv ->
-                    scope.launch {
+                    scope.launchSafe(onDone = { imagesVM.showLoading.value = false }) {
                         imagesVM.loadAsync(tv)
                     }
                 },
@@ -267,7 +270,7 @@ fun ImagesPage(
                                 }
                                 item(span = { GridItemSpan(maxLineSpan) }, key = "loadMore") {
                                     if (itemsState.isNotEmpty() && !imagesVM.noMore.value) {
-                                        LaunchedEffect(Unit) { scope.launch(Dispatchers.Default) { imagesVM.moreAsync(tagsVM) } }
+                                        LaunchedEffect(Unit) { scope.launchSafe { imagesVM.moreAsync(tagsVM) } }
                                     }
                                     LoadMoreRefreshContent(imagesVM.noMore.value)
                                 }
