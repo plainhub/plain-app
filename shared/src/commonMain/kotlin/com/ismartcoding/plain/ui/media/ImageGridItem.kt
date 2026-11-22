@@ -9,22 +9,18 @@ import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.selection.toggleable
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 import com.ismartcoding.plain.lib.extensions.formatBytes
-import com.ismartcoding.plain.lib.extensions.getFilenameFromPath
 import com.ismartcoding.plain.lib.withIO
 import com.ismartcoding.plain.platform.media.getMediaItemUriString
 import com.ismartcoding.plain.ui.base.dragselect.DragSelectState
 import com.ismartcoding.plain.ui.media.viewer.previewer.MediaPreviewerState
-import com.ismartcoding.plain.ui.media.viewer.previewer.TransformImageViewWithUri
 import com.ismartcoding.plain.ui.media.viewer.previewer.rememberTransformItemState
 import com.ismartcoding.plain.ui.casting.CastViewModel
 import com.ismartcoding.plain.ui.images.ImagesViewModel
@@ -43,7 +39,6 @@ fun ImageGridItem(
     showSize: Boolean,
     previewerState: MediaPreviewerState,
     dragSelectState: DragSelectState,
-    widthPx: Int,
 ) {
     val isSelected by remember { derivedStateOf { dragSelectState.isSelected(m.id) } }
     val inSelectionMode = dragSelectState.selectMode
@@ -94,15 +89,12 @@ fun ImageGridItem(
                 },
             ),
     ) {
-        TransformImageViewWithUri(
-            modifier = Modifier.size(with(LocalDensity.current) { widthPx.toDp() }),
+        MediaGridThumbnail(
             uri = getMediaItemUriString(imagesVM.dataType, m.id, m.path),
             path = m.path,
-            fileName = m.path.getFilenameFromPath(),
             key = m.id,
             itemState = itemState,
             previewerState = previewerState,
-            widthPx = widthPx
         )
 
         if (selected) {

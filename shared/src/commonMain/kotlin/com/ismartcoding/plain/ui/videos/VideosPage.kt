@@ -25,9 +25,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalHapticFeedback
-import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
@@ -86,7 +84,6 @@ fun VideosPage(
     castVM: CastViewModel = viewModel(key = "videoCastVM") { CastViewModel(source) },
 ) {
     val scope = rememberCoroutineScope()
-    val density = LocalDensity.current
     val hapticFeedback = LocalHapticFeedback.current
 
     LaunchedEffect(Unit) {
@@ -105,12 +102,6 @@ fun VideosPage(
     val tagsMapState by tagsVM.tagsMapFlow.collectAsState()
     val bucketsMap by mediaFoldersVM.bucketsMapFlow.collectAsState()
     val cellsPerRow = remember { mutableIntStateOf(Prefs.videoGridCellsPerRow.value) }
-    val windowInfo = LocalWindowInfo.current
-    val imageWidthPx = remember(cellsPerRow.value, windowInfo.containerSize.width) {
-        with(density) {
-            ((windowInfo.containerSize.width.toDp() - ((cellsPerRow.value - 1) * 2).dp) / cellsPerRow.value).toPx().toInt()
-        }
-    }
     val topRefreshLayoutState = rememberRefreshLayoutState {
         scope.launch {
             videosVM.loadAsync(tagsVM)
@@ -244,7 +235,6 @@ fun VideosPage(
                                                 showSize = cellsPerRow.value < 6,
                                                 previewerState,
                                                 dragSelectState,
-                                                imageWidthPx,
                                                 sort = videosVM.sortBy.value,
                                             )
                                         }
@@ -259,7 +249,6 @@ fun VideosPage(
                                             showSize = cellsPerRow.value < 6,
                                             previewerState,
                                             dragSelectState,
-                                            imageWidthPx,
                                             sort = videosVM.sortBy.value,
                                         )
                                     }
