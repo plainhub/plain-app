@@ -13,6 +13,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.key
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -28,7 +29,9 @@ import coil3.compose.AsyncImagePainter
 import coil3.compose.LocalPlatformContext
 import coil3.compose.rememberAsyncImagePainter
 import coil3.request.ImageRequest
+import coil3.request.crossfade
 import coil3.network.HttpException
+import com.ismartcoding.plain.features.chat.peer.ResourceSize
 import com.ismartcoding.plain.lib.logcat.LogCat
 import kotlin.time.Instant
 import com.ismartcoding.plain.lib.extensions.isImageFast
@@ -47,16 +50,25 @@ fun TransformImageViewWithUri(
     widthPx: Int, forceVideoDecoder: Boolean = false, version: Instant? = null,
 ) {
     val source = com.ismartcoding.plain.ui.navigation.LocalContentSource.current
-    val resource by com.ismartcoding.plain.ui.navigation.rememberContentResource(
-        source, path, com.ismartcoding.plain.features.chat.peer.ResourceSize.SM, version,
-    )
+    val managedThumbnail = if (source is com.ismartcoding.plain.rust.graphql.ContentSource.Remote && version != null) {
+        val info = source.client.currentInfo
+        remember(source, path, version, info.urlToken, info.tlsCertificateSha256) {
+            source.client.versionedThumbnail(path, ResourceSize.SM, version)
+        }
+    } else null
+    val resource = if (managedThumbnail == null) {
+        com.ismartcoding.plain.ui.navigation.rememberContentResource(source, path, ResourceSize.SM, version).value
+    } else null
     TransformImageView(modifier = modifier, key = key, itemState = itemState, contentState = previewerState.transformState) { itemKey ->
         key(itemKey) {
             val painter = rememberAsyncImagePainter(
-                model = ImageRequest.Builder(LocalPlatformContext.current).data(if (source is com.ismartcoding.plain.rust.graphql.ContentSource.Local) uri ?: path else resource?.getOrNull()).size(widthPx)
+                model = ImageRequest.Builder(LocalPlatformContext.current)
+                    .data(managedThumbnail ?: if (source is com.ismartcoding.plain.rust.graphql.ContentSource.Local) uri ?: path else resource?.getOrNull())
+                    .size(widthPx)
+                    .apply { if (managedThumbnail != null) crossfade(false) }
                     .applyForceVideoDecoder(forceVideoDecoder && source is com.ismartcoding.plain.rust.graphql.ContentSource.Local).build(),
                 onError = { state ->
-                    if (source is com.ismartcoding.plain.rust.graphql.ContentSource.Remote && resource?.isSuccess == true) {
+                    if (managedThumbnail != null || source is com.ismartcoding.plain.rust.graphql.ContentSource.Remote && resource?.isSuccess == true) {
                         val cause = state.result.throwable
                         val reason = if (cause is HttpException) "HTTP ${cause.response.code}" else cause::class.simpleName
                         LogCat.w("Remote thumbnail request failed: $reason")

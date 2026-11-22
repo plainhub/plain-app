@@ -105,10 +105,10 @@ class ManagedDeviceLoadTest {
 
     @Test
     @OptIn(ExperimentalFoundationApi::class)
-    fun remote_video_grid_warms_two_viewports_and_keeps_half_a_viewport_behind() = with(remoteVideosCacheWindow) {
+    fun remote_video_grid_bounds_offscreen_thumbnail_work() = with(remoteVideosCacheWindow) {
         with(Density(2f)) {
-            assertEquals(2400, calculateAheadWindow(1200))
-            assertEquals(600, calculateBehindWindow(1200))
+            assertEquals(300, calculateAheadWindow(1200))
+            assertEquals(0, calculateBehindWindow(1200))
         }
     }
 

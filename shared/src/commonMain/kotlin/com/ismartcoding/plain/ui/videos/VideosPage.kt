@@ -37,6 +37,9 @@ import com.ismartcoding.plain.ui.platform.media.MediaPreviewer
 import com.ismartcoding.plain.ui.navigation.PBackHandler
 import com.ismartcoding.plain.ui.platform.system.isGestureInteractionMode
 import com.ismartcoding.plain.Prefs
+import coil3.SingletonImageLoader
+import coil3.compose.LocalPlatformContext
+import com.ismartcoding.plain.rust.graphql.ContentSource
 import com.ismartcoding.plain.ui.base.AnimatedBottomAction
 import com.ismartcoding.plain.ui.base.BottomSpace
 import com.ismartcoding.plain.ui.components.NeedPermissionColumn
@@ -75,7 +78,15 @@ import com.ismartcoding.plain.ui.resources.Res as UiRes
 import com.ismartcoding.plain.ui.resources.video as ui_drawable_video
 
 @OptIn(ExperimentalFoundationApi::class)
-internal val remoteVideosCacheWindow = LazyLayoutCacheWindow(aheadFraction = 2f, behindFraction = 0.5f)
+internal val remoteVideosCacheWindow = LazyLayoutCacheWindow(aheadFraction = 0.25f, behindFraction = 0f)
+
+@Composable
+private fun videosViewModel(source: ContentSource): VideosViewModel {
+    val cache = if (source is ContentSource.Remote) {
+        SingletonImageLoader.get(LocalPlatformContext.current).diskCache?.let(::VideoGridCache)
+    } else null
+    return viewModel(key = "videosVM") { VideosViewModel(source, cache) }
+}
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
@@ -83,7 +94,7 @@ fun VideosPage(
     navController: NavHostController,
     initialLoadGate: NavLoadGate? = null,
     source: com.ismartcoding.plain.rust.graphql.ContentSource = com.ismartcoding.plain.ui.navigation.LocalContentSource.current,
-    videosVM: VideosViewModel = viewModel(key = "videosVM") { VideosViewModel(source) },
+    videosVM: VideosViewModel = videosViewModel(source),
     tagsVM: TagsViewModel = viewModel(key = "videoTagsVM") { TagsViewModel(source.tags) },
     mediaFoldersVM: MediaFoldersViewModel = viewModel(key = "videoFoldersVM") { MediaFoldersViewModel(source) },
     castVM: CastViewModel = viewModel(key = "videoCastVM") { CastViewModel(source) },
@@ -140,7 +151,7 @@ fun VideosPage(
     val reloadAfterGrant: () -> Unit = {
         cellsPerRow.value = Prefs.videoGridCellsPerRow.value
         videosVM.sortBy.value = Prefs.videoSortBy.value
-        videosVM.loadFromPage(scope, tagsVM, mediaFoldersVM::loadAsync)
+        videosVM.enterPage(scope, tagsVM, mediaFoldersVM::loadAsync)
     }
 
     MediaPermissionEffects(videosVM.hasPermission, initialLoadGate, reloadAfterGrant, videosVM.source, feature = videosVM.accessFeature)

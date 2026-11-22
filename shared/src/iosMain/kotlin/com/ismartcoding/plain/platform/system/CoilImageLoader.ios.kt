@@ -12,6 +12,8 @@ internal actual fun platformImageLoaderBuilder(context: PlatformContext): ImageL
         .components {
             add(ManagedImageCacheKeyer)
             add(ManagedImageFetcher())
+            add(VersionedManagedThumbnailKeyer)
+            add(VersionedManagedThumbnailFetcher())
             add(IosPhotoFetcher.Factory())
             add(SvgDecoder.Factory(true))
             add(NetworkFetcher.Factory(networkClient = { IosImageNetworkClient() }))

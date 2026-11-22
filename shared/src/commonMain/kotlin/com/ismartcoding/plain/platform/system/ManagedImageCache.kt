@@ -8,12 +8,16 @@ import coil3.network.NetworkResponse
 import coil3.request.CachePolicy
 import coil3.request.Options
 import com.ismartcoding.plain.models.ManagedResource
+import com.ismartcoding.plain.models.ManagedThumbnail
 
 internal fun ManagedResource.imageCacheKey(): String? =
     if (thumbnail?.versioned == true) thumbnailDiskCacheKey() else null
 
 internal fun ManagedResource.thumbnailDiskCacheKey(): String? =
-    thumbnail?.let { "$tlsCertificateSha256:${it.cacheId}" }
+    thumbnail?.let { thumbnailDiskCacheKey(tlsCertificateSha256, it) }
+
+internal fun thumbnailDiskCacheKey(fingerprint: String, thumbnail: ManagedThumbnail): String =
+    "$fingerprint:${thumbnail.cacheId}"
 
 internal val ManagedImageCacheKeyer = Keyer<ManagedResource> { resource, _ -> resource.imageCacheKey() }
 

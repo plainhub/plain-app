@@ -2,6 +2,7 @@ package com.ismartcoding.plain.rust.graphql
 
 import com.ismartcoding.plain.models.ManagedResource
 import okhttp3.OkHttpClient
+import okhttp3.Dispatcher
 import okhttp3.HttpUrl.Companion.toHttpUrl
 import java.security.MessageDigest
 import java.security.cert.CertificateException
@@ -22,7 +23,7 @@ private fun ManagedResource.pinnedOrigin(): PinnedOrigin {
 internal fun createPeerResourceHttpClient(resource: ManagedResource): OkHttpClient =
     createPeerResourceHttpClient(resource.pinnedOrigin())
 
-private fun createPeerResourceHttpClient(origin: PinnedOrigin): OkHttpClient {
+private fun createPeerResourceHttpClient(origin: PinnedOrigin, imageRequests: Boolean = false): OkHttpClient {
     val trust = object : X509TrustManager {
         override fun getAcceptedIssuers(): Array<X509Certificate> = emptyArray()
         override fun checkClientTrusted(chain: Array<X509Certificate>, authType: String) = throw CertificateException("Client certificates are unsupported")
@@ -35,6 +36,7 @@ private fun createPeerResourceHttpClient(origin: PinnedOrigin): OkHttpClient {
     }
     val ssl = SSLContext.getInstance("TLS").apply { init(null, arrayOf<TrustManager>(trust), null) }
     return OkHttpClient.Builder()
+        .apply { if (imageRequests) dispatcher(Dispatcher().apply { maxRequestsPerHost = 12 }) }
         .sslSocketFactory(ssl.socketFactory, trust)
         .hostnameVerifier { hostname, _ -> hostname == origin.host }
         .followRedirects(false)
@@ -52,7 +54,7 @@ internal fun peerImageHttpClient(resource: ManagedResource): OkHttpClient {
     return synchronized(imageClients) {
         imageClients.getOrPut(origin) {
             if (imageClients.size == MAX_IMAGE_ORIGINS) imageClients.remove(imageClients.keys.first())
-            createPeerResourceHttpClient(origin)
+            createPeerResourceHttpClient(origin, imageRequests = true)
         }
     }
 }

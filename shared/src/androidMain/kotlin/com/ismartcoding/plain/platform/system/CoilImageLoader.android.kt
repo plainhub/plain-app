@@ -115,6 +115,8 @@ internal actual fun platformImageLoaderBuilder(context: PlatformContext): ImageL
         .components {
             add(ManagedImageCacheKeyer)
             add(ManagedImageFetcher())
+            add(VersionedManagedThumbnailKeyer)
+            add(VersionedManagedThumbnailFetcher())
             add(PackageIconMapper())
             add(SvgDecoder.Factory(true))
             add(AnimatedImageDecoder.Factory())

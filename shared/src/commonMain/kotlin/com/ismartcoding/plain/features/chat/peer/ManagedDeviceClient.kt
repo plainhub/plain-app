@@ -1,6 +1,5 @@
 package com.ismartcoding.plain.features.chat.peer
 
-import com.ismartcoding.plain.Prefs
 import com.ismartcoding.plain.models.AuthErrorCode
 import com.ismartcoding.plain.models.PeerConnectionErrorCode
 
@@ -18,6 +17,8 @@ import com.ismartcoding.plain.models.ManagedDeviceInfo
 import com.ismartcoding.plain.models.ManagedResource
 import com.ismartcoding.plain.models.ManagedThumbnail
 import com.ismartcoding.plain.models.Peer
+import com.ismartcoding.plain.platform.system.VersionedManagedThumbnail
+import com.ismartcoding.plain.platform.system.thumbnailDiskCacheKey
 import com.ismartcoding.plain.rust.graphql.changes
 import com.ismartcoding.plain.rust.graphql.GraphqlApi
 import com.ismartcoding.plain.rust.graphql.GraphqlRequest
@@ -103,6 +104,25 @@ internal class ManagedDeviceClient private constructor(
         version: Instant? = null,
     ): ManagedResource = resource(http.current(), currentInfo, path, size, action, version)
 
+    private fun cacheAuthority(info: ManagedDeviceInfo) = listOf(
+        peer.id, peer.publicKey, peer.token, info.urlToken,
+    )
+
+    fun videoCatalogCacheScope(): String = sha256(
+        JsonHelper.jsonEncode(cacheAuthority(currentInfo)).encodeToByteArray(),
+    ).toHexString()
+
+    fun versionedThumbnail(path: String, size: ResourceSize, version: Instant): VersionedManagedThumbnail? {
+        val info = currentInfo
+        val fingerprint = info.tlsCertificateSha256 ?: return null
+        val key = thumbnailDiskCacheKey(fingerprint, thumbnail(info, path, size, version))
+        return VersionedManagedThumbnail(key) {
+            resource(path, size, version = version).also {
+                check(it.thumbnailDiskCacheKey() == key) { "Thumbnail authorization changed" }
+            }
+        }
+    }
+
     suspend fun thumbnailResources(paths: List<String>): Map<String, ManagedResource> {
         if (paths.isEmpty()) return emptyMap()
         val peer = http.current()
@@ -124,14 +144,15 @@ internal class ManagedDeviceClient private constructor(
         val fileId = http.getFileId(info.urlToken, path)
         val url = managedResourceUrl(current.getBaseUrl(), fileId, size, action, version)
         val thumbnail = if (action == FileAction.PREVIEW && size != null) {
-            val identity = listOf(
-                current.id, current.publicKey, current.token, Prefs.clientId.value, info.urlToken,
-                path, size.name, version?.toString(),
-            )
-            val cacheId = sha256(JsonHelper.jsonEncode(identity).encodeToByteArray()).toHexString()
-            ManagedThumbnail(cacheId, versioned = version != null)
+            thumbnail(info, path, size, version)
         } else null
         return ManagedResource(url, fingerprint, thumbnail)
+    }
+
+    private fun thumbnail(info: ManagedDeviceInfo, path: String, size: ResourceSize, version: Instant?): ManagedThumbnail {
+        val identity = cacheAuthority(info) + listOf(path, size.name, version?.toString())
+        val cacheId = sha256(JsonHelper.jsonEncode(identity).encodeToByteArray()).toHexString()
+        return ManagedThumbnail(cacheId, versioned = version != null)
     }
 
     suspend fun downloadFile(path: String, name: String): String {

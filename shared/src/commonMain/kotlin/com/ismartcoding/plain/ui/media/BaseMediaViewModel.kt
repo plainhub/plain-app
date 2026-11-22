@@ -12,6 +12,7 @@ import androidx.lifecycle.viewModelScope
 import com.ismartcoding.plain.IData
 import com.ismartcoding.plain.platform.system.DataType
 import com.ismartcoding.plain.models.mediaSortBy
+import com.ismartcoding.plain.models.MediaSortBy
 import com.ismartcoding.plain.models.Tag
 import com.ismartcoding.plain.helpers.SearchHelper
 import com.ismartcoding.plain.lib.withIO
@@ -111,14 +112,19 @@ abstract class BaseMediaViewModel<T : IData> internal constructor(
     }
 
     open suspend fun loadAsync(tagsVM: TagsViewModel) = withIO {
-        val items = searchMediaAsync(getQuery(), limit = initialPageSize)
+        val query = getQuery()
+        val sort = sortBy.value
+        val items = searchMediaAsync(query, limit = initialPageSize, sort = sort)
         noMore.value = items.size < initialPageSize
         _itemsFlow.value = items
+        onInitialRows(query, sort, items)
         tagsVM.loadAsync(items.map { it.id }.toSet())
         total.intValue = countMediaAsync(getTotalQuery())
         totalTrash.intValue = countMediaAsync(getTrashQuery())
         showLoading.value = false
     }
+
+    protected open fun onInitialRows(query: String, sort: MediaSortBy, items: List<T>) = Unit
 
     fun share(ids: Collection<String>) {
         viewModelScope.launchSafe {
@@ -175,7 +181,8 @@ abstract class BaseMediaViewModel<T : IData> internal constructor(
         query: String,
         offset: Int = 0,
         limit: Int = pageSize,
+        sort: MediaSortBy = sortBy.value,
     ): List<T> = withIO {
-        source.catalog.rows(dataType, query, limit, offset, sortBy.value) as List<T>
+        source.catalog.rows(dataType, query, limit, offset, sort) as List<T>
     }
 }
