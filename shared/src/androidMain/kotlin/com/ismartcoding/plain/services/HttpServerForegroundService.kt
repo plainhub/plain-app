@@ -41,7 +41,7 @@ class HttpServerForegroundService : LifecycleService() {
             return START_NOT_STICKY
         }
         HttpServerManager.foregroundServiceError.value = ""
-        return START_STICKY
+        return START_NOT_STICKY
     }
 
     override fun onDestroy() {
