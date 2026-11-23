@@ -43,16 +43,7 @@ operator fun String.times(x: Int): String {
     return stringBuilder.toString()
 }
 
-fun String.isTextFile(): Boolean {
-    val list = setOf(
-        "txt", "md", "xml", "html", "json", "csv", "log", "yaml", "yml", "ovpn", "opml",
-        "cfg", "conf", "ini", "rtf", "tex", "sh", "bat", "properties", "plist",
-        "asp", "aspx", "php", "js", "css", "java", "py", "rb", "rs", "swift", "kt",
-        "go", "sql", "ts"
-    )
-
-    return list.contains(getFilenameExtension())
-}
+fun String.isTextFile() = isTextFileName(this)
 
 fun String.isOfficeFile() = getFilenameExtension().lowercase() in setOf("doc", "docx", "xls", "xlsx", "ppt", "pptx")
 

@@ -135,6 +135,20 @@ class StringExtensionsTest {
     }
 
     @Test
+    fun isTextFile_sourceCodeAndConfiguration() {
+        val textFiles = listOf(
+            "main.cpp", "src/HEADER.HPP", "native.c", "Main.cs", "settings.toml",
+            "script.mjs", "data.tsv", "Dockerfile", ".gitignore", "README.markdown",
+        )
+        for (name in textFiles) {
+            assertTrue(name.isTextFile(), name)
+        }
+        for (name in listOf("cpp", "Dockerfile.bin", "dir.cpp/archive", ".gitignore.zip", "archive")) {
+            assertFalse(name.isTextFile(), name)
+        }
+    }
+
+    @Test
     fun isPdfFile() {
         assertTrue("doc.pdf".isPdfFile())
         assertTrue("doc.PDF".isPdfFile())
