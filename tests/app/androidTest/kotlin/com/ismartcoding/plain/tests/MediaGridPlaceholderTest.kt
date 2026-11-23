@@ -81,6 +81,7 @@ class MediaGridPlaceholderTest {
                                                 uri = file.path,
                                                 path = file.path,
                                                 key = file.name,
+                                                thumbHash = null,
                                                 updatedAt = Instant.fromEpochMilliseconds(0),
                                                 itemState = rememberTransformItemState(),
                                                 previewerState = rememberPreviewerState(),
