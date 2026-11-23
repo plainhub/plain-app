@@ -12,6 +12,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.mutableStateOf
@@ -23,7 +24,9 @@ import androidx.test.core.app.ActivityScenario
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.ismartcoding.plain.MainActivity
+import com.ismartcoding.plain.models.MediaBucketCover
 import com.ismartcoding.plain.ui.media.MediaGridThumbnail
+import com.ismartcoding.plain.ui.media.MediaThumbnailGrid
 import com.ismartcoding.plain.ui.media.viewer.previewer.rememberPreviewerState
 import com.ismartcoding.plain.ui.media.viewer.previewer.rememberTransformItemState
 import com.ismartcoding.plain.ui.theme.AppTheme
@@ -43,12 +46,14 @@ class MediaGridPlaceholderTest {
     private val instrumentation = InstrumentationRegistry.getInstrumentation()
 
     @Test
-    fun missingImageAndVideoUseThemeColorAndDecodedImageReplacesIt() {
+    fun gridShowsThemeColorAndThumbHashUntilThumbnailsAreAvailable() {
         val folder = createTempDirectory(instrumentation.targetContext.cacheDir.toPath(), "grid-placeholder-").toFile()
         val missingImage = File(folder, "missing.png")
         val missingVideo = File(folder, "missing.mp4")
         val validImage = File(folder, "preview.png")
         val previewColor = Color.rgb(23, 118, 86)
+        val thumbHash = "2BoDBwAAAAAAAAAAAAAAAAAAAAAAAAAA"
+        val updatedAt = Instant.fromEpochMilliseconds(0)
         val image = Bitmap.createBitmap(16, 16, Bitmap.Config.ARGB_8888)
         image.eraseColor(previewColor)
         validImage.outputStream().use { image.compress(Bitmap.CompressFormat.PNG, 100, it) }
@@ -70,10 +75,10 @@ class MediaGridPlaceholderTest {
                             ) {
                                 Row(Modifier.onGloballyPositioned { coordinates ->
                                     val start = coordinates.positionInWindow()
-                                    val side = coordinates.size.width / 3
+                                    val side = coordinates.size.width / 4
                                     val left = start.x.roundToInt()
                                     val top = start.y.roundToInt()
-                                    sample.set(Rect(left, top + side / 4, left + side * 3, top + side * 3 / 4))
+                                    sample.set(Rect(left, top + side / 4, left + side * 4, top + side * 3 / 4))
                                 }) {
                                     for (file in listOf(missingImage, missingVideo, validImage)) {
                                         androidx.compose.foundation.layout.Box(Modifier.width(72.dp)) {
@@ -81,13 +86,18 @@ class MediaGridPlaceholderTest {
                                                 uri = file.path,
                                                 path = file.path,
                                                 key = file.name,
-                                                thumbHash = null,
-                                                updatedAt = Instant.fromEpochMilliseconds(0),
+                                                thumbHash = if (file == missingImage) null else thumbHash,
+                                                updatedAt = updatedAt,
                                                 itemState = rememberTransformItemState(),
                                                 previewerState = rememberPreviewerState(),
                                             )
                                         }
                                     }
+                                    MediaThumbnailGrid(
+                                        items = listOf(MediaBucketCover(missingVideo.path, updatedAt, thumbHash)),
+                                        contentDescription = null,
+                                        modifier = Modifier.size(72.dp),
+                                    )
                                 }
                             }
                         }
@@ -112,7 +122,8 @@ class MediaGridPlaceholderTest {
     ) {
         val deadline = SystemClock.elapsedRealtime() + 5_000
         var observed: List<Int>? = null
-        val wanted = listOf(placeholder, placeholder, previewColor)
+        val hashColor = Color.rgb(199, 57, 35)
+        val wanted = listOf(placeholder, hashColor, previewColor, hashColor)
         while (SystemClock.elapsedRealtime() < deadline) {
             instrumentation.waitForIdleSync()
             val bounds = sample.get()
@@ -124,8 +135,8 @@ class MediaGridPlaceholderTest {
                         PixelCopy.request(activity.window, bounds, bitmap, { result.complete(it) }, Handler(Looper.getMainLooper()))
                     }
                     assertEquals(PixelCopy.SUCCESS, result.get(3, TimeUnit.SECONDS).toInt())
-                    val side = bitmap.width / 3
-                    observed = List(3) { tile ->
+                    val side = bitmap.width / 4
+                    observed = List(4) { tile ->
                         val x = tile * side + side / 4
                         val y = bitmap.height / 2
                         val pixel = bitmap.getPixel(x, y)
