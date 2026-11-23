@@ -125,6 +125,7 @@
     <string name="stay_online_foreground_desc">PlainApp সামনে খোলা থাকলেই দূরবর্তী অ্যাক্সেস কাজ করে। অনলাইনে থাকুন স্ক্রিন চালু রাখে এবং কালো স্ক্রিন দেখানোর সুযোগ দেয়।</string>
     <string name="expanded">প্রসারিত</string>
     <string name="collapsed">সংকুচিত</string>
+    <string name="keep_online_in_background">ব্যাকগ্রাউন্ডে অনলাইনে থাকুন</string>
     <string name="background_online_failed">ব্যাকগ্রাউন্ডে চলা চালিয়ে যাওয়া যায়নি। নিচে “অনলাইনে থাকুন” চেষ্টা করুন।</string>
     <string name="enable_desktop_access">কম্পিউটার অ্যাক্সেস চালু করুন</string>
     <string name="disable_desktop_access">কম্পিউটার অ্যাক্সেস বন্ধ করুন</string>

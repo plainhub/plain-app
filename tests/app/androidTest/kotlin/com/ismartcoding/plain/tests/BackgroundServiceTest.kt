@@ -1,6 +1,7 @@
 package com.ismartcoding.plain.tests
 
 import android.app.ActivityManager
+import android.app.Notification
 import android.app.NotificationManager
 import android.os.Build
 import android.os.SystemClock
@@ -21,6 +22,7 @@ import com.ismartcoding.plain.Prefs
 import com.ismartcoding.plain.ui.app.MainViewModel
 import com.ismartcoding.plain.services.HttpServerForegroundService
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Assume.assumeFalse
 import org.junit.Assume.assumeTrue
@@ -31,6 +33,47 @@ import org.junit.runner.RunWith
 class BackgroundServiceTest {
     private val instrumentation = InstrumentationRegistry.getInstrumentation()
     private val context = instrumentation.targetContext
+
+    @Test
+    fun foregroundNotificationShowsBackgroundStatusInEnglish() {
+        assumeTrue(context.resources.configuration.locales[0].language == "en")
+        val notification = HttpServerForegroundService.createNotification(context)
+        assertEquals("Keep online in background", notification.extras.getCharSequence(Notification.EXTRA_TITLE)?.toString())
+    }
+
+    @Test
+    fun removingAppTaskStopsServiceAndRemovesNotification() {
+        val activityManager = context.getSystemService(ActivityManager::class.java)
+        val notifications = context.getSystemService(NotificationManager::class.java)
+        fun serviceRunning() = activityManager.getRunningServices(Int.MAX_VALUE).any {
+            it.service.className == HttpServerForegroundService::class.java.name
+        }
+        fun notificationPosted() = notifications.activeNotifications.any {
+            it.id == HttpServerForegroundService.notificationId
+        }
+
+        ActivityScenario.launch(MainActivity::class.java).use { scenario ->
+            val deadline = SystemClock.elapsedRealtime() + 5_000
+            while ((!serviceRunning() || (notifications.areNotificationsEnabled() && !notificationPosted())) &&
+                SystemClock.elapsedRealtime() < deadline
+            ) {
+                SystemClock.sleep(50)
+            }
+            assertTrue("Opening PlainApp should start its service", serviceRunning())
+            if (notifications.areNotificationsEnabled()) {
+                assertTrue("Opening PlainApp should post its service notification", notificationPosted())
+            }
+
+            scenario.onActivity { it.finishAndRemoveTask() }
+
+            val removalDeadline = SystemClock.elapsedRealtime() + 5_000
+            while ((serviceRunning() || notificationPosted()) && SystemClock.elapsedRealtime() < removalDeadline) {
+                SystemClock.sleep(50)
+            }
+            assertFalse("Removing the task should stop the foreground service", serviceRunning())
+            assertFalse("Removing the task should remove its foreground notification", notificationPosted())
+        }
+    }
 
     @Test
     fun openingAppKeepsServiceInForegroundAfterUiStops() {

@@ -126,6 +126,7 @@
     <string name="stay_online_foreground_desc">El acceso remoto solo funciona mientras PlainApp está en primer plano. Permanecer en línea mantiene la pantalla encendida y permite mostrarla en negro.</string>
     <string name="expanded">Expandido</string>
     <string name="collapsed">Contraído</string>
+    <string name="keep_online_in_background">Seguir en línea en segundo plano</string>
     <string name="background_online_failed">No se pudo seguir ejecutando en segundo plano. Prueba «Permanecer en línea» más abajo.</string>
     <string name="enable_desktop_access">Activar acceso desde el ordenador</string>
     <string name="disable_desktop_access">Desactivar acceso desde el ordenador</string>

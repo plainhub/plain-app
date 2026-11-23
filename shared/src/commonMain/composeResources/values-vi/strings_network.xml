@@ -126,6 +126,7 @@
     <string name="stay_online_foreground_desc">Truy cập từ xa chỉ hoạt động khi PlainApp ở phía trước. Giữ trực tuyến giữ màn hình sáng và cho phép chuyển sang màn hình đen.</string>
     <string name="expanded">Đã mở rộng</string>
     <string name="collapsed">Đã thu gọn</string>
+    <string name="keep_online_in_background">Duy trì trực tuyến trong nền</string>
     <string name="background_online_failed">Không thể tiếp tục chạy trong nền. Hãy thử “Giữ trực tuyến” bên dưới.</string>
     <string name="enable_desktop_access">Bật truy cập từ máy tính</string>
     <string name="disable_desktop_access">Tắt truy cập từ máy tính</string>

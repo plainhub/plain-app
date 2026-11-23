@@ -10,8 +10,8 @@ import androidx.lifecycle.LifecycleService
 import com.ismartcoding.plain.lib.UrlHelper
 import com.ismartcoding.plain.ui.platform.notifications.NotificationHelper
 import com.ismartcoding.plain.i18n.Res
-import com.ismartcoding.plain.i18n.app_name
 import com.ismartcoding.plain.i18n.background_online_failed
+import com.ismartcoding.plain.i18n.keep_online_in_background
 import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.ui.i18n.LocaleHelper
 import com.ismartcoding.plain.HttpServerManager
@@ -75,7 +75,7 @@ class HttpServerForegroundService : LifecycleService() {
 
         fun createNotification(context: Context) = NotificationHelper.createServiceNotification(
             context = context,
-            title = LocaleHelper.getString(Res.string.app_name),
+            title = LocaleHelper.getString(Res.string.keep_online_in_background),
             description = getHttpServerUrls(),
         )
 

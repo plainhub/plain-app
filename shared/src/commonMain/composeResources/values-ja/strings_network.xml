@@ -126,6 +126,7 @@
     <string name="stay_online_foreground_desc">リモートアクセスは PlainApp が前面にある間のみ利用できます。「オンライン状態を維持」で画面の自動ロックを防ぎ、黒い画面に切り替えられます。</string>
     <string name="expanded">展開済み</string>
     <string name="collapsed">折りたたみ済み</string>
+    <string name="keep_online_in_background">バックグラウンドで接続を維持</string>
     <string name="background_online_failed">バックグラウンドでの実行を継続できませんでした。下の「オンライン状態を維持」をお試しください。</string>
     <string name="enable_desktop_access">パソコンからのアクセスを有効にする</string>
     <string name="disable_desktop_access">パソコンからのアクセスを無効にする</string>

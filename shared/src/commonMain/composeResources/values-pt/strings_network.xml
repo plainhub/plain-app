@@ -126,6 +126,7 @@
     <string name="stay_online_foreground_desc">O acesso remoto só funciona enquanto o PlainApp está em primeiro plano. Manter online mantém a tela ligada e permite exibir uma tela preta.</string>
     <string name="expanded">Expandido</string>
     <string name="collapsed">Recolhido</string>
+    <string name="keep_online_in_background">Manter online em segundo plano</string>
     <string name="background_online_failed">Não foi possível continuar em segundo plano. Experimente «Manter online» abaixo.</string>
     <string name="enable_desktop_access">Ativar acesso pelo computador</string>
     <string name="disable_desktop_access">Desativar acesso pelo computador</string>

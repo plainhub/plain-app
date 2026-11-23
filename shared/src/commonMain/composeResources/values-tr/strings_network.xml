@@ -126,6 +126,7 @@
     <string name="stay_online_foreground_desc">Uzaktan erişim yalnızca PlainApp ön plandayken çalışır. Çevrimiçi kal ekranı açık tutar ve siyah ekran gösterebilir.</string>
     <string name="expanded">Genişletildi</string>
     <string name="collapsed">Daraltıldı</string>
+    <string name="keep_online_in_background">Arka planda çevrimiçi kal</string>
     <string name="background_online_failed">Arka planda çalışmaya devam edilemedi. Aşağıdaki “Çevrimiçi kal” seçeneğini deneyin.</string>
     <string name="enable_desktop_access">Bilgisayar erişimini aç</string>
     <string name="disable_desktop_access">Bilgisayar erişimini kapat</string>

@@ -124,6 +124,7 @@
     <string name="stay_online_foreground_desc">Remote access only works while PlainApp is in the foreground. Stay Online keeps the screen awake and can show a black screen.</string>
     <string name="expanded">Expanded</string>
     <string name="collapsed">Collapsed</string>
+    <string name="keep_online_in_background">Keep online in background</string>
     <string name="background_online_failed">Could not keep running in the background. Try Stay Online below.</string>
     <string name="enable_desktop_access">Enable Desktop Access</string>
     <string name="disable_desktop_access">Disable Desktop Access</string>

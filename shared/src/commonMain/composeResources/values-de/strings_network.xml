@@ -126,6 +126,7 @@
     <string name="stay_online_foreground_desc">Fernzugriff funktioniert nur, solange PlainApp im Vordergrund ist. Online bleiben hält den Bildschirm wach und kann einen schwarzen Bildschirm anzeigen.</string>
     <string name="expanded">Ausgeklappt</string>
     <string name="collapsed">Eingeklappt</string>
+    <string name="keep_online_in_background">Im Hintergrund online bleiben</string>
     <string name="background_online_failed">Die App konnte nicht im Hintergrund weiterlaufen. Versuche unten „Online bleiben“.</string>
     <string name="enable_desktop_access">Desktop-Zugriff aktivieren</string>
     <string name="disable_desktop_access">Desktop-Zugriff deaktivieren</string>

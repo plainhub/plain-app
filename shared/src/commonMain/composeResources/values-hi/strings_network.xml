@@ -126,6 +126,7 @@
     <string name="stay_online_foreground_desc">रिमोट एक्सेस केवल तब काम करता है जब PlainApp फ़ोरग्राउंड में खुला हो। ऑनलाइन रहें स्क्रीन को चालू रखता है और काली स्क्रीन दिखाने का विकल्प देता है।</string>
     <string name="expanded">विस्तृत</string>
     <string name="collapsed">संक्षिप्त</string>
+    <string name="keep_online_in_background">बैकग्राउंड में ऑनलाइन रहें</string>
     <string name="background_online_failed">बैकग्राउंड में चलना जारी नहीं रह सका। नीचे “ऑनलाइन रहें” आज़माएँ।</string>
     <string name="enable_desktop_access">कंप्यूटर एक्सेस चालू करें</string>
     <string name="disable_desktop_access">कंप्यूटर एक्सेस बंद करें</string>

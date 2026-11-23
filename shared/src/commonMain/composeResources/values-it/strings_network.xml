@@ -126,6 +126,7 @@
     <string name="stay_online_foreground_desc">L’accesso remoto funziona solo quando PlainApp è in primo piano. Resta online mantiene lo schermo acceso e consente di renderlo nero.</string>
     <string name="expanded">Espanso</string>
     <string name="collapsed">Compresso</string>
+    <string name="keep_online_in_background">Resta online in background</string>
     <string name="background_online_failed">Impossibile continuare in background. Prova «Resta online» qui sotto.</string>
     <string name="enable_desktop_access">Attiva accesso dal computer</string>
     <string name="disable_desktop_access">Disattiva accesso dal computer</string>

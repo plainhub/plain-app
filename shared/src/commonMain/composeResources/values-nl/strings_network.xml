@@ -126,6 +126,7 @@
     <string name="stay_online_foreground_desc">Toegang op afstand werkt alleen als PlainApp op de voorgrond staat. Online blijven houdt het scherm aan en kan een zwart scherm tonen.</string>
     <string name="expanded">Uitgevouwen</string>
     <string name="collapsed">Ingevouwen</string>
+    <string name="keep_online_in_background">Online blijven op de achtergrond</string>
     <string name="background_online_failed">De app kon niet op de achtergrond blijven werken. Probeer hieronder ‘Online blijven’.</string>
     <string name="enable_desktop_access">Computertoegang inschakelen</string>
     <string name="disable_desktop_access">Computertoegang uitschakelen</string>
