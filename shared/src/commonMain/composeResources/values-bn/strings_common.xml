@@ -176,6 +176,9 @@
     <string name="large_file_edit">ফাইলটি খুব বড়। সম্পাদনা ধীর হতে পারে। চালিয়ে যাবেন?</string>
     <string name="line_number">লাইন নম্বর</string>
     <string name="global_search_hint">সবকিছু খুঁজুন</string>
+    <string name="search_all_devices">সব ডিভাইস</string>
+    <string name="search_choose_devices">খোঁজার জন্য ডিভাইস বেছে নিন</string>
+    <string name="search_selected_device_count">%1$dটি ডিভাইস বেছে নেওয়া হয়েছে</string>
     <string name="search_in_domain">%1$s-এ খুঁজুন</string>
     <string name="recent_searches">সাম্প্রতিক খোঁজ</string>
     <string name="search_scope_hint">শুধু %1$s-এ খোঁজা হচ্ছে। সব ধরন খুঁজতে "সব" ট্যাপ করুন।</string>

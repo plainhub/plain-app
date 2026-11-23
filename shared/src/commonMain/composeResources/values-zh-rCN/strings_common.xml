@@ -177,6 +177,9 @@
     <string name="large_file_edit">文件很大，编辑可能较慢。继续？</string>
     <string name="line_number">行号</string>
     <string name="global_search_hint">搜索全部内容</string>
+    <string name="search_all_devices">全部设备</string>
+    <string name="search_choose_devices">选择搜索设备</string>
+    <string name="search_selected_device_count">已选 %1$d 台</string>
     <string name="search_in_domain">在%1$s中搜索</string>
     <string name="recent_searches">最近搜索</string>
     <string name="search_scope_hint">将只在%1$s中搜索，点「全部」恢复跨类型搜索。</string>

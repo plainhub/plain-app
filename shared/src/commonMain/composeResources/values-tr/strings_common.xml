@@ -176,6 +176,9 @@
     <string name="large_file_edit">Bu dosya çok büyük. Düzenleme yavaş olabilir. Devam edilsin mi?</string>
     <string name="line_number">Satır numarası</string>
     <string name="global_search_hint">Her şeyi ara</string>
+    <string name="search_all_devices">Tüm cihazlar</string>
+    <string name="search_choose_devices">Aranacak cihazları seçin</string>
+    <string name="search_selected_device_count">%1$d cihaz seçildi</string>
     <string name="search_in_domain">%1$s içinde ara</string>
     <string name="recent_searches">Son aramalar</string>
     <string name="search_scope_hint">Yalnızca %1$s içinde aranıyor. Tüm türlerde aramak için "Tümü"ne dokunun.</string>

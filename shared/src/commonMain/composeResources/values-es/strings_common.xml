@@ -176,6 +176,9 @@
     <string name="large_file_edit">Este archivo es muy grande. Editarlo puede ser lento. ¿Continuar?</string>
     <string name="line_number">Número de línea</string>
     <string name="global_search_hint">Buscar todo</string>
+    <string name="search_all_devices">Todos los dispositivos</string>
+    <string name="search_choose_devices">Elige dónde buscar</string>
+    <string name="search_selected_device_count">%1$d dispositivos seleccionados</string>
     <string name="search_in_domain">Buscar en %1$s</string>
     <string name="recent_searches">Búsquedas recientes</string>
     <string name="search_scope_hint">Buscando solo en %1$s. Toca "Todo" para buscar todos los tipos.</string>

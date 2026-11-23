@@ -176,6 +176,9 @@
     <string name="large_file_edit">Файл очень большой, редактирование может быть медленным. Продолжить?</string>
     <string name="line_number">Номер строки</string>
     <string name="global_search_hint">Поиск по всему</string>
+    <string name="search_all_devices">Все устройства</string>
+    <string name="search_choose_devices">Выбрать устройства для поиска</string>
+    <string name="search_selected_device_count">Выбрано: %1$d</string>
     <string name="search_in_domain">Поиск в %1$s</string>
     <string name="recent_searches">Недавние запросы</string>
     <string name="search_scope_hint">Поиск только в %1$s. Нажмите «Все», чтобы искать по всем типам.</string>

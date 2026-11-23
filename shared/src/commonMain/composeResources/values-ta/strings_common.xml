@@ -176,6 +176,9 @@
     <string name="large_file_edit">இந்தக் கோப்பு மிகவும் பெரியது. திருத்துவது மெதுவாக இருக்கலாம். தொடரவா?</string>
     <string name="line_number">வரி எண்</string>
     <string name="global_search_hint">அனைத்தையும் தேடுங்கள்</string>
+    <string name="search_all_devices">எல்லா சாதனங்களும்</string>
+    <string name="search_choose_devices">தேட வேண்டிய சாதனங்களைத் தேர்ந்தெடுக்கவும்</string>
+    <string name="search_selected_device_count">தேர்ந்தெடுத்த சாதனங்கள்: %1$d</string>
     <string name="search_in_domain">%1$s-இல் தேடுங்கள்</string>
     <string name="recent_searches">சமீபத்திய தேடல்கள்</string>
     <string name="search_scope_hint">%1$s-இல் மட்டும் தேடப்படுகிறது. அனைத்து வகைகளையும் தேட "அனைத்து" தட்டவும்.</string>

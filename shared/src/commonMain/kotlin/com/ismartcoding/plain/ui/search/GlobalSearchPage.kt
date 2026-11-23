@@ -53,6 +53,7 @@ fun GlobalSearchPage(
     val domains = viewModel.domains.value
     val query = viewModel.queryText.value
     val domainScope = viewModel.domain.value
+    val searchPeers = viewModel.searchPeers.value
 
     LaunchedEffect(viewModel) {
         viewModel.refreshHits()
@@ -64,6 +65,11 @@ fun GlobalSearchPage(
             AppSubscriptions.peersChanged.changes(),
                 AppSubscriptions.channelsChanged.changes(),
         ).collect { viewModel.refreshHits(GlobalSearchDomain.CHAT) }
+    }
+
+    LaunchedEffect(viewModel, "search-devices") {
+        viewModel.refreshSearchDevices()
+        AppSubscriptions.peersChanged.changes().collect { viewModel.refreshSearchDevices() }
     }
 
     LaunchedEffect(viewModel, "search-permissions") {
@@ -122,6 +128,15 @@ fun GlobalSearchPage(
                 selected = domainScope,
                 chips = listOf<GlobalSearchDomain?>(null) + domains,
                 onSelect = viewModel::setDomain,
+                deviceFilter = if (searchPeers.isEmpty()) null else {
+                    {
+                        GlobalSearchDeviceFilter(
+                            peers = searchPeers,
+                            selected = viewModel.selectedSearchDevices.value,
+                            onConfirm = viewModel::setSearchDevices,
+                        )
+                    }
+                },
             )
 
             if (query.isBlank()) {

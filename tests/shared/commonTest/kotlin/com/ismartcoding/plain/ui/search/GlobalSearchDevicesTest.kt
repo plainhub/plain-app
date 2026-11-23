@@ -47,11 +47,21 @@ class GlobalSearchDevicesTest {
     @AfterTest
     fun cleanup() { stores.forEach { it.clear() }; Dispatchers.resetMain() }
 
-    private fun model(readDevices: suspend () -> GlobalSearchDevices): GlobalSearchViewModel {
+    private fun model(
+        peers: List<Peer> = emptyList(),
+        readDevices: suspend (Set<String>?) -> GlobalSearchDevices,
+    ): GlobalSearchViewModel {
         val owner = object : ViewModelStoreOwner { override val viewModelStore = ViewModelStore() }
         stores.add(owner.viewModelStore)
         return ViewModelProvider.create(owner, viewModelFactory {
-            initializer { GlobalSearchViewModel(readDevices, readHistory = { emptyList() }, initialDomains = listOf(GlobalSearchDomain.NOTES)) }
+            initializer {
+                GlobalSearchViewModel(
+                    readDevices = { _, selected -> readDevices(selected) },
+                    readHistory = { emptyList() },
+                    initialDomains = listOf(GlobalSearchDomain.NOTES),
+                    readPeers = { peers },
+                )
+            }
         })[GlobalSearchViewModel::class].also {
             it.domain.value = GlobalSearchDomain.NOTES
             it.onQueryChange("needle")
@@ -162,6 +172,51 @@ class GlobalSearchDevicesTest {
         assertEquals(listOf(ContentSource.Local.key, available.source().key), result.devices.map { it.key })
         assertEquals(listOf("broken"), result.errors.map { it.name })
         assertEquals(503, assertIs<GraphqlHttpException>(result.errors.single().error).status)
+    }
+
+    @Test
+    fun selecting_one_remote_only_connects_to_that_device() = runTest {
+        val first = Device("first", 1)
+        val other = Device("other", 1)
+        val requested = mutableListOf<String>()
+        val result = searchDevices(
+            readPeers = { listOf(first.peer(), other.peer()) },
+            loadDevice = {
+                requested += it.id
+                first.source().client
+            },
+            selectedIds = setOf(first.peer().id),
+        )
+        assertEquals(listOf(first.peer().id), requested)
+        assertEquals(listOf(first.source().key), result.devices.map { it.key })
+    }
+
+    @Test
+    fun confirmation_researches_once_and_rejects_an_empty_selection() = runTest {
+        val first = Device("first", 1)
+        val other = Device("other", 1)
+        val requested = mutableListOf<Set<String>?>()
+        val vm = model(listOf(first.peer(), other.peer())) {
+            requested += it
+            GlobalSearchDevices(emptyList())
+        }
+        vm.refreshSearchDevices()
+        val local = ContentSource.Local.key
+        assertEquals(setOf(local, "first", "other"), vm.selectedSearchDevices.value)
+        assertTrue(requested.isEmpty())
+
+        vm.setSearchDevices(setOf("first"))
+        advanceUntilIdle()
+        assertEquals(listOf<Set<String>?>(setOf("first")), requested)
+        vm.setSearchDevices(setOf("first"))
+        vm.setSearchDevices(emptySet())
+        advanceUntilIdle()
+        assertEquals(listOf<Set<String>?>(setOf("first")), requested)
+        assertEquals(setOf("first"), vm.selectedSearchDevices.value)
+
+        vm.setSearchDevices(setOf(local, "first", "other"))
+        advanceUntilIdle()
+        assertEquals(listOf<Set<String>?>(setOf("first"), null), requested)
     }
 
     @Test

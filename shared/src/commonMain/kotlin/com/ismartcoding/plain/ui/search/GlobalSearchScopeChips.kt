@@ -26,31 +26,36 @@ fun GlobalSearchScopeChips(
     selected: GlobalSearchDomain?,
     chips: List<GlobalSearchDomain?>,
     onSelect: (GlobalSearchDomain?) -> Unit,
+    deviceFilter: (@Composable () -> Unit)?,
 ) {
     Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .horizontalScroll(rememberScrollState())
-            .padding(horizontal = 16.dp, vertical = 8.dp),
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        chips.forEach { chip ->
-            PFilterChip(
-                selected = selected == chip,
-                onClick = { onSelect(chip) },
-                label = {
-                    if (chip == null) {
-                        Text(stringResource(Res.string.all))
-                    } else {
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            PIcon(icon = chip.iconRes, contentDescription = stringResource(chip.labelRes), modifier = Modifier.size(16.dp))
-                            HorizontalSpace(6.dp)
-                            Text(stringResource(chip.labelRes))
+        deviceFilter?.invoke()
+        Row(
+            modifier = Modifier.weight(1f).horizontalScroll(rememberScrollState())
+                .padding(start = if (deviceFilter == null) 16.dp else 8.dp, end = 16.dp),
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            chips.forEach { chip ->
+                PFilterChip(
+                    selected = selected == chip,
+                    onClick = { onSelect(chip) },
+                    label = {
+                        if (chip == null) {
+                            Text(stringResource(Res.string.all))
+                        } else {
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                PIcon(icon = chip.iconRes, contentDescription = null, modifier = Modifier.size(16.dp))
+                                HorizontalSpace(8.dp)
+                                Text(stringResource(chip.labelRes))
+                            }
                         }
-                    }
-                },
-            )
+                    },
+                )
+            }
         }
     }
 }

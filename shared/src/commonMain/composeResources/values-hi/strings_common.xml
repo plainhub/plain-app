@@ -176,6 +176,9 @@
     <string name="large_file_edit">यह फ़ाइल बहुत बड़ी है। संपादन धीमा हो सकता है। जारी रखें?</string>
     <string name="line_number">पंक्ति संख्या</string>
     <string name="global_search_hint">सब कुछ खोजें</string>
+    <string name="search_all_devices">सभी डिवाइस</string>
+    <string name="search_choose_devices">खोजने के लिए डिवाइस चुनें</string>
+    <string name="search_selected_device_count">%1$d डिवाइस चुने गए</string>
     <string name="search_in_domain">%1$s में खोजें</string>
     <string name="recent_searches">हाल की खोजें</string>
     <string name="search_scope_hint">केवल %1$s में खोजा जा रहा है. सभी प्रकार खोजने के लिए "सभी" पर टैप करें.</string>

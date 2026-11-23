@@ -176,6 +176,9 @@
     <string name="large_file_edit">Tệp này rất lớn. Việc chỉnh sửa có thể chậm. Tiếp tục?</string>
     <string name="line_number">Số dòng</string>
     <string name="global_search_hint">Tìm kiếm mọi thứ</string>
+    <string name="search_all_devices">Tất cả thiết bị</string>
+    <string name="search_choose_devices">Chọn thiết bị để tìm kiếm</string>
+    <string name="search_selected_device_count">Đã chọn %1$d thiết bị</string>
     <string name="search_in_domain">Tìm trong %1$s</string>
     <string name="recent_searches">Tìm kiếm gần đây</string>
     <string name="search_scope_hint">Chỉ tìm trong %1$s. Chạm "Tất cả" để tìm mọi loại.</string>

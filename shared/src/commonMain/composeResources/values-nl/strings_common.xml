@@ -176,6 +176,9 @@
     <string name="large_file_edit">Dit bestand is zeer groot. Bewerken kan traag zijn. Doorgaan?</string>
     <string name="line_number">Regelnummer</string>
     <string name="global_search_hint">Alles doorzoeken</string>
+    <string name="search_all_devices">Alle apparaten</string>
+    <string name="search_choose_devices">Kies op welke apparaten je zoekt</string>
+    <string name="search_selected_device_count">%1$d apparaten geselecteerd</string>
     <string name="search_in_domain">Zoeken in %1$s</string>
     <string name="recent_searches">Recente zoekopdrachten</string>
     <string name="search_scope_hint">Er wordt alleen in %1$s gezocht. Tik op "Alles" om alle typen te doorzoeken.</string>

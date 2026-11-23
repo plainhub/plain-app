@@ -176,6 +176,9 @@
     <string name="large_file_edit">このファイルは非常に大きく、編集に時間がかかる可能性があります。続行しますか？</string>
     <string name="line_number">行番号</string>
     <string name="global_search_hint">すべてを検索</string>
+    <string name="search_all_devices">すべてのデバイス</string>
+    <string name="search_choose_devices">検索するデバイスを選択</string>
+    <string name="search_selected_device_count">%1$d 台を選択中</string>
     <string name="search_in_domain">%1$s内を検索</string>
     <string name="recent_searches">最近の検索</string>
     <string name="search_scope_hint">%1$sのみを検索します。「すべて」で全タイプを検索できます。</string>

@@ -177,6 +177,9 @@
     <string name="large_file_edit">This file is very large. Editing may be slow. Continue?</string>
     <string name="line_number">Line number</string>
     <string name="global_search_hint">Search everything</string>
+    <string name="search_all_devices">All devices</string>
+    <string name="search_choose_devices">Choose search devices</string>
+    <string name="search_selected_device_count">%1$d devices selected</string>
     <string name="search_in_domain">Search in %1$s</string>
     <string name="recent_searches">Recent searches</string>
     <string name="search_scope_hint">Only searching in %1$s. Tap "All" to search every type.</string>

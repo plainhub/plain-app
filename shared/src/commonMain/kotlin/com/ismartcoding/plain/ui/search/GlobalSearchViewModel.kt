@@ -4,6 +4,8 @@ import com.ismartcoding.plain.models.AuthErrorCode
 
 import com.ismartcoding.plain.models.BusinessException
 import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
@@ -13,6 +15,7 @@ import com.ismartcoding.plain.features.search.SearchHistoryClient
 import com.ismartcoding.plain.i18n.devices
 import com.ismartcoding.plain.graphql.Query
 import com.ismartcoding.plain.models.Peer
+import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.rust.graphql.GraphqlHttpException
 import com.ismartcoding.plain.rust.graphql.ContentSource
 import com.ismartcoding.plain.rust.graphql.GraphqlApi
@@ -24,9 +27,12 @@ import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
 
 class GlobalSearchViewModel internal constructor(
-    private val readDevices: suspend () -> GlobalSearchDevices = { searchDevices() },
+    private val readDevices: suspend (List<Peer>, Set<String>?) -> GlobalSearchDevices = { peers, selected ->
+        searchDevices(readPeers = { peers }, selectedIds = selected)
+    },
     readHistory: suspend () -> List<String> = SearchHistoryClient::read,
     initialDomains: List<GlobalSearchDomain> = globalSearchDomains(),
+    private val readPeers: suspend () -> List<Peer> = { GraphqlApi.execute(Query.peers()) },
 ) : ViewModel() {
     val queryText = mutableStateOf("")
     val domain = mutableStateOf<GlobalSearchDomain?>(null)
@@ -37,6 +43,12 @@ class GlobalSearchViewModel internal constructor(
     val recentQueries = mutableStateOf<List<String>>(emptyList())
     val domains = mutableStateOf(initialDomains)
     internal val deviceErrors = mutableStateOf<List<GlobalSearchDeviceError>>(emptyList())
+    internal val searchPeers = mutableStateOf<List<GlobalSearchPeer>>(emptyList())
+    private var selectedDeviceIds by mutableStateOf<Set<String>?>(null)
+    internal val selectedSearchDevices = derivedStateOf {
+        val all = searchDeviceIds(searchPeers.value)
+        selectedDeviceIds?.intersect(all)?.ifEmpty { setOf(ContentSource.Local.key) } ?: all
+    }
     val empty = derivedStateOf {
         searchedQuery.value.isNotEmpty() && !searching.value && deviceErrors.value.isEmpty() &&
             domainStates.values.all { it.total.value == 0 && !it.hasErrors.value }
@@ -46,6 +58,29 @@ class GlobalSearchViewModel internal constructor(
     private val refreshJobs = mutableMapOf<GlobalSearchDeviceState, Job>()
 
     init { viewModelScope.launchSafe { recentQueries.value = readHistory() } }
+
+    internal suspend fun refreshSearchDevices() {
+        try {
+            discoverSearchPeers()
+        } catch (canceled: CancellationException) {
+            throw canceled
+        } catch (error: Exception) {
+            LogCat.e(error)
+        }
+    }
+
+    private suspend fun discoverSearchPeers(): List<Peer> =
+        readPeers().filter { it.isPaired() && it.token.isNotEmpty() }.also { peers ->
+            searchPeers.value = peers.map { GlobalSearchPeer(it.id, it.name, it.online) }
+        }
+
+    internal fun setSearchDevices(ids: Set<String>) {
+        val all = searchDeviceIds(searchPeers.value)
+        val checked = ids.intersect(all)
+        if (checked.isEmpty() || checked == selectedSearchDevices.value) return
+        selectedDeviceIds = checked.takeUnless { it == all }
+        if (queryText.value.isNotBlank()) search()
+    }
 
     fun onQueryChange(query: String) {
         if (queryText.value == query) return
@@ -110,12 +145,14 @@ class GlobalSearchViewModel internal constructor(
         searching.value = true
         searchJob = viewModelScope.launchSafe {
             try {
-                val available = readDevices()
+                val peers = discoverSearchPeers()
+                val selected = selectedDeviceIds?.let { selectedSearchDevices.value }
+                val available = readDevices(peers, selected)
                 deviceErrors.value = available.errors
                 domains.value = GlobalSearchDomain.entries.filter { entry -> available.devices.any { entry.supportedBy(it) } }
-                val selected = domain.value?.let { listOf(it) } ?: domains.value
+                val selectedDomains = domain.value?.let { listOf(it) } ?: domains.value
                 val size = if (domain.value == null) PAGE_SIZE else SCROLL_PAGE_SIZE
-                selected.forEach { entry ->
+                selectedDomains.forEach { entry ->
                     domainStates[entry] = GlobalSearchDomainState(available.devices.filter { entry.supportedBy(it) }.map { GlobalSearchDeviceState(it) })
                 }
                 coroutineScope {
@@ -183,11 +220,20 @@ class GlobalSearchViewModel internal constructor(
 private fun Exception.isRemoteAccessDisabled(): Boolean =
     this is GraphqlHttpException && status == 404 || this is BusinessException && code == AuthErrorCode.REMOTE_ACCESS_DISABLED.wire
 
+internal data class GlobalSearchPeer(val id: String, val name: String, val online: Boolean)
+
+internal fun searchDeviceIds(peers: List<GlobalSearchPeer>): Set<String> =
+    setOf(ContentSource.Local.key) + peers.map(GlobalSearchPeer::id)
+
 internal suspend fun searchDevices(
     readPeers: suspend () -> List<Peer> = { GraphqlApi.execute(Query.peers()) },
     loadDevice: suspend (Peer) -> ManagedDeviceClient = { ManagedDeviceClient.load(it) },
+    selectedIds: Set<String>? = null,
 ): GlobalSearchDevices = coroutineScope {
-    val remote = readPeers().filter { it.isPaired() && it.token.isNotEmpty() }.map { peer -> async {
+    val peers = if (selectedIds == setOf(ContentSource.Local.key)) emptyList() else readPeers().filter {
+        it.isPaired() && it.token.isNotEmpty() && (selectedIds == null || it.id in selectedIds)
+    }
+    val remote = peers.map { peer -> async {
         try {
             val client = loadDevice(peer)
             GlobalSearchDevices(listOf(ContentSource.Remote(client)))
@@ -196,5 +242,6 @@ internal suspend fun searchDevices(
             GlobalSearchDevices(emptyList(), if (error.isRemoteAccessDisabled()) emptyList() else listOf(GlobalSearchDeviceError(peer.name, error)))
         }
     } }.awaitAll()
-    GlobalSearchDevices(listOf(ContentSource.Local) + remote.flatMap { it.devices }, remote.flatMap { it.errors })
+    val local = if (selectedIds == null || ContentSource.Local.key in selectedIds) listOf(ContentSource.Local) else emptyList()
+    GlobalSearchDevices(local + remote.flatMap { it.devices }, remote.flatMap { it.errors })
 }
