@@ -365,7 +365,7 @@ object Query {
     )
 
     fun mediaBuckets(type: DataType): GraphqlRequest<List<MediaBucket>> = GraphqlRequest(
-        $$"query($type: MediaDataType!) { mediaBuckets(type: $type) { id name itemCount size topItemPaths } }",
+        $$"query($type: MediaDataType!) { mediaBuckets(type: $type) { id name itemCount size coverItems { path updatedAt thumbHash } } }",
         mapOf(variable("type", type.name)),
         field = "mediaBuckets",
     )

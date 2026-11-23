@@ -14,6 +14,7 @@ import com.ismartcoding.plain.lib.extensions.getSearchCursor
 import com.ismartcoding.plain.lib.extensions.getStringValue
 import com.ismartcoding.plain.lib.extensions.map
 import com.ismartcoding.plain.lib.withIO
+import com.ismartcoding.plain.lib.extensions.getTimeSecondsValue
 import com.ismartcoding.plain.rust.host.provider.MediaBucketItemFacts
 import com.ismartcoding.plain.features.media.MediaType
 
@@ -55,6 +56,7 @@ abstract class BaseMediaContentHelper {
             MediaStore.MediaColumns.BUCKET_DISPLAY_NAME,
             MediaStore.MediaColumns.SIZE,
             MediaStore.MediaColumns.DATA,
+            MediaStore.MediaColumns.DATE_MODIFIED,
         )
         return context.contentResolver.query(
             uriExternal,
@@ -69,6 +71,7 @@ abstract class BaseMediaContentHelper {
                 name = name,
                 size = cursor.getLongValue(MediaStore.MediaColumns.SIZE, cache),
                 path = cursor.getStringValue(MediaStore.MediaColumns.DATA, cache),
+                updatedAt = cursor.getTimeSecondsValue(MediaStore.MediaColumns.DATE_MODIFIED, cache).toString(),
             )
         }.orEmpty()
     }

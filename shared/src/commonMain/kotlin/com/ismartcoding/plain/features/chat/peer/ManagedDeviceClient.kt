@@ -16,6 +16,7 @@ import com.ismartcoding.plain.lib.extensions.urlEncode
 import com.ismartcoding.plain.models.ManagedDeviceInfo
 import com.ismartcoding.plain.models.ManagedResource
 import com.ismartcoding.plain.models.ManagedThumbnail
+import com.ismartcoding.plain.models.MediaBucketCover
 import com.ismartcoding.plain.models.Peer
 import com.ismartcoding.plain.platform.system.ThumbnailNetworkSchedule
 import com.ismartcoding.plain.platform.system.VersionedManagedThumbnail
@@ -34,7 +35,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.distinctUntilChanged
 
-internal enum class ResourceSize { SM, LG }
+internal enum class ResourceSize { XS, SM, LG }
 
 internal class ManagedDeviceClient private constructor(
     private val peer: Peer,
@@ -116,23 +117,26 @@ internal class ManagedDeviceClient private constructor(
     fun versionedThumbnail(
         path: String, size: ResourceSize, version: Instant,
         networkSchedule: ThumbnailNetworkSchedule? = null,
+        resolve: (suspend () -> ManagedResource)? = null,
     ): VersionedManagedThumbnail? {
         val info = currentInfo
         val fingerprint = info.tlsCertificateSha256 ?: return null
         val key = thumbnailDiskCacheKey(fingerprint, thumbnail(info, path, size, version))
         return VersionedManagedThumbnail(key, networkSchedule) {
-            resource(path, size, version = version).also {
+            (resolve?.invoke() ?: resource(path, size, version = version)).also {
                 check(it.thumbnailDiskCacheKey() == key) { "Thumbnail authorization changed" }
             }
         }
     }
 
-    suspend fun thumbnailResources(paths: List<String>): Map<String, ManagedResource> {
-        if (paths.isEmpty()) return emptyMap()
+    suspend fun folderThumbnailResources(
+        items: List<MediaBucketCover>,
+        size: ResourceSize,
+    ): Map<String, ManagedResource> {
         val peer = http.current()
         val info = currentInfo
-        return paths.distinct().associateWith { path ->
-            resource(peer, info, path, ResourceSize.SM, FileAction.PREVIEW, version = null)
+        return items.distinctBy { it.path }.associate { item ->
+            item.path to resource(peer, info, item.path, size, FileAction.PREVIEW, item.updatedAt)
         }
     }
 

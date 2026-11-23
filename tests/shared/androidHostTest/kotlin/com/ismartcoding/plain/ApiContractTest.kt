@@ -278,7 +278,7 @@ class ApiContractTest {
         forbiddenPattern("MediaActionResult") { "legacy MediaActionResult must not come back — use ActionResult — $it" }
         forbiddenPattern("smsAllCounts") { "renamed to smsBoxCounts — $it" }
         forbiddenPattern("feedsCount") { "renamed to feedEntryCounts — $it" }
-        forbiddenPattern("topItems") { "renamed to topItemPaths — $it" }
+        forbiddenPattern("topItems|topItemPaths") { "use coverItems for media buckets — $it" }
         forbiddenPattern("fetchFeedContent") { "duplicate of syncFeedEntryContent was removed — $it" }
         // 2026-09-24 naming cleanup (API_SPEC §7) — old names must not come back.
         forbiddenPattern("filesCount") { "renamed to fileCount — $it" }

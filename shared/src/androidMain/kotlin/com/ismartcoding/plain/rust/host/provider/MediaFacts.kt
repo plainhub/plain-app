@@ -39,4 +39,5 @@ data class MediaBucketItemFacts(
     val name: String,
     val size: Long,
     val path: String,
+    val updatedAt: String,
 )

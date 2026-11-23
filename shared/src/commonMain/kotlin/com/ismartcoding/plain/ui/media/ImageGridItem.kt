@@ -94,6 +94,7 @@ fun ImageGridItem(
             path = m.path,
             key = m.id,
             updatedAt = m.updatedAt,
+            thumbHash = m.thumbHash,
             itemState = itemState,
             previewerState = previewerState,
         )

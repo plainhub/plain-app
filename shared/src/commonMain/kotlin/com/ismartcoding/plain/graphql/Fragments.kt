@@ -36,8 +36,8 @@ internal object Fragments {
     fun mediaFields(type: DataType): String {
         val extra = when (type) {
             DataType.AUDIO -> "artist durationMs albumId albumFileId isFavorite"
-            DataType.IMAGE -> "width height rotation takenAt isFavorite"
-            DataType.VIDEO -> "durationMs width height rotation takenAt isFavorite"
+            DataType.IMAGE -> "width height rotation takenAt isFavorite thumbHash"
+            DataType.VIDEO -> "durationMs width height rotation takenAt isFavorite thumbHash"
             DataType.DOC -> "extension"
             else -> error("Unsupported media type: $type")
         }

@@ -3,6 +3,7 @@ package com.ismartcoding.plain.features.chat.peer
 import com.ismartcoding.plain.features.nearby.PeerStatus
 import com.ismartcoding.plain.lib.JsonHelper
 import com.ismartcoding.plain.models.Peer
+import com.ismartcoding.plain.models.MediaBucketCover
 import com.ismartcoding.plain.platform.system.DeviceType
 import com.ismartcoding.plain.platform.system.imageCacheKey
 import com.ismartcoding.plain.platform.system.thumbnailDiskCacheKey
@@ -17,25 +18,28 @@ import kotlin.test.assertNull
 import kotlin.time.Instant
 
 class ManagedThumbnailResourcesTest {
+    private val version = Instant.fromEpochMilliseconds(10)
+    private fun covers(vararg paths: String) = paths.map { MediaBucketCover(it, version, null) }
+
     @Test
     fun folder_covers_share_a_peer_check_and_reuse_file_ids() = runTest {
         val fixture = Fixture()
         val client = fixture.client()
         val photo = "/fixtures/cover.jpg"
         val video = "/fixtures/cover.mov"
-        val covers = client.thumbnailResources(listOf(photo, video, photo))
+        val covers = client.folderThumbnailResources(covers(photo, video, photo), ResourceSize.XS)
 
         assertEquals(listOf(photo, video), covers.keys.toList())
-        assertEquals("https://media.test:8443/fs?id=reference-1&action=PREVIEW&size=SM", covers.getValue(photo).url)
-        assertEquals("https://media.test:8443/fs?id=reference-2&action=PREVIEW&size=SM", covers.getValue(video).url)
+        assertEquals("https://media.test:8443/fs?id=reference-1&action=PREVIEW&size=XS&v=1970-01-01T00%3A00%3A00.010Z", covers.getValue(photo).url)
+        assertEquals("https://media.test:8443/fs?id=reference-2&action=PREVIEW&size=XS&v=1970-01-01T00%3A00%3A00.010Z", covers.getValue(video).url)
         assertEquals(1, fixture.peerChecks)
         assertEquals(2, fixture.encryptions)
-        assertEquals(covers, client.thumbnailResources(listOf(photo, video)))
+        assertEquals(covers, client.folderThumbnailResources(covers(photo, video), ResourceSize.XS))
         assertEquals(2, fixture.peerChecks)
         assertEquals(2, fixture.encryptions)
 
         fixture.peer = fixture.peer.copy(token = "revoked-pairing")
-        assertFailsWith<IllegalStateException> { client.thumbnailResources(listOf(video)) }
+        assertFailsWith<IllegalStateException> { client.folderThumbnailResources(covers(video), ResourceSize.XS) }
         assertEquals(2, fixture.encryptions)
     }
 
@@ -44,13 +48,13 @@ class ManagedThumbnailResourcesTest {
         val fixture = Fixture()
         val photo = "/fixtures/cover.jpg"
         val originalClient = fixture.client()
-        val first = originalClient.thumbnailResources(listOf(photo)).getValue(photo)
+        val first = originalClient.folderThumbnailResources(covers(photo), ResourceSize.XS).getValue(photo)
         val firstKey = assertNotNull(first.thumbnailDiskCacheKey())
-        assertNull(first.imageCacheKey())
+        assertEquals(firstKey, first.imageCacheKey())
         assertNull(originalClient.resource(photo).thumbnailDiskCacheKey())
 
         fixture.peer = fixture.peer.copy(ip = "new-address.test")
-        val reloaded = fixture.client().thumbnailResources(listOf(photo)).getValue(photo)
+        val reloaded = fixture.client().folderThumbnailResources(covers(photo), ResourceSize.XS).getValue(photo)
         assertNotEquals(first.url, reloaded.url)
         assertEquals(firstKey, reloaded.thumbnailDiskCacheKey())
 
@@ -62,7 +66,7 @@ class ManagedThumbnailResourcesTest {
 
         fixture.urlToken = "rotated-resource-token"
         originalClient.info()
-        assertNotEquals(firstKey, originalClient.thumbnailResources(listOf(photo)).getValue(photo).thumbnailDiskCacheKey())
+        assertNotEquals(firstKey, originalClient.folderThumbnailResources(covers(photo), ResourceSize.XS).getValue(photo).thumbnailDiskCacheKey())
     }
 
     private class Fixture {

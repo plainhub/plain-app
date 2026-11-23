@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import kotlin.time.Instant
+import com.ismartcoding.plain.features.chat.peer.ResourceSize
 import com.ismartcoding.plain.platform.system.ThumbnailNetworkSchedule
 import com.ismartcoding.plain.lib.extensions.getFilenameFromPath
 import com.ismartcoding.plain.ui.media.viewer.previewer.MediaPreviewerState
@@ -17,6 +18,7 @@ internal fun MediaGridThumbnail(
     path: String,
     key: String,
     updatedAt: Instant,
+    thumbHash: String?,
     itemState: TransformItemState,
     previewerState: MediaPreviewerState,
     networkSchedule: ThumbnailNetworkSchedule? = null,
@@ -33,6 +35,8 @@ internal fun MediaGridThumbnail(
             widthPx = constraints.maxWidth,
             networkSchedule = networkSchedule,
             showPlaceholder = true,
+            thumbHash = thumbHash,
+            resourceSize = if (constraints.maxWidth in 1..128) ResourceSize.XS else ResourceSize.SM,
         )
     }
 }

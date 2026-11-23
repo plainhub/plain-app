@@ -2,6 +2,7 @@ package com.ismartcoding.plain.ui.files
 
 import com.ismartcoding.plain.rust.graphql.ContentSource
 import com.ismartcoding.plain.models.MediaBucket
+import com.ismartcoding.plain.models.MediaBucketCover
 import com.ismartcoding.plain.i18n.*
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -46,7 +47,7 @@ class MediaFoldersViewModel internal constructor(val source: ContentSource = Con
 
         var totalValue = 0
         var sizeValue = 0L
-        val subItems = mutableSetOf<String>()
+        val subItems = linkedMapOf<String, MediaBucketCover>()
 
         // Take one top item from each folder until we have 4 items
         for (bucket in _itemsFlow.value) {
@@ -54,10 +55,10 @@ class MediaFoldersViewModel internal constructor(val source: ContentSource = Con
             sizeValue += bucket.size
 
             if (subItems.size < 4) {
-                // Add the first item from each folder's topItems if available
-                val validTopItems = bucket.topItemPaths.filter { source is ContentSource.Remote || fileExists(it) }
+                val validTopItems = bucket.coverItems.filter { source is ContentSource.Remote || fileExists(it.path) }
                 if (validTopItems.isNotEmpty()) {
-                    subItems.add(validTopItems.first())
+                    val cover = validTopItems.first()
+                    subItems.getOrPut(cover.path) { cover }
                 }
             }
         }
@@ -66,12 +67,13 @@ class MediaFoldersViewModel internal constructor(val source: ContentSource = Con
         // take additional items from the first folder that has multiple items
         if (subItems.size < 4 && _itemsFlow.value.isNotEmpty()) {
             for (bucket in _itemsFlow.value) {
-                val validTopItems = bucket.topItemPaths.filter { source is ContentSource.Remote || fileExists(it) }
+                val validTopItems = bucket.coverItems.filter { source is ContentSource.Remote || fileExists(it.path) }
                 if (validTopItems.size > 1) {
                     // Start from the second item (index 1) since we've already added the first one
                     for (i in 1 until validTopItems.size) {
                         if (subItems.size < 4) {
-                            subItems.add(validTopItems[i])
+                            val cover = validTopItems[i]
+                            subItems.getOrPut(cover.path) { cover }
                         } else {
                             break
                         }
@@ -84,7 +86,7 @@ class MediaFoldersViewModel internal constructor(val source: ContentSource = Con
             }
         }
 
-        totalBucket.value = MediaBucket(id = "all", name = LocaleHelper.getString(Res.string.all), itemCount = totalValue, size = sizeValue, topItemPaths = subItems.toMutableList())
+        totalBucket.value = MediaBucket(id = "all", name = LocaleHelper.getString(Res.string.all), itemCount = totalValue, size = sizeValue, coverItems = subItems.values.toList())
 
         LoadingHelper.ensureMinimumLoadingTime(
             viewModel = this@MediaFoldersViewModel,
@@ -99,8 +101,9 @@ class MediaFoldersViewModel internal constructor(val source: ContentSource = Con
      */
     suspend fun preValidateFilesAsync() = withIO {
         _itemsFlow.value.forEach { bucket ->
-            val toRemove = bucket.topItemPaths.filter { source is ContentSource.Local && !fileExists(it) }
-            bucket.topItemPaths = bucket.topItemPaths.filterNot { it in toRemove }
+            if (source is ContentSource.Local) {
+                bucket.coverItems = bucket.coverItems.filter { fileExists(it.path) }
+            }
         }
     }
 }

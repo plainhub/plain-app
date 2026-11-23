@@ -26,8 +26,9 @@ class MainModelProjectionTest {
         val encoded = JsonHelper.jsonEncodeToElement(notification).jsonObject
         assertEquals("2026-10-15T00:00:00Z", notification.postedAt.toString())
         assertEquals(false, encoded.containsKey("time"))
-        val bucket = JsonHelper.jsonDecode<MediaBucket>("""{"id":"camera","name":"Camera","itemCount":2,"size":42,"topItemPaths":["/photo"]}""")
-        assertEquals(listOf("/photo"), bucket.topItemPaths)
+        val bucket = JsonHelper.jsonDecode<MediaBucket>("""{"id":"camera","name":"Camera","itemCount":2,"size":42,"coverItems":[{"path":"/photo","updatedAt":"2026-01-01T00:00:00Z","thumbHash":"fixture"}]}""")
+        assertEquals("/photo", bucket.coverItems.single().path)
+        assertEquals("fixture", bucket.coverItems.single().thumbHash)
         assertEquals(42L, bucket.size)
     }
 }

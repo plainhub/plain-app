@@ -1,6 +1,7 @@
 package com.ismartcoding.plain.ui.components
 
 import com.ismartcoding.plain.models.MediaBucket
+import com.ismartcoding.plain.models.MediaBucketCover
 import com.ismartcoding.plain.i18n.*
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.MaterialTheme
@@ -24,8 +25,8 @@ fun MediaSidebarBucketItem(
     coverRevision: Int,
     onClick: () -> Unit,
 ) {
-    val thumbnailPaths = sidebarBucketThumbnailPaths(m, isMedia, coversEnabled)
-    val showThumbnail = thumbnailPaths.isNotEmpty()
+    val covers = sidebarBucketCovers(m, isMedia, coversEnabled)
+    val showThumbnail = covers.isNotEmpty()
     SidebarItem(
         label = m.name,
         subtitle = m.size.formatBytes(),
@@ -36,7 +37,7 @@ fun MediaSidebarBucketItem(
             {
                 key(coverRevision) {
                     MediaThumbnailGrid(
-                        paths = thumbnailPaths,
+                        items = covers,
                         contentDescription = null,
                         modifier = Modifier.size(40.dp).clip(MaterialTheme.shapes.medium),
                     )
@@ -47,5 +48,5 @@ fun MediaSidebarBucketItem(
     )
 }
 
-internal fun sidebarBucketThumbnailPaths(bucket: MediaBucket, isMedia: Boolean, coversEnabled: Boolean): List<String> =
-    if (isMedia && coversEnabled) bucket.topItemPaths else emptyList()
+internal fun sidebarBucketCovers(bucket: MediaBucket, isMedia: Boolean, coversEnabled: Boolean): List<MediaBucketCover> =
+    if (isMedia && coversEnabled) bucket.coverItems else emptyList()

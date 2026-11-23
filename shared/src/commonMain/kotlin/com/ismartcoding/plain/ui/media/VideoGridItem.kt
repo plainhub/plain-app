@@ -95,6 +95,7 @@ internal fun VideoGridItem(
             path = m.path,
             key = m.id,
             updatedAt = m.updatedAt,
+            thumbHash = m.thumbHash,
             uri = getMediaItemUriString(videosVM.dataType, m.id, m.path),
             itemState = itemState,
             previewerState = previewerState,

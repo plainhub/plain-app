@@ -40,7 +40,7 @@ import com.ismartcoding.plain.lib.extensions.isImageFast
 import com.ismartcoding.plain.platform.media.applyForceVideoDecoder
 import com.ismartcoding.plain.platform.system.ThumbnailNetworkSchedule
 import kotlinx.coroutines.launch
-import com.ismartcoding.plain.ui.base.PPlaceholder
+import com.ismartcoding.plain.ui.media.ThumbnailPlaceholder
 import com.ismartcoding.plain.ui.resources.Res as UiRes
 import com.ismartcoding.plain.ui.resources.file_video as ui_drawable_file_video
 import com.ismartcoding.plain.ui.resources.image as ui_drawable_image
@@ -54,16 +54,18 @@ internal fun TransformImageViewWithUri(
     widthPx: Int, forceVideoDecoder: Boolean = false, version: Instant? = null,
     networkSchedule: ThumbnailNetworkSchedule? = null,
     showPlaceholder: Boolean = false,
+    thumbHash: String? = null,
+    resourceSize: ResourceSize = ResourceSize.SM,
 ) {
     val source = com.ismartcoding.plain.ui.navigation.LocalContentSource.current
     val managedThumbnail = if (source is com.ismartcoding.plain.rust.graphql.ContentSource.Remote && version != null) {
         val info = source.client.currentInfo
-        remember(source, path, version, info.urlToken, info.tlsCertificateSha256, networkSchedule) {
-            source.client.versionedThumbnail(path, ResourceSize.SM, version, networkSchedule)
+        remember(source, path, version, info.urlToken, info.tlsCertificateSha256, networkSchedule, resourceSize) {
+            source.client.versionedThumbnail(path, resourceSize, version, networkSchedule)
         }
     } else null
     val resource = if (managedThumbnail == null) {
-        com.ismartcoding.plain.ui.navigation.rememberContentResource(source, path, ResourceSize.SM, version).value
+        com.ismartcoding.plain.ui.navigation.rememberContentResource(source, path, resourceSize, version).value
     } else null
     TransformImageView(modifier = modifier, key = key, itemState = itemState, contentState = previewerState.transformState) { itemKey ->
         key(itemKey) {
@@ -89,7 +91,10 @@ internal fun TransformImageViewWithUri(
             val imageModifier = Modifier.fillMaxSize()
             val failed = resource?.isFailure == true || imageState is AsyncImagePainter.State.Error
             if (showPlaceholder && (failed || imageState !is AsyncImagePainter.State.Success)) {
-                PPlaceholder(if (failed) imageModifier.semantics { contentDescription = path } else imageModifier)
+                ThumbnailPlaceholder(
+                    thumbHash,
+                    if (failed) imageModifier.semantics { contentDescription = path } else imageModifier,
+                )
             }
             when {
                 failed && !showPlaceholder -> Image(

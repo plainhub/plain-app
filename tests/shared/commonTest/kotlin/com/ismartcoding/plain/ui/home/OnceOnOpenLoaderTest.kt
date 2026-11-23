@@ -1,7 +1,9 @@
 package com.ismartcoding.plain.ui.home
 
 import com.ismartcoding.plain.models.MediaBucket
-import com.ismartcoding.plain.ui.components.sidebarBucketThumbnailPaths
+import com.ismartcoding.plain.models.MediaBucketCover
+import kotlin.time.Instant
+import com.ismartcoding.plain.ui.components.sidebarBucketCovers
 import com.ismartcoding.plain.ui.media.OnceOnOpenLoader
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -12,14 +14,15 @@ class OnceOnOpenLoaderTest {
     @Test
     fun loadedDrawersRetainFolderCoversAcrossCloseAndReopen() {
         val paths = listOf("/fixture/one.jpg", "/fixture/two.jpg")
-        val bucket = MediaBucket("fixture", "Fixture", paths.size, paths)
+        val covers = paths.map { MediaBucketCover(it, Instant.fromEpochMilliseconds(0), null) }
+        val bucket = MediaBucket("fixture", "Fixture", covers.size, covers)
         val loader = OnceOnOpenLoader()
         val coversAcrossToggles = listOf(false, true, false, true).map { isOpen ->
             loader.shouldLoad(isOpen)
-            sidebarBucketThumbnailPaths(bucket, isMedia = true, coversEnabled = loader.hasOpened)
+            sidebarBucketCovers(bucket, isMedia = true, coversEnabled = loader.hasOpened)
         }
-        assertEquals(listOf(emptyList(), paths, paths, paths), coversAcrossToggles)
-        assertEquals(emptyList(), sidebarBucketThumbnailPaths(bucket, isMedia = false, coversEnabled = loader.hasOpened))
+        assertEquals(listOf(emptyList(), covers, covers, covers), coversAcrossToggles)
+        assertEquals(emptyList(), sidebarBucketCovers(bucket, isMedia = false, coversEnabled = loader.hasOpened))
     }
 
     @Test

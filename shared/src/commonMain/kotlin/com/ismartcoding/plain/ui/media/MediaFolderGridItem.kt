@@ -57,7 +57,7 @@ fun MediaFolderGridItem(
                     .clip(MaterialTheme.shapes.medium)
             ) {
                 MediaThumbnailGrid(
-                    paths = m.topItemPaths,
+                    items = m.coverItems,
                     contentDescription = m.name,
                     modifier = Modifier.fillMaxSize(),
                 )
