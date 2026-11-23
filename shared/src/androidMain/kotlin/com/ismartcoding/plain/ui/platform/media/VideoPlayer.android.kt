@@ -55,6 +55,7 @@ import androidx.media3.datasource.cache.Cache
 import androidx.media3.datasource.cache.CacheDataSource
 import androidx.media3.datasource.cache.LeastRecentlyUsedCacheEvictor
 import androidx.media3.datasource.cache.SimpleCache
+import androidx.media3.exoplayer.DefaultLoadControl
 import androidx.media3.exoplayer.ExoPlayer
 import kotlinx.coroutines.delay
 import androidx.media3.exoplayer.source.DefaultMediaSourceFactory
@@ -77,12 +78,16 @@ actual fun rememberVideoPlayerController(claimAudioSession: Boolean): VideoPlaye
     val context = LocalContext.current
     return remember {
         val resource = java.util.concurrent.atomic.AtomicReference<com.ismartcoding.plain.models.ManagedResource?>(null)
-        ExoPlayerVideoController(buildExoPlayer(context, resource), context, claimAudioSession, resource)
+        ExoPlayerVideoController(buildExoPlayer(context, resource, claimAudioSession), context, claimAudioSession, resource)
     }
 }
 
 @OptIn(UnstableApi::class)
-private fun buildExoPlayer(context: Context, resource: java.util.concurrent.atomic.AtomicReference<com.ismartcoding.plain.models.ManagedResource?>): ExoPlayer {
+private fun buildExoPlayer(
+    context: Context,
+    resource: java.util.concurrent.atomic.AtomicReference<com.ismartcoding.plain.models.ManagedResource?>,
+    preview: Boolean,
+): ExoPlayer {
     val standard = DefaultHttpDataSource.Factory()
     val httpDataSourceFactory = androidx.media3.datasource.DataSource.Factory {
         resource.get()?.let { com.ismartcoding.plain.platform.media.PeerResourceDataSource(it) } ?: standard.createDataSource()
@@ -98,6 +103,17 @@ private fun buildExoPlayer(context: Context, resource: java.util.concurrent.atom
             false,
         )
         .apply {
+            if (preview) setLoadControl(
+                DefaultLoadControl.Builder()
+                    .setBufferDurationsMsForStreaming(
+                        /* minBufferMs = */ 8_000,
+                        /* maxBufferMs = */ 18_000,
+                        /* bufferForPlaybackMs = */ 350,
+                        /* bufferForPlaybackAfterRebufferMs = */ 1_500,
+                    )
+                    .setTargetBufferBytes(32 * 1024 * 1024)
+                    .build(),
+            )
             val cache = VideoPlayerCacheManager.getCache()
             val upstream = DefaultDataSource.Factory(context, httpDataSourceFactory)
             val factory = if (cache == null) upstream else CacheDataSource.Factory().setCache(cache).setUpstreamDataSourceFactory(upstream)

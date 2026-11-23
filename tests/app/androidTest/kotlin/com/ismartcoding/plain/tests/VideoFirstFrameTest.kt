@@ -116,9 +116,18 @@ class VideoFirstFrameTest {
                     }
                     error("Selected video did not play: $page")
                 }
+                fun assertSingleVideoSurface() {
+                    scenario.onActivity { activity ->
+                        val root = activity.window.decorView as android.view.ViewGroup
+                        val surfaces = root.descendants.count { it is android.view.TextureView }
+                        org.junit.Assert.assertEquals("Offscreen pages must not create video surfaces", 1, surfaces)
+                    }
+                }
                 val first = awaitPlayer(0)
+                assertSingleVideoSurface()
                 scenario.onActivity { scope.launch { pager.scrollToPage(1) } }
                 val second = awaitPlayer(1)
+                assertSingleVideoSurface()
                 scenario.onActivity { scope.launch { pager.scrollToPage(0) } }
                 awaitPlayer(0)
                 scenario.onActivity {

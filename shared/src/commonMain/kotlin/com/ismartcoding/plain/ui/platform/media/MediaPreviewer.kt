@@ -10,6 +10,7 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.pager.HorizontalPager
@@ -22,6 +23,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
@@ -114,8 +116,7 @@ fun MediaPreviewer(
                 state = state.pagerState,
                 modifier = Modifier.fillMaxSize(),
                 pageSpacing = 16.dp,
-                // Pre-compose adjacent pages so their media (image/video) is
-                // loaded ahead of time — switching never shows a loading state.
+                // Adjacent video pages keep their thumbnails without preparing a player.
                 beyondViewportPageCount = 1,
                 userScrollEnabled = state.pagerUserScrollEnabled,
             ) { page ->
@@ -123,7 +124,9 @@ fun MediaPreviewer(
                 key(item?.id) {
                     val viewerContainerState = rememberSaveable(saver = ViewerContainerState.Saver) { ViewerContainerState() }
                     viewerContainerState.scope = scope
-                    viewerContainerState.viewerState = rememberViewerState()
+                    val video = item?.isVideo() == true
+                    val selectedVideo = video && state.pagerState.settledPage == page
+                    viewerContainerState.viewerState = key(selectedVideo) { rememberViewerState() }
                     viewerContainerState.transformState = rememberTransformContentState()
                     LaunchedEffect(key1 = state.pagerState.currentPage) {
                         if (state.pagerState.currentPage == page) {
@@ -151,12 +154,21 @@ fun MediaPreviewer(
                             ) {
                                 TransformContentView(transformState)
                             }
+                            val viewerMounted by viewerState.mountedFlow.collectAsState(initial = false)
                             Box(
                                 modifier = Modifier
                                     .fillMaxSize()
                                     .alpha(viewerContainerAlpha.value),
                             ) {
-                                if (item != null) {
+                                if (video && !viewerMounted && item != null) {
+                                    state.findTransformItem(item.id)?.let { cover ->
+                                        BoxWithConstraints(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                                            val side = minOf(maxWidth, maxHeight, 360.dp)
+                                            Box(Modifier.size(side)) { cover.blockCompose(cover.key) }
+                                        }
+                                    }
+                                }
+                                if (item != null && (!video || selectedVideo)) {
                                     MediaViewer(
                                         modifier = Modifier.fillMaxSize(),
                                         pagerState = state.pagerState,
@@ -176,8 +188,7 @@ fun MediaPreviewer(
                                     )
                                 }
                             }
-                            val viewerMounted by viewerState.mountedFlow.collectAsState(initial = false)
-                            if (showLoading) {
+                            if (showLoading && (!video || selectedVideo)) {
                                 val placeholder = PreviewerPlaceholder()
                                 // Show the loading icon only after the grace period:
                                 // quick switches never flash a loading state, only
