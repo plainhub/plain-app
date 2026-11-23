@@ -11,6 +11,8 @@ import com.ismartcoding.plain.rust.host.RustHostApiHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlin.concurrent.Volatile
 
 object RustRuntime {
@@ -25,6 +27,13 @@ object RustRuntime {
     val logFile: String get() = checkNotNull(logPath) { "Rust log path is not initialized" }
     @Volatile private var sharedPreviewPath: String? = null
     val sharedPreviewDir: String get() = checkNotNull(sharedPreviewPath) { "Rust shared preview cache is not initialized" }
+
+    private val legacyUpgradePrompt = MutableStateFlow(false)
+    internal val showLegacyUpgradePrompt = legacyUpgradePrompt.asStateFlow()
+
+    internal fun dismissLegacyUpgradePrompt() {
+        legacyUpgradePrompt.value = false
+    }
 
     private var sessionToken: String? = null
     private var collectorsStarted = false
@@ -41,6 +50,7 @@ object RustRuntime {
         sharedPreviewPath = result.sharedPreviewDir
         if (!collectorsStarted) {
             Prefs.load()
+            legacyUpgradePrompt.value = result.offerLegacyUpgrade
             isCoreInitialized = true
             RustHostApiHandler.start(scope)
             RustGraphqlSubscriptions.start(scope)

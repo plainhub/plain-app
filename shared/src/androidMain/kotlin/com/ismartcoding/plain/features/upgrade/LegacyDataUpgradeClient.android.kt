@@ -9,7 +9,7 @@ internal actual object LegacyDataUpgradeClient {
 
     actual suspend fun execute(action: LegacyDataUpgradeAction): LegacyDataUpgradeStatus {
         val status = nativeCall<LegacyDataUpgradeStatus> { RustNativeBindings.legacyDataUpgrade(action.name) }
-        if (action == LegacyDataUpgradeAction.SKIP || action == LegacyDataUpgradeAction.IMPORT) Prefs.load()
+        if (action == LegacyDataUpgradeAction.IMPORT) Prefs.load()
         return status
     }
 }

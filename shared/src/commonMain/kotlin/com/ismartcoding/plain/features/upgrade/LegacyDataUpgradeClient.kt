@@ -8,7 +8,7 @@ internal enum class LegacyDataUpgradeStatus {
 }
 
 internal enum class LegacyDataUpgradeAction {
-    STATUS, SKIP, IMPORT, CLEAR,
+    STATUS, IMPORT, CLEAR,
 }
 
 internal expect object LegacyDataUpgradeClient {

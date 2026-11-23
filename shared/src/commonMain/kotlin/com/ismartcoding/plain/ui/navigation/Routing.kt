@@ -22,7 +22,7 @@ class Routing {
     object BackupRestore
 
     @Serializable
-    data class LegacyDataUpgrade(val startup: Boolean = false)
+    object LegacyDataUpgrade
 
     @Serializable
     object DesktopAccessSettings

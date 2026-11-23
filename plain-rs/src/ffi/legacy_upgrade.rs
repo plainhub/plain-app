@@ -13,7 +13,6 @@ fn execute(action: &str) -> Result<Status, String> {
     };
     match action {
         "STATUS" => storage.status(&runtime.db, &directory),
-        "SKIP" => storage.skip(&runtime.db, &directory),
         "IMPORT" => storage.import(&runtime.db, &runtime.prefs, &directory),
         "CLEAR" => storage.clear(&runtime.db, &directory),
         _ => return Err("Invalid legacy data upgrade action".into()),

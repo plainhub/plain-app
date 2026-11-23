@@ -16,6 +16,10 @@ pub(crate) fn start(data_dir: &str, token: &str, config: &str) -> Result<String,
         return Err("Absolute data directory required".into());
     }
     let paths = plain_rs::infrastructure::data_paths::DataPaths::new(directory);
+    #[cfg(target_os = "android")]
+    let mut offer_legacy_upgrade = false;
+    #[cfg(not(target_os = "android"))]
+    let offer_legacy_upgrade = false;
     if let Some(core) = guard.as_ref() {
         if core.server.data_directory() != directory
             || core.token != token
@@ -36,10 +40,12 @@ pub(crate) fn start(data_dir: &str, token: &str, config: &str) -> Result<String,
         #[cfg(target_os = "android")]
         if let Some(storage) = &config.legacy_storage {
             storage.validate().map_err(|error| error.to_string())?;
-            if storage.present(&paths.database()).map_err(|error| error.to_string())?
-                && let Err(error) = storage.prepare_identity(&prefs)
-            {
-                log::write_log(Level::Error, &format!("Legacy identity import failed: {error}"));
+            match storage.prepare_identity(&prefs) {
+                Ok(renamed) => offer_legacy_upgrade = renamed,
+                Err(error) => log::write_log(
+                    Level::Error,
+                    &format!("Legacy identity import failed: {error:#}"),
+                ),
             }
         }
         let runtime = tokio::runtime::Builder::new_multi_thread()
@@ -67,6 +73,7 @@ pub(crate) fn start(data_dir: &str, token: &str, config: &str) -> Result<String,
     let core = guard.as_ref().unwrap();
     Ok(plain_libs::serde_json::json!({
         "logFile":core.server.log_file()?,
-        "sharedPreviewDir":core.server.cache_paths().shared_previews()})
+        "sharedPreviewDir":core.server.cache_paths().shared_previews(),
+        "offerLegacyUpgrade":offer_legacy_upgrade})
     .to_string())
 }

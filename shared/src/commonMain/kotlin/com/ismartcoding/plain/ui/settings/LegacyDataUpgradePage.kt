@@ -1,7 +1,6 @@
 package com.ismartcoding.plain.ui.settings
 
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -39,14 +38,13 @@ import org.jetbrains.compose.resources.stringResource
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-internal fun LegacyDataUpgradePage(navController: NavHostController, startup: Boolean) {
+internal fun LegacyDataUpgradePage(navController: NavHostController) {
     val scope = rememberCoroutineScope()
     val lifecycle = LocalLifecycleOwner.current.lifecycle
     var status by remember { mutableStateOf<LegacyDataUpgradeStatus?>(null) }
     var action by remember { mutableStateOf<LegacyDataUpgradeAction?>(null) }
     var failure by remember { mutableStateOf(false) }
     val pending = status == LegacyDataUpgradeStatus.PENDING || status == LegacyDataUpgradeStatus.SKIPPED
-    val mustChoose = startup && status != LegacyDataUpgradeStatus.IMPORTED && status != LegacyDataUpgradeStatus.CLEARED && !failure
 
     LaunchedEffect(lifecycle) {
         lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
@@ -68,7 +66,6 @@ internal fun LegacyDataUpgradePage(navController: NavHostController, startup: Bo
             scope.launch {
                 try {
                     status = LegacyDataUpgradeClient.execute(next)
-                    if (next == LegacyDataUpgradeAction.SKIP) navController.navigateUp()
                 } catch (canceled: CancellationException) {
                     throw canceled
                 } catch (_: Exception) {
@@ -80,12 +77,12 @@ internal fun LegacyDataUpgradePage(navController: NavHostController, startup: Bo
         }
     }
 
-    PBackHandler(enabled = mustChoose || action != null) { }
+    PBackHandler(enabled = action != null) { }
     PScaffold(
         topBar = {
             PTopAppBar(
                 title = stringResource(Res.string.legacy_data_upgrade),
-                onNavigateBack = if (mustChoose || action != null) null else {
+                onNavigateBack = if (action != null) null else {
                     { navController.navigateUp() }
                 },
             )
@@ -111,19 +108,12 @@ internal fun LegacyDataUpgradePage(navController: NavHostController, startup: Bo
                 }
                 if (pending) {
                     item {
-                        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                            PFilledButton(
-                                text = stringResource(Res.string.ok),
-                                onClick = { runAction(LegacyDataUpgradeAction.IMPORT) },
-                                isLoading = action == LegacyDataUpgradeAction.IMPORT,
-                                enabled = action != LegacyDataUpgradeAction.SKIP,
-                            )
-                            PTextButton(
-                                text = stringResource(Res.string.legacy_data_upgrade_skip),
-                                onClick = { runAction(LegacyDataUpgradeAction.SKIP) },
-                                enabled = action == null,
-                            )
-                        }
+                        PFilledButton(
+                            text = stringResource(Res.string.legacy_data_upgrade),
+                            onClick = { runAction(LegacyDataUpgradeAction.IMPORT) },
+                            isLoading = action == LegacyDataUpgradeAction.IMPORT,
+                            enabled = action == null,
+                        )
                     }
                 }
                 if (status == LegacyDataUpgradeStatus.IMPORTED) {

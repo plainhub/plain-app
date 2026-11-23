@@ -77,7 +77,7 @@ internal fun SettingsCardItems(navController: NavHostController) {
         )
         if (LegacyDataUpgradeClient.supported) {
             PListItem(
-                modifier = Modifier.clickable { navController.navigate(Routing.LegacyDataUpgrade()) },
+                modifier = Modifier.clickable { navController.navigate(Routing.LegacyDataUpgrade) },
                 title = stringResource(Res.string.legacy_data_upgrade),
                 showMore = true,
             )

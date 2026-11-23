@@ -51,8 +51,8 @@ internal fun NavGraphBuilder.addMainSettingsPages(
     composable<Routing.Language> { LanguagePage(navController) }
     composable<Routing.BackupRestore> { BackupRestorePage(navController) }
     if (LegacyDataUpgradeClient.supported) {
-        composable<Routing.LegacyDataUpgrade> { entry ->
-            LegacyDataUpgradePage(navController, entry.toRoute<Routing.LegacyDataUpgrade>().startup)
+        composable<Routing.LegacyDataUpgrade> {
+            LegacyDataUpgradePage(navController)
         }
     }
     composable<Routing.DesktopAccessSettings> { DesktopAccessSettingsPage(navController, batterySettings = batterySettings) }

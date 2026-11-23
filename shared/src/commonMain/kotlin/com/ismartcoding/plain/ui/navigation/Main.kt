@@ -36,12 +36,10 @@ import com.ismartcoding.plain.ui.dlna.DlnaReceiverOverlay
 import com.ismartcoding.plain.ui.audio.player.AudioPlayerPage
 import com.ismartcoding.plain.ui.media.ShortcutMediaPreviewer
 import com.ismartcoding.plain.ui.theme.backgroundNormal
-import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import com.ismartcoding.plain.features.upgrade.LegacyDataUpgradeAction
-import com.ismartcoding.plain.features.upgrade.LegacyDataUpgradeClient
-import com.ismartcoding.plain.features.upgrade.LegacyDataUpgradeStatus
+import com.ismartcoding.plain.rust.RustRuntime
+import com.ismartcoding.plain.ui.settings.LegacyDataUpgradeDialog
 
 @Composable
 fun Main(
@@ -83,23 +81,14 @@ fun Main(
         scope.launch(Dispatchers.Default) { pomodoroVM.loadAsync() }
     }
 
+    val showLegacyUpgradePrompt by RustRuntime.showLegacyUpgradePrompt.collectAsState()
     LaunchedEffect(navController) {
-        val status = try {
-            LegacyDataUpgradeClient.execute(LegacyDataUpgradeAction.STATUS)
-        } catch (canceled: CancellationException) {
-            throw canceled
-        } catch (_: Exception) {
-            null
+        if (!showLegacyUpgradePrompt && !Prefs.onboardingCompleted.value) {
+            navController.navigate(Routing.Onboarding) { launchSingleTop = true }
         }
-        if (status == LegacyDataUpgradeStatus.PENDING) {
-            navController.navigate(Routing.LegacyDataUpgrade(startup = true)) { launchSingleTop = true }
-        } else if (status in setOf(null, LegacyDataUpgradeStatus.UNAVAILABLE) && !Prefs.onboardingCompleted.value) {
-            // singleTop: this effect re-runs on activity recreation while the
-            // onboarding is still showing and the pref is not yet written
-            navController.navigate(Routing.Onboarding) {
-                launchSingleTop = true
-            }
-        }
+    }
+    if (showLegacyUpgradePrompt) {
+        LegacyDataUpgradeDialog(onClose = RustRuntime::dismissLegacyUpgradePrompt)
     }
 
     SideEffect {
