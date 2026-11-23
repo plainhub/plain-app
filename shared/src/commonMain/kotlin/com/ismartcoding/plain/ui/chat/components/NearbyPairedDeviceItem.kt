@@ -73,7 +73,7 @@ fun NearbyPairedDeviceItem(peer: Peer, device: NearbyDevice?, onPair: (NearbyDev
                         Res.drawable.arrow_left_right,
                         contentDescription = stringResource(Res.string.nearby_switch_device),
                         click = {
-                            if (reason == null) MainViewModel.selectDevice(DeviceIdentity(peer.id, peer.publicKey))
+                            if (reason == null) MainViewModel.requestDeviceSwitch(DeviceIdentity(peer.id, peer.publicKey))
                             else ToastManager.showInfoToast("${peer.name}: $reason")
                         },
                     )

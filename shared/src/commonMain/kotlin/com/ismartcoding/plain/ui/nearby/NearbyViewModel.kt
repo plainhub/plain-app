@@ -11,12 +11,14 @@ import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.models.NearbyDevice
 import com.ismartcoding.plain.models.PairingProgressNotice
 import com.ismartcoding.plain.platform.network.ensureBlePermissionAsync
+import com.ismartcoding.plain.ui.app.MainViewModel
 import com.ismartcoding.plain.ui.state.launchSafe
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.withContext
 
 object NearbyViewModel {
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
@@ -86,9 +88,7 @@ object NearbyViewModel {
             itemStatus.remove(deviceId)
         }) {
             val removed = PeerManager.markUnpaired(deviceId)
-            if (removed && com.ismartcoding.plain.ui.app.MainViewModel.selectedDevice.value?.peerId == deviceId) {
-                com.ismartcoding.plain.ui.app.MainViewModel.selectDevice(null)
-            }
+            if (removed) withContext(Dispatchers.Main) { MainViewModel.forgetUnpairedDevice(deviceId) }
         }
     }
 

@@ -98,6 +98,7 @@ object Prefs {
     val deviceName = MutableStateFlow("")
     val mdnsHostname = MutableStateFlow("")
     val onboardingCompleted = MutableStateFlow(false)
+    internal val selectedDeviceId = MutableStateFlow("")
     val screenMirrorQuality = MutableStateFlow(ScreenMirrorQuality(ScreenMirrorMode.HD, 0))
 
     internal fun load(values: JsonObject = nativeValue<JsonObject>(RustNativeBindings.loadPreferencesResponse())) {
@@ -165,6 +166,7 @@ object Prefs {
             PrefKeys.DEVICE_NAME -> deviceName.value = value.jsonPrimitive.content
             PrefKeys.MDNS_HOSTNAME -> mdnsHostname.value = value.jsonPrimitive.content
             PrefKeys.ONBOARDING_COMPLETED -> onboardingCompleted.value = value.jsonPrimitive.boolean
+            PrefKeys.SELECTED_DEVICE_ID -> selectedDeviceId.value = value.jsonPrimitive.content
             PrefKeys.SCREEN_MIRROR_QUALITY -> screenMirrorQuality.value = JsonHelper.jsonDecodeFromElement(value)
         }
     }

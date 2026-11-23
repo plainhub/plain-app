@@ -73,18 +73,62 @@ class SelectedDeviceTest {
         assertEquals(hit, MainViewModel.pendingSearchHit.value)
     }
 
-    private suspend fun remoteSource(): ContentSource.Remote {
-        val now = Instant.fromEpochMilliseconds(0)
-        val peer = Peer(
-            id = "fixture-peer", name = "Remote", ip = "device.test", status = PeerStatus.PAIRED, port = 8443,
-            deviceType = DeviceType.PHONE, createdAt = now, updatedAt = now,
-            publicKey = "fixture-key", token = "fixture-token",
+    @Test
+    fun switch_device_saves_the_peer_and_startup_restores_it_even_when_offline() = runTest {
+        val peer = remotePeer()
+        val selected = DeviceIdentity(peer.id, peer.publicKey)
+        var saved = ""
 
-        )
+        MainViewModel.switchDevice(selected) { saved = it }
+        assertEquals(peer.id, saved)
+        assertEquals(selected, MainViewModel.selectedDevice.value)
+
+        MainViewModel.selectDevice(null)
+        MainViewModel.restoreDeviceSelection(saved, findPeer = { id -> peer.takeIf { it.id == id } },
+            save = { fail("Restoring an authorized peer should not write the preference") })
+        assertFalse(peer.online)
+        assertEquals(selected, MainViewModel.selectedDevice.value)
+
+        MainViewModel.switchDevice(null) { saved = it }
+        assertEquals("", saved)
+        assertNull(MainViewModel.selectedDevice.value)
+    }
+
+    @Test
+    fun startup_returns_to_local_when_the_saved_peer_has_no_management_access() = runTest {
+        val peer = remotePeer()
+        for (unavailable in listOf(null, peer.copy(managed = false), peer.copy(publicKey = ""))) {
+            var saved = peer.id
+            MainViewModel.restoreDeviceSelection(saved, findPeer = { unavailable }, save = { saved = it })
+            assertEquals("", saved)
+            assertNull(MainViewModel.selectedDevice.value)
+        }
+    }
+
+    @Test
+    fun rejected_preference_write_preserves_the_current_device() = runTest {
+        val peer = remotePeer()
+        assertFailsWith<IllegalStateException> {
+            MainViewModel.switchDevice(DeviceIdentity(peer.id, peer.publicKey)) { error("Write failed") }
+        }
+        assertNull(MainViewModel.selectedDevice.value)
+    }
+
+    private suspend fun remoteSource(): ContentSource.Remote {
+        val peer = remotePeer()
         val response = """{"data":{"app":{"deviceName":"Remote","capabilities":[],"access":[],"appDir":"app://","downloadsDir":"/downloads","urlToken":"resource-token","tlsCertificateSha256":null}}}"""
         val http = PeerHttpClient(peer, peers = { listOf(peer) },
             executeGraphql = { _, _ -> JsonHelper.jsonDecode(response) },
         )
         return ContentSource.Remote(ManagedDeviceClient.load(peer, http))
+    }
+
+    private fun remotePeer(): Peer {
+        val now = Instant.fromEpochMilliseconds(0)
+        return Peer(
+            id = "fixture-peer", name = "Remote", ip = "device.test", status = PeerStatus.PAIRED, port = 8443,
+            deviceType = DeviceType.PHONE, createdAt = now, updatedAt = now,
+            publicKey = "fixture-key", token = "fixture-token", managed = true,
+        )
     }
 }

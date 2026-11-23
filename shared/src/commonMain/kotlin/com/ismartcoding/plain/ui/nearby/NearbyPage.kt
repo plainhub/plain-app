@@ -227,7 +227,7 @@ private fun LocalDeviceItem() {
             if (!isCurrent) PIconButton(
                 Res.drawable.arrow_left_right,
                 contentDescription = stringResource(Res.string.nearby_switch_device),
-                click = { MainViewModel.selectDevice(null) },
+                click = { MainViewModel.requestDeviceSwitch(null) },
             )
         },
     )

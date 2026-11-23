@@ -53,6 +53,8 @@ fun Main(
     platformPages: (NavGraphBuilder.(NavHostController) -> Unit)? = null,
     batterySettings: (@Composable () -> Unit)? = null,
 ) {
+    if (MainViewModel.restoringDeviceSelection.value) return
+
     val scope = rememberCoroutineScope()
     val selectedDevice by MainViewModel.selectedDevice
     val navController = key(selectedDevice) { rememberNavController() }
