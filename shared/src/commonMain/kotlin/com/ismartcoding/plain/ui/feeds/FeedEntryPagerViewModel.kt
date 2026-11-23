@@ -7,7 +7,6 @@ import androidx.lifecycle.viewModelScope
 import com.ismartcoding.plain.models.Feed
 import com.ismartcoding.plain.models.FeedEntry
 import com.ismartcoding.plain.ui.state.launchSafe
-import com.ismartcoding.plain.features.feeds.fetchContentAsync
 import com.ismartcoding.plain.lib.logcat.LogCat
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.delay
@@ -48,8 +47,13 @@ class FeedEntryPagerViewModel internal constructor(val source: ContentSource = C
 
     fun cachedContent(id: String): String = contents[id] ?: entries[id]?.content ?: ""
 
-    fun cacheContent(id: String, content: String) {
-        if (content.isNotEmpty()) contents[id] = content
+    suspend fun fetchContentAsync(entry: FeedEntry): String {
+        val refreshed = source.feedEntries.syncContent(entry.id)
+        entry.content = refreshed.content
+        entry.image = refreshed.image
+        entry.updatedAt = refreshed.updatedAt
+        if (entry.content.isNotEmpty()) contents[entry.id] = entry.content
+        return entry.content
     }
 
     private var latestPreloadId: String? = null
@@ -76,8 +80,7 @@ class FeedEntryPagerViewModel internal constructor(val source: ContentSource = C
                 if (feed?.fetchContent != true) return@forEach
                 if (!fetchingIds.add(neighbor)) return@forEach
                 try {
-                    m.fetchContentAsync()
-                    cacheContent(neighbor, m.content)
+                    fetchContentAsync(m)
                 } catch (canceled: CancellationException) {
                     throw canceled
                 } catch (error: Exception) {

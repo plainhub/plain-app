@@ -50,7 +50,6 @@ import com.ismartcoding.plain.ui.markdown.compose.Markdown
 import com.ismartcoding.plain.ui.markdown.compose.MarkdownElement
 import com.ismartcoding.plain.ui.markdown.model.State
 import com.ismartcoding.plain.ui.markdown.model.rememberMarkdownState
-import com.ismartcoding.plain.features.feeds.fetchContentAsync
 import com.ismartcoding.plain.ui.state.launchSafe
 import com.ismartcoding.plain.ui.base.BottomSpace
 import com.ismartcoding.plain.ui.base.POutlinedButton
@@ -154,9 +153,8 @@ internal fun FeedEntryArticle(
                                                 },
                                             ) {
                                                 feedEntryVM.fetchingContent.value = true
-                                                entry.fetchContentAsync()
-                                                pagerVM.cacheContent(entry.id, entry.content)
-                                                if (feedEntryVM.item.value?.id == entry.id) feedEntryVM.content.value = entry.content
+                                                val content = pagerVM.fetchContentAsync(entry)
+                                                if (feedEntryVM.item.value?.id == entry.id) feedEntryVM.content.value = content
                                             }
                                         }
                                     },

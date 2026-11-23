@@ -24,7 +24,6 @@ import com.ismartcoding.plain.features.feeds.FeedFontScale
 import com.ismartcoding.plain.i18n.*
 import com.ismartcoding.plain.ui.platform.media.MediaPreviewer
 import com.ismartcoding.plain.ui.navigation.PBackHandler
-import com.ismartcoding.plain.features.feeds.fetchContentAsync
 import com.ismartcoding.plain.ui.state.launchSafe
 import com.ismartcoding.plain.ui.base.PScaffold
 import com.ismartcoding.plain.ui.base.pullrefresh.PullToRefresh
@@ -77,9 +76,8 @@ fun FeedEntryPage(
             DialogHelper.showErrorDialog(error.toString())
         }) {
             feedEntryVM.item.value?.let { entry ->
-                entry.fetchContentAsync()
-                pagerVM.cacheContent(entry.id, entry.content)
-                if (feedEntryVM.item.value?.id == entry.id) feedEntryVM.content.value = entry.content
+                val content = pagerVM.fetchContentAsync(entry)
+                if (feedEntryVM.item.value?.id == entry.id) feedEntryVM.content.value = content
             }
             setRefreshState(RefreshContentState.Finished)
         }

@@ -4,12 +4,9 @@ import com.ismartcoding.plain.graphql.Mutation
 import com.ismartcoding.plain.graphql.Query
 import com.ismartcoding.plain.models.FeedEntry
 import com.ismartcoding.plain.rust.graphql.GraphqlClient
-import com.ismartcoding.plain.rust.graphql.GraphqlApi
 import com.ismartcoding.plain.rust.graphql.selectionQuery
 
-object FeedEntriesClient : FeedEntriesApi()
-
-open class FeedEntriesApi internal constructor(protected val api: GraphqlClient = GraphqlApi) {
+class FeedEntriesApi internal constructor(private val api: GraphqlClient) {
     suspend fun count(query: String): Int =
         api.execute(Query.feedEntryCount(query))
 
