@@ -323,6 +323,7 @@ fun VideosPage(
 
     MediaPreviewer(
         state = previewerState,
+        preloadAdjacentVideos = true,
         tagsVM = tagsVM,
         tagsMap = tagsMapState,
         tagsState = tagsState,

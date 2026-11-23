@@ -9,6 +9,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
@@ -27,6 +28,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.ensureActive
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
@@ -69,7 +71,10 @@ internal fun rememberMediaVideoController(
 
     val scope = rememberCoroutineScope()
     DisposableEffect(controller) {
-        val preparation = scope.prepareVideoPlayback(controller, model.resourcePath, model.tlsCertificateSha256) {
+        val preparation = scope.prepareVideoPlayback(controller, model.resourcePath, model.tlsCertificateSha256, onError = { error ->
+            snapshotFlow { pagerState.settledPage }.first { it == page }
+            ToastManager.showErrorToast(error.message ?: error.toString())
+        }) {
             if (mediaId.isEmpty() && model.pickedMediaType == null && model.source is com.ismartcoding.plain.rust.graphql.ContentSource.Local) {
                 mediaId = getVideoMediaId(model.path).orEmpty()
             }
@@ -117,10 +122,11 @@ internal fun rememberMediaVideoController(
             }
             if (active && videoState.controller === controller) {
                 val position = controller.currentPositionMs
+                val totalTime = controller.durationMs.takeIf { it > 0 } ?: duration
                 controller.pause()
                 controller.abandonAudioFocus()
                 if (mediaId.isNotEmpty()) model.source.history.saveProgress(mediaId, PlaybackType.VIDEO, position)
-                if (pagerState.settledPage != page && duration > 0 && position >= duration - 1000) controller.seekTo(0)
+                if (pagerState.settledPage != page && totalTime > 0 && position >= totalTime - 1000) controller.seekTo(0)
                 videoState.controller = null
                 videoState.isPlaying = false
                 videoState.isSeeking = false
@@ -134,6 +140,7 @@ internal fun CoroutineScope.prepareVideoPlayback(
     controller: VideoPlayerController,
     path: String,
     tlsCertificateSha256: String?,
+    onError: suspend (Throwable) -> Unit,
     resumePosition: suspend () -> Long,
 ) = launch(start = CoroutineStart.UNDISPATCHED) {
     try {
@@ -145,7 +152,7 @@ internal fun CoroutineScope.prepareVideoPlayback(
     } catch (error: CancellationException) {
         throw error
     } catch (error: Throwable) {
-        ToastManager.showErrorToast(error.message ?: error.toString())
+        onError(error)
     }
 }
 

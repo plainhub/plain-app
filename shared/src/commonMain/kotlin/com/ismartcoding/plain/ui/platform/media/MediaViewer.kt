@@ -8,6 +8,7 @@ import androidx.compose.foundation.pager.PagerState
 import androidx.compose.runtime.key
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
 import com.ismartcoding.plain.ui.media.viewer.GestureScope
 import com.ismartcoding.plain.ui.media.viewer.MediaViewerState
@@ -17,6 +18,7 @@ import com.ismartcoding.plain.ui.media.viewer.rememberViewerState
 import com.ismartcoding.plain.ui.media.viewer.video.MediaVideo
 import com.ismartcoding.plain.ui.media.viewer.video.VideoState
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.first
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -36,6 +38,7 @@ fun MediaViewer(
         } catch (canceled: kotlinx.coroutines.CancellationException) {
             throw canceled
         } catch (error: Exception) {
+            if (model.isVideo()) snapshotFlow { pagerState.settledPage }.first { it == page }
             com.ismartcoding.plain.ui.components.DialogHelper.showMessage(error)
             state.mountedFlow.emit(true)
         }

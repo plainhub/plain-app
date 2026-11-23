@@ -2,16 +2,14 @@ package com.ismartcoding.plain.tests
 
 import androidx.core.view.descendants
 import android.os.SystemClock
+import android.view.TextureView
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.pager.HorizontalPager
-import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.withFrameNanos
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.lifecycle.Lifecycle
 import com.ismartcoding.plain.ui.platform.media.ExoPlayerVideoController
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.IntSize
@@ -19,15 +17,21 @@ import androidx.test.core.app.ActivityScenario
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.ismartcoding.plain.MainActivity
+import com.ismartcoding.plain.features.media.MediaType
+import com.ismartcoding.plain.ui.media.MediaPreviewData
 import com.ismartcoding.plain.ui.media.viewer.PreviewItem
+import com.ismartcoding.plain.ui.media.viewer.previewer.MediaPreviewerState
+import com.ismartcoding.plain.ui.media.viewer.previewer.rememberPreviewerState
 import com.ismartcoding.plain.ui.media.viewer.video.MediaVideo
 import com.ismartcoding.plain.ui.media.viewer.video.VideoState
+import com.ismartcoding.plain.ui.platform.media.MediaPreviewer
 import com.ismartcoding.plain.ui.theme.AppTheme
 import java.io.File
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
+import org.junit.Assert.assertSame
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -78,75 +82,128 @@ class VideoFirstFrameTest {
     fun openingVideoRendersBeforeTheTransitionCanStartPlayback() = verifyPlayback(initiallyOpen = false)
 
     @Test
-    fun onlyTheLastSelectedVideoPlaysAfterReturningToTheActivity() {
+    fun adjacentVideoHasADecodedFrameBeforeTheSwipeSettles() = withPreviewer(preloadAdjacentVideos = true) { scenario, state, files ->
+        val first = awaitPlayer(scenario, state, files[0])
+        var adjacentSurface: TextureView? = null
+        val deadline = SystemClock.elapsedRealtime() + 10000
+        while (adjacentSurface == null && SystemClock.elapsedRealtime() < deadline) {
+            scenario.onActivity { activity ->
+                val root = activity.window.decorView as android.view.ViewGroup
+                adjacentSurface = root.descendants.filterIsInstance<TextureView>().firstOrNull { surface ->
+                    val location = IntArray(2)
+                    surface.getLocationOnScreen(location)
+                    if (location[0] < root.width) return@firstOrNull false
+                    val frame = surface.getBitmap(2, 2) ?: return@firstOrNull false
+                    val blueFrame = android.graphics.Color.blue(frame.getPixel(1, 1)) > 200
+                    frame.recycle()
+                    blueFrame
+                }
+            }
+            if (adjacentSurface == null) SystemClock.sleep(20)
+        }
+        assertTrue("Expected a decoded frame on the next page before starting the swipe", adjacentSurface != null)
+
+        scenario.onActivity {
+            assertSame(first, state.videoState.controller)
+            state.scope.launch { state.pagerState.animateScrollToPage(1) }
+        }
+        val second = awaitPlayer(scenario, state, files[1])
+        scenario.onActivity { activity ->
+            assertFalse(first.isPlaying)
+            val root = activity.window.decorView as android.view.ViewGroup
+            assertTrue("The next page must keep its prepared surface", root.descendants.any { it === adjacentSurface })
+            state.scope.launch { state.pagerState.animateScrollToPage(0) }
+        }
+        assertSame(first, awaitPlayer(scenario, state, files[0]))
+        scenario.onActivity {
+            assertFalse(second.isPlaying)
+        }
+    }
+
+    @Test
+    fun onlyTheLastSelectedVideoPlaysAfterReturningToTheActivity() = withPreviewer { scenario, state, files ->
+        fun assertSingleVideoSurface() {
+            scenario.onActivity { activity ->
+                val root = activity.window.decorView as android.view.ViewGroup
+                val surfaces = root.descendants.count { it is TextureView }
+                org.junit.Assert.assertEquals("Offscreen pages must not create video surfaces", 1, surfaces)
+            }
+        }
+        val first = awaitPlayer(scenario, state, files[0])
+        assertSingleVideoSurface()
+        scenario.onActivity { state.scope.launch { state.pagerState.scrollToPage(1) } }
+        val second = awaitPlayer(scenario, state, files[1])
+        assertSingleVideoSurface()
+        scenario.onActivity { state.scope.launch { state.pagerState.scrollToPage(0) } }
+        awaitPlayer(scenario, state, files[0])
+        scenario.onActivity {
+            state.scope.launch {
+                state.pagerState.scrollToPage(1)
+                withFrameNanos { }
+                state.pagerState.scrollToPage(2)
+            }
+        }
+        awaitPlayer(scenario, state, files[2])
+        scenario.moveToState(Lifecycle.State.CREATED)
+        scenario.moveToState(Lifecycle.State.RESUMED)
+        awaitPlayer(scenario, state, files[2])
+        scenario.onActivity {
+            assertFalse(first.isPlaying)
+            assertFalse(second.isPlaying)
+        }
+    }
+
+    private fun awaitPlayer(scenario: ActivityScenario<MainActivity>, state: MediaPreviewerState, file: File): ExoPlayerVideoController {
+        val deadline = SystemClock.elapsedRealtime() + 15000
+        while (SystemClock.elapsedRealtime() < deadline) {
+            var current: ExoPlayerVideoController? = null
+            scenario.onActivity {
+                val player = state.videoState.controller as? ExoPlayerVideoController
+                if (player?.isPlaying == true && player.exoPlayer.currentMediaItem?.localConfiguration?.uri?.path == file.path) current = player
+            }
+            current?.let { return it }
+            SystemClock.sleep(10)
+        }
+        error("Selected video did not play: ${file.name}")
+    }
+
+    private fun withPreviewer(
+        preloadAdjacentVideos: Boolean = false,
+        test: (ActivityScenario<MainActivity>, MediaPreviewerState, List<File>) -> Unit,
+    ) {
         val context = InstrumentationRegistry.getInstrumentation().targetContext
-        val files = List(3) { File.createTempFile("switch-", ".mp4", context.cacheDir) }
+        val files = List(3) { File.createTempFile("handoff-", ".mp4", context.cacheDir) }
         try {
             files.forEach { file ->
                 requireNotNull(javaClass.classLoader?.getResourceAsStream("video-start.mp4")).use { input ->
                     file.outputStream().use { input.copyTo(it) }
                 }
             }
-            val items = files.map { PreviewItem(it.name, it.path, it.length()).apply { intrinsicSize = IntSize(640, 360) } }
-            val state = VideoState().apply { isPreviewerOpen = true }
             ActivityScenario.launch(MainActivity::class.java).use { scenario ->
-                lateinit var pager: PagerState
-                lateinit var scope: CoroutineScope
+                val opened = CountDownLatch(1)
+                lateinit var state: MediaPreviewerState
                 scenario.onActivity { activity ->
+                    MediaPreviewData.items = files.map {
+                        PreviewItem(it.name, it.path, it.length(), pickedMediaType = MediaType.VIDEO).apply {
+                            intrinsicSize = IntSize(640, 360)
+                        }
+                    }
                     activity.setContent {
                         AppTheme(useDarkTheme = false) {
-                            pager = rememberPagerState { items.size }
-                            scope = rememberCoroutineScope()
-                            HorizontalPager(pager, beyondViewportPageCount = 1) { page ->
-                                MediaVideo(pagerState = pager, videoState = state, page = page, model = items[page])
+                            state = rememberPreviewerState()
+                            MediaPreviewer(state, preloadAdjacentVideos = preloadAdjacentVideos)
+                            LaunchedEffect(state) {
+                                state.open()
+                                opened.countDown()
                             }
                         }
                     }
                 }
-                fun awaitPlayer(page: Int): ExoPlayerVideoController {
-                    val deadline = SystemClock.elapsedRealtime() + 15000
-                    while (SystemClock.elapsedRealtime() < deadline) {
-                        var current: ExoPlayerVideoController? = null
-                        scenario.onActivity {
-                            val player = state.controller as? ExoPlayerVideoController
-                            if (player?.isPlaying == true && player.exoPlayer.currentMediaItem?.localConfiguration?.uri?.path == files[page].path) current = player
-                        }
-                        current?.let { return it }
-                        SystemClock.sleep(10)
-                    }
-                    error("Selected video did not play: $page")
-                }
-                fun assertSingleVideoSurface() {
-                    scenario.onActivity { activity ->
-                        val root = activity.window.decorView as android.view.ViewGroup
-                        val surfaces = root.descendants.count { it is android.view.TextureView }
-                        org.junit.Assert.assertEquals("Offscreen pages must not create video surfaces", 1, surfaces)
-                    }
-                }
-                val first = awaitPlayer(0)
-                assertSingleVideoSurface()
-                scenario.onActivity { scope.launch { pager.scrollToPage(1) } }
-                val second = awaitPlayer(1)
-                assertSingleVideoSurface()
-                scenario.onActivity { scope.launch { pager.scrollToPage(0) } }
-                awaitPlayer(0)
-                scenario.onActivity {
-                    scope.launch {
-                        pager.scrollToPage(1)
-                        withFrameNanos { }
-                        pager.scrollToPage(2)
-                    }
-                }
-                awaitPlayer(2)
-                scenario.moveToState(Lifecycle.State.CREATED)
-                scenario.moveToState(Lifecycle.State.RESUMED)
-                awaitPlayer(2)
-                scenario.onActivity {
-                    assertFalse(first.isPlaying)
-                    assertFalse(second.isPlaying)
-                }
+                assertTrue("Expected the video preview to open", opened.await(15, TimeUnit.SECONDS))
+                test(scenario, state, files)
             }
         } finally {
+            MediaPreviewData.items = emptyList()
             files.forEach { it.delete() }
         }
     }

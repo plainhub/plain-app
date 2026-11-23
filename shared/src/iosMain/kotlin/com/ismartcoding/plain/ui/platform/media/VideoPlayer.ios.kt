@@ -173,6 +173,7 @@ private class AVPlayerVideoController : VideoPlayerController {
     private fun stopPolling() {
         pollJob?.cancel()
         pollJob = null
+        lastIsPlaying = false
     }
 
     fun getPlayer(): AVPlayer? = player

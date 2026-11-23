@@ -65,6 +65,7 @@ fun MediaPreviewer(
     onRenamed: () -> Unit = {},
     deleteAction: (PreviewItem) -> Unit = {},
     onTagsChanged: () -> Unit = {},
+    preloadAdjacentVideos: Boolean = false,
 ) {
     val items = MediaPreviewData.items
     LaunchedEffect(key1 = state.animateContainerVisibleState, key2 = state.animateContainerVisibleState.currentState) {
@@ -116,7 +117,6 @@ fun MediaPreviewer(
                 state = state.pagerState,
                 modifier = Modifier.fillMaxSize(),
                 pageSpacing = 16.dp,
-                // Adjacent video pages keep their thumbnails without preparing a player.
                 beyondViewportPageCount = 1,
                 userScrollEnabled = state.pagerUserScrollEnabled,
             ) { page ->
@@ -125,9 +125,15 @@ fun MediaPreviewer(
                     val viewerContainerState = rememberSaveable(saver = ViewerContainerState.Saver) { ViewerContainerState() }
                     viewerContainerState.scope = scope
                     val video = item?.isVideo() == true
-                    val selectedVideo = video && state.pagerState.settledPage == page
-                    viewerContainerState.viewerState = key(selectedVideo) { rememberViewerState() }
+                    val settledPage = state.pagerState.settledPage
+                    val selectedVideo = video && settledPage == page
+                    val prepareVideo = selectedVideo || (video && preloadAdjacentVideos && state.videoState.isPreviewerOpen &&
+                        kotlin.math.abs(page - settledPage) == 1 && !item.requiresResourceDownload)
+                    viewerContainerState.viewerState = key(prepareVideo) { rememberViewerState() }
                     viewerContainerState.transformState = rememberTransformContentState()
+                    LaunchedEffect(selectedVideo) {
+                        if (prepareVideo && !selectedVideo) viewerContainerState.viewerState.resetImmediately()
+                    }
                     LaunchedEffect(key1 = state.pagerState.currentPage) {
                         if (state.pagerState.currentPage == page) {
                             state.viewerContainerState = viewerContainerState
@@ -160,7 +166,7 @@ fun MediaPreviewer(
                                     .fillMaxSize()
                                     .alpha(viewerContainerAlpha.value),
                             ) {
-                                if (video && !viewerMounted && item != null) {
+                                if (video && !viewerMounted) {
                                     state.findTransformItem(item.id)?.let { cover ->
                                         BoxWithConstraints(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                                             val side = minOf(maxWidth, maxHeight, 360.dp)
@@ -168,7 +174,7 @@ fun MediaPreviewer(
                                         }
                                     }
                                 }
-                                if (item != null && (!video || selectedVideo)) {
+                                if (item != null && (!video || prepareVideo)) {
                                     MediaViewer(
                                         modifier = Modifier.fillMaxSize(),
                                         pagerState = state.pagerState,

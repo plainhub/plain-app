@@ -16,6 +16,7 @@ import com.ismartcoding.plain.lib.extensions.getMimeType
 import com.ismartcoding.plain.lib.extensions.isImageFast
 import com.ismartcoding.plain.lib.extensions.isVideoFast
 import com.ismartcoding.plain.lib.extensions.isUrl
+import com.ismartcoding.plain.platform.media.viewerResourceRequiresDownload
 import kotlin.text.ifEmpty
 
 data class PreviewItem(
@@ -34,10 +35,13 @@ data class PreviewItem(
         value.tlsCertificateSha256?.let { com.ismartcoding.plain.models.ManagedResource(value.path, it) } ?: value.path
     }
     val tlsCertificateSha256: String? get() = remoteResource?.tlsCertificateSha256
+    private val isDirectResource: Boolean get() = path.isUrl() || path.startsWith("data:", true)
+    internal val requiresResourceDownload: Boolean
+        get() = source is ContentSource.Remote && !isDirectResource && viewerResourceRequiresDownload(isVideo(), size)
 
     suspend fun prepareResource() {
         if (source is ContentSource.Remote) {
-            remoteResource = if (path.isUrl() || path.startsWith("data:", true)) com.ismartcoding.plain.platform.media.ViewerResource(path, null)
+            remoteResource = if (isDirectResource) com.ismartcoding.plain.platform.media.ViewerResource(path, null)
                 else com.ismartcoding.plain.platform.media.prepareViewerResource(source.client.resource(path), path.substringAfterLast('/'), isVideo(), size)
         }
     }

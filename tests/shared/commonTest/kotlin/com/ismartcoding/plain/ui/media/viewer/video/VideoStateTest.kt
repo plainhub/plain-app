@@ -85,7 +85,7 @@ class VideoStateTest {
         val player = FakeVideoPlayerController()
         val history = CompletableDeferred<Long>()
         var requested = false
-        val job = prepareVideoPlayback(player, "clip", null) {
+        val job = prepareVideoPlayback(player, "clip", null, onError = { throw it }) {
             requested = true
             history.await()
         }
@@ -106,13 +106,13 @@ class VideoStateTest {
         val player = FakeVideoPlayerController()
         val oldHistory = CompletableDeferred<Long>()
         val oldRead = CompletableDeferred<Unit>()
-        val retired = prepareVideoPlayback(player, "clip", null) {
+        val retired = prepareVideoPlayback(player, "clip", null, onError = { throw it }) {
             oldRead.complete(Unit)
             kotlinx.coroutines.withContext(kotlinx.coroutines.NonCancellable) { oldHistory.await() }
         }
         oldRead.await()
         retired.cancel()
-        prepareVideoPlayback(player, "clip", null) { 2500L }.join()
+        prepareVideoPlayback(player, "clip", null, onError = { throw it }) { 2500L }.join()
         oldHistory.complete(9000L)
         retired.join()
         assertEquals("clip", player.mediaItems.single().first)
@@ -144,13 +144,13 @@ class VideoStateTest {
     }
 
     @Test
-    fun `initData does not mute when not muted`() {
+    fun `initData unmutes a retained controller when playback is unmuted`() {
         val state = VideoState()
-        val fake = FakeVideoPlayerController()
+        val fake = FakeVideoPlayerController().apply { setMuted(true) }
 
         state.initData(fake)
 
-        assertTrue(fake.mutedValues.isEmpty())
+        assertEquals(listOf(true, false), fake.mutedValues)
     }
 
     @Test
@@ -307,20 +307,19 @@ class VideoStateTest {
         state.toggleMute()
 
         assertTrue(state.isMuted)
-        assertEquals(listOf(true), fake.mutedValues)
+        assertEquals(listOf(false, true), fake.mutedValues)
     }
 
     @Test
     fun `toggleMute unmutes when muted`() {
-        val state = VideoState()
+        val state = VideoState().apply { isMuted = true }
         val fake = FakeVideoPlayerController()
         state.initData(fake)
-        state.isMuted = true
 
         state.toggleMute()
 
         assertFalse(state.isMuted)
-        assertEquals(listOf(false), fake.mutedValues)
+        assertEquals(listOf(true, false), fake.mutedValues)
     }
 
     @Test

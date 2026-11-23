@@ -29,9 +29,7 @@ class VideoState {
 
     fun initData(controller: VideoPlayerController) {
         this.controller = controller
-        if (isMuted) {
-            controller.setMuted(true)
-        }
+        controller.setMuted(isMuted)
         controller.setPlaybackSpeed(speed)
     }
 

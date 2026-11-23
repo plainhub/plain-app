@@ -1,7 +1,5 @@
 package com.ismartcoding.plain.ui.media.viewer.video
 
-import com.ismartcoding.plain.features.media.MediaClient
-
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 
@@ -54,7 +52,7 @@ fun MediaVideo(
     onSizeChange: suspend (SizeChangeContent) -> Unit = {},
     boundClip: Boolean = true,
 ) {
-    if (page != pagerState.settledPage) return
+    val selected = page == pagerState.settledPage
     val viewerAlpha = remember { Animatable(0F) }
     var bSize by remember { mutableStateOf(IntSize(0, 0)) }
     var vSize by remember(model) {
@@ -70,7 +68,8 @@ fun MediaVideo(
         }
     }
 
-    LaunchedEffect(model.path) {
+    LaunchedEffect(model.path, selected) {
+        if (!selected) return@LaunchedEffect
         if (model.intrinsicSize == IntSize.Zero && !isContentUri(model.path)) {
             when (val data = model.data) {
                 is MediaVideo -> model.initAsync(data)
@@ -107,20 +106,24 @@ fun MediaVideo(
             .fillMaxSize()
             .graphicsLayer { clip = boundClip; alpha = viewerAlpha.value }
             .onSizeChanged { bSize = it }
-            .pointerInput(Unit) {
+            .pointerInput(selected) {
+                if (!selected) return@pointerInput
                 awaitEachGesture {
                     val down = awaitFirstDown(requireUnconsumed = false)
                     val released = withTimeoutOrNull(viewConfiguration.longPressTimeoutMillis) { waitForUpOrCancellation() }
                     if (released == null) {
                         gesture.onLongPress(down.position)
                         videoState.startSpeedBoost()
-                        waitForUpOrCancellation()
-                        videoState.stopSpeedBoost()
+                        try {
+                            waitForUpOrCancellation()
+                        } finally {
+                            videoState.stopSpeedBoost()
+                        }
                     }
                 }
             }
-            .pointerInput(videoSpecified) {
-                if (videoSpecified) {
+            .pointerInput(videoSpecified, selected) {
+                if (videoSpecified && selected) {
                     detectTransformGestures(
                         onTap = gesture.onTap,
                         onDoubleTap = gesture.onDoubleTap,
@@ -139,14 +142,15 @@ fun MediaVideo(
                 rotationZ = rotation
             }
         }
+        val activeVideoState = videoState.takeIf { selected }
         val surfaceModifier = videoModifier.align(Alignment.Center).then(
-            if (videoState.isFullscreenMode || !videoSpecified) Modifier.fillMaxSize()
+            if (activeVideoState?.isFullscreenMode == true || !videoSpecified) Modifier.fillMaxSize()
             else Modifier.aspectRatio(sizing.videoRatio)
         )
         VideoPlayerSurface(
             modifier = surfaceModifier,
             controller = controller,
-            videoState = videoState,
+            videoState = activeVideoState,
         )
     }
 }
