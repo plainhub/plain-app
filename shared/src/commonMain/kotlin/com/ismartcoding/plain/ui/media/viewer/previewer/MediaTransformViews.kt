@@ -24,6 +24,8 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.positionInRoot
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import org.jetbrains.compose.resources.painterResource
 import coil3.compose.AsyncImagePainter
 import coil3.compose.LocalPlatformContext
@@ -38,6 +40,7 @@ import com.ismartcoding.plain.lib.extensions.isImageFast
 import com.ismartcoding.plain.platform.media.applyForceVideoDecoder
 import com.ismartcoding.plain.platform.system.ThumbnailNetworkSchedule
 import kotlinx.coroutines.launch
+import com.ismartcoding.plain.ui.base.PPlaceholder
 import com.ismartcoding.plain.ui.resources.Res as UiRes
 import com.ismartcoding.plain.ui.resources.file_video as ui_drawable_file_video
 import com.ismartcoding.plain.ui.resources.image as ui_drawable_image
@@ -50,6 +53,7 @@ internal fun TransformImageViewWithUri(
     itemState: TransformItemState, previewerState: MediaPreviewerState,
     widthPx: Int, forceVideoDecoder: Boolean = false, version: Instant? = null,
     networkSchedule: ThumbnailNetworkSchedule? = null,
+    showPlaceholder: Boolean = false,
 ) {
     val source = com.ismartcoding.plain.ui.navigation.LocalContentSource.current
     val managedThumbnail = if (source is com.ismartcoding.plain.rust.graphql.ContentSource.Remote && version != null) {
@@ -67,7 +71,7 @@ internal fun TransformImageViewWithUri(
                 model = ImageRequest.Builder(LocalPlatformContext.current)
                     .data(managedThumbnail ?: if (source is com.ismartcoding.plain.rust.graphql.ContentSource.Local) uri ?: path else resource?.getOrNull())
                     .size(widthPx)
-                    .apply { if (managedThumbnail != null) crossfade(false) }
+                    .apply { if (managedThumbnail != null || showPlaceholder) crossfade(false) }
                     .applyForceVideoDecoder(forceVideoDecoder && source is com.ismartcoding.plain.rust.graphql.ContentSource.Local).build(),
                 onError = { state ->
                     if (managedThumbnail != null || source is com.ismartcoding.plain.rust.graphql.ContentSource.Remote && resource?.isSuccess == true) {
@@ -83,19 +87,26 @@ internal fun TransformImageViewWithUri(
                 if (imageState is AsyncImagePainter.State.Success) itemState.updateIntrinsicSize(painter.intrinsicSize)
             }
             val imageModifier = Modifier.fillMaxSize()
-            if (resource?.isFailure == true || painter.state.value is AsyncImagePainter.State.Error) {
-                Image(
+            val failed = resource?.isFailure == true || imageState is AsyncImagePainter.State.Error
+            if (showPlaceholder && (failed || imageState !is AsyncImagePainter.State.Success)) {
+                PPlaceholder(if (failed) imageModifier.semantics { contentDescription = path } else imageModifier)
+            }
+            when {
+                failed && !showPlaceholder -> Image(
                     modifier = imageModifier,
                     painter = painterResource(if (fileName.isImageFast()) UiRes.drawable.ui_drawable_image else UiRes.drawable.ui_drawable_file_video),
                     contentDescription = path,
-                    contentScale = ContentScale.Crop
+                    contentScale = ContentScale.Crop,
                 )
-            } else {
-                Image(
-                    modifier = if (fileName.endsWith(".svg", true)) imageModifier.background(Color.White) else imageModifier,
+                !failed -> Image(
+                    modifier = if (!showPlaceholder && fileName.endsWith(".svg", true)) {
+                        imageModifier.background(Color.White)
+                    } else {
+                        imageModifier
+                    },
                     painter = painter,
                     contentDescription = path,
-                    contentScale = ContentScale.Crop
+                    contentScale = ContentScale.Crop,
                 )
             }
         }

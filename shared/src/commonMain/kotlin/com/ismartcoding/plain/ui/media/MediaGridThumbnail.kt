@@ -32,6 +32,7 @@ internal fun MediaGridThumbnail(
             previewerState = previewerState,
             widthPx = constraints.maxWidth,
             networkSchedule = networkSchedule,
+            showPlaceholder = true,
         )
     }
 }
