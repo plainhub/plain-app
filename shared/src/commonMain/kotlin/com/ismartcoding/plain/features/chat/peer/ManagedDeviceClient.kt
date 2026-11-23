@@ -17,6 +17,7 @@ import com.ismartcoding.plain.models.ManagedDeviceInfo
 import com.ismartcoding.plain.models.ManagedResource
 import com.ismartcoding.plain.models.ManagedThumbnail
 import com.ismartcoding.plain.models.Peer
+import com.ismartcoding.plain.platform.system.ThumbnailNetworkSchedule
 import com.ismartcoding.plain.platform.system.VersionedManagedThumbnail
 import com.ismartcoding.plain.platform.system.thumbnailDiskCacheKey
 import com.ismartcoding.plain.rust.graphql.changes
@@ -112,11 +113,14 @@ internal class ManagedDeviceClient private constructor(
         JsonHelper.jsonEncode(cacheAuthority(currentInfo)).encodeToByteArray(),
     ).toHexString()
 
-    fun versionedThumbnail(path: String, size: ResourceSize, version: Instant): VersionedManagedThumbnail? {
+    fun versionedThumbnail(
+        path: String, size: ResourceSize, version: Instant,
+        networkSchedule: ThumbnailNetworkSchedule? = null,
+    ): VersionedManagedThumbnail? {
         val info = currentInfo
         val fingerprint = info.tlsCertificateSha256 ?: return null
         val key = thumbnailDiskCacheKey(fingerprint, thumbnail(info, path, size, version))
-        return VersionedManagedThumbnail(key) {
+        return VersionedManagedThumbnail(key, networkSchedule) {
             resource(path, size, version = version).also {
                 check(it.thumbnailDiskCacheKey() == key) { "Thumbnail authorization changed" }
             }

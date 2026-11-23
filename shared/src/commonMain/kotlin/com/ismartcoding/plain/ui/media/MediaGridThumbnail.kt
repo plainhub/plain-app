@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import kotlin.time.Instant
+import com.ismartcoding.plain.platform.system.ThumbnailNetworkSchedule
 import com.ismartcoding.plain.lib.extensions.getFilenameFromPath
 import com.ismartcoding.plain.ui.media.viewer.previewer.MediaPreviewerState
 import com.ismartcoding.plain.ui.media.viewer.previewer.TransformImageViewWithUri
@@ -18,6 +19,7 @@ internal fun MediaGridThumbnail(
     updatedAt: Instant,
     itemState: TransformItemState,
     previewerState: MediaPreviewerState,
+    networkSchedule: ThumbnailNetworkSchedule? = null,
 ) {
     BoxWithConstraints(Modifier.aspectRatio(1f)) {
         TransformImageViewWithUri(
@@ -29,6 +31,7 @@ internal fun MediaGridThumbnail(
             itemState = itemState,
             previewerState = previewerState,
             widthPx = constraints.maxWidth,
+            networkSchedule = networkSchedule,
         )
     }
 }

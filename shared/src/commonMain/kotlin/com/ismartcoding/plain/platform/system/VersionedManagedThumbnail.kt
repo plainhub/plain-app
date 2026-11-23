@@ -11,8 +11,11 @@ import coil3.key.Keyer
 import coil3.request.Options
 import com.ismartcoding.plain.models.ManagedResource
 
+internal typealias ThumbnailNetworkSchedule = suspend (suspend () -> FetchResult?) -> FetchResult?
+
 internal class VersionedManagedThumbnail(
     val cacheKey: String,
+    private val networkSchedule: ThumbnailNetworkSchedule? = null,
     private val resolve: suspend () -> ManagedResource,
 ) {
     suspend fun fetch(cache: DiskCache?, fromNetwork: suspend (ManagedResource) -> FetchResult?): FetchResult? {
@@ -24,7 +27,8 @@ internal class VersionedManagedThumbnail(
                 dataSource = DataSource.DISK,
             )
         }
-        return fromNetwork(resolve())
+        val load: suspend () -> FetchResult? = { fromNetwork(resolve()) }
+        return if (networkSchedule == null) load() else networkSchedule(load)
     }
 }
 

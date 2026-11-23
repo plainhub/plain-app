@@ -27,11 +27,12 @@ import com.ismartcoding.plain.ui.media.viewer.previewer.MediaPreviewerState
 import com.ismartcoding.plain.ui.media.viewer.previewer.rememberTransformItemState
 import com.ismartcoding.plain.ui.casting.CastViewModel
 import com.ismartcoding.plain.ui.media.MediaPreviewData
+import com.ismartcoding.plain.ui.videos.VideoGridThumbnailRequests
 import com.ismartcoding.plain.ui.videos.VideosViewModel
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun VideoGridItem(
+internal fun VideoGridItem(
     modifier: Modifier = Modifier,
     videosVM: VideosViewModel,
     castVM: CastViewModel,
@@ -39,7 +40,8 @@ fun VideoGridItem(
     showSize: Boolean,
     previewerState: MediaPreviewerState,
     dragSelectState: DragSelectState,
-    sort: MediaSortBy
+    sort: MediaSortBy,
+    thumbnailRequests: VideoGridThumbnailRequests?,
 ) {
     val isSelected by remember { derivedStateOf { dragSelectState.isSelected(m.id) } }
     val inSelectionMode = dragSelectState.selectMode
@@ -96,6 +98,7 @@ fun VideoGridItem(
             uri = getMediaItemUriString(videosVM.dataType, m.id, m.path),
             itemState = itemState,
             previewerState = previewerState,
+            networkSchedule = remember(thumbnailRequests, m.id) { thumbnailRequests?.forItem(m.id) },
         )
 
         if (selected) {

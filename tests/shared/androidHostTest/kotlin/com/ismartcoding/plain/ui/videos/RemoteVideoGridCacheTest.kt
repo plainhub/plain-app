@@ -16,6 +16,8 @@ import com.ismartcoding.plain.rust.graphql.ContentSource
 import com.ismartcoding.plain.rust.graphql.PeerHttpClient
 import com.ismartcoding.plain.ui.tags.TagsViewModel
 import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.async
+import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.test.StandardTestDispatcher
@@ -49,7 +51,10 @@ class RemoteVideoGridCacheTest {
             fixture.peer = fixture.peer.copy(ip = "new-address.test")
             val restarted = fixture.client()
             fixture.peerChecks = 0
-            val restored = assertNotNull(restarted.versionedThumbnail(fixture.video.path, ResourceSize.SM, fixture.video.updatedAt))
+            val offscreen = VideoGridThumbnailRequests().forItem(fixture.video.id)
+            val restored = assertNotNull(restarted.versionedThumbnail(
+                fixture.video.path, ResourceSize.SM, fixture.video.updatedAt, offscreen,
+            ))
             assertEquals(saved.cacheKey, restored.cacheKey)
             val hit = assertIs<SourceFetchResult>(restored.fetch(disk) { error("Disk cache hit requested the peer") })
             hit.source.use { assertEquals("cached preview", it.source().readUtf8()) }
@@ -72,6 +77,77 @@ class RemoteVideoGridCacheTest {
             val otherDevice = fixture.client()
             assertNotEquals(saved.cacheKey, otherDevice.versionedThumbnail(fixture.video.path, ResourceSize.SM, fixture.video.updatedAt)?.cacheKey)
         }
+    }
+
+    @Test
+    fun thumbnail_grid_opens_a_network_slot_for_the_new_viewport_without_sending_departed_items() = runTest {
+        val fixture = Fixture()
+        val client = fixture.client()
+        fixture.peerChecks = 0
+        val requests = VideoGridThumbnailRequests(parallelism = 1)
+        val started = mutableListOf<String>()
+        val release = CompletableDeferred<Unit>()
+        fun fetch(id: String) = async {
+            val model = assertNotNull(client.versionedThumbnail(
+                "/videos/$id.mp4", ResourceSize.SM, fixture.time, requests.forItem(id),
+            ))
+            model.fetch(null) {
+                started += id
+                if (id == "first") release.await()
+                null
+            }
+        }
+
+        requests.updateVisible(listOf("first", "departed"))
+        val running = fetch("first")
+        runCurrent()
+        val departed = fetch("departed")
+        val next = fetch("next")
+        runCurrent()
+        assertEquals(listOf("first"), started)
+        assertEquals(1, fixture.peerChecks)
+
+        requests.updateVisible(listOf("next"))
+        release.complete(Unit)
+        running.await()
+        next.await()
+        assertEquals(listOf("first", "next"), started)
+        assertEquals(2, fixture.peerChecks)
+        departed.cancelAndJoin()
+    }
+
+    @Test
+    fun thumbnail_grid_sends_leading_rows_first_in_either_scroll_direction() = runTest {
+        val fixture = Fixture()
+        val client = fixture.client()
+        val requests = VideoGridThumbnailRequests(parallelism = 1)
+        val started = mutableListOf<String>()
+        fun fetch(id: String) = async {
+            val thumbnail = assertNotNull(client.versionedThumbnail(
+                "/videos/$id.mp4", ResourceSize.SM, fixture.time, requests.forItem(id),
+            ))
+            thumbnail.fetch(null) {
+                started += id
+                null
+            }
+        }
+
+        val viewport = listOf("top", "upper", "middle", "lower", "bottom")
+        requests.updateVisible(viewport, columns = 1, forward = true)
+        val top = fetch("top")
+        val middle = fetch("middle")
+        val bottom = fetch("bottom")
+        runCurrent()
+        assertEquals(listOf("bottom"), started)
+
+        requests.updateVisible(viewport, columns = 1, forward = false)
+        runCurrent()
+        assertEquals(listOf("bottom", "top"), started)
+
+        requests.updateVisible(viewport, columns = 1, forward = null)
+        runCurrent()
+        assertEquals(listOf("bottom", "top", "middle"), started)
+        listOf(top, middle, bottom).forEach { it.await() }
     }
 
     @Test

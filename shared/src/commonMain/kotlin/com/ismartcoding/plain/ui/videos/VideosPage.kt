@@ -24,6 +24,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
@@ -113,6 +114,32 @@ fun VideosPage(
     } else {
         rememberLazyGridState()
     }
+    val cellsPerRow = remember { mutableIntStateOf(Prefs.videoGridCellsPerRow.value) }
+    val thumbnailRequests = remember(videosVM, scrollState) {
+        if (videosVM.source is ContentSource.Remote) VideoGridThumbnailRequests() else null
+    }
+    LaunchedEffect(scrollState, thumbnailRequests) {
+        if (thumbnailRequests != null) {
+            try {
+                snapshotFlow {
+                    val ids = scrollState.layoutInfo.visibleItemsInfo.mapNotNull {
+                        if (it.contentType == "video") it.key as String else null
+                    }
+                    val direction = when {
+                        !scrollState.isScrollInProgress -> null
+                        scrollState.lastScrolledForward -> true
+                        scrollState.lastScrolledBackward -> false
+                        else -> null
+                    }
+                    Triple(ids, cellsPerRow.value, direction)
+                }.collect { (ids, columns, direction) ->
+                    thumbnailRequests.updateVisible(ids, columns, direction)
+                }
+            } finally {
+                thumbnailRequests.updateVisible(emptyList())
+            }
+        }
+    }
     videosVM.scrollStateMap[0] = scrollState
     val dragSelectState = rememberDragSelectState({ scrollState })
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(canScroll = {
@@ -121,7 +148,6 @@ fun VideosPage(
     val previewerState = rememberPreviewerState()
     val tagsMapState by tagsVM.tagsMapFlow.collectAsState()
     val bucketsMap by mediaFoldersVM.bucketsMapFlow.collectAsState()
-    val cellsPerRow = remember { mutableIntStateOf(Prefs.videoGridCellsPerRow.value) }
     val topRefreshLayoutState = rememberRefreshLayoutState {
         scope.launchSafe(
             onError = { error ->
@@ -259,6 +285,7 @@ fun VideosPage(
                                                 previewerState,
                                                 dragSelectState,
                                                 sort = videosVM.sortBy.value,
+                                                thumbnailRequests = thumbnailRequests,
                                             )
                                         }
                                     }
@@ -273,6 +300,7 @@ fun VideosPage(
                                             previewerState,
                                             dragSelectState,
                                             sort = videosVM.sortBy.value,
+                                            thumbnailRequests = thumbnailRequests,
                                         )
                                     }
                                 }

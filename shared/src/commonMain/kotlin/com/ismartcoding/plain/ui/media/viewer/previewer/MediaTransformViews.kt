@@ -36,6 +36,7 @@ import com.ismartcoding.plain.lib.logcat.LogCat
 import kotlin.time.Instant
 import com.ismartcoding.plain.lib.extensions.isImageFast
 import com.ismartcoding.plain.platform.media.applyForceVideoDecoder
+import com.ismartcoding.plain.platform.system.ThumbnailNetworkSchedule
 import kotlinx.coroutines.launch
 import com.ismartcoding.plain.ui.resources.Res as UiRes
 import com.ismartcoding.plain.ui.resources.file_video as ui_drawable_file_video
@@ -43,17 +44,18 @@ import com.ismartcoding.plain.ui.resources.image as ui_drawable_image
 import com.ismartcoding.plain.i18n.image
 
 @Composable
-fun TransformImageViewWithUri(
+internal fun TransformImageViewWithUri(
     modifier: Modifier = Modifier,
     path: String, fileName: String, key: String, uri: String? = null,
     itemState: TransformItemState, previewerState: MediaPreviewerState,
     widthPx: Int, forceVideoDecoder: Boolean = false, version: Instant? = null,
+    networkSchedule: ThumbnailNetworkSchedule? = null,
 ) {
     val source = com.ismartcoding.plain.ui.navigation.LocalContentSource.current
     val managedThumbnail = if (source is com.ismartcoding.plain.rust.graphql.ContentSource.Remote && version != null) {
         val info = source.client.currentInfo
-        remember(source, path, version, info.urlToken, info.tlsCertificateSha256) {
-            source.client.versionedThumbnail(path, ResourceSize.SM, version)
+        remember(source, path, version, info.urlToken, info.tlsCertificateSha256, networkSchedule) {
+            source.client.versionedThumbnail(path, ResourceSize.SM, version, networkSchedule)
         }
     } else null
     val resource = if (managedThumbnail == null) {
