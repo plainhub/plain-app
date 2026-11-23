@@ -13,7 +13,7 @@ import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
 class AudioPlaylistsClientTest {
-    private val playlist = """{"id":"playlist","name":"Playlist","itemCount":5,"createdAt":"2026-01-01T00:00:00Z","updatedAt":"2026-01-01T00:00:00Z","coverAlbums":[{"albumId":"album","trackCount":5,"candidatePaths":["/one.mp3","/two.mp3","/three.mp3"]}]}"""
+    private val playlist = """{"id":"playlist","name":"Playlist","itemCount":5,"createdAt":"2026-01-01T00:00:00Z","updatedAt":"2026-01-01T00:00:00Z","coverCandidatePaths":["/one.mp3","/two.mp3","/three.mp3"]}"""
 
     @Test
     fun list_loads_metadata_and_cover_candidates_in_one_request() = runTest {
@@ -24,9 +24,8 @@ class AudioPlaylistsClientTest {
         })
         val (row, count) = api.playlists(includeCovers = true).single()
         assertEquals(5, count)
-        assertEquals("album", row.coverAlbums.single().albumId)
-        assertEquals(listOf("/one.mp3", "/two.mp3", "/three.mp3"), row.coverAlbums.single().candidatePaths)
-        assertTrue("coverAlbums { albumId trackCount candidatePaths }" in requests.single().query)
+        assertEquals(listOf("/one.mp3", "/two.mp3", "/three.mp3"), row.coverCandidatePaths)
+        assertTrue("coverCandidatePaths" in requests.single().query)
         assertFalse("audioPlaylistCovers" in requests.single().query)
     }
 
@@ -38,7 +37,7 @@ class AudioPlaylistsClientTest {
             GraphqlResponse(data = JsonHelper.jsonDecode("""{"audioPlaylists":[]}"""))
         })
         assertTrue(api.playlists().isEmpty())
-        assertFalse("coverAlbums" in requests.single().query)
+        assertFalse("coverCandidatePaths" in requests.single().query)
     }
 
     @Test
@@ -48,11 +47,11 @@ class AudioPlaylistsClientTest {
             requests += operation
             GraphqlResponse(data = JsonHelper.jsonDecode("""{"audioPlaylist":$playlist}"""))
         })
-        assertEquals("album", api.playlist("playlist")?.coverAlbums?.single()?.albumId)
+        assertEquals(listOf("/one.mp3", "/two.mp3", "/three.mp3"), api.playlist("playlist")?.coverCandidatePaths)
         val request = requests.single()
         assertEquals(mapOf("id" to JsonPrimitive("playlist")), request.variables)
         assertTrue("audioPlaylist(id:" in request.query)
-        assertTrue("coverAlbums" in request.query)
+        assertTrue("coverCandidatePaths" in request.query)
         assertFalse("audioPlaylists {" in request.query)
     }
 

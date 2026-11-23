@@ -205,12 +205,12 @@ object Query {
     )
 
     fun audioPlaylists(includeCovers: Boolean = false): GraphqlRequest<List<AudioPlaylist>> = GraphqlRequest(
-        "query { audioPlaylists { ${Fragments.AUDIO_PLAYLIST_FIELDS} ${if (includeCovers) "coverAlbums { albumId trackCount candidatePaths }" else ""} } }",
+        "query { audioPlaylists { ${Fragments.AUDIO_PLAYLIST_FIELDS} ${if (includeCovers) "coverCandidatePaths" else ""} } }",
         field = "audioPlaylists",
     )
 
     fun audioPlaylist(id: String): GraphqlRequest<AudioPlaylist?> = GraphqlRequest(
-        "query(\$id: ID!) { audioPlaylist(id: \$id) { ${Fragments.AUDIO_PLAYLIST_FIELDS} coverAlbums { albumId trackCount candidatePaths } } }",
+        "query(\$id: ID!) { audioPlaylist(id: \$id) { ${Fragments.AUDIO_PLAYLIST_FIELDS} coverCandidatePaths } }",
         mapOf(variable("id", id)),
         field = "audioPlaylist",
     )

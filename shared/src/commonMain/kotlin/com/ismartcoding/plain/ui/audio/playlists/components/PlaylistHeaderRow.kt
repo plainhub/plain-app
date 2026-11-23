@@ -15,7 +15,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.ismartcoding.plain.i18n.*
-import com.ismartcoding.plain.models.AudioAlbumCover
 import com.ismartcoding.plain.ui.theme.listItemSubtitle
 import com.ismartcoding.plain.ui.theme.listItemTitle
 import org.jetbrains.compose.resources.pluralStringResource
@@ -25,7 +24,7 @@ import org.jetbrains.compose.resources.pluralStringResource
 fun PlaylistHeaderRow(
     name: String,
     itemCount: Int,
-    albums: List<AudioAlbumCover>,
+    candidatePaths: List<String>,
     gradientIndex: Int,
 ) {
     Row(
@@ -34,8 +33,8 @@ fun PlaylistHeaderRow(
             .padding(horizontal = 16.dp, vertical = 8.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        PlaylistMosaicCover(
-            albums = albums,
+        PlaylistTrackCover(
+            candidatePaths = candidatePaths,
             gradientIndex = gradientIndex,
             modifier = Modifier.size(96.dp).clip(RoundedCornerShape(12.dp)),
             iconSize = 36,

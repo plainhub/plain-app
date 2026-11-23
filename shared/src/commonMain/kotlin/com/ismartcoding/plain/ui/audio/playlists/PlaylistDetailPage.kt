@@ -1,6 +1,5 @@
 package com.ismartcoding.plain.ui.audio.playlists
 
-import com.ismartcoding.plain.models.AudioAlbumCover
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 
@@ -91,7 +90,7 @@ fun PlaylistDetailPage(
 
     var playlistName by remember { mutableStateOf("") }
     var items by remember { mutableStateOf<List<AudioItem>>(listOf()) }
-    var albumCovers by remember { mutableStateOf<List<AudioAlbumCover>>(emptyList()) }
+    var coverCandidatePaths by remember { mutableStateOf<List<String>>(emptyList()) }
     var version by remember { mutableIntStateOf(0) }
     var showMore by remember { mutableStateOf(false) }
     var showRename by remember { mutableStateOf(false) }
@@ -103,7 +102,7 @@ fun PlaylistDetailPage(
         items = list.pruneTrashedRows(playlistId, audioVM.source)
         val playlist = withIO { audioVM.source.playlists.playlist(playlistId) }
         playlistName = playlist?.name.orEmpty()
-        albumCovers = if (items.isEmpty()) emptyList() else playlist?.coverAlbums.orEmpty()
+        coverCandidatePaths = if (items.isEmpty()) emptyList() else playlist?.coverCandidatePaths.orEmpty()
     }
 
     LaunchedEffect(playlistId, version) {
@@ -258,7 +257,7 @@ fun PlaylistDetailPage(
             ) {
                 PlaylistTracksList(
                     name = playlistName, itemCount = items.size,
-                    albums = albumCovers, gradientIndex = playlistId.hashCode(),
+                    candidatePaths = coverCandidatePaths, gradientIndex = playlistId.hashCode(),
                     rowAudios = rowAudios,
                     audioVM = audioVM, audioQueueVM = audioQueueVM,
                     tagsVM = tagsVM, castVM = castVM,

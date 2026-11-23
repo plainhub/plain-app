@@ -10,5 +10,5 @@ data class AudioPlaylist(
     var itemCount: Int,
     var createdAt: Instant,
     var updatedAt: Instant,
-    val coverAlbums: List<AudioAlbumCover> = emptyList(),
+    val coverCandidatePaths: List<String> = emptyList(),
 )

@@ -1,6 +1,5 @@
 package com.ismartcoding.plain.ui.audio.playlists
 
-import com.ismartcoding.plain.models.AudioAlbumCover
 import com.ismartcoding.plain.models.Audio as AudioTrack
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
@@ -22,7 +21,7 @@ import androidx.compose.ui.unit.dp
 internal fun PlaylistTracksList(
     name: String,
     itemCount: Int,
-    albums: List<AudioAlbumCover>,
+    candidatePaths: List<String>,
     gradientIndex: Int,
     rowAudios: List<AudioTrack>,
     audioVM: AudioViewModel,
@@ -40,7 +39,7 @@ internal fun PlaylistTracksList(
 ) {
     LazyColumn(modifier = modifier, state = state) {
         item(key = "hero") {
-            PlaylistHeaderRow(name = name, itemCount = itemCount, albums = albums, gradientIndex = gradientIndex)
+            PlaylistHeaderRow(name = name, itemCount = itemCount, candidatePaths = candidatePaths, gradientIndex = gradientIndex)
         }
         item(key = "acts") {
             PlaylistActionsRow(enabled = itemCount > 0, isPlaying = isPlayingContext, onPlayAll = onPlayAll, onShuffle = onShuffle)

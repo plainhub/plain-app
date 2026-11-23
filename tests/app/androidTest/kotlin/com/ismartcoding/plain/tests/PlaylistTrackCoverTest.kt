@@ -16,27 +16,25 @@ import androidx.test.core.app.ActivityScenario
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.ismartcoding.plain.MainActivity
-import com.ismartcoding.plain.models.AudioAlbumCover
 import com.ismartcoding.plain.ui.audio.components.audioCoverCache
-import com.ismartcoding.plain.ui.audio.playlists.components.PlaylistMosaicCover
+import com.ismartcoding.plain.ui.audio.playlists.components.PlaylistTrackCover
 import com.ismartcoding.plain.ui.theme.AppTheme
 import java.io.File
 import java.util.concurrent.atomic.AtomicReference
 import org.junit.Assert.assertArrayEquals
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertSame
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
-class PlaylistMosaicCoverTest {
+class PlaylistTrackCoverTest {
     private val instrumentation = InstrumentationRegistry.getInstrumentation()
     private fun cacheKey(path: String) = com.ismartcoding.plain.rust.graphql.ContentSource.Local.key + ":" + path
-    private val colors = listOf(Color.RED, Color.GREEN, Color.BLUE, Color.YELLOW, Color.MAGENTA)
+    private val colors = listOf(Color.RED, Color.GREEN)
 
     @Test
-    fun zero_to_five_covers_keep_the_existing_tiles_fallbacks_and_cache() {
+    fun first_available_cover_fills_the_square_and_missing_art_uses_the_placeholder() {
         val bounds = AtomicReference<androidx.compose.ui.geometry.Rect>()
         val window = AtomicReference<android.view.Window>()
         val audio = File.createTempFile("playlist-cover-", ".mp3", instrumentation.targetContext.cacheDir)
@@ -46,9 +44,6 @@ class PlaylistMosaicCoverTest {
         }
         val paths = colors.indices.map { if (it == 0) audio.path else "playlist-cover-test-$it" }
         val missing = "playlist-cover-test-missing"
-        val albums = paths.mapIndexed { index, path ->
-            AudioAlbumCover("album-$index", 4, listOf(missing, path))
-        }
         instrumentation.runOnMainSync {
             audioCoverCache[cacheKey(missing)] = null
             colors.forEachIndexed { index, color ->
@@ -57,13 +52,13 @@ class PlaylistMosaicCoverTest {
         }
         try {
             ActivityScenario.launch(MainActivity::class.java).use { scenario ->
-                fun render(selected: List<AudioAlbumCover>) {
+                fun render(selected: List<String>) {
                     scenario.onActivity { activity ->
                         window.set(activity.window)
                         activity.setContent {
                             AppTheme(useDarkTheme = false) {
                                 Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                                    PlaylistMosaicCover(selected, 2, Modifier.size(128.dp).onGloballyPositioned { bounds.set(it.boundsInWindow()) })
+                                    PlaylistTrackCover(selected, 2, Modifier.size(128.dp).onGloballyPositioned { bounds.set(it.boundsInWindow()) })
                                 }
                             }
                         }
@@ -104,50 +99,30 @@ class PlaylistMosaicCoverTest {
                 }
                 render(emptyList())
                 val placeholder = capture()
-                render(listOf(AudioAlbumCover("missing", 1, listOf(missing))))
+                render(listOf(missing))
                 val unavailable = capture()
                 assertArrayEquals(pixels(placeholder), pixels(unavailable))
                 placeholder.recycle()
                 unavailable.recycle()
-                var decoded: androidx.compose.ui.graphics.ImageBitmap? = null
-                for (count in 1..5) {
-                    render(albums.take(count))
-                    val expected = when (count) {
-                        1 -> listOf(colors[0], colors[0], colors[0], colors[0])
-                        2 -> listOf(colors[0], colors[1], colors[0], colors[1])
-                        3 -> listOf(colors[0], colors[1], colors[0], colors[2])
-                        else -> colors.take(4)
-                    }
-                    var matched: Bitmap? = null
+                for (order in listOf(paths, paths.reversed())) {
+                    render(listOf(missing) + order)
+                    val expected = colors[paths.indexOf(order.first())]
+                    var matches = false
                     repeat(100) {
-                        if (matched == null) {
+                        if (!matches) {
                             val bitmap = capture()
-                            val samples = listOf(1 to 1, 3 to 1, 1 to 3, 3 to 3).map { (x, y) -> bitmap.getPixel(bitmap.width * x / 4, bitmap.height * y / 4) }
-                            if (samples.zip(expected).all { (actual, color) ->
-                                kotlin.math.abs(Color.red(actual) - Color.red(color)) <= 3 &&
-                                    kotlin.math.abs(Color.green(actual) - Color.green(color)) <= 3 &&
-                                    kotlin.math.abs(Color.blue(actual) - Color.blue(color)) <= 3
-                            }) matched = bitmap else bitmap.recycle()
-                            if (matched == null) Thread.sleep(50)
+                            matches = listOf(1 to 1, 3 to 1, 1 to 3, 3 to 3).all { (x, y) ->
+                                val actual = bitmap.getPixel(bitmap.width * x / 4, bitmap.height * y / 4)
+                                kotlin.math.abs(Color.red(actual) - Color.red(expected)) <= 3 &&
+                                    kotlin.math.abs(Color.green(actual) - Color.green(expected)) <= 3 &&
+                                    kotlin.math.abs(Color.blue(actual) - Color.blue(expected)) <= 3
+                            }
+                            bitmap.recycle()
+                            if (!matches) Thread.sleep(50)
                         }
                     }
-                    if (matched == null) {
-                        val failed = capture()
-                        File(instrumentation.targetContext.cacheDir, "playlist-mosaic-failed-$count.png").outputStream().use { failed.compress(Bitmap.CompressFormat.PNG, 100, it) }
-                        val screen = checkNotNull(instrumentation.uiAutomation.takeScreenshot())
-                        File(instrumentation.targetContext.cacheDir, "playlist-mosaic-failed-screen.png").outputStream().use { screen.compress(Bitmap.CompressFormat.PNG, 100, it) }
-                        val samples = listOf(1 to 1, 3 to 1, 1 to 3, 3 to 3).map { (x, y) -> failed.getPixel(failed.width * x / 4, failed.height * y / 4).toUInt().toString(16) }
-                        failed.recycle()
-                        screen.recycle()
-                        error("Incorrect mosaic for $count albums: pixels=$samples cached=${audioCoverCache[cacheKey(audio.path)] != null} bounds=${bounds.get()}")
-                    }
-                    val bitmap = checkNotNull(matched)
-                    val cached = checkNotNull(audioCoverCache[cacheKey(audio.path)])
-                    if (decoded == null) decoded = cached else assertSame(decoded, cached)
-                    File(instrumentation.targetContext.cacheDir, "playlist-mosaic-$count.png").outputStream().use { bitmap.compress(Bitmap.CompressFormat.PNG, 100, it) }
-                    bitmap.recycle()
+                    assertTrue("The first available cover should fill the square", matches)
                 }
-                assertEquals(6, paths.count { audioCoverCache.containsKey(cacheKey(it)) } + if (audioCoverCache.containsKey(cacheKey(missing))) 1 else 0)
             }
         } finally {
             assertTrue(audio.delete())
