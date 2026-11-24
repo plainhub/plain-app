@@ -485,10 +485,13 @@ object Query {
         field = "peerFileUrl",
     )
 
-    fun chatChannels(): GraphqlRequest<List<ChatChannel>> = GraphqlRequest(
-        $$"query { chatChannels { $${Fragments.CHANNEL_FIELDS} } }",
-        field = "chatChannels",
-    )
+    fun chatChannels(refreshFromOwners: Boolean = false): GraphqlRequest<List<ChatChannel>> {
+        val arguments = if (refreshFromOwners) "(refreshFromOwners: true)" else ""
+        return GraphqlRequest(
+            "query { chatChannels$arguments { ${Fragments.CHANNEL_FIELDS} } }",
+            field = "chatChannels",
+        )
+    }
 
     fun downloads(): GraphqlRequest<List<Download>> = GraphqlRequest(
         "query { downloads { ${Fragments.DOWNLOAD} } }", field = "downloads",

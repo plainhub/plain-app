@@ -100,7 +100,6 @@ fun MainNavGraph(
     val updateVM: UpdateViewModel = viewModel { UpdateViewModel() }
     val globalSearchVM = viewModel(key = "globalSearchVM") { GlobalSearchViewModel() }
     LaunchedEffect(peerVM) { peerVM.observe() }
-    LaunchedEffect(channelVM) { channelVM.observe() }
     val selectedDevice by MainViewModel.selectedDevice
     val deviceOwner = viewModel { DeviceNavigationStore(selectedDevice) }
     deviceOwner.selectDevice(selectedDevice)

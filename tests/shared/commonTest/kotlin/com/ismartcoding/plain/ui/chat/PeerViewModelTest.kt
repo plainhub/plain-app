@@ -15,6 +15,39 @@ import kotlin.time.Instant
 class PeerViewModelTest {
     @Test
     @OptIn(kotlinx.coroutines.ExperimentalCoroutinesApi::class)
+    fun leaving_chat_during_owner_refresh_discards_the_late_list() = runTest {
+        val response = kotlinx.coroutines.CompletableDeferred<Unit>()
+        var reads = 0
+        val api = com.ismartcoding.plain.rust.graphql.graphqlClient(query = { operation ->
+            assertTrue(operation.query.contains("refreshFromOwners: true"))
+            reads++
+            kotlinx.coroutines.withContext(kotlinx.coroutines.NonCancellable) { response.await() }
+            kotlinx.serialization.json.buildJsonObject {
+                put("chatChannels", kotlinx.serialization.json.JsonArray(emptyList()))
+            }
+        })
+        val vm = ChannelViewModel(api = api)
+        val time = Instant.fromEpochMilliseconds(0)
+        val cached = com.ismartcoding.plain.models.ChatChannel(
+            com.ismartcoding.plain.models.ChatChannelActions(false, false, false, true, false),
+            "channel", "owner", "Cached", emptyList(), 1,
+            com.ismartcoding.plain.features.chat.ChatChannelStatus.JOINED, time, time,
+        )
+        vm.channels.value = listOf(cached)
+        val refresh = launch { vm.refreshFromOwners() }
+        runCurrent()
+        assertEquals(1, reads)
+        refresh.cancel()
+        response.complete(Unit)
+        refresh.join()
+        assertEquals(listOf(cached), vm.channels.value)
+        vm.refreshFromOwners()
+        assertEquals(2, reads)
+        assertTrue(vm.channels.value.isEmpty())
+    }
+
+    @Test
+    @OptIn(kotlinx.coroutines.ExperimentalCoroutinesApi::class)
     fun recipient_observers_share_target_updates_and_reconnect_after_the_picker_reopens() = runTest {
         Dispatchers.setMain(StandardTestDispatcher(testScheduler))
         val events = kotlinx.coroutines.flow.MutableSharedFlow<Unit>()

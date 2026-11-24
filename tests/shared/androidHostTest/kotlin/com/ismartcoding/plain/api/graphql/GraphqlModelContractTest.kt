@@ -168,11 +168,7 @@ class GraphqlModelContractTest {
                 assertEquals(false, fields.getValue("tags"), "$name.tags remains a non-null GraphQL field")
                 assertEquals(false, actual.containsKey("tags"), "$name.tags must be resolved separately")
             }
-            if (name == "ChatChannel") {
-                assertEquals(false, fields.getValue("key"), "The trusted native key remains in the schema")
-                assertEquals(false, actual.containsKey("key"), "The UI model must not hydrate the channel key")
-            }
-            val expected = fields.filterKeys { (it != "tags" || name !in lazyTags) && (name != "ChatChannel" || it != "key") }
+            val expected = fields.filterKeys { it != "tags" || name !in lazyTags }
             if (expected != actual) mismatches.add("$name expected=$expected actual=$actual")
         }
         assertEquals(emptyList<String>(), mismatches)

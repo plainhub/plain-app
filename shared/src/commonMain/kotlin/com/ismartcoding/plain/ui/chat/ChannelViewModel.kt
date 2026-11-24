@@ -16,6 +16,8 @@ import com.ismartcoding.plain.models.ChatChannel
 import com.ismartcoding.plain.ui.components.ToastManager
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineStart
+import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
@@ -45,19 +47,23 @@ class ChannelViewModel internal constructor(
         refreshSafely()
     }
 
-    private suspend fun refresh() = lock.withLock {
-        channels.value = readChannels()
-    }
-
-    private suspend fun refreshSafely() {
-        try { refresh() }
+    private suspend fun refreshSafely(refreshFromOwners: Boolean = false) {
+        try {
+            lock.withLock {
+                val updated = if (refreshFromOwners) {
+                    api.execute(com.ismartcoding.plain.graphql.Query.chatChannels(refreshFromOwners = true))
+                } else {
+                    readChannels()
+                }
+                currentCoroutineContext().ensureActive()
+                channels.value = updated
+            }
+        }
         catch (canceled: CancellationException) { throw canceled }
         catch (error: Exception) { LogCat.e("Load channels", error) }
     }
 
-    fun load() {
-        viewModelScope.launch { refreshSafely() }
-    }
+    suspend fun refreshFromOwners() = refreshSafely(refreshFromOwners = true)
 
     fun createChannel(name: String) {
         viewModelScope.launchSafe {

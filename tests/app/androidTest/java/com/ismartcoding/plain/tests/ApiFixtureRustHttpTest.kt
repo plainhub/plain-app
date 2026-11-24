@@ -80,7 +80,6 @@ class ApiFixtureRustHttpTest {
             }
             check(GraphqlApi.execute(GraphqlRequest<JsonObject>("query { peers { id } }")).getValue("peers").jsonArray.count { it.jsonObject.getValue("id").jsonPrimitive.content == peerId } == 1)
             channelId = GraphqlApi.execute(GraphqlRequest<JsonObject>("mutation { createChatChannel(name: \"API fixture channel\") { id } }")).getValue("createChatChannel").jsonObject.getValue("id").jsonPrimitive.content
-            val channelKey = GraphqlApi.execute(GraphqlRequest<JsonObject>("query { chatChannels { id key } }")).getValue("chatChannels").jsonArray.single { it.jsonObject.getValue("id").jsonPrimitive.content == channelId }.jsonObject.getValue("key")
             val app = GraphqlApi.execute(GraphqlRequest<JsonObject>("query { app { httpPort capabilities } }")).getValue("app").jsonObject
             val credentials = JsonHelper.jsonEncode(mapOf(
                 "clientId" to JsonPrimitive(clientId),
@@ -92,7 +91,6 @@ class ApiFixtureRustHttpTest {
                 "cacheDir" to JsonPrimitive(appContext.cacheDir.path),
                 "peerId" to JsonPrimitive(peerId),
                 "peerChannelId" to JsonPrimitive(channelId),
-                "peerChannelKey" to channelKey,
             ))
             appContext.openFileOutput(ready.name, Context.MODE_PRIVATE).bufferedWriter().use { it.write(credentials) }
             withTimeout(10 * 60 * 1000L) { while (!stop.exists()) delay(250) }

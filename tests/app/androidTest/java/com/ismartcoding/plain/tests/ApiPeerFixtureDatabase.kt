@@ -9,12 +9,13 @@ import java.time.Instant
 import java.util.UUID
 
 @Serializable
-internal data class ApiPeerFixture(val id: String, val key: String, val publicKey: String) {
+internal data class ApiPeerFixture(val id: String, val key: String, val publicKey: String, val encryptionPublicKey: String) {
     fun validate() {
         val uuid = UUID.fromString(id)
         check(uuid.toString() == id && id.startsWith("706c6169-") && uuid.version() == 8 && uuid.variant() == 2)
         check(Base64.decode(key, Base64.NO_WRAP).size == 32)
         check(Base64.decode(publicKey, Base64.NO_WRAP).size == 32)
+        check(Base64.decode(encryptionPublicKey, Base64.NO_WRAP).size == 32)
     }
 }
 
@@ -31,8 +32,8 @@ object ApiPeerFixtureDatabase {
             check(db.enableWriteAheadLogging())
             val now = Instant.now().toString()
             db.execSQL(
-                "INSERT INTO peers (id,name,ip,chat_token,public_key,status,port,device_type,created_at,updated_at) VALUES (?,?,?,?,?,?,?,?,?,?)",
-                arrayOf<Any>(peer.id, "API fixture peer", "127.0.0.1", Base64.decode(peer.key, Base64.NO_WRAP), Base64.decode(peer.publicKey, Base64.NO_WRAP), "PAIRED", 1, "OTHER", now, now),
+                "INSERT INTO peers (id,name,ip,chat_token,signature_public_key,status,port,device_type,created_at,updated_at,encryption_public_key) VALUES (?,?,?,?,?,?,?,?,?,?,?)",
+                arrayOf<Any>(peer.id, "API fixture peer", "127.0.0.1", Base64.decode(peer.key, Base64.NO_WRAP), Base64.decode(peer.publicKey, Base64.NO_WRAP), "PAIRED", 1, "OTHER", now, now, Base64.decode(peer.encryptionPublicKey, Base64.NO_WRAP)),
             )
         }
     }

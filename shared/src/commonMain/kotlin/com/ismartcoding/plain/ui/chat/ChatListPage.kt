@@ -9,6 +9,8 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.rememberCoroutineScope
+import kotlinx.coroutines.launch
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
@@ -46,12 +48,15 @@ fun ChatListPage(
     val allPeers = peerVM.peerList.collectAsStateValue()
     val latestChats by peerVM.latestChats.collectAsState()
     LaunchedEffect(peerVM, observeUpdates) { if (observeUpdates) peerVM.observe() }
-    LaunchedEffect(channelVM, observeUpdates) { if (observeUpdates) channelVM.observe() }
+    LaunchedEffect(channelVM) { channelVM.observe() }
+    val refreshScope = rememberCoroutineScope()
     val refreshState = rememberRefreshLayoutState {
         if (local) PeerStatusClient.reconnectNow("chat_list_pull_refresh")
         peerVM.load()
-        channelVM.load()
-        setRefreshState(RefreshContentState.Finished)
+        refreshScope.launch {
+            channelVM.refreshFromOwners()
+            setRefreshState(RefreshContentState.Finished)
+        }
     }
     val channels = sortChatChannels(channelVM.channels.collectAsStateValue(), latestChats)
 
