@@ -783,6 +783,53 @@ class ManagedDeviceUiAcceptanceTest {
         }
     }
 
+    @Test
+    fun settingsPenRenamesTheLocalDeviceWhileARemoteDeviceIsSelected() = runBlocking {
+        val remote = DeviceIdentity("unavailable-rename-${UUID.randomUUID()}", "fixture-key")
+        val onboardingCompleted = Prefs.onboardingCompleted.value
+        val originalName = Prefs.deviceName.value
+        val displayedName = originalName.ifEmpty { com.ismartcoding.plain.platform.system.getDeviceName() }
+        val newName = "Rename fixture ${UUID.randomUUID().toString().take(8)}"
+        var saveAttempted = false
+        instrumentation.runOnMainSync { Prefs.onboardingCompleted.value = true }
+        try {
+            ActivityScenario.launch(MainActivity::class.java).use { scenario ->
+                scenario.onActivity { MainViewModel.selectDevice(remote) }
+                awaitNode("unavailable remote Chat") { it.text == text(Res.string.managed_authorization_changed) }
+                click(text(Res.string.settings), "local Settings tab")
+                val title = awaitNode("local device name in Settings") { it.text == displayedName }
+                val pen = awaitNode("rename icon beside the local device name") { it.contentDescription == text(Res.string.rename) }
+                assertEquals(title.screenCenter.y, pen.screenCenter.y, 1f)
+                assertTrue(pen.screenCenter.x > title.screenCenter.x)
+                assertStaticLocalDeviceName()
+
+                click(text(Res.string.rename), "open the device rename dialog")
+                awaitNode("device name dialog") { it.overlay && it.text == text(Res.string.device_name) }
+                val field = awaitNode("prefilled local device name") { it.overlay && it.isEditable && it.text == displayedName }
+                assertTrue(field.performAction(AccessibilityNodeInfo.ACTION_SET_TEXT, Bundle().apply {
+                    putCharSequence(AccessibilityNodeInfo.ACTION_ARGUMENT_SET_TEXT_CHARSEQUENCE, newName)
+                }))
+                saveAttempted = true
+                click(text(Res.string.save), "save the local device name")
+                awaitNode("updated local device name in Settings") { !it.overlay && it.text == newName }
+                assertEquals(newName, GraphqlApi.execute(identityRequest).deviceName)
+                assertEquals(remote, MainViewModel.selectedDevice.value)
+            }
+        } finally {
+            try {
+                if (saveAttempted) {
+                    assertTrue(GraphqlApi.execute(Mutation.updateDeviceName(originalName)))
+                    awaitValue("restored local device name") { true.takeIf { Prefs.deviceName.value == originalName } }
+                }
+            } finally {
+                instrumentation.runOnMainSync {
+                    MainViewModel.selectDevice(null)
+                    Prefs.onboardingCompleted.value = onboardingCompleted
+                }
+            }
+        }
+    }
+
     private fun assertSettingsTabIsLast() {
         val searchTab = awaitNode("search tab") { it.contentDescription == text(Res.string.search) }
         val settingsTab = awaitNode("settings tab") { it.contentDescription == text(Res.string.settings) }
