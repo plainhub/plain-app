@@ -2,10 +2,12 @@ package com.ismartcoding.plain.ui.navigation
 
 import com.ismartcoding.plain.rust.graphql.ContentSource
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
+import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.toRoute
 import com.ismartcoding.plain.ui.audio.*
 import com.ismartcoding.plain.ui.casting.CastViewModel
@@ -40,9 +42,10 @@ internal fun NavGraphBuilder.addDeviceAudioRoutes(
     localQueue: AudioQueueViewModel,
     source: @Composable () -> ContentSource?,
 ) {
-    contentDestination<Routing.Audio>(source) {
+    contentDestination<Routing.Audio>(source) { entry ->
         val state = audioNavigationState(navController.getBackStackEntry<Routing.Home>(), localQueue)
-        AudioHomePage(navController, state.queue, state.library, state.tags, state.folders, state.cast, state.home)
+        val currentEntry by navController.currentBackStackEntryAsState()
+        AudioHomePage(navController, state.queue, state.library, state.tags, state.folders, state.cast, state.home, currentEntry == entry)
     }
     contentDestination<Routing.AudioAll>(source) {
         val state = audioNavigationState(navController.getBackStackEntry<Routing.Home>(), localQueue)

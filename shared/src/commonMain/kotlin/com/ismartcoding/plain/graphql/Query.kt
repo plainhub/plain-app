@@ -53,6 +53,7 @@ import com.ismartcoding.plain.models.Video
 import com.ismartcoding.plain.models.VideoFileInfo
 import com.ismartcoding.plain.platform.system.DataType
 import com.ismartcoding.plain.rust.graphql.GraphqlRequest
+import com.ismartcoding.plain.rust.graphql.selectionQuery
 import com.ismartcoding.plain.rust.graphql.variable
 
 object Query {
@@ -195,14 +196,28 @@ object Query {
         field = "mediaPlayHistory",
     )
 
-    internal fun audioHomeContent(): GraphqlRequest<com.ismartcoding.plain.models.AudioHomeData> = GraphqlRequest(
-        $$"""query {
-            audioArtists { name itemCount playCount samplePath }
-            mediaPlayHistory(query: "type:AUDIO", offset: 0, limit: 8) {
-                media { __typename ... on Audio { $${Fragments.mediaFields(DataType.AUDIO)} } }
-            }
-        }""",
-    )
+    internal fun audioHomeContent(recentIds: List<String>?): GraphqlRequest<com.ismartcoding.plain.models.AudioHomeData> {
+        val artists = "audioArtists { name itemCount playCount samplePath }"
+        val audioFields = Fragments.mediaFields(DataType.AUDIO)
+        return when {
+            recentIds == null -> GraphqlRequest(
+                """query {
+                    $artists
+                    mediaPlayHistory(query: "type:AUDIO play_count:>0", offset: 0, limit: 8) {
+                        media { __typename ... on Audio { $audioFields } }
+                    }
+                }""",
+            )
+            recentIds.isEmpty() -> GraphqlRequest("query { $artists }")
+            else -> GraphqlRequest(
+                $$"""query($query: String!, $limit: Int!) {
+                    $$artists
+                    audios(query: $query, limit: $limit, offset: 0, sortBy: UPDATED_AT_DESC) { $$audioFields }
+                }""",
+                mapOf(variable("query", selectionQuery(recentIds)), variable("limit", recentIds.size)),
+            )
+        }
+    }
 
     fun audioPlaylists(includeCovers: Boolean = false): GraphqlRequest<List<AudioPlaylist>> = GraphqlRequest(
         "query { audioPlaylists { ${Fragments.AUDIO_PLAYLIST_FIELDS} ${if (includeCovers) "coverCandidatePaths" else ""} } }",

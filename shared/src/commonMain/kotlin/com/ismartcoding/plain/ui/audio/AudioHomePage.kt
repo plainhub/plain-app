@@ -1,14 +1,11 @@
 package com.ismartcoding.plain.ui.audio
 
-import com.ismartcoding.plain.lib.logcat.LogCat
-import kotlinx.coroutines.CancellationException
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -75,6 +72,7 @@ fun AudioHomePage(
     mediaFoldersVM: MediaFoldersViewModel,
     castVM: CastViewModel,
     homeVM: AudioHomeViewModel,
+    isActive: Boolean,
 ) {
     val scope = rememberCoroutineScope()
     val audioState = AudioPageState.create(audioVM, tagsVM, mediaFoldersVM)
@@ -96,7 +94,7 @@ fun AudioHomePage(
             audioVM.loadAsync(tagsVM)
             audioQueueVM.loadAsync()
             withIO { mediaFoldersVM.loadAsync() }
-            homeVM.loadAsync(tagsVM)
+            homeVM.refresh(tagsVM)
             setRefreshState(RefreshContentState.Finished)
         }
     }
@@ -132,17 +130,8 @@ fun AudioHomePage(
     val sidebarFilterActive =
         audioVM.trash.value || audioVM.bucketId.value.isNotEmpty() || audioVM.tag.value != null
 
-    DisposableEffect(homeVM, tagsVM, audioVM.hasPermission.value) {
-        if (audioVM.hasPermission.value) AudioHomeViewModel.attach(homeVM, tagsVM)
-        onDispose { AudioHomeViewModel.detach(homeVM) }
-    }
-
-    LaunchedEffect(homeVM, tagsVM, audioVM.hasPermission.value) {
-        if (audioVM.hasPermission.value) {
-            try { homeVM.observe(tagsVM) }
-            catch (canceled: CancellationException) { throw canceled }
-            catch (error: Exception) { LogCat.e("Audio home updates", error) }
-        }
+    LaunchedEffect(homeVM, tagsVM, isActive, audioVM.hasPermission.value) {
+        if (isActive && audioVM.hasPermission.value) homeVM.observe(tagsVM)
     }
 
     MediaTopBar(
@@ -253,9 +242,9 @@ fun AudioHomePage(
             confirmText = stringResource(Res.string.create),
             onConfirm = { name ->
                 showCreatePlaylist = false
-                scope.launch(Dispatchers.Default) {
+                scope.launch {
                     audioVM.source.playlists.createPlaylist(name)
-                    homeVM.loadAsync(tagsVM)
+                    homeVM.loadPlaylists()
                 }
             },
             onDismiss = { showCreatePlaylist = false },

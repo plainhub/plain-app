@@ -5,7 +5,6 @@ import com.ismartcoding.plain.rust.graphql.GraphqlClient
 import com.ismartcoding.plain.rust.graphql.GraphqlOperation
 import com.ismartcoding.plain.rust.graphql.GraphqlResponse
 import kotlinx.coroutines.test.runTest
-import kotlinx.serialization.json.JsonPrimitive
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
@@ -34,11 +33,11 @@ class AudioHomeContentTest {
         assertTrue(content.recentItems.first().isFavorite)
         val query = requests.single().query
         assertTrue("audioArtists {" in query)
-        assertTrue("""mediaPlayHistory(query: "type:AUDIO", offset: 0, limit: 8)""" in query)
+        assertTrue("""mediaPlayHistory(query: "type:AUDIO play_count:>0", offset: 0, limit: 8)""" in query)
     }
 
     @Test
-    fun empty_history_loads_at_most_eight_most_recent_audio_files() = runTest {
+    fun empty_history_does_not_load_audio_files_to_fill_recent() = runTest {
         val requests = mutableListOf<GraphqlOperation>()
         val api = AudioOverviewApi(GraphqlClient { operation ->
             requests += operation
@@ -46,11 +45,7 @@ class AudioHomeContentTest {
             else """{"audios":[${audio("newest")}]}"""
             GraphqlResponse(data = JsonHelper.jsonDecode(response))
         })
-        assertEquals("newest", api.read().recentItems.single().id)
-        assertEquals(2, requests.size)
-        assertEquals(
-            mapOf("query" to JsonPrimitive(""), "offset" to JsonPrimitive(0), "limit" to JsonPrimitive(8), "sortBy" to JsonPrimitive("UPDATED_AT_DESC")),
-            requests.last().variables,
-        )
+        assertTrue(api.read().recentItems.isEmpty())
+        assertEquals(1, requests.size)
     }
 }

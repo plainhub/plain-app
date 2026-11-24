@@ -47,7 +47,7 @@ internal fun AudioHomeSections(
 ) {
     val artists = homeVM.artists.value
     val playlists = homeVM.playlists.value
-    val recent = homeVM.recentItems.value
+    val recent = homeVM.recentItems
 
     LazyColumn(modifier = Modifier.fillMaxSize(), state = scrollState) {
         item(key = "quick_actions") {
@@ -69,10 +69,12 @@ internal fun AudioHomeSections(
                 PlaylistsRow(playlists, onPlaylistClick)
             }
         }
-        item(key = "recent_header") {
-            HomeSectionHeader(stringResource(Res.string.recent), null)
+        if (recent.isNotEmpty()) {
+            item(key = "recent_header") {
+                HomeSectionHeader(stringResource(Res.string.recent), null)
+            }
         }
-        items(recent.size, key = { recent[it].path }) { index ->
+        items(recent.size, key = { recent[it].id }) { index ->
             val item = recent[index]
             AudioListItem(
                 item = item,
