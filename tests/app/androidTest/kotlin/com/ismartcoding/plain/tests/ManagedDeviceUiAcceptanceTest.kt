@@ -1194,6 +1194,7 @@ class ManagedDeviceUiAcceptanceTest {
             val clearInput = awaitNode("clear search input") { it.contentDescription == text(Res.string.clear_search_term) }
             val picker = awaitNode("search device filter") { it.text == text(Res.string.search_all_devices) }
             assertTrue(clearInput.boundsInWindow.bottom <= clickable(picker).boundsInWindow.top)
+            assertDevicePickerPressStaysInsideFill(clickable(picker))
             assertFalse(allText().contains(text(Res.string.clear_search_term)))
             assertFalse(allText().contains("Search in all types"))
             captureNavigation("search-controls")
@@ -1222,6 +1223,57 @@ class ManagedDeviceUiAcceptanceTest {
             performClick(all, "switch back to all types")
             awaitValue("cleared type filter") { true.takeIf { model.domain.value == null } }
             assertTrue(awaitNode("selected All tab") { it.text == text(Res.string.all) }.let(::clickable).isChecked)
+        }
+    }
+
+    private fun assertDevicePickerPressStaysInsideFill(picker: UiNode) {
+        val center = picker.screenCenter
+        val density = instrumentation.targetContext.resources.displayMetrics.density
+        val before = requireNotNull(instrumentation.uiAutomation.takeScreenshot())
+        val down = android.os.SystemClock.uptimeMillis()
+        fun pointer(action: Int) {
+            val event = android.view.MotionEvent.obtain(down, android.os.SystemClock.uptimeMillis(), action, center.x, center.y, 0)
+            try {
+                event.source = android.view.InputDevice.SOURCE_TOUCHSCREEN
+                assertTrue(instrumentation.uiAutomation.injectInputEvent(event, true))
+            } finally {
+                event.recycle()
+            }
+        }
+        pointer(android.view.MotionEvent.ACTION_DOWN)
+        val pressed = try {
+            Thread.sleep(300)
+            requireNotNull(instrumentation.uiAutomation.takeScreenshot())
+        } finally {
+            pointer(android.view.MotionEvent.ACTION_CANCEL)
+        }
+        try {
+            val left = (center.x - picker.boundsInWindow.width / 2 + 4 * density).toInt()
+            val right = (center.x + picker.boundsInWindow.width / 2 - 4 * density).toInt()
+            val top = (center.y - 28 * density).toInt()
+            val bottom = (center.y + 28 * density).toInt()
+            val pageColor = before.getPixel(center.x.toInt(), top)
+            var changedInside = false
+            var changedOutside = 0
+            val margin = (2 * density).toInt().coerceAtLeast(1)
+            for (y in top..bottom) for (x in left..right) {
+                val initial = before.getPixel(x, y)
+                val current = pressed.getPixel(x, y)
+                if ((0..16 step 8).none { shift -> kotlin.math.abs((initial shr shift and 255) - (current shr shift and 255)) > 8 }) continue
+                if (initial != pageColor) {
+                    changedInside = true
+                } else if ((x - margin..x + margin step margin).all { column ->
+                        (y - margin..y + margin step margin).all { row -> before.getPixel(column, row) == pageColor }
+                    }
+                ) {
+                    changedOutside++
+                }
+            }
+            assertTrue("The device picker must show pressed feedback", changedInside)
+            assertEquals("Pressed feedback must not tint the page outside the device picker", 0, changedOutside)
+        } finally {
+            before.recycle()
+            pressed.recycle()
         }
     }
 
