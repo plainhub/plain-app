@@ -50,6 +50,7 @@ import kotlinx.coroutines.flow.onCompletion
 import com.ismartcoding.plain.features.nearby.PairingMode
 import com.ismartcoding.plain.ui.nearby.PairingStep
 import com.ismartcoding.plain.features.nearby.RustPairingRuntime
+import com.ismartcoding.plain.ui.app.DeviceIdentity
 import com.ismartcoding.plain.ui.app.MainViewModel
 import android.view.View
 import android.view.ViewGroup
@@ -680,14 +681,15 @@ class ManagedDeviceUiAcceptanceTest {
 
 
     @Test
-    fun localRootStartsWithChatAndKeepsServicesLastAndSettingsAccessible() = runBlocking {
+    fun localRootStartsWithChatAndKeepsSettingsLastWithAStaticDeviceName() = runBlocking {
         instrumentation.runOnMainSync {
             Prefs.onboardingCompleted.value = true
             MainViewModel.selectDevice(null)
             MainViewModel.currentRootTab.intValue = 1
         }
         ActivityScenario.launch(MainActivity::class.java).use { scenario ->
-            awaitNode("Chat settings action") { it.contentDescription == text(Res.string.settings) }
+            awaitNode("Chat tab") { it.contentDescription == text(Res.string.chat) }
+            assertSettingsTabIsLast()
             click(text(Res.string.select_a_device), "open nearby devices")
             awaitNode("nearby devices page") { it.text == text(Res.string.nearby_devices) }
             awaitNode("this device row") { it.text == text(Res.string.this_device) }
@@ -695,11 +697,9 @@ class ManagedDeviceUiAcceptanceTest {
             val deviceName = Prefs.deviceName.value.ifEmpty { com.ismartcoding.plain.platform.system.getDeviceName() }
             awaitNode("local device") { it.text == deviceName }
             assertFalse(uiNodes().any { it.overlay && it.text == text(Res.string.select_a_device) })
-            captureNavigation("nearby-local-device")
             click(text(Res.string.back), "return from nearby devices")
             awaitMainWindowFocus(scenario)
             assertEquals(1, MainViewModel.currentRootTab.intValue)
-            captureNavigation("local-chat")
             click(text(Res.string.tools), "local tools tab")
             click(text(Res.string.more), "local tools actions")
             click(text(Res.string.customize_features), "local customization remains available")
@@ -709,14 +709,91 @@ class ManagedDeviceUiAcceptanceTest {
             click(text(Res.string.settings), "settings tab")
             awaitNode("Remote Access service") { it.text == text(Res.string.home_remote_access) }
             assertEquals(0, MainViewModel.currentRootTab.intValue)
-            captureNavigation("local-services")
-            click(text(Res.string.chat), "chat tab")
-            click(text(Res.string.settings), "app settings")
+            assertStaticLocalDeviceName()
+            click(text(Res.string.settings), "app settings", firstMatch = true)
             awaitNode("application settings") { it.text == text(Res.string.dark_theme) }
             click(text(Res.string.back), "return from app settings")
-            awaitNode("Chat settings action after return") { it.contentDescription == text(Res.string.settings) }
+            awaitNode("Remote Access service after return") { it.text == text(Res.string.home_remote_access) }
+            click(text(Res.string.chat), "chat tab")
+            awaitNode("device selector after returning to Chat") { it.contentDescription == text(Res.string.select_a_device) }
             assertEquals(1, MainViewModel.currentRootTab.intValue)
         }
+    }
+
+    @Test
+    fun settingsStaysLastAndLocalWhenTheSelectedRemoteDeviceIsUnavailable() = runBlocking {
+        val remote = DeviceIdentity("unavailable-settings-${UUID.randomUUID()}", "fixture-key")
+        val onboardingCompleted = Prefs.onboardingCompleted.value
+        instrumentation.runOnMainSync { Prefs.onboardingCompleted.value = true }
+        try {
+            ActivityScenario.launch(MainActivity::class.java).use { scenario ->
+                scenario.onActivity { MainViewModel.selectDevice(remote) }
+                awaitNode("unavailable remote Chat") { it.text == text(Res.string.managed_authorization_changed) }
+                assertSettingsTabIsLast()
+
+                click(text(Res.string.settings), "settings tab on the remote device")
+                awaitNode("local Remote Access service") { it.text == text(Res.string.home_remote_access) }
+                assertStaticLocalDeviceName()
+                assertEquals(remote, MainViewModel.selectedDevice.value)
+
+                click(text(Res.string.chat), "return to remote Chat")
+                awaitNode("same unavailable remote Chat") { it.text == text(Res.string.managed_authorization_changed) }
+                assertEquals(remote, MainViewModel.selectedDevice.value)
+            }
+        } finally {
+            instrumentation.runOnMainSync {
+                MainViewModel.selectDevice(null)
+                Prefs.onboardingCompleted.value = onboardingCompleted
+            }
+        }
+    }
+
+    @Test
+    fun settingsStaysLastAndLocalWhileConnectedToARemoteDevice() = runBlocking {
+        val peerId = checkNotNull(InstrumentationRegistry.getArguments().getString("managedPeerId"))
+        val onboardingCompleted = Prefs.onboardingCompleted.value
+        instrumentation.runOnMainSync { Prefs.onboardingCompleted.value = true }
+        try {
+            ActivityScenario.launch(MainActivity::class.java).use { scenario ->
+                val peer = GraphqlApi.execute(Query.peers()).single { it.id == peerId }
+                val remoteName = GraphqlApi.forPeer(peer).execute(identityRequest).deviceName
+                val remote = DeviceIdentity(peer.id, peer.publicKey)
+                scenario.onActivity { MainViewModel.selectDevice(remote) }
+                awaitNode("connected remote device name") { it.text == remoteName }
+                awaitNode("connected remote Chat") { it.contentDescription == text(Res.string.folders) }
+                assertSettingsTabIsLast()
+
+                click(text(Res.string.settings), "settings tab on the connected remote device")
+                awaitNode("local Remote Access service") { it.text == text(Res.string.home_remote_access) }
+                assertStaticLocalDeviceName()
+
+                click(text(Res.string.chat), "return to remote Chat")
+                awaitNode("same connected remote device name") { it.text == remoteName }
+                assertEquals(remote, MainViewModel.selectedDevice.value)
+            }
+        } finally {
+            instrumentation.runOnMainSync {
+                MainViewModel.selectDevice(null)
+                Prefs.onboardingCompleted.value = onboardingCompleted
+            }
+        }
+    }
+
+    private fun assertSettingsTabIsLast() {
+        val searchTab = awaitNode("search tab") { it.contentDescription == text(Res.string.search) }
+        val settingsTab = awaitNode("settings tab") { it.contentDescription == text(Res.string.settings) }
+        assertEquals(searchTab.screenCenter.y, settingsTab.screenCenter.y, 1f)
+        assertTrue(settingsTab.screenCenter.x > searchTab.screenCenter.x)
+    }
+
+    private fun assertStaticLocalDeviceName() {
+        val deviceName = Prefs.deviceName.value.ifEmpty { com.ismartcoding.plain.platform.system.getDeviceName() }
+        val title = awaitNode("local device name in Settings") { it.text == deviceName }
+        assertFalse(generateSequence(title) { it.parent }.any { it.isClickable })
+        assertFalse(uiNodes().any { it.isVisible && it.contentDescription == text(Res.string.select_a_device) })
+        touch(title.screenCenter.x, title.screenCenter.y)
+        assertEquals(0, MainViewModel.currentRootTab.intValue)
+        assertFalse(allText().contains(text(Res.string.nearby_devices)))
     }
 
 

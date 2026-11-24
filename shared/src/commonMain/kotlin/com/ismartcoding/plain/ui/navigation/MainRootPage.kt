@@ -11,7 +11,7 @@ import com.ismartcoding.plain.ui.app.MainViewModel
 import com.ismartcoding.plain.ui.audio.AudioQueueViewModel
 import com.ismartcoding.plain.ui.chat.ChatListPageRoute
 import com.ismartcoding.plain.ui.chat.PeerViewModel
-import com.ismartcoding.plain.ui.components.ActionButtonSettings
+import com.ismartcoding.plain.ui.home.HomePage
 import com.ismartcoding.plain.ui.search.GlobalSearchPage
 import com.ismartcoding.plain.ui.search.GlobalSearchViewModel
 import com.ismartcoding.plain.ui.tools.ManagedDeviceStatus
@@ -32,18 +32,18 @@ internal fun MainRootPage(
     globalSearchVM: GlobalSearchViewModel,
 ) {
     val requestedTab by MainViewModel.currentRootTab
-    val items = mainNavItems()
-    val selectedTab = requestedTab.takeIf { tab -> items.any { it.index == tab } } ?: 1
+    val selectedTab = requestedTab.takeIf { tab -> mainNavItems.any { it.index == tab } } ?: 1
     val onTabSelected: (Int) -> Unit = { MainViewModel.currentRootTab.intValue = it }
-    if (selectedTab == 3) {
+    if (selectedTab == 0 || selectedTab == 3) {
         CompositionLocalProvider(LocalContentSource provides ContentSource.Local) {
-            GlobalSearchPage(navController, audioQueueVM, globalSearchVM, onTabSelected = onTabSelected)
+            when (selectedTab) {
+                0 -> HomePage(navController, updateVM, onTabSelected)
+                3 -> GlobalSearchPage(navController, audioQueueVM, globalSearchVM, onTabSelected = onTabSelected)
+            }
         }
     } else if (loading || error != null || source == null) {
         MainNavScaffold(selectedIndex = selectedTab, onTabSelected = onTabSelected, topBar = {
-            DeviceTopAppBar(navController) {
-                if (selectedTab == 0) ActionButtonSettings { navController.navigate(Routing.Settings) }
-            }
+            DeviceTopAppBar(navController)
         }) { padding ->
             Box(Modifier.padding(padding)) {
                 ManagedDeviceStatus(loading, error, tools = selectedTab == 2, onRefresh = refreshDevice)
@@ -52,7 +52,6 @@ internal fun MainRootPage(
     } else {
         CompositionLocalProvider(LocalContentSource provides source) {
             when (selectedTab) {
-                0 -> com.ismartcoding.plain.ui.home.HomePage(navController, updateVM, onTabSelected)
                 1 -> if (source is ContentSource.Local) com.ismartcoding.plain.ui.chat.ChatListPage(navController, localPeerVM, channelVM, onTabSelected, observeUpdates = false)
                     else ChatListPageRoute(navController, owner, onTabSelected)
                 2 -> ToolsPage(navController, onTabSelected)

@@ -27,7 +27,6 @@ import androidx.compose.material3.WideNavigationRailItemDefaults
 import androidx.compose.material3.WideNavigationRailValue
 import androidx.compose.material3.rememberWideNavigationRailState
 import androidx.compose.runtime.Composable
-import com.ismartcoding.plain.ui.app.MainViewModel
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.ismartcoding.plain.i18n.Res
@@ -53,24 +52,12 @@ internal data class MainNavItem(
     val label: StringResource,
 )
 
-@Composable
-internal fun mainNavItems(): List<MainNavItem> {
-    val selectedDevice = MainViewModel.selectedDevice.value
-    val source = LocalContentSource.current
-    return mainNavItems(
-        localOperationsAllowed = selectedDevice == null && source is com.ismartcoding.plain.rust.graphql.ContentSource.Local,
-    )
-}
-
-internal fun mainNavItems(localOperationsAllowed: Boolean): List<MainNavItem> =
-    buildList {
-        add(MainNavItem(1, UiRes.drawable.ui_drawable_message_circle, Res.string.chat))
-        add(MainNavItem(2, UiRes.drawable.ui_drawable_layout_grid, Res.string.tools))
-        add(MainNavItem(3, UiRes.drawable.ui_drawable_search, Res.string.search))
-        if (localOperationsAllowed) {
-            add(MainNavItem(0, UiRes.drawable.ui_drawable_page_info, Res.string.settings))
-        }
-    }
+internal val mainNavItems = listOf(
+    MainNavItem(1, UiRes.drawable.ui_drawable_message_circle, Res.string.chat),
+    MainNavItem(2, UiRes.drawable.ui_drawable_layout_grid, Res.string.tools),
+    MainNavItem(3, UiRes.drawable.ui_drawable_search, Res.string.search),
+    MainNavItem(0, UiRes.drawable.ui_drawable_page_info, Res.string.settings),
+)
 
 // Material 3 window width classes: compact < 600dp <= medium < 840dp <= expanded.
 // The drawer sheet itself is a fixed 360dp (NavigationDrawerTokens.ContainerWidth),
@@ -149,7 +136,7 @@ private fun MainNavRail(selectedIndex: Int, onTabSelected: (Int) -> Unit) {
             containerColor = MaterialTheme.colorScheme.background,
         ),
     ) {
-        mainNavItems().forEach { item ->
+        mainNavItems.forEach { item ->
             WideNavigationRailItem(
                 selected = selectedIndex == item.index,
                 onClick = { onTabSelected(item.index) },
@@ -170,7 +157,7 @@ private fun MainNavRail(selectedIndex: Int, onTabSelected: (Int) -> Unit) {
 private fun MainNavDrawerContent(selectedIndex: Int, onTabSelected: (Int) -> Unit) {
     PermanentDrawerSheet(drawerContainerColor = MaterialTheme.colorScheme.background) {
         Spacer(Modifier.height(16.dp))
-        mainNavItems().forEach { item ->
+        mainNavItems.forEach { item ->
             NavigationDrawerItem(
                 label = { Text(stringResource(item.label)) },
                 selected = selectedIndex == item.index,
