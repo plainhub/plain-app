@@ -7,6 +7,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.ismartcoding.plain.Prefs
 import com.ismartcoding.plain.graphql.Mutation
@@ -40,6 +41,7 @@ fun TopBarHome(navController: NavHostController) {
         titleTrailing = {
             PIconButton(
                 icon = UiRes.drawable.pen,
+                iconSize = 16.dp,
                 contentDescription = stringResource(Res.string.rename),
                 click = { showRename = true },
             )

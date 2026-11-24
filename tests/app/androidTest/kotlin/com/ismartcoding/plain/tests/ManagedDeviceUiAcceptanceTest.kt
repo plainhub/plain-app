@@ -799,6 +799,9 @@ class ManagedDeviceUiAcceptanceTest {
                 click(text(Res.string.settings), "local Settings tab")
                 val title = awaitNode("local device name in Settings") { it.text == displayedName }
                 val pen = awaitNode("rename icon beside the local device name") { it.contentDescription == text(Res.string.rename) }
+                val iconSize = 16 * instrumentation.targetContext.resources.displayMetrics.density
+                assertEquals(iconSize, pen.boundsInWindow.width, 1f)
+                assertEquals(iconSize, pen.boundsInWindow.height, 1f)
                 assertEquals(title.screenCenter.y, pen.screenCenter.y, 1f)
                 assertTrue(pen.screenCenter.x > title.screenCenter.x)
                 assertStaticLocalDeviceName()
