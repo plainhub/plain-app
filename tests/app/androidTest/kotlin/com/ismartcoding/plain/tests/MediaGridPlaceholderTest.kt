@@ -1,12 +1,14 @@
 package com.ismartcoding.plain.tests
 
 import android.graphics.Bitmap
+import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Rect
 import android.os.Handler
 import android.os.Looper
 import android.os.SystemClock
 import android.view.PixelCopy
+import android.view.View.MeasureSpec
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -19,6 +21,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.positionInWindow
+import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.unit.dp
 import androidx.test.core.app.ActivityScenario
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -27,6 +30,7 @@ import com.ismartcoding.plain.MainActivity
 import com.ismartcoding.plain.models.MediaBucketCover
 import com.ismartcoding.plain.ui.media.MediaGridThumbnail
 import com.ismartcoding.plain.ui.media.MediaThumbnailGrid
+import com.ismartcoding.plain.ui.media.ThumbnailPlaceholder
 import com.ismartcoding.plain.ui.media.viewer.previewer.rememberPreviewerState
 import com.ismartcoding.plain.ui.media.viewer.previewer.rememberTransformItemState
 import com.ismartcoding.plain.ui.theme.AppTheme
@@ -44,6 +48,31 @@ import kotlin.time.Instant
 @RunWith(AndroidJUnit4::class)
 class MediaGridPlaceholderTest {
     private val instrumentation = InstrumentationRegistry.getInstrumentation()
+
+    @Test
+    fun firstDrawShowsTheThumbHash() {
+        val image = Bitmap.createBitmap(64, 64, Bitmap.Config.ARGB_8888)
+        try {
+            ActivityScenario.launch(MainActivity::class.java).use { scenario ->
+                scenario.onActivity { activity ->
+                    val view = ComposeView(activity)
+                    view.setContent {
+                        AppTheme(useDarkTheme = false, amoledDarkTheme = false) {
+                            ThumbnailPlaceholder("2BoDBwAAAAAAAAAAAAAAAAAAAAAAAAAA", Modifier.fillMaxSize())
+                        }
+                    }
+                    activity.setContentView(view)
+                    val size = MeasureSpec.makeMeasureSpec(image.width, MeasureSpec.EXACTLY)
+                    view.measure(size, size)
+                    view.layout(0, 0, image.width, image.height)
+                    view.draw(Canvas(image))
+                }
+                assertEquals(Color.rgb(199, 57, 35), image.getPixel(32, 32))
+            }
+        } finally {
+            image.recycle()
+        }
+    }
 
     @Test
     fun gridShowsThemeColorAndThumbHashUntilThumbnailsAreAvailable() {
