@@ -5,22 +5,14 @@ import com.ismartcoding.plain.models.AudioSortBy
 import com.ismartcoding.plain.lib.JsonHelper
 import com.ismartcoding.plain.models.Audio
 import com.ismartcoding.plain.models.AudioArtist
-import com.ismartcoding.plain.models.MediaDataType
-import com.ismartcoding.plain.models.FileIndexScanState
 import com.ismartcoding.plain.platform.system.DataType
-import com.ismartcoding.plain.rust.graphql.AppSubscriptions
 import com.ismartcoding.plain.rust.graphql.GraphqlClient
-import com.ismartcoding.plain.rust.graphql.GraphqlApi
-import com.ismartcoding.plain.rust.graphql.changes
-import kotlinx.coroutines.flow.merge
 import kotlinx.serialization.json.contentOrNull
 import kotlinx.serialization.json.jsonPrimitive
 
 internal data class AudioHomeContent(val artists: List<AudioArtist>, val recentItems: List<Audio>)
 
-object AudioOverviewClient : AudioOverviewApi()
-
-open class AudioOverviewApi internal constructor(protected val api: GraphqlClient = GraphqlApi) {
+class AudioOverviewApi internal constructor(private val api: GraphqlClient) {
     internal suspend fun read(): AudioHomeContent {
         val data = api.execute(Query.audioHomeContent())
         val recent = data.mediaPlayHistory.mapNotNull { item ->
@@ -31,15 +23,4 @@ open class AudioOverviewApi internal constructor(protected val api: GraphqlClien
         }
         return AudioHomeContent(data.audioArtists, recent)
     }
-
-    val updates get() = merge(
-        AppSubscriptions.contentChanged.changes(),
-        AppSubscriptions.mediaUpdated.changes { MediaDataType.AUDIO in it.types },
-        AppSubscriptions.fileIndexScanProgressUpdated.changes {
-            when (it.state) {
-                FileIndexScanState.IDLE, FileIndexScanState.FAILED, FileIndexScanState.STOPPED, FileIndexScanState.PAUSED -> true
-                FileIndexScanState.RUNNING -> false
-            }
-        },
-    )
 }

@@ -2,8 +2,6 @@ package com.ismartcoding.plain.ui.audio
 
 import com.ismartcoding.plain.lib.logcat.LogCat
 import kotlinx.coroutines.CancellationException
-import com.ismartcoding.plain.features.audio.AudioOverviewClient
-import kotlinx.coroutines.flow.conflate
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -139,16 +137,11 @@ fun AudioHomePage(
         onDispose { AudioHomeViewModel.detach(homeVM) }
     }
 
-    LaunchedEffect(audioVM.hasPermission.value) {
+    LaunchedEffect(homeVM, tagsVM, audioVM.hasPermission.value) {
         if (audioVM.hasPermission.value) {
-            try { homeVM.loadAsync(tagsVM) }
+            try { homeVM.observe(tagsVM) }
             catch (canceled: CancellationException) { throw canceled }
-            catch (error: Exception) { LogCat.e("Audio home load", error) }
-            AudioOverviewClient.updates.conflate().collect {
-                try { homeVM.refreshOverview(tagsVM) }
-                catch (canceled: CancellationException) { throw canceled }
-                catch (error: Exception) { LogCat.e("Audio overview refresh", error) }
-            }
+            catch (error: Exception) { LogCat.e("Audio home updates", error) }
         }
     }
 

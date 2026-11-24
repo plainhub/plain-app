@@ -11,7 +11,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import com.ismartcoding.plain.IData
-import com.ismartcoding.plain.features.media.MediaCatalogClient
 import com.ismartcoding.plain.lib.withIO
 import com.ismartcoding.plain.ui.state.launchSafe
 import com.ismartcoding.plain.models.Tag
@@ -66,7 +65,7 @@ fun <T : IData> MediaFilesSelectModeBottomActions(
             IconTextSmallButtonShare {
                 val ids = dragSelectState.selectedIds.toList()
                 scope.launchSafe {
-                    val uris = withIO { MediaCatalogClient.shareUris(vm.dataType, ids) }
+                    val uris = withIO { vm.source.catalog.shareUris(vm.dataType, ids) }
                     shareFiles(uris)
                 }
             }

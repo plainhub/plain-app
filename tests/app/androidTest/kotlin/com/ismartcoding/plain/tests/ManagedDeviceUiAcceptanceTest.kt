@@ -24,6 +24,7 @@ import androidx.compose.ui.unit.dp
 import android.os.Bundle
 import android.view.accessibility.AccessibilityNodeInfo
 import androidx.test.core.app.ActivityScenario
+import com.ismartcoding.plain.platform.system.DataType
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.ismartcoding.plain.MainActivity
@@ -781,6 +782,184 @@ class ManagedDeviceUiAcceptanceTest {
         }
     }
 
+    @Test
+    fun quickNoteUndoTrashesTheNoteOnTheSelectedDevice() = runBlocking {
+        ActivityScenario.launch(MainActivity::class.java).use {
+            val name = checkNotNull(InstrumentationRegistry.getArguments().getString("managedPeerName"))
+            val peer = GraphqlApi.execute(Query.peers()).single { it.name == name && it.isPaired() }
+            val remote = com.ismartcoding.plain.features.chat.peer.ManagedDeviceClient.load(peer)
+            val originalDraft = remote.notes.readDraft()
+            check(originalDraft.isEmpty()) { "Selected device already has a quick-note draft" }
+            val marker = "routing-quick-note-${UUID.randomUUID()}"
+            val query = "text:$marker"
+            try {
+                instrumentation.runOnMainSync {
+                    MainViewModel.selectDevice(com.ismartcoding.plain.ui.app.DeviceIdentity(peer.id, peer.publicKey))
+                }
+                click(text(Res.string.tools), "selected device tools")
+                val field = awaitNode("quick-note draft") { it.isEditable }
+                touch(field.screenCenter.x, field.screenCenter.y)
+                instrumentation.sendStringSync(marker)
+                awaitNode("typed quick note") { it.isEditable && it.text == marker }
+                click(text(Res.string.save), "save the remote quick note")
+                click(text(Res.string.undo), "undo the remote quick note")
+                val trashed = awaitValue("owned note in remote trash", timeoutMillis = 12_000) {
+                    remote.notes.search("$query trash:true", 10, 0).singleOrNull { it.content == marker }
+                }
+                assertNotNull(trashed.deletedAt)
+                assertTrue(remote.notes.search("$query trash:false", 10, 0).isEmpty())
+                assertTrue(GraphqlApi.execute(Query.notes(query, 10, 0)).isEmpty())
+                assertEquals(marker, awaitNode("restored quick-note draft") { it.isEditable }.text)
+                report("quick_note_undo", "remote_note_trashed_and_draft_restored")
+            } finally {
+                uiNodes().firstOrNull { it.isEditable && it.text == marker }
+                    ?.performAction(AccessibilityNodeInfo.ACTION_SET_TEXT, Bundle().apply {
+                        putCharSequence(AccessibilityNodeInfo.ACTION_ARGUMENT_SET_TEXT_CHARSEQUENCE, originalDraft)
+                    })
+                remote.notes.writeDraft(originalDraft)
+                for (trash in listOf(false, true)) {
+                    remote.notes.search("$query trash:$trash", 10, 0).filter { it.content == marker }.forEach { note ->
+                        if (!trash) remote.notes.trashAsync(setOf(note.id))
+                        remote.api.execute(Mutation.deleteNotes("ids:=${note.id}"))
+                    }
+                }
+            }
+        }
+    }
+
+    @Test
+    fun batchShareUsesTheSelectedDevicesImages() = runBlocking { shareSelectedMedia(DataType.IMAGE, "png") }
+
+    @Test
+    fun batchShareUsesTheSelectedDevicesVideos() = runBlocking { shareSelectedMedia(DataType.VIDEO, "mp4") }
+
+    private suspend fun shareSelectedMedia(type: DataType, extension: String) {
+        val args = InstrumentationRegistry.getArguments()
+        val name = checkNotNull(args.getString("managedPeerName"))
+        val root = checkNotNull(args.getString("managedFixtureRoot"))
+        val context = instrumentation.targetContext
+        val fixtures = java.io.File(context.cacheDir, checkNotNull(args.getString("managedMediaFixtures")))
+        val fixtureBytes = listOf("red", "blue").associateWith { java.io.File(fixtures, "$it.$extension").readBytes() }
+        ActivityScenario.launch(MainActivity::class.java).use { scenario ->
+            val peer = GraphqlApi.execute(Query.peers()).single { it.name == name && it.isPaired() }
+            val source = ContentSource.Remote(ManagedDeviceClient.load(peer))
+            val marker = "routing-media-${UUID.randomUUID()}"
+            val directory = "${root.trimEnd('/')}/$marker"
+            source.files.createDirectory(directory)
+            val downloads = java.io.File(context.cacheDir, "resource_downloads")
+            val previousDownloads = downloads.list()?.toSet().orEmpty()
+            val chooser = java.util.concurrent.atomic.AtomicReference<android.content.Intent>()
+            val monitor = object : android.app.Instrumentation.ActivityMonitor() {
+                override fun onStartActivity(intent: android.content.Intent): android.app.Instrumentation.ActivityResult? {
+                    if (intent.action == android.content.Intent.ACTION_CHOOSER) chooser.set(intent)
+                    return null
+                }
+            }
+            instrumentation.addMonitor(monitor)
+            try {
+                fixtureBytes.forEach { (color, bytes) ->
+                    assertTrue(source.files.writeChunks("$directory/$marker-$color.$extension", listOf(bytes).iterator()))
+                }
+                val rows = awaitValue("two indexed remote $extension fixtures") {
+                    source.catalog.rows(type, "text:$marker", 4, 0,
+                        com.ismartcoding.plain.models.mediaSortBy(type, "UPDATED_AT_DESC")).takeIf { it.size == 2 }
+                }
+                scenario.onActivity { activity ->
+                    activity.setContent {
+                        com.ismartcoding.plain.ui.theme.AppTheme(useDarkTheme = false) {
+                            val tags = androidx.compose.runtime.remember { com.ismartcoding.plain.ui.tags.TagsViewModel(source.tags) }
+                            val selection = com.ismartcoding.plain.ui.base.dragselect.rememberDragSelectState(initialSelection = rows.map { it.id })
+                            if (type == DataType.IMAGE) {
+                                val model = androidx.compose.runtime.remember { com.ismartcoding.plain.ui.images.ImagesViewModel(source) }
+                                com.ismartcoding.plain.ui.components.MediaFilesSelectModeBottomActions(model, tags, emptyList(), selection, { emptyList() }, false)
+                            } else {
+                                val model = androidx.compose.runtime.remember { com.ismartcoding.plain.ui.videos.VideosViewModel(source) }
+                                com.ismartcoding.plain.ui.components.MediaFilesSelectModeBottomActions(model, tags, emptyList(), selection, { emptyList() }, false)
+                            }
+                        }
+                    }
+                }
+                click(text(Res.string.share), "share both remote $extension fixtures")
+                val intent = awaitValue("system share intent for $extension", timeoutMillis = 15_000) { chooser.get() }
+                val payload = checkNotNull(androidx.core.content.IntentCompat.getParcelableExtra(
+                    intent, android.content.Intent.EXTRA_INTENT, android.content.Intent::class.java,
+                ))
+                assertEquals(android.content.Intent.ACTION_SEND_MULTIPLE, payload.action)
+                val streams = checkNotNull(androidx.core.content.IntentCompat.getParcelableArrayListExtra(
+                    payload, android.content.Intent.EXTRA_STREAM, android.net.Uri::class.java,
+                ))
+                val shared = streams.map { uri -> checkNotNull(context.contentResolver.openInputStream(uri)).use { it.readBytes() } }
+                assertEquals(2, shared.size)
+                assertTrue(fixtureBytes.values.all { bytes -> shared.count { it.contentEquals(bytes) } == 1 })
+                report("batch_share_$extension", "system_chooser_received_both_verified_originals")
+            } finally {
+                instrumentation.removeMonitor(monitor)
+                downloads.listFiles().orEmpty().filter { it.name !in previousDownloads && it.extension == extension }.forEach { file ->
+                    val bytes = file.readBytes()
+                    if (fixtureBytes.values.any { it.contentEquals(bytes) }) check(file.delete())
+                }
+                check(source.files.delete(directory))
+            }
+        }
+    }
+
+    @Test
+    fun audioHomeRequeriesTheSelectedDeviceAfterRemoteIndexChanges() = runBlocking {
+        val args = InstrumentationRegistry.getArguments()
+        val name = checkNotNull(args.getString("managedPeerName"))
+        val root = checkNotNull(args.getString("managedFixtureRoot"))
+        val fixtureDirectory = java.io.File(instrumentation.targetContext.cacheDir, checkNotNull(args.getString("managedMediaFixtures")))
+        ActivityScenario.launch(MainActivity::class.java).use {
+            val peer = GraphqlApi.execute(Query.peers()).single { it.name == name && it.isPaired() }
+            val source = com.ismartcoding.plain.rust.graphql.ContentSource.Remote(
+                com.ismartcoding.plain.features.chat.peer.ManagedDeviceClient.load(peer),
+            )
+            val marker = "routing-audio-${UUID.randomUUID()}"
+            val directory = "${root.trimEnd('/')}/$marker"
+            val audioPath = "$directory/$marker.mp3"
+            source.files.createDirectory(directory)
+            fun overviewReads(): Int {
+                val process = ProcessBuilder("logcat", "-d", "--pid=${android.os.Process.myPid()}", "-v", "brief", "PlainApp:D", "RoutingTest:I", "*:S").start()
+                val log = process.inputStream.bufferedReader().use { it.readText() }
+                check(process.waitFor() == 0)
+                return log.substringAfter(marker, "").lineSequence().zipWithNext().count { (header, fields) ->
+                    "GraphQL transport=native-peer" in header && "result=success" in header && "audioArtists {" in fields
+                }
+            }
+            try {
+                instrumentation.runOnMainSync {
+                    MainViewModel.selectDevice(com.ismartcoding.plain.ui.app.DeviceIdentity(peer.id, peer.publicKey))
+                }
+                click(text(Res.string.tools), "selected device tools")
+                android.util.Log.i("RoutingTest", marker)
+                click(text(Res.string.audios), "selected device audio")
+                var reads = 0
+                var lastRead = android.os.SystemClock.elapsedRealtime()
+                val before = awaitValue("stable initial remote audio overview") {
+                    val current = overviewReads()
+                    if (current != reads) {
+                        reads = current
+                        lastRead = android.os.SystemClock.elapsedRealtime()
+                    }
+                    reads.takeIf { it > 0 && android.os.SystemClock.elapsedRealtime() - lastRead >= 1500 }
+                }
+                val bytes = java.io.File(fixtureDirectory, "tone.mp3").readBytes()
+                assertTrue(source.files.writeChunks(audioPath, listOf(bytes).iterator()))
+                awaitValue("owned audio indexed by the selected device") {
+                    source.catalog.rows(DataType.AUDIO, "text:\"Plain routing fixture tone\"", 10, 0,
+                        com.ismartcoding.plain.models.mediaSortBy(DataType.AUDIO, "UPDATED_AT_DESC"))
+                        .filterIsInstance<com.ismartcoding.plain.models.Audio>().singleOrNull { it.path == audioPath }
+                }
+                awaitValue("updated audio overview requested from the selected device", timeoutMillis = 15_000) {
+                    overviewReads().takeIf { it > before }
+                }
+                report("remote_audio_updates", "live_push_reloaded_the_remote_overview")
+            } finally {
+                check(source.files.delete(directory))
+            }
+        }
+    }
+
     private suspend fun awaitToolsRefreshFinished() {
         val finished = text(com.ismartcoding.plain.ui.resources.Res.string.srl_header_finish)
         val refreshing = text(com.ismartcoding.plain.ui.resources.Res.string.srl_header_refreshing)
@@ -858,7 +1037,7 @@ class ManagedDeviceUiAcceptanceTest {
             ActivityScenario.launch(MainActivity::class.java).use { scenario ->
                 lateinit var search: com.ismartcoding.plain.ui.search.GlobalSearchViewModel
                 scenario.onActivity { activity ->
-                    search = com.ismartcoding.plain.ui.search.GlobalSearchViewModel(readDevices = {
+                    search = com.ismartcoding.plain.ui.search.GlobalSearchViewModel(readDevices = { _, _ ->
                         com.ismartcoding.plain.ui.search.GlobalSearchDevices(listOf(com.ismartcoding.plain.rust.graphql.ContentSource.Local))
                     })
                     search.domain.value = com.ismartcoding.plain.ui.search.GlobalSearchDomain.NOTES
@@ -1757,8 +1936,8 @@ class ManagedDeviceUiAcceptanceTest {
 
     private fun report(key: String, value: String) = instrumentation.sendStatus(2, Bundle().apply { putString(key, value) })
 
-    private suspend fun <T> awaitValue(role: String, value: suspend () -> T?): T {
-        val deadline = System.nanoTime() + 90_000_000_000L
+    private suspend fun <T> awaitValue(role: String, timeoutMillis: Long = 90_000, value: suspend () -> T?): T {
+        val deadline = System.nanoTime() + timeoutMillis * 1_000_000L
         while (System.nanoTime() < deadline) {
             value()?.let { return it }
             delay(200)
@@ -2721,7 +2900,7 @@ class ManagedDeviceUiAcceptanceTest {
     ): com.ismartcoding.plain.ui.search.GlobalSearchViewModel {
         lateinit var model: com.ismartcoding.plain.ui.search.GlobalSearchViewModel
         scenario.onActivity { activity ->
-            model = com.ismartcoding.plain.ui.search.GlobalSearchViewModel(readDevices = {
+            model = com.ismartcoding.plain.ui.search.GlobalSearchViewModel(readDevices = { _, _ ->
                 com.ismartcoding.plain.ui.search.GlobalSearchDevices(listOf(com.ismartcoding.plain.rust.graphql.ContentSource.Local, remote))
             })
             model.domain.value = domain

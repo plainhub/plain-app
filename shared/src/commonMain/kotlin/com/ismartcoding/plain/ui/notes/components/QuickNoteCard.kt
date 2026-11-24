@@ -28,7 +28,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.unit.dp
-import com.ismartcoding.plain.features.notes.NotesClient
 import com.ismartcoding.plain.i18n.Res
 import com.ismartcoding.plain.ui.resources.check as ui_drawable_check
 import com.ismartcoding.plain.i18n.edit
@@ -168,7 +167,7 @@ fun QuickNoteCard(
                                     durationMs = 4000L,
                                     actionLabel = undoText,
                                 ) {
-                                    coIO { NotesClient.trashAsync(setOf(id)) }
+                                    coIO { source.notes.trashAsync(setOf(id)) }
                                     text = draft
                                 }
                             }
