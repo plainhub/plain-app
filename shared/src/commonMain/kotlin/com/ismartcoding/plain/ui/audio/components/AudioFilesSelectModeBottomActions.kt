@@ -1,6 +1,6 @@
 package com.ismartcoding.plain.ui.audio.components
 
-import com.ismartcoding.plain.platform.system.Capability
+import com.ismartcoding.plain.ui.media.MediaSelectionTrashActions
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
@@ -28,7 +28,6 @@ import com.ismartcoding.plain.ui.base.PBottomAppBar
 import com.ismartcoding.plain.ui.base.PIconTextSmallButton
 import com.ismartcoding.plain.ui.base.dragselect.DragSelectState
 import com.ismartcoding.plain.ui.components.DialogHelper
-import com.ismartcoding.plain.ui.components.confirmActionAsync
 import com.ismartcoding.plain.ui.audio.AudioQueueViewModel
 import com.ismartcoding.plain.ui.audio.AudioViewModel
 import com.ismartcoding.plain.ui.tags.TagsViewModel
@@ -95,46 +94,7 @@ fun AudioFilesSelectModeBottomActions(
                     }
                 }
             }
-            if (Capability.MEDIA_TRASH in audioVM.source.capabilities) {
-                if (audioVM.trash.value) {
-                    IconTextSmallButtonRestore {
-                        audioVM.restore(tagsVM, dragSelectState.selectedIds.toSet())
-                        dragSelectState.exitSelectMode()
-                    }
-                    IconTextSmallButtonDelete {
-                        scope.launch {
-                            confirmActionAsync(
-                                Res.string.delete,
-                                Res.string.confirm_to_delete,
-                                callback = {
-                                    audioVM.delete(tagsVM, dragSelectState.selectedIds.toSet())
-                                    dragSelectState.exitSelectMode()
-                                },
-                                danger = true
-                            )
-                        }
-                    }
-                } else {
-                    IconTextSmallButtonTrash {
-                        audioVM.trash(tagsVM, dragSelectState.selectedIds.toSet())
-                        dragSelectState.exitSelectMode()
-                    }
-                }
-            } else {
-                IconTextSmallButtonDelete {
-                    scope.launch {
-                        confirmActionAsync(
-                            Res.string.delete,
-                            Res.string.confirm_to_delete,
-                            callback = {
-                                audioVM.delete(tagsVM, dragSelectState.selectedIds.toSet())
-                                dragSelectState.exitSelectMode()
-                            },
-                            danger = true
-                        )
-                    }
-                }
-            }
+            MediaSelectionTrashActions(audioVM, tagsVM, dragSelectState, audioVM.trash.value)
         }
     }
 }

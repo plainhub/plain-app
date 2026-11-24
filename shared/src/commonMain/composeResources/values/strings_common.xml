@@ -188,4 +188,5 @@
     <string name="no_results_hint">Try a shorter keyword or pick a type filter</string>
     <string name="no_results_hint_scope">Try a shorter keyword or switch back to "All"</string>
     <string name="clear_search_term">Clear search term</string>
+    <string name="delete_from_system_photos">Delete from Apple Photos</string>
 </resources>

@@ -1,6 +1,7 @@
 package com.ismartcoding.plain.ui.files.documents
 
 
+import com.ismartcoding.plain.ui.media.MediaTrashSheetActions
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.padding
@@ -24,7 +25,6 @@ import com.ismartcoding.plain.lib.extensions.getFilenameFromPath
 import com.ismartcoding.plain.lib.extensions.getFilenameWithoutExtensionFromPath
 import com.ismartcoding.plain.lib.extensions.getMimeType
 import com.ismartcoding.plain.ui.app.MainViewModel
-import com.ismartcoding.plain.platform.system.Capability
 import com.ismartcoding.plain.platform.system.formatDateTime
 import com.ismartcoding.plain.ui.media.fileIconData
 import com.ismartcoding.plain.platform.system.openFileExternal
@@ -134,34 +134,13 @@ fun ViewDocBottomSheet(
                             PSheetPrimaryAction(UiRes.drawable.ui_drawable_pen, stringResource(Res.string.rename)) {
                                 docsVM.showRenameDialog.value = true
                             }
-                            if (Capability.MEDIA_TRASH in docsVM.source.capabilities) {
-                                PSheetPrimaryTrashAction(stringResource(Res.string.trash)) {
-                                    docsVM.trash(tagsVM, setOf(m.id))
-                                    onDismiss()
-                                }
-                            }
                         }
-                        if (Capability.MEDIA_TRASH in docsVM.source.capabilities && docsVM.trash.value) {
-                            PSheetPrimaryAction(UiRes.drawable.ui_drawable_archive_restore, stringResource(Res.string.restore)) {
-                                docsVM.restore(tagsVM, setOf(m.id))
-                                onDismiss()
-                            }
-                        }
-                        if (Capability.MEDIA_TRASH !in docsVM.source.capabilities || docsVM.trash.value) {
-                            PSheetPrimaryDeleteAction(stringResource(Res.string.delete)) {
-                                scope.launch {
-                                    confirmActionAsync(
-                                        Res.string.delete,
-                                        Res.string.confirm_to_delete,
-                                        callback = {
-                                            docsVM.delete(tagsVM, setOf(m.id))
-                                            onDismiss()
-                                        },
-                                        danger = true
-                                    )
-                                }
-                            }
-                        }
+                        MediaTrashSheetActions(
+                            id = m.id, source = docsVM.source, trashed = docsVM.trash.value,
+                            onTrash = { docsVM.trash(tagsVM, setOf(m.id)); onDismiss() },
+                            onRestore = { docsVM.restore(tagsVM, setOf(m.id)); onDismiss() },
+                            onDelete = { docsVM.delete(tagsVM, setOf(m.id)); onDismiss() },
+                        )
                     }
                 }
                 if (!docsVM.trash.value) {

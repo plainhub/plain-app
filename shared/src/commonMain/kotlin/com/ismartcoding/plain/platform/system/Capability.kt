@@ -6,8 +6,6 @@ enum class Capability {
     BLE,
     WIFI_AWARE,
     APP_RELAUNCH,
-    MEDIA_TRASH,
-    MEDIA_DELETE,
     MEDIA_MOVE,
     MEDIA_FAVORITE,
     APP_UPDATES,

@@ -53,6 +53,13 @@ import com.ismartcoding.plain.ui.state.launchSafe
 import org.jetbrains.compose.resources.stringResource
 import com.ismartcoding.plain.ui.casting.CastViewModel
 
+data class PreviewTrashActions(
+    val trashed: Boolean,
+    val trash: (PreviewItem) -> Unit,
+    val restore: (PreviewItem) -> Unit,
+    val delete: (PreviewItem) -> Unit,
+)
+
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
 fun ViewMediaBottomSheet(
@@ -62,7 +69,7 @@ fun ViewMediaBottomSheet(
     tagsState: List<Tag> = emptyList(),
     onDismiss: () -> Unit = {},
     onRenamedAsync: suspend () -> Unit = {},
-    deleteAction: () -> Unit = {},
+    trashActions: PreviewTrashActions? = null,
     onTagsChangedAsync: suspend () -> Unit = {},
     castViewModel: CastViewModel? = null,
 ) {
@@ -124,7 +131,7 @@ fun ViewMediaBottomSheet(
                     m = m, qrScanResult = qrScanResult,
                     onShowQrScanResult = { showQrScanResult = true },
                     onShowRenameDialog = { showRenameDialog = true },
-                    deleteAction = deleteAction, onDismiss = onDismiss,
+                    trashActions = trashActions, onDismiss = onDismiss,
                     onCast = castViewModel?.let { vm -> { vm.showCastDialog.value = true } })
             }
             if (m.data is MediaImage || m.data is MediaVideo) {

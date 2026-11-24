@@ -10,15 +10,13 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ismartcoding.plain.IData
+import com.ismartcoding.plain.features.media.actions.MediaAction
 import com.ismartcoding.plain.platform.system.DataType
 import com.ismartcoding.plain.models.mediaSortBy
 import com.ismartcoding.plain.models.MediaSortBy
 import com.ismartcoding.plain.models.Tag
 import com.ismartcoding.plain.helpers.SearchHelper
 import com.ismartcoding.plain.lib.withIO
-import com.ismartcoding.plain.platform.media.deleteMedia
-import com.ismartcoding.plain.platform.media.restoreMedia
-import com.ismartcoding.plain.platform.media.trashMedia
 import com.ismartcoding.plain.ui.components.DialogHelper
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -147,15 +145,15 @@ abstract class BaseMediaViewModel<T : IData> internal constructor(
     }
 
     open fun delete(tagsVM: TagsViewModel, ids: Set<String>) {
-        viewModelScope.launchSafe { applyMediaAction(tagsVM) { if (source is ContentSource.Remote) source.mediaActions.run(dataType, com.ismartcoding.plain.features.media.actions.MediaAction.DELETE, ids, trash.value) else deleteMedia(dataType, ids, trash.value) } }
+        viewModelScope.launchSafe { applyMediaAction(tagsVM) { source.mediaActions.run(dataType, MediaAction.DELETE, ids) } }
     }
 
     fun trashItems(tagsVM: TagsViewModel, ids: Set<String>) {
-        viewModelScope.launchSafe { applyMediaAction(tagsVM) { if (source is ContentSource.Remote) source.mediaActions.run(dataType, com.ismartcoding.plain.features.media.actions.MediaAction.TRASH, ids) else trashMedia(dataType, ids) } }
+        viewModelScope.launchSafe { applyMediaAction(tagsVM) { source.mediaActions.run(dataType, MediaAction.TRASH, ids) } }
     }
 
     fun restoreItems(tagsVM: TagsViewModel, ids: Set<String>) {
-        viewModelScope.launchSafe { applyMediaAction(tagsVM) { if (source is ContentSource.Remote) source.mediaActions.run(dataType, com.ismartcoding.plain.features.media.actions.MediaAction.RESTORE, ids) else restoreMedia(dataType, ids) } }
+        viewModelScope.launchSafe { applyMediaAction(tagsVM) { source.mediaActions.run(dataType, MediaAction.RESTORE, ids) } }
     }
 
     private suspend fun applyMediaAction(tagsVM: TagsViewModel, action: suspend () -> Unit) {

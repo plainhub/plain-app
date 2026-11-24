@@ -16,7 +16,7 @@ actual fun getDeviceCapabilities(): List<Capability> = Capability.entries.filter
         Capability.MEDIA_MOVE, Capability.MIRROR_AUDIO -> Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q
         Capability.PACKAGES, Capability.NOTIFICATIONS -> buildChannel != AppChannelType.GOOGLE.name
         Capability.APP_UPDATES -> buildChannel == AppChannelType.GITHUB.name
-        Capability.APP_RELAUNCH, Capability.MEDIA_DELETE, Capability.MEDIA_TRASH,
+        Capability.APP_RELAUNCH,
         Capability.TELEPHONY,
         Capability.SCREEN_MIRROR,
         Capability.CLIPBOARD -> true

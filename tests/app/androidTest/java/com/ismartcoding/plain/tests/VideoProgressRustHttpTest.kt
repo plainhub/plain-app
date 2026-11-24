@@ -46,7 +46,8 @@ class VideoProgressRustHttpTest {
             GraphqlApi.execute(Mutation.saveMediaPlayProgress(id, PlaybackType.VIDEO, 0))
             assertEquals(0L, current().positionMs)
         } finally {
-            deleteMedia(DataType.VIDEO, setOf(id), false)
+            com.ismartcoding.plain.platform.media.trashMedia(DataType.VIDEO, setOf(id))
+            deleteMedia(DataType.VIDEO, setOf(id))
         }
     }
 }

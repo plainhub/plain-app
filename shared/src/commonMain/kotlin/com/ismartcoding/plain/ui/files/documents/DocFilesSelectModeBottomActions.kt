@@ -1,6 +1,6 @@
 package com.ismartcoding.plain.ui.files.documents
 
-import com.ismartcoding.plain.platform.system.Capability
+import com.ismartcoding.plain.ui.media.MediaSelectionTrashActions
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
@@ -12,8 +12,6 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import com.ismartcoding.plain.models.Tag
 import com.ismartcoding.plain.i18n.Res
-import com.ismartcoding.plain.i18n.confirm_to_delete
-import com.ismartcoding.plain.i18n.delete
 import com.ismartcoding.plain.platform.system.shareFiles
 import com.ismartcoding.plain.ui.base.BottomActionButtons
 import com.ismartcoding.plain.ui.components.IconTextSmallButtonDelete
@@ -24,7 +22,6 @@ import com.ismartcoding.plain.ui.components.IconTextSmallButtonShare
 import com.ismartcoding.plain.ui.components.IconTextSmallButtonTrash
 import com.ismartcoding.plain.ui.base.PBottomAppBar
 import com.ismartcoding.plain.ui.base.dragselect.DragSelectState
-import com.ismartcoding.plain.ui.components.confirmActionAsync
 import com.ismartcoding.plain.ui.files.documents.DocsViewModel
 import com.ismartcoding.plain.ui.tags.TagsViewModel
 import com.ismartcoding.plain.ui.tags.BatchSelectTagsDialog
@@ -67,46 +64,7 @@ fun DocFilesSelectModeBottomActions(
                     docsVM.share(selectedIds.toList())
                 }
             }
-            if (Capability.MEDIA_TRASH in docsVM.source.capabilities) {
-                if (docsVM.trash.value) {
-                    IconTextSmallButtonRestore {
-                        docsVM.restore(tagsVM, dragSelectState.selectedIds.toSet())
-                        dragSelectState.exitSelectMode()
-                    }
-                    IconTextSmallButtonDelete {
-                        scope.launch {
-                            confirmActionAsync(
-                                Res.string.delete,
-                                Res.string.confirm_to_delete,
-                                callback = {
-                                    docsVM.delete(tagsVM, dragSelectState.selectedIds.toSet())
-                                    dragSelectState.exitSelectMode()
-                                },
-                                danger = true
-                            )
-                        }
-                    }
-                } else {
-                    IconTextSmallButtonTrash {
-                        docsVM.trash(tagsVM, dragSelectState.selectedIds.toSet())
-                        dragSelectState.exitSelectMode()
-                    }
-                }
-            } else {
-                IconTextSmallButtonDelete {
-                    scope.launch {
-                        confirmActionAsync(
-                            Res.string.delete,
-                            Res.string.confirm_to_delete,
-                            callback = {
-                                docsVM.delete(tagsVM, dragSelectState.selectedIds.toSet())
-                                dragSelectState.exitSelectMode()
-                            },
-                            danger = true
-                        )
-                    }
-                }
-            }
+            MediaSelectionTrashActions(docsVM, tagsVM, dragSelectState, docsVM.trash.value)
         }
     }
 }

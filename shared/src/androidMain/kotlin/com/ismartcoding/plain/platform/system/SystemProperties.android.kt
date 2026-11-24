@@ -40,7 +40,7 @@ internal actual fun createRustStartupConfig(): RustStartupConfig {
         wifiAwareSupported = isWifiAwareSupported,
         recentFilesCatalog = Build.VERSION.SDK_INT >= 29,
         systemMediaCatalog = true,
-        filesystemMediaTrash = Build.VERSION.SDK_INT < Build.VERSION_CODES.R,
+        systemMediaTrash = Build.VERSION.SDK_INT >= Build.VERSION_CODES.R,
         supportedAbis = Build.SUPPORTED_ABIS.toList(),
         updateSource = if (buildChannel == AppChannelType.GITHUB.name) {
             StartupUpdateSource(

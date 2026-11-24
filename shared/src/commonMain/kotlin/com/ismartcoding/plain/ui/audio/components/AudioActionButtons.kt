@@ -1,5 +1,6 @@
 package com.ismartcoding.plain.ui.audio.components
 
+import com.ismartcoding.plain.ui.media.MediaTrashSheetActions
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 
@@ -19,7 +20,6 @@ import com.ismartcoding.plain.platform.system.DataType
 import com.ismartcoding.plain.i18n.*
 import com.ismartcoding.plain.lib.withIO
 import com.ismartcoding.plain.ui.app.MainViewModel
-import com.ismartcoding.plain.platform.system.Capability
 import com.ismartcoding.plain.platform.media.getMediaItemUriString
 import com.ismartcoding.plain.platform.system.openFileExternal
 import com.ismartcoding.plain.platform.system.shareFiles
@@ -89,34 +89,13 @@ internal fun AudioActionButtons(
                 PSheetPrimaryAction(UiRes.drawable.ui_drawable_pen, stringResource(Res.string.rename)) {
                     audioVM.showRenameDialog.value = true
                 }
-                if (Capability.MEDIA_TRASH in audioVM.source.capabilities) {
-                    PSheetPrimaryTrashAction(stringResource(Res.string.trash)) {
-                        audioVM.trash(tagsVM, setOf(m.id))
-                        onDismiss()
-                    }
-                }
             }
-            if (Capability.MEDIA_TRASH in audioVM.source.capabilities && audioVM.trash.value) {
-                PSheetPrimaryAction(UiRes.drawable.ui_drawable_archive_restore, stringResource(Res.string.restore)) {
-                    audioVM.restore(tagsVM, setOf(m.id))
-                    onDismiss()
-                }
-            }
-            if (Capability.MEDIA_TRASH !in audioVM.source.capabilities || audioVM.trash.value) {
-                PSheetPrimaryDeleteAction(stringResource(Res.string.delete)) {
-                    scope.launch {
-                        confirmActionAsync(
-                            Res.string.delete,
-                            Res.string.confirm_to_delete,
-                            callback = {
-                                audioVM.delete(tagsVM, setOf(m.id))
-                                onDismiss()
-                            },
-                            danger = true
-                        )
-                    }
-                }
-            }
+            MediaTrashSheetActions(
+                id = m.id, source = audioVM.source, trashed = audioVM.trash.value,
+                onTrash = { audioVM.trash(tagsVM, setOf(m.id)); onDismiss() },
+                onRestore = { audioVM.restore(tagsVM, setOf(m.id)); onDismiss() },
+                onDelete = { audioVM.delete(tagsVM, setOf(m.id)); onDismiss() },
+            )
         }
     }
     val hasSecondary = (!audioVM.trash.value && !m.path.isUrl()) || playlistId != null

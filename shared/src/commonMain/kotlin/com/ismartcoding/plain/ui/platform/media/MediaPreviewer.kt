@@ -37,6 +37,7 @@ import com.ismartcoding.plain.models.TagRelation
 import com.ismartcoding.plain.ui.media.viewer.GestureScope
 import com.ismartcoding.plain.ui.media.viewer.ImagePreviewActions
 import com.ismartcoding.plain.ui.media.viewer.PreviewItem
+import com.ismartcoding.plain.ui.media.viewer.PreviewTrashActions
 import com.ismartcoding.plain.ui.media.viewer.ViewMediaBottomSheet
 import com.ismartcoding.plain.ui.media.viewer.previewer.MediaPreviewerState
 import com.ismartcoding.plain.ui.media.viewer.previewer.TransformContentView
@@ -63,7 +64,7 @@ fun MediaPreviewer(
     tagsMap: Map<String, List<TagRelation>>? = null,
     tagsState: List<Tag> = emptyList(),
     onRenamed: () -> Unit = {},
-    deleteAction: (PreviewItem) -> Unit = {},
+    trashActions: PreviewTrashActions? = null,
     onTagsChanged: () -> Unit = {},
     preloadAdjacentVideos: Boolean = false,
 ) {
@@ -240,7 +241,7 @@ fun MediaPreviewer(
                 tagsState,
                 onDismiss = { state.showMediaInfo = false },
                 onRenamedAsync = onRenamed,
-                deleteAction = { deleteAction(m) },
+                trashActions = trashActions,
                 onTagsChangedAsync = onTagsChanged,
                 castViewModel = castVM,
             )

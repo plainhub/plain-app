@@ -125,7 +125,8 @@ class MediaActionsRustHttpTest {
             assertTrue(GraphqlApi.execute(Query.mediaPlayHistory("type:AUDIO ids:=$id", 0, 20)).isEmpty())
             restoreMedia(DataType.AUDIO,setOf(id))
             assertTrue(File(path).isFile)
-            deleteMedia(DataType.AUDIO,setOf(id),false)
+            trashMedia(DataType.AUDIO,setOf(id))
+            deleteMedia(DataType.AUDIO,setOf(id))
             assertFalse(File(path).exists())
             val (videoId,videoPath) = create(DataType.VIDEO)
             videoIds.add(videoId)
@@ -134,7 +135,7 @@ class MediaActionsRustHttpTest {
             trashMedia(DataType.VIDEO,setOf(videoId))
             assertTrue(GraphqlApi.execute(Query.mediaPlayHistory("type:VIDEO ids:=$videoId", 0, 20)).none { it.mediaId == videoId })
             assertTrue(TagsClient.getTagRelationsByKeys(setOf(videoId), DataType.VIDEO).isEmpty())
-            deleteMedia(DataType.VIDEO,setOf(videoId),true)
+            deleteMedia(DataType.VIDEO,setOf(videoId))
             assertFalse(File(videoPath).exists())
             val (imageId,imagePath) = create(DataType.IMAGE)
             val imageTag = tag(DataType.IMAGE)
@@ -148,7 +149,8 @@ class MediaActionsRustHttpTest {
             trashMedia(DataType.IMAGE,setOf(imageId))
             assertTrue(TagsClient.getTagRelationsByKeys(setOf(imageId), DataType.IMAGE).isEmpty())
             restoreMedia(DataType.IMAGE,setOf(imageId))
-            deleteMedia(DataType.IMAGE,setOf(imageId),false)
+            trashMedia(DataType.IMAGE,setOf(imageId))
+            deleteMedia(DataType.IMAGE,setOf(imageId))
             assertFalse(File(movedPath).exists())
         } finally {
             try {
@@ -161,7 +163,11 @@ class MediaActionsRustHttpTest {
                         uri, arrayOf(MediaStore.MediaColumns.IS_TRASHED),
                         Bundle().apply { putInt(MediaStore.QUERY_ARG_MATCH_TRASHED, MediaStore.MATCH_INCLUDE) }, null,
                     )).use { if (it.moveToFirst()) it.getInt(0) != 0 else null }
-                    if (trashed != null) deleteMedia(DataType.VIDEO, setOf(videoId), trashed)
+                    if (trashed != null) {
+                        val selected = setOf(videoId)
+                        if (!trashed) trashMedia(DataType.VIDEO, selected)
+                        deleteMedia(DataType.VIDEO, selected)
+                    }
                 }
             } finally {
                 try { uris.forEach { appContext.contentResolver.delete(it,Bundle().apply { putInt(MediaStore.QUERY_ARG_MATCH_TRASHED,MediaStore.MATCH_INCLUDE) }) } }

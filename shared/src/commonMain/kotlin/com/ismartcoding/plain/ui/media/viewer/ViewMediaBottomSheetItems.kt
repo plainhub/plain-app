@@ -1,6 +1,7 @@
 package com.ismartcoding.plain.ui.media.viewer
 
 import com.ismartcoding.plain.platform.system.Capability
+import com.ismartcoding.plain.ui.media.MediaTrashSheetActions
 import com.ismartcoding.plain.ui.state.launchSafe
 import androidx.compose.foundation.layout.Column
 import com.ismartcoding.plain.features.chat.models.MessageFile
@@ -24,16 +25,13 @@ import com.ismartcoding.plain.ui.base.PListItem
 import com.ismartcoding.plain.ui.base.PSheetActionRow
 import com.ismartcoding.plain.ui.base.PSheetPrimaryAction
 import com.ismartcoding.plain.ui.base.PSheetPrimaryActionsCard
-import com.ismartcoding.plain.ui.base.PSheetPrimaryDeleteAction
 import com.ismartcoding.plain.ui.base.VerticalSpace
-import com.ismartcoding.plain.ui.components.confirmActionAsync
 import com.ismartcoding.plain.ui.resources.Res as UiRes
 import com.ismartcoding.plain.ui.resources.cast as ui_drawable_cast
 import com.ismartcoding.plain.ui.resources.pen as ui_drawable_pen
 import com.ismartcoding.plain.ui.resources.scan_qr_code as ui_drawable_scan_qr_code
 import com.ismartcoding.plain.ui.resources.share_2 as ui_drawable_share_2
 import com.ismartcoding.plain.ui.theme.PlainTheme
-import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
 
 @OptIn(ExperimentalLayoutApi::class)
@@ -43,7 +41,7 @@ internal fun ViewMediaActionButtons(
     qrScanResult: String,
     onShowQrScanResult: () -> Unit,
     onShowRenameDialog: () -> Unit,
-    deleteAction: () -> Unit,
+    trashActions: PreviewTrashActions?,
     onDismiss: () -> Unit,
     onCast: (() -> Unit)? = null,
 ) {
@@ -73,18 +71,13 @@ internal fun ViewMediaActionButtons(
                     onShowRenameDialog()
                 }
             }
-            if (Capability.MEDIA_DELETE in m.source.capabilities) PSheetPrimaryDeleteAction(stringResource(Res.string.delete)) {
-                scope.launch {
-                    confirmActionAsync(
-                        Res.string.delete,
-                        Res.string.confirm_to_delete,
-                        callback = {
-                            deleteAction()
-                            onDismiss()
-                        },
-                        danger = true
-                    )
-                }
+            if (trashActions != null) {
+                MediaTrashSheetActions(
+                    id = m.mediaId, source = m.source, trashed = trashActions.trashed,
+                    onTrash = { trashActions.trash(m); onDismiss() },
+                    onRestore = { trashActions.restore(m); onDismiss() },
+                    onDelete = { trashActions.delete(m); onDismiss() },
+                )
             }
         }
     }

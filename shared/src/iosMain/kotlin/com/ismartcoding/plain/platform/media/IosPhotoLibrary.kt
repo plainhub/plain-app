@@ -11,6 +11,13 @@ import platform.Foundation.*
 import platform.Photos.*
 import platform.darwin.NSObject
 import kotlinx.cinterop.ExperimentalForeignApi
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.suspendCancellableCoroutine
+import kotlinx.coroutines.withContext
+import platform.UIKit.UIApplication
+import platform.UIKit.UIApplicationState
+import kotlin.coroutines.resume
+import kotlin.coroutines.resumeWithException
 
 internal object IosPhotoLibrary : ImageCatalog {
     private val lock = NSRecursiveLock()
@@ -105,6 +112,24 @@ internal object IosPhotoLibrary : ImageCatalog {
             })
         } finally { lock.unlock() }
     }
+    suspend fun deleteAssets(ids: List<String>): Boolean = withContext(Dispatchers.Main) {
+        check(UIApplication.sharedApplication.applicationState == UIApplicationState.UIApplicationStateActive) { "Open PlainApp to delete system photos" }
+        requirePermission()
+        val fetched = PHAsset.fetchAssetsWithLocalIdentifiers(ids, null)
+        check(fetched.count.toInt() == ids.size) { "System photo selection changed" }
+        val assets = (0 until fetched.count.toInt()).map { fetched.objectAtIndex(it.toULong()) as PHAsset }
+        check(assets.all { it.canPerformEditOperation(PHAssetEditOperationDelete) }) { "System photo cannot be deleted" }
+        suspendCancellableCoroutine { continuation ->
+            PHPhotoLibrary.sharedPhotoLibrary().performChanges({ PHAssetChangeRequest.deleteAssets(fetched) }) { success, error ->
+                when {
+                    success -> continuation.resume(true)
+                    error?.domain == PHPhotosErrorDomain && error?.code == PHPhotosErrorUserCancelled.toLong() -> continuation.resume(false)
+                    else -> continuation.resumeWithException(IllegalStateException(error?.localizedDescription ?: "System photo deletion failed"))
+                }
+            }
+        }
+    }
+
     override fun resolve(revision: String, ids: List<String>): JsonElement {
         require(ids.size <= 100)
         verify(revision)

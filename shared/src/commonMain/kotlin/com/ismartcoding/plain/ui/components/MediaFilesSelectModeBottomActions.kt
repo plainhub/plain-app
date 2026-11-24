@@ -1,7 +1,6 @@
 package com.ismartcoding.plain.ui.components
 
-import com.ismartcoding.plain.platform.system.getDeviceCapabilities
-import com.ismartcoding.plain.platform.system.Capability
+import com.ismartcoding.plain.ui.media.MediaSelectionTrashActions
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
@@ -15,8 +14,6 @@ import com.ismartcoding.plain.lib.withIO
 import com.ismartcoding.plain.ui.state.launchSafe
 import com.ismartcoding.plain.models.Tag
 import com.ismartcoding.plain.i18n.Res
-import com.ismartcoding.plain.i18n.confirm_to_delete
-import com.ismartcoding.plain.i18n.delete
 import com.ismartcoding.plain.platform.system.shareFiles
 import com.ismartcoding.plain.ui.base.BottomActionButtons
 import com.ismartcoding.plain.ui.base.PBottomAppBar
@@ -69,46 +66,7 @@ fun <T : IData> MediaFilesSelectModeBottomActions(
                     shareFiles(uris)
                 }
             }
-            if (Capability.MEDIA_TRASH in getDeviceCapabilities()) {
-                if (isInTrashMode) {
-                    IconTextSmallButtonRestore {
-                        vm.restore(tagsVM, dragSelectState.selectedIds.toSet())
-                        dragSelectState.exitSelectMode()
-                    }
-                    if (Capability.MEDIA_DELETE in getDeviceCapabilities()) IconTextSmallButtonDelete {
-                        scope.launch {
-                            confirmActionAsync(
-                                Res.string.delete,
-                                Res.string.confirm_to_delete,
-                                callback = {
-                                    vm.delete(tagsVM, dragSelectState.selectedIds.toSet())
-                                    dragSelectState.exitSelectMode()
-                                },
-                                danger = true
-                            )
-                        }
-                    }
-                } else {
-                    IconTextSmallButtonTrash {
-                        vm.trash(tagsVM, dragSelectState.selectedIds.toSet())
-                        dragSelectState.exitSelectMode()
-                    }
-                }
-            } else if (Capability.MEDIA_DELETE in getDeviceCapabilities()) {
-                IconTextSmallButtonDelete {
-                    scope.launch {
-                        confirmActionAsync(
-                            Res.string.delete,
-                            Res.string.confirm_to_delete,
-                            callback = {
-                                vm.delete(tagsVM, dragSelectState.selectedIds.toSet())
-                                dragSelectState.exitSelectMode()
-                            },
-                            danger = true
-                        )
-                    }
-                }
-            }
+            MediaSelectionTrashActions(vm, tagsVM, dragSelectState, isInTrashMode)
         }
     }
 }

@@ -188,4 +188,5 @@
     <string name="no_results_hint">試試更短的關鍵詞，或用類型篩選縮小範圍</string>
     <string name="no_results_hint_scope">試試更短的關鍵詞，或切回「全部」</string>
     <string name="clear_search_term">清除搜尋詞</string>
+    <string name="delete_from_system_photos">從系統照片刪除</string>
 </resources>

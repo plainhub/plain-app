@@ -1,7 +1,5 @@
 package com.ismartcoding.plain.ui.media
 
-import com.ismartcoding.plain.platform.system.getDeviceCapabilities
-import com.ismartcoding.plain.platform.system.Capability
 import com.ismartcoding.plain.i18n.*
 
 import androidx.compose.foundation.layout.padding
@@ -111,23 +109,21 @@ fun <T : IData> MediaSidebarDrawer(
                 badge = mediaFoldersVM.totalBucket.value?.itemCount?.toString() ?: "0"
             )
         }
-        if (Capability.MEDIA_TRASH in getDeviceCapabilities()) {
-            item {
-                SidebarItem(
-                    label = stringResource(Res.string.trash),
-                    icon = UiRes.drawable.ui_drawable_trash_2,
-                    isSelected = mediaVM.trash.value,
-                    onClick = {
-                        mediaVM.trash.value = true
-                        mediaVM.bucketId.value = ""
-                        mediaVM.tag.value = null
-                        if (mediaVM is DocsViewModel) mediaVM.fileType.value = ""
-                        loadMedia()
-                        scope.launch { drawerState.close() }
-                    },
-                    badge = mediaFoldersVM.trashCount.intValue.toString()
-                )
-            }
+        item {
+            SidebarItem(
+                label = stringResource(Res.string.trash),
+                icon = UiRes.drawable.ui_drawable_trash_2,
+                isSelected = mediaVM.trash.value,
+                onClick = {
+                    mediaVM.trash.value = true
+                    mediaVM.bucketId.value = ""
+                    mediaVM.tag.value = null
+                    if (mediaVM is DocsViewModel) mediaVM.fileType.value = ""
+                    loadMedia()
+                    scope.launch { drawerState.close() }
+                },
+                badge = mediaFoldersVM.trashCount.intValue.toString()
+            )
         }
         item { HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp)) }
 

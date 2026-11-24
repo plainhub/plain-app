@@ -35,10 +35,13 @@ class TrashCascadeGuardTest {
 
     @Test
     fun `media UI delegates actions without preemptive reference cleanup`() {
-        val body = functionBody(source(baseMediaVmPath), "trashItems")
-        assertTrue(body.contains("trashMedia(dataType, ids)"))
-        assertTrue(!body.contains("deleteTagRelationByKeys"))
-        assertTrue(!body.contains("onTrashed"))
+        val viewModel = source(baseMediaVmPath)
+        for ((name, action) in listOf("trashItems" to "TRASH", "restoreItems" to "RESTORE", "delete" to "DELETE")) {
+            val body = functionBody(viewModel, name)
+            assertTrue(body.contains("source.mediaActions.run(dataType, MediaAction.$action, ids)"))
+            assertTrue(!body.contains("deleteTagRelationByKeys"))
+            assertTrue(!body.contains("onTrashed"))
+        }
         assertTrue(!source(audioVmPath).contains("override suspend fun onTrashed"))
     }
 

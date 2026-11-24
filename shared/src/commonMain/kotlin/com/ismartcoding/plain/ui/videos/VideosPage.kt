@@ -1,5 +1,6 @@
 package com.ismartcoding.plain.ui.videos
 
+import com.ismartcoding.plain.ui.media.previewTrashActions
 import com.ismartcoding.plain.preferences.PrefKeys
 
 import androidx.compose.foundation.ExperimentalFoundationApi
@@ -271,11 +272,8 @@ fun VideosPage(
         tagsMap = tagsMapState,
         tagsState = tagsState,
         onRenamed = { scope.launchSafe(onDone = { videosVM.showLoading.value = false }) { videosVM.loadAsync(tagsVM) } },
-        deleteAction = { item ->
-            scope.launch(Dispatchers.Default) {
-                videosVM.delete(tagsVM, setOf(item.mediaId))
-                previewerState.closeTransform()
-            }
+        trashActions = videosVM.previewTrashActions(tagsVM) {
+            scope.launch { previewerState.closeTransform() }
         },
         onTagsChanged = {},
     )

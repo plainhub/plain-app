@@ -13,12 +13,11 @@ open class MediaActionApi internal constructor(protected val api: GraphqlClient 
         type: DataType,
         action: MediaAction,
         ids: Collection<String>,
-        fromTrash: Boolean = false,
         destDir: String = "",
     ): Int {
         require(type in setOf(DataType.AUDIO, DataType.VIDEO, DataType.IMAGE, DataType.DOC)) { "Unsupported media type" }
         if (ids.isEmpty()) return 0
-        val query = mediaActionSelection(ids, fromTrash || action == MediaAction.RESTORE)
+        val query = mediaActionSelection(ids, action == MediaAction.RESTORE || action == MediaAction.DELETE)
         val request = Mutation.mediaAction(action, type, query, destDir)
         return api.execute(request).affectedCount
     }

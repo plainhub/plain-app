@@ -23,7 +23,7 @@ internal data class RustStartupConfig(
     val wifiAwareSupported: Boolean,
     val recentFilesCatalog: Boolean,
     val systemMediaCatalog: Boolean,
-    val filesystemMediaTrash: Boolean = false,
+    val systemMediaTrash: Boolean = false,
     val supportedAbis: List<String>,
     val updateSource: StartupUpdateSource? = null,
     val androidSdkVersion: Int? = null,

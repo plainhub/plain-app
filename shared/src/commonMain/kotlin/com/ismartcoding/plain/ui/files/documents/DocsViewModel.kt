@@ -1,6 +1,5 @@
 package com.ismartcoding.plain.ui.files.documents
 
-import com.ismartcoding.plain.platform.system.Capability
 import androidx.lifecycle.viewModelScope
 import com.ismartcoding.plain.ui.state.launchSafe
 import com.ismartcoding.plain.ui.components.DialogHelper
@@ -52,7 +51,7 @@ class DocsViewModel internal constructor(source: ContentSource = ContentSource.L
         noMore.value = _itemsFlow.value.size < pageSize
         if (!trash.value) {
             val extGroups = source.catalog.docExtGroups(super.getQuery())
-            val trashTabs = if (Capability.MEDIA_TRASH in source.capabilities) listOf(VTabData(LocaleHelper.getStringAsync(Res.string.trash), "trash", totalTrash.intValue)) else emptyList()
+            val trashTabs = listOf(VTabData(LocaleHelper.getStringAsync(Res.string.trash), "trash", totalTrash.intValue))
             val extensions = extGroups.map { VTabData(it.first, it.first.lowercase(), it.second) }
             tabs.value = listOf(VTabData(LocaleHelper.getStringAsync(Res.string.all), "", total.intValue)) + trashTabs + extensions
         }

@@ -19,11 +19,10 @@ suspend fun restoreMedia(dataType: DataType, ids: Set<String>) {
 }
 
 /**
- * Permanently delete media items of [dataType] identified by [ids] from disk and MediaStore.
- * If [fromTrash] is true, only items already in the trash are deleted.
+ * Delete the selected items from media trash.
  */
-suspend fun deleteMedia(dataType: DataType, ids: Set<String>, fromTrash: Boolean) {
-    MediaActionClient.run(dataType, MediaAction.DELETE, ids, fromTrash)
+suspend fun deleteMedia(dataType: DataType, ids: Set<String>) {
+    MediaActionClient.run(dataType, MediaAction.DELETE, ids)
 }
 
 /**

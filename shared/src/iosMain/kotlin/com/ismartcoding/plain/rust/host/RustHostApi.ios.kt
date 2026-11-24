@@ -15,8 +15,15 @@ internal actual suspend fun executePlatformHostRequest(method: String, params: J
             val request = com.ismartcoding.plain.lib.JsonHelper.jsonDecodeFromElement<PhotoCatalogPageRequest>(params)
             hostResult(com.ismartcoding.plain.platform.media.IosPhotoLibrary.mediaPage(request.revision, request.offset, request.limit))
         }
+        "deletePhotoAssets" -> {
+            val request = com.ismartcoding.plain.lib.JsonHelper.jsonDecodeFromElement<DeletePhotoAssetsRequest>(params)
+            hostResult(com.ismartcoding.plain.platform.media.IosPhotoLibrary.deleteAssets(request.ids))
+        }
         else -> error("Unknown Rust host operation: $method")
     }
 
 @kotlinx.serialization.Serializable
 private data class PhotoCatalogPageRequest(val revision: String, val offset: Int, val limit: Int)
+
+@kotlinx.serialization.Serializable
+private data class DeletePhotoAssetsRequest(val ids: List<String>)
