@@ -31,8 +31,8 @@ object ApiPeerFixtureDatabase {
             check(db.enableWriteAheadLogging())
             val now = Instant.now().toString()
             db.execSQL(
-                "INSERT INTO peers (id,name,ip,key,public_key,status,port,device_type,created_at,updated_at) VALUES (?,?,?,?,?,?,?,?,?,?)",
-                arrayOf<Any>(peer.id, "API fixture peer", "127.0.0.1", peer.key, peer.publicKey, "PAIRED", 1, "OTHER", now, now),
+                "INSERT INTO peers (id,name,ip,chat_token,public_key,status,port,device_type,created_at,updated_at) VALUES (?,?,?,?,?,?,?,?,?,?)",
+                arrayOf<Any>(peer.id, "API fixture peer", "127.0.0.1", Base64.decode(peer.key, Base64.NO_WRAP), Base64.decode(peer.publicKey, Base64.NO_WRAP), "PAIRED", 1, "OTHER", now, now),
             )
         }
     }
