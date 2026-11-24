@@ -1,5 +1,6 @@
 package com.ismartcoding.plain.tests
 
+import android.content.ContentValues
 import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.Color
@@ -7,15 +8,22 @@ import android.graphics.Rect
 import android.os.Handler
 import android.os.Looper
 import android.os.SystemClock
+import android.provider.MediaStore
 import android.view.PixelCopy
 import android.view.View.MeasureSpec
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyGridState
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Modifier
@@ -25,7 +33,15 @@ import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.unit.dp
 import androidx.test.core.app.ActivityScenario
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.filters.SdkSuppress
 import androidx.test.platform.app.InstrumentationRegistry
+import coil3.SingletonImageLoader
+import coil3.decode.DataSource
+import coil3.request.ImageRequest
+import coil3.request.SuccessResult
+import coil3.request.allowHardware
+import coil3.size.Precision
+import coil3.size.Scale
 import com.ismartcoding.plain.MainActivity
 import com.ismartcoding.plain.models.MediaBucketCover
 import com.ismartcoding.plain.ui.media.MediaGridThumbnail
@@ -34,10 +50,12 @@ import com.ismartcoding.plain.ui.media.ThumbnailPlaceholder
 import com.ismartcoding.plain.ui.media.viewer.previewer.rememberPreviewerState
 import com.ismartcoding.plain.ui.media.viewer.previewer.rememberTransformItemState
 import com.ismartcoding.plain.ui.theme.AppTheme
+import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
 import org.junit.Test
 import org.junit.runner.RunWith
 import java.io.File
+import java.util.UUID
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicReference
@@ -72,6 +90,74 @@ class MediaGridPlaceholderTest {
         } finally {
             image.recycle()
         }
+    }
+
+    @Test
+    @SdkSuppress(minSdkVersion = 29)
+    fun localPhotoDrawsTheCachedThumbnailOnTheFirstFrameOfEachReturn() = runBlocking {
+        val context = instrumentation.targetContext
+        val resolver = context.contentResolver
+        val name = "grid-cache-${UUID.randomUUID()}.svg"
+        val side = 96
+        val photoColor = Color.rgb(23, 118, 86)
+        val uri = checkNotNull(resolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, ContentValues().apply {
+            put(MediaStore.Images.Media.DISPLAY_NAME, name)
+            put(MediaStore.Images.Media.MIME_TYPE, "image/svg+xml")
+            put(MediaStore.Images.Media.IS_PENDING, 1)
+        }))
+        val frame = Bitmap.createBitmap(side, side, Bitmap.Config.ARGB_8888)
+        try {
+            val svg = """<svg xmlns="http://www.w3.org/2000/svg" width="96" height="96"><rect x="24" y="24" width="48" height="48" fill="#177656"/></svg>"""
+            checkNotNull(resolver.openOutputStream(uri)).bufferedWriter().use { output ->
+                output.write(svg)
+            }
+            resolver.update(uri, ContentValues().apply { put(MediaStore.Images.Media.IS_PENDING, 0) }, null, null)
+            val request = ImageRequest.Builder(context).data(uri.toString()).size(side)
+                .scale(Scale.FIT).precision(Precision.INEXACT).allowHardware(false).build()
+            val loader = SingletonImageLoader.get(context)
+            check((loader.execute(request) as SuccessResult).memoryCacheKey != null)
+            assertEquals(DataSource.MEMORY_CACHE, (loader.execute(request) as SuccessResult).dataSource)
+
+            ActivityScenario.launch(MainActivity::class.java).use { scenario ->
+                repeat(12) { pass ->
+                    scenario.onActivity { activity ->
+                        val scroll = LazyGridState()
+                        val view = ComposeView(activity)
+                        view.setContent {
+                            AppTheme(useDarkTheme = false) {
+                                LazyVerticalGrid(GridCells.Fixed(1), Modifier.fillMaxSize().background(androidx.compose.ui.graphics.Color.White), state = scroll) {
+                                    items(12, key = { it }) { index ->
+                                        if (index == 0) {
+                                            MediaGridThumbnail(uri.toString(), name, name, Instant.fromEpochMilliseconds(0), null,
+                                                rememberTransformItemState(), rememberPreviewerState())
+                                        } else Box(Modifier.fillMaxWidth().aspectRatio(1f))
+                                    }
+                                }
+                            }
+                        }
+                        activity.setContentView(view)
+                        val size = MeasureSpec.makeMeasureSpec(side, MeasureSpec.EXACTLY)
+                        fun drawAt(index: Int) {
+                            scroll.requestScrollToItem(index)
+                            view.forceLayout()
+                            view.measure(size, size)
+                            view.layout(0, 0, side, side)
+                            view.draw(Canvas(frame))
+                            assertEquals(index, scroll.firstVisibleItemIndex)
+                        }
+                        drawAt(0)
+                        drawAt(10)
+                        drawAt(0)
+                        assertEquals("Cached photo on return ${pass + 1}", photoColor, frame.getPixel(48, 48))
+                        assertEquals("Background on return ${pass + 1}", Color.WHITE, frame.getPixel(12, 12))
+                    }
+                }
+            }
+        } finally {
+            frame.recycle()
+            check(resolver.delete(uri, null, null) == 1)
+        }
+        Unit
     }
 
     @Test

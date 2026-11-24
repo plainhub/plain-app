@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.size
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -20,6 +21,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.FilterQuality
 import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.graphics.painter.ColorPainter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.positionInRoot
@@ -37,6 +39,7 @@ import com.ismartcoding.plain.features.chat.peer.ResourceSize
 import com.ismartcoding.plain.lib.logcat.LogCat
 import kotlin.time.Instant
 import com.ismartcoding.plain.lib.extensions.isImageFast
+import com.ismartcoding.plain.platform.files.isContentUri
 import com.ismartcoding.plain.platform.media.applyForceVideoDecoder
 import com.ismartcoding.plain.platform.system.ThumbnailNetworkSchedule
 import kotlinx.coroutines.launch
@@ -69,12 +72,17 @@ internal fun TransformImageViewWithUri(
     } else null
     TransformImageView(modifier = modifier, key = key, itemState = itemState, contentState = previewerState.transformState) { itemKey ->
         key(itemKey) {
+            val localPhotoPlaceholder = if (showPlaceholder && thumbHash == null && fileName.isImageFast() &&
+                source is com.ismartcoding.plain.rust.graphql.ContentSource.Local && uri?.let(::isContentUri) == true
+            ) ColorPainter(MaterialTheme.colorScheme.surfaceContainerHighest) else null
             val painter = rememberAsyncImagePainter(
                 model = ImageRequest.Builder(LocalPlatformContext.current)
                     .data(managedThumbnail ?: if (source is com.ismartcoding.plain.rust.graphql.ContentSource.Local) uri ?: path else resource?.getOrNull())
                     .size(widthPx)
                     .apply { if (managedThumbnail != null || showPlaceholder) crossfade(false) }
                     .applyForceVideoDecoder(forceVideoDecoder && source is com.ismartcoding.plain.rust.graphql.ContentSource.Local).build(),
+                placeholder = localPhotoPlaceholder,
+                error = localPhotoPlaceholder,
                 onError = { state ->
                     if (managedThumbnail != null || source is com.ismartcoding.plain.rust.graphql.ContentSource.Remote && resource?.isSuccess == true) {
                         val cause = state.result.throwable
@@ -90,7 +98,7 @@ internal fun TransformImageViewWithUri(
             }
             val imageModifier = Modifier.fillMaxSize()
             val failed = resource?.isFailure == true || imageState is AsyncImagePainter.State.Error
-            if (showPlaceholder && (failed || imageState !is AsyncImagePainter.State.Success)) {
+            if (showPlaceholder && localPhotoPlaceholder == null && (failed || imageState !is AsyncImagePainter.State.Success)) {
                 ThumbnailPlaceholder(
                     thumbHash,
                     if (failed) imageModifier.semantics { contentDescription = path } else imageModifier,
@@ -103,7 +111,7 @@ internal fun TransformImageViewWithUri(
                     contentDescription = path,
                     contentScale = ContentScale.Crop,
                 )
-                !failed -> Image(
+                !failed || localPhotoPlaceholder != null -> Image(
                     modifier = if (!showPlaceholder && fileName.endsWith(".svg", true)) {
                         imageModifier.background(Color.White)
                     } else {
