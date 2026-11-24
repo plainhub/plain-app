@@ -4,17 +4,9 @@ import com.ismartcoding.plain.preferences.PrefKeys
 import com.ismartcoding.plain.platform.permissions.imageLibraryPermission
 import com.ismartcoding.plain.rust.graphql.ContentSource
 
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.GridItemSpan
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.TopAppBarDefaults
@@ -28,7 +20,6 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalHapticFeedback
-import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.ismartcoding.plain.platform.system.AppFeatureType
@@ -37,23 +28,19 @@ import com.ismartcoding.plain.ui.navigation.PBackHandler
 import com.ismartcoding.plain.ui.platform.system.isGestureInteractionMode
 import com.ismartcoding.plain.Prefs
 import com.ismartcoding.plain.ui.base.AnimatedBottomAction
-import com.ismartcoding.plain.ui.base.BottomSpace
 import com.ismartcoding.plain.ui.components.NeedPermissionColumn
 import com.ismartcoding.plain.ui.base.NoDataColumn
 import com.ismartcoding.plain.ui.base.dragselect.gridDragSelect
 import com.ismartcoding.plain.ui.base.dragselect.rememberDragSelectState
-import com.ismartcoding.plain.ui.base.fastscroll.LazyVerticalGridScrollbar
 import com.ismartcoding.plain.ui.components.pinchZoomGrid
-import com.ismartcoding.plain.ui.base.pullrefresh.LoadMoreRefreshContent
 import com.ismartcoding.plain.ui.base.pullrefresh.PullToRefresh
 import com.ismartcoding.plain.ui.components.ToastManager
 import com.ismartcoding.plain.ui.base.pullrefresh.RefreshContentState
 import com.ismartcoding.plain.ui.base.pullrefresh.rememberRefreshLayoutState
 import com.ismartcoding.plain.ui.base.pullrefresh.setRefreshState
-import com.ismartcoding.plain.ui.components.rememberBoostFlingBehavior
 import com.ismartcoding.plain.ui.media.MediaPermissionEffects
 import com.ismartcoding.plain.ui.media.ImageGridItem
-import com.ismartcoding.plain.ui.media.MediaDateGroupHeader
+import com.ismartcoding.plain.ui.media.MediaGrid
 import com.ismartcoding.plain.ui.components.MediaFilesSelectModeBottomActions
 import com.ismartcoding.plain.ui.media.MediaTopBar
 import com.ismartcoding.plain.ui.media.viewer.previewer.rememberPreviewerState
@@ -90,8 +77,7 @@ fun ImagesPage(
     val hapticFeedback = LocalHapticFeedback.current
     val itemsState by imagesVM.itemsFlow.collectAsState()
     val scrollState = rememberLazyGridState()
-    imagesVM.scrollStateMap[0] = scrollState
-    val dragSelectState = rememberDragSelectState({ scrollState })
+    val dragSelectState = rememberDragSelectState(scrollState)
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(canScroll = {
         scrollState.firstVisibleItemIndex > 0 && !dragSelectState.selectMode
     })
@@ -151,13 +137,10 @@ fun ImagesPage(
 
     CastDialog(castVM)
 
-    // Date grouping is computed outside the grid DSL: the DSL block re-executes
-    // on every recomposition (tags/buckets landing right after items), which
-    // would re-run the O(n) grouping each time.
     val isGroupMode = imagesVM.sortBy.value == ImageSortBy.TAKEN_AT_DESC
             && imagesVM.queryText.value.isEmpty()
     val groupedItems = remember(itemsState, isGroupMode) {
-        if (isGroupMode) groupMediaByDate(itemsState, { it.takenAt ?: it.createdAt }) else emptyList()
+        if (isGroupMode) groupMediaByDate(itemsState, { it.takenAt ?: it.createdAt }) else null
     }
 
     MediaTopBar(
@@ -210,76 +193,39 @@ fun ImagesPage(
             }
 
             PullToRefresh(refreshLayoutState = topRefreshLayoutState) {
-                AnimatedVisibility(visible = true, enter = fadeIn(), exit = fadeOut()) {
-                    if (itemsState.isNotEmpty()) {
-                        val flingBehavior = rememberBoostFlingBehavior(cellsPerRow.value / 3f)
-                        LazyVerticalGridScrollbar(state = scrollState) {
-                            LazyVerticalGrid(
-                                columns = GridCells.Fixed(cellsPerRow.value), state = scrollState, flingBehavior = flingBehavior,
-                                modifier = Modifier
-                                    .fillMaxSize()
-                                    .nestedScroll(scrollBehavior.nestedScrollConnection)
-                                    .gridDragSelect(items = itemsState, state = dragSelectState)
-                                    .pinchZoomGrid(cellsPerRow = cellsPerRow, hapticFeedback = hapticFeedback, scope = scope) {
-                                        Prefs.set(PrefKeys.IMAGE_GRID_CELLS_PER_ROW, it)
-                                    },
-                                horizontalArrangement = Arrangement.spacedBy(2.dp),
-                                verticalArrangement = Arrangement.spacedBy(2.dp)
-                            ) {
-                                if (isGroupMode) {
-                                    groupedItems.forEach { group ->
-                                        item(span = { GridItemSpan(maxLineSpan) }, key = "header_${group.dateKey}", contentType = "header") {
-                                            val ids = group.items.map { it.id }
-                                            val allSelected = ids.isNotEmpty() && ids.all { dragSelectState.isSelected(it) }
-                                            MediaDateGroupHeader(
-                                                dateLabel = group.dateLabel,
-                                                allSelected = allSelected,
-                                                partialSelected = !allSelected && ids.any { dragSelectState.isSelected(it) },
-                                                showCheckbox = dragSelectState.selectMode,
-                                            ) {
-                                                if (!dragSelectState.selectMode) dragSelectState.enterSelectMode()
-                                                if (allSelected) dragSelectState.removeSelectedIds(ids) else dragSelectState.addSelectedIds(ids)
-                                            }
-                                        }
-                                        items(group.items, key = { it.id }, contentType = { "image" }, span = { GridItemSpan(1) }) { m ->
-                                            ImageGridItem(
-                                                scope,
-                                                modifier = Modifier.animateItem(fadeInSpec = null, fadeOutSpec = null),
-                                                imagesVM,
-                                                castVM,
-                                                m,
-                                                showSize = cellsPerRow.value < 6,
-                                                previewerState,
-                                                dragSelectState,
-                                            )
-                                        }
-                                    }
-                                } else {
-                                    items(itemsState, key = { it.id }, contentType = { "image" }, span = { GridItemSpan(1) }) { m ->
-                                        ImageGridItem(
-                                            scope,
-                                            modifier = Modifier.animateItem(fadeInSpec = null, fadeOutSpec = null),
-                                            imagesVM,
-                                            castVM,
-                                            m,
-                                            showSize = cellsPerRow.value < 6,
-                                            previewerState,
-                                            dragSelectState,
-                                        )
-                                    }
-                                }
-                                item(span = { GridItemSpan(maxLineSpan) }, key = "loadMore") {
-                                    if (itemsState.isNotEmpty() && !imagesVM.noMore.value) {
-                                        LaunchedEffect(Unit) { scope.launchSafe { imagesVM.moreAsync(tagsVM) } }
-                                    }
-                                    LoadMoreRefreshContent(imagesVM.noMore.value)
-                                }
-                                item(span = { GridItemSpan(maxLineSpan) }, key = "bottomSpace") { BottomSpace(paddingValues) }
-                            }
-                        }
-                    } else {
-                        NoDataColumn(loading = imagesVM.showLoading.value, search = imagesVM.showSearchBar.value)
-                    }
+                if (itemsState.isEmpty()) {
+                    NoDataColumn(loading = imagesVM.showLoading.value, search = imagesVM.showSearchBar.value)
+                    return@PullToRefresh
+                }
+
+                MediaGrid(
+                    rows = itemsState,
+                    groups = groupedItems,
+                    contentType = "image",
+                    columns = cellsPerRow.value,
+                    state = scrollState,
+                    selection = dragSelectState,
+                    noMore = imagesVM.noMore,
+                    padding = paddingValues,
+                    onLoadMore = { scope.launchSafe { imagesVM.moreAsync(tagsVM) } },
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .nestedScroll(scrollBehavior.nestedScrollConnection)
+                        .gridDragSelect(items = itemsState, state = dragSelectState)
+                        .pinchZoomGrid(cellsPerRow = cellsPerRow, hapticFeedback = hapticFeedback, scope = scope) {
+                            Prefs.set(PrefKeys.IMAGE_GRID_CELLS_PER_ROW, it)
+                        },
+                ) { item ->
+                    ImageGridItem(
+                        scope = scope,
+                        modifier = Modifier.animateItem(fadeInSpec = null, fadeOutSpec = null),
+                        imagesVM = imagesVM,
+                        castVM = castVM,
+                        m = item,
+                        showSize = cellsPerRow.value < 6,
+                        previewerState = previewerState,
+                        dragSelectState = dragSelectState,
+                    )
                 }
             }
         }

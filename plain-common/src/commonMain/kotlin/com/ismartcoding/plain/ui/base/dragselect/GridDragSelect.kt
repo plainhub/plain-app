@@ -26,11 +26,6 @@ fun Modifier.gridDragSelect(
     enableHaptics: Boolean = true,
     hapticFeedback: HapticFeedback? = null,
 ): Modifier = composed {
-    val itemIndices = remember(items) {
-        buildMap {
-            items.forEachIndexed { index, item -> if (!containsKey(item.id)) put(item.id, index) }
-        }
-    }
     val scrollThreshold: Float = autoScrollThreshold ?: GridDragSelectDefaults.autoScrollThreshold
     if (enableAutoScroll) {
         LaunchedEffect(state, state.autoScrollSpeed.floatValue) {
@@ -52,6 +47,14 @@ fun Modifier.gridDragSelect(
 
     if (!state.selectMode) {
         return@composed this
+    }
+    val itemIndices = remember(items) {
+        buildMap {
+            items.forEachIndexed { index, item ->
+                val id = item.id
+                if (!containsKey(id)) put(id, index)
+            }
+        }
     }
     // Restart on data changes so a range cannot mix old and new indices.
     pointerInput(state, items, scrollThreshold, haptics) {

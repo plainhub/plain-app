@@ -21,6 +21,7 @@ import com.ismartcoding.plain.lib.extensions.formatDurationMs
 import com.ismartcoding.plain.lib.coMain
 import com.ismartcoding.plain.lib.withIO
 import com.ismartcoding.plain.models.MediaSortBy
+import com.ismartcoding.plain.models.VideoSortBy
 import com.ismartcoding.plain.platform.media.getMediaItemUriString
 import com.ismartcoding.plain.ui.base.dragselect.DragSelectState
 import com.ismartcoding.plain.ui.media.viewer.previewer.MediaPreviewerState
@@ -116,7 +117,7 @@ internal fun VideoGridItem(
         if (showSize) {
             Box(modifier = Modifier.align(Alignment.BottomEnd)) {
                 SizeLabel(
-                    text = if (sort.name in setOf("SIZE_ASC", "SIZE_DESC"))
+                    text = if (sort == VideoSortBy.SIZE_ASC || sort == VideoSortBy.SIZE_DESC)
                         m.size.formatBytes() else m.durationMs.formatDurationMs()
                 )
             }
