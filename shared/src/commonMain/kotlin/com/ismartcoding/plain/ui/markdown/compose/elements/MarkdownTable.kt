@@ -24,7 +24,11 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
+import androidx.compose.ui.input.nestedscroll.NestedScrollSource
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.onPlaced
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.semantics.CollectionInfo
@@ -37,6 +41,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.Velocity
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.toSize
 import com.ismartcoding.plain.ui.markdown.annotator.AnnotatorSettings
@@ -63,6 +68,14 @@ import org.intellij.markdown.flavours.gfm.GFMTokenTypes.TABLE_SEPARATOR
  * implementations can read this to set their own collection semantics.
  */
 val LocalTableRowIndex = compositionLocalOf { 1 }
+
+private object TableNestedScrollConnection : NestedScrollConnection {
+    override fun onPostScroll(consumed: Offset, available: Offset, source: NestedScrollSource): Offset =
+        Offset(available.x, 0f)
+
+    override suspend fun onPostFling(consumed: Velocity, available: Velocity): Velocity =
+        Velocity(available.x, 0f)
+}
 
 @Composable
 fun MarkdownTable(
@@ -101,7 +114,10 @@ fun MarkdownTable(
         val scrollable = maxWidth <= tableMinWidth
         Column(
             modifier = if (scrollable) {
-                Modifier.horizontalScroll(rememberScrollState()).requiredWidth(tableMinWidth)
+                Modifier
+                    .nestedScroll(TableNestedScrollConnection)
+                    .horizontalScroll(rememberScrollState())
+                    .requiredWidth(tableMinWidth)
             } else {
                 Modifier.fillMaxWidth()
             }
