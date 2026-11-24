@@ -87,6 +87,10 @@ import com.ismartcoding.plain.ui.files.FilesPage
 import com.ismartcoding.plain.ui.files.stored.AppFilesPage
 import com.ismartcoding.plain.ui.navigation.LocalContentSource
 import com.ismartcoding.plain.ui.navigation.MainDialogs
+import com.ismartcoding.plain.ui.search.GlobalSearchDevices
+import com.ismartcoding.plain.ui.search.GlobalSearchDomain
+import com.ismartcoding.plain.ui.search.GlobalSearchPage
+import com.ismartcoding.plain.ui.search.GlobalSearchViewModel
 import com.ismartcoding.plain.ui.theme.AppTheme
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.Dispatchers
@@ -1098,6 +1102,76 @@ class ManagedDeviceUiAcceptanceTest {
                 assertTrue(layouts.single().isLineEllipsized(0))
             }
             report("chat_preview_result", "one_line_ellipsis_verified")
+        }
+    }
+
+    @Test
+    fun globalSearchKeepsItsDevicePickerAndTabsWithoutResultActions() = runBlocking {
+        fun clickable(node: UiNode): UiNode = generateSequence(node) { it.parent }.first { it.isClickable }
+        val now = kotlin.time.Instant.fromEpochMilliseconds(0)
+        val peers = listOf("Desk fixture", "Phone fixture").map { name ->
+            Peer(
+                id = name, name = name, ip = "127.0.0.1", status = com.ismartcoding.plain.features.nearby.PeerStatus.PAIRED,
+                port = 8443, deviceType = com.ismartcoding.plain.platform.system.DeviceType.PHONE,
+                createdAt = now, updatedAt = now, token = "fixture", online = true,
+            )
+        }
+        val types = listOf(GlobalSearchDomain.FILES, GlobalSearchDomain.IMAGES, GlobalSearchDomain.VIDEOS, GlobalSearchDomain.NOTES)
+        ActivityScenario.launch(MainActivity::class.java).use { scenario ->
+            lateinit var model: GlobalSearchViewModel
+            scenario.onActivity { activity ->
+                model = GlobalSearchViewModel(
+                    readDevices = { _, _ -> GlobalSearchDevices(emptyList()) },
+                    initialDomains = types,
+                    readPeers = { peers },
+                )
+                activity.viewModelStore.put("search-controls-fixture", model)
+                val audio = AudioQueueViewModel()
+                activity.viewModelStore.put("search-controls-audio-fixture", audio)
+                model.domain.value = GlobalSearchDomain.FILES
+                model.queryText.value = "journey"
+                model.submitted.value = true
+                model.searchedQuery.value = "journey"
+                activity.setContent {
+                    AppTheme(useDarkTheme = false) {
+                        GlobalSearchPage(rememberNavController(), audio, model, onTabSelected = {})
+                    }
+                }
+            }
+            awaitNode("empty result hint") { it.text == text(Res.string.no_results_hint_scope) }
+            scenario.onActivity { model.domains.value = types }
+            awaitNode("visible Files tab") { it.text == text(Res.string.files) && clickable(it).isChecked }
+            val clearInput = awaitNode("clear search input") { it.contentDescription == text(Res.string.clear_search_term) }
+            val picker = awaitNode("search device filter") { it.text == text(Res.string.search_all_devices) }
+            assertTrue(clearInput.boundsInWindow.bottom <= clickable(picker).boundsInWindow.top)
+            assertFalse(allText().contains(text(Res.string.clear_search_term)))
+            assertFalse(allText().contains("Search in all types"))
+            captureNavigation("search-controls")
+            performClick(clearInput, "clear search input")
+            awaitNode("blank search input") { it.isEditable && it.text.isNullOrEmpty() }
+            assertEquals("", model.queryText.value)
+            assertFalse(allText().contains("Recent searches"))
+
+            click(text(Res.string.search_all_devices), "open search device picker")
+            val phone = awaitNode("checkbox for the phone") { it.text == "Phone fixture" }.let(::clickable)
+            assertTrue(phone.isCheckable && phone.isChecked)
+            performClick(phone, "uncheck the phone")
+            awaitNode("unchecked phone") { it.text == "Phone fixture" && !clickable(it).isChecked }
+            assertEquals(3, model.selectedSearchDevices.value.size)
+            awaitNode("partial device selection") {
+                it.text == text(Res.string.search_all_devices) &&
+                    clickable(it).semantic.config.getOrNull(SemanticsProperties.ToggleableState) == ToggleableState.Indeterminate
+            }
+            captureNavigation("search-device-choices")
+            click(text(Res.string.ok), "apply device selection")
+            awaitValue("two devices selected") { model.selectedSearchDevices.value.takeIf { it.size == 2 } }
+            assertEquals(setOf(ContentSource.Local.key, "Desk fixture"), model.selectedSearchDevices.value)
+
+            awaitMainWindowFocus(scenario)
+            val all = awaitNode("All types tab") { it.text == text(Res.string.all) }
+            performClick(all, "switch back to all types")
+            awaitValue("cleared type filter") { true.takeIf { model.domain.value == null } }
+            assertTrue(awaitNode("selected All tab") { it.text == text(Res.string.all) }.let(::clickable).isChecked)
         }
     }
 

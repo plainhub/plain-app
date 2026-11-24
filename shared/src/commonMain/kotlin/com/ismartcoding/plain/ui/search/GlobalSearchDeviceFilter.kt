@@ -1,17 +1,21 @@
 package com.ismartcoding.plain.ui.search
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.selection.triStateToggleable
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Text
-import androidx.compose.material3.TriStateCheckbox
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -19,6 +23,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.state.ToggleableState
 import androidx.compose.ui.text.style.TextOverflow
@@ -27,12 +32,13 @@ import com.ismartcoding.plain.i18n.*
 import com.ismartcoding.plain.rust.graphql.ContentSource
 import com.ismartcoding.plain.ui.base.PBottomSheetTopAppBar
 import com.ismartcoding.plain.ui.base.PFilledButton
-import com.ismartcoding.plain.ui.base.PFilterChip
 import com.ismartcoding.plain.ui.base.PIcon
 import com.ismartcoding.plain.ui.base.PListItem
 import com.ismartcoding.plain.ui.base.PModalBottomSheet
+import com.ismartcoding.plain.ui.components.CheckCircle
 import com.ismartcoding.plain.ui.resources.Res as UiRes
 import com.ismartcoding.plain.ui.resources.chevron_down
+import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 
 @Composable
@@ -51,17 +57,32 @@ internal fun GlobalSearchDeviceFilter(
         else -> stringResource(Res.string.search_selected_device_count, selected.size)
     }
     var open by remember { mutableStateOf(false) }
-    PFilterChip(
-        selected = true,
-        onClick = { open = true },
-        modifier = Modifier.padding(start = 16.dp).widthIn(max = 144.dp),
-        label = {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(label, Modifier.weight(1f, fill = false), maxLines = 1, overflow = TextOverflow.Ellipsis)
-                PIcon(modifier = Modifier.padding(start = 4.dp).size(16.dp), icon = UiRes.drawable.chevron_down, contentDescription = null)
-            }
-        },
-    )
+    val colors = MaterialTheme.colorScheme
+    Row(
+        modifier = Modifier.padding(start = 8.dp).widthIn(max = 144.dp).heightIn(min = 48.dp)
+            .clickable(role = Role.Button) { open = true },
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Row(
+            modifier = Modifier.clip(CircleShape).background(colors.primaryContainer)
+                .padding(horizontal = 16.dp, vertical = 8.dp),
+            horizontalArrangement = Arrangement.spacedBy(4.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Text(
+                label, Modifier.weight(1f, fill = false),
+                color = colors.primary,
+                style = MaterialTheme.typography.labelLarge,
+                maxLines = 1, overflow = TextOverflow.Ellipsis,
+            )
+            PIcon(
+                modifier = Modifier.size(16.dp),
+                icon = painterResource(UiRes.drawable.chevron_down),
+                contentDescription = null,
+                tint = colors.primary,
+            )
+        }
+    }
     if (open) {
         SearchDeviceSheet(peers, selected, all, thisDevice, allLabel, { open = false }) {
             open = false
@@ -125,6 +146,6 @@ private fun SearchDeviceChoice(
             .triStateToggleable(state = state, role = Role.Checkbox, onClick = onClick),
         title = title,
         subtitle = subtitle,
-        start = { TriStateCheckbox(state, onClick = null) },
+        start = { CheckCircle(state) },
     )
 }

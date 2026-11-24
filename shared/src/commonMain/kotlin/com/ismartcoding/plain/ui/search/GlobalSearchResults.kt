@@ -67,7 +67,7 @@ internal fun SearchResults(
         return
     }
     if (!viewModel.searching.value && viewModel.empty.value) {
-        EmptyResults(viewModel, domainScope)
+        EmptyResults(query, domainScope)
         return
     }
 
@@ -236,10 +236,9 @@ private fun SectionFooterButton(text: String, onClick: () -> Unit) {
 
 @Composable
 private fun EmptyResults(
-    viewModel: GlobalSearchViewModel,
+    query: String,
     domainScope: GlobalSearchDomain?,
 ) {
-    val query = viewModel.queryText.value.trim()
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -271,27 +270,6 @@ private fun EmptyResults(
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             modifier = Modifier.padding(top = 8.dp),
-        )
-        Row(
-            modifier = Modifier.padding(top = 16.dp),
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
-        ) {
-            if (domainScope != null) {
-                POutlinedButton(
-                    text = stringResource(Res.string.search_in_all_types),
-                    onClick = { viewModel.setDomain(null) },
-                )
-            }
-            POutlinedButton(
-                text = stringResource(Res.string.clear_search_term),
-                onClick = { viewModel.onQueryChange("") },
-            )
-        }
-        GlobalSearchRecentSection(
-            recent = viewModel.recentQueries.value.take(4),
-            onSearch = viewModel::searchFromRecent,
-            onRemove = viewModel::removeRecent,
-            onClear = viewModel::clearRecent,
         )
     }
 }

@@ -180,13 +180,11 @@
     <string name="search_choose_devices">검색할 기기 선택</string>
     <string name="search_selected_device_count">%1$d대 선택됨</string>
     <string name="search_in_domain">%1$s에서 검색</string>
-    <string name="recent_searches">최근 검색</string>
     <string name="search_scope_hint">%1$s에서만 검색합니다. "전체"를 눌러 모든 유형을 검색하세요.</string>
     <string name="view_all_n">전체 보기(%1$d)</string>
     <string name="show_more_n">더 보기(%1$d/%2$d)</string>
     <string name="no_results_for">"%1$s"에 대한 결과를 찾을 수 없습니다</string>
     <string name="no_results_hint">더 짧은 키워드를 시도하거나 유형으로 범위를 좁혀 보세요</string>
     <string name="no_results_hint_scope">더 짧은 키워드를 시도하거나 "전체"로 전환하세요</string>
-    <string name="search_in_all_types">모든 유형에서 검색</string>
     <string name="clear_search_term">검색어 지우기</string>
 </resources>

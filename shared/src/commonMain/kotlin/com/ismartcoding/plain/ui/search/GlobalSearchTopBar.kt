@@ -1,7 +1,7 @@
 package com.ismartcoding.plain.ui.search
 
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
@@ -20,15 +20,14 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.unit.dp
 import com.ismartcoding.plain.i18n.*
+import com.ismartcoding.plain.ui.base.PIcon
 import com.ismartcoding.plain.ui.components.PIconButton
-import com.ismartcoding.plain.ui.search.GlobalSearchDomain
-import com.ismartcoding.plain.ui.search.GlobalSearchViewModel
 import com.ismartcoding.plain.ui.theme.cardBackgroundNormal
+import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import com.ismartcoding.plain.ui.resources.Res as UiRes
 import com.ismartcoding.plain.ui.resources.close as ui_drawable_close
-import com.ismartcoding.plain.i18n.search
-import com.ismartcoding.plain.i18n.close
+import com.ismartcoding.plain.ui.resources.search as ui_drawable_search
 
 /** Search input bar of the global search tab, with once-per-session auto focus. */
 @OptIn(ExperimentalMaterial3Api::class)
@@ -52,39 +51,41 @@ internal fun GlobalSearchTopBar(
     else stringResource(Res.string.search_in_domain, stringResource(domainScope.labelRes))
     val colors = SearchBarDefaults.colors(containerColor = MaterialTheme.colorScheme.cardBackgroundNormal)
 
-    Column(Modifier.fillMaxWidth()) {
-        SearchBar(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 12.dp, vertical = 8.dp)
-                .focusRequester(focusRequester),
-            inputField = {
-                SearchBarDefaults.InputField(
-                    modifier = Modifier.padding(start = 8.dp),
-                    colors = colors.inputFieldColors,
-                    query = viewModel.queryText.value,
-                    onQueryChange = viewModel::onQueryChange,
-                    onSearch = { viewModel.submit() },
-                    expanded = false,
-                    onExpandedChange = { },
-                    placeholder = { Text(hint) },
-                    trailingIcon = if (viewModel.queryText.value.isEmpty()) null else {
-                        {
-                            PIconButton(
-                                icon = UiRes.drawable.ui_drawable_close,
-                                contentDescription = stringResource(Res.string.clear_search_term),
-                                tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                            ) {
-                                viewModel.onQueryChange("")
-                            }
-                        }
-                    },
-                )
-            },
-            expanded = false,
-            onExpandedChange = { },
-            colors = colors,
-        ) {
-        }
-    }
+    SearchBar(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 8.dp, vertical = 8.dp)
+            .focusRequester(focusRequester),
+        inputField = {
+            SearchBarDefaults.InputField(
+                colors = colors.inputFieldColors,
+                query = viewModel.queryText.value,
+                onQueryChange = viewModel::onQueryChange,
+                onSearch = { viewModel.submit() },
+                expanded = false,
+                onExpandedChange = {},
+                placeholder = { Text(hint) },
+                leadingIcon = {
+                    PIcon(
+                        modifier = Modifier.size(24.dp),
+                        icon = painterResource(UiRes.drawable.ui_drawable_search),
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                },
+                trailingIcon = if (viewModel.queryText.value.isEmpty()) null else {
+                    {
+                        PIconButton(
+                            icon = UiRes.drawable.ui_drawable_close,
+                            contentDescription = stringResource(Res.string.clear_search_term),
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                        ) { viewModel.onQueryChange("") }
+                    }
+                },
+            )
+        },
+        expanded = false,
+        onExpandedChange = {},
+        colors = colors,
+    ) {}
 }

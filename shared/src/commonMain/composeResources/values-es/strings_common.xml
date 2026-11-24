@@ -180,13 +180,11 @@
     <string name="search_choose_devices">Elige dónde buscar</string>
     <string name="search_selected_device_count">%1$d dispositivos seleccionados</string>
     <string name="search_in_domain">Buscar en %1$s</string>
-    <string name="recent_searches">Búsquedas recientes</string>
     <string name="search_scope_hint">Buscando solo en %1$s. Toca "Todo" para buscar todos los tipos.</string>
     <string name="view_all_n">Ver todo (%1$d)</string>
     <string name="show_more_n">Mostrar más (%1$d/%2$d)</string>
     <string name="no_results_for">No se encontraron resultados para "%1$s"</string>
     <string name="no_results_hint">Prueba una palabra clave más corta o elige un filtro de tipo.</string>
     <string name="no_results_hint_scope">Prueba una palabra clave más corta o vuelve a "Todo".</string>
-    <string name="search_in_all_types">Buscar en todos los tipos</string>
     <string name="clear_search_term">Borrar término de búsqueda</string>
 </resources>

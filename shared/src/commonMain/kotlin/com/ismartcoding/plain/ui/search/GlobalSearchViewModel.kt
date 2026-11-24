@@ -11,7 +11,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ismartcoding.plain.features.chat.peer.ManagedDeviceClient
-import com.ismartcoding.plain.features.search.SearchHistoryClient
 import com.ismartcoding.plain.i18n.devices
 import com.ismartcoding.plain.graphql.Query
 import com.ismartcoding.plain.models.Peer
@@ -30,7 +29,6 @@ class GlobalSearchViewModel internal constructor(
     private val readDevices: suspend (List<Peer>, Set<String>?) -> GlobalSearchDevices = { peers, selected ->
         searchDevices(readPeers = { peers }, selectedIds = selected)
     },
-    readHistory: suspend () -> List<String> = SearchHistoryClient::read,
     initialDomains: List<GlobalSearchDomain> = globalSearchDomains(),
     private val readPeers: suspend () -> List<Peer> = { GraphqlApi.execute(Query.peers()) },
 ) : ViewModel() {
@@ -40,7 +38,6 @@ class GlobalSearchViewModel internal constructor(
     val searching = mutableStateOf(false)
     val searchedQuery = mutableStateOf("")
     val domainStates = mutableStateMapOf<GlobalSearchDomain, GlobalSearchDomainState>()
-    val recentQueries = mutableStateOf<List<String>>(emptyList())
     val domains = mutableStateOf(initialDomains)
     internal val deviceErrors = mutableStateOf<List<GlobalSearchDeviceError>>(emptyList())
     internal val searchPeers = mutableStateOf<List<GlobalSearchPeer>>(emptyList())
@@ -56,8 +53,6 @@ class GlobalSearchViewModel internal constructor(
     private var revision = 0L
     private var searchJob: Job? = null
     private val refreshJobs = mutableMapOf<GlobalSearchDeviceState, Job>()
-
-    init { viewModelScope.launchSafe { recentQueries.value = readHistory() } }
 
     internal suspend fun refreshSearchDevices() {
         try {
@@ -97,16 +92,8 @@ class GlobalSearchViewModel internal constructor(
         val query = queryText.value.trim()
         if (query.isEmpty()) return
         submitted.value = true
-        recordRecent(query)
         search()
     }
-    fun searchFromRecent(query: String) {
-        queryText.value = query
-        submit()
-    }
-    fun removeRecent(query: String) { viewModelScope.launchSafe { SearchHistoryClient.remove(query); recentQueries.value = SearchHistoryClient.read() } }
-    fun clearRecent() { viewModelScope.launchSafe { SearchHistoryClient.clear(); recentQueries.value = SearchHistoryClient.read() } }
-    private fun recordRecent(query: String) { viewModelScope.launchSafe { SearchHistoryClient.record(query); recentQueries.value = SearchHistoryClient.read() } }
 
     fun loadMore(value: GlobalSearchDomain, pageSize: Int = PAGE_SIZE) {
         val query = searchedQuery.value

@@ -124,9 +124,9 @@ fun GlobalSearchPage(
                 .padding(top = paddingValues.calculateTopPadding())
                 .hideKeyboardOnTap(focusManager, keyboard),
         ) {
-            GlobalSearchScopeChips(
+            GlobalSearchTabs(
                 selected = domainScope,
-                chips = listOf<GlobalSearchDomain?>(null) + domains,
+                domains = domains,
                 onSelect = viewModel::setDomain,
                 deviceFilter = if (searchPeers.isEmpty()) null else {
                     {
@@ -153,12 +153,6 @@ fun GlobalSearchPage(
                             )
                         }
                     }
-                    GlobalSearchRecentSection(
-                        recent = viewModel.recentQueries.value,
-                        onSearch = viewModel::searchFromRecent,
-                        onRemove = viewModel::removeRecent,
-                        onClear = viewModel::clearRecent,
-                    )
                     BottomSpace(paddingValues)
                 }
             } else {

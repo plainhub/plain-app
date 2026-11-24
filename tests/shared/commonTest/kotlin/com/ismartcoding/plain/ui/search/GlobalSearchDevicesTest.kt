@@ -57,7 +57,6 @@ class GlobalSearchDevicesTest {
             initializer {
                 GlobalSearchViewModel(
                     readDevices = { _, selected -> readDevices(selected) },
-                    readHistory = { emptyList() },
                     initialDomains = listOf(GlobalSearchDomain.NOTES),
                     readPeers = { peers },
                 )

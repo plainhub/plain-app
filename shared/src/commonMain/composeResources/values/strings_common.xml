@@ -181,13 +181,11 @@
     <string name="search_choose_devices">Choose search devices</string>
     <string name="search_selected_device_count">%1$d devices selected</string>
     <string name="search_in_domain">Search in %1$s</string>
-    <string name="recent_searches">Recent searches</string>
     <string name="search_scope_hint">Only searching in %1$s. Tap "All" to search every type.</string>
     <string name="view_all_n">View all (%1$d)</string>
     <string name="show_more_n">Show more (%1$d/%2$d)</string>
     <string name="no_results_for">No results found for "%1$s"</string>
     <string name="no_results_hint">Try a shorter keyword or pick a type filter</string>
     <string name="no_results_hint_scope">Try a shorter keyword or switch back to "All"</string>
-    <string name="search_in_all_types">Search in all types</string>
     <string name="clear_search_term">Clear search term</string>
 </resources>
