@@ -685,7 +685,7 @@ class ManagedDeviceUiAcceptanceTest {
 
 
     @Test
-    fun localRootStartsWithChatAndKeepsSettingsLastWithAStaticDeviceName() = runBlocking {
+    fun localRootStartsWithChatAndKeepsSettingsLastWithTheLocalDeviceName() = runBlocking {
         instrumentation.runOnMainSync {
             Prefs.onboardingCompleted.value = true
             MainViewModel.selectDevice(null)
@@ -713,7 +713,7 @@ class ManagedDeviceUiAcceptanceTest {
             click(text(Res.string.settings), "settings tab")
             awaitNode("Remote Access service") { it.text == text(Res.string.home_remote_access) }
             assertEquals(0, MainViewModel.currentRootTab.intValue)
-            assertStaticLocalDeviceName()
+            assertLocalDeviceNameInSettings()
             click(text(Res.string.settings), "app settings", firstMatch = true)
             awaitNode("application settings") { it.text == text(Res.string.dark_theme) }
             click(text(Res.string.back), "return from app settings")
@@ -737,7 +737,7 @@ class ManagedDeviceUiAcceptanceTest {
 
                 click(text(Res.string.settings), "settings tab on the remote device")
                 awaitNode("local Remote Access service") { it.text == text(Res.string.home_remote_access) }
-                assertStaticLocalDeviceName()
+                assertLocalDeviceNameInSettings()
                 assertEquals(remote, MainViewModel.selectedDevice.value)
 
                 click(text(Res.string.chat), "return to remote Chat")
@@ -769,7 +769,7 @@ class ManagedDeviceUiAcceptanceTest {
 
                 click(text(Res.string.settings), "settings tab on the connected remote device")
                 awaitNode("local Remote Access service") { it.text == text(Res.string.home_remote_access) }
-                assertStaticLocalDeviceName()
+                assertLocalDeviceNameInSettings()
 
                 click(text(Res.string.chat), "return to remote Chat")
                 awaitNode("same connected remote device name") { it.text == remoteName }
@@ -784,7 +784,7 @@ class ManagedDeviceUiAcceptanceTest {
     }
 
     @Test
-    fun settingsPenRenamesTheLocalDeviceWhileARemoteDeviceIsSelected() = runBlocking {
+    fun settingsNameAndPenShareTheLocalRenameActionWhileARemoteDeviceIsSelected() = runBlocking {
         val remote = DeviceIdentity("unavailable-rename-${UUID.randomUUID()}", "fixture-key")
         val onboardingCompleted = Prefs.onboardingCompleted.value
         val originalName = Prefs.deviceName.value
@@ -797,17 +797,25 @@ class ManagedDeviceUiAcceptanceTest {
                 scenario.onActivity { MainViewModel.selectDevice(remote) }
                 awaitNode("unavailable remote Chat") { it.text == text(Res.string.managed_authorization_changed) }
                 click(text(Res.string.settings), "local Settings tab")
-                val title = awaitNode("local device name in Settings") { it.text == displayedName }
+                val title = assertLocalDeviceNameInSettings()
                 val pen = awaitNode("rename icon beside the local device name") { it.contentDescription == text(Res.string.rename) }
                 val iconSize = 16 * instrumentation.targetContext.resources.displayMetrics.density
                 assertEquals(iconSize, pen.boundsInWindow.width, 1f)
                 assertEquals(iconSize, pen.boundsInWindow.height, 1f)
                 assertEquals(title.screenCenter.y, pen.screenCenter.y, 1f)
                 assertTrue(pen.screenCenter.x > title.screenCenter.x)
-                assertStaticLocalDeviceName()
+                val titleAction = generateSequence(title) { it.parent }.firstOrNull { it.isClickable }
+                val penAction = generateSequence(pen) { it.parent }.firstOrNull { it.isClickable }
+                assertNotNull("The device name must open the rename dialog", titleAction)
+                assertEquals(titleAction?.semantic?.id, penAction?.semantic?.id)
 
-                click(text(Res.string.rename), "open the device rename dialog")
-                awaitNode("device name dialog") { it.overlay && it.text == text(Res.string.device_name) }
+                touch(pen.screenCenter.x, pen.screenCenter.y)
+                awaitNode("device name dialog from the pen") { it.overlay && it.text == text(Res.string.device_name) }
+                click(text(Res.string.cancel), "dismiss the device name dialog")
+                awaitMainWindowFocus(scenario)
+
+                touch(title.screenCenter.x, title.screenCenter.y)
+                awaitNode("device name dialog from the title") { it.overlay && it.text == text(Res.string.device_name) }
                 val field = awaitNode("prefilled local device name") { it.overlay && it.isEditable && it.text == displayedName }
                 assertTrue(field.performAction(AccessibilityNodeInfo.ACTION_SET_TEXT, Bundle().apply {
                     putCharSequence(AccessibilityNodeInfo.ACTION_ARGUMENT_SET_TEXT_CHARSEQUENCE, newName)
@@ -840,14 +848,11 @@ class ManagedDeviceUiAcceptanceTest {
         assertTrue(settingsTab.screenCenter.x > searchTab.screenCenter.x)
     }
 
-    private fun assertStaticLocalDeviceName() {
+    private fun assertLocalDeviceNameInSettings(): UiNode {
         val deviceName = Prefs.deviceName.value.ifEmpty { com.ismartcoding.plain.platform.system.getDeviceName() }
         val title = awaitNode("local device name in Settings") { it.text == deviceName }
-        assertFalse(generateSequence(title) { it.parent }.any { it.isClickable })
         assertFalse(uiNodes().any { it.isVisible && it.contentDescription == text(Res.string.select_a_device) })
-        touch(title.screenCenter.x, title.screenCenter.y)
-        assertEquals(0, MainViewModel.currentRootTab.intValue)
-        assertFalse(allText().contains(text(Res.string.nearby_devices)))
+        return title
     }
 
 

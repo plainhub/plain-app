@@ -1,5 +1,6 @@
 package com.ismartcoding.plain.ui.home
 
+import androidx.compose.foundation.layout.size
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -7,6 +8,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.ismartcoding.plain.Prefs
@@ -15,14 +17,15 @@ import com.ismartcoding.plain.i18n.Res
 import com.ismartcoding.plain.i18n.rename
 import com.ismartcoding.plain.platform.system.getDeviceName
 import com.ismartcoding.plain.rust.graphql.GraphqlApi
+import com.ismartcoding.plain.ui.base.PIcon
 import com.ismartcoding.plain.ui.base.PTopAppBar
 import com.ismartcoding.plain.ui.components.ActionButtonScan
 import com.ismartcoding.plain.ui.components.ActionButtonSettings
 import com.ismartcoding.plain.ui.components.DeviceRenameDialog
-import com.ismartcoding.plain.ui.components.PIconButton
 import com.ismartcoding.plain.ui.navigation.Routing
 import com.ismartcoding.plain.ui.resources.Res as UiRes
 import com.ismartcoding.plain.ui.resources.pen
+import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -38,12 +41,12 @@ fun TopBarHome(navController: NavHostController) {
     }
     PTopAppBar(
         title = deviceName,
+        onTitleClick = { showRename = true },
         titleTrailing = {
-            PIconButton(
-                icon = UiRes.drawable.pen,
-                iconSize = 16.dp,
+            PIcon(
+                modifier = Modifier.size(16.dp),
+                icon = painterResource(UiRes.drawable.pen),
                 contentDescription = stringResource(Res.string.rename),
-                click = { showRename = true },
             )
         },
         actions = {
