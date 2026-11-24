@@ -21,6 +21,20 @@ class GlobalSearchControlsTest {
     }
 
     @Test
+    fun pressFeedbackIsClippedBeforeTheControlHandlesInput() {
+        val picker = searchSource("GlobalSearchDeviceFilter").substringBefore("    if (open)")
+        val tabs = searchSource("GlobalSearchTabs")
+        assertTrue(
+            Regex("""\.clip\(CircleShape\)\.background\(colors\.primaryContainer\)\s*\.clickable""").containsMatchIn(picker),
+            "The device button must clip its press feedback to the same shape as its fill",
+        )
+        assertTrue(
+            Regex("""\.clip\(MaterialTheme\.shapes\.small\)\s*\.selectable""").containsMatchIn(tabs),
+            "Tabs must clip their press feedback to rounded corners",
+        )
+    }
+
+    @Test
     fun emptySearchKeepsItsTopControlsWithoutExtraButtonsOrHistory() {
         val results = searchSource("GlobalSearchResults")
         assertFalse("Res.string.search_in_all_types" in results)

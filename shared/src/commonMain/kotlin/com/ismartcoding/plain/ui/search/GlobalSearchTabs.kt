@@ -21,6 +21,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalLayoutDirection
@@ -63,6 +64,7 @@ internal fun GlobalSearchTabs(
                 val colors = MaterialTheme.colorScheme
                 Column(
                     modifier = Modifier.height(48.dp)
+                        .clip(MaterialTheme.shapes.small)
                         .selectable(selected = active, role = Role.Tab, onClick = { onSelect(domain) })
                         .padding(horizontal = 8.dp)
                         .width(IntrinsicSize.Max),

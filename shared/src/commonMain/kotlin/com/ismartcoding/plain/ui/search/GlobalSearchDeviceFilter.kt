@@ -16,6 +16,7 @@ import androidx.compose.foundation.selection.triStateToggleable
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Text
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.minimumInteractiveComponentSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -59,29 +60,26 @@ internal fun GlobalSearchDeviceFilter(
     var open by remember { mutableStateOf(false) }
     val colors = MaterialTheme.colorScheme
     Row(
-        modifier = Modifier.padding(start = 8.dp).widthIn(max = 144.dp).heightIn(min = 48.dp)
-            .clickable(role = Role.Button) { open = true },
+        modifier = Modifier.padding(start = 8.dp).widthIn(max = 144.dp)
+            .minimumInteractiveComponentSize()
+            .clip(CircleShape).background(colors.primaryContainer)
+            .clickable(role = Role.Button) { open = true }
+            .padding(horizontal = 16.dp, vertical = 8.dp),
+        horizontalArrangement = Arrangement.spacedBy(4.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Row(
-            modifier = Modifier.clip(CircleShape).background(colors.primaryContainer)
-                .padding(horizontal = 16.dp, vertical = 8.dp),
-            horizontalArrangement = Arrangement.spacedBy(4.dp),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            Text(
-                label, Modifier.weight(1f, fill = false),
-                color = colors.primary,
-                style = MaterialTheme.typography.labelLarge,
-                maxLines = 1, overflow = TextOverflow.Ellipsis,
-            )
-            PIcon(
-                modifier = Modifier.size(16.dp),
-                icon = painterResource(UiRes.drawable.chevron_down),
-                contentDescription = null,
-                tint = colors.primary,
-            )
-        }
+        Text(
+            label, Modifier.weight(1f, fill = false),
+            color = colors.primary,
+            style = MaterialTheme.typography.labelLarge,
+            maxLines = 1, overflow = TextOverflow.Ellipsis,
+        )
+        PIcon(
+            modifier = Modifier.size(16.dp),
+            icon = painterResource(UiRes.drawable.chevron_down),
+            contentDescription = null,
+            tint = colors.primary,
+        )
     }
     if (open) {
         SearchDeviceSheet(peers, selected, all, thisDevice, allLabel, { open = false }) {
