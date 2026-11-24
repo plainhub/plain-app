@@ -12,11 +12,11 @@ actual fun getDeviceCapabilities(): List<Capability> = Capability.entries.filter
         Capability.BLE -> isBluetoothSupported()
         Capability.WIFI_AWARE -> isWifiAwareSupported
         Capability.MEDIA_SCAN, Capability.DISK_MANAGER, Capability.HTTP_SERVER -> false
-        Capability.MEDIA_TRASH, Capability.MEDIA_FAVORITE -> Build.VERSION.SDK_INT >= Build.VERSION_CODES.R
+        Capability.MEDIA_FAVORITE -> Build.VERSION.SDK_INT >= Build.VERSION_CODES.R
         Capability.MEDIA_MOVE, Capability.MIRROR_AUDIO -> Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q
         Capability.PACKAGES, Capability.NOTIFICATIONS -> buildChannel != AppChannelType.GOOGLE.name
         Capability.APP_UPDATES -> buildChannel == AppChannelType.GITHUB.name
-        Capability.APP_RELAUNCH, Capability.MEDIA_DELETE,
+        Capability.APP_RELAUNCH, Capability.MEDIA_DELETE, Capability.MEDIA_TRASH,
         Capability.TELEPHONY,
         Capability.SCREEN_MIRROR,
         Capability.CLIPBOARD -> true
