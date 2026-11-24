@@ -45,16 +45,16 @@ import org.jetbrains.compose.resources.stringResource
 @Composable
 internal fun GlobalSearchDeviceFilter(
     peers: List<GlobalSearchPeer>,
+    localDeviceName: String,
     selected: Set<String>,
     onConfirm: (Set<String>) -> Unit,
 ) {
     val local = ContentSource.Local.key
-    val thisDevice = stringResource(Res.string.this_device)
     val allLabel = stringResource(Res.string.search_all_devices)
     val all = searchDeviceIds(peers)
     val label = when {
         selected == all -> allLabel
-        selected.size == 1 -> if (local in selected) thisDevice else peers.first { it.id in selected }.name
+        selected.size == 1 -> if (local in selected) localDeviceName else peers.first { it.id in selected }.name
         else -> stringResource(Res.string.search_selected_device_count, selected.size)
     }
     var open by remember { mutableStateOf(false) }
@@ -82,7 +82,7 @@ internal fun GlobalSearchDeviceFilter(
         )
     }
     if (open) {
-        SearchDeviceSheet(peers, selected, all, thisDevice, allLabel, { open = false }) {
+        SearchDeviceSheet(peers, selected, all, localDeviceName, allLabel, { open = false }) {
             open = false
             onConfirm(it)
         }
@@ -95,7 +95,7 @@ private fun SearchDeviceSheet(
     peers: List<GlobalSearchPeer>,
     selected: Set<String>,
     all: Set<String>,
-    thisDevice: String,
+    localDeviceName: String,
     allLabel: String,
     onDismiss: () -> Unit,
     onConfirm: (Set<String>) -> Unit,
@@ -114,7 +114,7 @@ private fun SearchDeviceSheet(
         PBottomSheetTopAppBar(title = stringResource(Res.string.search_choose_devices))
         SearchDeviceChoice(allLabel, allChecked, onClick = { draft = if (checked == all) emptySet() else all })
         LazyColumn(Modifier.weight(1f, fill = false)) {
-            item { SearchDeviceChoice(thisDevice, ToggleableState(local in checked)) { toggle(local) } }
+            item { SearchDeviceChoice(localDeviceName, ToggleableState(local in checked)) { toggle(local) } }
             items(peers, key = { it.id }) { peer ->
                 SearchDeviceChoice(
                     peer.name,

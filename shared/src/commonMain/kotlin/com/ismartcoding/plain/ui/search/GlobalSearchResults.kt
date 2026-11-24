@@ -51,6 +51,7 @@ import com.ismartcoding.plain.i18n.search
 internal fun SearchResults(
     viewModel: GlobalSearchViewModel,
     domains: List<GlobalSearchDomain>,
+    localDeviceName: String,
     paddingValues: PaddingValues,
     rowContexts: Map<com.ismartcoding.plain.rust.graphql.ContentSource, GlobalSearchRowContext>,
     onOpen: (GlobalSearchHit) -> Unit,
@@ -121,7 +122,7 @@ internal fun SearchResults(
                     if (state.devices.size > 1 || device.device is com.ismartcoding.plain.rust.graphql.ContentSource.Remote) {
                         item(key = "device_${d.name}_${device.device.key}") {
                             Text(
-                                text = if (device.device is com.ismartcoding.plain.rust.graphql.ContentSource.Remote) device.device.info.deviceName else stringResource(Res.string.this_device),
+                                text = if (device.device is com.ismartcoding.plain.rust.graphql.ContentSource.Remote) device.device.info.deviceName else localDeviceName,
                                 style = MaterialTheme.typography.titleSmall,
                                 modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
                             )

@@ -44,6 +44,19 @@ class GlobalSearchControlsTest {
     }
 
     @Test
+    fun searchShowsTheLocalDeviceNameInsteadOfThisDevice() {
+        val page = searchSource("GlobalSearchPage")
+        val picker = searchSource("GlobalSearchDeviceFilter")
+        val results = searchSource("GlobalSearchResults")
+        assertFalse("Res.string.this_device" in picker)
+        assertFalse("Res.string.this_device" in results)
+        assertTrue("Prefs.deviceName.collectAsState()" in page)
+        assertTrue("SearchDeviceChoice(localDeviceName," in picker)
+        assertTrue("if (local in selected) localDeviceName" in picker)
+        assertTrue("else localDeviceName" in results)
+    }
+
+    @Test
     fun emptySearchKeepsItsTopControlsWithoutExtraButtonsOrHistory() {
         val results = searchSource("GlobalSearchResults")
         assertFalse("Res.string.search_in_all_types" in results)

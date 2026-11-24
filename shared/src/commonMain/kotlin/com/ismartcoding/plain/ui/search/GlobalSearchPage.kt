@@ -12,6 +12,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusManager
@@ -22,6 +23,8 @@ import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.platform.SoftwareKeyboardController
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import com.ismartcoding.plain.Prefs
+import com.ismartcoding.plain.platform.system.getDeviceName
 import com.ismartcoding.plain.ui.platform.media.MediaPreviewer
 import com.ismartcoding.plain.platform.media.checkAudioPlaybackPermission
 import com.ismartcoding.plain.ui.base.BottomSpace
@@ -54,6 +57,7 @@ fun GlobalSearchPage(
     val query = viewModel.queryText.value
     val domainScope = viewModel.domain.value
     val searchPeers = viewModel.searchPeers.value
+    val localDeviceName = Prefs.deviceName.collectAsState().value.ifEmpty { getDeviceName() }
 
     LaunchedEffect(viewModel) {
         viewModel.refreshHits()
@@ -132,6 +136,7 @@ fun GlobalSearchPage(
                     {
                         GlobalSearchDeviceFilter(
                             peers = searchPeers,
+                            localDeviceName = localDeviceName,
                             selected = viewModel.selectedSearchDevices.value,
                             onConfirm = viewModel::setSearchDevices,
                         )
@@ -159,6 +164,7 @@ fun GlobalSearchPage(
                 SearchResults(
                     viewModel = viewModel,
                     domains = domains,
+                    localDeviceName = localDeviceName,
                     paddingValues = paddingValues,
                     rowContexts = rowContexts,
                     onOpen = onOpen,
