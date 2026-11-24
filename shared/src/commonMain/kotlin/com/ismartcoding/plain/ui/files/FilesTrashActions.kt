@@ -2,44 +2,16 @@ package com.ismartcoding.plain.ui.files
 
 import androidx.compose.runtime.*
 import com.ismartcoding.plain.i18n.*
-import com.ismartcoding.plain.models.File
-import com.ismartcoding.plain.rust.graphql.*
+import com.ismartcoding.plain.rust.graphql.ContentSource
 import com.ismartcoding.plain.ui.base.BottomActionButtons
 import com.ismartcoding.plain.ui.base.PBottomAppBar
 import com.ismartcoding.plain.ui.base.PIconTextSmallButton
-import com.ismartcoding.plain.ui.components.DialogHelper
 import com.ismartcoding.plain.ui.components.confirmActionAsync
 import com.ismartcoding.plain.ui.resources.Res as UiRes
 import com.ismartcoding.plain.ui.resources.archive_restore
 import com.ismartcoding.plain.ui.resources.delete_forever
-import com.ismartcoding.plain.ui.state.exitSelectMode
 import com.ismartcoding.plain.ui.state.launchSafe
-import kotlinx.coroutines.CancellationException
-import kotlinx.coroutines.flow.merge
 import org.jetbrains.compose.resources.stringResource
-
-@Composable
-internal fun rememberTrashFiles(filesVM: FilesViewModel): State<List<File>?> =
-    produceState<List<File>?>(null, filesVM) {
-        val source = filesVM.source
-        val updates = when (source) {
-            ContentSource.Local -> merge(AppSubscriptions.contentChanged, AppSubscriptions.mediaUpdated)
-            is ContentSource.Remote -> source.client.subscriptionUpdates(listOf(GraphqlOperation("subscription { contentChanged }"), GraphqlOperation("subscription { mediaUpdated { types } }")))
-        }
-        updates.collect { update ->
-            if (update is SubscriptionUpdate.Failed) {
-                DialogHelper.showMessage(update.error)
-            } else {
-                try {
-                    val entries = source.files.trashed()
-                    value = entries
-                    filesVM.selectedIds.retainAll(entries.map { it.path }.toSet())
-                    if (filesVM.selectedIds.isEmpty()) filesVM.exitSelectMode()
-                } catch (canceled: CancellationException) { throw canceled }
-                catch (error: Exception) { DialogHelper.showMessage(error) }
-            }
-        }
-    }
 
 @Composable
 internal fun FilesTrashActions(source: ContentSource, selected: Set<String>) {

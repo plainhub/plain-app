@@ -23,9 +23,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
@@ -47,18 +49,10 @@ import com.ismartcoding.plain.ui.base.PScaffold
 import com.ismartcoding.plain.ui.base.PTopAppBar
 import com.ismartcoding.plain.ui.base.PTopRightButton
 import com.ismartcoding.plain.ui.components.SearchableTopBar
-import com.ismartcoding.plain.ui.base.pullrefresh.PullToRefresh
-import com.ismartcoding.plain.ui.base.pullrefresh.RefreshContentState
-import com.ismartcoding.plain.ui.base.pullrefresh.setRefreshState
-import com.ismartcoding.plain.ui.base.pullrefresh.rememberRefreshLayoutState
 import com.ismartcoding.plain.ui.platform.media.MediaPreviewer
 import com.ismartcoding.plain.ui.media.viewer.previewer.rememberPreviewerState
 import com.ismartcoding.plain.ui.audio.AudioQueueViewModel
-import com.ismartcoding.plain.ui.files.FilesViewModel
 import com.ismartcoding.plain.ui.navigation.PBackHandler
-import com.ismartcoding.plain.ui.files.components.FileRows
-import com.ismartcoding.plain.ui.files.components.FileTrashItem
-import com.ismartcoding.plain.ui.state.select
 import com.ismartcoding.plain.ui.state.exitSearchMode
 import com.ismartcoding.plain.ui.state.enterSearchMode
 import com.ismartcoding.plain.ui.state.exitSelectMode
@@ -85,14 +79,19 @@ fun FilesPage(
     val scope = rememberCoroutineScope()
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
     val drawerState = rememberDrawerState(DrawerValue.Closed)
-    var showTrash by remember(source) { mutableStateOf(false) }
+    var showTrash by rememberSaveable(source) { mutableStateOf(false) }
     val previewerState = rememberPreviewerState()
     val itemsState by filesVM.itemsFlow.collectAsState()
     var systemExpanded by remember(filesVM.selectedPath, filesVM.queryText.value) { mutableStateOf(false) }
     val groupSystem = !showTrash && !(filesVM.showSearchBar.value && filesVM.getQuery().isNotEmpty()) && filesVM.type != FilesType.RECENTS && !ZipBrowserHelper.isZipPath(filesVM.selectedPath)
     val systemFiles = if (groupSystem) itemsState.filter { it.isSystem } else emptyList()
-    val trashFiles = if (showTrash) rememberTrashFiles(filesVM).value else null
-    val regularFiles = if (showTrash) trashFiles.orEmpty() else if (groupSystem) itemsState.filterNot { it.isSystem } else itemsState
+    val canListFiles = filesVM.hasPermission.value || filesVM.source is ContentSource.Local && filesVM.type == FilesType.APP
+    val trash = if (showTrash && canListFiles) rememberFilesTrash(filesVM) else null
+    val regularFiles = when {
+        showTrash -> trash?.files.orEmpty()
+        groupSystem -> itemsState.filterNot { it.isSystem }
+        else -> itemsState
+    }
     val visibleFiles = if (systemExpanded) systemFiles + regularFiles else regularFiles
     var showMoreSheet by remember { mutableStateOf(false) }
     val canBrowse = filesVM.source is ContentSource.Local || filesVM.hasPermission.value
@@ -102,22 +101,17 @@ fun FilesPage(
             drawerState.close()
         }
     }
-    val topRefreshLayoutState = rememberRefreshLayoutState {
-        scope.launch { filesVM.loadAsync(); setRefreshState(RefreshContentState.Finished) }
-    }
-
     FilesPageEffects(filesVM, scope, folderPath, previewerState, audioQueueVM, showTrash)
     if (canBrowse && !showTrash) FilesPageDialogs(filesVM, scope)
+    if (canListFiles) FileInfoBottomSheet(filesVM, showingTrash = showTrash)
 
     if (canBrowse && !showTrash && showMoreSheet) {
         FilesMoreActionsSheet(filesVM = filesVM, onDismiss = { showMoreSheet = false })
     }
 
-    PBackHandler(enabled = showTrash && !drawerState.isOpen) {
-        if (filesVM.selectMode.value) filesVM.exitSelectMode() else {
-            showTrash = false
-            scope.launch { filesVM.loadAsync() }
-        }
+    PBackHandler(enabled = showTrash && !drawerState.isOpen && !filesVM.selectMode.value && !previewerState.visible) {
+        showTrash = false
+        scope.launch { filesVM.loadAsync() }
     }
 
     val drawerFolderTitle = filesVM.currentFolderTitleOverride()
@@ -192,9 +186,12 @@ fun FilesPage(
                         label = stringResource(if (visibleFiles.all { it.id in filesVM.selectedIds }) Res.string.unselect_all else Res.string.select_all),
                         click = {
                             val allSelected = visibleFiles.all { it.id in filesVM.selectedIds }
-                            filesVM.selectedIds.clear()
-                            if (!allSelected) filesVM.selectedIds.addAll(visibleFiles.map { it.id })
-                            else if (showTrash) filesVM.exitSelectMode()
+                            if (allSelected && showTrash) {
+                                filesVM.exitSelectMode()
+                            } else {
+                                filesVM.selectedIds.clear()
+                                if (!allSelected) filesVM.selectedIds.addAll(visibleFiles.map { it.id })
+                            }
                         }); HorizontalSpace(dp = 8.dp)
                 }
             },
@@ -229,36 +226,29 @@ fun FilesPage(
                 .fillMaxSize()
                 .padding(paddingValues)
         ) {
-            if (!filesVM.hasPermission.value && (filesVM.source is com.ismartcoding.plain.rust.graphql.ContentSource.Remote || filesVM.type != FilesType.APP)) {
+            if (!canListFiles) {
                 NeedPermissionColumn(UiRes.drawable.ui_drawable_folder, AppFeatureType.FILES.getPermission()!!)
                 return@Column
             }
-            if (showTrash) {
-                FileRows(regularFiles, loading = trashFiles == null) { file ->
-                    FileTrashItem(file, file.path in filesVM.selectedIds, filesVM.selectMode.value, previewerState) {
-                        filesVM.select(file.path)
-                        filesVM.selectMode.value = filesVM.selectedIds.isNotEmpty()
-                    }
-                }
-                return@Column
-            }
-            if (filesVM.type != FilesType.RECENTS) {
+            if (!showTrash && filesVM.type != FilesType.RECENTS) {
                 BreadcrumbView(
                     breadcrumbs = filesVM.breadcrumbs,
                     selectedIndex = filesVM.selectedBreadcrumbIndex.value,
                     onItemClick = { filesVM.navigateToDirectory(it.path) })
             }
-            PullToRefresh(refreshLayoutState = topRefreshLayoutState) {
+            key(showTrash) {
                 FileListContent(
                     navController = navController,
                     filesVM = filesVM,
                     files = visibleFiles,
                     systemCount = systemFiles.size,
-                    systemExpanded = systemExpanded,
+                    systemExpanded = groupSystem && systemExpanded,
                     onToggleSystem = { systemExpanded = !systemExpanded; filesVM.selectedIds.clear() },
-                    loadFiles = { _, _ -> scope.launch(Dispatchers.Default) { filesVM.loadAsync() } },
                     previewerState = previewerState,
-                    audioQueueVM = audioQueueVM
+                    audioQueueVM = audioQueueVM,
+                    showingTrash = showTrash,
+                    loading = if (showTrash) trash?.files == null else filesVM.isLoading.value,
+                    onRefresh = trash?.let { it::refresh } ?: filesVM::loadAsync,
                 )
             }
         }

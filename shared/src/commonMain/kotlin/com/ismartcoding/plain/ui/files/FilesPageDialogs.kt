@@ -74,6 +74,4 @@ internal fun FilesPageDialogs(
             onCreated = { filesVM.sharesVersion.value++ },
         )
     }
-
-    FileInfoBottomSheet(filesVM = filesVM)
 }

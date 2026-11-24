@@ -123,6 +123,7 @@ fun openFile(
         path = path,
         navController = navController,
         audioQueueVM = audioQueueVM,
+        name = file.name,
         onPreviewMedia = {
             coMain {
                 withIO {

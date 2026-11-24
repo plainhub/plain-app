@@ -11,7 +11,6 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -33,8 +32,6 @@ import com.ismartcoding.plain.ui.base.PSheetHeader
 import com.ismartcoding.plain.ui.base.PSheetHeaderThumb
 import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.components.FileRenameDialog
-import com.ismartcoding.plain.ui.files.FilesViewModel
-import kotlinx.coroutines.launch
 import com.ismartcoding.plain.ui.state.launchSafe
 import com.ismartcoding.plain.ui.resources.Res as UiRes
 import com.ismartcoding.plain.ui.resources.file as ui_drawable_file
@@ -42,23 +39,23 @@ import com.ismartcoding.plain.i18n.file
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun FileInfoBottomSheet(filesVM: FilesViewModel) {
+fun FileInfoBottomSheet(filesVM: FilesViewModel, showingTrash: Boolean) {
     val scope = rememberCoroutineScope()
     val file = filesVM.selectedFile.value ?: return
     // Scoped to this sheet instance: a fresh long-press always starts with the dialog
     // closed, so a stale flag can never pop rename together with the sheet.
     val showRenameDialog = remember { mutableStateOf(false) }
-    val favorites by filesVM.source.favorites.items.collectAsState()
-    val isFavorite = favorites.any { it.fullPath == file.path }
+    val isFavorite = !showingTrash &&
+        filesVM.source.favorites.items.collectAsState().value.any { it.fullPath == file.path }
     val onDismiss = { filesVM.selectedFile.value = null }
 
-    LaunchedEffect(file.path) {
-        if (file.isDir) {
+    if (!showingTrash && file.isDir) {
+        LaunchedEffect(file.path) {
             scope.launchSafe { filesVM.source.favorites.refresh() }
         }
     }
 
-    if (showRenameDialog.value) {
+    if (!showingTrash && showRenameDialog.value) {
         FileRenameDialog(path = file.path, onDismiss = {
             showRenameDialog.value = false
         }, onRename = { p, name -> filesVM.source.files.rename(p, name) }, onRenamed = {
@@ -90,27 +87,30 @@ fun FileInfoBottomSheet(filesVM: FilesViewModel) {
                     )
                     FileInfoPrimaryActions(
                         file = file, filesVM = filesVM, onDismiss = onDismiss,
+                        showingTrash = showingTrash,
                         onShowPasteBar = { filesVM.showPasteBar.value = it },
                     )
                 }
-                VerticalSpace(12.dp)
-                FileInfoSecondaryActions(
-                    file = file, filesVM = filesVM, isFavorite = isFavorite,
-                    onFavoriteToggle = {
-                        scope.launchSafe {
-                            if (isFavorite) {
-                                filesVM.source.favorites.remove(file.path)
-                            } else {
-                                filesVM.source.favorites.add(filesVM.rootPath,file.path)
+                if (!showingTrash) {
+                    VerticalSpace(12.dp)
+                    FileInfoSecondaryActions(
+                        file = file, filesVM = filesVM, isFavorite = isFavorite,
+                        onFavoriteToggle = {
+                            scope.launchSafe {
+                                if (isFavorite) {
+                                    filesVM.source.favorites.remove(file.path)
+                                } else {
+                                    filesVM.source.favorites.add(filesVM.rootPath,file.path)
+                                }
+                                filesVM.favoriteFoldersVersion.value++
                             }
-                            filesVM.favoriteFoldersVersion.value++
-                        }
-                    },
-                    showRenameDialog = showRenameDialog,
-                    scope = scope,
-                    onShowPasteBar = { filesVM.showPasteBar.value = it },
-                    onDismiss = onDismiss,
-                )
+                        },
+                        showRenameDialog = showRenameDialog,
+                        scope = scope,
+                        onShowPasteBar = { filesVM.showPasteBar.value = it },
+                        onDismiss = onDismiss,
+                    )
+                }
                 VerticalSpace(12.dp)
                 PCard(modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN)) {
                     PListItem(title = file.path, action = {

@@ -40,10 +40,6 @@ import com.ismartcoding.plain.ui.base.PDropdownMenuItem
 import com.ismartcoding.plain.ui.components.PIconButton
 import com.ismartcoding.plain.ui.base.PScaffold
 import com.ismartcoding.plain.ui.base.PTopAppBar
-import com.ismartcoding.plain.ui.base.pullrefresh.PullToRefresh
-import com.ismartcoding.plain.ui.base.pullrefresh.RefreshContentState
-import com.ismartcoding.plain.ui.base.pullrefresh.rememberRefreshLayoutState
-import com.ismartcoding.plain.ui.base.pullrefresh.setRefreshState
 import com.ismartcoding.plain.ui.components.CheckCircle
 import com.ismartcoding.plain.ui.components.FileSortDialog
 import com.ismartcoding.plain.ui.media.viewer.previewer.rememberPreviewerState
@@ -71,10 +67,6 @@ fun ZipFilePage(
     val previewerState = rememberPreviewerState()
     val itemsState by filesVM.itemsFlow.collectAsState()
     val showHiddenFiles by Prefs.showHiddenFiles.collectAsState()
-    val topRefreshLayoutState = rememberRefreshLayoutState {
-        scope.launch { filesVM.loadAsync(); setRefreshState(RefreshContentState.Finished) }
-    }
-
     val zipVirtualRoot = remember(path) { ZipBrowserHelper.joinPath(path, "") }
 
     LaunchedEffect(path) {
@@ -163,19 +155,13 @@ fun ZipFilePage(
                 breadcrumbs = filesVM.breadcrumbs,
                 selectedIndex = filesVM.selectedBreadcrumbIndex.value,
                 onItemClick = { filesVM.navigateToDirectory(it.path) })
-            PullToRefresh(refreshLayoutState = topRefreshLayoutState) {
-                FileListContent(
-                    navController = navController,
-                    filesVM = filesVM,
-                    files = itemsState,
-                    systemCount = 0,
-                    systemExpanded = false,
-                    onToggleSystem = {},
-                    loadFiles = { _, _ -> scope.launch(Dispatchers.Default) { filesVM.loadAsync() } },
-                    previewerState = previewerState,
-                    audioQueueVM = audioQueueVM
-                )
-            }
+            FileListContent(
+                navController = navController,
+                filesVM = filesVM,
+                files = itemsState,
+                previewerState = previewerState,
+                audioQueueVM = audioQueueVM,
+            )
         }
     }
     MediaPreviewer(state = previewerState)

@@ -5,6 +5,7 @@ import android.graphics.Bitmap
 import android.os.Build
 import android.os.Bundle
 import android.os.SystemClock
+import android.view.KeyEvent
 import android.view.accessibility.AccessibilityNodeInfo
 import androidx.test.core.app.ActivityScenario
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -24,6 +25,8 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.junit.runner.RunWith
+import com.ismartcoding.plain.ui.resources.Res as UiRes
+import com.ismartcoding.plain.ui.resources.srl_header_last_refresh_just_now
 
 @RunWith(AndroidJUnit4::class)
 class FileUiWorkflowTest {
@@ -42,14 +45,13 @@ class FileUiWorkflowTest {
         try {
             ActivityScenario.launch(MainActivity::class.java).use {
                 try {
-                    click(getString(Res.string.onboarding_skip))
+                    dismissOnboarding()
                     assertTrue(root.mkdirs())
                     created = true
                     FavoriteFoldersClient.add(getInternalStoragePath(), root.path)
                     favoriteAdded = true
                     FavoriteFoldersClient.rename(root.path, alias)
-                    click(getString(Res.string.tools))
-                    click(getString(Res.string.files))
+                    openFiles()
                     click(getString(Res.string.folders))
                     click(alias)
                     click(getString(Res.string.more))
@@ -92,17 +94,13 @@ class FileUiWorkflowTest {
         val files = listOf("single", "first", "second").map { File(root, "$it-${root.name.take(8)}.txt") }
         try {
             ActivityScenario.launch(MainActivity::class.java).use {
-                val tools = getString(Res.string.tools)
-                val skip = getString(Res.string.onboarding_skip)
-                val entry = awaitNode { it.isVisibleToUser && (it.hasLabel(tools) || it.hasLabel(skip)) }
-                if (entry.hasLabel(skip)) click(skip)
+                dismissOnboarding()
                 assertTrue(root.mkdirs())
                 files.forEach { it.writeText(it.name) }
                 scanFileTaskPaths(files.map { it.path })
                 FavoriteFoldersClient.add(storage, root.path)
                 FavoriteFoldersClient.rename(root.path, alias)
-                click(tools)
-                click(getString(Res.string.files))
+                openFiles()
                 click(getString(Res.string.folders))
                 click(alias)
 
@@ -117,6 +115,47 @@ class FileUiWorkflowTest {
                 click(getString(Res.string.folders))
                 click(getString(Res.string.trash))
                 files.forEach { file -> awaitNode { it.isVisibleToUser && it.text?.toString() == file.name } }
+
+                val trashedPath = FilesClient.trashed().single { it.name == files[0].name }.path
+                val folders = getString(Res.string.folders)
+                click(files[0].name, longPress = true)
+                awaitNode("trash file details") { it.isVisibleToUser && it.hasLabel(trashedPath) }
+                instrumentation.sendKeyDownUpSync(KeyEvent.KEYCODE_BACK)
+                awaitNode { it.isVisibleToUser && it.hasLabel(folders) }
+
+                click(files[0].name)
+                val wrapContent = getString(Res.string.wrap_content)
+                awaitNode("text preview") { it.isVisibleToUser && it.hasLabel(wrapContent) }
+                instrumentation.sendKeyDownUpSync(KeyEvent.KEYCODE_BACK)
+                awaitNode { it.isVisibleToUser && it.hasLabel(folders) }
+                awaitNode { it.isVisibleToUser && it.hasLabel(files[0].name) }
+
+                pullToRefresh()
+
+                click(files[1].name, longPress = true)
+                val select = getString(Res.string.select)
+                click(select)
+                click(files[2].name)
+                val selected = getString(Res.string.x_selected, 2)
+                awaitNode { it.isVisibleToUser && it.hasLabel(selected) }
+                click(getString(Res.string.restore))
+                awaitNode { it.isVisibleToUser && it.hasLabel(folders) }
+                assertTrue(files.drop(1).all { it.exists() })
+                assertTrue(!files[0].exists())
+
+                click(files[0].name, longPress = true)
+                click(select)
+                click(getString(Res.string.delete))
+                click(getString(Res.string.confirm))
+                val noData = getString(Res.string.no_data)
+                awaitNode { it.isVisibleToUser && it.hasLabel(noData) }
+                assertTrue(FilesClient.trashed().none { entry -> files.any { it.name == entry.name } })
+
+                instrumentation.sendKeyDownUpSync(KeyEvent.KEYCODE_BACK)
+                click(folders)
+                click(getString(Res.string.trash))
+                awaitNode { it.isVisibleToUser && it.hasLabel(noData) }
+                pullToRefresh()
             }
         } finally {
             if (root.exists()) {
@@ -126,6 +165,33 @@ class FileUiWorkflowTest {
                 if (trashedPaths.isNotEmpty()) FilesClient.restore(trashedPaths)
                 assertTrue(root.deleteRecursively())
             }
+        }
+    }
+
+    private suspend fun dismissOnboarding() {
+        val tools = getString(Res.string.tools)
+        val skip = getString(Res.string.onboarding_skip)
+        val entry = awaitNode { it.isVisibleToUser && (it.hasLabel(tools) || it.hasLabel(skip)) }
+        if (entry.hasLabel(skip)) click(skip)
+    }
+
+    private suspend fun openFiles() {
+        val files = getString(Res.string.files)
+        val filesTile = instrumentation.uiAutomation.rootInActiveWindow?.let { root ->
+            find(root) { it.isVisibleToUser && it.hasLabel(files) }
+        }
+        if (filesTile == null) click(getString(Res.string.tools))
+        click(files)
+    }
+
+    private suspend fun pullToRefresh() {
+        val display = instrumentation.targetContext.resources.displayMetrics
+        val x = display.widthPixels / 2
+        val refreshed = getString(UiRes.string.srl_header_last_refresh_just_now)
+        instrumentation.uiAutomation.executeShellCommand(
+            "input swipe $x ${display.heightPixels / 4} $x ${display.heightPixels * 3 / 4} 600",
+        ).use {
+            awaitNode("completed pull to refresh") { it.isVisibleToUser && it.hasLabel(refreshed) }
         }
     }
 
@@ -144,29 +210,29 @@ class FileUiWorkflowTest {
 
     private fun click(label: String, longPress: Boolean = false) {
         instrumentation.uiAutomation.waitForIdle(300, 5000)
-        var node = awaitNode { it.isVisibleToUser && it.isEnabled && it.hasLabel(label) }
-        repeat(16) {
-            if (if (longPress) node.isLongClickable else node.isClickable) {
-                assertTrue("Control is not visible: $label", node.isVisibleToUser)
-                val action = if (longPress) AccessibilityNodeInfo.ACTION_LONG_CLICK else AccessibilityNodeInfo.ACTION_CLICK
-                assertTrue("Click failed: $label", node.performAction(action))
-                return
+        var control: AccessibilityNodeInfo? = null
+        awaitNode("clickable $label") { node ->
+            if (!node.isVisibleToUser || !node.isEnabled || !node.hasLabel(label)) return@awaitNode false
+            control = generateSequence(node) { it.parent }.take(16).firstOrNull {
+                val supportsAction = if (longPress) it.isLongClickable else it.isClickable
+                it.isVisibleToUser && it.isEnabled && supportsAction
             }
-            node = checkNotNull(node.parent) { "Control has no clickable parent: $label" }
+            control != null
         }
-        error("Control parent limit reached: $label")
+        val action = if (longPress) AccessibilityNodeInfo.ACTION_LONG_CLICK else AccessibilityNodeInfo.ACTION_CLICK
+        assertTrue("Click failed: $label", checkNotNull(control).performAction(action))
     }
 
     private fun AccessibilityNodeInfo.hasLabel(label: String) = text?.toString() == label || contentDescription?.toString() == label
 
-    private fun awaitNode(predicate: (AccessibilityNodeInfo) -> Boolean): AccessibilityNodeInfo {
+    private fun awaitNode(description: String = "UI control", predicate: (AccessibilityNodeInfo) -> Boolean): AccessibilityNodeInfo {
         repeat(300) {
             instrumentation.uiAutomation.rootInActiveWindow?.let { root ->
                 find(root, predicate)?.let { return it }
             }
             SystemClock.sleep(100)
         }
-        error("Expected UI control did not become available")
+        error("Expected $description did not become available")
     }
 
     private fun find(node: AccessibilityNodeInfo, predicate: (AccessibilityNodeInfo) -> Boolean): AccessibilityNodeInfo? {

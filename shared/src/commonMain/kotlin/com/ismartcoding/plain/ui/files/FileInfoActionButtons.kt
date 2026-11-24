@@ -42,6 +42,7 @@ internal fun FileInfoPrimaryActions(
     file: FileEntry,
     filesVM: FilesViewModel,
     onDismiss: () -> Unit,
+    showingTrash: Boolean,
     onShowPasteBar: (Boolean) -> Unit,
 ) {
     val scope = rememberCoroutineScope()
@@ -53,6 +54,7 @@ internal fun FileInfoPrimaryActions(
                 onDismiss()
             }
         }
+        if (showingTrash) return@PSheetPrimaryActionsRow
         PSheetPrimaryAction(UiRes.drawable.ui_drawable_share_2, stringResource(Res.string.share)) {
             scope.launchSafe {
                 val path = filesVM.source.fileForOpen(file.path, file.name)
