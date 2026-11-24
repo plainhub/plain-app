@@ -35,6 +35,15 @@ class GlobalSearchControlsTest {
     }
 
     @Test
+    fun selectedTabUnderlineFollowsTheTextInsteadOfTheTapArea() {
+        val tabs = searchSource("GlobalSearchTabs")
+        assertTrue("Modifier.minimumInteractiveComponentSize()" in tabs, "Keep the full tab touch target")
+        assertTrue("modifier = Modifier.padding(vertical = 8.dp)" in tabs, "Use the same label padding as the device pill")
+        assertTrue(".align(Alignment.BottomCenter).padding(bottom = 2.dp)" in tabs, "Keep the underline within the label padding")
+        assertFalse("Modifier.weight(1f).wrapContentHeight()" in tabs, "Do not stretch the label to push the underline to the bottom")
+    }
+
+    @Test
     fun emptySearchKeepsItsTopControlsWithoutExtraButtonsOrHistory() {
         val results = searchSource("GlobalSearchResults")
         assertFalse("Res.string.search_in_all_types" in results)
