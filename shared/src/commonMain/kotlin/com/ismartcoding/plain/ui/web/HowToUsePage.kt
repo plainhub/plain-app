@@ -34,16 +34,16 @@ fun HowToUsePage(navController: NavHostController, webVM: DesktopAccessSettingsV
         PTopAppBar(onNavigateBack = { navController.navigateUp() }, title = stringResource(Res.string.how_to_use))
     }) { insets ->
         Column(Modifier.padding(insets).verticalScroll(rememberScrollState())
-            .padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN, vertical = 16.dp)) {
+            .padding(vertical = 16.dp)) {
             PSectionTitle(stringResource(Res.string.guide_connect))
-            PCard {
+            PCard(modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN)) {
                 StepItem(1, stringResource(Res.string.step_connect_network_title), stringResource(Res.string.step_connect_network_desc))
                 StepItem(2, stringResource(Res.string.guide_enable), stringResource(Res.string.guide_enable_desc))
                 StepItem(3, stringResource(Res.string.step_open_url_title), stringResource(Res.string.guide_address_desc))
             }
             VerticalSpace(16.dp)
             PSectionTitle(stringResource(Res.string.troubleshooting))
-            PCard {
+            PCard(modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN)) {
                 GuideQuestion(Res.string.faq_cannot_open_q, Res.string.guide_unreachable) {
                     PTextButton(stringResource(Res.string.run_diagnostics), onClick = webVM::checkHttpServerHealth)
                 }
@@ -58,7 +58,10 @@ fun HowToUsePage(navController: NavHostController, webVM: DesktopAccessSettingsV
                 GuideQuestion(Res.string.guide_missing_feature, Res.string.guide_permissions)
             }
             VerticalSpace(8.dp)
-            FlowRow(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+            FlowRow(
+                Modifier.fillMaxWidth().padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN),
+                horizontalArrangement = Arrangement.SpaceBetween,
+            ) {
                 PTextButton(stringResource(Res.string.onboarding_replay), onClick = { navController.navigate(Routing.Onboarding) })
                 PTextButton(stringResource(Res.string.more_help), onClick = { WebHelper.open(TROUBLESHOOTING_GUIDE_URL) })
             }
