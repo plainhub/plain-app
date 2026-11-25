@@ -34,9 +34,10 @@ class ClientContractModelsTest {
     @Test
     fun nearby_devices_decode_every_supported_discovery_method() {
         val device = JsonHelper.jsonDecode<NearbyDevice>(
-            """{"id":"device","signaturePublicKey":"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=","name":"Device","port":8080,"deviceType":"PHONE","version":"1","platform":"android","lastSeen":"2026-01-01T00:00:00Z","status":"UNPAIRED","discoveryMethods":["LAN","BLE","QR"]}""",
+            """{"id":"device","signaturePublicKey":"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=","name":"Device","port":8080,"remoteAccess":true,"deviceType":"PHONE","version":"1","platform":"android","lastSeen":"2026-01-01T00:00:00Z","status":"UNPAIRED","discoveryMethods":["LAN","BLE","QR"]}""",
         )
         assertEquals(DeviceType.PHONE, device.deviceType)
+        assertEquals(true, device.remoteAccess)
         assertEquals(Instant.parse("2026-01-01T00:00:00Z"), device.lastSeen)
         assertEquals(PeerStatus.UNPAIRED, device.status)
         assertEquals(
@@ -49,14 +50,14 @@ class ClientContractModelsTest {
     fun nearby_discovery_methods_reject_unknown_values() {
         assertFailsWith<SerializationException> {
             JsonHelper.jsonDecode<NearbyDevice>(
-                """{"id":"device","signaturePublicKey":"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=","name":"Device","port":8080,"deviceType":"OTHER","version":"1","platform":"platform","lastSeen":"2026-01-01T00:00:00Z","status":"UNPAIRED","discoveryMethods":["FUTURE_METHOD"]}""",
+                """{"id":"device","signaturePublicKey":"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=","name":"Device","port":8080,"remoteAccess":false,"deviceType":"OTHER","version":"1","platform":"platform","lastSeen":"2026-01-01T00:00:00Z","status":"UNPAIRED","discoveryMethods":["FUTURE_METHOD"]}""",
             )
         }
     }
 
     @Test
     fun nearby_device_types_use_the_enum_contract() {
-        val payload = """{"id":"device","signaturePublicKey":"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=","name":"Device","port":8080,"deviceType":"%s","version":"1","platform":"platform","lastSeen":"2026-01-01T00:00:00Z","status":"UNPAIRED"}"""
+        val payload = """{"id":"device","signaturePublicKey":"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=","name":"Device","port":8080,"remoteAccess":false,"deviceType":"%s","version":"1","platform":"platform","lastSeen":"2026-01-01T00:00:00Z","status":"UNPAIRED"}"""
         for (type in DeviceType.entries) {
             val device = JsonHelper.jsonDecode<NearbyDevice>(payload.replace("%s", type.name))
             assertEquals(type, device.deviceType)
@@ -64,6 +65,9 @@ class ClientContractModelsTest {
         }
         assertFailsWith<SerializationException> {
             JsonHelper.jsonDecode<NearbyDevice>(payload.replace("%s", "FUTURE_DEVICE"))
+        }
+        assertFailsWith<SerializationException> {
+            JsonHelper.jsonDecode<NearbyDevice>(payload.replace("%s", "PHONE").replace(""""remoteAccess":false,""", ""))
         }
     }
 

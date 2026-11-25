@@ -2015,7 +2015,7 @@ class ManagedDeviceUiAcceptanceTest {
     @Test
     fun unpairRequiresConfirmationAndPreservesChatHistory() = runBlocking {
         val device = com.ismartcoding.plain.models.NearbyDevice(
-            id = "unpair-confirmation-${UUID.randomUUID()}", name = "Confirmation device", port = 8443,
+            id = "unpair-confirmation-${UUID.randomUUID()}", name = "Confirmation device", port = 8443, remoteAccess = true,
             signaturePublicKey = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=",
             deviceType = com.ismartcoding.plain.platform.system.DeviceType.PHONE,
             version = "4.0.0", platform = "Android", lastSeen = kotlin.time.Instant.fromEpochMilliseconds(0),

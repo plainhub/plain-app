@@ -188,7 +188,7 @@ class SharedComponentSpacingTest {
 
     @Test
     fun pairingAnotherDevicePreservesTheFirstRequestAndKeepsCodesOutOfRows() {
-        val first = NearbyDevice("pair-first", "First phone", "", port = 0, deviceType = DeviceType.PHONE,
+        val first = NearbyDevice("pair-first", "First phone", "", port = 0, remoteAccess = false, deviceType = DeviceType.PHONE,
             version = "", platform = "", lastSeen = Instant.fromEpochMilliseconds(0), status = PeerStatus.PAIRED)
         val second = first.copy(id = "pair-second", name = "Second phone")
         val selected = mutableStateOf<NearbyDevice?>(first)

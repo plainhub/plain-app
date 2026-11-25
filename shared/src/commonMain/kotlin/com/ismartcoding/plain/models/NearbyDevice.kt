@@ -13,7 +13,7 @@ data class NearbyDevice(
     val signaturePublicKey: String,
     val ips: List<String> = emptyList(),
     val port: Int,
-    val remoteAccess: Boolean? = null,
+    val remoteAccess: Boolean,
     val deviceType: DeviceType,
     val version: String,
     val platform: String,
