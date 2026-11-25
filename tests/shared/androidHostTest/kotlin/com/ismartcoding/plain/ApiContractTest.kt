@@ -98,10 +98,10 @@ class ApiContractTest {
         val queries = operationFieldNamesIn("Query")
         val mutations = operationFieldNamesIn("Mutation")
         val subscriptions = operationFieldNamesIn("Subscription")
-        if (queries.size != 125 || mutations.size != 179 || subscriptions.size != 36) {
+        if (queries.size != 125 || mutations.size != 179 || subscriptions.size != 37) {
             fail(
                 "Shared Rust schema fragments declare ${queries.size} Query / ${mutations.size} " +
-                    "Mutation and ${subscriptions.size} Subscription operations — the contract has 125 / 179 / 36. The snapshot looks truncated or " +
+                    "Mutation and ${subscriptions.size} Subscription operations — the contract has 125 / 179 / 37. The snapshot looks truncated or " +
                     "drifted; every check in this class reads it, so they would pass on an empty file.",
             )
         }
@@ -109,10 +109,11 @@ class ApiContractTest {
 
     @Test
     fun hostCallbacksAreNotExposedAsSubscriptions() {
+        val declarations = operationFieldDeclarationsIn("Subscription")
+        assertTrue("httpServerChanged: HttpServer!" in declarations)
+        assertTrue("clipboardHistoryChanged: Boolean!" in declarations)
         val subscriptions = operationFieldNamesIn("Subscription")
-        // The Web snapshot is an intentional public subscription, unlike the native callbacks below.
-        assertTrue("httpServerChanged: HttpServer!" in operationFieldDeclarationsIn("Subscription"))
-        for (name in listOf("networkChanged", "audioLibraryChanged", "clipboardHistoryChanged",
+        for (name in listOf("networkChanged", "audioLibraryChanged",
             "onlineClientsUpdated", "peerClipboardChanged",
             "sharedFolderDownloadsChanged", "dlnaRendererChanged", "dlnaSenderUpdated",
             "peerTransportsUpdated", "appUpdateDownloadUpdated", "feedSyncUpdated",
