@@ -2,8 +2,6 @@ package com.ismartcoding.plain.features.contacts
 
 import kotlinx.serialization.Serializable
 
-import com.ismartcoding.plain.lib.ID
-
 @Serializable
 data class ContactInput(
     var prefix: String,
@@ -19,7 +17,6 @@ data class ContactInput(
     var source: String,
     var starred: Boolean,
     var notes: String,
-    var groupIds: List<ID>,
     var organization: ContactOrganizationInput?,
     var websites: List<ContactWebsiteInput>,
     var ims: List<ContactImInput>,

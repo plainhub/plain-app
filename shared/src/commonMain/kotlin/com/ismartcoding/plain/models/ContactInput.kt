@@ -17,7 +17,6 @@ data class ContactInput(
     var source: String,
     var starred: Boolean,
     var notes: String,
-    var groupIds: List<String>,
     var organization: ContactOrganizationInput?,
     var websites: List<ContactWebsiteInput>,
     var ims: List<ContactImInput>,

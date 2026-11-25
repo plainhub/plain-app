@@ -119,11 +119,6 @@ object ContactMediaStoreHelper {
             operations.addAll(contact.websites.map { ContactDataHelper.newInsert(id, type, it) })
         }
 
-        ContactsContract.CommonDataKinds.GroupMembership.CONTENT_ITEM_TYPE.let { type ->
-            operations.add(ContactDataHelper.newDelete(id, type))
-            operations.addAll(contact.groupIds.map { ContactDataHelper.newInsert(id, type, it.value) })
-        }
-
 //            val uri = Uri.withAppendedPath(ContactsContract.Contacts.CONTENT_URI, contact.contactId.toString())
 //            val contentValues = ContentValues(2)
 //            contentValues.put(ContactsContract.Contacts.STARRED, contact.starred)
@@ -190,10 +185,6 @@ object ContactMediaStoreHelper {
 
         ContactsContract.CommonDataKinds.Website.CONTENT_ITEM_TYPE.let { type ->
             operations.addAll(contact.websites.map { ContactDataHelper.newInsert(id, type, it) })
-        }
-
-        ContactsContract.CommonDataKinds.GroupMembership.CONTENT_ITEM_TYPE.let { type ->
-            operations.addAll(contact.groupIds.map { ContactDataHelper.newInsert(id, type, it.value) })
         }
 
         val results = context.contentResolver.applyBatch(ContactsContract.AUTHORITY, operations)

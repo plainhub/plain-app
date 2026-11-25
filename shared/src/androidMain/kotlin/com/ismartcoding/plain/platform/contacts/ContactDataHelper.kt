@@ -140,10 +140,6 @@ internal object ContactDataHelper {
                 ContactsContract.CommonDataKinds.Nickname.CONTENT_ITEM_TYPE -> {
                     withValue(ContactsContract.CommonDataKinds.Nickname.NAME, value)
                 }
-
-                ContactsContract.CommonDataKinds.GroupMembership.CONTENT_ITEM_TYPE -> {
-                    withValue(ContactsContract.CommonDataKinds.GroupMembership.GROUP_ROW_ID, value)
-                }
             }
         }
         return o.build()
