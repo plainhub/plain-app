@@ -65,7 +65,6 @@ class ApiContractTest {
         // Each entry must be justified in the API contract ("deliberate exceptions").
         "photoId", // Android RawContact photo row id (Contact, Android-only feature)
         "thumbnailId",
-        "rawId", // FeedEntry.rawId — upstream RSS guid, foreign identifier
         "requestId", // sendSms request id — idempotency key, not an entity id
         "subscriptionId", // Android SIM subscription integer (slot index), not an entity id
         "diskId", // StorageMount.diskId — OS disk uuid, foreign identifier (empty on Android)
@@ -171,7 +170,7 @@ class ApiContractTest {
             val isIdName = isIdName(name)
             if (!isIdName) return@forEachOperationArgument
             val usesIdScalar = type.startsWith("ID") || type.startsWith("[ID")
-            if (!usesIdScalar && name !in stringIdAllowlist && name != "ids") { // deleteDbTableRows(ids): raw table PKs, debug-only
+            if (!usesIdScalar && name !in stringIdAllowlist) {
                 fail("Argument $op($name:) is typed '$type' — id-suffixed arguments must use the ID scalar (spec §IDs).")
             }
         }

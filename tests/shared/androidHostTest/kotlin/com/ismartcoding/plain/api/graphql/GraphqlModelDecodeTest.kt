@@ -19,6 +19,12 @@ import kotlin.test.assertNull
 import kotlin.time.Instant
 
 class GraphqlModelDecodeTest {
+    @Test
+    fun ungroupedBookmarkDecodesWithNullGroup() {
+        val fixture = """{"id":"b","url":"https://example.invalid","title":"b","faviconPath":"","groupId":null,"pinned":false,"clickCount":0,"lastClickedAt":null,"sortOrder":0,"createdAt":"2026-01-01T00:00:00Z","updatedAt":"2026-01-01T00:00:00Z"}"""
+        assertNull(JsonHelper.jsonDecode<Bookmark>(fixture).groupId)
+    }
+
     private val chat = """{"id":"chat-1","fromId":"me","toId":"peer-1","channelId":null,"content":{"__typename":"ChatMessageContent","text":"hello 中文","format":"PLAIN","items":[],"linkPreviews":[]},"status":"SENT","deliveryResults":[],"createdAt":"2026-10-12T00:00:00Z","updatedAt":"2026-10-12T01:00:00Z"}"""
 
     @Test

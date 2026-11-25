@@ -11,7 +11,7 @@ import kotlin.test.assertTrue
  *
  * Test vectors are the official NIST FIPS 180-4 SHA-256 examples plus a few
  * edge cases that matter for the pairing/feed code paths:
- *  - empty input (used when computing the rawId of a degenerate feed entry)
+ *  - empty input
  *  - multi-block input (> 56 bytes, exercises the two-block padding path)
  *  - non-ASCII UTF-8 input
  */

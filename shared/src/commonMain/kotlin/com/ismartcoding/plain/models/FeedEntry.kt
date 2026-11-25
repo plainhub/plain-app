@@ -16,7 +16,6 @@ data class FeedEntry(
     @Required var description: String = "",
     @Required var author: String = "",
     @Required var content: String = "",
-    @Required var rawId: String = "",
     @Required var read: Boolean = false,
     @Required var publishedAt: Instant = TimeHelper.now(),
     @Required var createdAt: Instant = TimeHelper.now(),

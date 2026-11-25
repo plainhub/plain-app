@@ -12,7 +12,7 @@ data class Bookmark(
     @Required var url: String = "",
     @Required var title: String = "",
     @Required var faviconPath: String = "",
-    @Required var groupId: String = "",
+    @Required var groupId: String? = null,
     @Required var pinned: Boolean = false,
     @Required var clickCount: Int = 0,
     @Required var lastClickedAt: Instant? = null,
