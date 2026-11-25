@@ -15,6 +15,7 @@ import com.ismartcoding.plain.models.SelectedMediaPath
 import com.ismartcoding.plain.features.chat.models.MessageShare
 import com.ismartcoding.plain.features.files.FileSortBy
 import com.ismartcoding.plain.models.MediaSortBy
+import com.ismartcoding.plain.features.chat.ChatSortBy
 import com.ismartcoding.plain.features.nearby.NearbyDiscoverySnapshot
 import com.ismartcoding.plain.features.nearby.MdnsSnapshot
 import com.ismartcoding.plain.features.sessions.SessionFacts
@@ -86,10 +87,10 @@ object Query {
         field = "chatCount",
     )
 
-    fun chatRecords(query: String, offset: Int, limit: Int): GraphqlRequest<List<ChatItem>> = GraphqlRequest(
-        $$"query($query: String!, $offset: Int!, $limit: Int!) { chatRecords(query: $query, offset: $offset, limit: $limit) { $${Fragments.CHAT_ITEM} } }",
-        mapOf(variable("query", query), variable("offset", offset), variable("limit", limit)),
-        field = "chatRecords",
+    fun chatItems(query: String, offset: Int, limit: Int, sortBy: ChatSortBy): GraphqlRequest<List<ChatItem>> = GraphqlRequest(
+        $$"query($query: String!, $offset: Int!, $limit: Int!, $sortBy: ChatSortBy!) { chatItems(query: $query, offset: $offset, limit: $limit, sortBy: $sortBy) { $${Fragments.CHAT_ITEM} } }",
+        mapOf(variable("query", query), variable("offset", offset), variable("limit", limit), variable("sortBy", sortBy.name)),
+        field = "chatItems",
     )
 
     fun chatItem(id: String): GraphqlRequest<ChatItem?> = GraphqlRequest(

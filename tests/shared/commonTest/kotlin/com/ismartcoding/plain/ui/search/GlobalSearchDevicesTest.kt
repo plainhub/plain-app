@@ -321,6 +321,34 @@ class GlobalSearchDevicesTest {
         assertSame(source, hit.device)
     }
 
+    @Test
+    fun chat_search_loads_two_pages_in_the_requested_order_without_duplicates() = runTest {
+        val device = Device("first", 0)
+        val now = Instant.parse("2026-01-01T00:00:00Z")
+        device.chats = (25 downTo 1).map { index ->
+            com.ismartcoding.plain.models.ChatItem(
+                id = "message-$index", fromId = "first", toId = "me",
+                status = com.ismartcoding.plain.features.chat.ChatStatus.SENT,
+                content = com.ismartcoding.plain.models.ChatContent.Message("needle $index", com.ismartcoding.plain.features.chat.models.ChatTextFormat.PLAIN, emptyList(), emptyList()),
+                createdAt = now, updatedAt = now,
+            )
+        }
+        val vm = model { GlobalSearchDevices(listOf(device.source())) }
+        vm.domain.value = GlobalSearchDomain.CHAT
+        vm.search()
+        advanceUntilIdle()
+        val state = vm.domainStates.getValue(GlobalSearchDomain.CHAT)
+        val expected = (25 downTo 1).map { "needle $it" }
+        assertEquals(expected.take(20), state.hits.value.map { it.snippet })
+        vm.loadMore(GlobalSearchDomain.CHAT)
+        advanceUntilIdle()
+        assertEquals(expected, state.hits.value.map { it.snippet })
+        assertEquals(25, state.hits.value.map { it.key }.toSet().size)
+        val pages = device.requests.filter { "chatItems(" in it.query }
+        assertEquals(listOf(0, 20), pages.map { it.variables.getValue("offset").jsonPrimitive.int })
+        assertTrue(pages.all { it.variables.getValue("sortBy").jsonPrimitive.content == "NEWEST_FIRST" })
+    }
+
     private class Device(val name: String, count: Int) {
         private val now = Instant.parse("2026-01-01T00:00:00Z")
         var rows = (0 until count).map { Note("row-$it", "$name $it", "$name needle $it", null, now, now) }
@@ -355,7 +383,7 @@ class GlobalSearchDevicesTest {
                         failure?.let { throw BusinessException(it) }
                         val offset = operation.variables["offset"]?.jsonPrimitive?.int ?: 0
                         val limit = operation.variables["limit"]?.jsonPrimitive?.int ?: rows.size
-                        if ("chatRecords(" in operation.query || "chatCount(" in operation.query || "peers {" in operation.query) {
+                        if ("chatItems(" in operation.query || "chatCount(" in operation.query || "peers {" in operation.query) {
                             JsonHelper.jsonEncodeToElement(ChatData(chats.size, chats.drop(offset).take(limit), listOf(peer)))
                         } else JsonHelper.jsonEncodeToElement(NotesData(rows.size, rows.drop(offset).take(limit), rows.firstOrNull { it.id == operation.variables["id"]?.jsonPrimitive?.content }))
                     }
@@ -366,7 +394,7 @@ class GlobalSearchDevicesTest {
         }
     }
 
-    @Serializable private data class ChatData(val chatCount: Int, val chatRecords: List<com.ismartcoding.plain.models.ChatItem>, val peers: List<Peer>)
+    @Serializable private data class ChatData(val chatCount: Int, val chatItems: List<com.ismartcoding.plain.models.ChatItem>, val peers: List<Peer>)
     @Serializable private data class AppData(val app: ManagedDeviceInfo)
     @Serializable private data class NotesData(val noteCount: Int, val notes: List<Note>, val note: Note?)
 }

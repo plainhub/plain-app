@@ -12,6 +12,7 @@ import com.ismartcoding.plain.features.chat.data.ChatTarget
 import com.ismartcoding.plain.features.chat.models.ChatMessage
 import com.ismartcoding.plain.features.chat.models.MessageShare
 import com.ismartcoding.plain.features.chat.ChatStatus
+import com.ismartcoding.plain.features.chat.ChatSortBy
 import com.ismartcoding.plain.features.shares.SharesClient
 import com.ismartcoding.plain.models.ChatItem
 import com.ismartcoding.plain.features.files.stored.AppFileStore
@@ -32,6 +33,33 @@ import com.ismartcoding.plain.Prefs
 
 @RunWith(AndroidJUnit4::class)
 class ChatServiceRustHttpTest {
+    @Test
+    fun chatItemsReturnsTwoDistinctPagesOnAndroid() = runBlocking {
+        val marker = "synthetic-chat-pages-${UUID.randomUUID()}"
+        val target = ChatTarget.parseId("peer:local")
+        val sent = mutableListOf<ChatItem>()
+        try {
+            repeat(5) { index -> sent += ChatClient.sendText(target, "$marker $index") }
+            val expected = sent.sortedWith(compareBy<ChatItem> { it.createdAt }.thenBy { it.id }).map { it.id }
+            for ((sortBy, order) in listOf(
+                ChatSortBy.OLDEST_FIRST to expected,
+                ChatSortBy.NEWEST_FIRST to expected.reversed(),
+            )) {
+                val first = RustChatStore.page(peer = "local", text = marker, offset = 0, limit = 3, sortBy = sortBy)
+                val second = RustChatStore.page(peer = "local", text = marker, offset = 3, limit = 3, sortBy = sortBy)
+                assertEquals(order.take(3), first.map { it.id })
+                assertEquals(order.drop(3), second.map { it.id })
+            }
+            val searchFirst = RustChatStore.search(marker, offset = 0, limit = 3)
+            val searchSecond = RustChatStore.search(marker, offset = 3, limit = 3)
+            assertEquals(expected.reversed().take(3), searchFirst.map { it.id })
+            assertEquals(expected.reversed().drop(3), searchSecond.map { it.id })
+            assertEquals(5, RustChatStore.count(marker))
+        } finally {
+            for (row in sent) ChatClient.deleteOne(row.id)
+        }
+    }
+
     @Test
     fun pageShareForwardAndFolderUseNativeGraphqlWithActualOsSources() = runBlocking {
         val marker = "synthetic-chat-service-${UUID.randomUUID()}"
@@ -66,7 +94,7 @@ class ChatServiceRustHttpTest {
             assertEquals(200, status)
             assertArrayEquals(source.readBytes(), body)
             ChatClient.deleteOne(picked.first().id)
-            val page = GraphqlApi.execute(GraphqlRequest<JsonObject>("query { " + """chatItems(target: "peer:local", offset: 0, limit: 20, query: "text:$marker") { id }""" + " }"))["chatItems"]!!.jsonArray
+            val page = GraphqlApi.execute(GraphqlRequest<JsonObject>("query { " + """chatItems(sortBy: NEWEST_FIRST, offset: 0, limit: 20, query: "peer:local text:$marker") { id }""" + " }"))["chatItems"]!!.jsonArray
             assertTrue("the sent message must appear in the contract page, got $page", page.any { it.jsonObject["id"]!!.jsonPrimitive.content == forward.id })
             val image = File(root, "$marker.png")
             val bitmap = Bitmap.createBitmap(7, 5, Bitmap.Config.ARGB_8888)
