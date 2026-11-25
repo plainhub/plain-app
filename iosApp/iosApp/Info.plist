@@ -44,6 +44,10 @@
         <string>UIInterfaceOrientationLandscapeLeft</string>
         <string>UIInterfaceOrientationLandscapeRight</string>
     </array>
+    <key>NSBonjourServices</key>
+    <array>
+        <string>_plainapp._tcp</string>
+    </array>
     <key>NSLocalNetworkUsageDescription</key>
     <string>PlainApp needs local network access to discover and communicate with peer devices.</string>
     <key>NSPhotoLibraryUsageDescription</key>
