@@ -7,6 +7,10 @@ on:
         description: Build and verify APKs without uploading to R2, scanning, drafting a release, or publishing to Play
         type: boolean
         default: false
+      draft_only:
+        description: Create a GitHub draft without uploading to Play or R2
+        type: boolean
+        default: false
 
 permissions:
   contents: read   # jobs that need more declare it at job level
@@ -27,7 +31,7 @@ jobs:
   # internal track. The AAB is Play-Store-only: it never becomes a GitHub
   # release asset. Runs in parallel with the apk job on a separate runner.
   play:
-    if: ${{ !inputs.verify_only }}
+    if: ${{ !inputs.verify_only && !inputs.draft_only }}
     name: Build AAB and publish to Play Store
     runs-on: ubuntu-latest
     permissions:
@@ -223,7 +227,7 @@ jobs:
 
   r2-upload:
     name: Upload verified installers to Cloudflare R2
-    if: ${{ !inputs.verify_only }}
+    if: ${{ !inputs.verify_only && !inputs.draft_only }}
     needs: apk
     runs-on: ubuntu-latest
     permissions: {}
