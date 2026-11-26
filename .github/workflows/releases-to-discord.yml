@@ -11,51 +11,30 @@ jobs:
   notify-discord:
     runs-on: ubuntu-latest
     steps:
-      - name: Determine Release Info
-        id: release-info
-        # Pass github.event values via env to prevent expression injection
+      - name: Send release announcement
+        shell: bash
         env:
-          GH_RELEASE_NAME: ${{ github.event.release.name }}
-          GH_RELEASE_URL: ${{ github.event.release.html_url }}
-          GH_RELEASE_TIMESTAMP: ${{ github.event.release.published_at }}
-          GH_RELEASE_BODY: ${{ github.event.release.body }}
+          RELEASE_WEBHOOK_URL: ${{ secrets.RELEASE_WEBHOOK_URL }}
         run: |
-          if [ "${{ github.event.release.tag_name != '' }}" = "true" ]; then
-            echo "Using release event payload"
-            echo "RELEASE_NAME=$GH_RELEASE_NAME" >> $GITHUB_ENV
-            echo "RELEASE_URL=$GH_RELEASE_URL" >> $GITHUB_ENV
-            echo "RELEASE_TIMESTAMP=$GH_RELEASE_TIMESTAMP" >> $GITHUB_ENV
-            CLEAN_BODY=$(printf '%s' "$GH_RELEASE_BODY" | tr -d '\r')
-            echo "RELEASE_BODY<<EOF" >> $GITHUB_ENV
-            echo "$CLEAN_BODY" >> $GITHUB_ENV
-            echo "EOF" >> $GITHUB_ENV
+          : "${RELEASE_WEBHOOK_URL:?Configure the RELEASE_WEBHOOK_URL secret}"
+          if [[ "$GITHUB_EVENT_NAME" == release ]]; then
+            release=$(jq -ce '.release' "$GITHUB_EVENT_PATH")
           else
-            echo "Fetching latest release from GitHub API"
-            response=$(curl -s https://api.github.com/repos/${{ github.repository }}/releases/latest)
-            name=$(echo "$response" | jq -r '.name')
-            body=$(echo "$response" | jq -r '.body // "No changelog provided."' | tr -d '\r')
-            url=$(echo "$response" | jq -r '.html_url')
-            timestamp=$(echo "$response" | jq -r '.published_at')
-      
-            echo "RELEASE_NAME=$name" >> $GITHUB_ENV
-            echo "RELEASE_URL=$url" >> $GITHUB_ENV
-            echo "RELEASE_TIMESTAMP=$timestamp" >> $GITHUB_ENV
-            echo "RELEASE_BODY<<EOF" >> $GITHUB_ENV
-            echo "$body" >> $GITHUB_ENV
-            echo "EOF" >> $GITHUB_ENV
+            release=$(curl --fail --silent --show-error --max-time 30 \
+              "https://api.github.com/repos/$GITHUB_REPOSITORY/releases/latest")
           fi
-
-      - name: Send to Discord
-        uses: tsickert/discord-webhook@v7.0.0
-        with:
-          webhook-url: ${{ secrets.RELEASE_WEBHOOK_URL }}
-          username: "Release"
-          avatar-url: "https://cdn.discordapp.com/icons/1109007781337505823/39f69a2c514e3d448db625017213698d.webp?size=160"
-          content: "||@everyone||"
-          embed-title: "📦 New Release: ${{ env.RELEASE_NAME }}"
-          embed-url: "${{ env.RELEASE_URL }}"
-          embed-description: "${{ env.RELEASE_BODY }}"
-          embed-color: 2105893
-          embed-footer-text: "Changelog"
-          embed-footer-icon-url: "https://cdn.discordapp.com/icons/1109007781337505823/39f69a2c514e3d448db625017213698d.webp?size=160"
-          embed-timestamp: "${{ env.RELEASE_TIMESTAMP }}"
+          jq -ce '{
+            username: "Release",
+            avatar_url: "https://cdn.discordapp.com/icons/1109007781337505823/39f69a2c514e3d448db625017213698d.webp?size=160",
+            content: "||@everyone||",
+            allowed_mentions: {parse: ["everyone"]},
+            embeds: [{
+              title: (("📦 New Release: " + (.name // .tag_name))[:256]),
+              url: .html_url,
+              description: ((.body // "No changelog provided." | gsub("\r"; ""))[:4000]),
+              color: 2105893,
+              footer: {text: "Changelog", icon_url: "https://cdn.discordapp.com/icons/1109007781337505823/39f69a2c514e3d448db625017213698d.webp?size=160"},
+              timestamp: .published_at
+            }]
+          }' <<< "$release" |
+            curl --fail --silent --show-error --max-time 30 --proto '=https' --json @- "$RELEASE_WEBHOOK_URL"
