@@ -6,6 +6,8 @@ on:
       version_name:
         value: ${{ jobs.apk.outputs.version_name }}
     secrets:
+      RELEASE_SIGNING_PRIVATE_KEY:
+        required: true
       ANDROID_STORE_PASSWORD:
         required: true
       ANDROID_KEY_PASSWORD:
@@ -110,6 +112,34 @@ jobs:
             exit 1
           fi
 
+      - name: Sign release manifest
+        shell: bash
+        env:
+          LC_ALL: C
+          SIGNING_KEY: ${{ secrets.RELEASE_SIGNING_PRIVATE_KEY }}
+          PUBLIC_KEY: ${{ vars.RELEASE_SIGNING_PUBLIC_KEY }}
+          VERSION: ${{ needs.apk.outputs.version_name }}
+        run: |
+          : "${SIGNING_KEY:?Configure RELEASE_SIGNING_PRIVATE_KEY}"
+          : "${PUBLIC_KEY:?Configure RELEASE_SIGNING_PUBLIC_KEY}"
+          [[ "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]
+          key=$(mktemp)
+          trap 'rm -f "$key"' EXIT
+          printf '%s\n' "$SIGNING_KEY" > "$key"
+          public=$(openssl pkey -in "$key" -pubout -outform DER | openssl base64 -A)
+          test "$public" = "$PUBLIC_KEY"
+          test "$(printf '%s' "$public" | openssl base64 -d -A | od -An -tx1 -N12 | tr -d ' \n')" = 302a300506032b6570032100
+          (
+            cd release-artifacts
+            files=(PlainApp-"$VERSION"-64bit-Recommended.apk PlainApp-"$VERSION"-Old-32bit.apk)
+            printf 'version %s\nrepository %s\n' "$VERSION" "$GITHUB_REPOSITORY"
+            sha256sum -- "${files[@]}"
+          ) > release-manifest.txt
+          openssl pkeyutl -sign -inkey "$key" -rawin -in release-manifest.txt -out release-manifest.sig
+          test "$(wc -c < release-manifest.sig)" -eq 64
+          openssl pkeyutl -verify -pubin -inkey <(openssl pkey -in "$key" -pubout) -rawin \
+            -in release-manifest.txt -sigfile release-manifest.sig
+
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: release-artifacts
@@ -120,6 +150,9 @@ jobs:
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: release-provenance
-          path: release-provenance.jsonl
+          path: |
+            release-provenance.jsonl
+            release-manifest.txt
+            release-manifest.sig
           if-no-files-found: error
           retention-days: 30

@@ -23,6 +23,7 @@ jobs:
       id-token: write
       attestations: write
     secrets:
+      RELEASE_SIGNING_PRIVATE_KEY: ${{ secrets.RELEASE_SIGNING_PRIVATE_KEY }}
       ANDROID_STORE_PASSWORD: ${{ secrets.ANDROID_STORE_PASSWORD }}
       ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
       KEYSTORE_B64: ${{ secrets.KEYSTORE_B64 }}
@@ -126,7 +127,7 @@ jobs:
           gh release create "$tag" --repo "$GITHUB_REPOSITORY" --draft --target "$GITHUB_SHA" \
             --title "Release $VERSION" --notes-file release-notes.md -- \
             "PlainApp-$VERSION-64bit-Recommended.apk" "PlainApp-$VERSION-Old-32bit.apk" \
-            release-provenance.jsonl mapping-github-release.txt
+            release-provenance.jsonl release-manifest.txt release-manifest.sig mapping-github-release.txt
 
   # Scans both release APKs concurrently and appends the VirusTotal table to
   # the release body once done. The AAB is not scanned: it is only
@@ -236,6 +237,10 @@ jobs:
         with:
           name: release-artifacts
 
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          name: release-provenance
+
       - name: Upload verified installers to R2
         shell: bash
         env:
@@ -253,3 +258,6 @@ jobs:
           : "${R2_BUCKET:?Configure R2_BUCKET}"
           dest="s3://$R2_BUCKET/${R2_PREFIX:+${R2_PREFIX%/}/}"
           aws s3 cp "PlainApp-$VERSION-64bit-Recommended.apk" "$dest" --cache-control "public, max-age=31536000, immutable"
+          for file in release-manifest.txt release-manifest.sig; do
+            aws s3 cp "$file" "${dest}v$VERSION/" --cache-control "public, max-age=31536000, immutable"
+          done
