@@ -47,7 +47,6 @@ fun UpdateBanner(updateVM: UpdateViewModel) {
     val downloadProgress = updateVM.downloadProgress.intValue
     val downloadFailed = updateVM.downloadFailed.value
     val isDownloadComplete = updateVM.isDownloadComplete.value
-    val downloadedFilePath = updateVM.downloadedFilePath.value
 
     val needsUpdate = Prefs.appUpdateAvailable.collectAsStateValue()
 
@@ -66,7 +65,7 @@ fun UpdateBanner(updateVM: UpdateViewModel) {
         isDownloadComplete -> {
             DownloadCompleteBanner(
                 onInstall = {
-                    MainViewModel.installAppUpdate(downloadedFilePath)
+                    AppUpdateDownloads.install(MainViewModel.installAppUpdate)
                 },
                 onDismiss = {
                     AppUpdateDownloads.cancel()

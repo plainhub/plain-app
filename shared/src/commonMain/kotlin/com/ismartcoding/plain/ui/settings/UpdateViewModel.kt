@@ -14,7 +14,6 @@ class UpdateViewModel : ViewModel() {
     val downloadProgress = mutableIntStateOf(0)
     val downloadFailed = mutableStateOf(false)
     val isDownloadComplete = mutableStateOf(false)
-    val downloadedFilePath = mutableStateOf("")
 
     init {
         viewModelScope.launch {
@@ -23,7 +22,6 @@ class UpdateViewModel : ViewModel() {
                 downloadProgress.intValue = snapshot.progress
                 downloadFailed.value = snapshot.status == AppUpdateDownloadStatus.FAILED
                 isDownloadComplete.value = snapshot.status == AppUpdateDownloadStatus.COMPLETED
-                downloadedFilePath.value = snapshot.filePath
             }
         }
     }
