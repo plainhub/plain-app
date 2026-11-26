@@ -1,0 +1,125 @@
+name: Build and attest release installers
+
+on:
+  workflow_call:
+    outputs:
+      version_name:
+        value: ${{ jobs.apk.outputs.version_name }}
+    secrets:
+      ANDROID_STORE_PASSWORD:
+        required: true
+      ANDROID_KEY_PASSWORD:
+        required: true
+      KEYSTORE_B64:
+        required: true
+
+jobs:
+  apk:
+    name: Build APKs (GitHub release)
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    env:
+      ANDROID_STORE_PASSWORD: ${{ secrets.ANDROID_STORE_PASSWORD }}
+      ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+    outputs:
+      version_name: ${{ steps.meta.outputs.version_name }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Set version name
+        id: meta
+        run: |
+          VER=$(grep versionName ./app/build.gradle.kts | awk -F '"' '{print $2}')
+          echo "version_name=$VER" >> $GITHUB_OUTPUT
+
+      - uses: actions/setup-java@cf277c60eb25467037889841efdb72551f06f6c3 # v4
+        with:
+          distribution: 'zulu'
+          java-version: '17'
+
+      - run: chmod +x ./gradlew
+
+      - name: Restore keystore
+        run: echo "${{ secrets.KEYSTORE_B64 }}" | base64 --decode > ./app/release.jks
+
+      - name: Build APKs (arm64-v8a + armeabi-v7a)
+        run: bash build-apk.sh
+
+      - name: Save mapping.txt (githubRelease)
+        run: cp app/build/outputs/mapping/githubRelease/mapping.txt mapping-github-release.txt
+
+      - name: Upload release artifacts
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: built-apks
+          path: |
+            PlainApp-${{ steps.meta.outputs.version_name }}-64bit-Recommended.apk
+            PlainApp-${{ steps.meta.outputs.version_name }}-Old-32bit.apk
+            mapping-github-release.txt
+          if-no-files-found: error
+          retention-days: 30
+
+  provenance:
+    name: Verify release installer provenance
+    needs: apk
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+      attestations: write
+    steps:
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          name: built-apks
+          path: release-artifacts
+
+      - name: Attest release installers
+        id: attest
+        uses: actions/attest@1e69f48acb82d1966a394da916b4c1698aa569d6 # v4.2.2
+        with:
+          subject-path: |
+            release-artifacts/PlainApp-${{ needs.apk.outputs.version_name }}-64bit-Recommended.apk
+            release-artifacts/PlainApp-${{ needs.apk.outputs.version_name }}-Old-32bit.apk
+
+      - name: Verify installers against the build commit
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          BUNDLE: ${{ steps.attest.outputs.bundle-path }}
+          VERSION: ${{ needs.apk.outputs.version_name }}
+        run: |
+          jq -ce '.' "$BUNDLE" > release-provenance.jsonl
+          files=(release-artifacts/PlainApp-"$VERSION"-64bit-Recommended.apk release-artifacts/PlainApp-"$VERSION"-Old-32bit.apk)
+          verification=(
+            --repo "$GITHUB_REPOSITORY"
+            --signer-workflow "$GITHUB_REPOSITORY/.github/workflows/build-apk-release.yml"
+            --source-digest "$GITHUB_SHA"
+            --signer-digest "$GITHUB_SHA"
+            --bundle release-provenance.jsonl
+          )
+          for file in "${files[@]}"; do
+            gh attestation verify "$file" "${verification[@]}"
+          done
+          tampered=$(mktemp)
+          trap 'rm -f "$tampered"' EXIT
+          cp "${files[0]}" "$tampered"
+          printf 'x' >> "$tampered"
+          if gh attestation verify "$tampered" "${verification[@]}"; then
+            echo "Attestation unexpectedly accepted an altered installer." >&2
+            exit 1
+          fi
+
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: release-artifacts
+          path: release-artifacts/*
+          if-no-files-found: error
+          retention-days: 30
+
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: release-provenance
+          path: release-provenance.jsonl
+          if-no-files-found: error
+          retention-days: 30
