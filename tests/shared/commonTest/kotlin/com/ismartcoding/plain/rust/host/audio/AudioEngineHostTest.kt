@@ -1,5 +1,9 @@
 package com.ismartcoding.plain.rust.host.audio
 
+import com.ismartcoding.plain.features.audio.AudioCommands
+import com.ismartcoding.plain.models.AudioCommand
+import com.ismartcoding.plain.rust.graphql.GraphqlClient
+import com.ismartcoding.plain.rust.graphql.GraphqlResponse
 import com.ismartcoding.plain.models.AudioItem
 import com.ismartcoding.plain.lib.JsonHelper
 import com.ismartcoding.plain.platform.media.AudioPlayer
@@ -43,6 +47,57 @@ class AudioEngineHostTest {
     private fun command(newTrack: Boolean): JsonObject = JsonHelper.jsonDecode(
         """{"action":"PLAY","newTrack":$newTrack,"speed":1.5,"playback":{"path":"song","positionMs":1200,"revision":5},"track":{"path":"song","title":"Song","artist":"Artist","durationMs":2000}}""",
     )
+
+    @Test
+    fun playLoadsQueueHeadOrSelectedTrackAndResumesWithoutReloading() = runTest {
+        Dispatchers.setMain(StandardTestDispatcher(testScheduler))
+        val player = Player().apply { currentPath = ""; gate.complete(Unit) }
+        val previous = AudioEngineHost.install(player)
+        var selected: String? = null
+        var selectionRevision = 100L
+        var queueHead: String? = null
+        val api = GraphqlClient { request ->
+            val id = selected
+            val response = when {
+                "selectAudio(" in request.query -> {
+                    val track = request.variables.getValue("mediaId").jsonPrimitive.content
+                    selected = track
+                    AudioEngineHost.stageLocalSelection(AudioSelectionState(track, ++selectionRevision, 0))
+                    """{"selectAudio":{"mediaId":"$track","path":"$track","title":"Fixture","artist":"","durationMs":5000}}"""
+                }
+                "audioQueueItems" in request.query -> {
+                    val item = queueHead?.let { """{"mediaId":"$it"}""" }.orEmpty()
+                    """{"audioQueueItems":[$item]}"""
+                }
+                "audioPlayback" in request.query -> {
+                    val value = id?.let { JsonPrimitive(it).toString() } ?: "null"
+                    """{"audioPlayback":{"path":$value,"mediaId":$value},"prefs":{}}"""
+                }
+                else -> error("Unexpected request")
+            }
+            GraphqlResponse(data = JsonHelper.jsonDecode(response))
+        }
+        suspend fun play() = AudioCommands.commandLocal(AudioCommand.PLAY, 0, 1f, api)
+        try {
+            queueHead = "first"
+            play()
+            assertEquals("first", player.currentPath)
+            selected = "second"
+            play()
+            assertEquals("second", player.currentPath)
+            player.progress = 900
+            play()
+            assertEquals(900L, player.progress)
+            selected = null
+            queueHead = null
+            play()
+            assertEquals(listOf("load", "load", "play"), player.calls)
+        } finally {
+            AudioEngineHost.command(command(true))
+            AudioEngineHost.install(previous)
+            Dispatchers.resetMain()
+        }
+    }
 
     @Test
     fun resume_acknowledges_only_after_seek_speed_and_play_complete() = runTest {

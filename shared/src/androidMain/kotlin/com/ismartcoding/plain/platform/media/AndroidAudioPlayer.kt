@@ -3,6 +3,7 @@ package com.ismartcoding.plain.platform.media
 import android.content.ComponentName
 import android.content.Context
 import androidx.media3.common.PlaybackException
+import androidx.media3.common.util.Util
 import androidx.media3.common.Player
 import androidx.media3.session.MediaController
 import androidx.media3.session.SessionToken
@@ -30,16 +31,8 @@ internal object AndroidAudioPlayer {
         return player?.isPlaying == true
     }
 
-    /**
-     * The flow exposes *playback intent* (playWhenReady), not "audio is coming
-     * out right now": it stays true while the player switches tracks, so play
-     * buttons never flicker during a skip. False only when paused, stopped or
-     * uninitialized. STATE_ENDED keeps playWhenReady true — skipTo pauses the
-     * player explicitly when the queue runs dry.
-     */
     private fun refreshPlayingState() {
-        val p = player ?: return
-        _isPlayingFlow.value = p.playWhenReady && p.playbackState != Player.STATE_IDLE
+        _isPlayingFlow.value = !Util.shouldShowPlayButton(player, false)
     }
 
     private var activeRevision = -1L
@@ -150,7 +143,7 @@ internal object AndroidAudioPlayer {
         doPlay(audio, positionMs, speed, revision)
     }
 
-    suspend fun play() = withContext(Dispatchers.Main) { player?.play(); Unit }
+    suspend fun play() = withContext(Dispatchers.Main) { Util.handlePlayButtonAction(player); Unit }
 
     suspend fun seekTo(positionMs: Long) = withContext(Dispatchers.Main) {
         lastPositionMs = positionMs

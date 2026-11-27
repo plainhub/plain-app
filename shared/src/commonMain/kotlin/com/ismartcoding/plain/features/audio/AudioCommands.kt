@@ -1,5 +1,7 @@
 package com.ismartcoding.plain.features.audio
 
+import com.ismartcoding.plain.graphql.Query
+import com.ismartcoding.plain.rust.graphql.GraphqlClient
 import com.ismartcoding.plain.graphql.Mutation
 import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.models.AudioCommand
@@ -56,13 +58,30 @@ object AudioCommands {
         Unit
     }
 
-    private suspend fun commandLocal(action: AudioCommand, positionMs: Long, speed: Float) {
+    internal suspend fun commandLocal(
+        action: AudioCommand, positionMs: Long, speed: Float, api: GraphqlClient = ContentSource.Local.api,
+    ) {
         val source = ContentSource.Local
         when (action) {
+            AudioCommand.PLAY -> {
+                val current = api.execute(Query.audioPlayback())
+                val path = current.path
+                if (path != null && AudioEngineHost.resumeLocal(path)) return
+                val mediaId = current.mediaId
+                val selected = when {
+                    mediaId != null -> api.execute(Mutation.selectAudio(mediaId))
+                    path != null -> api.execute(Mutation.selectAudioByPath(path))
+                    else -> {
+                        val first = api.execute(Query.audioQueueIds(1)).firstOrNull()?.mediaId ?: return
+                        api.execute(Mutation.selectAudio(first))
+                    }
+                }
+                renderLocal(api, selected)
+            }
             AudioCommand.NEXT, AudioCommand.PREVIOUS -> {
                 val next = source.queue.nextMediaId(source.queue.snapshot(1), action)
                 if (next == null) AudioEngineHost.controlLocal(AudioCommand.PAUSE, 0, 1f)
-                else renderLocal(source, source.queue.select(next, enqueue = false))
+                else renderLocal(source.api, source.queue.select(next, enqueue = false))
             }
             AudioCommand.SET_SPEED -> {
                 require(speed.isFinite() && speed > 0) { "Invalid playback speed" }
@@ -92,14 +111,14 @@ object AudioCommands {
             val mediaId = audio.mediaId
             val selected = if (mediaId.isNullOrEmpty()) source.api.execute(Mutation.selectAudioByPath(audio.path))
             else source.queue.select(mediaId, enqueue = false)
-            renderLocal(source, selected)
+            renderLocal(source.api, selected)
         }
         changed.tryEmit(Unit)
         Unit
     }
 
-    private suspend fun renderLocal(source: ContentSource, selected: AudioItem) {
-        val settings = source.queue.playbackSettings()
+    private suspend fun renderLocal(api: GraphqlClient, selected: AudioItem) {
+        val settings = api.execute(Query.audioPlaybackSettings())
         check(settings.audioPlayback.mediaId == selected.mediaId && settings.audioPlayback.path == selected.path) {
             "Audio selection changed before playback"
         }

@@ -82,6 +82,15 @@ object AudioEngineHost {
         AudioCommands.useLocalSource()
     }
 
+    internal suspend fun resumeLocal(path: String): Boolean = withContext(Dispatchers.Main) {
+        mutex.withLock {
+            val player = engine()
+            if (remoteReport != null || player.currentPath != path) return@withLock false
+            player.play()
+            true
+        }
+    }
+
     internal suspend fun controlLocal(action: AudioCommand, positionMs: Long, speed: Float) = withContext(Dispatchers.Main) {
         require(positionMs >= 0 && speed.isFinite() && speed > 0)
         val progress = mutex.withLock {
