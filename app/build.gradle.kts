@@ -247,7 +247,6 @@ abstract class PackageNativeFiles @Inject constructor(
 val rustPackages = listOf("debug" to "dev", "release" to "release").associate { (buildType, profile) ->
     val suffix = buildType.replaceFirstChar { it.uppercase() }
     val outputProfile = if (profile == "dev") "debug" else profile
-    val runtimeDirectory = layout.buildDirectory.dir("onnxruntime/$buildType")
     val library = rustTargetDir.map { it.file("$rustAndroidTarget/$outputProfile/libplain_rust.so") }
     val buildRust = tasks.register<Exec>("buildPlainRustAndroid$suffix") {
         dependsOn(installRustAndroidTarget)
@@ -257,9 +256,6 @@ val rustPackages = listOf("debug" to "dev", "release" to "release").associate { 
         inputs.property("rustProfile", profile)
         inputs.property("rustTarget", rustAndroidTarget)
         outputs.file(library)
-        outputs.file(runtimeDirectory.map { it.file("libonnxruntime.so") })
-        outputs.file(runtimeDirectory.map { it.file("LICENSE") })
-        outputs.file(runtimeDirectory.map { it.file("ThirdPartyNotices.txt") })
         outputs.upToDateWhen { false }
         webBundleDir?.let {
             inputs.dir(it).withPropertyName("webBundle")
@@ -268,7 +264,6 @@ val rustPackages = listOf("debug" to "dev", "release" to "release").associate { 
         environment("CARGO_TARGET_DIR", rustTargetDir.get().asFile.absolutePath)
         environment("ANDROID_HOME", androidSdk.absolutePath)
         environment("ANDROID_NDK_HOME", androidNdk.absolutePath)
-        environment("PLAIN_ONNX_RUNTIME_DIR", runtimeDirectory.get().asFile.absolutePath)
         environment("CARGO_TARGET_${rustAndroidTarget.uppercase().replace('-', '_')}_LINKER", androidClang.absolutePath)
         environment("CC_${rustAndroidTarget.replace('-', '_')}", androidClang.absolutePath)
         environment("AR_${rustAndroidTarget.replace('-', '_')}", File(ndkHost, "bin/llvm-ar").absolutePath)
@@ -279,27 +274,19 @@ val rustPackages = listOf("debug" to "dev", "release" to "release").associate { 
     }
     val packageRust = tasks.register<PackageNativeFiles>("packagePlainRustAndroid$suffix") {
         dependsOn(buildRust)
-        // PDFium supplies the shared C++ runtime used by ONNX Runtime.
-        nativeFiles.from(library, runtimeDirectory.map { it.file("libonnxruntime.so") })
+        nativeFiles.from(library)
         relativeDirectory.set(rustAbi)
         outputDirectory.set(layout.buildDirectory.dir("generated/rustJniLibs/$buildType"))
     }
-    val packageLicenses = tasks.register<PackageNativeFiles>("packageOnnxRuntimeLicenses$suffix") {
-        dependsOn(buildRust)
-        nativeFiles.from(runtimeDirectory.map { it.file("LICENSE") }, runtimeDirectory.map { it.file("ThirdPartyNotices.txt") })
-        relativeDirectory.set("onnxruntime")
-        outputDirectory.set(layout.buildDirectory.dir("generated/onnxLicenses/$buildType"))
-    }
-    buildType to (packageRust to packageLicenses)
+    buildType to packageRust
 }
 androidComponents.onVariants { variant ->
     val expectedId = if (variant.buildType == "debug") plainApplicationId + plainDebugSuffix else plainApplicationId
     check(variant.applicationId.get() == expectedId) {
         "${variant.name} must use the PlainApp application ID: $expectedId"
     }
-    val (nativePackage, licensePackage) = rustPackages.getValue(requireNotNull(variant.buildType))
+    val nativePackage = rustPackages.getValue(requireNotNull(variant.buildType))
     variant.sources.jniLibs?.addGeneratedSourceDirectory(nativePackage, PackageNativeFiles::outputDirectory)
-    variant.sources.assets?.addGeneratedSourceDirectory(licensePackage, PackageNativeFiles::outputDirectory)
 }
 
 tasks.withType<KotlinCompile>().configureEach {

@@ -59,7 +59,6 @@ kotlin {
     iosTargets.forEach { iosTarget ->
         val rustTarget = if (iosTarget.name == "iosArm64") "aarch64-apple-ios" else "aarch64-apple-ios-sim"
         val rustTargetDir = layout.buildDirectory.dir("rust-target")
-        val onnxRuntimeDir = layout.buildDirectory.dir("onnxruntime/$rustTarget")
         val installRustTarget = tasks.register<Exec>("installPlainRustTarget${iosTarget.name.replaceFirstChar { it.uppercase() }}") {
             commandLine(rustupExe.absolutePath, "target", "add", rustTarget)
         }
@@ -75,7 +74,6 @@ kotlin {
                 environment("PLAIN_WEB_DIST", it.absolutePath)
             }
             environment("CARGO_TARGET_DIR", rustTargetDir.get().asFile.absolutePath)
-            environment("PLAIN_ONNX_RUNTIME_DIR", onnxRuntimeDir.get().asFile.absolutePath)
             // iOS frameworks consume only the static archive.
             commandLine(listOfNotNull(cargoExe.absolutePath, "rustc", "--locked".takeUnless { localCoreOverride }, "--manifest-path", rootProject.file("plain-rs/Cargo.toml"), "--lib", "--crate-type", "staticlib", "--release", "--target", rustTarget))
         }
@@ -87,7 +85,7 @@ kotlin {
             inputs.file(rootProject.file("plain-rs/include/plain_rust.h"))
         }
         iosTarget.binaries.all {
-            linkerOpts("-L${rustTargetDir.get().asFile.absolutePath}/$rustTarget/release", "-lplain_rust", "-L${onnxRuntimeDir.get().asFile.absolutePath}", "-lonnxruntime", "-lc++", "-framework", "Foundation", "-framework", "CoreML", "-framework", "Accelerate")
+            linkerOpts("-L${rustTargetDir.get().asFile.absolutePath}/$rustTarget/release", "-lplain_rust")
         }
         iosTarget.binaries.framework {
             baseName = "PlainShared"
