@@ -68,3 +68,5 @@ mv ./app/build/outputs/apk/github/release/app-github-release.apk ./$ARMV7_BUILD_
 
 assert_apk_abi "$BUILD_FILE" arm64-v8a armeabi-v7a
 assert_apk_abi "$ARMV7_BUILD_FILE" armeabi-v7a arm64-v8a
+bash scripts/tests/check-launcher-shortcuts-apk.sh "$BUILD_FILE" "$ARMV7_BUILD_FILE" ||
+  err_and_exit "Launcher shortcut resources failed verification"
