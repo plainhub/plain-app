@@ -43,18 +43,18 @@ internal fun LegacyDataUpgradePage(navController: NavHostController) {
     val lifecycle = LocalLifecycleOwner.current.lifecycle
     var status by remember { mutableStateOf<LegacyDataUpgradeStatus?>(null) }
     var action by remember { mutableStateOf<LegacyDataUpgradeAction?>(null) }
-    var failure by remember { mutableStateOf(false) }
+    var failure by remember { mutableStateOf<String?>(null) }
     val pending = status == LegacyDataUpgradeStatus.PENDING || status == LegacyDataUpgradeStatus.SKIPPED
 
     LaunchedEffect(lifecycle) {
         lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
             try {
                 status = LegacyDataUpgradeClient.execute(LegacyDataUpgradeAction.STATUS)
-                failure = false
+                failure = null
             } catch (canceled: CancellationException) {
                 throw canceled
-            } catch (_: Exception) {
-                failure = true
+            } catch (error: Exception) {
+                failure = error.message ?: error.toString()
             }
         }
     }
@@ -62,14 +62,14 @@ internal fun LegacyDataUpgradePage(navController: NavHostController) {
     val runAction: (LegacyDataUpgradeAction) -> Unit = { next ->
         if (action == null) {
             action = next
-            failure = false
+            failure = null
             scope.launch {
                 try {
                     status = LegacyDataUpgradeClient.execute(next)
                 } catch (canceled: CancellationException) {
                     throw canceled
-                } catch (_: Exception) {
-                    failure = true
+                } catch (error: Exception) {
+                    failure = error.message ?: error.toString()
                 } finally {
                     action = null
                 }
@@ -103,8 +103,8 @@ internal fun LegacyDataUpgradePage(navController: NavHostController) {
                 description?.let { message ->
                     item { Text(stringResource(message), style = MaterialTheme.typography.bodyLarge) }
                 }
-                if (failure) {
-                    item { Text(stringResource(Res.string.legacy_data_upgrade_error), color = MaterialTheme.colorScheme.error) }
+                failure?.let { reason ->
+                    item { Text("${stringResource(Res.string.legacy_data_upgrade_error)}\n$reason", color = MaterialTheme.colorScheme.error) }
                 }
                 if (pending) {
                     item {

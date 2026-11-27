@@ -26,8 +26,25 @@ import org.jetbrains.compose.resources.stringResource
 @Composable
 internal fun LegacyDataUpgradeDialog(onClose: () -> Unit) {
     val scope = rememberCoroutineScope()
-    var upgrading by remember { mutableStateOf(false) }
-    var failed by remember { mutableStateOf(false) }
+    var action by remember { mutableStateOf<LegacyDataUpgradeAction?>(null) }
+    var failure by remember { mutableStateOf<String?>(null) }
+    fun execute(next: LegacyDataUpgradeAction) {
+        if (action != null) return
+        action = next
+        failure = null
+        scope.launch {
+            try {
+                LegacyDataUpgradeClient.execute(next)
+                onClose()
+            } catch (canceled: CancellationException) {
+                throw canceled
+            } catch (error: Exception) {
+                failure = error.message ?: error.toString()
+            } finally {
+                action = null
+            }
+        }
+    }
     AlertDialog(
         containerColor = MaterialTheme.colorScheme.dialogSheetBackground,
         onDismissRequest = {},
@@ -36,40 +53,24 @@ internal fun LegacyDataUpgradeDialog(onClose: () -> Unit) {
         text = {
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 Text(stringResource(Res.string.legacy_data_upgrade_prompt))
-                if (failed) {
-                    Text(stringResource(Res.string.legacy_data_upgrade_error), color = MaterialTheme.colorScheme.error)
+                failure?.let { reason ->
+                    Text("${stringResource(Res.string.legacy_data_upgrade_error)}\n$reason", color = MaterialTheme.colorScheme.error)
                 }
             }
         },
         confirmButton = {
             PFilledButton(
                 text = stringResource(Res.string.legacy_data_upgrade),
-                isLoading = upgrading,
-                onClick = {
-                    if (!upgrading) {
-                        upgrading = true
-                        failed = false
-                        scope.launch {
-                            try {
-                                LegacyDataUpgradeClient.execute(LegacyDataUpgradeAction.IMPORT)
-                                onClose()
-                            } catch (canceled: CancellationException) {
-                                throw canceled
-                            } catch (_: Exception) {
-                                failed = true
-                            } finally {
-                                upgrading = false
-                            }
-                        }
-                    }
-                },
+                isLoading = action == LegacyDataUpgradeAction.IMPORT,
+                enabled = action == null,
+                onClick = { execute(LegacyDataUpgradeAction.IMPORT) },
             )
         },
         dismissButton = {
             PTextButton(
                 text = stringResource(Res.string.legacy_data_upgrade_skip),
-                onClick = onClose,
-                enabled = !upgrading,
+                onClick = { execute(LegacyDataUpgradeAction.SKIP) },
+                enabled = action == null,
             )
         },
     )

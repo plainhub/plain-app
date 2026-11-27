@@ -28,11 +28,11 @@ object RustRuntime {
     @Volatile private var sharedPreviewPath: String? = null
     val sharedPreviewDir: String get() = checkNotNull(sharedPreviewPath) { "Rust shared preview cache is not initialized" }
 
-    private val legacyUpgradePrompt = MutableStateFlow(false)
-    internal val showLegacyUpgradePrompt = legacyUpgradePrompt.asStateFlow()
+    private val legacyUpgradePrompt = MutableStateFlow<RustStartupResult?>(null)
+    internal val pendingLegacyUpgrade = legacyUpgradePrompt.asStateFlow()
 
     internal fun dismissLegacyUpgradePrompt() {
-        legacyUpgradePrompt.value = false
+        legacyUpgradePrompt.value = null
     }
 
     private var sessionToken: String? = null
@@ -50,7 +50,7 @@ object RustRuntime {
         sharedPreviewPath = result.sharedPreviewDir
         if (!collectorsStarted) {
             Prefs.load()
-            legacyUpgradePrompt.value = result.offerLegacyUpgrade
+            legacyUpgradePrompt.value = result.takeIf { it.offerLegacyUpgrade || it.legacyUpgradeError != null }
             isCoreInitialized = true
             RustHostApiHandler.start(scope)
             RustGraphqlSubscriptions.start(scope)

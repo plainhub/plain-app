@@ -39,6 +39,7 @@ import com.ismartcoding.plain.ui.theme.backgroundNormal
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import com.ismartcoding.plain.rust.RustRuntime
+import com.ismartcoding.plain.ui.components.DialogHelper
 import com.ismartcoding.plain.ui.settings.LegacyDataUpgradeDialog
 
 @Composable
@@ -83,14 +84,21 @@ fun Main(
         scope.launch(Dispatchers.Default) { pomodoroVM.loadAsync() }
     }
 
-    val showLegacyUpgradePrompt by RustRuntime.showLegacyUpgradePrompt.collectAsState()
+    val pendingLegacyUpgrade by RustRuntime.pendingLegacyUpgrade.collectAsState()
     LaunchedEffect(navController) {
-        if (!showLegacyUpgradePrompt && !Prefs.onboardingCompleted.value) {
+        if (pendingLegacyUpgrade == null && !Prefs.onboardingCompleted.value) {
             navController.navigate(Routing.Onboarding) { launchSingleTop = true }
         }
     }
-    if (showLegacyUpgradePrompt) {
-        LegacyDataUpgradeDialog(onClose = RustRuntime::dismissLegacyUpgradePrompt)
+    pendingLegacyUpgrade?.let { upgrade ->
+        val error = upgrade.legacyUpgradeError
+        if (error == null) {
+            LegacyDataUpgradeDialog(onClose = RustRuntime::dismissLegacyUpgradePrompt)
+        } else {
+            LaunchedEffect(error) {
+                DialogHelper.showErrorDialog(error, RustRuntime::dismissLegacyUpgradePrompt)
+            }
+        }
     }
 
     SideEffect {

@@ -13,13 +13,14 @@ fn execute(action: &str) -> Result<Status, String> {
     };
     match action {
         "STATUS" => storage.status(&runtime.db, &directory),
+        "SKIP" => storage.skip(&runtime.db, &directory),
         "IMPORT" => storage.import(&runtime.db, &runtime.prefs, &directory),
         "CLEAR" => storage.clear(&runtime.db, &directory),
         _ => return Err("Invalid legacy data upgrade action".into()),
     }
     .map_err(|error| {
         log::write_log(Level::Error, &format!("Legacy data upgrade failed: {error:#}"));
-        error.to_string()
+        format!("{error:#}")
     })
 }
 

@@ -18,8 +18,10 @@ pub(crate) fn start(data_dir: &str, token: &str, config: &str) -> Result<String,
     let paths = plain_rs::infrastructure::data_paths::DataPaths::new(directory);
     #[cfg(target_os = "android")]
     let mut offer_legacy_upgrade = false;
+    #[cfg(target_os = "android")]
+    let mut legacy_upgrade_error = None;
     #[cfg(not(target_os = "android"))]
-    let offer_legacy_upgrade = false;
+    let (offer_legacy_upgrade, legacy_upgrade_error) = (false, None::<String>);
     if let Some(core) = guard.as_ref() {
         if core.server.data_directory() != directory
             || core.token != token
@@ -40,12 +42,8 @@ pub(crate) fn start(data_dir: &str, token: &str, config: &str) -> Result<String,
         #[cfg(target_os = "android")]
         if let Some(storage) = &config.legacy_storage {
             storage.validate().map_err(|error| error.to_string())?;
-            match storage.prepare_identity(&prefs) {
-                Ok(renamed) => offer_legacy_upgrade = renamed,
-                Err(error) => log::write_log(
-                    Level::Error,
-                    &format!("Legacy identity import failed: {error:#}"),
-                ),
+            if let Err(error) = storage.prepare_identity(&prefs) {
+                legacy_upgrade_error = Some(format!("Legacy identity import failed: {error:#}"));
             }
         }
         let runtime = tokio::runtime::Builder::new_multi_thread()
@@ -56,6 +54,14 @@ pub(crate) fn start(data_dir: &str, token: &str, config: &str) -> Result<String,
         let mut server = runtime.block_on(async {
             ContentServer::start_core_with_config(directory, token, prefs, config)
         })?;
+        #[cfg(target_os = "android")]
+        if legacy_upgrade_error.is_none() && let Some(storage) = &server.runtime().host.startup().legacy_storage {
+            use plain_rs::features::legacy_upgrade::Status;
+            match storage.status(&server.runtime().db, directory) {
+                Ok(status) => offer_legacy_upgrade = status == Status::Pending,
+                Err(error) => legacy_upgrade_error = Some(format!("Legacy upgrade status failed: {error:#}")),
+            }
+        }
         match runtime.block_on(server.start_configured_public()) {
             Ok((http, _)) => server.port = http,
             Err(error) => log::write_log(
@@ -70,10 +76,13 @@ pub(crate) fn start(data_dir: &str, token: &str, config: &str) -> Result<String,
             runtime,
         });
     }
+    if let Some(error) = &legacy_upgrade_error {
+        log::write_log(Level::Error, error);
+    }
     let core = guard.as_ref().unwrap();
     Ok(plain_libs::serde_json::json!({
         "logFile":core.server.log_file()?,
         "sharedPreviewDir":core.server.cache_paths().shared_previews(),
-        "offerLegacyUpgrade":offer_legacy_upgrade})
+        "offerLegacyUpgrade":offer_legacy_upgrade,"legacyUpgradeError":legacy_upgrade_error})
     .to_string())
 }
