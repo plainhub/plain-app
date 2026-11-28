@@ -25,25 +25,30 @@ internal enum class ShizukuStep(val hint: StringResource, val action: StringReso
     Ready(Res.string.shizuku_ready, Res.string.done)
 }
 
-private fun currentStep(): ShizukuStep = when {
-    ShizukuHelper.isGranted() -> ShizukuStep.Ready
-    appContext.packageManager.getLaunchIntentForPackage(SHIZUKU_PACKAGE) == null -> ShizukuStep.Install
-    !ShizukuHelper.isAvailable() -> ShizukuStep.Start
-    Shizuku.shouldShowRequestPermissionRationale() -> ShizukuStep.Manage
+internal fun currentShizukuStep(
+    granted: () -> Boolean = ShizukuHelper::isGranted,
+    installed: () -> Boolean = { appContext.packageManager.getLaunchIntentForPackage(SHIZUKU_PACKAGE) != null },
+    running: () -> Boolean = ShizukuHelper::isAvailable,
+    needsManager: () -> Boolean = Shizuku::shouldShowRequestPermissionRationale,
+): ShizukuStep = when {
+    granted() -> ShizukuStep.Ready
+    !installed() -> ShizukuStep.Install
+    !running() -> ShizukuStep.Start
+    needsManager() -> ShizukuStep.Manage
     else -> ShizukuStep.Authorize
 }
 
 @Composable
 internal fun rememberShizukuStep(): ShizukuStep {
-    var step by remember { mutableStateOf(currentStep()) }
+    var step by remember { mutableStateOf(currentShizukuStep()) }
     LifecycleResumeEffect(Unit) {
-        val result = Shizuku.OnRequestPermissionResultListener { _, _ -> step = currentStep() }
-        val received = Shizuku.OnBinderReceivedListener { step = currentStep() }
-        val died = Shizuku.OnBinderDeadListener { step = currentStep() }
+        val result = Shizuku.OnRequestPermissionResultListener { _, _ -> step = currentShizukuStep() }
+        val received = Shizuku.OnBinderReceivedListener { step = currentShizukuStep() }
+        val died = Shizuku.OnBinderDeadListener { step = currentShizukuStep() }
         Shizuku.addRequestPermissionResultListener(result)
         Shizuku.addBinderReceivedListener(received)
         Shizuku.addBinderDeadListener(died)
-        step = currentStep()
+        step = currentShizukuStep()
         onPauseOrDispose {
             Shizuku.removeRequestPermissionResultListener(result)
             Shizuku.removeBinderReceivedListener(received)
