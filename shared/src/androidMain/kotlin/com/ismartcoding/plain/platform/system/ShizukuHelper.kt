@@ -1,7 +1,5 @@
 package com.ismartcoding.plain.platform.system
 
-import com.ismartcoding.plain.platform.permissions.isGranted
-
 import android.content.pm.PackageManager
 import android.os.ParcelFileDescriptor
 import moe.shizuku.server.IShizukuService
@@ -27,17 +25,7 @@ object ShizukuHelper {
                 false
             }
 
-    /**
-     * Fire-and-forget permission request. The system dialog is shown by the
-     * Shizuku app; the caller should poll [isGranted] afterwards.
-     */
-    fun requestPermission() {
-        if (!isAvailable() || isGranted()) return
-        try {
-            Shizuku.requestPermission(REQUEST_CODE)
-        } catch (_: Throwable) {
-        }
-    }
+    fun requestPermission() = Shizuku.requestPermission(REQUEST_CODE)
 
     /**
      * Run a shell command as the shell uid via Shizuku.

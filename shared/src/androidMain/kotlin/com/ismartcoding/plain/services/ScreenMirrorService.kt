@@ -18,6 +18,7 @@ import com.ismartcoding.plain.app.AppIntents
 import com.ismartcoding.plain.ui.platform.notifications.NotificationHelper
 import com.ismartcoding.plain.mediaProjectionManager
 import com.ismartcoding.plain.services.screenmirror.ScreenMirrorOrientationState
+import com.ismartcoding.plain.services.screenmirror.ShizukuMirrorConnection
 import com.ismartcoding.plain.services.screenmirror.ScreenMirrorPipeline
 import com.ismartcoding.plain.Prefs
 import kotlinx.coroutines.CancellationException
@@ -27,6 +28,8 @@ class ScreenMirrorService : LifecycleService() {
 
     private lateinit var orientationState: ScreenMirrorOrientationState
     private var notificationId: Int = 0
+
+    internal val shizukuInput = ShizukuMirrorConnection()
 
     private var pipeline: ScreenMirrorPipeline? = null
 
@@ -152,6 +155,11 @@ class ScreenMirrorService : LifecycleService() {
     override fun onDestroy() {
         super.onDestroy()
         running = false
+        try {
+            shizukuInput.close()
+        } catch (error: RuntimeException) {
+            LogCat.e("Could not detach the Shizuku input service", error)
+        }
         pipeline?.stop()
         pipeline = null
         instance = null

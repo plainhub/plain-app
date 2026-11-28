@@ -38,6 +38,9 @@ import com.ismartcoding.plain.ui.state.launchSafe
 import com.ismartcoding.plain.ui.theme.PlainTheme
 import org.jetbrains.compose.resources.stringResource
 
+@Composable
+internal expect fun ShizukuAccessSettings()
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DesktopAccessSettingsPage(
@@ -106,6 +109,7 @@ fun DesktopAccessSettingsPage(
                 VerticalSpace(dp = 16.dp)
                 PCard(modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN)) {
                     if (Capability.ADB in getDeviceCapabilities()) {
+                        ShizukuAccessSettings()
                         PListItem(
                             modifier = Modifier.clickable { navController.navigate(Routing.WebDev) },
                             title = stringResource(Res.string.adb_automation), showMore = true,

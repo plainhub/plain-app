@@ -161,4 +161,7 @@
     <string name="disable_password_login">關閉密碼登入</string>
     <string name="disable_password_login_description">新的登入將不再要求密碼。已儲存的密碼和登入確認設定將保留。</string>
     <string name="api_token_save_once">請立即複製並妥善儲存 Token，離開此頁面後將不再顯示。</string>
+    <string name="adb_wireless_shizuku">ADB 無線偵錯（Shizuku）</string>
+    <string name="start_shizuku">請先在此裝置上啟動 Shizuku，然後授權。</string>
+    <string name="manage_shizuku">請在 Shizuku 中撤銷 PlainApp 的授權。</string>
 </resources>

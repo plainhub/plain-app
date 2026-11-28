@@ -10,8 +10,7 @@ import com.ismartcoding.plain.requestScreenMirrorAudio
 import com.ismartcoding.plain.lib.JsonHelper
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import com.ismartcoding.plain.platform.media.ScreenMirrorControlsFacts
-import com.ismartcoding.plain.platform.media.dispatchScreenMirrorControl
+import com.ismartcoding.plain.platform.media.dispatchScreenMirrorControls
 import com.ismartcoding.plain.platform.media.getScreenMirrorVideoCodec
 import com.ismartcoding.plain.platform.media.isScreenMirrorControlEnabled
 import com.ismartcoding.plain.platform.media.isScreenMirrorRunning
@@ -33,7 +32,7 @@ internal object SystemScreenMirrorHost {
             hostResult(true)
         }
         "systemScreenMirrorControls" -> {
-            JsonHelper.jsonDecodeFromElement<ScreenMirrorControlsFacts>(params).inputs.forEach { dispatchScreenMirrorControl(it) }
+            dispatchScreenMirrorControls(params)
             hostResult()
         }
         "systemScreenMirrorResetTouch" -> {
