@@ -21,3 +21,5 @@ mod subscriptions;
 mod http_crypto;
 
 mod host_reports;
+#[cfg(target_os = "android")]
+mod web_accessory;

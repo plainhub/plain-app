@@ -142,6 +142,7 @@ class MainActivity : AppCompatActivity() {
             registerReceiver(networkStateReceiver, IntentFilter(WifiManager.NETWORK_STATE_CHANGED_ACTION))
         }
         installComposeUi()
+        openWebAccessory(intent)
     }
 
     override fun onResume() {
@@ -162,7 +163,9 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onNewIntent(intent: Intent) {
-        super.onNewIntent(intent); handleIntent(intent)
+        super.onNewIntent(intent)
+        openWebAccessory(intent)
+        handleIntent(intent)
     }
 
     fun openNew() {

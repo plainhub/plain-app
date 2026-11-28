@@ -3,6 +3,7 @@ package com.ismartcoding.plain.rust.native
 internal actual object RustNativeBindings {
     init { System.loadLibrary("plain_rust") }
 
+    external fun serveWebAccessory(fd: Int)
     actual external fun fileIcon(extension: String): String
     actual external fun startCore(dataDir: String, token: String, configJson: String): String
     external fun legacyDataUpgrade(action: String): String
