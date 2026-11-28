@@ -10,19 +10,18 @@ import com.ismartcoding.plain.i18n.*
 import com.ismartcoding.plain.platform.system.ShizukuHelper
 import com.ismartcoding.plain.ui.base.PListItem
 import com.ismartcoding.plain.ui.components.DialogHelper
-import com.ismartcoding.plain.ui.components.PSwitch
 import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.stringResource
 import rikka.shizuku.Shizuku
 
 private const val SHIZUKU_PACKAGE = "moe.shizuku.privileged.api"
 
-internal enum class ShizukuStep(val hint: StringResource, val action: StringResource) {
-    Install(Res.string.install_shizuku_hint, Res.string.download_shizuku),
-    Start(Res.string.start_shizuku_hint, Res.string.open_shizuku),
-    Authorize(Res.string.authorize_shizuku_hint, Res.string.authorize_plainapp),
-    Manage(Res.string.authorize_in_manager_hint, Res.string.open_shizuku),
-    Ready(Res.string.shizuku_ready, Res.string.done)
+internal enum class ShizukuStep(val title: StringResource, val hint: StringResource, val action: StringResource) {
+    Install(Res.string.shizuku_install_title, Res.string.install_shizuku_hint, Res.string.download_shizuku),
+    Start(Res.string.shizuku_start_title, Res.string.start_shizuku_hint, Res.string.open_shizuku),
+    Authorize(Res.string.authorize_plainapp, Res.string.authorize_shizuku_hint, Res.string.authorize_plainapp),
+    Manage(Res.string.shizuku_manage_title, Res.string.authorize_in_manager_hint, Res.string.open_shizuku),
+    Ready(Res.string.shizuku_enabled, Res.string.shizuku_ready, Res.string.shizuku_manage_action)
 }
 
 internal fun currentShizukuStep(
@@ -61,14 +60,16 @@ internal fun rememberShizukuStep(): ShizukuStep {
 internal fun openShizuku() {
     val intent = appContext.packageManager.getLaunchIntentForPackage(SHIZUKU_PACKAGE)
     if (intent != null) appContext.startActivity(intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
-    else DialogHelper.showMessage(Res.string.manage_shizuku)
+    else DialogHelper.showMessage(Res.string.install_shizuku_hint)
 }
 
 @Composable
 internal actual fun ShizukuAccessSettings(onSetup: () -> Unit) {
     val granted = rememberShizukuStep() == ShizukuStep.Ready
-    val toggle = { if (granted) openShizuku() else onSetup() }
-    PListItem(title = stringResource(Res.string.adb_wireless_shizuku), modifier = Modifier.clickable { toggle() }) {
-        PSwitch(checked = granted, onCheckedChange = { toggle() })
-    }
+    PListItem(
+        modifier = Modifier.clickable(onClick = onSetup),
+        title = stringResource(Res.string.adb_wireless_shizuku),
+        subtitle = stringResource(if (granted) Res.string.shizuku_enabled else Res.string.shizuku_disabled),
+        showMore = true,
+    )
 }
