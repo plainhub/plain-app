@@ -27,15 +27,10 @@ object ShizukuHelper {
 
     fun requestPermission() = Shizuku.requestPermission(REQUEST_CODE)
 
-    /**
-     * Run a shell command as the shell uid via Shizuku.
-     * The shell uid already carries the WRITE_SMS appop, so Telephony
-     * provider deletes are permitted without any extra appops setup.
-     */
-    fun exec(command: String): String {
+    fun exec(vararg command: String): String {
         val service = IShizukuService.Stub.asInterface(Shizuku.getBinder())
             ?: throw IllegalStateException("Shizuku service binder is not available")
-        val process = service.newProcess(arrayOf("sh", "-c", command), null, null)
+        val process = service.newProcess(command, null, null)
         // RemoteProcess streams must be read on separate threads: reading
         // stdout to EOF before touching stderr can deadlock when both
         // pipe buffers fill up.

@@ -32,6 +32,10 @@ import kotlinx.coroutines.currentCoroutineContext
 
 suspend fun deleteSmsRows(ids: List<String>): SmsDeletionReceipt = withIO {
     check(ShizukuHelper.isGranted()) { "Shizuku is not available or not granted" }
+    // Android assigns each user a range of 100,000 Linux UIDs.
+    val userId = android.os.Process.myUid() / 100_000
+    val deleteCommand = appContext.resources.openRawResource(com.ismartcoding.plain.shared.R.raw.delete_sms_row)
+        .bufferedReader().use { it.readText() }
     val deleted = mutableListOf<String>()
     val failed = mutableListOf<String>()
     for (id in ids) {
@@ -45,7 +49,7 @@ suspend fun deleteSmsRows(ids: List<String>): SmsDeletionReceipt = withIO {
         val provider = if (id.startsWith("mms_")) Telephony.Mms.CONTENT_URI else Telephony.Sms.CONTENT_URI
         val uri = ContentUris.withAppendedId(provider, number)
         val removed = try {
-            ShizukuHelper.exec("content delete --uri $uri")
+            ShizukuHelper.exec("sh", "-c", deleteCommand, "delete-sms", uri.toString(), userId.toString())
             appContext.contentResolver.query(uri, arrayOf("_id"), null, null, null)?.use { !it.moveToFirst() } == true
         } catch (canceled: CancellationException) {
             throw canceled
