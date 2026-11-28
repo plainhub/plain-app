@@ -6,9 +6,16 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalUriHandler
+import androidx.compose.ui.text.LinkAnnotation
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.TextLinkStyles
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.intl.Locale
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
@@ -20,6 +27,8 @@ import com.ismartcoding.plain.ui.resources.Res as UiRes
 import com.ismartcoding.plain.ui.resources.cast
 import com.ismartcoding.plain.ui.resources.message_circle
 import com.ismartcoding.plain.ui.theme.PlainTheme
+import com.ismartcoding.plain.ui.theme.listItemSubtitle
+import com.ismartcoding.plain.ui.theme.listItemTitle
 import org.jetbrains.compose.resources.stringResource
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -40,7 +49,14 @@ internal fun ShizukuSetupPage(navController: NavHostController) {
             VerticalSpace(24.dp)
             if (step.action != null) PSectionTitle(stringResource(Res.string.shizuku_setup_heading))
             PCard(modifier = margin) {
-                PListItem(title = stringResource(step.title), subtitle = stringResource(step.hint))
+                if (step == ShizukuStep.Ready) {
+                    PListItem(
+                        title = { Text(stringResource(step.title), style = MaterialTheme.typography.listItemTitle()) },
+                        subtitle = { ShizukuAccessHint(stringResource(step.hint)) },
+                    )
+                } else {
+                    PListItem(title = stringResource(step.title), subtitle = stringResource(step.hint))
+                }
                 if (step.action != null) PFilledButton(text = stringResource(step.action), modifier = Modifier.fillMaxWidth().padding(start = 16.dp, end = 16.dp, bottom = 16.dp), onClick = {
                     try {
                         when (step) {
@@ -57,4 +73,21 @@ internal fun ShizukuSetupPage(navController: NavHostController) {
             }
         }
     }
+}
+
+@Composable
+private fun ShizukuAccessHint(hint: String) {
+    val name = "Shizuku"
+    val link = LinkAnnotation.Clickable(
+        tag = name,
+        styles = TextLinkStyles(SpanStyle(color = MaterialTheme.colorScheme.primary, textDecoration = TextDecoration.Underline)),
+    ) { openShizuku() }
+    Text(
+        text = buildAnnotatedString {
+            append(hint)
+            val start = hint.indexOf(name)
+            if (start >= 0) addLink(link, start, start + name.length)
+        },
+        style = MaterialTheme.typography.listItemSubtitle(),
+    )
 }
