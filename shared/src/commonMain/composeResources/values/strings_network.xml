@@ -163,6 +163,14 @@
     <string name="disable_password_login_description">New logins will not require a password. Your saved password and login confirmation setting will be kept.</string>
     <string name="api_token_save_once">Copy and save this token now. After leaving this page, it will not be shown again.</string>
     <string name="adb_wireless_shizuku">ADB wireless debugging (Shizuku)</string>
-    <string name="start_shizuku">Start Shizuku on this device to allow access.</string>
     <string name="manage_shizuku">Open Shizuku and revoke access for PlainApp.</string>
+    <string name="setup_shizuku">Set up Shizuku</string>
+    <string name="download_shizuku">Download Shizuku</string>
+    <string name="open_shizuku">Open Shizuku</string>
+    <string name="authorize_plainapp">Authorize PlainApp</string>
+    <string name="install_shizuku_hint">Install Shizuku on this phone, then come back here.</string>
+    <string name="start_shizuku_hint">Open Shizuku and follow its instructions. When it says the service is running, come back here.</string>
+    <string name="authorize_shizuku_hint">In the next window, tap Allow to let PlainApp use Shizuku.</string>
+    <string name="authorize_in_manager_hint">Open Shizuku, go to application management and allow PlainApp.</string>
+    <string name="shizuku_ready">Shizuku is ready to use.</string>
 </resources>

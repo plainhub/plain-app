@@ -162,6 +162,14 @@
     <string name="disable_password_login_description">新的登入將不再要求密碼。已儲存的密碼和登入確認設定將保留。</string>
     <string name="api_token_save_once">請立即複製並妥善儲存 Token，離開此頁面後將不再顯示。</string>
     <string name="adb_wireless_shizuku">ADB 無線偵錯（Shizuku）</string>
-    <string name="start_shizuku">請先在此裝置上啟動 Shizuku，然後授權。</string>
     <string name="manage_shizuku">請在 Shizuku 中撤銷 PlainApp 的授權。</string>
+    <string name="setup_shizuku">設定 Shizuku</string>
+    <string name="download_shizuku">下載 Shizuku</string>
+    <string name="open_shizuku">開啟 Shizuku</string>
+    <string name="authorize_plainapp">授權 PlainApp</string>
+    <string name="install_shizuku_hint">先在這支手機上安裝 Shizuku。安裝後，回到這裡繼續。</string>
+    <string name="start_shizuku_hint">開啟 Shizuku，按照裡面的說明啟動。首頁顯示「執行中」後，回到這裡。</string>
+    <string name="authorize_shizuku_hint">接下來會跳出授權視窗。點選「允許」，PlainApp 就能使用 Shizuku。</string>
+    <string name="authorize_in_manager_hint">開啟 Shizuku，進入應用程式管理，允許 PlainApp 使用 Shizuku。</string>
+    <string name="shizuku_ready">Shizuku 已可使用。</string>
 </resources>

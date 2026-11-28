@@ -64,6 +64,9 @@ class Routing {
     object WebDev
 
     @Serializable
+    object ShizukuSetup
+
+    @Serializable
     object ExchangeRate
 
     @Serializable

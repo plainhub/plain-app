@@ -92,10 +92,7 @@
         <intent>
             <action android:name="android.speech.RecognitionService" />
         </intent>
-        <!-- Shizuku (privileged SMS deletion) -->
-        <intent>
-            <action android:name="moe.shizuku.manager.intent.ACTION_START_SERVICE" />
-        </intent>
+        <package android:name="moe.shizuku.privileged.api" />
     </queries>
 
     <attribution
