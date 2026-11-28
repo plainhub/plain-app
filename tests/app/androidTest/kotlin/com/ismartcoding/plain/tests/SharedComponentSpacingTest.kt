@@ -367,9 +367,15 @@ class SharedComponentSpacingTest {
         PAlert("Network permission is needed to find nearby devices.", AlertType.WARNING, Modifier.testTag("with-button")) {
             PAlertTextButton("Fix now", {}, Modifier.testTag("fix-action"))
         }
-        PAlert("No alert action", AlertType.INFO, Modifier.testTag("without-button"))
-        PAlert("No alert action", AlertType.INFO, Modifier.testTag("empty-button"), actions = {}, content = {})
-        PAlert("More details", AlertType.ERROR, Modifier.testTag("with-detail"), content = {
+        PAlert("No alert action", AlertType.INFO, Modifier.testTag("without-button"), trailing = {
+            Box(Modifier.size(24.dp).testTag("plain-header-marker"))
+        })
+        PAlert("No alert action", AlertType.INFO, Modifier.testTag("empty-button"), trailing = {
+            Box(Modifier.size(24.dp))
+        }, actions = {}, content = {})
+        PAlert("More details", AlertType.ERROR, Modifier.testTag("with-detail"), trailing = {
+            Box(Modifier.size(24.dp).testTag("details-header-marker"))
+        }, content = {
             Text("Description", Modifier.testTag("detail-content"))
         })
         PTextButton("Outside alert", {}, Modifier.testTag("regular-action"), buttonSize = ButtonSize.SMALL)
@@ -378,19 +384,24 @@ class SharedComponentSpacingTest {
         val action = tagged("fix-action").touchBoundsInRoot
         val alert = tagged("with-button").boundsInRoot
         val message = text("Network permission is needed to find nearby devices.").boundsInRoot
-        assertEquals(8f, message.top - alert.top, 1f)
+        assertEquals(12f, message.top - alert.top, 1f)
         assertEquals(0f, action.top - message.bottom, 0.5f)
         assertEquals(32f, action.height, 0.5f)
         assertEquals(32f, tagged("fix-action").boundsInRoot.height, 0.5f)
         assertEquals(48f, tagged("regular-action").touchBoundsInRoot.height, 0.5f)
-        assertEquals(4f, alert.bottom - action.bottom, 0.5f)
+        assertEquals(12f, alert.bottom - action.bottom, 0.5f)
         assertEquals(8f, alert.right - action.right, 0.5f)
-        assertEquals(8f, alert.right - message.right, 0.5f)
+        assertEquals(16f, alert.right - message.right, 0.5f)
         assertEquals(8f, action.right - text("Fix now").boundsInRoot.right, 0.5f)
         assertEquals(16f, alert.right - text("Fix now").boundsInRoot.right, 0.5f)
         val plain = tagged("without-button").boundsInRoot
         assertEquals(plain.height, tagged("empty-button").boundsInRoot.height, 0.5f)
-        assertEquals(8f, tagged("with-detail").boundsInRoot.bottom - tagged("detail-content").boundsInRoot.bottom, 0.5f)
+        val plainHeader = tagged("plain-header-marker").boundsInRoot
+        assertEquals(12f, plainHeader.top - plain.top, 0.5f)
+        assertEquals(12f, plain.bottom - plainHeader.bottom, 0.5f)
+        val detail = tagged("detail-content").boundsInRoot
+        assertEquals(8f, detail.top - tagged("details-header-marker").boundsInRoot.bottom, 0.5f)
+        assertEquals(12f, tagged("with-detail").boundsInRoot.bottom - detail.bottom, 0.5f)
     }
 
     @Test
@@ -404,10 +415,11 @@ class SharedComponentSpacingTest {
         await { nodes().any { it.config.getOrNull(SemanticsProperties.TestTag) == "rtl-action" } }
         val alert = tagged("rtl-alert").boundsInRoot
         val action = tagged("rtl-action").touchBoundsInRoot
+        assertEquals(16f, text("Network permission is needed to find nearby devices.").boundsInRoot.left - alert.left, 0.5f)
         assertEquals(8f, action.left - alert.left, 0.5f)
         assertEquals(8f, text("OK").boundsInRoot.left - action.left, 0.5f)
         assertEquals(16f, text("OK").boundsInRoot.left - alert.left, 0.5f)
-        assertEquals(4f, alert.bottom - action.bottom, 0.5f)
+        assertEquals(12f, alert.bottom - action.bottom, 0.5f)
     }
 
     @Test

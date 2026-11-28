@@ -82,9 +82,13 @@ fun PAlert(
         AlertLayout(
             modifier = Modifier
                 .then(if (onClick != null) Modifier.clip(shape).clickable(onClick = onClick) else Modifier)
-                .padding(start = Spacing.lg, end = Spacing.sm),
+                .padding(start = Spacing.lg, top = 12.dp, end = Spacing.sm, bottom = 12.dp),
             header = {
-                Row(verticalAlignment = Alignment.Top, horizontalArrangement = Arrangement.spacedBy(Spacing.sm)) {
+                Row(
+                    modifier = Modifier.padding(end = Spacing.lg - Spacing.sm),
+                    verticalAlignment = Alignment.Top,
+                    horizontalArrangement = Arrangement.spacedBy(Spacing.sm),
+                ) {
                     Icon(
                         painter = painterResource(iconRes),
                         contentDescription = null,
@@ -128,24 +132,21 @@ private fun AlertLayout(
     details: @Composable () -> Unit,
 ) {
     Layout(contents = listOf(header, actions, details), modifier = modifier) { (heading, buttons, body), constraints ->
-        val inset = Spacing.sm.roundToPx()
-        val compact = Spacing.xs.roundToPx()
+        val detailGap = Spacing.sm.roundToPx()
         val loose = constraints.copy(minHeight = 0)
-        val headingPlaceable = heading.single().measure(loose.offset(vertical = -inset - compact))
-        val afterHeading = inset + headingPlaceable.height
-        val buttonPlaceable = buttons.singleOrNull()?.measure(loose.offset(vertical = -afterHeading - compact))
-        val buttonHeight = buttonPlaceable?.height ?: 0
-        val afterButtons = afterHeading + buttonHeight
-        val detailPlaceable = body.singleOrNull()?.measure(loose.offset(vertical = -afterButtons - inset * 2))
-        val hasDetails = (detailPlaceable?.height ?: 0) > 0
-        val detailStart = afterButtons + if (hasDetails) inset else 0
-        val bottom = if (buttonHeight > 0 && !hasDetails) compact else inset
+        val headingPlaceable = heading.single().measure(loose)
+        val afterHeading = headingPlaceable.height
+        val buttonPlaceable = buttons.singleOrNull()?.measure(loose.offset(vertical = -afterHeading))
+        val afterButtons = afterHeading + (buttonPlaceable?.height ?: 0)
+        val detailPlaceable = body.singleOrNull()?.measure(loose.offset(vertical = -afterButtons - detailGap))
+        val detailHeight = detailPlaceable?.height ?: 0
+        val detailStart = afterButtons + if (detailHeight > 0) detailGap else 0
         val width = constraints.constrainWidth(
             maxOf(headingPlaceable.width, buttonPlaceable?.width ?: 0, detailPlaceable?.width ?: 0),
         )
-        val height = constraints.constrainHeight(detailStart + (detailPlaceable?.height ?: 0) + bottom)
+        val height = constraints.constrainHeight(detailStart + detailHeight)
         layout(width, height) {
-            headingPlaceable.placeRelative(0, inset)
+            headingPlaceable.placeRelative(0, 0)
             buttonPlaceable?.placeRelative(0, afterHeading)
             detailPlaceable?.placeRelative(0, detailStart)
         }
