@@ -417,7 +417,7 @@ class SharedComponentSpacingTest {
         assertEquals(32f, action.height, 0.5f)
         assertEquals(32f, tagged("fix-action").boundsInRoot.height, 0.5f)
         assertEquals(48f, tagged("regular-action").touchBoundsInRoot.height, 0.5f)
-        assertEquals(12f, alert.bottom - action.bottom, 0.5f)
+        assertEquals(8f, alert.bottom - action.bottom, 0.5f)
         assertEquals(8f, alert.right - action.right, 0.5f)
         assertEquals(16f, alert.right - message.right, 0.5f)
         assertEquals(8f, action.right - text("Fix now").boundsInRoot.right, 0.5f)
@@ -426,10 +426,10 @@ class SharedComponentSpacingTest {
         assertEquals(plain.height, tagged("empty-button").boundsInRoot.height, 0.5f)
         val plainHeader = tagged("plain-header-marker").boundsInRoot
         assertEquals(12f, plainHeader.top - plain.top, 0.5f)
-        assertEquals(12f, plain.bottom - plainHeader.bottom, 0.5f)
+        assertEquals(8f, plain.bottom - plainHeader.bottom, 0.5f)
         val detail = tagged("detail-content").boundsInRoot
         assertEquals(8f, detail.top - tagged("details-header-marker").boundsInRoot.bottom, 0.5f)
-        assertEquals(12f, tagged("with-detail").boundsInRoot.bottom - detail.bottom, 0.5f)
+        assertEquals(8f, tagged("with-detail").boundsInRoot.bottom - detail.bottom, 0.5f)
     }
 
     @Test
@@ -447,7 +447,7 @@ class SharedComponentSpacingTest {
         assertEquals(8f, action.left - alert.left, 0.5f)
         assertEquals(8f, text("OK").boundsInRoot.left - action.left, 0.5f)
         assertEquals(16f, text("OK").boundsInRoot.left - alert.left, 0.5f)
-        assertEquals(12f, alert.bottom - action.bottom, 0.5f)
+        assertEquals(8f, alert.bottom - action.bottom, 0.5f)
     }
 
     @Test

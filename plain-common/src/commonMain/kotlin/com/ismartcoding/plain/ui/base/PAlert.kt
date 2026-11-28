@@ -82,7 +82,7 @@ fun PAlert(
         AlertLayout(
             modifier = Modifier
                 .then(if (onClick != null) Modifier.clip(shape).clickable(onClick = onClick) else Modifier)
-                .padding(start = Spacing.lg, top = 12.dp, end = Spacing.sm, bottom = 12.dp),
+                .padding(start = Spacing.lg, top = 12.dp, end = Spacing.sm, bottom = 8.dp),
             header = {
                 Row(
                     modifier = Modifier.padding(end = Spacing.lg - Spacing.sm),
