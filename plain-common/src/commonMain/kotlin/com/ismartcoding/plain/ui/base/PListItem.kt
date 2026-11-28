@@ -20,6 +20,7 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
+import com.ismartcoding.plain.ui.theme.Spacing
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.painterResource
 
@@ -37,10 +38,14 @@ fun PListItem(
     titleSuffix: (@Composable () -> Unit)? = null,
     separatedActions: Boolean = false,
     showMore: Boolean = false,
+    verticalPadding: Dp = Spacing.sm,
     action: (@Composable () -> Unit)? = null,
 ) {
     val hasValue = !value.isNullOrEmpty()
-    PListItemRow(modifier, dimmed, if (subtitle.isNotEmpty()) 72.dp else 56.dp, icon, start, contentColor) {
+    PListItemRow(
+        modifier, dimmed, if (subtitle.isNotEmpty()) 72.dp else 56.dp, icon, start, contentColor,
+        verticalPadding = verticalPadding,
+    ) {
         if (hasValue) {
             PListKeyValueContent(title, value.orEmpty(), subtitle, showMore, contentColor)
         } else {
@@ -83,6 +88,7 @@ private fun PListItemRow(
     start: (@Composable RowScope.() -> Unit)?,
     contentColor: Color?,
     statusColor: Color? = null,
+    verticalPadding: Dp = Spacing.sm,
     content: @Composable RowScope.() -> Unit,
 ) {
     val status = if (statusColor == null) Modifier else Modifier.drawBehind {
@@ -99,7 +105,7 @@ private fun PListItemRow(
             .then(status)
             .semantics(mergeDescendants = true) {}
             .heightIn(min = minHeight)
-            .padding(horizontal = 16.dp, vertical = 8.dp),
+            .padding(horizontal = 16.dp, vertical = verticalPadding),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         if (start != null) {

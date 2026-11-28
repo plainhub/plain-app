@@ -4,6 +4,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.ismartcoding.plain.ui.components.PSwitch
 import com.ismartcoding.plain.Prefs
@@ -27,6 +28,7 @@ fun DlnaReceiverSection(navController: NavHostController) {
         title = stringResource(Res.string.dlna_receiver),
         subtitle = stringResource(Res.string.dlna_receiver_desc),
         separatedActions = true,
+        verticalPadding = 12.dp,
     ) {
         PSwitch(checked = dlnaReceiverEnabled, onCheckedChange = { enable ->
             scope.launchSafe { Prefs.set(PrefKeys.DLNA, enable) }

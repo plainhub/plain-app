@@ -50,6 +50,7 @@ import com.ismartcoding.plain.ui.base.AlertType
 import com.ismartcoding.plain.ui.base.PAlert
 import com.ismartcoding.plain.ui.base.PAlertTextButton
 import com.ismartcoding.plain.ui.base.PCard
+import com.ismartcoding.plain.ui.base.PListItem
 import com.ismartcoding.plain.ui.base.PTextButton
 import com.ismartcoding.plain.ui.base.PBottomSheetTopAppBar
 import com.ismartcoding.plain.ui.base.PSheetPrimaryActionsCard
@@ -91,6 +92,8 @@ import com.ismartcoding.plain.features.nearby.PeerStatus
 import com.ismartcoding.plain.i18n.Res
 import com.ismartcoding.plain.i18n.cancel
 import com.ismartcoding.plain.i18n.dark_theme
+import com.ismartcoding.plain.i18n.dlna_receiver
+import com.ismartcoding.plain.i18n.dlna_receiver_desc
 import com.ismartcoding.plain.i18n.donation_title
 import com.ismartcoding.plain.i18n.images
 import com.ismartcoding.plain.i18n.pair
@@ -106,6 +109,7 @@ import com.ismartcoding.plain.platform.system.AppFeatureType
 import com.ismartcoding.plain.platform.system.DeviceType
 import com.ismartcoding.plain.platform.system.has
 import com.ismartcoding.plain.ui.chat.components.NearbyDeviceItem
+import com.ismartcoding.plain.ui.home.DlnaReceiverSection
 import com.ismartcoding.plain.ui.home.PlainAppServiceSection
 import com.ismartcoding.plain.ui.i18n.LocaleHelper
 import com.ismartcoding.plain.ui.nearby.NearbyViewModel
@@ -360,6 +364,30 @@ class SharedComponentSpacingTest {
             node.config.getOrNull(SemanticsProperties.Text)?.any { it.text == "fixture.pdf" } == true
         })
         assertEquals(8f, height("mixed") - height("image") - height("file") + height("text"), 0.5f)
+    }
+
+    @Test
+    fun dlnaReceiverCardHas12DpVerticalPaddingWithoutChangingRegularListItems() = render({
+        PCard(Modifier.width(220.dp).testTag("dlna-card")) {
+            DlnaReceiverSection(rememberNavController())
+        }
+        PListItem(
+            modifier = Modifier.width(220.dp).testTag("regular-list-item"),
+            title = "Regular item",
+            subtitle = "A long subtitle that wraps across several lines in this narrow row.",
+            separatedActions = true,
+            action = { Box(Modifier.size(52.dp, 32.dp)) },
+        )
+    }) {
+        val dlnaTitle = LocaleHelper.getString(Res.string.dlna_receiver)
+        val dlnaSubtitle = LocaleHelper.getString(Res.string.dlna_receiver_desc)
+        await { nodes().any { it.config.getOrNull(SemanticsProperties.Text)?.any { label -> label.text == dlnaSubtitle } == true } }
+        val regular = tagged("regular-list-item").boundsInRoot
+        assertEquals(8f, text("Regular item").boundsInRoot.top - regular.top, 0.5f)
+        assertEquals(8f, regular.bottom - text("A long subtitle that wraps across several lines in this narrow row.").boundsInRoot.bottom, 0.5f)
+        val card = tagged("dlna-card").boundsInRoot
+        assertEquals(12f, text(dlnaTitle).boundsInRoot.top - card.top, 0.5f)
+        assertEquals(12f, card.bottom - text(dlnaSubtitle).boundsInRoot.bottom, 0.5f)
     }
 
     @Test
