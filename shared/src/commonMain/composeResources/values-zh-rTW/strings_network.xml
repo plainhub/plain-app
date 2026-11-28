@@ -181,5 +181,4 @@
     <string name="shizuku_install_title">安裝 Shizuku</string>
     <string name="shizuku_start_title">啟動 Shizuku</string>
     <string name="shizuku_manage_title">在 Shizuku 裡允許 PlainApp</string>
-    <string name="shizuku_manage_action">管理授權</string>
 </resources>

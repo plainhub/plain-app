@@ -3,6 +3,7 @@ package com.ismartcoding.plain.tests
 import com.ismartcoding.plain.ui.web.ShizukuStep
 import com.ismartcoding.plain.ui.web.currentShizukuStep
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNull
 import org.junit.Test
 
 class ShizukuSetupTest {
@@ -25,6 +26,8 @@ class ShizukuSetupTest {
     }
 
     @Test fun grantCompletesSetup() {
-        assertEquals(ShizukuStep.Ready, currentShizukuStep({ true }, unexpected, unexpected, unexpected))
+        val step = currentShizukuStep({ true }, unexpected, unexpected, unexpected)
+        assertEquals(ShizukuStep.Ready, step)
+        assertNull(step.action)
     }
 }

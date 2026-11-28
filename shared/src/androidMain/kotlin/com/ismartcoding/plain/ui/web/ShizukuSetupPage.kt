@@ -38,16 +38,17 @@ internal fun ShizukuSetupPage(navController: NavHostController) {
                 PListItem(title = stringResource(Res.string.shizuku_sms_title), subtitle = stringResource(Res.string.shizuku_sms_hint), icon = UiRes.drawable.message_circle)
             }
             VerticalSpace(24.dp)
-            PSectionTitle(stringResource(if (step == ShizukuStep.Ready) Res.string.shizuku_manage_action else Res.string.shizuku_setup_heading))
+            if (step.action != null) PSectionTitle(stringResource(Res.string.shizuku_setup_heading))
             PCard(modifier = margin) {
                 PListItem(title = stringResource(step.title), subtitle = stringResource(step.hint))
-                PFilledButton(text = stringResource(step.action), modifier = Modifier.fillMaxWidth().padding(start = 16.dp, end = 16.dp, bottom = 16.dp), onClick = {
+                if (step.action != null) PFilledButton(text = stringResource(step.action), modifier = Modifier.fillMaxWidth().padding(start = 16.dp, end = 16.dp, bottom = 16.dp), onClick = {
                     try {
                         when (step) {
                             ShizukuStep.Install -> browser.openUri(if (Locale.current.language == "zh")
                                 "https://shizuku.rikka.app/zh-hans/download/" else "https://shizuku.rikka.app/download/")
-                            ShizukuStep.Start, ShizukuStep.Manage, ShizukuStep.Ready -> openShizuku()
+                            ShizukuStep.Start, ShizukuStep.Manage -> openShizuku()
                             ShizukuStep.Authorize -> ShizukuHelper.requestPermission()
+                            ShizukuStep.Ready -> Unit
                         }
                     } catch (error: Exception) {
                         DialogHelper.showMessage(error)

@@ -182,5 +182,4 @@
     <string name="shizuku_install_title">安装 Shizuku</string>
     <string name="shizuku_start_title">启动 Shizuku</string>
     <string name="shizuku_manage_title">在 Shizuku 里允许 PlainApp</string>
-    <string name="shizuku_manage_action">管理授权</string>
 </resources>

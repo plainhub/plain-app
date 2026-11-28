@@ -182,5 +182,4 @@
     <string name="shizuku_install_title">Install Shizuku</string>
     <string name="shizuku_start_title">Start Shizuku</string>
     <string name="shizuku_manage_title">Allow PlainApp in Shizuku</string>
-    <string name="shizuku_manage_action">Manage access</string>
 </resources>
